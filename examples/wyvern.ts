@@ -27,7 +27,7 @@ export default function build() {
       [0, 1.08, 0.25],
       [0, 1.15, 0.55],
     ],
-    { parent: hips, group: "body" },
+    { parent: hips, role: "spine", group: "body" },
   );
   b.sweep(spine, [0.26, 0.3, 0.22], { color: SCALE, group: "body" });
 
@@ -43,6 +43,7 @@ export default function build() {
     {
       parent: spine.joints[1],
       count: 4,
+      role: "neck",
       group: "neck",
     },
   );
@@ -51,13 +52,14 @@ export default function build() {
 
   // Head and jaw.
   const headAt = neck.at(1).p;
-  const head = b.joint("head", { parent: neck.joints[3], at: headAt, dir: [0, -0.15, 1], group: "head" });
+  const head = b.joint("head", { parent: neck.joints[3], at: headAt, dir: [0, -0.15, 1], role: "head", group: "head" });
   const snout = head.local([0, 0.32, 0]);
   b.capsule(headAt, snout, [0.13, 0.08], { bone: head, color: SCALE, group: "head" });
   const jaw = b.joint("jaw", {
     parent: head,
     at: head.local([0, 0.02, -0.06]),
     aim: head.local([0, 0.3, -0.1]),
+    role: "jaw",
     group: "jaw",
   });
   b.capsule(jaw.at, jaw.local([0, 0.28, 0]), [0.08, 0.05], { bone: jaw, color: BELLY, group: "jaw" });
@@ -97,6 +99,7 @@ export default function build() {
     {
       parent: hips,
       count: 6,
+      role: "tail",
       group: "tail",
     },
   );
@@ -117,7 +120,11 @@ export default function build() {
     const shoulder: [number, number, number] = [s * 0.2, 1.25, 0.4];
     const elbow: [number, number, number] = [s * 0.65, 1.55, 0.3];
     const wrist: [number, number, number] = [s * 1.1, 1.75, 0.2];
-    const arm = b.chain(`arm${side}`, [shoulder, elbow, wrist], { parent: spine.joints[1], group: `wing${side}` });
+    const arm = b.chain(`arm${side}`, [shoulder, elbow, wrist], {
+      parent: spine.joints[1],
+      role: "wing",
+      group: `wing${side}`,
+    });
     b.sweep(arm, [0.06, 0.04], { color: SCALE });
     const fingerTips: Array<[number, number, number]> = [
       [s * 2.0, 1.9, -0.05],
@@ -127,6 +134,7 @@ export default function build() {
     const fingers = fingerTips.map((tip, i) =>
       b.chain(`finger${i + 1}${side}`, polyline([wrist, offset(mid(wrist, tip), [0, 1, 0], 0.08), tip]), {
         parent: arm.joints[1],
+        role: "digit",
         group: `wing${side}`,
       }),
     );
@@ -156,7 +164,12 @@ export default function build() {
         ],
         { sole: [0, 0, 1] },
       ),
-      { parent: hips, names: ["thigh", "shin", "tarsus", "toe"].map((n) => n + side), group: `leg${side}` },
+      {
+        parent: hips,
+        names: ["thigh", "shin", "tarsus", "toe"].map((n) => n + side),
+        role: "leg",
+        group: `leg${side}`,
+      },
     );
     const ankle = leg.ts[3];
     b.sweep(leg, (t) => Math.max(toeR, 0.11 - (0.06 * t) / ankle), { color: SCALE });

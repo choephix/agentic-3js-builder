@@ -1,6 +1,8 @@
 // Example 2: a quadruped. Countershaded, sagging loft body split over a spine chain; digitigrade hind legs and
-// two-bone front legs from `limb`, with rigging names; a region-scaled head with a frustumBox snout and spiral
-// ram horns sprouted from its surface; spots, scales and a draped strap on the real body surface.
+// two-bone front legs from `limb`, with rigging names and rig roles (legs record their floor contact); a
+// region-scaled head riding on the neck, re-posed mid-build, with a frustumBox snout and spiral ram horns sprouted
+// from its surface; spots, scales and a draped strap on the real body surface; jaw opened and tail raised by
+// posing after everything is built.
 import { BoxGeometry, CylinderGeometry, SphereGeometry } from "three";
 import { createBuilder } from "../src/builder";
 import { limb } from "../src/ik";
@@ -34,7 +36,7 @@ export default function build() {
       [0, 1.0, 0.35],
       [0, 1.05, 0.62],
     ],
-    { parent: root, group: "body" },
+    { parent: root, role: "spine", group: "body" },
   );
   const body = b.loft(
     [
@@ -91,6 +93,8 @@ export default function build() {
       const leg = b.chain(group, limb(hip, ankle, lengths, bends), {
         parent: spine.joints[spineIndex],
         names: names.map((n) => `${n}${group.slice(3)}`),
+        role: "leg",
+        contact: [ankle[0], 0, ankle[2] + 0.06],
         group,
       });
       b.sweep(leg, [0.1, 0.05], { color: FUR });
@@ -115,11 +119,18 @@ export default function build() {
       [0, 1.25, 0.8],
       [0, 1.4, 0.92],
     ],
-    { parent: spine.joints[2], group: "neck" },
+    { parent: spine.joints[2], role: "neck", group: "neck" },
   );
   b.sweep(neck, [0.17, 0.13], { color: FUR });
-  const head = b.region({ at: [0, 1.4, 0.92], scale: HEAD_SCALE });
-  const skull = head.joint("head", { parent: neck.joints[1], at: [0, 0, 0], dir: [0, 0, 1], group: "head" });
+  // The head region rides on the upper neck joint, so re-posing the neck carries every later head.p() with it.
+  const head = b.region({ at: [0, 1.4, 0.92], scale: HEAD_SCALE, bone: neck.joints[1] });
+  const skull = head.joint("head", {
+    parent: neck.joints[1],
+    at: [0, 0, 0],
+    dir: [0, 0, 1],
+    role: "head",
+    group: "head",
+  });
   head.part(new SphereGeometry(0.17, 12, 10), FUR, { bone: skull, at: [0, 0.03, 0], group: "head" });
   b.frustumBox(
     head.p([0, -0.02, 0.08]),
@@ -132,7 +143,13 @@ export default function build() {
       group: "head",
     },
   );
-  const jaw = head.joint("jaw", { parent: skull, at: [0, -0.08, 0.05], aim: [0, -0.1, 0.3], group: "jaw" });
+  const jaw = head.joint("jaw", {
+    parent: skull,
+    at: [0, -0.08, 0.05],
+    aim: [0, -0.1, 0.3],
+    role: "jaw",
+    group: "jaw",
+  });
   b.frustumBox(
     head.p([0, -0.08, 0.05]),
     head.p([0, -0.1, 0.3]),
@@ -144,6 +161,10 @@ export default function build() {
       group: "jaw",
     },
   );
+  // Lift the head a little. Everything built so far follows, and the region, surfaces and handles used below see
+  // the new pose.
+  b.pose(neck.joints[1], { axis: [1, 0, 0], deg: -10 });
+
   // Ram horns: log-spiral coils sprouted from the skull's real surface, coiling back, down and outward. The
   // surface is taken before the ears exist, so the hits land on the skull itself.
   const headSurface = b.surface(skull);
@@ -172,7 +193,7 @@ export default function build() {
     });
   }
   // A nose ray-cast from the front onto the snout.
-  const nose = b.surface(skull).ray(head.p([0, -0.03, 1]), [0, 0, -1]);
+  const nose = b.surface(skull).ray(head.p([0, -0.03, 1]), head.d([0, 0, -1]));
   if (nose) b.stick(new SphereGeometry(0.03, 8, 6), HOOF, nose, { embed: 0.4 });
 
   // Spots on the flanks and back scales on the real body surface; scales shingle backwards (flow = -Z).
@@ -203,17 +224,22 @@ export default function build() {
   });
 
   // Tail sprouted from the rump: its root is buried in the body, its first joint sits on the surface.
-  const rump = bodySurface.ray([0, 0.98, -1.6], [0, 0, 1]);
-  if (rump)
-    b.sprout("tail", rump, catmull([rump.p, [0, 0.92, -1.05], [0, 0.78, -1.22]]), [0.07, 0.03], {
-      count: 2,
-      names: ["tailBase", "tailTip"],
-      group: "tail",
-      bands: [
-        [0.7, FUR],
-        [1, SPOT],
-      ],
-    });
+  const rump = bodySurface.ray([0, 0.98, -1.6], [0, 0, 1])!;
+  const tail = b.sprout("tail", rump, catmull([rump.p, [0, 0.92, -1.05], [0, 0.78, -1.22]]), [0.07, 0.03], {
+    count: 2,
+    names: ["tailBase", "tailTip"],
+    role: "tail",
+    group: "tail",
+    bands: [
+      [0.7, FUR],
+      [1, SPOT],
+    ],
+  });
+
+  // Rest-pose edits after building: open the jaw and raise the tail. +deg about +X tips forward-pointing bones
+  // down and backward-pointing bones up.
+  b.pose(jaw, { axis: [1, 0, 0], deg: 14 });
+  b.pose(tail.chain!.joints[0], { axis: [1, 0, 0], deg: 30 });
 
   return b.root;
 }

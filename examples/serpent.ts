@@ -1,5 +1,5 @@
 // Example 3: a tentacled serpent. The skeleton is rooted mid-body with two chains growing both ways along one
-// body curve. The tail has a belly sector under its stripes and plates along its back, a dorsal fin stands on
+// body curve. A frill of 13 ribs on 4 fan banks rings the neck behind the head; the jaw is posed open at the end. The tail has a belly sector under its stripes and plates along its back, a dorsal fin stands on
 // the neck's skin line, a spike collar and a closed ring circle the tilted neck, a twisted tusk juts from the
 // head, and tentacles sprouted from the head surface curl on arcs.
 import { BoxGeometry, SphereGeometry } from "three";
@@ -33,10 +33,10 @@ export default function build() {
     [0, 0.45, 0.95],
     [0, 0.75, 1.2],
   ]);
-  const core = b.joint("core", { at: body.at(body.knots[3]), group: "body" });
+  const core = b.joint("core", { at: body.at(body.knots[3]), role: "spine", group: "body" });
   const rootT = body.closestT(core.at);
-  const front = b.chain("front", body.slice(rootT, 1), { parent: core, count: 5, group: "neck" });
-  const back = b.chain("back", body.slice(rootT, 0), { parent: core, count: 7, group: "tail" });
+  const front = b.chain("front", body.slice(rootT, 1), { parent: core, count: 5, role: "neck", group: "neck" });
+  const back = b.chain("back", body.slice(rootT, 0), { parent: core, count: 7, role: "tail", group: "tail" });
   const frontTube = b.sweep(front, [0.2, 0.19, 0.16, 0.14], { color: SKIN, sides: 10, sectors: [[110, 250, BELLY]] });
   // Stripes per tail joint, and a pale belly sector under all of them.
   const backTube = b.sweep(back, [0.2, 0.17, 0.12, 0.07, 0.04], {
@@ -83,12 +83,19 @@ export default function build() {
 
   // Head with jaw.
   const neckEnd = front.at(1);
-  const head = b.joint("head", { parent: front.joints[4], at: neckEnd.p, dir: [0, -0.2, 1], group: "head" });
+  const head = b.joint("head", {
+    parent: front.joints[4],
+    at: neckEnd.p,
+    dir: [0, -0.2, 1],
+    role: "head",
+    group: "head",
+  });
   b.capsule(head.at, head.local([0, 0.22, 0]), [0.15, 0.1], { bone: head, color: SKIN, group: "head" });
   const jaw = b.joint("jaw", {
     parent: head,
     at: head.local([0, 0.02, -0.07]),
     dir: head.dir([0, 1, -0.3]),
+    role: "jaw",
     group: "jaw",
   });
   b.capsule(jaw.at, jaw.local([0, 0.2, 0]), [0.09, 0.06], { bone: jaw, color: BELLY, group: "jaw" });
@@ -131,6 +138,7 @@ export default function build() {
     const curl = arc(offset(reach, back, 0.12), reach, out.clone().cross(back), 160);
     b.sprout(`tentacle${i + 1}`, hit, polyline([hit.p, reach]).concat(curl), [0.035, 0.01], {
       count: 5,
+      role: "tentacle",
       twist: i % 3 === 0 ? 90 : 0,
       section: { ngon: 6 },
       caps: { start: "round", end: "point" },
@@ -145,6 +153,41 @@ export default function build() {
           }),
     });
   });
+
+  // Frill: 13 ribs from the neck skin, spread 200° over the top of the neck and swept back 25°, owned by 4 bank
+  // joints instead of 13. Each rib carries a web slab reaching halfway to the next rib.
+  const frillAt = frontTube.at(0.8);
+  const axis = frillAt.tangent;
+  const side = frontTube.at(0.8, 100).p.sub(frillAt.p.clone().addScaledVector(frillAt.n, -frillAt.radius)).normalize();
+  // Negative: from the right side, turning left-handed about the tangent carries the ribs over the top.
+  const spread = -200;
+  b.fan(
+    "frill",
+    {
+      parent: frillAt.joint,
+      at: frillAt.p.clone().addScaledVector(frillAt.n, -frillAt.radius),
+      axis,
+      from: side.multiplyScalar(Math.cos(0.44)).addScaledVector(axis, -Math.sin(0.44)),
+      angleDeg: spread,
+      count: 13,
+      banks: 4,
+      radius: frillAt.radius * 0.9,
+      group: "neck",
+    },
+    (item) => {
+      const tip = offset(item.p, item.dir, 0.24);
+      b.spike(item.p, tip, null, 0.016, { bone: item.joint, color: PLATE });
+      if (item.i === 12) return;
+      const next = item.dir.clone().applyAxisAngle(axis, ((spread / 12) * Math.PI) / 180);
+      b.slab([item.p, tip, offset(offset(item.p, next, 0.2), item.dir, 0.02)], {
+        thickness: 0.01,
+        color: FIN,
+        bone: item.joint,
+      });
+    },
+  );
+
+  b.pose(jaw, { axis: [1, 0, 0], deg: 18 });
 
   return b.root;
 }

@@ -30,15 +30,19 @@ const PERTURB = new Vector3(0.0123, 0.0321, 0.0231);
 export class Surface {
   readonly meshes: Mesh[] = [];
   private readonly joints: Joint[] = [];
-  /** World triangles, 9 floats each. */
-  private readonly tris: number[] = [];
-  private readonly normals: Vector3[] = [];
-  private readonly owner: number[] = [];
-  private readonly cumArea: number[] = [];
-  private readonly box = new Box3();
-  private readonly eps: number;
+  /** World triangles, 9 floats each, as of pose `version`. */
+  private tris: number[] = [];
+  private normals: Vector3[] = [];
+  private owner: number[] = [];
+  private cumArea: number[] = [];
+  private box = new Box3();
+  private eps = 0;
+  private version = -1;
 
-  constructor(ctx: Ctx, targets: SurfaceTarget) {
+  constructor(
+    private readonly ctx: Ctx,
+    targets: SurfaceTarget,
+  ) {
     const add = (target: SurfaceTarget) => {
       if (target instanceof Sweep) target.meshes.forEach(add);
       else if (target instanceof Joint) (ctx.meshes.get(target) ?? []).forEach(add);
@@ -51,12 +55,22 @@ export class Surface {
     };
     add(targets);
     if (!this.meshes.length) throw new Error("surface(): no meshes in targets");
+  }
+
+  /** Re-read the meshes' world triangles when a `pose()` happened since the last query. */
+  private sync() {
+    if (this.version === this.ctx.poses) return;
+    this.version = this.ctx.poses;
+    this.tris = [];
+    this.normals = [];
+    this.owner = [];
+    this.cumArea = [];
+    this.box = new Box3();
     const a = new Vector3();
     const b = new Vector3();
     const c = new Vector3();
     let total = 0;
     this.meshes.forEach((mesh, m) => {
-      mesh.updateWorldMatrix(true, false);
       const geometry = mesh.geometry as BufferGeometry;
       const position = geometry.getAttribute("position");
       const index = geometry.index;
@@ -127,6 +141,7 @@ export class Surface {
 
   /** Closest surface point to `p`. */
   nearest(p: V3): Hit {
+    this.sync();
     const q = vec(p);
     let best = -1;
     let bestD = Infinity;
@@ -146,6 +161,7 @@ export class Surface {
 
   /** First surface hit along the ray, or null. */
   ray(origin: V3, dir: V3): Hit | null {
+    this.sync();
     const o = vec(origin);
     const d = vec(dir).normalize();
     const found = this.intersections(o, d);
@@ -160,6 +176,7 @@ export class Surface {
    * 90 = +X (left); elevation 90 = straight up.
    */
   around(center?: V3) {
+    this.sync();
     const c = center ? vec(center) : this.box.getCenter(new Vector3());
     const far = this.box.getSize(new Vector3()).length() * 2 + this.box.distanceToPoint(c);
     return {
@@ -177,6 +194,7 @@ export class Surface {
    * the face normal. Knots and closedness carry over, so a loop drawn roughly around a body becomes a strap.
    */
   drape(path: PathLike, options: { lift?: number } = {}) {
+    this.sync();
     const source = toPath(path);
     const step = this.box.getSize(new Vector3()).length() / 150;
     const count = Math.max(32, Math.ceil(source.length / step));
@@ -199,6 +217,7 @@ export class Surface {
    * target meshes are rejected, as are points failing `keepOut`, `filter` or `minDist`.
    */
   scatter(count: number, options: ScatterOptions = {}) {
+    this.sync();
     const random = options.rng ?? makeRng(1);
     const total = this.cumArea[this.cumArea.length - 1];
     const hits: Hit[] = [];

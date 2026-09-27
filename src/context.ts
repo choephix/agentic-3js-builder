@@ -1,7 +1,9 @@
-// State shared by every builder helper: the root group, the joint registry, mesh ownership and the
-// material cache, plus the two placement primitives every helper uses (`setWorld`, `meshFromWorld`).
+// State shared by every builder helper: the root group, the joint registry, mesh ownership, the material cache,
+// the detail level, the pose counter and the rig records, plus the two placement primitives every helper uses
+// (`setWorld`, `meshFromWorld`).
 import { BufferGeometry, Float32BufferAttribute, Group, Matrix4, Mesh, MeshStandardMaterial, Vector3 } from "three";
 import type { Object3D, Quaternion } from "three";
+import type { RigRecord } from "./rig";
 import type { Joint } from "./skeleton";
 
 /** A joint handle or a joint name. */
@@ -15,10 +17,24 @@ export class Ctx {
   rootJoint: Joint | null = null;
   readonly meshes = new Map<Joint, Mesh[]>();
   readonly owner = new Map<Mesh, Joint>();
+  /** Rig answer-key records, evaluated against the current pose when `b.root` is read. */
+  readonly rig: Array<() => RigRecord> = [];
+  /** Bumped by every `pose()`, so cached world-space data (surfaces) knows to refresh. */
+  poses = 0;
   private readonly materials = new Map<string, MeshStandardMaterial>();
 
-  constructor(name: string) {
+  constructor(
+    name: string,
+    /** Tessellation multiplier: default sides, ring density and membrane cells scale with it. */
+    readonly detail: number,
+  ) {
+    if (!(detail > 0)) throw new Error(`detail must be positive, got ${detail}`);
     this.root.name = name;
+  }
+
+  /** `n` segments scaled by `detail` (at least 3): for the SDK's defaults and for your own geometry. */
+  segments(n: number) {
+    return Math.max(3, Math.round(n * this.detail));
   }
 
   /** One shared matte material per colour, like the creature-lab kit. */

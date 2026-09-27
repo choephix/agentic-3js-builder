@@ -2,14 +2,14 @@
 // per joint span), with continuous radius, parallel-transported roll, adaptive ring spacing, caps, colour bands
 // along the tube and colour sectors around it.
 import { Vector3 } from "three";
-import type { Mesh } from "three";
+import type { Matrix4, Mesh } from "three";
 import { meshFromWorld, resolveJoint } from "./context";
 import type { Ctx, JointRef, Tags } from "./context";
 import { DEG, flatten } from "./math";
 import type { V3 } from "./math";
 import { smoothPath, toPath } from "./path";
 import type { Corner, Frames, Path, PathLike, Twist } from "./path";
-import { Chain } from "./skeleton";
+import { Capture, Chain } from "./skeleton";
 import type { Joint } from "./skeleton";
 
 export type Cap = "round" | "flat" | "point" | "none";
@@ -34,7 +34,7 @@ export type SweepOptions = Tags & {
   from?: number;
   to?: number;
   section?: Section;
-  /** Circle sides (default 8). */
+  /** Circle sides (default 8 × the builder's `detail`). */
   sides?: number;
   /** Smooth normals (default: circle smooth, box/ngon faceted). */
   smooth?: boolean;
@@ -75,6 +75,8 @@ type Tube = {
   closed: boolean;
   /** Averaged tangent at the seam of a closed tube whose seam is smooth; both end rings use it. */
   seam: Vector3 | null;
+  /** Owner frames when the curve was taken: rings owned by a joint follow its later poses. */
+  capture: Capture;
 };
 /** A ring: sweep t, centre, tangent/normal/binormal, radii, polar angle of the dorsal side in (B, N). */
 type Frame = {
@@ -92,6 +94,7 @@ type Frame = {
 type Arc = { a0: number; a1: number; color: string | null };
 
 const CORNER_SPLIT = 20 * (Math.PI / 180);
+/** Ring spacing at detail 1: at most this much turn or roll between rings. */
 const MAX_TURN = 10 * (Math.PI / 180);
 
 /** Smooth interpolation through (xs[i], ys[i]); linear for 2 keys. */
@@ -189,8 +192,11 @@ function sectionPoint(shape: Shape, r: [number, number], dx: number, dy: number)
   return { x: 0, y: 0, nx: dx, ny: dy };
 }
 
-/** The ring at sweep t. `side`: incoming tangent at a corner ("left"), outgoing ("right") or their average. */
-function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", mandatory = false): Frame {
+/**
+ * The ring at sweep t in the current pose (`motion` = the owning joint's `Capture.motion`). `side`: incoming
+ * tangent at a corner ("left"), outgoing ("right") or their average.
+ */
+function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", motion: Matrix4, mandatory = false): Frame {
   const t = tube.from + u * (tube.to - tube.from);
   const seamEnd = tube.seam !== null && (u <= 0 || u >= 1);
   let T = seamEnd ? tube.seam!.clone() : tube.path.tangentAt(t, side === "left");
@@ -199,9 +205,11 @@ function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", manda
     if (corner) T = corner.tin.clone().add(corner.tout).normalize();
   }
   const N = flatten(tube.frames.normalAt(seamEnd ? 0 : t, side === "left"), T).normalize();
-  const B = T.clone().cross(N);
   const s = tube.shift(u);
-  const c = tube.path.at(t).addScaledVector(B, s[0]).addScaledVector(N, s[1]);
+  const c = tube.path.at(t).addScaledVector(T.clone().cross(N), s[0]).addScaledVector(N, s[1]).applyMatrix4(motion);
+  T.transformDirection(motion);
+  N.transformDirection(motion);
+  const B = T.clone().cross(N);
   const up = flatten(new Vector3(0, 1, 0), T);
   const ref = up.lengthSq() > 1e-6 ? up.normalize() : N;
   return { t: u, c, T, N, B, r: tube.radius(u), s, ref: Math.atan2(ref.dot(N), ref.dot(B)), mandatory };
@@ -235,22 +243,17 @@ export class Sweep {
    * +90 = a quarter turn clockwise seen looking along the tube (for a tube running toward +Z: its -X side).
    */
   at(t: number, angleDeg = 0, lift = 0): SweepPoint {
-    const f = frameAt(this.tube, t, "right");
+    const sourceT = this.tube.from + t * (this.tube.to - this.tube.from);
+    const joint = this.jointAt(sourceT);
+    const motion = this.tube.capture.motion(joint);
+    const f = frameAt(this.tube, t, "right", motion);
     const { p, q, nSec } = surfacePoint(this.tube, f, angleDeg);
-    const ahead = surfacePoint(this.tube, frameAt(this.tube, Math.min(1, t + 1e-3), "right"), angleDeg).p;
-    const behind = surfacePoint(this.tube, frameAt(this.tube, Math.max(0, t - 1e-3), "right"), angleDeg).p;
+    const ahead = surfacePoint(this.tube, frameAt(this.tube, Math.min(1, t + 1e-3), "right", motion), angleDeg).p;
+    const behind = surfacePoint(this.tube, frameAt(this.tube, Math.max(0, t - 1e-3), "right", motion), angleDeg).p;
     const along = ahead.sub(behind);
     const lean = f.T.dot(along);
     const n = (Math.abs(lean) > 1e-12 ? nSec.addScaledVector(f.T, -nSec.dot(along) / lean) : nSec).normalize();
-    const sourceT = this.tube.from + t * (this.tube.to - this.tube.from);
-    return {
-      t,
-      p: p.addScaledVector(n, lift),
-      n,
-      tangent: f.T,
-      radius: Math.hypot(q.x, q.y),
-      joint: this.jointAt(sourceT),
-    };
+    return { t, p: p.addScaledVector(n, lift), n, tangent: f.T, radius: Math.hypot(q.x, q.y), joint };
   }
 
   /**
@@ -330,7 +333,8 @@ export function sweep(ctx: Ctx, source: PathLike | Chain, radius: Radius, option
   const frames = chain
     ? chain.frames
     : path.frames(options.up, typeof twist === "function" ? (t) => twist(toU(t)) : twist);
-  const shape = sectionShape(options.section ?? "circle", options.sides ?? 8);
+  const shape = sectionShape(options.section ?? "circle", options.sides ?? ctx.segments(8));
+  const maxTurn = MAX_TURN / ctx.detail;
   const smooth = options.smooth ?? shape.smooth;
   const sides = shape.pts.length;
   const closed = path.closed && from === 0 && to === 1;
@@ -338,6 +342,17 @@ export function sweep(ctx: Ctx, source: PathLike | Chain, radius: Radius, option
   const seamOut = path.tangentAt(0);
   const seamSmooth = closed && seamIn.angleTo(seamOut) <= CORNER_SPLIT;
   const corners = path.corners(from, to);
+  // Bone boundaries in source t.
+  const owner = options.bone;
+  const bones = chain ?? (owner instanceof Chain ? owner : null);
+  const boneTs = chain ? chain.ts.slice(0, -1) : bones ? bones.joints.map((j) => path.closestT(j.at)) : [0];
+  const boneJoints = bones ? bones.joints : [resolveJoint(ctx, owner instanceof Chain ? undefined : owner)];
+  const jointAt = (t: number) => {
+    let i = 0;
+    while (i < boneTs.length - 1 && boneTs[i + 1] <= t) i++;
+    return boneJoints[i];
+  };
+
   const tube: Tube = {
     path,
     frames,
@@ -349,6 +364,7 @@ export function sweep(ctx: Ctx, source: PathLike | Chain, radius: Radius, option
     corners,
     closed,
     seam: seamSmooth ? seamIn.add(seamOut).normalize() : null,
+    capture: chain ? chain.capture : new Capture(boneJoints),
   };
   const caps = typeof options.caps === "object" ? options.caps : { start: options.caps, end: options.caps };
   const seamCap: Cap = seamSmooth ? "none" : "round";
@@ -359,17 +375,6 @@ export function sweep(ctx: Ctx, source: PathLike | Chain, radius: Radius, option
     : typeof options.extend === "number"
       ? [options.extend, options.extend]
       : (options.extend ?? [0, 0]);
-
-  // Bone boundaries in source t.
-  const owner = options.bone;
-  const bones = chain ?? (owner instanceof Chain ? owner : null);
-  const boneTs = chain ? chain.ts.slice(0, -1) : bones ? bones.joints.map((j) => path.closestT(j.at)) : [0];
-  const boneJoints = bones ? bones.joints : [resolveJoint(ctx, owner instanceof Chain ? undefined : owner)];
-  const jointAt = (t: number) => {
-    let i = 0;
-    while (i < boneTs.length - 1 && boneTs[i + 1] <= t) i++;
-    return boneJoints[i];
-  };
 
   // Cuts, in sweep t (u), ascending.
   const cuts: Cut[] = [];
@@ -513,6 +518,7 @@ export function sweep(ctx: Ctx, source: PathLike | Chain, radius: Radius, option
       groupJoint = joint;
       buffers = arcs.map((arc) => new MeshBuffer(arc.color ?? color, joint));
     }
+    const motion = tube.capture.motion(joint);
     const span = (to - from) * path.length;
     if (options.overlap) {
       if (kinds[i] === "joint") a = Math.max(0, a - (options.overlap * Math.max(...tube.radius(a))) / span);
@@ -525,7 +531,8 @@ export function sweep(ctx: Ctx, source: PathLike | Chain, radius: Radius, option
       .map((c) => toU(c.t))
       .filter((u) => u > a + 1e-6 && u < b - 1e-6);
     const us = new Set<number>([a, b, ...smallCorners]);
-    for (let k = 1; k < 32; k++) us.add(a + ((b - a) * k) / 32);
+    const steps = Math.ceil(32 * Math.max(1, ctx.detail));
+    for (let k = 1; k < steps; k++) us.add(a + ((b - a) * k) / steps);
     for (const t of path.samples(from, to)) {
       const u = toU(t);
       if (u > a + 1e-6 && u < b - 1e-6) us.add(u);
@@ -534,16 +541,16 @@ export function sweep(ctx: Ctx, source: PathLike | Chain, radius: Radius, option
       .sort((x, y) => x - y)
       .map((u) =>
         u === b
-          ? frameAt(tube, u, "left", true)
+          ? frameAt(tube, u, "left", motion, true)
           : smallCorners.includes(u)
-            ? frameAt(tube, u, "corner", true)
-            : frameAt(tube, u, "right", u === a),
+            ? frameAt(tube, u, "corner", motion, true)
+            : frameAt(tube, u, "right", motion, u === a),
       );
     const rmax = Math.max(...cand.map((f) => Math.max(...f.r)));
-    const tol = 0.03 * rmax + 1e-6;
+    const tol = (0.03 / ctx.detail) * rmax + 1e-6;
     const keys = (f: Frame) => [...f.r, ...f.s];
     const fits = (k: number, j: number) => {
-      if (cand[k].T.angleTo(cand[j].T) > MAX_TURN || cand[k].N.angleTo(cand[j].N) > MAX_TURN) return false;
+      if (cand[k].T.angleTo(cand[j].T) > maxTurn || cand[k].N.angleTo(cand[j].N) > maxTurn) return false;
       const [ka, kb] = [keys(cand[k]), keys(cand[j])];
       for (let m = k + 1; m < j; m++) {
         const s = (cand[m].t - cand[k].t) / (cand[j].t - cand[k].t);

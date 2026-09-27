@@ -1,20 +1,24 @@
 // `region()`: a movable, scalable authoring frame (not a scene node) for heads, props and other sub-assemblies.
 import { Euler, Quaternion, Vector3 } from "three";
 import type { BufferGeometry } from "three";
-import type { Ctx } from "./context";
+import { resolveJoint } from "./context";
+import type { Ctx, JointRef } from "./context";
 import { DEG, vec } from "./math";
 import type { V3 } from "./math";
 import { part } from "./parts";
 import type { PartOptions } from "./parts";
-import { createJoint } from "./skeleton";
-import type { JointOptions } from "./skeleton";
+import { Capture, createJoint } from "./skeleton";
+import type { Joint, JointOptions } from "./skeleton";
 
-export type RegionOptions = { at: V3; scale?: number; quat?: Quaternion };
+/** `bone`: the region rides on that joint, following its later `pose()` calls. */
+export type RegionOptions = { at: V3; scale?: number; quat?: Quaternion; bone?: JointRef };
 
 export class Region {
-  readonly origin: Vector3;
+  private readonly origin: Vector3;
   readonly scale: number;
-  readonly quat: Quaternion;
+  private readonly rest: Quaternion;
+  private readonly bone: Joint | null;
+  private readonly capture: Capture | null;
 
   constructor(
     private readonly ctx: Ctx,
@@ -22,12 +26,31 @@ export class Region {
   ) {
     this.origin = vec(options.at);
     this.scale = options.scale ?? 1;
-    this.quat = options.quat?.clone() ?? new Quaternion();
+    this.rest = options.quat?.clone() ?? new Quaternion();
+    this.bone = options.bone === undefined ? null : resolveJoint(ctx, options.bone);
+    this.capture = this.bone && new Capture([this.bone]);
+  }
+
+  /** The bone's motion since the region was made (identity without a bone). */
+  private motion() {
+    return this.capture?.motion(this.bone!);
+  }
+
+  /** Current region orientation in model space. */
+  get quat() {
+    const motion = this.motion();
+    return motion ? new Quaternion().setFromRotationMatrix(motion).multiply(this.rest) : this.rest.clone();
+  }
+
+  /** Current region origin in model space. */
+  get at() {
+    const motion = this.motion();
+    return motion ? this.origin.clone().applyMatrix4(motion) : this.origin.clone();
   }
 
   /** Region-local point → model space (scaled, rotated, moved). */
   p(local: V3) {
-    return vec(local).multiplyScalar(this.scale).applyQuaternion(this.quat).add(this.origin);
+    return vec(local).multiplyScalar(this.scale).applyQuaternion(this.quat).add(this.at);
   }
 
   /** Region-local direction → model space (rotated only). */

@@ -67,7 +67,7 @@ export function loft(ctx: Ctx, stations: readonly Station[], options: SweepOptio
 }
 
 export type SproutOptions = Omit<SweepOptions, "bone" | "extend"> &
-  Pick<ChainOptions, "names" | "twist"> & {
+  Pick<ChainOptions, "names" | "twist" | "role" | "contact"> & {
     /** Joints along the appendage (default: one per knot span); 0 = no joints, the tube rides on `hit.joint`. */
     count?: number;
     /** How far the root runs back into the parent volume, along the start tangent (default: the root radius). */
@@ -87,7 +87,7 @@ export function sprout(
   radius: Radius,
   options: SproutOptions = {},
 ) {
-  const { count, bury, names, ...rest } = options;
+  const { count, bury, names, role, contact, ...rest } = options;
   const tip = !(pathOrTip instanceof Path) && ("isVector3" in pathOrTip || typeof pathOrTip[0] === "number");
   const given = tip ? polyline([hit.p, pathOrTip as V3]) : toPath(pathOrTip as PathLike);
   const path = given.at(0).distanceTo(hit.p) > 1e-6 ? polyline([hit.p, given.at(0)]).concat(given) : given;
@@ -98,6 +98,8 @@ export function sprout(
           parent: hit.joint,
           count,
           names,
+          role,
+          contact,
           twist: rest.twist,
           up: rest.up,
           group: rest.group,

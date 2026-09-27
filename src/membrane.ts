@@ -15,7 +15,7 @@ export type MembraneOptions = Tags & {
   color: string;
   /** Total thickness; the skin is offset ± thickness/2 along its normal and closed with side walls. */
   thickness: number;
-  /** Cells between the edges (default 4). */
+  /** Cells between the edges (default 4 × the builder's `detail`). */
   rows?: number;
   /** Cells along the edges (default from the aspect ratio); every bone span boundary also gets a column. */
   cols?: number;
@@ -80,9 +80,12 @@ function prism(grid: Grid, normals: Grid, cells: Array<[number, number]>, half: 
 export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions) {
   const chainA = edgeA instanceof Chain ? edgeA : null;
   const chainB = edgeB instanceof Chain ? edgeB : null;
-  const pathA = chainA ? chainA.path : toPath(edgeA as PathLike);
-  const pathB = chainB ? chainB.path : toPath(edgeB as PathLike);
-  const rows = options.rows ?? 4;
+  const pathA = chainA ? null : toPath(edgeA as PathLike);
+  const pathB = chainB ? null : toPath(edgeB as PathLike);
+  // Chain edges are read in their current pose.
+  const pointA = (t: number) => (chainA ? chainA.at(t).p : pathA!.at(t));
+  const pointB = (t: number) => (chainB ? chainB.at(t).p : pathB!.at(t));
+  const rows = options.rows ?? Math.max(1, Math.round(4 * ctx.detail));
   const scallop = options.scallop ?? 0;
   const split = options.split ?? "mid";
   const owner = options.bone;
@@ -90,15 +93,16 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     const own = side === "a" ? chainA : chainB;
     const other = side === "a" ? chainB : chainA;
     if (own) return own.jointAt(t);
-    if (owner instanceof Chain) return owner.jointAt(owner.path.closestT(at));
+    if (owner instanceof Chain) return owner.nearestJoint(at);
     if (owner !== undefined) return resolveJoint(ctx, owner);
     return other?.jointAt(t) ?? resolveJoint(ctx);
   };
 
   let width = 0;
-  for (let k = 0; k <= 8; k++) width += pathA.at(k / 8).distanceTo(pathB.at(k / 8)) / 9;
-  const length = Math.max(pathA.length, pathB.length);
-  const cols = options.cols ?? Math.min(24, Math.max(4, Math.round((length / Math.max(width, 1e-6)) * rows)));
+  for (let k = 0; k <= 8; k++) width += pointA(k / 8).distanceTo(pointB(k / 8)) / 9;
+  const length = Math.max((chainA ?? pathA!).length, (chainB ?? pathB!).length);
+  const cols =
+    options.cols ?? Math.min(ctx.segments(24), Math.max(4, Math.round((length / Math.max(width, 1e-6)) * rows)));
   const us = new Set<number>();
   for (let i = 0; i <= cols; i++) us.add(i / cols);
   for (const chain of [chainA, chainB]) for (const t of chain?.ts ?? []) us.add(t);
@@ -109,7 +113,7 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     Array.from({ length: rows + 1 }, (_, j) => {
       const s = j / rows;
       const t = u * tMax(s);
-      return pathA.at(t).lerp(pathB.at(t), s);
+      return pointA(t).lerp(pointB(t), s);
     }),
   );
 
