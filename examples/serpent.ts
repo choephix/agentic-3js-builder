@@ -1,0 +1,119 @@
+// Example 3: a tentacled serpent. The skeleton is rooted mid-body with two chains growing both ways along one
+// body curve, plates run along the back tube, a spike collar rings the tilted neck, tentacles curl on arcs.
+import { BoxGeometry, SphereGeometry } from "three";
+import { createBuilder } from "../src/builder";
+import { along, ring } from "../src/distribute";
+import { aim, lerp, offset } from "../src/math";
+import { arc, catmull, polyline } from "../src/path";
+
+export const meta = { name: "SDK smoke: serpent" };
+
+const SKIN = "#2f6f73";
+const BELLY = "#d9c98f";
+const PLATE = "#1d3b44";
+const TENTACLE = "#8a4f7d";
+const TIP = "#e6a0c4";
+
+export default function build() {
+  const b = createBuilder({ name: "serpent" });
+
+  // One body curve; the root sits on it and two chains grow toward the head and the tail.
+  const body = catmull([
+    [0.2, 0.05, -1.7],
+    [-0.25, 0.1, -1.15],
+    [0.2, 0.16, -0.55],
+    [0, 0.2, 0],
+    [-0.2, 0.22, 0.5],
+    [0, 0.45, 0.95],
+    [0, 0.75, 1.2],
+  ]);
+  const core = b.joint("core", { at: body.at(body.knots[3]), group: "body" });
+  const rootT = body.closestT(core.at);
+  const front = b.chain("front", body.slice(rootT, 1), { parent: core, count: 5, group: "neck" });
+  const back = b.chain("back", body.slice(rootT, 0), { parent: core, count: 7, group: "tail" });
+  b.sweep(front, [0.2, 0.19, 0.16, 0.14], { color: SKIN, sides: 10 });
+  const backTube = b.sweep(back, [0.2, 0.17, 0.12, 0.07, 0.04], {
+    sides: 10,
+    color: (t) => (Math.floor(t * 8) % 2 ? SKIN : BELLY),
+  });
+
+  // Dorsal plates seated on the top of the tail tube.
+  along(
+    backTube,
+    9,
+    (at) => b.part(new BoxGeometry(0.12, 0.04, 0.09), PLATE, { bone: at.joint, at: at.p, quat: aim(at.n, at.tangent) }),
+    { from: 0.02, to: 0.85 },
+  );
+
+  // Tail fluke: flattened sideways by rolling the section with `up`.
+  const tip = back.at(1);
+  b.sweep([tip.p, offset(tip.p, tip.tangent, 0.28)], (t) => [0.02, 0.14 * (1 - t) + 0.02], {
+    bone: back.joints[6],
+    up: [1, 0, 0],
+    color: PLATE,
+  });
+
+  // Spike collar around the tilted neck axis.
+  const collar = front.at(0.55);
+  ring(collar.p, collar.tangent, 0.13, 9, (p, out) =>
+    b.spike(p, out, 0.12, 0.03, { bone: collar.joint, color: PLATE }),
+  );
+
+  // Head with jaw.
+  const neckEnd = front.at(1);
+  const head = b.joint("head", { parent: front.joints[4], at: neckEnd.p, dir: [0, -0.2, 1], group: "head" });
+  b.capsule(head.at, head.local([0, 0.22, 0]), [0.15, 0.1], { bone: head, color: SKIN, group: "head" });
+  const jaw = b.joint("jaw", {
+    parent: head,
+    at: head.local([0, 0.02, -0.07]),
+    dir: head.dir([0, 1, -0.3]),
+    group: "jaw",
+  });
+  b.capsule(jaw.at, jaw.local([0, 0.2, 0]), [0.09, 0.06], { bone: jaw, color: BELLY, group: "jaw" });
+  for (const s of [1, -1]) {
+    b.part(new SphereGeometry(0.035, 10, 8), "#111111", {
+      bone: head,
+      at: head.local([s * 0.12, 0.12, 0.08]),
+      group: "head",
+    });
+    // Antenna: a point-array sweep with a sharp elbow (split into round-capped segments inside one mesh).
+    const root = head.local([s * 0.06, 0.08, 0.12]);
+    b.sweep(
+      [root, offset(root, head.dir([s * 0.3, -0.2, 1]), 0.22), offset(root, head.dir([s * 0.8, 0.9, 1.4]), 0.36)],
+      0.014,
+      {
+        bone: head,
+        color: TIP,
+        caps: { start: "round", end: "point" },
+        group: "head",
+      },
+    );
+  }
+
+  // Tentacles: straight root + arc curl, alternately with colour bands (round cuts) and overlap cuts.
+  ring(lerp(head.at, head.local([0, 0.22, 0]), 0.1), head.dir([0, 1, 0]), 0.12, 6, (p, out, i) => {
+    // Straight out, then curl backward on an arc whose start tangent continues `out`.
+    const reach = offset(p, out, 0.18);
+    const back = head.dir([0, -1, 0]);
+    const curl = arc(offset(reach, back, 0.12), reach, out.clone().cross(back), 160);
+    const tentacle = b.chain(`tentacle${i + 1}`, polyline([p, reach]).concat(curl), {
+      parent: head,
+      count: 5,
+      group: `tentacle${i + 1}`,
+    });
+    b.sweep(tentacle, [0.035, 0.01], {
+      section: { ngon: 6 },
+      caps: { start: "round", end: "point" },
+      ...(i % 2
+        ? { overlap: 0.8, color: TENTACLE }
+        : {
+            bands: [
+              [0.75, TENTACLE],
+              [1, TIP],
+            ] as const,
+          }),
+    });
+  });
+
+  return b.root;
+}
