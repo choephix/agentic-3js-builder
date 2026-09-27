@@ -12,8 +12,8 @@ import { Region } from "./region";
 import type { RegionOptions } from "./region";
 import { createChain, createJoint } from "./skeleton";
 import type { Chain, ChainOptions, JointOptions } from "./skeleton";
-import { capsule, frustumBox, loft, rod, spike } from "./sugar";
-import type { Station } from "./sugar";
+import { capsule, frustumBox, loft, rod, spike, sprout } from "./sugar";
+import type { SproutOptions, Station } from "./sugar";
 import { stick, Surface } from "./surface";
 import type { Hit, StickOptions, SurfaceTarget } from "./surface";
 import { sweep } from "./sweep";
@@ -68,8 +68,12 @@ export class Builder {
     return frustumBox(this.ctx, a, b, start, end, options);
   }
 
-  loft(stations: readonly Station[], options?: SweepOptions & { chain?: Chain }) {
+  loft(stations: readonly Station[], options?: SweepOptions) {
     return loft(this.ctx, stations, options);
+  }
+
+  sprout(name: string, hit: Hit, pathOrTip: PathLike | V3, radius: Radius, options?: SproutOptions) {
+    return sprout(this.ctx, name, hit, pathOrTip, radius, options);
   }
 
   surface(targets: SurfaceTarget) {

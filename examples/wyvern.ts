@@ -1,8 +1,10 @@
 // Example 1: a wyvern. Neck and tail chains swept as one continuous tube, curved horns and neck spikes from
-// bezier sweeps, bat wings as membranes between finger chains.
+// bezier sweeps, bat wings as membranes between finger chains, closed triangular brow rings, and bird-like
+// four-segment legs from `limb` with the toe segment flat on the floor.
 import { SphereGeometry } from "three";
 import { createBuilder } from "../src/builder";
 import { along } from "../src/distribute";
+import { limb } from "../src/ik";
 import { mid, offset } from "../src/math";
 import { bezier, catmull, polyline } from "../src/path";
 
@@ -65,6 +67,13 @@ export default function build() {
       at: head.local([s * 0.09, 0.07, 0.12]),
       group: "head",
     });
+    // Brow ring: a closed polyline; its sharp corners (the seam included) get round-capped joins.
+    const brow = [
+      [0.07, 0.14],
+      [0.02, 0.07],
+      [0.1, 0.07],
+    ].map(([y, z]) => head.local([s * 0.11, y, z]));
+    b.sweep(polyline(brow, { closed: true }), 0.012, { bone: head, color: BONE, group: "head" });
     // Curved horn: bezier sweep tapering to a point.
     const base = head.local([s * 0.07, 0.02, 0.1]);
     b.sweep(bezier(base, offset(base, [s * 0.1, 0.15, -0.1], 0.18), head.local([s * 0.2, -0.35, 0.12])), [0.045, 0], {
@@ -132,22 +141,31 @@ export default function build() {
       group: `wing${side}`,
     });
 
-    // Legs straight down to feet on the floor (y = 0).
-    const hip: [number, number, number] = [s * 0.2, 0.95, -0.05];
-    const leg = b.chain(`leg${side}`, [hip, [s * 0.28, 0.5, 0.12], [s * 0.3, 0.07, -0.02]], {
-      parent: hips,
-      group: `leg${side}`,
-    });
-    b.sweep(leg, [0.11, 0.06], { color: SCALE });
-    const foot = b.joint(`foot${side}`, {
-      parent: leg.joints[1],
-      at: [s * 0.3, 0.07, -0.02],
-      dir: [0, 0, 1],
-      group: `leg${side}`,
-    });
-    b.capsule(foot.at, [s * 0.3, 0.07, 0.2], 0.07, { bone: foot, color: SCALE });
+    // Bird legs: thigh, shin, tarsus and a toe lying flat on the floor (`sole`), knee forward, ankle back.
+    const toeR = 0.05;
+    const leg = b.chain(
+      `leg${side}`,
+      limb(
+        [s * 0.2, 0.95, -0.05],
+        [s * 0.28, toeR, 0.32],
+        [0.34, 0.36, 0.3, 0.16],
+        [
+          [0, 0, 1],
+          [0, 0, -1],
+          [0, 0, 1],
+        ],
+        { sole: [0, 0, 1] },
+      ),
+      { parent: hips, names: ["thigh", "shin", "tarsus", "toe"].map((n) => n + side), group: `leg${side}` },
+    );
+    const ankle = leg.ts[3];
+    b.sweep(leg, (t) => Math.max(toeR, 0.11 - (0.06 * t) / ankle), { color: SCALE });
+    const toeTip = leg.at(1);
     for (const dx of [-0.05, 0, 0.05])
-      b.spike([s * 0.3 + dx, 0.03, 0.2], [0, 0, 1], 0.08, 0.025, { bone: foot, color: BONE });
+      b.spike(offset(toeTip.p, [dx, 0, 0], Math.abs(dx)), [0, -0.3, 1], 0.08, 0.025, {
+        bone: leg.joints[3],
+        color: BONE,
+      });
   }
 
   return b.root;

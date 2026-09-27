@@ -5,7 +5,7 @@ import type { Ctx, JointRef } from "./context";
 import { aim, vec } from "./math";
 import type { V3 } from "./math";
 import { toPath } from "./path";
-import type { Frames, Path, PathLike } from "./path";
+import type { Frames, Path, PathLike, Twist } from "./path";
 
 const JOINT_NAME = /^[A-Za-z][A-Za-z0-9_]*$/;
 
@@ -77,6 +77,10 @@ export type ChainOptions = {
   group?: string;
   /** Number of joints, evenly spaced by arc length. Default: one joint per knot span of the path. */
   count?: number;
+  /** Joint names, by index from 0 (auto-riggers key on names: hipHL, kneeHL, hockHL). Default `${name}1..N`. */
+  names?: readonly string[] | ((i: number) => string);
+  /** Roll about the path after parallel transport: total degrees start→end, or `(t) => deg`. Joints and sweeps follow. */
+  twist?: Twist;
 };
 
 /** A point on a chain's path with its transported frame and owning joint. */
@@ -118,14 +122,19 @@ export class Chain {
 
 export function createChain(ctx: Ctx, name: string, source: PathLike, options: ChainOptions) {
   const path = toPath(source);
-  const frames = path.frames(options.up);
+  const frames = path.frames(options.up, options.twist);
+  const { names } = options;
+  const nameOf = (i: number) =>
+    names === undefined ? `${name}${i + 1}` : typeof names === "function" ? names(i) : names[i];
   const ts = options.count ? Array.from({ length: options.count + 1 }, (_, i) => i / options.count!) : path.knots;
   if (ts.length < 2) throw new Error(`Chain "${name}" needs at least one span`);
+  if (Array.isArray(names) && names.length !== ts.length - 1)
+    throw new Error(`Chain "${name}" has ${ts.length - 1} joints but ${names.length} names`);
   const joints: Joint[] = [];
   for (let i = 0; i < ts.length - 1; i++) {
     const at = path.at(ts[i]);
     joints.push(
-      createJoint(ctx, `${name}${i + 1}`, {
+      createJoint(ctx, nameOf(i), {
         parent: i === 0 ? options.parent : joints[i - 1],
         at,
         aim: path.at(ts[i + 1]),

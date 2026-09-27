@@ -5,6 +5,8 @@ import type { Ctx, JointRef, Tags } from "./context";
 import { aim, DEG, flatten, rng as makeRng, vec } from "./math";
 import type { V3 } from "./math";
 import { part } from "./parts";
+import { smoothPath, toPath } from "./path";
+import type { PathLike } from "./path";
 import { Joint } from "./skeleton";
 import { Sweep } from "./sweep";
 
@@ -168,6 +170,22 @@ export class Surface {
         return this.ray(c.clone().addScaledVector(dir, far), dir.negate());
       },
     };
+  }
+
+  /**
+   * `path` pulled onto the built surface: every sample moves to its nearest surface point, then `lift` out along
+   * the face normal. Knots and closedness carry over, so a loop drawn roughly around a body becomes a strap.
+   */
+  drape(path: PathLike, options: { lift?: number } = {}) {
+    const source = toPath(path);
+    const step = this.box.getSize(new Vector3()).length() / 150;
+    const count = Math.max(32, Math.ceil(source.length / step));
+    const pts = Array.from({ length: count + 1 }, (_, i) => {
+      const hit = this.nearest(source.at(i / count));
+      return hit.p.addScaledVector(hit.n, options.lift ?? 0);
+    });
+    const indices = [...new Set(source.knots.map((t) => Math.round(t * count)))];
+    return smoothPath(pts, null, { indices }, source.closed);
   }
 
   /** True when `p` (on triangle `i`) lies inside another closed part of this surface. */

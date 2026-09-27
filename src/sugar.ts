@@ -1,11 +1,14 @@
-// One-line shapes over `sweep()`. None of these has its own geometry code.
+// Shapes over `sweep()` (and `chain()` for sprout). None of these has its own geometry code.
 import type { Ctx } from "./context";
 import { offset, vec } from "./math";
 import type { V3 } from "./math";
-import { catmull } from "./path";
-import type { Chain } from "./skeleton";
-import { interpolate, sweep } from "./sweep";
-import type { SweepOptions } from "./sweep";
+import { catmull, Path, polyline, toPath } from "./path";
+import type { PathLike } from "./path";
+import { createChain } from "./skeleton";
+import type { ChainOptions } from "./skeleton";
+import type { Hit } from "./surface";
+import { interpolate, radiusFn, sweep } from "./sweep";
+import type { Radius, SweepOptions } from "./sweep";
 
 /** Straight tube with flat ends. `r` = radius or [r0, r1] taper. */
 export function rod(ctx: Ctx, a: V3, b: V3, r: number | readonly [number, number], options: SweepOptions = {}) {
@@ -43,16 +46,15 @@ export type Station = { at: V3; w: number; h: number };
 
 /**
  * Smooth body through station centres (catmull), full width/height interpolated between stations.
- * `chain`: split into one mesh per joint of that chain (cut where the body passes each joint).
+ * `bone: chain` splits it into one mesh per joint of that chain (cut where the body passes each joint).
  */
-export function loft(ctx: Ctx, stations: readonly Station[], options: SweepOptions & { chain?: Chain } = {}) {
-  const { chain, ...rest } = options;
+export function loft(ctx: Ctx, stations: readonly Station[], options: SweepOptions = {}) {
   const path = catmull(stations.map((s) => s.at));
   const ts = path.knots;
   const ws = stations.map((s) => s.w / 2);
   const hs = stations.map((s) => s.h / 2);
-  const from = rest.from ?? 0;
-  const to = rest.to ?? 1;
+  const from = options.from ?? 0;
+  const to = options.to ?? 1;
   return sweep(
     ctx,
     path,
@@ -60,6 +62,51 @@ export function loft(ctx: Ctx, stations: readonly Station[], options: SweepOptio
       const t = from + u * (to - from);
       return [interpolate(ts, ws, t), interpolate(ts, hs, t)];
     },
-    { split: chain, ...rest },
+    options,
   );
+}
+
+export type SproutOptions = Omit<SweepOptions, "bone" | "extend"> &
+  Pick<ChainOptions, "names" | "twist"> & {
+    /** Joints along the appendage (default: one per knot span); 0 = no joints, the tube rides on `hit.joint`. */
+    count?: number;
+    /** How far the root runs back into the parent volume, along the start tangent (default: the root radius). */
+    bury?: number;
+  };
+
+/**
+ * An appendage (limb, horn, tentacle, neck) rooted on another volume at a surface hit. `pathOrTip` is a tip point
+ * (straight out) or a path / points (prefixed with the hit point when it starts elsewhere). The first joint sits
+ * at the hit, parented to `hit.joint`; the tube's root continues `bury` into the parent so it never floats.
+ */
+export function sprout(
+  ctx: Ctx,
+  name: string,
+  hit: Hit,
+  pathOrTip: PathLike | V3,
+  radius: Radius,
+  options: SproutOptions = {},
+) {
+  const { count, bury, names, ...rest } = options;
+  const tip = !(pathOrTip instanceof Path) && ("isVector3" in pathOrTip || typeof pathOrTip[0] === "number");
+  const given = tip ? polyline([hit.p, pathOrTip as V3]) : toPath(pathOrTip as PathLike);
+  const path = given.at(0).distanceTo(hit.p) > 1e-6 ? polyline([hit.p, given.at(0)]).concat(given) : given;
+  const chain =
+    count === 0
+      ? null
+      : createChain(ctx, name, path, {
+          parent: hit.joint,
+          count,
+          names,
+          twist: rest.twist,
+          up: rest.up,
+          group: rest.group,
+        });
+  const sweepOptions = {
+    name,
+    ...rest,
+    bone: hit.joint,
+    extend: [bury ?? Math.max(...radiusFn(radius)(0)), 0] as const,
+  };
+  return { chain, sweep: sweep(ctx, chain ?? path, radius, sweepOptions) };
 }

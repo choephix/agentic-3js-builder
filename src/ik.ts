@@ -1,22 +1,113 @@
-// Two-bone IK: solve the middle joint so a limb ends exactly on a target (feet planted on the floor).
+// Limb IK: joint positions for a chain of fixed segment lengths that ends exactly on a target (feet planted on
+// the floor). One solver for 2-bone arms, digitigrade 3-segment hind legs, 4-segment insect legs and curls.
 import { Vector3 } from "three";
 import { flatten, vec } from "./math";
 import type { V3 } from "./math";
 
+/** In-plane segment angles for equal turns of `k` radians, each joint turning away from its side. */
+function turned(sides: readonly number[], k: number) {
+  const angles = [0];
+  for (const side of sides) angles.push(angles[angles.length - 1] - side * k);
+  return angles;
+}
+
+/** End of a planar chain with these segment angles, as [along, across]. */
+function end(lengths: readonly number[], angles: readonly number[]) {
+  let x = 0;
+  let y = 0;
+  lengths.forEach((l, i) => {
+    x += l * Math.cos(angles[i]);
+    y += l * Math.sin(angles[i]);
+  });
+  return [x, y] as const;
+}
+
 /**
- * Knee/elbow position for a two-bone limb from `root` to `target` with bone lengths [l1, l2], bending toward
- * `bendHint` (a direction, e.g. [0, 0, 1] for a knee pointing forward). Out-of-reach targets straighten the limb
- * toward the target; too-close targets fold it as far as the lengths allow.
+ * Equal-turn fold: every joint turns by the same angle toward its side, and the whole chain rotates so it ends on
+ * the line at `dist`. Too far: straight. Too close: folded as far as equal turns go. Angles are from the line.
  */
-export function twoBoneIK(root: V3, target: V3, [l1, l2]: readonly [number, number], bendHint: V3) {
+function fold(lengths: readonly number[], sides: readonly number[], dist: number) {
+  const reach = (k: number) => Math.hypot(...end(lengths, turned(sides, k)));
+  let k = 0;
+  if (dist < lengths.reduce((sum, l) => sum + l, 0)) {
+    let previous = 0;
+    let tightest = 0;
+    k = NaN;
+    for (let i = 1; i <= 90 && Number.isNaN(k); i++) {
+      const next = (i / 90) * Math.PI;
+      if (reach(next) <= dist) {
+        let lo = previous;
+        let hi = next;
+        for (let n = 0; n < 50; n++) {
+          const m = (lo + hi) / 2;
+          if (reach(m) > dist) lo = m;
+          else hi = m;
+        }
+        k = (lo + hi) / 2;
+      } else if (reach(next) < reach(tightest)) tightest = next;
+      previous = next;
+    }
+    if (Number.isNaN(k)) k = tightest;
+  }
+  const angles = turned(sides, k);
+  const [x, y] = end(lengths, angles);
+  const rotation = -Math.atan2(y, x);
+  return angles.map((angle) => angle + rotation);
+}
+
+/**
+ * Joint positions `[root, ..., end]` for segments of exactly `lengths` from `root` to `target`. `bends` is one
+ * direction per inner joint (or one for all) saying which way that joint points: alternate them for a digitigrade
+ * leg (knee forward, hock back). The limb is planar: the plane holds root, target and the first hint.
+ *
+ * Rule for the extra freedom of 3+ segments: the last segment runs parallel to root→target (a vertical cannon
+ * under a hip) when that respects its hint and reach; otherwise every joint turns by the same angle. Out of reach:
+ * straight toward the target. `sole`: the last segment points exactly along `sole` (a flat foot along the floor)
+ * and the rest solves to its heel. With two lengths this is classic two-bone IK.
+ */
+export function limb(
+  root: V3,
+  target: V3,
+  lengths: readonly number[],
+  bends: V3 | readonly V3[],
+  options: { sole?: V3 } = {},
+): Vector3[] {
+  const n = lengths.length;
+  const hints =
+    Array.isArray(bends) && typeof bends[0] !== "number"
+      ? (bends as readonly V3[]).map(vec)
+      : lengths.slice(1).map(() => vec(bends as V3));
+  if (hints.length < n - 1) throw new Error(`limb(): ${n - 1} inner joints but ${hints.length} bend hints`);
+  if (options.sole) {
+    const sole = vec(options.sole).normalize();
+    const last = lengths[n - 1];
+    const upper = limb(root, vec(target).addScaledVector(sole, -last), lengths.slice(0, -1), hints.slice(0, n - 2));
+    return [...upper, upper[upper.length - 1].clone().addScaledVector(sole, last)];
+  }
   const a = vec(root);
   const toTarget = vec(target).sub(a);
-  const dir = toTarget.clone().normalize();
-  const d = Math.min(Math.max(toTarget.length(), Math.abs(l1 - l2) + 1e-6), l1 + l2 - 1e-6);
-  const along = (l1 * l1 - l2 * l2 + d * d) / (2 * d);
-  const height = Math.sqrt(Math.max(l1 * l1 - along * along, 0));
-  let bend = flatten(vec(bendHint), dir);
-  if (bend.lengthSq() < 1e-10) bend = flatten(new Vector3(0, 0, 1), dir);
-  if (bend.lengthSq() < 1e-10) bend = flatten(new Vector3(1, 0, 0), dir);
-  return a.addScaledVector(dir, along).addScaledVector(bend.normalize(), height);
+  const d = toTarget.length();
+  const dir = d > 1e-9 ? toTarget.normalize() : new Vector3(0, -1, 0);
+  let across = flatten(hints[0] ?? new Vector3(0, 0, 1), dir);
+  if (across.lengthSq() < 1e-10) across = flatten(new Vector3(0, 0, 1), dir);
+  if (across.lengthSq() < 1e-10) across = flatten(new Vector3(1, 0, 0), dir);
+  across.normalize();
+  const sides = hints.slice(0, n - 1).map((h) => Math.sign(flatten(h, dir).dot(across)) || 1);
+
+  let angles = fold(lengths, sides, d);
+  if (n >= 3) {
+    const upperLengths = lengths.slice(0, -1);
+    const heel = d - lengths[n - 1];
+    const upper = fold(upperLengths, sides.slice(0, -1), heel);
+    const [x, y] = end(upperLengths, upper);
+    const reached = heel > 0 && Math.abs(x - heel) < 1e-6 && Math.abs(y) < 1e-6;
+    const lean = upper[upper.length - 1];
+    if (reached && (Math.abs(lean) < 1e-9 || Math.sign(lean) === sides[n - 2])) angles = [...upper, 0];
+  }
+  const points = [a];
+  angles.forEach((angle, i) => {
+    const step = dir.clone().multiplyScalar(Math.cos(angle)).addScaledVector(across, Math.sin(angle));
+    points.push(points[i].clone().addScaledVector(step, lengths[i]));
+  });
+  return points;
 }

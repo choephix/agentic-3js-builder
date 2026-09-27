@@ -23,8 +23,11 @@ export type MembraneOptions = Tags & {
   scallop?: number;
   /** Which bone owns a cell: "mid" = the nearer edge's joint at that t, "a" / "b" = always that edge. */
   split?: "mid" | "a" | "b";
-  /** Bone for Path / point edges (default: the other edge's joints, else the root joint). */
-  bone?: JointRef;
+  /**
+   * Owner of cells on Path / point edges (default: the other edge's joints, else the root joint). A Chain gives
+   * each cell to the chain joint nearest to it: a fin on `sweep.line(0)` follows the spine.
+   */
+  bone?: JointRef | Chain;
 };
 
 /** Grid vertices P[i][j]: `i` along the edges, `j` from edge A (0) to edge B (rows). */
@@ -82,11 +85,14 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
   const rows = options.rows ?? 4;
   const scallop = options.scallop ?? 0;
   const split = options.split ?? "mid";
-  const fallback = options.bone !== undefined ? resolveJoint(ctx, options.bone) : null;
-  const jointFor = (side: "a" | "b", t: number): Joint => {
+  const owner = options.bone;
+  const jointFor = (side: "a" | "b", t: number, at: Vector3): Joint => {
     const own = side === "a" ? chainA : chainB;
     const other = side === "a" ? chainB : chainA;
-    return own?.jointAt(t) ?? fallback ?? other?.jointAt(t) ?? resolveJoint(ctx);
+    if (own) return own.jointAt(t);
+    if (owner instanceof Chain) return owner.jointAt(owner.path.closestT(at));
+    if (owner !== undefined) return resolveJoint(ctx, owner);
+    return other?.jointAt(t) ?? resolveJoint(ctx);
   };
 
   let width = 0;
@@ -133,7 +139,11 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
       const s = (j + 0.5) / rows;
       const t = ((columns[i] + columns[i + 1]) / 2) * tMax(s);
       const side = split === "mid" ? (s < 0.5 ? "a" : "b") : split;
-      const joint = jointFor(side, t);
+      const centre = grid[i][j]
+        .clone()
+        .add(grid[i + 1][j + 1])
+        .multiplyScalar(0.5);
+      const joint = jointFor(side, t, centre);
       const list = byJoint.get(joint);
       if (list) list.push([i, j]);
       else byJoint.set(joint, [[i, j]]);
