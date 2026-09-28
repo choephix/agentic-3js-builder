@@ -1,8 +1,8 @@
-// Veiled chameleon, a 0.5 m adult male, standing on four gripping feet. A tall, laterally flattened trunk is lofted
-// over a spine chain and arches from the hips to a short neck; the prehensile tail is its own chain that runs back
-// and rolls down into a tight ventral coil. The head's signature is the casque: an extruded side-view helmet, thick
-// at its root and knife-thin at its crest, with a lighter inset core, ridged cranial crests and a sawtooth gular
-// crest hanging under the chin. Serrated dorsal crest teeth are small extrudes seated on the skin along the spine.
+// Veiled chameleon, a 0.5 m adult male, standing on four gripping feet. One continuous tapered tube runs from the
+// tail tip through the hips and up the spine to a short neck; the prehensile tail rolls down into a tight ventral coil.
+// The head's signature is the casque: an extruded side-view helmet, thick at its root and knife-thin at its crest, with
+// a lighter inset core, ridged cranial crests and a sawtooth gular crest hanging under the chin. Serrated dorsal crest
+// teeth are small extrudes seated on that continuous skin along the spine and tail.
 // The conical eye turrets, the pupils' tiny apertures, the flank spots and the claws are lathes. Each foot splits
 // into two opposed toe bundles (3 + 2 in front, 2 + 3 behind), each a two-joint chain ending in separate clawed toes.
 import { SphereGeometry, Vector3 } from "three";
@@ -59,9 +59,9 @@ export default function build() {
     [0, 0.0015, "sharp"],
   ];
 
-  // ---------------------------------------------------------------- trunk and neck
-  // Station centres from the rump to the base of the skull; w/h are full width and height. The trunk is deep and
-  // narrow, highest over the middle of the back.
+  // ---------------------------------------------------------------- trunk, neck and tail
+  // One continuous curve runs from the tail tip through the hips to the base of the skull. The body is deep and
+  // narrow, highest over the middle of the back; the tail tapers through its ventral coil.
   const stations = [
     { at: [0, 0.142, -0.1], w: 0.036, h: 0.06 },
     { at: [0, 0.146, -0.075], w: 0.05, h: 0.088 },
@@ -80,36 +80,14 @@ export default function build() {
     role: "spine",
     group: "body",
   });
-  // Three broad yellow bars edged in orange cross the flanks; the belly and a pale lateral stripe run under them.
-  const bars = [0.24, 0.44, 0.64];
-  const bodyColor = (t: number) => {
-    for (const c of bars) {
-      const d = Math.abs(t - c);
-      if (d < 0.035) return YELLOW;
-      if (d < 0.05) return ORANGE;
-    }
-    return GREEN;
-  };
-  const body = b.loft(stations, {
-    bone: spine,
-    color: bodyColor,
-    sectors: [
-      [120, 132, STRIPE],
-      [132, 228, BELLY],
-      [228, 240, STRIPE],
-    ],
-    sides: 16,
-    group: "body",
-  });
-
-  // ---------------------------------------------------------------- tail
-  // Straight back from the hips, then a ventral coil: over the top, down behind and forward underneath.
   const coilCentre: V3 = [0, 0.084, -0.19];
   const coilStart: V3 = [0, 0.136, -0.19];
   const tailPath = catmull([stations[1].at, [0, 0.144, -0.11], [0, 0.139, -0.155], coilStart]).concat(
     spiral(coilCentre, coilStart, [-1, 0, 0], { turns: 1.35, r1: 0.012 }),
   );
   const tail = b.chain("tail", tailPath, { parent: hips, count: 14, role: "tail", group: "tail" });
+  const fullPath = tailPath.slice(1, 0).concat(curve.slice(curve.knots[1], 1));
+  const tailT = tailPath.length / fullPath.length;
   const tailRx: [number, number][] = [
     [0, 0.022],
     [0.08, 0.017],
@@ -124,12 +102,67 @@ export default function build() {
     [0.65, 0.009],
     [1, 0.0035],
   ];
-  const tailColor = (t: number) => (t > 0.08 && t < 0.8 && ((t - 0.08) / 0.09) % 1 > 0.62 ? LIME : GREEN);
-  const tailTube = b.sweep(tail, (t) => [interp(tailRx, t), interp(tailRy, t)], {
-    color: tailColor,
+  const bars = [0.24, 0.44, 0.64];
+  const bodyColor = (t: number) => {
+    const bodyT = (t - tailT) / (1 - tailT);
+    for (const c of bars) {
+      const d = Math.abs(bodyT - c);
+      if (d < 0.035) return YELLOW;
+      if (d < 0.05) return ORANGE;
+    }
+    return GREEN;
+  };
+  const radiusAt = (t: number): [number, number] => {
+    if (t <= tailT) {
+      const u = 1 - t / tailT;
+      return [interp(tailRx, u), interp(tailRy, u)];
+    }
+    const u = (t - tailT) / (1 - tailT);
+    return [
+      interp(
+        stations.map((s, i) => [i / (stations.length - 1), s.w / 2]),
+        u,
+      ),
+      interp(
+        stations.map((s, i) => [i / (stations.length - 1), s.h / 2]),
+        u,
+      ),
+    ];
+  };
+  const colorAt = (t: number) => {
+    if (t < tailT) {
+      const u = 1 - t / tailT;
+      return u > 0.08 && u < 0.8 && ((u - 0.08) / 0.09) % 1 > 0.62 ? LIME : GREEN;
+    }
+    return bodyColor(t);
+  };
+  // One curve and one bone list, swept in two ranges: the tail keeps only its belly sector, the body its lateral
+  // stripes. The rings at the cut coincide and share weights, so there is no seam.
+  const bone = [tail, hips, spine];
+  const tailTube = b.sweep(fullPath, (u) => radiusAt(u * tailT), {
+    bone,
+    from: 0,
+    to: tailT,
+    color: (u) => colorAt(u * tailT),
     sectors: [[135, 225, BELLY]],
-    sides: 12,
+    caps: { end: "none" },
+    sides: 16,
     group: "tail",
+  });
+  const bodyAt = (u: number) => tailT + u * (1 - tailT);
+  const bodyTube = b.sweep(fullPath, (u) => radiusAt(bodyAt(u)), {
+    bone,
+    from: tailT,
+    to: 1,
+    color: (u) => colorAt(bodyAt(u)),
+    sectors: [
+      [120, 132, STRIPE],
+      [132, 228, BELLY],
+      [228, 240, STRIPE],
+    ],
+    caps: { start: "none" },
+    sides: 16,
+    group: "body",
   });
 
   // ---------------------------------------------------------------- head
@@ -456,7 +489,7 @@ export default function build() {
 
   // ---------------------------------------------------------------- dorsal crest
   // Backward-leaning sawteeth down the ridge of the back, largest over the shoulders, fading onto the tail. The
-  // outline's +x runs toward the tail: against the body loft's tangent, along the tail's.
+  // outline's +x runs toward the tail on the tail section and against the body section's tangent on the spine.
   const crestAt = (tube: Sweep, back: number, t: number, h: number, l: number, group: string) => {
     const p = tube.at(t, 0);
     b.extrude(
@@ -478,12 +511,14 @@ export default function build() {
       },
     );
   };
-  for (let i = 0; i < 16; i++) {
-    const t = 0.08 + i * 0.054;
-    const k = Math.sin(Math.PI * (0.15 + 0.8 * t));
-    crestAt(body, -1, t, 0.004 + 0.006 * k, 0.006 + 0.002 * k, "body");
+  for (let i = 0; i < 14; i++) {
+    crestAt(tailTube, 1, 1 - (0.02 + i * 0.03), 0.0055 - i * 0.0005, 0.0065, "tail");
   }
-  for (let i = 0; i < 9; i++) crestAt(tailTube, 1, 0.02 + i * 0.03, 0.0055 - i * 0.0005, 0.0065, "tail");
+  for (let i = 0; i < 12; i++) {
+    const u = 0.15 + i * 0.065;
+    const k = Math.sin(Math.PI * (0.15 + 0.8 * u));
+    crestAt(bodyTube, -1, u, 0.004 + 0.006 * k, 0.006 + 0.002 * k, "body");
+  }
 
   // ---------------------------------------------------------------- skin details
   // Turquoise and orange spots between the bars, and pale tubercles on the legs: each a small turned dome.
@@ -493,7 +528,7 @@ export default function build() {
     [0.004, 0.0012],
     [0, 0.0022, "sharp"],
   ];
-  const trunk = b.surface(body);
+  const trunk = b.surface(bodyTube);
   for (const hit of trunk.scatter(34, {
     rng: random,
     minDist: 0.012,
