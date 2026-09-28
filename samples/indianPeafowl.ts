@@ -1,6 +1,7 @@
 // Indian peafowl (Pavo cristatus), a male in full display at real size. The train is a fan of individually drawn
 // feathers: teardrop eye feathers in four staggered tiers and fishtail feathers at the lateral edges, each an
-// extruded outline with its eye spot stacked on its face in four extruded layers. Nine ring joints carry the fan.
+// extruded outline with its eye spot stacked on its face in four extruded layers. Nine ring joints carry the fan. The
+// body and neck share one continuous loft over the spine and neck chains.
 import { SphereGeometry, Vector3 } from "three";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
@@ -142,26 +143,49 @@ export default function build() {
     { parent: hips, count: 2, names: ["spine", "chest"], role: "spine", group: "body" },
   );
   const rump = b.joint("rump", { parent: hips, at: [0, 0.66, -0.25], aim: [0, 0.72, -0.31], group: "body" });
+  const stations = [
+    { at: [0, 0.68, -0.31], w: 0.12, h: 0.1 },
+    { at: [0, 0.64, -0.2], w: 0.25, h: 0.26 },
+    { at: [0, 0.63, -0.04], w: 0.3, h: 0.32 },
+    { at: [0, 0.68, 0.1], w: 0.26, h: 0.3 },
+    { at: [0, 0.77, 0.17], w: 0.15, h: 0.17 },
+    { at: [0, 0.8413, 0.2122], w: 0.12, h: 0.12 },
+    { at: [0, 0.87, 0.21], w: 0.12, h: 0.12 },
+    { at: [0, 0.97, 0.215], w: 0.09, h: 0.09 },
+    { at: [0, 1.05, 0.25], w: 0.058, h: 0.058 },
+  ] as const;
+  const bodyPath = catmull(stations.map(({ at }) => at));
+  const neckStart = bodyPath.closestT(stations[5].at);
+  const neckChain = b.chain("neck", bodyPath.slice(neckStart, 1), {
+    parent: spine.joints[1],
+    count: 3,
+    names: ["neck1", "neck2", "neck3"],
+    role: "neck",
+    group: "neck",
+  });
 
-  const body = b.loft(
-    [
-      { at: [0, 0.68, -0.31], w: 0.12, h: 0.1 },
-      { at: [0, 0.64, -0.2], w: 0.25, h: 0.26 },
-      { at: [0, 0.63, -0.04], w: 0.3, h: 0.32 },
-      { at: [0, 0.68, 0.1], w: 0.26, h: 0.3 },
-      { at: [0, 0.77, 0.17], w: 0.15, h: 0.17 },
+  // One curve carries the body and neck. Split only to preserve the body's belly sectors and its colour bands.
+  const body = b.loft(stations, {
+    bone: [spine, neckChain],
+    from: 0,
+    to: neckStart,
+    color: MANTLE,
+    bands: [
+      [0.5, MANTLE],
+      [1, BLUE],
     ],
-    {
-      bone: spine,
-      color: MANTLE,
-      bands: [
-        [0.5, MANTLE],
-        [1, BLUE],
-      ],
-      sectors: [[122, 238, BELLY]],
-      group: "body",
-    },
-  );
+    sectors: [[122, 238, BELLY]],
+    caps: { start: "round", end: "none" },
+    group: "body",
+  });
+  b.loft(stations, {
+    bone: [spine, neckChain],
+    from: neckStart,
+    to: 1,
+    color: BLUE,
+    caps: { start: "none", end: "round" },
+    group: "neck",
+  });
   const bodySkin = b.surface(body);
 
   // Bronze-green mantle scales on the back between the folded wings.
@@ -178,15 +202,6 @@ export default function build() {
     });
 
   // ---- Neck, head, beak ---------------------------------------------------------------------------------------
-  const neckRoot = must(bodySkin.around([0, 0.68, 0.02]).at(0, 40), "neck root");
-  const neck = b.sprout(
-    "neck",
-    neckRoot,
-    catmull([neckRoot.at, [0, 0.87, 0.21], [0, 0.97, 0.215], [0, 1.05, 0.25]]),
-    [0.06, 0.029],
-    { count: 3, names: ["neck1", "neck2", "neck3"], role: "neck", color: BLUE, group: "neck" },
-  );
-  const neckChain = neck.chain!;
   const head = b.joint("head", {
     parent: neckChain.joints[2],
     at: neckChain.at(1),
