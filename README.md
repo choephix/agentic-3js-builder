@@ -127,7 +127,7 @@ const jaw = b.joint("jaw", { parent: head, at: head.local([0, 0.02, -0.06]), aim
 
 `b.chain(name, path, { parent?, up?, twist?, group?, count?, names?, role?, contact? })` returns a `Chain` of joints `${name}1..N`, or the names you give (`names: ["hipHL", "kneeHL", "hockHL"]` or `(i) => string`; auto-riggers key on them). Joint i sits at its span start and aims at the next; the last span ends at the path end. The default count is one joint per knot span; `count` resamples by arc length. Roll starts from `aim(tangent, up)` and is parallel-transported, so it never flips. `twist` then rolls it about the path: a number is the total in degrees, spread evenly from start to end; `(t) => deg` sets it per t. Joints and chain sweeps both follow it (a pronated forearm, a twisting tentacle). A `Chain` has `joints`, `length`, `ts` (joint t's plus 1), `at(t)` returning `{ t, p, tangent, normal, binormal, joint }`, `jointAt(t)` and `span(i)` returning `[t0, t1]`. `chain.at(t)` is in the current pose (see "Posing after building"); `chain.path` is the curve as built. `chain.nearestJoint(p)` is the joint whose bone segment passes closest to `p`. `role` and `contact` feed the rig answer key.
 
-To root a chain mid-body (serpents, centipedes), cut one curve into two chains from the same parent:
+To root a chain mid-body (quadrupeds with a tail, serpents, centipedes), cut one curve into two chains from the same parent, then skin one tube over both so the body has no seam:
 
 ```ts
 const body = catmull([tailTip, ..., rootPoint, ..., headEnd]);
@@ -135,6 +135,7 @@ const core = b.joint("core", { at: rootPoint });
 const rootT = body.closestT(core.at);
 const front = b.chain("front", body.slice(rootT, 1), { parent: core, count: 5 });
 const back = b.chain("back", body.slice(rootT, 0), { parent: core, count: 7 });
+b.sweep(body, radii, { bone: [back, core, front], color: SKIN }); // or b.loft(stations, { bone: [...] })
 ```
 
 ## Parts
@@ -157,7 +158,7 @@ b.rod(eye, crest, 0.012, { color: BONE }); // from an eye to a joint, on the eye
 
 `b.sweep(source, radius, options?)` returns a `Sweep`. Use it for every tube: bodies, necks, tails, limbs, horns, tentacles, whiskers.
 
-- `source` is a Path input (one mesh; its bones are `bone`, else the path's own bones when it was made from built inputs, else the joint nearest its start) or a `Chain`. For a path that runs along a chain in the same direction (a loft body over a spine), `bone: chain` skins it to that chain like a chain source. `from`/`to` restrict the source range.
+- `source` is a Path input (one mesh; its bones are `bone`, else the path's own bones when it was made from built inputs, else the joint nearest its start) or a `Chain`. For a path that runs through chains and joints (a loft body over a spine, or tail, hips, spine and neck on one curve), `bone: chain` or `bone: [tail, hips, spine, head]` skins it like a chain source: one mesh that bends at every listed joint. List them in any order; each chain may run either way along the path. `from`/`to` restrict the source range.
 - `radius` is `r`, `[r0, r1]` (linear), `number[]` (evenly keyed, smooth), `(t) => r` or `(t) => [rx, ry]`. `rx` runs sideways (binormal) and `ry` along the frame normal. For boxes these are half extents. Radius, shift, colour, bands and `at` all use t from 0 to 1 over the swept range.
 - `shift` is `[x, y]` or `(t) => [x, y]` in the same axes as `[rx, ry]`: it moves the section centre off the path, so a heavy belly hangs below the spine while the bones stay on the spine line.
 - `section` is `"circle"` (default, `sides` = 8 × `detail`, smooth), `"box"` or `{ ngon: n }` (faceted). `smooth` overrides the shading. Circles are circumscribed: flat faces sit exactly at `r`, top and bottom are flat, so a tube of radius r whose axis is at height r touches the floor.
@@ -199,7 +200,7 @@ These shorthands are each one call to `sweep`:
 | `b.capsule(a, b, r \| [r0, r1], opts?)`         | round ends                                                                                                                                |
 | `b.spike(base, dirOrTip, len, r, opts?)`        | cone to a point; `len` number means direction (a frame gives its axis: `spike(hit, hit, len, r)`), `len` null means `dirOrTip` is the tip |
 | `b.frustumBox(a, b, [w0, h0], [w1, h1], opts?)` | box section, full width × height, flat ends                                                                                               |
-| `b.loft([{ at, w, h }, ...], opts?)`            | catmull through station centres, full width/height interpolated; `bone: chain` skins it to that chain                                     |
+| `b.loft([{ at, w, h }, ...], opts?)`            | catmull through station centres, full width/height interpolated; `bone: chain` or `[chains and joints]` skins it to them                  |
 
 `b.sprout(name, on, pathOrTip, radius, { count?, bury?, names?, twist?, role?, ...sweep options })` roots an appendage (limb, horn, tentacle, neck) on another volume at a Frame (usually a surface hit) and returns `{ chain, sweep }`. `pathOrTip` is a tip Point (straight out) or a Path; the frame's point is prepended when the path starts elsewhere. The first joint sits at the frame's point, parented to its heaviest bone (else the nearest joint), and `count` joints follow (default one per knot span). With `count: 0` there are no joints (`chain` is null) and the tube rides on that bone. The tube's root continues `bury` (default: the root radius) back along its start tangent into the parent, so it never floats on a curved surface and no joint is wasted inside the body.
 

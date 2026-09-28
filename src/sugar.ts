@@ -69,7 +69,7 @@ export type Station = { at: PointInput; w: number; h: number };
 
 /**
  * Smooth body through station centres (catmull), full width/height interpolated between stations.
- * `bone: chain` splits it into one mesh per joint of that chain (cut where the body passes each joint).
+ * `bone` (a chain, or a list of chains and joints the body runs through) skins it as one mesh bending at each joint.
  */
 export function loft(ctx: Ctx, stations: readonly Station[], options: SweepOptions = {}) {
   const path = catmull(stations.map((s) => s.at));

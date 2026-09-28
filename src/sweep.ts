@@ -1,11 +1,11 @@
 // `sweep()`: the one tube primitive. A section swept along a path or a chain, with continuous radius,
 // parallel-transported roll, adaptive ring spacing, caps, colour bands along the tube and colour sectors around it.
-// On a chain the tube is one continuous blend-skinned mesh by default ("smooth": each ring blends the two bones
-// either side of a joint over about ±1 local radius, and corners are rounded); `skin: "rigid"` cuts it into one
-// round-capped piece per bone instead.
+// On a chain, or on a path given the chains and joints it runs through, the tube is one continuous blend-skinned mesh
+// by default ("smooth": each ring blends the two bones either side of a joint over about ±1 local radius, and corners
+// are rounded); `skin: "rigid"` cuts it into one round-capped piece per bone instead.
 import { Matrix3, Matrix4, Quaternion, Vector3 } from "three";
 import type { Mesh } from "three";
-import { Capture, meshFromWorld, rigid, spanWeights, weightsFor } from "./context";
+import { Capture, meshFromWorld, resolveJoint, rigid, spanWeights, weightsFor } from "./context";
 import type { Ctx, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, flatten } from "./math";
@@ -32,11 +32,12 @@ export type SweepOptions = Tags & {
   /** `[[tEnd, color], ...]` ascending: color bands; each band edge splits the mesh (same bone, no cap). */
   bands?: ReadonlyArray<readonly [number, string]>;
   /**
-   * Bones for a Path source: a joint (rigid), or a Chain the path runs along in the same direction (a body over a
-   * spine: skinned to that chain like a chain source). Default: the weights of the path's first built input, else
-   * the joint nearest the path's start. Chain sources always use their own joints.
+   * Bones for a Path source: a joint (rigid), or the chains and joints the path runs through, as one Chain or a list
+   * in any order (a body drawn from tail tip to snout: `[tail, hips, spine, neck, head]`). The tube is then one mesh
+   * skinned like a chain source, whichever way each chain runs along the path. Default: the weights of the path's
+   * first built input, else the joint nearest the path's start. Chain sources always use their own joints.
    */
-  bone?: JointRef | Chain;
+  bone?: JointRef | Chain | ReadonlyArray<JointRef | Chain>;
   /** "smooth" (default): one continuous mesh bending across joints. "rigid": one round-capped piece per bone. */
   skin?: Skin;
   /** Range of the source to sweep, in source t. All other t (radius, color, bands, at) run 0..1 over this range. */
@@ -405,6 +406,31 @@ class MeshBuffer {
   }
 }
 
+const isBoneList = (x: SweepOptions["bone"]): x is ReadonlyArray<JointRef | Chain> => Array.isArray(x);
+
+/**
+ * A `bone` list laid onto the path, in path order: each joint owns source t from its span start to the next one. A
+ * chain running with the path owns forward from each joint; one running against it (a tail on a curve drawn from
+ * the tail tip) owns the stretch behind each joint, from its child or the chain tip. A lone joint owns from its
+ * own position. Of several spans starting at one t, the last listed keeps it.
+ */
+function boneSpans(ctx: Ctx, path: Path, items: ReadonlyArray<JointRef | Chain>) {
+  const spans: Array<{ joint: Joint; t: number }> = [];
+  for (const item of items) {
+    if (!(item instanceof Chain)) {
+      const joint = resolveJoint(ctx, item);
+      spans.push({ joint, t: path.closestT(joint.at) });
+      continue;
+    }
+    const ends = [...item.joints.map((joint) => path.closestT(joint.at)), path.closestT(item.at(1).at)];
+    const forward = ends[ends.length - 1] >= ends[0];
+    item.joints.forEach((joint, i) => spans.push({ joint, t: forward ? ends[i] : ends[i + 1] }));
+  }
+  if (!spans.length) throw new Error("sweep(): the `bone` list is empty");
+  spans.sort((a, b) => a.t - b.t);
+  return spans.filter((span, i) => i === spans.length - 1 || spans[i + 1].t - span.t > 1e-6);
+}
+
 export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, options: SweepOptions = {}) {
   const chain = source instanceof Chain ? source : null;
   const path = source instanceof Chain ? source.path : toPath(source);
@@ -431,17 +457,22 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const rOf = radiusFn(radius);
   const rMaxAt = (t: number) => Math.max(...rOf(Math.min(Math.max(toU(t), 0), 1)));
 
-  // Bones: a chain (the source, or `bone: chain` for a path along it) with joint starts in source t, else one
-  // fixed set of weights for the whole tube (the path's own, or `bone`).
+  // Bones: joint spans in source t (a chain source's own joints, or `bone` as chains and joints laid onto the path),
+  // else one fixed set of weights for the whole tube (the path's own, or `bone`).
   const owner = options.bone;
-  const bones = chain ?? (owner instanceof Chain ? owner : null);
-  const boneTs = chain ? chain.ts.slice(0, -1) : bones ? bones.joints.map((j) => path.closestT(j.at)) : [0];
+  const spans = chain
+    ? chain.joints.map((joint, i) => ({ joint, t: chain.ts[i] }))
+    : owner instanceof Chain || isBoneList(owner)
+      ? boneSpans(ctx, path, owner instanceof Chain ? [owner] : owner)
+      : null;
+  const boneJoints = spans?.map((span) => span.joint) ?? null;
+  const boneTs = spans ? spans.map((span) => span.t) : [0];
   const starts = boneTs.map((t) => t * L);
-  const uniform = bones ? null : weightsFor(ctx, owner as JointRef | undefined, [path], path.at(from));
+  const uniform = spans ? null : weightsFor(ctx, owner as JointRef | undefined, [path], path.at(from));
   const jointAt = (t: number) => {
     let i = 0;
     while (i < boneTs.length - 1 && boneTs[i + 1] <= t) i++;
-    return bones!.joints[i];
+    return boneJoints![i];
   };
   // Smooth blend window around joint k: ±1 local radius, at most 45% of either neighbouring span.
   const half = (k: number) =>
@@ -453,7 +484,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
         : uniform
       : rigidSkin
         ? rigid(jointAt(toT(u)))
-        : spanWeights(bones!.joints, starts, toT(u) * L, half);
+        : spanWeights(boneJoints!, starts, toT(u) * L, half);
 
   // Smooth skin rounds every corner inside the range with a bezier over ±1 local radius.
   const fillets: Tube["fillets"] = [];
@@ -487,7 +518,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     closed,
     seam: seamSmooth ? seamIn.add(seamOut).normalize() : null,
     fillets,
-    capture: chain ? chain.capture : new Capture(bones ? bones.joints : uniform!.map(([joint]) => joint)),
+    capture: chain ? chain.capture : new Capture(boneJoints ?? uniform!.map(([joint]) => joint)),
   };
   const caps = typeof options.caps === "object" ? options.caps : { start: options.caps, end: options.caps };
   const seamCap: Cap = seamSmooth ? "none" : "round";
