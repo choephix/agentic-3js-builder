@@ -2,7 +2,7 @@
 
 Helpers for writing primitive-built, skeleton-rigged three.js creatures in code. You describe the creature in model space; the SDK builds joints, tubes, membranes and stuck-on details, and returns a plain `THREE.Object3D` tree that meets the Nilo Creature Lab contract (`~/tmp/public/nilo/creature-lab/GUIDE.md`).
 
-Why each helper exists, with the evidence from 100 builds: [`docs/DESIGN.md`](docs/DESIGN.md). Working samples: [`samples/`](samples), viewable in the local showcase (`npm run showcase`).
+Why each helper exists, with the evidence from 100 builds: [`docs/DESIGN.md`](docs/DESIGN.md). Working samples: [`samples/`](samples), viewable in the local showcase (`npm run showcase`). To have an agent build a new sample, hand it [`GUIDE.md`](GUIDE.md) and a subject.
 
 ## Cheat sheet
 
@@ -380,7 +380,7 @@ The showcase (`showcase/`, Vite with plain TypeScript) discovers every `samples/
 
 ## Non-goals
 
-No per-vertex skin weights, textures, mirroring helper, grid/row helpers, ground-shift helper or auto-merge batching. Mirror with `for (const s of [1, -1])`.
+No textures, auto weights for plain meshes, mirroring helper, grid/row helpers, ground-shift helper or auto-merge batching. Mirror with `for (const s of [1, -1])`.
 
 ## Development
 
@@ -389,6 +389,7 @@ npm install
 npm run typecheck        # src, samples and showcase
 npm run showcase         # dev server with hot reload
 npm run showcase:build   # static build in showcase/dist
+npm run snap -- <slug> v01   # render a sample through the creature-lab harness
 ```
 
-To render a skeleton sample through the creature-lab harness, point a scratch creature-lab slug's `B/creature.ts` at it (`export { default, meta } from "/home/cx/noodlespace/agentic-3js-builder/samples/wyvern";`) and run `node_modules/.bin/tsx harness/snap.ts <slug> B v01` from `~/workspace/nilo-creature-lab`. Delete the scratch slug afterwards.
+`snap` renders on the shared NVIDIA Chromium (port 9333) and writes the contact sheet, shots, report and GLBs to `~/tmp/public/nilo/agentic-3js-builder/snaps/<slug>/` (arm B with joints, A for plain objects). It needs `~/workspace/nilo-creature-lab` checked out; its `harness/snap.ts` reads `CREATURE_LAB_DIR` for the output folder.
