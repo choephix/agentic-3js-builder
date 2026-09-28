@@ -1,5 +1,5 @@
 // Barn owl. A compact, blocky bird with an extended wing skeleton, heart-shaped facial disk,
-// paired jaws, articulated feet, feathered wing fingers, and a small fan tail.
+// paired jaws, articulated feet, a continuous torso-to-neck tube, and a small fan tail.
 import { SphereGeometry, Vector3 } from "three";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
@@ -29,7 +29,7 @@ const WHITE = "#f2e8d5";
 export default function build() {
   const b = createBuilder({ name: "barnOwl", detail: 0.85 });
 
-  // Skeleton first: a short torso, rising neck, and a forward-facing head.
+  // Skeleton first: a short torso that flows continuously into the rising neck and forward-facing head.
   const hips = b.joint("hips", { at: [0, 0.36, -0.06], role: "spine", group: "body" });
   const spine = b.chain(
     "spine",
@@ -41,16 +41,6 @@ export default function build() {
     ],
     { parent: hips, role: "spine", group: "body" },
   );
-  b.loft(
-    [
-      { at: [0, 0.36, -0.25], w: 0.2, h: 0.2 },
-      { at: [0, 0.39, -0.08], w: 0.34, h: 0.38 },
-      { at: [0, 0.46, 0.12], w: 0.31, h: 0.35 },
-      { at: [0, 0.53, 0.27], w: 0.19, h: 0.23 },
-    ],
-    { bone: spine, color: PLUMAGE, sectors: [[125, 235, PLUMAGE_DARK]], group: "body" },
-  );
-
   const neck = b.chain(
     "neck",
     catmull([
@@ -61,7 +51,33 @@ export default function build() {
     ]),
     { parent: spine.joints[2], count: 3, role: "neck", group: "neck" },
   );
-  b.sweep(neck, [0.13, 0.1], { color: PLUMAGE, group: "neck" });
+  const torsoNeckStations = [
+    { at: [0, 0.36, -0.25] as const, w: 0.2, h: 0.2 },
+    { at: [0, 0.39, -0.08] as const, w: 0.34, h: 0.38 },
+    { at: [0, 0.46, 0.12] as const, w: 0.31, h: 0.35 },
+    { at: [0, 0.5, 0.25] as const, w: 0.26, h: 0.26 },
+    { at: [0, 0.61, 0.34] as const, w: 0.24, h: 0.2 },
+    { at: [0, 0.7, 0.4] as const, w: 0.22, h: 0.2 },
+    { at: [0, 0.76, 0.44] as const, w: 0.2, h: 0.2 },
+  ];
+  const torsoNeckPath = catmull(torsoNeckStations.map(({ at }) => at));
+  const neckStart = torsoNeckPath.knots[3];
+  const torsoNeckBone = [spine, hips, neck] as const;
+  b.loft(torsoNeckStations, {
+    bone: torsoNeckBone,
+    color: PLUMAGE,
+    sectors: [[125, 235, PLUMAGE_DARK]],
+    to: neckStart,
+    caps: { end: "none" },
+    group: "body",
+  });
+  b.loft(torsoNeckStations, {
+    bone: torsoNeckBone,
+    color: PLUMAGE,
+    from: neckStart,
+    caps: { start: "none" },
+    group: "neck",
+  });
 
   const head = b.joint("head", { at: neck.at(1), dir: [0, -0.08, 1], role: "head", group: "head" });
   b.part(new SphereGeometry(1, b.segments(12), b.segments(8)), PLUMAGE, {

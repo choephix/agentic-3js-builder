@@ -150,20 +150,26 @@ export default function build() {
   const caudal2 = tail.joints[4];
   const caudal3 = tail.joints[5];
 
-  // ---------------------------------------------------------------- Main Fusiform Body Trunk
-  // Lofted anterior body stations running forward from hips to neck, skinned smoothly to `spine`.
-  const trunkStations = [
-    { at: [0, 0.59, -0.48], w: 0.41, h: 0.37 }, // slight overlap with tail tube
-    { at: [0, 0.59, -0.45], w: 0.43, h: 0.38 }, // hips
-    { at: [0, 0.6, 0.05], w: 0.56, h: 0.46 }, // mid torso (spine1)
-    { at: [0, 0.6, 0.45], w: 0.6, h: 0.5 }, // chest / 1st dorsal root (chest)
-    { at: [0, 0.6, 0.85], w: 0.54, h: 0.42 }, // gills (neck1)
-    { at: [0, 0.6, 1.15], w: 0.44, h: 0.32 }, // neck / skull base (neck2)
+  // ---------------------------------------------------------------- Continuous Fusiform Body and Tail Tube
+  // One loft follows the vertebral column from the upper caudal tip through hips and forward to the neck.
+  // Keeping both chains in `bone` makes the body and tail a single continuous surface at the pelvic join.
+  const bodyStations = [
+    { at: [0, 1.26, -2.55], w: 0.009, h: 0.012 },
+    { at: [0, 0.96, -2.25], w: 0.018, h: 0.025 },
+    { at: [0, 0.72, -1.95], w: 0.035, h: 0.05 },
+    { at: [0, 0.58, -1.65], w: 0.07, h: 0.08 },
+    { at: [0, 0.58, -1.3], w: 0.12, h: 0.11 },
+    { at: [0, 0.58, -0.9], w: 0.18, h: 0.16 },
+    { at: [0, 0.59, -0.48], w: 0.41, h: 0.37 },
+    { at: [0, 0.59, -0.45], w: 0.43, h: 0.38 },
+    { at: [0, 0.6, 0.05], w: 0.56, h: 0.46 },
+    { at: [0, 0.6, 0.45], w: 0.6, h: 0.5 },
+    { at: [0, 0.6, 0.85], w: 0.54, h: 0.42 },
+    { at: [0, 0.6, 1.15], w: 0.44, h: 0.32 },
   ] as const;
 
-  const bellySag = (t: number) => Math.sin(Math.PI * t) * -0.025;
-  const bodyTrunk = b.loft(trunkStations, {
-    bone: spine,
+  const bodyTube = b.loft(bodyStations, {
+    bone: [tail, spine],
     color: FLANK,
     sectors: [
       [-56, 56, DORSAL],
@@ -171,41 +177,13 @@ export default function build() {
       [126, 234, VENTRAL],
       [234, 260, LATERAL],
     ],
-    shift: (t) => [0, bellySag(t)],
-    sides: 14,
-    group: "body",
-  });
-
-  // ---------------------------------------------------------------- Posterior Tail Tube & Spine
-  // Smoothly swept tail tube from hips through caudal peduncle to the tip of the upper caudal lobe.
-  // Directly swept on the `tail` chain so all 6 tail vertebrae skin and flex smoothly!
-  const tailRadii = (t: number): readonly [number, number] => {
-    if (t <= 0.55) {
-      // Hips to precaudal base (t = 0..0.55)
-      const u = t / 0.55;
-      const rx = 0.215 * (1 - u) + 0.05 * u;
-      const ry = 0.19 * (1 - u) + 0.07 * u;
-      return [rx, ry] as const;
-    } else {
-      // Upper caudal fin spine extending to tip (t = 0.55..1.0)
-      const u = (t - 0.55) / 0.45;
-      const rx = 0.05 * (1 - 0.82 * u);
-      const ry = 0.07 * (1 - 0.82 * u);
-      return [rx, ry] as const;
-    }
-  };
-
-  b.sweep(tail, tailRadii, {
-    color: FLANK,
-    sectors: [
-      [-56, 56, DORSAL],
-      [100, 126, LATERAL],
-      [126, 234, VENTRAL],
-      [234, 260, LATERAL],
-    ],
+    shift: (t) => {
+      const u = Math.max(0, Math.min(1, (t - 0.56) / 0.44));
+      return [0, Math.sin(Math.PI * u) * -0.025];
+    },
     sides: 14,
     caps: "round",
-    group: "tail",
+    group: "body",
   });
 
   // Subtle sensory lateral lines along both flanks from neck to caudal peduncle.
@@ -760,7 +738,7 @@ export default function build() {
 
   // ---------------------------------------------------------------- Dermal Denticle Highlights
   // Subtle scattered placoid scales along upper flanks for tactile puppet character.
-  const skin = b.surface(bodyTrunk);
+  const skin = b.surface(bodyTube);
   for (const hit of skin.scatter(24, {
     rng: random,
     minDist: 0.1,
