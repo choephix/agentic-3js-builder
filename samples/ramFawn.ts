@@ -1,4 +1,4 @@
-// Example 2: a quadruped. Countershaded, sagging loft body split over a spine chain; digitigrade hind legs and
+// Ram fawn, a quadruped. Countershaded, sagging loft body split over a spine chain; digitigrade hind legs and
 // two-bone front legs from `limb`, with rigging names and rig roles (legs record their floor contact); a
 // region-scaled head riding on the neck, re-posed mid-build, with a frustumBox snout and spiral ram horns sprouted
 // from its surface; spots, scales and a draped strap on the real body surface; jaw opened and tail raised by
@@ -12,7 +12,10 @@ import { offset, rng } from "../src/math";
 import type { V3 } from "../src/math";
 import { catmull, spiral } from "../src/path";
 
-export const meta = { name: "SDK smoke: quadruped" };
+export const meta = {
+  name: "Ram Fawn",
+  description: "Countershaded, spotted quadruped with digitigrade hind legs, spiral ram horns, a saddle and a strap.",
+};
 
 const FUR = "#b0703a";
 const SPOT = "#4a2c17";

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>agentic-3js-builder samples</title>
+    <link rel="icon" href="data:," />
+    <style>
+      :root {
+        font:
+          14px/1.4 system-ui,
+          sans-serif;
+        color: #23272b;
+        background: #f7f8f9;
+      }
+      body {
+        margin: 0;
+        height: 100vh;
+        display: grid;
+        grid-template-columns: 220px 1fr;
+      }
+      body.with-source {
+        grid-template-columns: 220px 1fr 44%;
+      }
+      nav {
+        border-right: 1px solid #e1e4e8;
+        padding: 20px 12px;
+        overflow: auto;
+      }
+      nav h1 {
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 8px 14px;
+        color: #6a737d;
+      }
+      nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      nav a {
+        display: block;
+        padding: 6px 8px;
+        border-radius: 6px;
+        color: inherit;
+        text-decoration: none;
+      }
+      nav a:hover {
+        background: #eceef1;
+      }
+      nav a.active {
+        background: #e3e8ef;
+        font-weight: 600;
+      }
+      main {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-width: 0;
+      }
+      header {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        padding: 14px 18px;
+        border-bottom: 1px solid #e1e4e8;
+      }
+      header .text {
+        flex: 1;
+        min-width: 0;
+      }
+      #title {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+      }
+      #description {
+        color: #6a737d;
+        margin: 2px 0 0;
+      }
+      #stats {
+        color: #6a737d;
+        font-variant-numeric: tabular-nums;
+        margin: 4px 0 0;
+        font-size: 12px;
+      }
+      button {
+        font: inherit;
+        font-size: 12px;
+        padding: 5px 10px;
+        border: 1px solid #d5d9de;
+        border-radius: 6px;
+        background: #fff;
+        color: inherit;
+        cursor: pointer;
+      }
+      button.on {
+        background: #23272b;
+        border-color: #23272b;
+        color: #fff;
+      }
+      #stage {
+        position: relative;
+        min-height: 0;
+      }
+      #viewer {
+        position: absolute;
+        inset: 0;
+      }
+      #viewer canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      #error {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        top: 18px;
+        margin: 0;
+        padding: 12px 14px;
+        max-height: 60%;
+        overflow: auto;
+        border: 1px solid #efc2c2;
+        border-radius: 8px;
+        background: #fff5f5;
+        color: #8b1d1d;
+        font:
+          12px/1.5 ui-monospace,
+          monospace;
+        white-space: pre-wrap;
+      }
+      #source {
+        display: none;
+        margin: 0;
+        padding: 16px 18px;
+        overflow: auto;
+        border-left: 1px solid #e1e4e8;
+        background: #fff;
+        font:
+          12px/1.5 ui-monospace,
+          monospace;
+        white-space: pre;
+      }
+      body.with-source #source {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <h1>Samples</h1>
+      <ul id="samples"></ul>
+    </nav>
+    <main>
+      <header>
+        <div class="text">
+          <p id="title"></p>
+          <p id="description"></p>
+          <p id="stats"></p>
+        </div>
+        <button id="toggle-skeleton" hidden>Skeleton</button>
+        <button id="toggle-source">Source</button>
+      </header>
+      <div id="stage">
+        <div id="viewer"></div>
+        <pre id="error" hidden></pre>
+      </div>
+    </main>
+    <pre id="source"></pre>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

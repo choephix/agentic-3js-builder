@@ -2,7 +2,7 @@
 
 Helpers for writing primitive-built, skeleton-rigged three.js creatures in code. You describe the creature in model space; the SDK builds joints, tubes, membranes and stuck-on details, and returns a plain `THREE.Object3D` tree that meets the Nilo Creature Lab contract (`~/tmp/public/nilo/creature-lab/GUIDE.md`).
 
-Why each helper exists, with the evidence from 100 builds: [`docs/DESIGN.md`](docs/DESIGN.md). Working examples: [`examples/`](examples).
+Why each helper exists, with the evidence from 100 builds: [`docs/DESIGN.md`](docs/DESIGN.md). Working samples: [`samples/`](samples), viewable in the local showcase (`npm run showcase`).
 
 ## Cheat sheet
 
@@ -349,6 +349,32 @@ Reading `b.root` writes `root.userData.rig`, evaluated in the current pose. The 
 - `jaw` and `hinge` joints (lids, wing cases, flaps) record `hinge`, the bone's local X in model space. With the default roll it runs across the body.
 - Rings with joints always record their group joints and item counts.
 
+## Samples and showcase
+
+`samples/` is the sample library: small scripts, not exported models. The showcase runs a script and shows what it returns.
+
+The sample contract:
+
+- One ES module per sample, `samples/<slug>.ts` (lowerCamel slug). It imports `three` and, if it wants, the SDK by relative path (`../src/builder`).
+- It default-exports a function that takes no arguments and returns a `THREE.Object3D`.
+- It may export `meta = { name, description? }`. The showcase lists it by `meta.name`, falling back to the slug.
+- Anything goes: creatures, people, props, environments. The SDK and a skeleton are optional; `samples/lantern.ts` is plain three.js.
+- Samples are part of the codebase: `tsc` checks them, and an SDK change that breaks a sample updates the sample in the same change.
+
+```ts
+import { createBuilder } from "../src/builder";
+
+export const meta = { name: "Wyvern", description: "Bat-winged wyvern with bird legs." };
+
+export default function build() {
+  const b = createBuilder({ name: "wyvern" });
+  // ...
+  return b.root;
+}
+```
+
+The showcase (`showcase/`, Vite with plain TypeScript) discovers every `samples/*.ts`. It shows one sample at a time: orbit controls, a floor grid at y = 0 with a shadow, the camera framed to the object's bounds, and the selected slug in the URL hash (`#wyvern`). A stats line shows meshes, triangles, joints (`userData.joint` tags), colours and size in meters. Toggles show the script's source and, when the sample has joints, a skeleton overlay. An error thrown while loading or running a sample appears in the page. Editing a sample, or any SDK file it imports, re-runs it in place.
+
 ## Non-goals
 
 No per-vertex skin weights, textures, mirroring helper, grid/row helpers, ground-shift helper or auto-merge batching. Mirror with `for (const s of [1, -1])`.
@@ -357,7 +383,9 @@ No per-vertex skin weights, textures, mirroring helper, grid/row helpers, ground
 
 ```
 npm install
-npm run typecheck
+npm run typecheck        # src, samples and showcase
+npm run showcase         # dev server with hot reload
+npm run showcase:build   # static build in showcase/dist
 ```
 
-To smoke-render an example, point a scratch creature-lab slug's `B/creature.ts` at it (`export { default, meta } from "/home/cx/noodlespace/agentic-3js-builder/examples/wyvern";`) and run `node_modules/.bin/tsx harness/snap.ts <slug> B v01` from `~/workspace/nilo-creature-lab`. Delete the scratch slug afterwards.
+To render a skeleton sample through the creature-lab harness, point a scratch creature-lab slug's `B/creature.ts` at it (`export { default, meta } from "/home/cx/noodlespace/agentic-3js-builder/samples/wyvern";`) and run `node_modules/.bin/tsx harness/snap.ts <slug> B v01` from `~/workspace/nilo-creature-lab`. Delete the scratch slug afterwards.

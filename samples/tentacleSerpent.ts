@@ -1,4 +1,4 @@
-// Example 3: a tentacled serpent. The skeleton is rooted mid-body with two chains growing both ways along one
+// Tentacle serpent. The skeleton is rooted mid-body with two chains growing both ways along one
 // body curve. The tail has a belly sector under its stripes and plates along its back, a dorsal fin stands on
 // the neck's skin line, a spike collar and a closed ring circle the tilted neck, a twisted tusk juts from the
 // head, and tentacles sprouted from the head surface curl on arcs. A frill of 13 ribs rings the neck on 4 group
@@ -9,7 +9,10 @@ import { frame } from "../src/frame";
 import { lerp, offset } from "../src/math";
 import { arc, catmull, polyline } from "../src/path";
 
-export const meta = { name: "SDK smoke: serpent" };
+export const meta = {
+  name: "Tentacle Serpent",
+  description: "Serpent rooted mid-body, with a frill on four group joints, a twisted tusk and sprouted tentacles.",
+};
 
 const SKIN = "#2f6f73";
 const BELLY = "#d9c98f";

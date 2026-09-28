@@ -1,4 +1,4 @@
-// Example 1: a wyvern. Neck and tail chains swept as one continuous tube, curved horns and neck spikes from
+// Wyvern. Neck and tail chains swept as one continuous tube, curved horns and neck spikes from
 // bezier sweeps, bat wings as membranes between finger chains, closed triangular brow rings, and bird-like
 // four-segment legs from `limb` with the toe segment flat on the floor. The eyes are parts that face their gaze:
 // lashes ring each gaze (inheriting the head bone), struts run from each eye to a crest joint, and the crest is
@@ -10,7 +10,10 @@ import { limb } from "../src/ik";
 import { mid, offset } from "../src/math";
 import { bezier, catmull, polyline } from "../src/path";
 
-export const meta = { name: "SDK smoke: wyvern" };
+export const meta = {
+  name: "Wyvern",
+  description: "Bat-winged wyvern with bird legs, lashed eyes and a crest hinged on the line through its eyes.",
+};
 
 const SCALE = "#5f7f3a";
 const BELLY = "#c9b27a";

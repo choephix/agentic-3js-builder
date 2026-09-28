@@ -1,4 +1,4 @@
-// Example 4: a peacock. A 24-feather train ringed around a vertical line behind the rump on 6 group joints, built
+// Peacock. A 24-feather train ringed around a vertical line behind the rump on 6 group joints, built
 // lying back and then raised into display by posing those 6 joints; a 7-feather crest ringed around the head's
 // forward line on 2 joints; bird legs from `limb`; rig roles on every part of the skeleton; `detail` sets the
 // tessellation budget in one place. Feather geometry never names a bone: each item carries its group joint.
@@ -9,7 +9,10 @@ import { limb } from "../src/ik";
 import { aim, offset } from "../src/math";
 import { bezier, catmull } from "../src/path";
 
-export const meta = { name: "SDK smoke: peacock" };
+export const meta = {
+  name: "Peacock",
+  description: "24-feather train on 6 group joints, raised into display by posing them.",
+};
 
 const BLUE = "#1f4fa8";
 const TEAL = "#1b8a7a";
