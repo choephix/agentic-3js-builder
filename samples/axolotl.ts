@@ -1,10 +1,11 @@
-// Leucistic axolotl, 27 cm, sprawled flat in a rigging rest pose. One smooth-skinned trunk lofted over a spine chain,
-// a broad flat head with a separate lower jaw closed in the axolotl smile, and a laterally flattened tail on its own
-// eight-joint chain. The tail fin is one membrane sheet from its dorsal to its ventral outline, skinned along the tail
-// chain so it ripples joint by joint; a low dorsal ridge carries it forward over the back. Three gill stalks on each
-// side are two-joint sprouts off the back of the head, fringed on both sides with extruded petal filaments that ride
-// each stalk's joints. Thin legs come from `limb`, splayed out to the sides, ending in one-joint toes tipped with
-// turned (lathe) toe pads. Lathes also make the eye sockets, nostrils and the cloaca.
+// Leucistic axolotl, 27 cm, sprawled flat in a rigging rest pose. One smooth-skinned tube runs from the base of the
+// skull through the trunk to the tail tip, with body and tail sectors split at the hips; a broad flat head has a
+// separate lower jaw closed in the axolotl smile. The tail fin is one membrane sheet from its dorsal to its ventral
+// outline, skinned along the tail chain so it ripples joint by joint; a low dorsal ridge carries it forward over the
+// back. Three gill stalks on each side are two-joint sprouts off the back of the head, fringed on both sides with
+// extruded petal filaments that ride each stalk's joints. Thin legs come from `limb`, splayed out to the sides,
+// ending in one-joint toes tipped with turned (lathe) toe pads. Lathes also make the eye sockets, nostrils and the
+// cloaca.
 import { SphereGeometry, Vector3 } from "three";
 import { createBuilder } from "../src/builder";
 import { limb } from "../src/ik";
@@ -50,8 +51,9 @@ function interp(keys: readonly (readonly [number, number])[], x: number) {
 export default function build() {
   const b = createBuilder({ name: "axolotl" });
 
-  // ---------------------------------------------------------------- trunk
-  // Station centres from the rump to the base of the skull; w/h are full width and height.
+  // ---------------------------------------------------------------- trunk and tail
+  // One continuous centreline runs from the base of the skull through the hips to the tail tip. The tail and trunk
+  // keep their original sectors by sweeping the same path in two ranges, with no cap at their shared ring.
   const stations = [
     { at: [0, 0.019, -0.046], w: 0.024, h: 0.024 },
     { at: [0, 0.019, -0.03], w: 0.029, h: 0.026 },
@@ -61,38 +63,27 @@ export default function build() {
     { at: [0, 0.019, 0.053], w: 0.027, h: 0.022 },
   ] as const;
   const curve = catmull(stations.map((s) => s.at));
+  const hipsT = curve.knots[1];
   const hips = b.joint("hips", { at: stations[1].at, role: "spine", group: "body" });
-  const spine = b.chain("spine", curve.slice(curve.knots[1], 1), {
+  const spine = b.chain("spine", curve.slice(hipsT, 1), {
     parent: hips,
     count: 4,
     names: ["spine1", "spine2", "chest", "neck"],
     role: "spine",
     group: "body",
   });
-  const body = b.loft(stations, {
-    bone: spine,
-    color: SKIN,
-    sectors: [
-      [-55, 55, BACK],
-      [125, 235, BELLY],
-    ],
-    shift: (t) => [0, -0.0015 * Math.sin(Math.PI * t)],
-    sides: 16,
-    group: "body",
-  });
-
-  // ---------------------------------------------------------------- tail
-  const tail = b.chain(
-    "tail",
-    catmull([
-      [0, 0.019, -0.03],
-      [0, 0.0195, -0.06],
-      [0, 0.0205, -0.095],
-      [0, 0.021, -0.125],
-      [0, 0.0205, -0.152],
-    ]),
-    { parent: hips, count: 8, role: "tail", group: "tail" },
-  );
+  const tailPath = catmull([
+    [0, 0.019, -0.03],
+    [0, 0.0195, -0.06],
+    [0, 0.0205, -0.095],
+    [0, 0.021, -0.125],
+    [0, 0.0205, -0.152],
+  ]);
+  const tail = b.chain("tail", tailPath, { parent: hips, count: 8, role: "tail", group: "tail" });
+  const wholePath = curve.slice(1, hipsT).concat(tailPath);
+  const tailT = curve.slice(1, hipsT).length / wholePath.length;
+  const bodyWidth = stations.map((s, i) => [curve.knots[i], s.w / 2] as const);
+  const bodyHeight = stations.map((s, i) => [curve.knots[i], s.h / 2] as const);
   const tailRx: [number, number][] = [
     [0, 0.0125],
     [0.25, 0.0085],
@@ -107,15 +98,38 @@ export default function build() {
     [0.75, 0.006],
     [1, 0.0028],
   ];
-  const tailTube = b.sweep(tail, (t) => [interp(tailRx, t), interp(tailRy, t)], {
+  const tailTube = b.sweep(wholePath, (t) => [interp(tailRx, t), interp(tailRy, t)], {
+    bone: [spine, hips, tail],
+    from: tailT,
     color: SKIN,
     sectors: [
       [-45, 45, BACK],
       [135, 225, BELLY],
     ],
     sides: 14,
+    caps: { start: "none", end: "round" },
     group: "tail",
   });
+  const body = b.sweep(
+    wholePath,
+    (t) => {
+      const bodyT = hipsT + (1 - t) * (1 - hipsT);
+      return [interp(bodyWidth, bodyT), interp(bodyHeight, bodyT)];
+    },
+    {
+      bone: [spine, hips, tail],
+      to: tailT,
+      color: SKIN,
+      sectors: [
+        [-55, 55, BACK],
+        [125, 235, BELLY],
+      ],
+      shift: (t) => [0, -0.0015 * Math.sin(Math.PI * (hipsT + (1 - t) * (1 - hipsT)))],
+      sides: 16,
+      caps: { start: "round", end: "none" },
+      group: "body",
+    },
+  );
 
   // Tail fin: one sheet from the dorsal outline to the ventral one, through the tail, meeting in a point past the
   // tip. It follows the tail chain nearest to each cell, so it ripples with every tail joint.
@@ -167,8 +181,8 @@ export default function build() {
   const ridgeTop: Vector3[] = [];
   for (let i = 0; i <= 8; i++) {
     const z = 0.022 - (i / 8) * 0.06;
-    const zs = [stations[0].at[2], stations[5].at[2]];
-    const p = body.at((z - zs[0]) / (zs[1] - zs[0]), 0, -0.0006).at;
+    const curveT = (z - stations[0].at[2]) / (stations[5].at[2] - stations[0].at[2]);
+    const p = body.at(1 - (curveT - hipsT) / (1 - hipsT), 0, -0.0006).at;
     ridgeBase.push(p.clone());
     ridgeTop.push(p.add(new Vector3(0, 0.0032 * Math.pow(i / 8, 1.3), 0)));
   }
