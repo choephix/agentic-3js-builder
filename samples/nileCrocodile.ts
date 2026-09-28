@@ -1,9 +1,9 @@
-// Nile crocodile, 4 m, in a low sprawl: one smooth-skinned trunk and neck lofted over a spine chain, a laterally
-// flattened tail on its own eight-joint chain, and a flat, triangular head whose upper and lower jaws are separate
-// lofts, opened after building to show interlocking teeth and a pale mouth. Teeth are cones seated on rays cast at
-// the real jaw surfaces. Keeled osteoderms (a hand-built tile geometry) run in banded rows down the back, gather into
-// the nuchal shield behind the head and become the double, then single, tail crest in step with the tail's
-// crossbands. Legs come from `limb`, elbows and knees out; fingers and webbed toes are two-joint chains.
+// Nile crocodile, 4 m, in a low sprawl: one seamless trunk, neck and tail lofted over chains rooted at the hips,
+// and a flat, triangular head whose upper and lower jaws are separate lofts, opened after building to show interlocking
+// teeth and a pale mouth. Teeth are cones seated on rays cast at the real jaw surfaces. Keeled osteoderms (a
+// hand-built tile geometry) run in banded rows down the back, gather into the nuchal shield behind the head and
+// become the double, then single, tail crest in step with the tail's crossbands. Legs come from `limb`, elbows and
+// knees out; fingers and webbed toes are two-joint chains.
 import { BufferGeometry, ConeGeometry, CylinderGeometry, Float32BufferAttribute, SphereGeometry, Vector3 } from "three";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
@@ -105,10 +105,14 @@ export default function build() {
   const b = createBuilder({ name: "nileCrocodile" });
   const random = rng(11);
 
-  // ---------------------------------------------------------------- trunk and neck
-  // Station centres from the rump to the base of the skull; w/h are full width and height.
-  const stations = [
-    { at: [0, 0.33, -0.4], w: 0.4, h: 0.3 },
+  // ---------------------------------------------------------------- trunk, neck and tail
+  // One station curve runs from the tail tip through the hips to the base of the skull.
+  const bodyStations = [
+    { at: [0, 0.08, -2.28], w: 0.032, h: 0.07 },
+    { at: [0, 0.12, -2.02], w: 0.11, h: 0.07 },
+    { at: [0, 0.2, -1.6], w: 0.11, h: 0.17 },
+    { at: [0, 0.28, -1.1], w: 0.2, h: 0.25 },
+    { at: [0, 0.33, -0.62], w: 0.32, h: 0.3 },
     { at: [0, 0.34, -0.22], w: 0.5, h: 0.33 },
     { at: [0, 0.35, 0.05], w: 0.62, h: 0.35 },
     { at: [0, 0.35, 0.32], w: 0.66, h: 0.36 },
@@ -116,19 +120,38 @@ export default function build() {
     { at: [0, 0.325, 0.86], w: 0.4, h: 0.26 },
     { at: [0, 0.315, 1.1], w: 0.34, h: 0.22 },
   ] as const;
-  const bodyHalfW = stations.map((s) => [s.at[2], s.w / 2] as const);
-  const curve = catmull(stations.map((s) => s.at));
-  const hips = b.joint("hips", { at: stations[1].at, role: "spine", group: "body" });
-  const spine = b.chain("spine", curve.slice(curve.knots[1], 1), {
+  const curve = catmull(bodyStations.map((s) => s.at));
+  const hipsT = curve.closestT([0, 0.34, -0.22]);
+  const hips = b.joint("hips", { at: [0, 0.34, -0.22], role: "spine", group: "body" });
+  const tail = b.chain("tail", curve.slice(hipsT, 0), { parent: hips, count: 8, role: "tail", group: "tail" });
+  const spine = b.chain("spine", curve.slice(hipsT, 1), {
     parent: hips,
     count: 5,
     names: ["spine1", "spine2", "chest", "neck1", "neck2"],
     role: "spine",
     group: "body",
   });
+  const bodyHalfW = bodyStations.map((s) => [s.at[2], s.w / 2] as const);
   const belly = (t: number) => Math.sin(Math.PI * Math.min(Math.max((t - 0.12) / 0.6, 0), 1));
-  const body = b.loft(stations, {
-    bone: spine,
+  const tailColor = (t: number) =>
+    t > 0.17 && t < 0.98 && (t - 0.12) / 0.09 - Math.floor((t - 0.12) / 0.09) > 0.61 ? BAND : FLANK;
+  const tailBody = b.loft(bodyStations, {
+    bone: [tail, hips, spine],
+    from: 0,
+    to: hipsT,
+    color: (t) => tailColor(1 - t),
+    sectors: [
+      [-40, 40, BACK],
+      [132, 228, BELLY],
+    ],
+    caps: { start: "round", end: "none" },
+    sides: 14,
+    group: "tail",
+  });
+  const body = b.loft(bodyStations, {
+    bone: [tail, hips, spine],
+    from: hipsT,
+    to: 1,
     color: FLANK,
     sectors: [
       [-62, 62, BACK],
@@ -137,48 +160,9 @@ export default function build() {
       [232, 256, LATERAL],
     ],
     shift: (t) => [0, -0.035 * belly(t)],
+    caps: { start: "none", end: "round" },
     sides: 14,
     group: "body",
-  });
-
-  // ---------------------------------------------------------------- tail
-  const tail = b.chain(
-    "tail",
-    catmull([
-      [0, 0.34, -0.22],
-      [0, 0.33, -0.62],
-      [0, 0.28, -1.1],
-      [0, 0.2, -1.6],
-      [0, 0.12, -2.02],
-      [0, 0.08, -2.28],
-    ]),
-    { parent: hips, count: 8, role: "tail", group: "tail" },
-  );
-  const tailRx: [number, number][] = [
-    [0, 0.2],
-    [0.15, 0.16],
-    [0.4, 0.1],
-    [0.7, 0.055],
-    [1, 0.016],
-  ];
-  const tailRy: [number, number][] = [
-    [0, 0.16],
-    [0.15, 0.15],
-    [0.4, 0.125],
-    [0.7, 0.085],
-    [1, 0.035],
-  ];
-  // Crossbands: from t = 0.21 on, the last 0.035 of every 0.09 of tail is dark (crests on a band go dark too).
-  const tailColor = (t: number) =>
-    t > 0.17 && t < 0.98 && (t - 0.12) / 0.09 - Math.floor((t - 0.12) / 0.09) > 0.61 ? BAND : FLANK;
-  const tailTube = b.sweep(tail, (t) => [interp(tailRx, t), interp(tailRy, t)], {
-    color: tailColor,
-    sectors: [
-      [-40, 40, BACK],
-      [132, 228, BELLY],
-    ],
-    sides: 14,
-    group: "tail",
   });
 
   // ---------------------------------------------------------------- head
@@ -446,6 +430,9 @@ export default function build() {
   // row is dark, continuing the tail's crossbands up the back.
   const scute = scuteGeometry(0.06, 0.068, 0.014, 0.016);
   const smallScute = scuteGeometry(0.045, 0.05, 0.012, 0.012);
+  // A point on the skin at full-curve t: the tail range below the hips, the body range above.
+  const skinAt = (t: number, angle: number) =>
+    t < hipsT ? tailBody.at(t / hipsT, angle) : body.at((t - hipsT) / (1 - hipsT), angle);
   let row = 0;
   for (let z = 0.74; z > -0.3; z -= 0.072, row++) {
     const t = curve.closestT([0, 0.35, z]);
@@ -454,7 +441,7 @@ export default function build() {
     for (let c = 0; c < cols; c++) {
       const x = (c - (cols - 1) / 2) * 0.062;
       const ang = (Math.asin(Math.min(0.95, Math.abs(x) / hw)) * 180) / Math.PI;
-      const at = body.at(t, x > 0 ? -ang : ang);
+      const at = skinAt(t, x > 0 ? -ang : ang);
       b.stick(Math.abs(x) > 0.14 ? smallScute : scute, row % 3 === 1 ? BAND : SCUTE, at, {
         flow: [0, 0, 1],
         embed: 0.3,
@@ -477,7 +464,7 @@ export default function build() {
   ] as const) {
     const t = curve.closestT([0, 0.32, z]);
     const ang = (Math.asin(Math.min(0.95, Math.abs(x) / interp(bodyHalfW, z))) * 180) / Math.PI;
-    b.stick(geo, SCUTE, body.at(t, x > 0 ? -ang : ang), { flow: [0, 0, 1], embed: 0.3 });
+    b.stick(geo, SCUTE, skinAt(t, x > 0 ? -ang : ang), { flow: [0, 0, 1], embed: 0.3 });
   }
 
   // Tail crests: two rows of tall keeled scutes that merge into one along the last part of the tail, two per band
@@ -485,14 +472,15 @@ export default function build() {
   const crest = scuteGeometry(0.042, 0.078, 0.012, 0.075, 0.2);
   const sideScale = scuteGeometry(0.035, 0.04, 0.01, 0.012);
   for (let t = 0.0525; t < 0.97; t += 0.045) {
+    const u = 1 - t;
     const color = tailColor(t) === BAND ? BAND : SCUTE;
     const scale = 1 - 0.5 * t;
     if (t < 0.55)
-      for (const s of [1, -1]) b.stick(crest, color, tailTube.at(t, s * 27), { flow: [0, 0, 1], embed: 0.3, scale });
-    else b.stick(crest, color, tailTube.at(t, 0), { flow: [0, 0, 1], embed: 0.3, scale: [scale, scale * 1.1, scale] });
+      for (const s of [1, -1]) b.stick(crest, color, tailBody.at(u, s * 27), { flow: [0, 0, 1], embed: 0.3, scale });
+    else b.stick(crest, color, tailBody.at(u, 0), { flow: [0, 0, 1], embed: 0.3, scale: [scale, scale * 1.1, scale] });
     if (t < 0.8)
       for (const s of [1, -1])
-        b.stick(sideScale, tailColor(t + 0.0225) === BAND ? BAND : SCUTE, tailTube.at(t + 0.0225, s * 72), {
+        b.stick(sideScale, tailColor(t + 0.0225) === BAND ? BAND : SCUTE, tailBody.at(1 - t - 0.0225, s * 72), {
           flow: [0, 0, 1],
           embed: 0.3,
           scale: 1.2 - 0.6 * t,
@@ -501,7 +489,7 @@ export default function build() {
 
   // Dark spots on the flanks and legs.
   const spot = new CylinderGeometry(0.02, 0.02, 0.006, 10);
-  const skin = b.surface(body);
+  const skin = b.surface([tailBody, body]);
   for (const hit of skin.scatter(40, {
     rng: random,
     minDist: 0.07,
