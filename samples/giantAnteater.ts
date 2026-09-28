@@ -6,7 +6,8 @@ import { catmull } from "../src/path";
 
 export const meta = {
   name: "Giant Anteater",
-  description: "A long-snouted giant anteater with a shaggy plume tail, dark shoulder mantle, and enormous hooked claws.",
+  description:
+    "A long-snouted giant anteater with a shaggy plume tail, dark shoulder mantle, and enormous hooked claws.",
   builtBy: "GPT-6 Astra",
 };
 
@@ -27,7 +28,7 @@ export default function build() {
   const b = createBuilder({ name: "giantAnteater" });
   const random = rng(29);
 
-  // A low, deep torso rises gently into the neck. The spine handles are shared by the loft and limbs.
+  // One continuous tube runs from the tail plume through the low torso and rises into the neck.
   const stations = [
     { at: [0, 0.72, -0.62], w: 0.2, h: 0.27 },
     { at: [0, 0.78, -0.4], w: 0.43, h: 0.5 },
@@ -37,6 +38,15 @@ export default function build() {
     { at: [0, 1.08, 0.51], w: 0.2, h: 0.24 },
   ] as const;
   const curve = catmull(stations.map((s) => s.at));
+  const tailCurve = catmull([
+    [0, 0.78, -0.62],
+    [0, 0.75, -0.86],
+    [0, 0.78, -1.1],
+    [0, 0.9, -1.32],
+    [0, 1.06, -1.5],
+    [0, 1.18, -1.64],
+    [0, 1.27, -1.73],
+  ]);
   const root = b.joint("hips", { at: stations[1].at, role: "spine", group: "body" });
   const spine = b.chain("spine", curve.slice(curve.knots[1], 1), {
     parent: root,
@@ -45,15 +55,50 @@ export default function build() {
     role: "spine",
     group: "body",
   });
-  const bellyDip = (t: number) => Math.sin(Math.PI * Math.min(Math.max((t - 0.08) / 0.72, 0), 1));
-  const body = b.loft(stations, {
-    bone: spine,
+  const tail = b.chain("tail", tailCurve, {
+    parent: root,
+    count: 8,
+    names: ["tailBase", "tail2", "tail3", "tail4", "tail5", "tail6", "tail7", "tailTip"],
+    role: "tail",
+    group: "tail",
+  });
+  const joinedStations = [
+    { at: tailCurve.at(1), w: 0.05, h: 0.04 },
+    { at: tailCurve.at(0.82), w: 0.12, h: 0.09 },
+    { at: tailCurve.at(0.62), w: 0.17, h: 0.13 },
+    { at: tailCurve.at(0.4), w: 0.21, h: 0.16 },
+    { at: tailCurve.at(0.2), w: 0.22, h: 0.16 },
+    ...stations,
+  ] as const;
+  const tailFraction = tailCurve.length / (tailCurve.length + curve.length);
+  const bellyDip = (t: number) =>
+    Math.sin(Math.PI * Math.min(Math.max(((t - tailFraction) / (1 - tailFraction) - 0.08) / 0.72, 0), 1));
+  const tailTube = b.loft(joinedStations, {
+    bone: [tail, root, spine],
+    from: 0,
+    to: tailFraction,
+    color: FUR,
+    bands: [
+      [0.22, DARK_BROWN],
+      [0.45, FUR],
+      [0.68, BACK],
+      [0.82, FUR],
+      [1, DARK_BROWN],
+    ],
+    caps: "none",
+    sides: 14,
+    group: "tail",
+  });
+  const body = b.loft(joinedStations, {
+    bone: [tail, root, spine],
+    from: tailFraction,
     color: FUR,
     sectors: [
       [-68, 68, BACK],
       [125, 235, BELLY],
     ],
     shift: (t) => [0, -0.045 * bellyDip(t), 0],
+    caps: "none",
     sides: 14,
     group: "body",
   });
@@ -127,34 +172,6 @@ export default function build() {
     });
   }
 
-  // The tail is nearly as large as the torso: broad at the rump and tapering into a soft, raised plume.
-  const tail = b.chain(
-    "tail",
-    catmull([
-      [0, 0.78, -0.62],
-      [0, 0.75, -0.86],
-      [0, 0.78, -1.1],
-      [0, 0.9, -1.32],
-      [0, 1.06, -1.5],
-      [0, 1.18, -1.64],
-      [0, 1.27, -1.73],
-    ]),
-    { parent: root, count: 8, names: ["tailBase", "tail2", "tail3", "tail4", "tail5", "tail6", "tail7", "tailTip"], role: "tail", group: "tail" },
-  );
-  b.sweep(tail, (t) => [0.22 - 0.17 * t, 0.16 - 0.12 * t], {
-    color: FUR,
-    sectors: [[125, 235, BELLY]],
-    bands: [
-      [0.18, DARK_BROWN],
-      [0.32, FUR],
-      [0.55, BACK],
-      [0.78, FUR],
-      [1, DARK_BROWN],
-    ],
-    sides: 14,
-    group: "tail",
-  });
-
   // Head: an elongated wedge, with a separate lower jaw so the rig can open the mouth.
   const skull = b.joint("head", {
     parent: spine.joints[4],
@@ -196,9 +213,18 @@ export default function build() {
 
   // Eyes sit high on the wedge, with a warm iris and a tiny glint.
   for (const s of [1, -1]) {
-    head.part(new SphereGeometry(0.029, b.segments(10), b.segments(8)), IRIS, { at: [s * 0.105, 0.075, 0.2], group: "head" });
-    head.part(new SphereGeometry(0.014, b.segments(8), b.segments(6)), EYE, { at: [s * 0.112, 0.077, 0.215], group: "head" });
-    head.part(new SphereGeometry(0.0045, b.segments(6), b.segments(5)), "#fff5dc", { at: [s * 0.116, 0.087, 0.225], group: "head" });
+    head.part(new SphereGeometry(0.029, b.segments(10), b.segments(8)), IRIS, {
+      at: [s * 0.105, 0.075, 0.2],
+      group: "head",
+    });
+    head.part(new SphereGeometry(0.014, b.segments(8), b.segments(6)), EYE, {
+      at: [s * 0.112, 0.077, 0.215],
+      group: "head",
+    });
+    head.part(new SphereGeometry(0.0045, b.segments(6), b.segments(5)), "#fff5dc", {
+      at: [s * 0.116, 0.087, 0.225],
+      group: "head",
+    });
     // Large, rounded ears stand behind the eyes.
     const ear: V3[] = [
       [s * 0.11, 0.1, -0.08],
@@ -206,13 +232,19 @@ export default function build() {
       [s * 0.24, 0.11, -0.2],
       [s * 0.16, 0.045, -0.15],
     ];
-    b.slab(ear.map((p) => head.p(p)), { thickness: 0.022, color: EAR, bone: skull, group: "head" });
-    b.slab(ear.map(([x, y, z]) => head.p([x * 0.82, y * 0.94, z + 0.012])), {
-      thickness: 0.008,
-      color: EAR_IN,
-      bone: skull,
-      group: "head",
-    });
+    b.slab(
+      ear.map((p) => head.p(p)),
+      { thickness: 0.022, color: EAR, bone: skull, group: "head" },
+    );
+    b.slab(
+      ear.map(([x, y, z]) => head.p([x * 0.82, y * 0.94, z + 0.012])),
+      {
+        thickness: 0.008,
+        color: EAR_IN,
+        bone: skull,
+        group: "head",
+      },
+    );
 
     // Three stiff whiskers on each side emphasize the long, sensitive muzzle.
     for (const [dy, dz] of [
@@ -251,7 +283,12 @@ export default function build() {
     minDist: 0.08,
     filter: (h) => h.n.y > 0.45 && h.at.z > -0.45 && h.at.z < 0.35,
   })) {
-    b.stick(new ConeGeometry(0.022, 0.075, b.segments(6)), BACK, hit, { embed: 0.45, flow: hit.tangent, scale: 0.65 + random() * 0.55, group: "body" });
+    b.stick(new ConeGeometry(0.022, 0.075, b.segments(6)), BACK, hit, {
+      embed: 0.45,
+      flow: hit.tangent,
+      scale: 0.65 + random() * 0.55,
+      group: "body",
+    });
   }
 
   // Rest pose: the jaw parts slightly and the long tail lifts clear of the floor.
