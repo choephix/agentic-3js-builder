@@ -1,0 +1,83 @@
+# Status, 2026-09-28
+
+Where the work stands. The API is in `README.md`, the reasons behind it in `docs/DESIGN.md`.
+
+## Origin
+
+Nilo Creature Lab (`~/workspace/nilo-creature-lab`, site https://nilo-creature-lab.netlify.app, data `~/tmp/public/nilo/creature-lab/`) is a library of primitive-built, skeleton-rigged, non-humanoid creatures for benchmarking AI auto-rigging and animation services. Claude Opus 5.5 built 100 of them with only a tiny kit (`harness/kit.ts`); GPT-6 Astra low/xhigh rebuilt them. Scouts read every Opus build and classified all 304 iteration diffs: most builds re-invented world-space joint placement and surface math, and a third of all steps went to tuning surface offsets and retyping dependents. Stefan asked for an SDK that removes that repeated and hard-to-position work, as its own project. His overriding requirement: "a simple, understandable, easy-to-use API is key since we're going to give this work to fast and cheap language models."
+
+## History
+
+All commits are local; nothing is pushed.
+
+| Commit  | Batch   | What                                                                                                                                                                                                                                       |
+| ------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| e4f8d12 | 1       | Model-space joints and parts, `aim`, paths, `chain`, `sweep` (+ rod/capsule/spike/frustumBox/loft sugar), `surface`/`stick`, `membrane`/`slab`, `ring`/`along`, IK, `region`.                                                              |
+| 22632e7 | 2       | From a Gemini/Kimi/Grok/Fable brainstorm: `limb` N-segment solver (replaced twoBoneIK), chain `names`, sweep `sectors`/`shift`/`twist`/`extend`, closed paths, `spiral`, `surface.drape`, `sweep.line`, `sprout`.                          |
+| a116bcd | 3       | `b.pose` after building (handles stay live via Capture), `createBuilder({ detail })`, rig answer key (`root.userData.rig`: roles, contacts, hinges), `fan` (later removed). Stefan asked only for `pose`; he kept the rest after the fact. |
+| 4511b18 | 4       | Stefan: "a bone is just a point/line in space". Everything takes Point/Direction/Frame/Path inputs; parts, hits and tube points are Frames; one bone-inheritance rule; `fan` became `b.ring(line, { joints })`; `pose` about any line.     |
+| 656fe3c | samples | `samples/` library and the local showcase (Vite, plain TS). Sample contract: `samples/<slug>.ts` default-exports a no-arg function returning a `THREE.Object3D`, optional `meta`.                                                          |
+| 842f88d | 5       | Smooth skinning by default for sweeps, lofts and membranes on chains: one continuous mesh, weights blended ±1 local radius at joints. `skin: "rigid"` opts out.                                                                            |
+| 729f43b | guide   | `GUIDE.md`, the reusable brief for a builder agent, and `npm run snap`.                                                                                                                                                                    |
+| ea6266c | guide   | giantAnteater, committed by its Astra builder with type errors (see to-dos).                                                                                                                                                               |
+
+## Guide test run
+
+On 2026-09-28 six builders each got `GUIDE.md` and one animal.
+
+| Model            | Sample          | Final tag | Result                               | In git                   |
+| ---------------- | --------------- | --------- | ------------------------------------ | ------------------------ |
+| Claude Opus 5.5  | snowLeopard     | v13-final | good; 34.7k tris, 12 min             | untracked                |
+| Claude Opus 5.5  | nileCrocodile   | v10       | good; 24.8k tris, 15 min             | untracked                |
+| GPT-6 Astra      | giantAnteater   | v02       | crude                                | ea6266c, fails typecheck |
+| GPT-6 Astra      | barnOwl         | v03       | crude                                | untracked                |
+| Gemini 3.8 Flash | redFox          | v03       | decent                               | untracked                |
+| Gemini 3.8 Flash | hammerheadShark | —         | still running at the time of writing | untracked                |
+
+- Gemini ran through the Cursor account: Antigravity quota is out until 2026-09-29 15:02 UTC. Cursor dropped mid-run and both Gemini builders were resumed.
+- Opus build time is almost all model generation (~600 s of ~620 s, ~55k output tokens, 10-13 rounds). A render takes 1-2 s.
+
+## To-do
+
+Friction the builders reported:
+
+- [ ] Triangle limit disagrees: `GUIDE.md` says 60k, `README.md` "Requirements" says 120k. The harness (`harness/assemble.ts` `LIMITS`) errors above 120k and warns above 60k, and GUIDE's done-criterion is a report with no issues.
+- [ ] `chain.at(t)`: builders read `.p`/`.joint`; the fields are `.at`/`.bone`. The wrong names crash at run time.
+- [ ] `Hit` has no `tangent`; two builders reached for one.
+- [ ] `radius: [r0, r1]` reads as an ellipse but is a linear taper; an ellipse needs `(t) => [rx, ry]`.
+- [ ] `limb` silently straightens when the target is out of reach.
+- [ ] Sloped feet: the round end cap dips below the floor, and the snap report doesn't flag min y < 0.
+- [ ] `surface(joint)` finds no meshes on a smooth-skinned chain; the mesh sits under its heaviest bone.
+- [ ] Sweep `sectors` on narrow colour-split pieces trigger the harness's inside-out false alarm.
+- [ ] README has lines over 1,000 characters (the `b.chain` and membrane paragraphs), which read tools truncate.
+- [ ] One broken sample fails `npm run typecheck` for everyone.
+
+Samples:
+
+- [ ] Fix giantAnteater's type errors: a 3-tuple `radius` (~line 55) and `hit.tangent` (line 253).
+- [ ] Review and commit the untracked guide-test samples: barnOwl, hammerheadShark (once its builder finishes), nileCrocodile, redFox, snowLeopard.
+
+Known geometry issues:
+
+- [ ] `sweep.at` can sit 3-5 mm off the mesh between rings on strongly curved tubes.
+- [ ] The round start of a leg tube bumps out of the flank when flexed.
+- [ ] Draped collars lag on hard neck bends.
+- [ ] Sector edges are saw-toothed.
+- [ ] Box sections: round caps can leave wedges at the corners of sharp bends.
+
+## Sibling repos
+
+- `~/workspace/nilo-creature-lab`: the harness `npm run snap` drives (`harness/snap.ts`). It has to be checked out. SDK-related commits there, also local:
+  - db5ed31: the rig answer key goes into the report and the rigged GLB extras.
+  - 3964259: keep per-vertex bone weights a part already carries.
+  - 1c352fb: `CREATURE_LAB_DIR` sets the snap output folder.
+  - The creature-lab site hasn't been redeployed since.
+- `~/tmp/public/nilo/creature-lab/GUIDE.md`: the lab's creature contract, which SDK output meets.
+
+## Output locations
+
+Under `~/tmp/public/nilo/agentic-3js-builder/`:
+
+- `snaps/<slug>/<B|A>/`: `npm run snap` output. `snaps/` holds each tag's contact sheet, shots, report and the sample as rendered; `out/` the GLBs. B for rigged samples, A for plain objects. `snaps/index.html` is the harness's progress page.
+- `smoke/batch2` … `smoke/batch5`, `smoke/sdkSmoke*`: smoke renders from the SDK batches.
+- `showcase/`: showcase screenshots.
