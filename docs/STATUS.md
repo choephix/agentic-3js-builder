@@ -24,6 +24,11 @@ All commits are local; nothing is pushed.
 | 115bc75 | samples | Outline showcase, each built by Claude Opus 5.5 from `GUIDE.md`: stegosaurus (extruded plates, lathed beak and pads; 40.3k tris).                                                                                                          |
 | 0235b83 | samples | sailfish (extruded sail split per spine bone with membrane gap strips, fins and forked tail; lathed eyes and gill cover; 20.5k tris).                                                                                                      |
 | 0a62e8b | samples | indianPeafowl (66 extruded eye feathers with stacked extruded eye spots on a 9-joint ring; lathed beak and eyes; 52.0k tris).                                                                                                              |
+| 584237a | samples | triceratops (extruded scalloped frill with sharp tips and beak; lathed horns, frill spots and skin bumps; 36.5k tris; real size, 7.8 m). Opus, 4 renders.                                                                                  |
+| 9e97f9e | samples | axolotl (144 extruded gill filaments riding 2-joint gill stalks; lathed toe pads and eye rings; 25.0k tris). Opus, 5 renders.                                                                                                              |
+| dcaafa4 | samples | veiledChameleon (tapered extruded casque with inset core, sawtooth crests that follow the spine; lathed eye turrets on eye joints, claws; 24.6k tris). Opus, 4 renders.                                                                    |
+| 55efe7d | samples | mantaRay (extruded jaw, pelvic and dorsal fins, remora fins; lathed eyes, spiracles and remora bodies; 23.0k tris). Opus, 5 renders.                                                                                                       |
+| 9a95789 | samples | griffin (extruded wing feathers, coverts, body feathers and ears; lathed cere, eyes and pads; 44.0k tris). Opus, 5 renders.                                                                                                                |
 
 ## Guide test run
 
