@@ -15,17 +15,11 @@
   --good: #388a34;
   --warn: #895503;
   --mono: "Cascadia Code", "JetBrains Mono", Consolas, "Droid Sans Mono", "DejaVu Sans Mono", monospace;
-  --side-width: 200px;
-  --panel-width: 360px;
-  font:
-    13px/1.4 -apple-system,
-    BlinkMacSystemFont,
-    "Segoe WPC",
-    "Segoe UI",
-    system-ui,
-    Ubuntu,
-    "Droid Sans",
-    sans-serif;
+  /* Named families before any generic: on Linux `system-ui` resolves to the wide DejaVu Sans. Liberation Sans has
+     Arial's metrics, as narrow as Segoe UI. */
+  --ui: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", Ubuntu, "Liberation Sans", Arial, sans-serif;
+  --panel-width: 330px;
+  font: 13px/1.4 var(--ui);
   color: var(--fg);
   background: var(--bg);
 }
@@ -39,10 +33,10 @@ body {
   height: 100vh;
   overflow: hidden;
   display: grid;
-  grid-template-columns: var(--side-width) minmax(0, 1fr) 0;
+  grid-template-columns: auto minmax(0, 1fr) 0;
 }
 body.with-panel {
-  grid-template-columns: var(--side-width) minmax(0, 1fr) var(--panel-width);
+  grid-template-columns: auto minmax(0, 1fr) var(--panel-width);
 }
 body.with-panel:has(#panel-body[data-panel^="code:"]) {
   --panel-width: clamp(440px, 38vw, 700px);
@@ -97,11 +91,7 @@ kbd {
   box-shadow: inset 0 -1px 0 #bababa;
   background: #f8f8f8;
   color: var(--fg-2);
-  font:
-    11px/15px -apple-system,
-    "Segoe UI",
-    system-ui,
-    sans-serif;
+  font: 11px/15px var(--ui);
   text-align: center;
 }
 .muted {
@@ -126,9 +116,13 @@ details.parts summary,
 
 /* ── Sidebar ─────────────────────────────────────────────────────────── */
 
+/* As wide as the longest name plus its tag, like an explorer. */
 #side {
   display: flex;
   flex-direction: column;
+  width: max-content;
+  min-width: 150px;
+  max-width: 240px;
   min-height: 0;
   background: var(--bar);
   border-right: 1px solid var(--border);
@@ -138,22 +132,26 @@ details.parts summary,
   align-items: center;
   gap: 6px;
   height: 35px;
-  padding: 0 12px 0 20px;
+  padding: 0 8px;
 }
 .side-head .muted {
   font-size: 11px;
 }
+/* Zero intrinsic width, so the input never widens the sidebar. */
 .filter {
   position: relative;
-  margin: 0 10px 6px 12px;
+  width: 0;
+  min-width: calc(100% - 12px);
+  margin: 0 6px 4px;
 }
 .filter input {
   width: 100%;
-  height: 24px;
-  padding: 0 24px 0 6px;
+  height: 22px;
+  padding: 0 22px 0 5px;
   border: 1px solid #cecece;
   border-radius: 2px;
   background: var(--bg);
+  font-size: 12px;
   outline: none;
 }
 .filter input:focus {
@@ -164,8 +162,8 @@ details.parts summary,
 }
 .filter kbd {
   position: absolute;
-  right: 4px;
-  top: 4px;
+  right: 3px;
+  top: 3px;
 }
 .filter input:focus + kbd {
   display: none;
@@ -177,11 +175,12 @@ details.parts summary,
 #list .item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   height: 22px;
-  padding: 0 12px 0 20px;
+  padding: 0 8px;
   color: var(--fg);
   text-decoration: none;
+  white-space: nowrap;
   border: 1px solid transparent;
 }
 #list .item:hover {
@@ -196,7 +195,6 @@ details.parts summary,
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 #list .latest {
   font-size: 11px;
@@ -212,14 +210,15 @@ details.parts summary,
   color: var(--bad);
 }
 #list .none {
-  padding: 3px 20px;
+  padding: 3px 8px;
   color: var(--fg-3);
 }
 .side-foot {
   height: 22px;
-  padding: 0 20px;
+  padding: 0 8px;
   font-size: 11px;
-  line-height: 22px;
+  line-height: 21px;
+  white-space: nowrap;
   border-top: 1px solid var(--border);
 }
 #scrim,
@@ -240,7 +239,7 @@ details.parts summary,
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 6px 0 12px;
+  padding: 0 4px 0 8px;
   background: var(--bar);
   border-bottom: 1px solid var(--border);
   min-width: 0;
@@ -372,14 +371,14 @@ details.parts summary,
 #legend {
   left: 8px;
   top: 8px;
-  width: 170px;
+  width: 150px;
   max-height: calc(100% - 16px);
   display: flex;
   flex-direction: column;
   padding: 4px 0;
 }
 .legend-head {
-  padding: 0 10px 3px;
+  padding: 0 8px 3px;
   color: var(--fg-3);
   font-size: 11px;
   text-transform: uppercase;
@@ -396,7 +395,7 @@ details.parts summary,
   gap: 6px;
   width: 100%;
   height: 22px;
-  padding: 0 10px;
+  padding: 0 8px;
   text-align: left;
   font-size: 13px;
   border: 1px solid transparent;
@@ -625,7 +624,7 @@ details.parts summary,
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 4px 0 10px;
+  padding: 0 4px 0 8px;
   background: var(--bar);
   border-top: 1px solid var(--border);
   font-size: 12px;
@@ -743,15 +742,15 @@ body.with-panel #panel {
   overflow: hidden;
 }
 #panel-body section {
-  padding: 0 12px;
+  padding: 0 8px;
   margin-top: 10px;
 }
 #panel-body section > h3 {
   display: flex;
   align-items: center;
   height: 22px;
-  margin: 0 -12px 2px;
-  padding: 0 12px;
+  margin: 0 -8px 2px;
+  padding: 0 8px;
 }
 #panel-body .meta {
   margin-top: 8px;
@@ -766,12 +765,12 @@ body.with-panel #panel {
 }
 #panel-body > div > p.muted.small,
 .rig > p {
-  padding: 8px 12px 0;
+  padding: 8px 8px 0;
   margin: 0;
 }
 dl.grid {
   display: grid;
-  grid-template-columns: 76px 1fr;
+  grid-template-columns: 68px 1fr;
   gap: 1px 10px;
   margin: 0;
   line-height: 20px;
@@ -866,7 +865,7 @@ dl.grid dd {
   display: grid;
   gap: 6px;
   justify-items: start;
-  padding: 16px 12px;
+  padding: 12px 8px;
   color: var(--fg-2);
 }
 .empty-state code {
@@ -911,10 +910,10 @@ dl.grid dd {
 }
 
 .rows {
-  margin: 0 -12px;
+  margin: 0 -8px;
 }
 .tree-row {
-  padding-left: calc(12px + var(--depth, 0) * 8px);
+  padding-left: calc(8px + var(--depth, 0) * 8px);
 }
 .tree-row .count {
   font-size: 12px;
@@ -955,8 +954,8 @@ details.parts[open] summary::before {
 }
 
 .rig-row {
-  padding: 3px 12px;
-  margin: 0 -12px;
+  padding: 3px 8px;
+  margin: 0 -8px;
   border: 1px solid transparent;
   cursor: default;
 }
@@ -1003,7 +1002,7 @@ details.parts[open] summary::before {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 12px;
+  padding: 0 8px;
   border-bottom: 1px solid var(--border);
   font-size: 12px;
 }
@@ -1135,15 +1134,16 @@ details.parts[open] summary::before {
   color: var(--accent);
 }
 .tags {
-  margin: 0 -12px;
+  margin: 0 -8px;
 }
 .tag-row {
   display: grid;
-  grid-template-columns: 70px minmax(0, 1fr) 76px 96px 44px;
+  grid-template-columns: 52px minmax(0, 1fr) 54px 78px 42px;
+  column-gap: 6px;
   align-items: center;
   width: 100%;
   height: 22px;
-  padding: 0 12px;
+  padding: 0 8px;
   text-align: left;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
@@ -1344,7 +1344,7 @@ button.tag-row:hover {
 /* Below 1240 px the panel floats over the stage instead of squeezing it. */
 @media (max-width: 1239px) {
   body.with-panel {
-    grid-template-columns: var(--side-width) minmax(0, 1fr) 0;
+    grid-template-columns: auto minmax(0, 1fr) 0;
   }
   #panel {
     position: fixed;
@@ -1366,7 +1366,6 @@ button.tag-row:hover {
     position: fixed;
     z-index: 15;
     inset: 0 auto 0 0;
-    width: 240px;
     transform: translateX(-100%);
     transition: transform 0.15s ease;
     box-shadow: 0 0 16px rgb(0 0 0 / 0.14);
