@@ -376,7 +376,12 @@ export default function build() {
 }
 ```
 
-The showcase (`showcase/`, Vite with plain TypeScript) discovers every `samples/*.ts`, including guide-test builds. It shows one sample at a time: orbit controls, a floor grid at y = 0 with a shadow, the camera framed to the object's bounds, and the selected slug in the URL hash (`#wyvern`). The header shows the builder from `meta.builtBy`; a stats line shows meshes, triangles, joints (`userData.joint` tags), colours and size in meters. Toggles show the script's source and, when the sample has joints, a skeleton overlay. Samples with snapshots have a compact, newest-first history strip; click a contact sheet to enlarge it. An error thrown while loading or running a sample appears in the page without preventing other samples from loading. Editing a sample, or any SDK file it imports, re-runs it in place.
+The showcase (`showcase/`, Vite with plain TypeScript, `npm run showcase`) discovers every `samples/*.ts`, including guide-test builds, and shows one at a time, framed like the harness renders. Everything about the view lives in the URL (`#redFox?mode=bones&skeleton&bend=40&panel=tree`); press `?` for the keys.
+
+- **View**: Shaded, Bones (false colour by owning bone; smooth-skinned parts blend by weight) or Groups; a skeleton x-ray; wireframe. Outside Shaded, hover a part for its bone, group and skin weights. Click a part, or a row in any list, to single out that part, bone (weight paint) or group.
+- **Bend test**: bends every bone but the root by a seeded random angle, up to ±28° per axis like the harness flex shots, as a wiggle or at a chosen amount. Skinned parts deform through their `skinIndex` / `skinWeight`; rigid parts ride their joint.
+- **Panels**, closed by default: Info (meta, live stats, colours, latest render vs live), Tree (joint tree, part groups, every part with its bone and group), Rig (`root.userData.rig`: chains, hinges, rings, with contacts and hinge axes drawn in the view), Code (the source, or a diff between any rendered version and live) and Versions (every `npm run snap` tag with its report numbers, sheet, shots and the latest GLBs to download).
+- An error thrown while loading or building a sample shows in the page, with its stack mapped to source lines, without affecting other samples. Editing a sample, or any SDK file it imports, re-runs it in place and keeps the camera; new renders appear as they land.
 
 ## Non-goals
 
