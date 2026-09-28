@@ -13,6 +13,7 @@ import { arc, catmull, polyline } from "../src/path";
 export const meta = {
   name: "Tentacle Serpent",
   description: "Serpent rooted mid-body, with a frill on four group joints, a twisted tusk and sprouted tentacles.",
+  builtBy: "SDK author (Claude Opus 5.5)",
 };
 
 const SKIN = "#2f6f73";

@@ -2,7 +2,11 @@
 import { BoxGeometry, ConeGeometry, CylinderGeometry, Group, Mesh, MeshStandardMaterial, TorusGeometry } from "three";
 import type { BufferGeometry } from "three";
 
-export const meta = { name: "Lantern", description: "A plain three.js prop: no SDK, no joints." };
+export const meta = {
+  name: "Lantern",
+  description: "A plain three.js prop: no SDK, no joints.",
+  builtBy: "SDK author (Claude Opus 5.5)",
+};
 
 export default function build() {
   const lantern = new Group();

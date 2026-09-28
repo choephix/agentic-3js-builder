@@ -13,6 +13,7 @@ import { bezier, catmull, polyline } from "../src/path";
 export const meta = {
   name: "Wyvern",
   description: "Bat-winged wyvern with bird legs, lashed eyes and a crest hinged on the line through its eyes.",
+  builtBy: "SDK author (Claude Opus 5.5)",
 };
 
 const SCALE = "#5f7f3a";

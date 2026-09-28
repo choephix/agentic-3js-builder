@@ -7,6 +7,7 @@ import { catmull } from "../src/path";
 export const meta = {
   name: "Giant Anteater",
   description: "A long-snouted giant anteater with a shaggy plume tail, dark shoulder mantle, and enormous hooked claws.",
+  builtBy: "GPT-6 Astra",
 };
 
 const FUR = "#9b6a3f";

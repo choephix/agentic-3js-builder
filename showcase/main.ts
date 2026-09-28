@@ -8,12 +8,17 @@ const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as 
 const list = $<HTMLUListElement>("samples");
 const title = $("title");
 const description = $("description");
+const builder = $("builder");
 const statsLine = $("stats");
 const errorBox = $("error");
+const history = $("history");
+const historyList = $<HTMLDivElement>("history-list");
 const source = $("source");
 const sourceToggle = $<HTMLButtonElement>("toggle-source");
 const skeletonToggle = $<HTMLButtonElement>("toggle-skeleton");
 const viewer = new Viewer($("viewer"));
+
+type Snapshot = { tag: string; arm: "A" | "B"; url: string };
 
 let current: Catalog = { modules: catalog.modules, sources: catalog.sources };
 let showSource = false;
@@ -50,14 +55,48 @@ async function renderList() {
   );
 }
 
+async function loadHistory(slug: string): Promise<Snapshot[]> {
+  try {
+    const response = await fetch(`/__snapshot-index/${encodeURIComponent(slug)}`);
+    return response.ok ? ((await response.json()) as Snapshot[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function renderHistory(items: Snapshot[]) {
+  history.hidden = items.length === 0;
+  historyList.replaceChildren(
+    ...items.map((item) => {
+      const link = document.createElement("a");
+      link.href = item.url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.title = `${item.tag} · arm ${item.arm}`;
+
+      const image = document.createElement("img");
+      image.src = item.url;
+      image.alt = `${item.tag} snapshot`;
+
+      const label = document.createElement("span");
+      label.textContent = item.tag;
+      link.append(image, label);
+      return link;
+    }),
+  );
+}
+
 async function run() {
   const token = ++loading;
   const slug = selected();
   const path = pathOf(slug);
+  const historyPromise = loadHistory(slug);
   for (const link of list.querySelectorAll("a")) link.classList.toggle("active", link.hash === `#${slug}`);
   errorBox.hidden = true;
   title.textContent = slug;
   description.textContent = "";
+  builder.textContent = "";
+  renderHistory([]);
   try {
     if (!path) throw new Error(`No sample "${slug}" in samples/`);
     const [module, text] = await Promise.all([current.modules[path](), current.sources[path]()]);
@@ -65,6 +104,7 @@ async function run() {
     source.textContent = text;
     title.textContent = module.meta?.name ?? slug;
     description.textContent = module.meta?.description ?? "";
+    builder.textContent = module.meta?.builtBy ? `Built by ${module.meta.builtBy}` : "";
     const built = (module as SampleModule).default();
     if (!built?.isObject3D) throw new Error(`samples/${slug}.ts: the default export must return a THREE.Object3D`);
     viewer.show(built);
@@ -80,6 +120,9 @@ async function run() {
         .map((v) => v.toFixed(2))
         .join(" × ")} m`,
     ].join(" · ");
+    const snapshots = await historyPromise;
+    if (token !== loading) return;
+    renderHistory(snapshots);
   } catch (reason) {
     if (token !== loading) return;
     viewer.show(null);
@@ -87,6 +130,7 @@ async function run() {
     statsLine.textContent = "";
     errorBox.textContent = message(reason);
     errorBox.hidden = false;
+    renderHistory(await historyPromise);
   }
   skeletonToggle.hidden = joints === 0;
   viewer.setSkeleton(showSkeleton && joints > 0);

@@ -13,6 +13,7 @@ import { catmull, spiral } from "../src/path";
 export const meta = {
   name: "Ram Fawn",
   description: "A dappled young ram: one smooth-skinned body from rump to head, countershaded, with spiral horns.",
+  builtBy: "SDK author (Claude Opus 5.5)",
 };
 
 const BACK = "#7a4726";

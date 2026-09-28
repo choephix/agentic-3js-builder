@@ -360,14 +360,14 @@ The sample contract:
 
 - One ES module per sample, `samples/<slug>.ts` (lowerCamel slug). It imports `three` and, if it wants, the SDK by relative path (`../src/builder`).
 - It default-exports a function that takes no arguments and returns a `THREE.Object3D`.
-- It may export `meta = { name, description? }`. The showcase lists it by `meta.name`, falling back to the slug.
+- It may export `meta = { name, description?, builtBy? }`. The showcase lists it by `meta.name`, falling back to the slug, and shows `builtBy` when present.
 - Anything goes: creatures, people, props, environments. The SDK and a skeleton are optional; `samples/lantern.ts` is plain three.js.
 - Samples are part of the codebase: `tsc` checks them, and an SDK change that breaks a sample updates the sample in the same change.
 
 ```ts
 import { createBuilder } from "../src/builder";
 
-export const meta = { name: "Wyvern", description: "Bat-winged wyvern with bird legs." };
+export const meta = { name: "Wyvern", description: "Bat-winged wyvern with bird legs.", builtBy: "SDK author" };
 
 export default function build() {
   const b = createBuilder({ name: "wyvern" });
@@ -376,7 +376,7 @@ export default function build() {
 }
 ```
 
-The showcase (`showcase/`, Vite with plain TypeScript) discovers every `samples/*.ts`. It shows one sample at a time: orbit controls, a floor grid at y = 0 with a shadow, the camera framed to the object's bounds, and the selected slug in the URL hash (`#wyvern`). A stats line shows meshes, triangles, joints (`userData.joint` tags), colours and size in meters. Toggles show the script's source and, when the sample has joints, a skeleton overlay. An error thrown while loading or running a sample appears in the page. Editing a sample, or any SDK file it imports, re-runs it in place.
+The showcase (`showcase/`, Vite with plain TypeScript) discovers every `samples/*.ts`, including guide-test builds. It shows one sample at a time: orbit controls, a floor grid at y = 0 with a shadow, the camera framed to the object's bounds, and the selected slug in the URL hash (`#wyvern`). The header shows the builder from `meta.builtBy`; a stats line shows meshes, triangles, joints (`userData.joint` tags), colours and size in meters. Toggles show the script's source and, when the sample has joints, a skeleton overlay. Samples with snapshots have a compact, newest-first history strip; click a contact sheet to enlarge it. An error thrown while loading or running a sample appears in the page without preventing other samples from loading. Editing a sample, or any SDK file it imports, re-runs it in place.
 
 ## Non-goals
 

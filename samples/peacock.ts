@@ -12,6 +12,7 @@ import { bezier, catmull } from "../src/path";
 export const meta = {
   name: "Peacock",
   description: "24-feather train on 6 group joints, raised into display by posing them.",
+  builtBy: "SDK author (Claude Opus 5.5)",
 };
 
 const BLUE = "#1f4fa8";
