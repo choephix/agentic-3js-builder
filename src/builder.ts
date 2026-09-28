@@ -9,6 +9,8 @@ import type { RingItem, RingOptions } from "./distribute";
 import { membrane, slab } from "./membrane";
 import type { MembraneEdge, MembraneOptions, SlabOptions } from "./membrane";
 import type { FrameInput, PointInput } from "./math";
+import { extrude, lathe } from "./outline";
+import type { ExtrudeOptions, LatheOptions, OutlinePoint } from "./outline";
 import { part } from "./parts";
 import type { PartOptions } from "./parts";
 import type { PathInput } from "./path";
@@ -123,6 +125,14 @@ export class Builder {
 
   slab(points: readonly PointInput[], options: SlabOptions) {
     return slab(this.ctx, points, options);
+  }
+
+  extrude(points: readonly OutlinePoint[], options: ExtrudeOptions) {
+    return extrude(this.ctx, points, options);
+  }
+
+  lathe(points: readonly OutlinePoint[], options: LatheOptions) {
+    return lathe(this.ctx, points, options);
   }
 
   region(options: RegionOptions) {

@@ -23,6 +23,7 @@ Bones work, and so does any other point, line or frame: an eye, a horn, a surfac
 | `b.rod/capsule/frustumBox(a, b)`, `b.slab(points)`, `b.loft(stations[].at)`, `limb(root, target)` | Points                                                         |
 | `b.spike(base, dirOrTip, len, r)`                                                                 | Point, then a Direction (`len` number) or a Point (`len` null) |
 | `b.part({ at, frame, aim, dir, up })`                                                             | Point, Frame, Point, Direction, Direction                      |
+| `b.extrude(outline, { at, x, y })`, `b.lathe(outline, { at, axis })`                              | 2D outline, then a Point and Directions                        |
 | `b.stick(geo, color, on)`, `b.sprout(name, on, ...)`                                              | Frame (seated along its facing axis)                           |
 | `b.ring(line, ...)`, `b.pose(joint, { about })`                                                   | Line                                                           |
 | `surface.nearest/ray/around`, `aim`, `offset`, `lerp`, `mid`, `bezier/catmull/arc/spiral`         | Points and Directions                                          |
@@ -246,7 +247,7 @@ b.sweep(skin.drape(loop, { lift: 0.012 }), 0.018, { color: STRAP }); // weights:
 
 `b.membrane(edgeA, edgeB, { color, thickness, rows?, cols?, scallop?, skin?, split?, bone?, group?, name? })` skins between two edges (each a `Chain`, path or points), resampled by arc length. Chain edges are read in their current pose. `rows` defaults to 4 × `detail`. It returns closed, double-sided meshes. Smooth (default): one mesh whose vertices blend from edge A's bones to edge B's across the width, and between neighbouring joints along each chain edge. `skin: "rigid"`: one mesh per bone; with `split: "mid"` (default) cells nearer A go to A's joint at that t and cells nearer B go to B's, and `"a"` or `"b"` assigns everything to one edge. Path edges follow `bone`, which is a joint, or a Chain followed along its nearest point; without `bone`, the path's own bones, else the other edge's chain, else the nearest joint. A fin between `tube.line(0)` and a raised line then follows the spine. Every bone span boundary gets a column. `scallop` (a fraction of the length) pulls the trailing edge between the two tips inward. Run both edges in the same direction, from root to tip.
 
-`b.slab(points, { color, thickness, bone?, group?, name? })` turns a roughly planar polygon (any Points) into a thin closed prism for fins, ears, leaves and plates, and returns a `Part` centred on it, facing its normal. It follows `bone` (rigid), else the first built point's bones, else the nearest joint.
+`b.slab(points, { color, thickness, bone?, group?, name? })` turns a roughly planar polygon (any Points) into a thin closed prism for fins, ears, leaves and plates, and returns a `Part` centred on it, facing its normal. It follows `bone` (rigid), else the first built point's bones, else the nearest joint. Use it when the corners come from built things (hits, tube points); to draw a shape, use `extrude`.
 
 ```ts
 b.membrane(finger1, finger2, { thickness: 0.02, color: WING, scallop: 0.18 });
@@ -256,6 +257,52 @@ b.membrane(neckTube.line(0, -0.01).slice(0.05, 0.45), neckTube.line(0, 0.12).sli
   color: FIN,
   bone: neck,
 });
+```
+
+## Outlines: extrude and lathe
+
+Both take an outline: at least 3 corners `[x, y]` in meters, drawn in order around the shape (at most 512 after smoothing). The loop always closes; a last point repeating the first is dropped. Mark a corner `[x, y, "sharp"]` to keep it pointed through smoothing. An outline that crosses or touches itself throws, naming the two edges. Both return a `Part` and follow `bone` (rigid), else `at`'s bones, else the nearest joint.
+
+- `smoothing: 0..3` cuts every unsharp corner into two, a quarter of the way along each neighbouring edge, per round. Few points plus smoothing 2 draws a leaf or petal. It throws when a cut corner would cross another edge, naming the corners; mark one "sharp" or lower it.
+
+`b.extrude(outline, { at, x?, y?, thickness, bevel?, smoothing?, color, bone?, group?, name? })` pushes the outline into a flat slab whose silhouette is the drawing: fins, sails, blades, plates, leaves, feathers, ears, crests.
+
+- The outline's origin sits at `at`; its +x runs along the model-space Direction `x` (default `[0, 0, 1]`, forward) and its +y along `y` (default `[0, 1, 0]`, up), so the default is a side view. Thickness runs along x × y, centred on the drawing.
+- `thickness` is a number, or `[atLowest, atHighest]` for a linear taper from the outline's lowest y to its highest y. Either end can be 0 for a knife edge. Both faces stay flat.
+- `bevel` rounds the front and back rims inward along a quarter circle, so the outline stays the silhouette. It is capped at half the thickness and shrinks until it fits sharp and concave corners.
+- The returned Part's local x, y and z are the outline's x, y and the thickness axis: `fin.local([u, v, 0])` is a point of the drawing, and `fin.local([u, v, t / 2])` is on its front face. Build spots and ribs from it.
+- Mirror a pair by mirroring the directions: `x: [s, 0, 0]`, or `x: [0, 0, 1], y: [s * 0.3, 1, 0]`. The outline stays the same.
+
+`b.lathe(outline, { at, axis?, segments?, spin?, smoothing?, color, bone?, group?, name? })` spins half a cross-section around `axis` (default `[0, 1, 0]`) through `at`: hats, domes, bells, collars, bottles, vases, buttons, beaks, turned legs and anything round whose profile doubles back, which a sweep can't draw.
+
+- The outline's x is the distance from the axis and never negative; its y is the height along `axis`. For a solid, run from the axis out around the shape and back to it. For a shell (a bell, a hat brim), draw both walls so the loop has thickness.
+- `segments` (3 to 64, default 16 × `detail`) is the steps around. Below 12 the sides shade flat: 6 gives a hex column, 4 a square spire. `spin` turns the first step by that many degrees.
+- Profile corners sharper than 35° stay creased; gentler ones (and smoothed curves) shade smooth.
+
+```ts
+const sail = b.extrude(
+  [
+    [0, 0],
+    [0.9, 0],
+    [0.75, 0.25],
+    [0.1, 0.55, "sharp"],
+  ],
+  { at: spine.at(0.2), x: [0, 0, -1], thickness: [0.03, 0.006], bevel: 0.006, smoothing: 2, color: SAIL },
+);
+b.stick(new THREE.SphereGeometry(0.03), SPOT, sail.moved(sail.local([0.4, 0.2, 0.015])));
+for (const s of [1, -1])
+  b.extrude(petal, { at: collar.local([s * 0.06, 0, 0]), x: [s, 0, 0], thickness: 0.01, bevel: 0.003, color: PINK });
+b.lathe(
+  [
+    [0, 0],
+    [0.32, 0],
+    [0.32, 0.015],
+    [0.14, 0.03],
+    [0.13, 0.2],
+    [0, 0.22],
+  ],
+  { at: head.local([0, 0.12, 0]), bone: head, smoothing: 1, color: FELT },
+); // a wide-brimmed hat
 ```
 
 ## Distribution, IK, regions
