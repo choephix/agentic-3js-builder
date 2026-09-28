@@ -41,11 +41,15 @@ export default function build() {
   const random = rng(42);
 
   // ---------------------------------------------------------------------------
-  // Spine & Torso: A graceful, slender vulpine body with high withers and tucked loin
-  // ---------------------------------------------------------------------------
-  // Stations running from rump tip to base of skull.
+  // One continuous profile runs from the tail tip through the rump, hips, spine, and neck to the base of the skull.
+  // The tail and body share this curve, so the transition is one smooth skinned surface rather than overlapping caps.
   const stations = [
-    { at: [0, 0.4, -0.34], w: 0.13, h: 0.15 }, // Rump tip
+    { at: [0, 0.25, -0.9], w: 0.05, h: 0.06 }, // Tail tip
+    { at: [0, 0.24, -0.8], w: 0.07, h: 0.08 },
+    { at: [0, 0.27, -0.7], w: 0.09, h: 0.1 },
+    { at: [0, 0.32, -0.58], w: 0.11, h: 0.12 },
+    { at: [0, 0.37, -0.46], w: 0.12, h: 0.14 },
+    { at: [0, 0.39, -0.34], w: 0.13, h: 0.15 }, // Rump / tail root
     { at: [0, 0.41, -0.24], w: 0.18, h: 0.19 }, // Hips / Pelvis
     { at: [0, 0.41, -0.06], w: 0.16, h: 0.17 }, // Tucked loin / waist
     { at: [0, 0.42, 0.11], w: 0.19, h: 0.23 }, // Deep ribcage / chest
@@ -54,14 +58,23 @@ export default function build() {
     { at: [0, 0.58, 0.43], w: 0.11, h: 0.13 }, // Throat / base of skull
   ] as const;
 
-  const bodyCurve = catmull(stations.map((s) => s.at));
-  const root = b.joint("hips", { at: stations[1].at });
+  const curve = catmull(stations.map((s) => s.at));
+  const tailBaseIndex = 5;
+  const tailBaseT = curve.knots[tailBaseIndex];
+  const root = b.joint("hips", { at: stations[tailBaseIndex + 1].at });
+  const hipsT = curve.knots[tailBaseIndex + 1];
 
-  const spine = b.chain("spine", bodyCurve.slice(bodyCurve.knots[1], 1), {
+  const spine = b.chain("spine", curve.slice(hipsT, 1), {
     parent: root,
     names: ["spine1", "spine2", "chest", "neck1", "neck2"],
     role: "spine",
     group: "body",
+  });
+  const tail = b.chain("tail", curve.slice(hipsT, 0), {
+    parent: root,
+    count: 6,
+    role: "tail",
+    group: "tail",
   });
 
   // Chest hangs slightly below the spine, loin tucked up
@@ -73,7 +86,9 @@ export default function build() {
   };
 
   const body = b.loft(stations, {
-    bone: spine,
+    from: tailBaseT,
+    to: 1,
+    bone: [tail, root, spine],
     color: RED_FOX,
     sectors: [
       [-65, 65, RED_BACK],
@@ -81,6 +96,7 @@ export default function build() {
     ],
     shift: (t) => [0, bellySag(t)],
     sides: 16,
+    caps: { start: "none", end: "round" },
     group: "body",
   });
 
@@ -293,26 +309,8 @@ export default function build() {
   // ---------------------------------------------------------------------------
   // Bushy Brush Tail with Pure White Tag and Scent Gland Spot
   // ---------------------------------------------------------------------------
-  // 6 joints for a fluid, natural curve backward and slightly downward
-  const tail = b.chain(
-    "tail",
-    catmull([
-      [0, 0.39, -0.34],
-      [0, 0.37, -0.46],
-      [0, 0.32, -0.58],
-      [0, 0.27, -0.7],
-      [0, 0.24, -0.8],
-      [0, 0.25, -0.9],
-    ]),
-    {
-      parent: root,
-      count: 6,
-      role: "tail",
-      group: "tail",
-    },
-  );
-
-  // Very thick spindle profile: narrow base, massive fluffy middle, tapered tip
+  // The shared curve is drawn tail-tip -> head, while the old tail profile was base -> tip. Remap every tail
+  // callback through tailBaseT so the thin tip and white tag stay exactly where they were.
   const tailRadius = (t: number): [number, number] => {
     // Bulges up to radius 0.065 (13cm thick!), slightly taller than wide
     const bulge = Math.sin(Math.PI * Math.min(t / 0.85, 1));
@@ -321,33 +319,43 @@ export default function build() {
   };
 
   const tagSplit = 0.78; // White tag on the last 22% of the tail
+  const tagT = tailBaseT * (1 - tagSplit);
+  const tailBones = [tail, root, spine] as const;
 
-  // Red main body of tail
-  b.sweep(tail, tailRadius, {
-    to: tagSplit,
+  // Red main body of tail, from its white-tag boundary back to the shared rump surface.
+  b.sweep(curve, (u) => tailRadius(1 - u), {
+    from: tagT,
+    to: tailBaseT,
+    bone: tailBones,
     color: RED_FOX,
     sectors: [
       [-60, 60, RED_BACK], // Darker dorsal ridge on tail
     ],
     sides: 16,
+    caps: { start: "none", end: "none" },
+    group: "tail",
+  });
+
+  // White tip ("tag") of the tail. Reverse the old profile so its rounded, bushy end stays at the tip; its
+  // narrow boundary matches the red sweep exactly, leaving no collar.
+  b.sweep(curve, (u) => tailRadius(u), {
+    from: 0,
+    to: tagT,
+    bone: tailBones,
+    color: WHITE,
+    sides: 16,
     caps: { start: "round", end: "none" },
     group: "tail",
   });
 
-  // White tip ("tag") of the tail
-  b.sweep(tail, tailRadius, {
-    from: tagSplit,
-    color: WHITE,
-    sides: 16,
-    caps: { start: "none", end: "round" },
-    group: "tail",
-  });
+  // Tail details use the original base -> tip parameter, mapped onto the shared chain.
+  const tailAt = (t: number) => tail.at((hipsT - tailBaseT * (1 - t)) / hipsT);
 
   // Dark supracaudal scent gland mark (violet gland) near tail base
-  const glandPt = tail.at(0.12);
+  const glandPt = tailAt(0.12);
   const glandR = tailRadius(0.12)[1];
   b.part(new CylinderGeometry(0.012, 0.012, 0.004, 12), VIOLET_GLAND, {
-    bone: tail.joints[0],
+    bone: glandPt.bone ?? tail.joints[0],
     at: [0, glandPt.at.y + glandR - 0.001, glandPt.at.z],
     dir: [0, 1, 0],
     scale: [0.8, 1, 1.6],
@@ -358,7 +366,7 @@ export default function build() {
   for (let i = 0; i < 8; i++) {
     const t = 0.22 + i * 0.07;
     for (const s of [1, -1]) {
-      const pt = tail.at(t);
+      const pt = tailAt(t);
       const rad = tailRadius(t)[0];
       const tuftPos: V3 = [s * (rad + 0.004), pt.at.y + (i % 2 === 0 ? 0.008 : -0.008), pt.at.z];
       b.spike(tuftPos, [s * 0.03, -0.01, -0.05], 0.05, 0.014, {
@@ -376,7 +384,7 @@ export default function build() {
   const headDir: V3 = [0, -0.08, 1];
   const skull = b.joint("head", {
     parent: spine.joints[4],
-    at: bodyCurve.at(1),
+    at: curve.at(1),
     dir: headDir,
     role: "head",
     group: "head",
