@@ -1,8 +1,9 @@
 // Giant oceanic manta ray (Mobula birostris), 4.6 m across the wings, 3.5 m from cephalic fins to tail tip.
 // A gliding rest pose: the pectoral wings spread level, each a smooth lens-section sweep on a five-joint chain so it
-// flaps and bends as one skin; the rolled cephalic fins curl forward off the head on two-joint chains; the whip
-// tail runs straight back on six. The lower jaw, pelvic fins and dorsal fin are extruded plates; the eyes,
-// spiracles and the two hitchhiking remoras (body, sucking disc) are turned lathe profiles.
+// flaps and bends as one skin; the rolled cephalic fins curl forward off the head on two-joint chains. The body and
+// whip tail are one continuous skin over the spine and tail chains, with the tail tapering to a fine tip. The lower
+// jaw, pelvic fins and dorsal fin are extruded plates; the eyes, spiracles and the two hitchhiking remoras (body,
+// sucking disc) are turned lathe profiles.
 import { CylinderGeometry, SphereGeometry } from "three";
 import { createBuilder } from "../src/builder";
 import { offset, rng } from "../src/math";
@@ -81,20 +82,40 @@ export default function build() {
   const head = b.joint("head", { parent: root, at: [0, Y0, 0.6], dir: [0, 0, 1], role: "head", group: "head" });
   const jaw = b.joint("jaw", { parent: head, at: [0, Y0 - 0.06, 0.84], dir: [0, 0, 1], role: "jaw", group: "jaw" });
 
-  // ---------------------------------------------------------------- Body
-  // A raised central disc from behind the head to the tail root, dark above and white below.
-  const body = b.loft(
-    [
-      { at: [0, Y0, 0.75], w: 0.8, h: 0.26 },
-      { at: [0, Y0, 0.45], w: 0.98, h: 0.38 },
-      { at: [0, Y0 + 0.01, 0.1], w: 1.02, h: 0.42 },
-      { at: [0, Y0 + 0.01, -0.3], w: 0.86, h: 0.36 },
-      { at: [0, Y0, -0.6], w: 0.52, h: 0.24 },
-      { at: [0, Y0, -0.85], w: 0.2, h: 0.12 },
-      { at: [0, Y0, -0.97], w: 0.1, h: 0.08 },
-    ],
-    { bone: spine, color: BACK, sectors: [[100, 260, BELLY]], sides: 24, group: "body" },
-  );
+  // The body path continues through the tail tip so its ring at the tail root is shared by both sector palettes. The
+  // three tail stations match the old whip-tail curve; the first body station keeps its fine circular base.
+  const bodyStations = [
+    { at: [0, Y0 + 0.03, -2.45], w: 0.006, h: 0.006 },
+    { at: [0, Y0 + 0.01, -1.6], w: 0.036, h: 0.036 },
+    { at: [0, Y0, -0.95], w: 0.078, h: 0.078 },
+    { at: [0, Y0, -0.85], w: 0.2, h: 0.12 },
+    { at: [0, Y0, -0.6], w: 0.52, h: 0.24 },
+    { at: [0, Y0 + 0.01, -0.3], w: 0.86, h: 0.36 },
+    { at: [0, Y0 + 0.01, 0.1], w: 1.02, h: 0.42 },
+    { at: [0, Y0, 0.45], w: 0.98, h: 0.38 },
+    { at: [0, Y0, 0.75], w: 0.8, h: 0.26 },
+  ] as const;
+  const bodyPath = catmull(bodyStations.map((station) => station.at));
+  const tailT = bodyPath.closestT([0, Y0, -0.95]);
+  const mergedBones = [tail, spine, root] as const;
+  b.sweep(bodyPath, (u) => 0.036 * u ** 1.3 + 0.003, {
+    bone: mergedBones,
+    to: tailT,
+    color: BACK,
+    sectors: [[125, 235, MARGIN]],
+    caps: { start: "round", end: "none" },
+    sides: 24,
+    group: "tail",
+  });
+  const body = b.loft(bodyStations, {
+    bone: mergedBones,
+    from: tailT,
+    color: BACK,
+    sectors: [[100, 260, BELLY]],
+    caps: { start: "none", end: "round" },
+    sides: 24,
+    group: "body",
+  });
 
   // Head: the broad flat snout, rigid on the head bone and buried in the body behind the eyes.
   const headLoft = b.loft(
@@ -346,12 +367,6 @@ export default function build() {
     });
   }
 
-  // ---------------------------------------------------------------- Tail
-  b.sweep(tail, (t) => 0.036 * (1 - t) ** 1.3 + 0.003, {
-    color: BACK,
-    sectors: [[125, 235, MARGIN]],
-    group: "tail",
-  });
   const tail1 = tail.joints[0];
   b.extrude(
     [
