@@ -1,5 +1,6 @@
-// Triceratops at real size (8.5 m), four-square in a rigging rest pose. A smooth-skinned barrel trunk and short neck
-// are lofted over a spine chain that peaks at the hips; the tail is its own eight-joint chain held straight out.
+// Triceratops at real size (8.5 m), four-square in a rigging rest pose. Tail, barrel trunk and short neck are one
+// smooth-skinned loft drawn from the tail tip to the base of the skull, over an eight-joint tail chain that runs back
+// from the hips and a spine chain that runs forward from them, so the tail grows out of the rump without a seam.
 // The head is the show: a deep skull loft with a separate lower jaw, a hooked beak drawn as extruded side profiles
 // (upper rostral hook over the lower predentary), two long brow horns swept on curved paths with a dark keratin tip,
 // and a turned nasal horn and cheek horns. The frill is one big extrude whose outline is a smooth rim cut into
@@ -112,11 +113,15 @@ export default function build() {
   const b = createBuilder({ name: "triceratops" });
   const random = rng(23);
 
-  // ---------------------------------------------------------------- trunk and neck
-  // Station centres from the rump to the base of the skull; w/h are full width and height. A wide barrel with the
-  // back peaking over the hips and falling to a short, thick neck hidden under the frill.
+  // ---------------------------------------------------------------- tail, trunk and neck
+  // One loft from the tail tip to the base of the skull; w/h are full width and height. A tapering tail swells into a
+  // wide barrel with the back peaking over the hips, then falls to a short, thick neck hidden under the frill.
   const stations = [
-    { at: [0, 2.12, -1.95], w: 1.25, h: 1.35 },
+    { at: [0, 1.35, -4.3], w: 0.1, h: 0.12 },
+    { at: [0, 1.55, -3.6], w: 0.26, h: 0.3 },
+    { at: [0, 1.85, -2.8], w: 0.56, h: 0.62 },
+    { at: [0, 2.04, -2.3], w: 0.92, h: 1.02 },
+    { at: [0, 2.14, -1.9], w: 1.3, h: 1.4 },
     { at: [0, 2.2, -1.3], w: 1.8, h: 1.65 },
     { at: [0, 2.05, -0.4], w: 2.1, h: 1.85 },
     { at: [0, 1.85, 0.5], w: 1.85, h: 1.65 },
@@ -124,64 +129,34 @@ export default function build() {
     { at: [0, 1.66, 1.6], w: 0.8, h: 0.8 },
   ] as const;
   const curve = catmull(stations.map((s) => s.at));
-  const hips = b.joint("hips", { at: stations[1].at, role: "spine", group: "body" });
-  const spine = b.chain("spine", curve.slice(curve.knots[1], 1), {
+  const hipsT = curve.knots[5];
+  const hips = b.joint("hips", { at: stations[5].at, role: "spine", group: "body" });
+  const spine = b.chain("spine", curve.slice(hipsT, 1), {
     parent: hips,
     count: 5,
     names: ["spine1", "spine2", "chest", "neck1", "neck2"],
     role: "spine",
     group: "body",
   });
-  const belly = (t: number) => Math.sin(Math.PI * Math.min(Math.max((t - 0.1) / 0.6, 0), 1));
-  // Dark saddle stripes across the back; the back and belly sectors keep their own colours.
-  const stripe = (t: number) => (t > 0.15 && t < 0.75 && ((t - 0.15) / 0.1) % 1 > 0.6 ? STRIPE : HIDE);
+  const tail = b.chain("tail", curve.slice(hipsT, 0), { parent: hips, count: 8, role: "tail", group: "tail" });
+  // Colour and belly sag are keyed on z, so they stay put along the one curve.
+  const zAt = (t: number) => curve.at(t).z;
+  const belly = (z: number) => Math.sin(Math.PI * Math.min(Math.max((z + 1.6) / 2.15, 0), 1));
+  // Dark saddle stripes across the back and down the tail; the back and belly sectors keep their own colours.
+  const stripe = (t: number) => {
+    const z = zAt(t);
+    return z > -3.8 && z < 0.75 && ((z + 3.8) / 0.36) % 1 > 0.6 ? STRIPE : HIDE;
+  };
   const body = b.loft(stations, {
-    bone: spine,
+    bone: [tail, hips, spine],
     color: stripe,
     sectors: [
       [-55, 55, BACK],
       [120, 240, BELLY],
     ],
-    shift: (t) => [0, -0.12 * belly(t)],
+    shift: (t) => [0, -0.12 * belly(zAt(t))],
     sides: 18,
     group: "body",
-  });
-
-  // ---------------------------------------------------------------- tail
-  const tail = b.chain(
-    "tail",
-    catmull([
-      [0, 2.2, -1.3],
-      [0, 2.1, -2.0],
-      [0, 1.85, -2.8],
-      [0, 1.55, -3.6],
-      [0, 1.35, -4.3],
-    ]),
-    { parent: hips, count: 8, role: "tail", group: "tail" },
-  );
-  const tailRx: [number, number][] = [
-    [0, 0.6],
-    [0.2, 0.45],
-    [0.5, 0.27],
-    [0.8, 0.13],
-    [1, 0.05],
-  ];
-  const tailRy: [number, number][] = [
-    [0, 0.66],
-    [0.2, 0.5],
-    [0.5, 0.3],
-    [0.8, 0.15],
-    [1, 0.06],
-  ];
-  const tailStripe = (t: number) => (t > 0.1 && t < 0.8 && ((t - 0.1) / 0.12) % 1 > 0.6 ? STRIPE : HIDE);
-  const tailTube = b.sweep(tail, (t) => [interp(tailRx, t), interp(tailRy, t)], {
-    color: tailStripe,
-    sectors: [
-      [-50, 50, BACK],
-      [125, 235, BELLY],
-    ],
-    sides: 16,
-    group: "tail",
   });
 
   // ---------------------------------------------------------------- head
@@ -590,7 +565,7 @@ export default function build() {
     [0.95 * r, 0.25 * r],
     [0, 0.7 * r, "sharp"],
   ];
-  const trunk = b.surface([body, tailTube]);
+  const trunk = b.surface([body]);
   for (const [surface, count, minDist, r, filter, colors] of [
     [trunk, 70, 0.26, 0.055, (h: Hit) => Math.abs(h.n.y) < 0.6 && h.at.z > -2.8 && h.at.z < 1.0, [BUMP, STUD]],
     [trunk, 40, 0.24, 0.05, (h: Hit) => h.n.y >= 0.6 && h.at.z > -3.2 && h.at.z < 0.9, [BUMP]],
