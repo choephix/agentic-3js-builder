@@ -1,6 +1,6 @@
 // Griffin: an eagle's head, wings and forelegs on a lion's hindquarters and tail, lion-sized (3.2 m from beak to tail
-// tuft, 4.2 m wingspan). One smooth-skinned lion body lofted over the spine chain; a separate neck chain rises from the
-// chest. The eagle half is feathered in extruded contour feathers laid in shingled rows on the real skin of the neck,
+// tuft, 4.2 m wingspan). One continuous lion tube is lofted from the tail tip through the spine and up the neck, with
+// the eagle half feathered in extruded contour feathers laid in shingled rows on the real skin of the neck, chest, nape
 // chest, nape and forelegs, so they bend with it. The wings are spread in a shallow V for rigging: each is an arm
 // chain (shoulder, elbow, wrist) carrying layered extruded feathers (primaries, secondaries, tertials and three rows
 // of coverts with dark shaft streaks), and the nine primaries hang on three digit joints so the hand fans and folds.
@@ -115,38 +115,56 @@ const streak = (len: number, w: number) =>
 export default function build() {
   const b = createBuilder({ name: "griffin" });
 
-  // ---- Lion body ------------------------------------------------------------------------------------------------
-  // Rump tip to the front of the breast; w/h are full width and height.
+  // ---- Lion body, tail and neck ----------------------------------------------------------------------------------
+  // One continuous tube runs from the tail tip through the breast and up the neck; w/h are full width and height.
   const stations = [
-    { at: [0, 0.99, -0.8], w: 0.3, h: 0.32 },
+    { at: [0, 1.18, -1.9], w: 0.08, h: 0.1 },
+    { at: [0, 1.0, -1.38], w: 0.12, h: 0.14 },
+    { at: [0, 0.99, -0.76], w: 0.2, h: 0.22 },
     { at: [0, 1.02, -0.58], w: 0.46, h: 0.5 },
     { at: [0, 0.98, -0.2], w: 0.4, h: 0.44 },
     { at: [0, 1.02, 0.2], w: 0.48, h: 0.6 },
     { at: [0, 1.1, 0.46], w: 0.42, h: 0.52 },
     { at: [0, 1.17, 0.6], w: 0.26, h: 0.3 },
+    { at: [0, 1.32, 0.62], w: 0.32, h: 0.32 },
+    { at: [0, 1.5, 0.72], w: 0.26, h: 0.26 },
+    { at: [0, 1.62, 0.8], w: 0.2, h: 0.2 },
   ] as const;
-  const hips = b.joint("hips", { at: stations[1].at, role: "spine", group: "body" });
-  const spine = b.chain("spine", catmull([stations[1].at, stations[2].at, stations[3].at, stations[4].at]), {
+  const curve = catmull(stations.map((s) => s.at));
+  const hipsT = curve.knots[3];
+  const chestT = curve.knots[7];
+  const neckT = curve.knots[8];
+  const hips = b.joint("hips", { at: stations[3].at, role: "spine", group: "body" });
+  const spine = b.chain("spine", curve.slice(hipsT, chestT), {
     parent: hips,
+    count: 3,
     names: ["spine1", "spine2", "chest"],
     role: "spine",
     group: "body",
   });
   const chest = spine.joints[2];
+  const neck = b.chain("neck", curve.slice(chestT, 1), {
+    parent: chest,
+    names: ["neck1", "neck2", "neck3"],
+    role: "neck",
+    group: "neck",
+  });
+  const tail = b.chain("tail", curve.slice(hipsT, 0), { parent: hips, count: 8, role: "tail", group: "tail" });
   const bump = (t: number, c: number, w: number) => Math.exp(-(((t - c) / w) ** 2));
-  // A deep keel under the chest, the loin tucked up behind it.
+  const zAt = (t: number) => curve.at(t).z;
   const body = b.loft(stations, {
-    bone: spine,
-    color: LION,
+    bone: [tail, hips, spine, neck],
+    color: (t) => (t < hipsT ? LION : t < neckT ? LION : WHITE),
     bands: [
       [0.56, LION],
-      [1, CHEST],
+      [neckT, CHEST_LIGHT],
+      [1, WHITE],
     ],
     sectors: [
       [-40, 40, LION_BACK],
       [130, 230, LION_BELLY],
     ],
-    shift: (t) => [0, -0.05 * bump(t, 0.72, 0.14) + 0.02 * bump(t, 0.4, 0.1)],
+    shift: (t) => [0, -0.05 * bump(t, 0.66, 0.14) + 0.02 * bump(t, 0.42, 0.1)],
     sides: 16,
     group: "body",
   });
@@ -190,37 +208,23 @@ export default function build() {
   // The eagle half: rows of golden-brown contour feathers over the chest and shoulders, fading into the tawny loin.
   for (let r = 0; r < 8; r++) {
     const t = 0.995 - r * 0.063;
+    const bodyT = hipsT + t * (neckT - hipsT);
     const count = 14;
     for (let i = 0; i < count; i++) {
-      const p = body.at(t, ((i + (r % 2) * 0.5) * 360) / count);
+      const p = body.at(bodyT, ((i + (r % 2) * 0.5) * 360) / count);
       // Dark brown breast in a regular two-tone scale pattern, lightening toward the loin.
       const color = (i + r) % 2 ? (r < 6 ? CHEST : CHEST_LIGHT) : r < 3 ? CHEST_DARK : r < 6 ? CHEST : CHEST_LIGHT;
       shingle(p, p.tangent.negate(), 0.17, 0.056, color, 0.002 + 0.003 * ((i + r) % 2), "body");
     }
   }
 
-  // ---- Neck and head --------------------------------------------------------------------------------------------
-  const neck = b.chain("neck", catmull([stations[4].at, [0, 1.32, 0.62], [0, 1.5, 0.72], [0, 1.62, 0.8]]), {
-    parent: chest,
-    names: ["neck1", "neck2", "neck3"],
-    role: "neck",
-    group: "neck",
-  });
-  const neckTube = b.sweep(neck, [0.16, 0.13, 0.11, 0.1], {
-    color: WHITE,
-    bands: [
-      [0.35, CHEST_LIGHT],
-      [1, WHITE],
-    ],
-    sides: 14,
-    group: "neck",
-  });
+  // ---- Head ------------------------------------------------------------------------------------------------------
   // Hackles: white at the throat, golden where the neck meets the breast, every tip pointing down the neck.
   for (let r = 0; r < 9; r++) {
     const t = 0.95 - r * 0.1;
     const count = 12;
     for (let i = 0; i < count; i++) {
-      const p = neckTube.at(t, ((i + (r % 2) * 0.5) * 360) / count);
+      const p = body.at(neckT + t * (1 - neckT), ((i + (r % 2) * 0.5) * 360) / count);
       const color = t > 0.45 ? (i % 2 ? WHITE : WHITE_SHADE) : t > 0.25 ? CHEST_LIGHT : CHEST;
       const lift = 0.002 + 0.003 * ((i + r) % 2);
       shingle(p, p.tangent.negate(), 0.12 + 0.05 * (1 - t), 0.045 + 0.01 * (1 - t), color, lift, "neck");
@@ -767,19 +771,7 @@ export default function build() {
       });
   }
 
-  // ---- Lion tail with a tuft ------------------------------------------------------------------------------------
-  const tail = b.chain(
-    "tail",
-    catmull([
-      [0, 0.99, -0.76],
-      [0, 0.92, -1.05],
-      [0, 0.9, -1.38],
-      [0, 1.0, -1.68],
-      [0, 1.18, -1.9],
-    ]),
-    { parent: hips, count: 8, role: "tail", group: "tail" },
-  );
-  b.sweep(tail, (t) => 0.06 - 0.028 * t, { color: LION, sectors: [[140, 220, LION_BELLY]], sides: 12, group: "tail" });
+  // ---- Lion tail tuft --------------------------------------------------------------------------------------------
   const tuftBase = tail.at(0.94);
   b.lathe(
     [

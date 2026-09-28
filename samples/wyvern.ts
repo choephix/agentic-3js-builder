@@ -1,5 +1,5 @@
-// Wyvern. Neck and tail chains swept as one continuous tube, curved horns and neck spikes from
-// bezier sweeps, bat wings as membranes between finger chains, closed triangular brow rings, and bird-like
+// Wyvern. Neck, spine, and tail chains are skinned by one continuous tube, with curved horns and neck spikes
+// from bezier sweeps, bat wings as membranes between finger chains, closed triangular brow rings, and bird-like
 // four-segment legs from `limb` with the toe segment flat on the floor. The eyes are parts that face their gaze:
 // lashes ring each gaze (inheriting the head bone), struts run from each eye to a crest joint, and the crest is
 // posed about a made-up hinge line through both eyes.
@@ -35,9 +35,20 @@ export default function build() {
     ],
     { parent: hips, role: "spine", group: "body" },
   );
-  b.sweep(spine, [0.26, 0.3, 0.22], { color: SCALE, group: "body" });
+  const bodyPath = catmull([
+    [0, 1.3, -1.7],
+    [0, 1.1, -1.45],
+    [0, 0.95, -1.0],
+    [0, 0.95, -0.55],
+    [0, 1.0, -0.1],
+    [0, 1.08, 0.25],
+    [0, 1.15, 0.55],
+    [0, 1.4, 0.8],
+    [0, 1.7, 0.85],
+    [0, 1.85, 1.0],
+  ]);
 
-  // Neck: a catmull chain, swept as one tube; spikes follow the tube surface.
+  // Neck: the continuous body tube runs through tail, hips, spine, and neck; spikes stay on its neck range.
   const neck = b.chain(
     "neck",
     catmull([
@@ -53,9 +64,6 @@ export default function build() {
       group: "neck",
     },
   );
-  const neckTube = b.sweep(neck, [0.18, 0.1], { color: SCALE, caps: { start: "round", end: "round" } });
-  // Each spike stands on a tube point (a frame facing out) and inherits that point's neck joint.
-  b.along(neckTube, 5, (at) => b.spike(at, at, 0.12, 0.035, { color: BONE }), { from: 0.1, to: 0.9 });
 
   // Head and jaw. The head joint sits on the neck's end point and takes that point's joint as parent.
   const head = b.joint("head", { at: neck.at(1), dir: [0, -0.15, 1], role: "head", group: "head" });
@@ -134,14 +142,26 @@ export default function build() {
       group: "tail",
     },
   );
-  b.sweep(tail, (t) => 0.2 * (1 - t) + 0.025, {
-    color: SCALE,
-    bands: [
-      [0.8, SCALE],
-      [1, BONE],
-    ],
-    group: "tail",
-  });
+  const neckTube = b.sweep(
+    bodyPath,
+    (t) => {
+      if (t < 0.5) return 0.025 + 0.175 * (t / 0.5);
+      if (t < 0.7) return 0.26 + (0.22 - 0.26) * ((t - 0.5) / 0.2);
+      return 0.18 + (0.1 - 0.18) * ((t - 0.7) / 0.3);
+    },
+    {
+      bone: [tail, hips, spine, neck],
+      color: SCALE,
+      bands: [
+        [0, BONE],
+        [0.1, SCALE],
+      ],
+      caps: { start: "round", end: "round" },
+      group: "body",
+    },
+  );
+  // Each spike stands on a tube point (a frame facing out) and inherits that point's neck joint.
+  b.along(neckTube, 5, (at) => b.spike(at, at, 0.12, 0.035, { color: BONE }), { from: 0.7, to: 0.98 });
 
   // Wings: arm chain, three finger chains from the wrist, membranes between consecutive fingers and the flank.
   for (const [s, side] of [
