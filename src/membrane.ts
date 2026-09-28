@@ -1,7 +1,7 @@
-// Thin closed skins: `membrane()` between two edges (split per bone) and `slab()` from one polygon.
+// Thin closed skins: `membrane()` between two edges (blend-skinned, or split per bone) and `slab()` from one polygon.
 import { ShapeUtils, Vector2, Vector3 } from "three";
-import { boneFor, meshFromWorld, nearestJoint, resolveJoint } from "./context";
-import type { Ctx, JointRef, Tags } from "./context";
+import { meshFromWorld, mix, nearestJoint, resolveJoint, rigid, weightsFor } from "./context";
+import type { Ctx, JointRef, Tags, Weights } from "./context";
 import { aim, toPoint } from "./math";
 import type { PointInput } from "./math";
 import { Part } from "./parts";
@@ -9,6 +9,7 @@ import { toPath } from "./path";
 import type { PathInput } from "./path";
 import { Chain } from "./skeleton";
 import type { Joint } from "./skeleton";
+import type { Skin } from "./sweep";
 
 export type MembraneEdge = Chain | PathInput;
 
@@ -22,12 +23,17 @@ export type MembraneOptions = Tags & {
   cols?: number;
   /** Trailing-edge inset between the two edge tips, as a fraction of the edge length (0.25 = a deep scallop). */
   scallop?: number;
-  /** Which bone owns a cell: "mid" = the nearer edge's joint at that t, "a" / "b" = always that edge. */
+  /**
+   * "smooth" (default): one mesh whose vertices blend across the width between the two edges' bones and along
+   * each edge between neighbouring joints. "rigid": one closed piece per bone.
+   */
+  skin?: Skin;
+  /** Rigid only: which bone owns a cell: "mid" = the nearer edge's joint at that t, "a" / "b" = always that edge. */
   split?: "mid" | "a" | "b";
   /**
-   * Owner of cells on Path / point edges. A Chain gives each cell to the chain joint nearest to it: a fin on
-   * `sweep.line(0)` follows the spine. Default: the edge's own bone (a path made from built inputs), else the other
-   * edge's chain joints, else the joint nearest to the cell.
+   * Bones of Path / point edges. A Chain follows the chain nearest to each cell: a fin on `sweep.line(0)` follows
+   * the spine. Default: the edge's own weights (a path made from built inputs), else the other edge's chain
+   * joints, else the joint nearest to the cell.
    */
   bone?: JointRef | Chain;
 };
@@ -36,19 +42,26 @@ export type MembraneOptions = Tags & {
 type Grid = Vector3[][];
 
 /**
- * Closed prism triangles for a set of grid cells, appended to positions (world). Cells are [i, j]; `normals` are
- * per-vertex unit normals. Walls are built on every cell edge whose neighbour is not in the set.
+ * Closed prism triangles for a set of grid cells, appended to positions (world), with the grid vertex [i, j] of
+ * every emitted vertex. Cells are [i, j]; `normals` are per-vertex unit normals. Walls are built on every cell edge
+ * whose neighbour is not in the set.
  */
 function prism(grid: Grid, normals: Grid, cells: Array<[number, number]>, half: number) {
   const positions: number[] = [];
   const index: number[] = [];
+  const sources: Array<[number, number]> = [];
   const inSet = new Set(cells.map(([i, j]) => `${i},${j}`));
-  const top = (i: number, j: number) => grid[i][j].clone().addScaledVector(normals[i][j], half);
-  const bottom = (i: number, j: number) => grid[i][j].clone().addScaledVector(normals[i][j], -half);
-  const tri = (a: Vector3, b: Vector3, c: Vector3) => {
-    const base = positions.length / 3;
-    positions.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
-    index.push(base, base + 1, base + 2);
+  const top = (i: number, j: number) => ({ p: grid[i][j].clone().addScaledVector(normals[i][j], half), at: [i, j] });
+  const bottom = (i: number, j: number) => ({
+    p: grid[i][j].clone().addScaledVector(normals[i][j], -half),
+    at: [i, j],
+  });
+  const tri = (...vs: Array<{ p: Vector3; at: number[] }>) => {
+    for (const { p, at } of vs) {
+      index.push(positions.length / 3);
+      positions.push(p.x, p.y, p.z);
+      sources.push([at[0], at[1]]);
+    }
   };
   for (const [i, j] of cells) {
     // Counter-clockwise around the cell when seen from +normal: (i,j) → (i+1,j) → (i+1,j+1) → (i,j+1).
@@ -76,7 +89,7 @@ function prism(grid: Grid, normals: Grid, cells: Array<[number, number]>, half: 
       tri(top(...b), bottom(...a), bottom(...b));
     }
   }
-  return { positions, index };
+  return { positions, index, sources };
 }
 
 export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions) {
@@ -90,14 +103,19 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
   const rows = options.rows ?? Math.max(1, Math.round(4 * ctx.detail));
   const scallop = options.scallop ?? 0;
   const split = options.split ?? "mid";
+  const smooth = (options.skin ?? "smooth") === "smooth";
   const owner = options.bone;
-  const jointFor = (side: "a" | "b", t: number, at: Vector3): Joint => {
+  const ownerCurve = owner instanceof Chain ? owner.curve() : null;
+  /** The weights of edge `side` at edge parameter t, near `at`: blended along chains when smooth. */
+  const edgeWeights = (side: "a" | "b", t: number, at: Vector3): Weights => {
     const own = side === "a" ? chainA : chainB;
     const other = side === "a" ? chainB : chainA;
-    if (own) return own.jointAt(t);
-    if (owner instanceof Chain) return owner.nearestJoint(at);
-    if (owner !== undefined) return resolveJoint(ctx, owner);
-    return (side === "a" ? pathA : pathB)!.bone ?? other?.jointAt(t) ?? nearestJoint(ctx, at);
+    const along = (chain: Chain, u: number) => (smooth ? chain.weightsAt(u) : rigid(chain.jointAt(u)));
+    if (own) return along(own, t);
+    if (owner instanceof Chain) return along(owner, ownerCurve!.closestT(at));
+    if (owner !== undefined) return rigid(resolveJoint(ctx, owner));
+    const weights = (side === "a" ? pathA : pathB)!.weights;
+    return weights ? (smooth ? weights : rigid(weights[0][0])) : other ? along(other, t) : rigid(nearestJoint(ctx, at));
   };
 
   let width = 0;
@@ -137,33 +155,50 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
         normals[a][b].add(n);
     }
   for (const col of normals) for (const n of col) (n.lengthSq() > 1e-16 ? n : n.copy(total)).normalize();
+  const tags = { name: options.name ?? "membrane", group: options.group };
+  const cells: Array<[number, number]> = [];
+  for (let i = 0; i < columns.length - 1; i++) for (let j = 0; j < rows; j++) cells.push([i, j]);
 
-  // Assign cells to bones and build one closed prism per bone.
+  if (smooth) {
+    // One mesh: each grid vertex blends edge A's weights into edge B's across the width.
+    const weights = grid.map((col, i) =>
+      col.map((at, j) => {
+        const s = j / rows;
+        const t = columns[i] * tMax(s);
+        return mix([
+          [edgeWeights("a", t, at), 1 - s],
+          [edgeWeights("b", t, at), s],
+        ]);
+      }),
+    );
+    const { positions, index, sources } = prism(grid, normals, cells, options.thickness / 2);
+    return [
+      meshFromWorld(ctx, positions, index, options.color, (v) => weights[sources[v][0]][sources[v][1]], false, tags),
+    ];
+  }
+
+  // Rigid: assign cells to bones and build one closed prism per bone.
   const byJoint = new Map<Joint, Array<[number, number]>>();
-  for (let i = 0; i < columns.length - 1; i++)
-    for (let j = 0; j < rows; j++) {
-      const s = (j + 0.5) / rows;
-      const t = ((columns[i] + columns[i + 1]) / 2) * tMax(s);
-      const side = split === "mid" ? (s < 0.5 ? "a" : "b") : split;
-      const centre = grid[i][j]
-        .clone()
-        .add(grid[i + 1][j + 1])
-        .multiplyScalar(0.5);
-      const joint = jointFor(side, t, centre);
-      const list = byJoint.get(joint);
-      if (list) list.push([i, j]);
-      else byJoint.set(joint, [[i, j]]);
-    }
-  return [...byJoint].map(([joint, cells]) => {
-    const { positions, index } = prism(grid, normals, cells, options.thickness / 2);
-    return meshFromWorld(ctx, positions, index, options.color, joint, false, {
-      name: options.name ?? "membrane",
-      group: options.group,
-    });
+  for (const [i, j] of cells) {
+    const s = (j + 0.5) / rows;
+    const t = ((columns[i] + columns[i + 1]) / 2) * tMax(s);
+    const side = split === "mid" ? (s < 0.5 ? "a" : "b") : split;
+    const centre = grid[i][j]
+      .clone()
+      .add(grid[i + 1][j + 1])
+      .multiplyScalar(0.5);
+    const joint = edgeWeights(side, t, centre)[0][0];
+    const list = byJoint.get(joint);
+    if (list) list.push([i, j]);
+    else byJoint.set(joint, [[i, j]]);
+  }
+  return [...byJoint].map(([joint, group]) => {
+    const { positions, index } = prism(grid, normals, group, options.thickness / 2);
+    return meshFromWorld(ctx, positions, index, options.color, () => rigid(joint), false, tags);
   });
 }
 
-/** `bone` default: the first built point's bone, else the joint nearest the polygon's centre. */
+/** `bone` (rigid) default: the first built point's weights, else the joint nearest the polygon's centre. */
 export type SlabOptions = Tags & { color: string; thickness: number; bone?: JointRef };
 
 /**
@@ -213,10 +248,10 @@ export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptio
     tri(top[b], top[a], bottom[a]);
     tri(top[b], bottom[a], bottom[b]);
   }
-  const bone = boneFor(ctx, options.bone, points, center);
-  const mesh = meshFromWorld(ctx, positions, index, options.color, bone, false, {
+  const weights = weightsFor(ctx, options.bone, points, center);
+  const mesh = meshFromWorld(ctx, positions, index, options.color, () => weights, false, {
     name: options.name ?? "slab",
     group: options.group,
   });
-  return new Part(mesh, center, frame, bone, [0, 0, 1]);
+  return new Part(mesh, center, frame, weights, [0, 0, 1]);
 }

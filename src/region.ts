@@ -3,9 +3,9 @@
 // (joints, parts, hits...) is already in model space and passes through.
 import { Euler, Quaternion } from "three";
 import type { BufferGeometry } from "three";
-import { resolveJoint } from "./context";
+import { resolveJoint, rigid, weightsOf } from "./context";
 import type { Ctx, JointRef } from "./context";
-import { ownerOf, Spot } from "./frame";
+import { Spot } from "./frame";
 import { DEG, toDirection, toPoint, vec } from "./math";
 import type { DirectionInput, PointInput, V3 } from "./math";
 import { part } from "./parts";
@@ -13,7 +13,7 @@ import type { PartOptions } from "./parts";
 import { createJoint } from "./skeleton";
 import type { JointOptions } from "./skeleton";
 
-/** `bone` (default: the bone of `at` when it came from something built): the region rides on that joint. */
+/** `bone` (default: the weights of `at` when it came from something built): the region rides on that joint. */
 export type RegionOptions = { at: PointInput; scale?: number; quat?: Quaternion; bone?: JointRef };
 
 const literal = (x: PointInput | DirectionInput): x is V3 => Array.isArray(x) || "isVector3" in x;
@@ -25,8 +25,8 @@ export class Region extends Spot {
     private readonly ctx: Ctx,
     options: RegionOptions,
   ) {
-    const bone = options.bone === undefined ? ownerOf(options.at) : resolveJoint(ctx, options.bone);
-    super(toPoint(options.at), options.quat?.clone() ?? new Quaternion(), bone);
+    const weights = options.bone === undefined ? (weightsOf(options.at) ?? []) : rigid(resolveJoint(ctx, options.bone));
+    super(toPoint(options.at), options.quat?.clone() ?? new Quaternion(), weights);
     this.scale = options.scale ?? 1;
   }
 
@@ -66,11 +66,11 @@ export class Region extends Spot {
         : typeof options.scale === "number"
           ? options.scale * this.scale
           : vec(options.scale).multiplyScalar(this.scale);
-    // Literal positions belong to the region's bone; built inputs keep their own.
+    // Literal positions take the region's weights (it is passed as the frame); built inputs keep their own.
     const own = !options.frame && (!options.at || literal(options.at));
     return part(this.ctx, geometry, color, {
       ...options,
-      bone: options.bone ?? (own ? (this.bone ?? undefined) : undefined),
+      frame: own ? this : options.frame,
       at:
         options.at && literal(options.at) ? this.p(options.at) : (options.at ?? (options.frame ? undefined : this.at)),
       aim: options.aim && this.p(options.aim),

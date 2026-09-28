@@ -1,13 +1,14 @@
 // `part()`: one mesh placed in model space and parented under its bone, keeping its world transform. It returns a
 // `Part`: a Frame (the geometry's origin and orientation, facing the axis it was aimed along) that follows its bone.
+// A part placed on a smooth-skinned point (a bend in a tube, a hit on a bend) takes that point's weights and bends
+// with the skin under it.
 import { Euler, Mesh, Quaternion, Vector3 } from "three";
 import type { BufferGeometry } from "three";
-import { addMesh, boneFor, resolveJoint, setWorld } from "./context";
-import type { Ctx, JointRef, Tags } from "./context";
+import { addMesh, resolveJoint, rigid, setWorld, skinMesh, weightsFor, writeWeights } from "./context";
+import type { Ctx, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, toDirection, toFrame, toPoint, vec } from "./math";
 import type { Axis, DirectionInput, FrameInput, PointInput, V3 } from "./math";
-import type { Joint } from "./skeleton";
 
 const AXES: Record<Axis, V3> = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] };
 
@@ -17,15 +18,18 @@ export class Part extends Spot {
     readonly mesh: Mesh,
     at: Vector3,
     quat: Quaternion,
-    bone: Joint,
+    weights: Weights,
     facing: V3,
   ) {
-    super(at, quat, bone, facing);
+    super(at, quat, weights, facing);
   }
 }
 
 export type PartOptions = Tags & {
-  /** Owning bone. Default: the bone of `frame` / `at` when they came from something built, else the nearest joint. */
+  /**
+   * Owning bone (rigid). Default: the weights of `at` / `frame` when they came from something built (a bend in a
+   * smooth tube gives two bones), else the nearest joint.
+   */
   bone?: JointRef;
   /** Place the geometry on a frame: its position, and its orientation unless another orientation option is given. */
   frame?: FrameInput;
@@ -45,9 +49,10 @@ export type PartOptions = Tags & {
 
 export function part(ctx: Ctx, geometry: BufferGeometry, color: string, options: PartOptions = {}) {
   const placed = options.at ?? options.frame;
-  const joint = placed
-    ? boneFor(ctx, options.bone, [options.at, options.frame], toPoint(placed))
-    : resolveJoint(ctx, options.bone);
+  const weights = placed
+    ? weightsFor(ctx, options.bone, [options.at, options.frame], toPoint(placed))
+    : rigid(resolveJoint(ctx, options.bone));
+  const joint = weights[0][0];
   const at = placed ? toPoint(placed) : joint.at;
   let quat = new Quaternion();
   if (options.quat) quat = options.quat.clone();
@@ -63,8 +68,15 @@ export function part(ctx: Ctx, geometry: BufferGeometry, color: string, options:
       : typeof options.scale === "number"
         ? new Vector3().setScalar(options.scale)
         : vec(options.scale);
-  const mesh = new Mesh(geometry, ctx.material(color));
+  const blended = weights.length > 1;
+  const mesh = new Mesh(blended ? geometry.clone() : geometry, ctx.material(color));
   setWorld(mesh, joint.object, at, quat, scale);
   addMesh(ctx, mesh, joint, options);
-  return new Part(mesh, at, quat, joint, AXES[options.axis ?? "y"]);
+  if (blended)
+    skinMesh(
+      ctx,
+      mesh,
+      writeWeights(mesh.geometry, mesh.geometry.getAttribute("position").count, () => weights),
+    );
+  return new Part(mesh, at, quat, weights, AXES[options.axis ?? "y"]);
 }

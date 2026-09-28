@@ -3,10 +3,10 @@
 // concatenation and framing path.
 import { CatmullRomCurve3, CubicBezierCurve3, QuadraticBezierCurve3, Quaternion, Vector3 } from "three";
 import type { Curve } from "three";
-import { ownerOf } from "./frame";
+import { weightsOf } from "./context";
+import type { Weights } from "./context";
 import { aim, DEG, flatten, toDirection, toPoint } from "./math";
 import type { DirectionInput, PointInput } from "./math";
-import type { Joint } from "./skeleton";
 
 /** Something that can give its curve in the current pose: a Chain, a Sweep (its centreline). */
 export type Curved = { curve(): Path };
@@ -30,7 +30,7 @@ export class Path {
    * @param straight per segment: true = a polyline segment (constant tangent), false = interpolate tangents
    * @param knotS arc-length positions of the defining points (chains default to one joint per knot span)
    * @param closed the last sample equals the first and the curve continues through it (loops, rims, straps)
-   * @param bone the bone of the first defining input that came from something built (for bone inheritance)
+   * @param weights the bone weights of the first defining input that came from something built (for inheritance)
    */
   constructor(
     private readonly pts: Vector3[],
@@ -39,7 +39,7 @@ export class Path {
     private readonly straight: boolean[],
     private readonly knotS: number[],
     readonly closed = false,
-    readonly bone: Joint | null = null,
+    readonly weights: Weights | null = null,
   ) {
     if (pts.length < 2) throw new Error("Path needs at least 2 distinct points");
     this.cum = [0];
@@ -144,7 +144,7 @@ export class Path {
     }
     straight.push(...b.straight);
     for (const s of b.knotS) if (s > EPS || gap > 1e-6) knotS.push(base + s);
-    return new Path(pts, tin, tout, straight, knotS, false, this.bone ?? b.bone);
+    return new Path(pts, tin, tout, straight, knotS, false, this.weights ?? b.weights);
   }
 
   /** The open part between t0 and t1; t1 < t0 gives it reversed (chains growing both ways from a mid-body root). */
@@ -172,7 +172,7 @@ export class Path {
     const total = (b - a) * this.length;
     const inner = this.knotS.filter((s) => s > s0 + 1e-7 && s < s0 + total - 1e-7).map((s) => s - s0);
     const knotS = [0, ...inner, total];
-    if (t1 >= t0) return new Path(pts, tin, tout, straight, knotS, false, this.bone);
+    if (t1 >= t0) return new Path(pts, tin, tout, straight, knotS, false, this.weights);
     return new Path(
       pts.reverse(),
       tout.reverse().map((v) => v.negate()),
@@ -180,7 +180,7 @@ export class Path {
       straight.reverse(),
       knotS.map((s) => total - s).reverse(),
       false,
-      this.bone,
+      this.weights,
     );
   }
 
@@ -250,7 +250,7 @@ export function smoothPath(
   tangents: Vector3[] | null,
   knots: { indices: number[] } | { spans: number },
   closed = false,
-  bone: Joint | null = null,
+  weights: Weights | null = null,
 ) {
   const keep = [0];
   for (let i = 1; i < pts.length; i++) if (pts[i].distanceTo(pts[keep[keep.length - 1]]) > 1e-7) keep.push(i);
@@ -288,12 +288,12 @@ export function smoothPath(
     new Array(last).fill(false),
     knotS,
     closed,
-    bone,
+    weights,
   );
 }
 
-/** The bone of the first input that came from something built. */
-const firstOwner = (inputs: readonly unknown[]) => inputs.map(ownerOf).find((bone) => bone) ?? null;
+/** The weights of the first input that came from something built. */
+const firstOwner = (inputs: readonly unknown[]) => inputs.map(weightsOf).find((weights) => weights) ?? null;
 
 function sampleCurve(curve: Curve<Vector3>, count: number) {
   const pts: Vector3[] = [];

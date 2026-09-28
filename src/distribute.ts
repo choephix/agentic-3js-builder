@@ -2,8 +2,8 @@
 // optional group joints so many items cost a few bones; `along()` any chain, sweep or path. Callbacks get a Frame
 // per item that carries the bone its geometry should default to.
 import { Quaternion, Vector3 } from "three";
-import { boneFor } from "./context";
-import type { Ctx, JointRef } from "./context";
+import { boneFor, rigid } from "./context";
+import type { Ctx, JointRef, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, flatten, toFrame } from "./math";
 import type { FrameInput } from "./math";
@@ -44,7 +44,7 @@ export type RingOptions = {
   role?: Role;
 };
 
-/** A ring item: +Y = `outward`, +Z leaning toward the line's direction; `bone` = its group joint or the line's. */
+/** A ring item: +Y = `outward`, +Z leaning toward the line's direction; on its group joint, else the line's weights. */
 export class RingItem extends Spot {
   constructor(
     readonly i: number,
@@ -52,9 +52,9 @@ export class RingItem extends Spot {
     readonly t: number,
     at: Vector3,
     quat: Quaternion,
-    bone: Joint | null,
+    weights: Weights,
   ) {
-    super(at, quat, bone);
+    super(at, quat, weights);
   }
 
   get outward() {
@@ -113,7 +113,7 @@ export function ring(ctx: Ctx, on: FrameInput, options: RingOptions, fn?: (item:
         }),
       );
     }
-    const pivot = new Spot(center, aim(axis), parent);
+    const pivot = new Spot(center, aim(axis), rigid(parent));
     ctx.rig.push(() => ({
       ring: {
         name: options.name!,
@@ -132,22 +132,22 @@ export function ring(ctx: Ctx, on: FrameInput, options: RingOptions, fn?: (item:
   const items = Array.from({ length: count }, (_, i) => {
     const outward = outwardAt(angleOf(i));
     const t = full ? i / count : count === 1 ? 0.5 : i / (count - 1);
-    const bone = groups ? joints[groupOf(i)] : line.bone;
-    return new RingItem(i, t, center.clone().addScaledVector(outward, radius), aim(outward, axis), bone);
+    const weights = groups ? rigid(joints[groupOf(i)]) : line.weights;
+    return new RingItem(i, t, center.clone().addScaledVector(outward, radius), aim(outward, axis), weights);
   });
   if (fn) items.forEach(fn);
   return { joints, items };
 }
 
-/** A frame on a plain path: +Y = tangent, +Z = the transported normal; owned by the path's bone (if any). */
+/** A frame on a plain path: +Y = tangent, +Z = the transported normal; takes the path's weights (if any). */
 export class PathPoint extends Spot {
   constructor(
     readonly t: number,
     at: Vector3,
     quat: Quaternion,
-    bone: Joint | null,
+    weights: Weights,
   ) {
-    super(at, quat, bone);
+    super(at, quat, weights);
   }
 
   get tangent() {
@@ -183,7 +183,7 @@ export function along(
     const t = from + ((to - from) * (i + 0.5)) / count;
     if (!path) return (source as Chain | Sweep).at(t);
     const tangent = path.tangentAt(t);
-    return new PathPoint(t, path.at(t), aim(tangent, frames!.normalAt(t)), path.bone);
+    return new PathPoint(t, path.at(t), aim(tangent, frames!.normalAt(t)), path.weights ?? []);
   });
   items.forEach(fn as (at: unknown) => void);
   return items;

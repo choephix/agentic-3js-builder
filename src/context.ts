@@ -1,14 +1,120 @@
 // State shared by every builder helper: the root group, the joint registry, mesh ownership, the material cache,
-// the detail level, the pose counter and the rig records; the bone-inheritance rule (`boneFor`); and the two
-// placement primitives every helper uses (`setWorld`, `meshFromWorld`).
-import { BufferGeometry, Float32BufferAttribute, Group, Matrix4, Mesh, MeshStandardMaterial, Vector3 } from "three";
-import type { Object3D, Quaternion } from "three";
-import { ownerOf } from "./frame";
+// the detail level, the pose counter, the rig records and the skins to refresh after a pose; bone weights and the
+// inheritance rule (`weightsFor`); `Capture`, which keeps build-time data valid after poses; and the placement
+// primitives every helper uses (`setWorld`, `meshFromWorld`, `skinMesh`).
+import {
+  BufferGeometry,
+  Float32BufferAttribute,
+  Group,
+  Matrix3,
+  Matrix4,
+  Mesh,
+  MeshStandardMaterial,
+  Quaternion,
+  Uint16BufferAttribute,
+  Vector3,
+} from "three";
+import type { Object3D } from "three";
+import type { Frame } from "./frame";
 import type { RigRecord } from "./rig";
 import type { Joint } from "./skeleton";
 
 /** A joint handle or a joint name. */
 export type JointRef = Joint | string;
+
+/**
+ * Bone influences, heaviest first, summing to 1: `[[joint, weight], ...]`. One entry = rigid on that bone. Empty =
+ * not attached to anything (a point made from nothing).
+ */
+export type Weights = ReadonlyArray<readonly [Joint, number]>;
+
+/** Rigid on one joint (or on nothing). */
+export const rigid = (joint: Joint | null): Weights => (joint ? [[joint, 1]] : []);
+
+/** A weighted sum of weight sets, merged per joint, keeping the `max` heaviest (renormalised). */
+export function mix(parts: ReadonlyArray<readonly [Weights, number]>, max = 4): Weights {
+  const sum = new Map<Joint, number>();
+  for (const [weights, f] of parts) for (const [joint, w] of weights) sum.set(joint, (sum.get(joint) ?? 0) + w * f);
+  const kept = [...sum]
+    .filter(([, w]) => w > 1e-4)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, max);
+  const total = kept.reduce((acc, [, w]) => acc + w, 0);
+  return kept.map(([joint, w]) => [joint, w / total] as const);
+}
+
+/**
+ * Weights along a run of bones: `joints[k]` owns arc length from `starts[k]` to the next start. Around each start
+ * k ≥ 1 the two neighbours blend with a smoothstep over ±`half(k)`; everywhere else one joint has it all.
+ */
+export function spanWeights(
+  joints: readonly Joint[],
+  starts: readonly number[],
+  s: number,
+  half: (k: number) => number,
+) {
+  let k = 0;
+  while (k < joints.length - 1 && starts[k + 1] <= s) k++;
+  for (const b of [k, k + 1]) {
+    if (b < 1 || b >= joints.length) continue;
+    const h = half(b);
+    if (!(h > 0) || Math.abs(s - starts[b]) >= h) continue;
+    const x = (s - starts[b] + h) / (2 * h);
+    const f = x * x * (3 - 2 * x);
+    const pair: Weights = [
+      [joints[b], f],
+      [joints[b - 1], 1 - f],
+    ];
+    return f >= 0.5 ? pair : [pair[1], pair[0]];
+  }
+  return rigid(joints[k]);
+}
+
+/**
+ * Model-space data captured at one moment (a chain's curve, a sweep's rings, a frame). Data owned by joints
+ * follows them: `blend(weights)` maps from capture time to the current pose, rigidly for one joint and by linear
+ * blend for several, so handles stay valid after `pose()` while the scene graph remains the one source of truth.
+ */
+export class Capture {
+  private readonly inverse = new Map<Joint, Matrix4>();
+
+  constructor(joints: Iterable<Joint>) {
+    for (const joint of joints) this.inverse.set(joint, joint.object.matrixWorld.clone().invert());
+  }
+
+  /** Rigid transform from capture time to now for data owned by `joint`. */
+  motion(joint: Joint) {
+    const inverse = this.inverse.get(joint);
+    if (!inverse) throw new Error(`Joint "${joint.name}" was not captured`);
+    return joint.object.matrixWorld.clone().multiply(inverse);
+  }
+
+  /** Σ weight × motion: exact for one joint, linear-blend skinning for several, identity for none. */
+  blend(weights: Weights) {
+    if (weights.length === 1) return this.motion(weights[0][0]);
+    const out = new Matrix4();
+    if (!weights.length) return out;
+    out.elements.fill(0);
+    for (const [joint, w] of weights) {
+      const e = this.motion(joint).elements;
+      for (let i = 0; i < 16; i++) out.elements[i] += w * e[i];
+    }
+    return out;
+  }
+
+  /** The weighted rotation from capture time to now (normalised quaternion blend). */
+  turn(weights: Weights) {
+    const out = new Quaternion(0, 0, 0, 0);
+    if (!weights.length) return new Quaternion();
+    const q = new Quaternion();
+    for (const [joint, w] of weights) {
+      q.setFromRotationMatrix(this.motion(joint));
+      const sign = out.dot(q) < 0 ? -w : w;
+      out.set(out.x + q.x * sign, out.y + q.y * sign, out.z + q.z * sign, out.w + q.w * sign);
+    }
+    return out.normalize();
+  }
+}
 
 export type Tags = { name?: string; group?: string };
 
@@ -20,6 +126,8 @@ export class Ctx {
   readonly owner = new Map<Mesh, Joint>();
   /** Rig answer-key records, evaluated against the current pose when `b.root` is read. */
   readonly rig: Array<() => RigRecord> = [];
+  /** Blend-skinned meshes, re-deformed after every `pose()`. */
+  readonly skins: Array<() => void> = [];
   /** Bumped by every `pose()`, so cached world-space data (surfaces) knows to refresh. */
   poses = 0;
   private readonly materials = new Map<string, MeshStandardMaterial>();
@@ -72,18 +180,35 @@ export function nearestJoint(ctx: Ctx, p: Vector3) {
   return best as Joint;
 }
 
-/**
- * The bone for new geometry or joints: explicit `bone`, else the bone of the first input that came from something
- * built (a joint, part, hit, sweep, tube or chain point, or a path made from them), else the joint nearest to `at`.
- */
-export function boneFor(ctx: Ctx, explicit: JointRef | undefined, inputs: readonly unknown[], at: Vector3) {
-  if (explicit !== undefined) return resolveJoint(ctx, explicit);
-  for (const input of inputs) {
-    const owner =
-      ownerOf(input) ?? (input && typeof input === "object" && "isMesh" in input ? ctx.owner.get(input as Mesh) : null);
-    if (owner) return owner;
+/** The weights of an input that came from something built (a frame, a sweep, a path made from frames), else null. */
+export function weightsOf(x: unknown): Weights | null {
+  if (!x || typeof x !== "object") return null;
+  if ("weights" in x) {
+    const weights = (x as { weights: Weights | null }).weights;
+    return weights?.length ? weights : null;
   }
-  return nearestJoint(ctx, at);
+  if ("frame" in x) return weightsOf((x as { frame: Frame }).frame);
+  return null;
+}
+
+/**
+ * The weights for new geometry: explicit `bone` (rigid), else the weights of the first input that came from
+ * something built (a joint, part, hit, sweep, tube or chain point, or a path made from them), else rigid on the
+ * joint nearest to `at`.
+ */
+export function weightsFor(ctx: Ctx, explicit: JointRef | undefined, inputs: readonly unknown[], at: Vector3) {
+  if (explicit !== undefined) return rigid(resolveJoint(ctx, explicit));
+  for (const input of inputs) {
+    const mesh = input && typeof input === "object" && "isMesh" in input ? ctx.owner.get(input as Mesh) : undefined;
+    const weights = weightsOf(input) ?? (mesh ? rigid(mesh) : null);
+    if (weights) return weights;
+  }
+  return rigid(nearestJoint(ctx, at));
+}
+
+/** The bone for new joints: the heaviest bone of `weightsFor`. */
+export function boneFor(ctx: Ctx, explicit: JointRef | undefined, inputs: readonly unknown[], at: Vector3) {
+  return weightsFor(ctx, explicit, inputs, at)[0][0];
 }
 
 /** The joint for `ref`; omitted = the root joint. */
@@ -125,18 +250,23 @@ export function addMesh(ctx: Ctx, mesh: Mesh, joint: Joint, tags: Tags) {
 }
 
 /**
- * A mesh on `joint` from WORLD-space triangles. Vertices are stored in the joint's frame and the mesh keeps an
- * identity local transform. `smooth` shares vertices (smooth normals); otherwise every face is flat shaded.
+ * A mesh from WORLD-space triangles with weights per vertex. It hangs under its heaviest bone with an identity
+ * local transform; vertices on other bones are blend-skinned (`skinMesh`). `smooth` shares vertices (smooth
+ * normals); otherwise every face is flat shaded.
  */
 export function meshFromWorld(
   ctx: Ctx,
   positions: number[],
   index: number[],
   color: string,
-  joint: Joint,
+  weightAt: (vertex: number) => Weights,
   smooth: boolean,
   tags: Tags,
 ) {
+  const count = positions.length / 3;
+  const totals = new Map<Joint, number>();
+  for (let i = 0; i < count; i++) for (const [j, w] of weightAt(i)) totals.set(j, (totals.get(j) ?? 0) + w);
+  const joint = [...totals].sort((a, b) => b[1] - a[1])[0][0];
   const inverse = joint.object.matrixWorld.clone().invert();
   const local = new Float32Array(positions.length);
   const v = new Vector3();
@@ -146,11 +276,95 @@ export function meshFromWorld(
   let geometry = new BufferGeometry();
   geometry.setAttribute("position", new Float32BufferAttribute(local, 3));
   geometry.setIndex(index);
+  const bones = totals.size > 1 ? writeWeights(geometry, count, weightAt) : null;
   if (!smooth) geometry = geometry.toNonIndexed();
   geometry.computeVertexNormals();
   const mesh = new Mesh(geometry, ctx.material(color));
   joint.object.add(mesh);
   mesh.updateMatrixWorld(true);
   addMesh(ctx, mesh, joint, tags);
+  if (bones) skinMesh(ctx, mesh, bones);
   return mesh;
+}
+
+/** `skinIndex` / `skinWeight` attributes (indices into the returned bone list), up to 4 influences per vertex. */
+export function writeWeights(geometry: BufferGeometry, count: number, weightAt: (vertex: number) => Weights) {
+  const bones: Joint[] = [];
+  const indices = new Uint16Array(count * 4);
+  const weights = new Float32Array(count * 4);
+  for (let i = 0; i < count; i++)
+    weightAt(i)
+      .slice(0, 4)
+      .forEach(([joint, w], k) => {
+        let b = bones.indexOf(joint);
+        if (b < 0) b = bones.push(joint) - 1;
+        indices[i * 4 + k] = b;
+        weights[i * 4 + k] = w;
+      });
+  geometry.setAttribute("skinIndex", new Uint16BufferAttribute(indices, 4));
+  geometry.setAttribute("skinWeight", new Float32BufferAttribute(weights, 4));
+  return bones;
+}
+
+/**
+ * Make a mesh with `skinIndex` / `skinWeight` over `bones` follow them: `userData.skinBones` names them for the
+ * exporter, and every later `pose()` re-deforms the vertices from their current (bind) positions by linear blend.
+ */
+export function skinMesh(ctx: Ctx, mesh: Mesh, bones: readonly Joint[]) {
+  mesh.userData.skinBones = bones.map((joint) => joint.name);
+  const geometry = mesh.geometry;
+  const position = geometry.getAttribute("position");
+  const normal = geometry.getAttribute("normal");
+  const indices = geometry.getAttribute("skinIndex");
+  const weights = geometry.getAttribute("skinWeight");
+  mesh.updateWorldMatrix(true, false);
+  const toWorld = mesh.matrixWorld.clone();
+  const normalToWorld = new Matrix3().getNormalMatrix(toWorld);
+  const bindPositions = Array.from({ length: position.count }, (_, i) =>
+    new Vector3().fromBufferAttribute(position, i).applyMatrix4(toWorld),
+  );
+  const bindNormals = Array.from({ length: position.count }, (_, i) =>
+    new Vector3().fromBufferAttribute(normal, i).applyMatrix3(normalToWorld),
+  );
+  const capture = new Capture(bones);
+  ctx.skins.push(() => {
+    const motions = bones.map((joint) => capture.motion(joint));
+    const turns = motions.map((m) => new Matrix3().setFromMatrix4(m));
+    const toLocal = mesh.matrixWorld.clone().invert();
+    const normalToLocal = new Matrix3().getNormalMatrix(toLocal);
+    const p = new Vector3();
+    const n = new Vector3();
+    const v = new Vector3();
+    for (let i = 0; i < position.count; i++) {
+      p.set(0, 0, 0);
+      n.set(0, 0, 0);
+      for (let k = 0; k < 4; k++) {
+        const w = weights.getComponent(i, k);
+        if (!w) continue;
+        const b = indices.getComponent(i, k);
+        p.addScaledVector(v.copy(bindPositions[i]).applyMatrix4(motions[b]), w);
+        n.addScaledVector(v.copy(bindNormals[i]).applyMatrix3(turns[b]), w);
+      }
+      position.setXYZ(i, ...p.applyMatrix4(toLocal).toArray());
+      normal.setXYZ(i, ...n.applyMatrix3(normalToLocal).normalize().toArray());
+    }
+    position.needsUpdate = true;
+    normal.needsUpdate = true;
+    geometry.boundingBox = null;
+    geometry.boundingSphere = null;
+  });
+}
+
+/** The weights of one vertex of a built mesh (its skin attributes, else rigid on its bone). */
+export function vertexWeights(ctx: Ctx, mesh: Mesh, vertex: number): Weights {
+  const names = mesh.userData.skinBones as string[] | undefined;
+  const indices = mesh.geometry.getAttribute("skinIndex");
+  const weights = mesh.geometry.getAttribute("skinWeight");
+  if (!names || !indices || !weights) return rigid(ctx.owner.get(mesh) ?? null);
+  const out: Array<readonly [Joint, number]> = [];
+  for (let k = 0; k < 4; k++) {
+    const w = weights.getComponent(vertex, k);
+    if (w > 0) out.push([ctx.joints.get(names[indices.getComponent(vertex, k)])!, w]);
+  }
+  return out.sort((a, b) => b[1] - a[1]);
 }

@@ -1,261 +1,222 @@
-// Ram fawn, a quadruped. Countershaded, sagging loft body split over a spine chain; digitigrade hind legs and
-// two-bone front legs from `limb`, with rigging names and rig roles (legs record their floor contact); a
-// region-scaled head riding on the neck, re-posed mid-build, with a frustumBox snout and spiral ram horns sprouted
-// from its surface; spots, scales and a draped strap on the real body surface; jaw opened and tail raised by
-// posing after everything is built; a saddle with rivets ringed around its own axis and a flower whose petals
-// ring a made-up line.
+// Ram fawn. One continuous smooth-skinned body from rump to head: a loft with a real profile (a width and height
+// per station), a belly that sags below the spine (`shift`) and countershading (`sectors`), bending over five
+// spine and neck joints. Legs from `limb` with elliptical `(t) => [rx, ry]` sections, digitigrade behind; a
+// region-scaled head with spiral horns sprouted from its surface; pale dapples stuck on the back that bend with
+// the skin; a collar ringed around the neck and draped onto it; jaw opened and tail raised after building.
 import { BoxGeometry, CylinderGeometry, SphereGeometry } from "three";
 import { createBuilder } from "../src/builder";
-import { frame } from "../src/frame";
 import { limb } from "../src/ik";
-import { offset, rng } from "../src/math";
+import { aim, offset, rng } from "../src/math";
 import type { V3 } from "../src/math";
 import { catmull, spiral } from "../src/path";
 
 export const meta = {
   name: "Ram Fawn",
-  description: "Countershaded, spotted quadruped with digitigrade hind legs, spiral ram horns, a saddle and a strap.",
+  description: "A dappled young ram: one smooth-skinned body from rump to head, countershaded, with spiral horns.",
 };
 
-const FUR = "#b0703a";
-const SPOT = "#4a2c17";
-const PALE = "#ecd9b4";
-const BACK = "#6b3f1f";
-const CREAM = "#f0dcb0";
-const STRAP = "#8c1d2c";
-const HOOF = "#302621";
-const EYE = "#101010";
-const BRASS = "#c9a227";
-const PETAL = "#e9e4f5";
+const BACK = "#7a4726";
+const FLANK = "#b87a42";
+const CREAM = "#f0dfc2";
+const DAPPLE = "#f6ead3";
+const HOOF = "#2e2522";
+const HORN = "#dccaa2";
+const NOSE = "#2b1f1c";
+const EYE = "#16110e";
+const EAR = "#e5ad97";
+const COLLAR = "#2f5d8a";
+const BELL = "#d6a62b";
 
 /** Change this one number to resize the whole head; joints move, never scale. */
-const HEAD_SCALE = 1.15;
+const HEAD_SCALE = 1;
 
 export default function build() {
-  const b = createBuilder({ name: "quadruped" });
+  const b = createBuilder({ name: "ramFawn" });
 
-  const root = b.joint("root", { at: [0, 0.95, -0.55] });
-  const spine = b.chain(
-    "spine",
-    [
-      [0, 0.95, -0.55],
-      [0, 0.97, -0.1],
-      [0, 1.0, 0.35],
-      [0, 1.05, 0.62],
+  // Body profile: station centres run from the rump tip to the base of the head; w/h are the full width and
+  // height there. The spine and neck joints sit on the same curve, from the hips on.
+  const stations = [
+    { at: [0, 0.86, -0.64], w: 0.24, h: 0.28 },
+    { at: [0, 0.87, -0.42], w: 0.36, h: 0.42 },
+    { at: [0, 0.86, -0.08], w: 0.4, h: 0.46 },
+    { at: [0, 0.9, 0.26], w: 0.36, h: 0.48 },
+    { at: [0, 1.06, 0.46], w: 0.22, h: 0.28 },
+    { at: [0, 1.24, 0.56], w: 0.15, h: 0.18 },
+    { at: [0, 1.38, 0.63], w: 0.14, h: 0.15 },
+  ] as const;
+  const curve = catmull(stations.map((s) => s.at));
+  const root = b.joint("root", { at: stations[1].at });
+  const spine = b.chain("spine", curve.slice(curve.knots[1], 1), {
+    parent: root,
+    names: ["spine1", "spine2", "chest", "neck1", "neck2"],
+    role: "spine",
+    group: "body",
+  });
+  // The belly hangs up to 5 cm below the spine line between hips and chest; the joints stay on the spine.
+  const belly = (t: number) => Math.sin(Math.PI * Math.min(Math.max((t - 0.1) / 0.45, 0), 1));
+  const body = b.loft(stations, {
+    bone: spine,
+    color: FLANK,
+    sectors: [
+      [-70, 70, BACK],
+      [125, 235, CREAM],
     ],
-    { parent: root, role: "spine", group: "body" },
-  );
-  const body = b.loft(
-    [
-      { at: [0, 0.98, -0.8], w: 0.3, h: 0.3 },
-      { at: [0, 0.95, -0.55], w: 0.55, h: 0.55 },
-      { at: [0, 0.96, -0.1], w: 0.6, h: 0.62 },
-      { at: [0, 1.0, 0.35], w: 0.58, h: 0.64 },
-      { at: [0, 1.05, 0.62], w: 0.4, h: 0.44 },
-    ],
-    {
-      bone: spine,
-      color: FUR,
-      // Countershading: dark back, cream belly, fur flanks.
-      sectors: [
-        [-65, 65, BACK],
-        [125, 235, CREAM],
-      ],
-      // The belly hangs 6 cm below the spine line mid-body; the joints stay on the spine.
-      shift: (t) => [0, -0.06 * Math.sin(Math.PI * t)],
-      group: "body",
-    },
-  );
+    shift: (t) => [0, -0.05 * belly(t)],
+    sides: 12,
+    group: "body",
+  });
 
-  // Legs end exactly on feet resting on y = 0: two-bone front legs, digitigrade hind legs (knee forward, hock back).
-  const footR = 0.06;
+  // Legs end on hooves resting on y = 0: straight front legs, digitigrade hind legs (knee forward, hock back).
   for (const [s, side] of [
     [1, "L"],
     [-1, "R"],
   ] as const) {
-    const legs: Array<[string, V3, [number, number, number], number[], V3[], string[], number]> = [
-      [
-        `legF${side}`,
-        [s * 0.2, 0.9, 0.35],
-        [s * 0.24, footR, 0.4],
-        [0.46, 0.44],
-        [[0, 0, -1]],
-        ["shoulder", "elbow"],
-        2,
-      ],
-      [
-        `legH${side}`,
-        [s * 0.2, 0.9, -0.5],
-        [s * 0.24, footR, -0.52],
-        [0.36, 0.34, 0.26],
+    const front = b.chain(
+      `legF${side}`,
+      limb([s * 0.12, 0.78, 0.28], [s * 0.13, 0.1, 0.33], [0.37, 0.35], [0, 0, -1]),
+      { parent: spine.joints[2], names: [`shoulder${side}`, `elbow${side}`], role: "leg", group: `legF${side}` },
+    );
+    b.sweep(front, [0.075, 0.05, 0.042], { color: FLANK, sides: 10 });
+    const hind = b.chain(
+      `legH${side}`,
+      limb(
+        [s * 0.13, 0.8, -0.42],
+        [s * 0.14, 0.1, -0.5],
+        [0.3, 0.3, 0.2],
         [
           [0, 0, 1],
           [0, 0, -1],
         ],
-        ["hip", "knee", "hock"],
-        0,
-      ],
-    ];
-    for (const [group, hip, ankle, lengths, bends, names, spineIndex] of legs) {
-      const leg = b.chain(group, limb(hip, ankle, lengths, bends), {
-        parent: spine.joints[spineIndex],
-        names: names.map((n) => `${n}${group.slice(3)}`),
+      ),
+      {
+        parent: spine.joints[0],
+        names: [`hip${side}`, `knee${side}`, `hock${side}`],
         role: "leg",
-        contact: [ankle[0], 0, ankle[2] + 0.06],
-        group,
+        group: `legH${side}`,
+      },
+    );
+    // A deep thigh tapering to a slim cannon: an elliptical section, deeper front-to-back than side-to-side.
+    b.sweep(
+      hind,
+      (t) => {
+        const thigh = Math.max(0, 1 - t / 0.45);
+        return [0.042 + 0.04 * thigh, 0.045 + 0.075 * thigh];
+      },
+      { color: FLANK, sides: 10 },
+    );
+    for (const leg of [front, hind]) {
+      const ankle = leg.at(1).at;
+      b.frustumBox(ankle, [ankle.x, 0, ankle.z], [0.07, 0.08], [0.085, 0.1], {
+        bone: leg.joints[leg.joints.length - 1],
+        color: HOOF,
       });
-      b.sweep(leg, [0.1, 0.05], { color: FUR });
-      const foot = b.joint(`foot${group.slice(3)}`, {
-        parent: leg.joints[leg.joints.length - 1],
-        at: ankle,
-        dir: [0, 0, 1],
-        group,
-      });
-      const [x, , z] = ankle;
-      b.capsule(ankle, [x, footR, z + 0.12], footR, { bone: foot, color: HOOF });
-      for (const dx of [-0.035, 0.035])
-        b.rod([x + dx, 0.02, z + 0.13], [x + dx, 0.02, z + 0.2], [0.02, 0.012], { bone: foot, color: HOOF });
     }
   }
 
-  // Neck and a region-scaled head.
-  const neck = b.chain(
-    "neck",
+  // Tail: a short flattened tuft on its own two joints, cream at the tip.
+  const tail = b.chain(
+    "tail",
     [
-      [0, 1.05, 0.62],
-      [0, 1.25, 0.8],
-      [0, 1.4, 0.92],
+      [0, 0.92, -0.6],
+      [0, 0.98, -0.7],
+      [0, 0.95, -0.8],
     ],
-    { parent: spine.joints[2], role: "neck", group: "neck" },
+    { parent: root, names: ["tailBase", "tailTip"], role: "tail", group: "tail" },
   );
-  b.sweep(neck, [0.17, 0.13], { color: FUR });
-  // The head region rides on the upper neck joint, so re-posing the neck carries every later head.p() with it.
-  const head = b.region({ at: [0, 1.4, 0.92], scale: HEAD_SCALE, bone: neck.joints[1] });
-  const skull = head.joint("head", {
-    parent: neck.joints[1],
-    at: [0, 0, 0],
-    dir: [0, 0, 1],
+  b.sweep(tail, (t) => [0.06 - 0.03 * t, 0.04 - 0.02 * t], {
+    bands: [
+      [0.6, FLANK],
+      [1, CREAM],
+    ],
+  });
+
+  // Head: a joint at the end of the neck and a region riding on it, +Z forward and +Y up in head units.
+  const skull = b.joint("head", {
+    parent: spine.joints[4],
+    at: curve.at(1),
+    dir: [0, -0.45, 1],
     role: "head",
     group: "head",
   });
-  head.part(new SphereGeometry(0.17, 12, 10), FUR, { bone: skull, at: [0, 0.03, 0], group: "head" });
-  b.frustumBox(
-    head.p([0, -0.02, 0.08]),
-    head.p([0, -0.05, 0.34]),
-    [head.s(0.2), head.s(0.17)],
-    [head.s(0.14), head.s(0.1)],
-    {
-      bone: skull,
-      color: PALE,
-      group: "head",
-    },
+  const head = b.region({ at: skull, scale: HEAD_SCALE, quat: aim([0, -0.45, 1], [0, 1, 0], "z") });
+  b.loft(
+    [
+      { at: head.p([0, 0.02, -0.06]), w: head.s(0.19), h: head.s(0.2) },
+      { at: head.p([0, 0.03, 0.07]), w: head.s(0.21), h: head.s(0.21) },
+      { at: head.p([0, -0.01, 0.2]), w: head.s(0.14), h: head.s(0.14) },
+      { at: head.p([0, -0.03, 0.29]), w: head.s(0.11), h: head.s(0.1) },
+    ],
+    { bone: skull, color: FLANK, sectors: [[120, 240, CREAM]], group: "head" },
   );
+  head.part(new BoxGeometry(0.07, 0.04, 0.03), NOSE, { at: [0, -0.02, 0.33], group: "head" });
   const jaw = head.joint("jaw", {
     parent: skull,
-    at: [0, -0.08, 0.05],
-    aim: [0, -0.1, 0.3],
+    at: [0, -0.06, 0.06],
+    aim: [0, -0.08, 0.27],
     role: "jaw",
     group: "jaw",
   });
-  b.frustumBox(
-    head.p([0, -0.08, 0.05]),
-    head.p([0, -0.1, 0.3]),
-    [head.s(0.16), head.s(0.06)],
-    [head.s(0.11), head.s(0.05)],
-    {
-      bone: jaw,
-      color: PALE,
-      group: "jaw",
-    },
-  );
-  // Lift the head a little. Everything built so far follows, and the region, surfaces and handles used below see
-  // the new pose.
-  b.pose(neck.joints[1], { axis: [1, 0, 0], deg: -10 });
+  b.capsule(jaw, head.p([0, -0.08, 0.26]), [head.s(0.05), head.s(0.035)], { color: CREAM, group: "jaw" });
 
-  // Ram horns: log-spiral coils sprouted from the skull's real surface, coiling back, down and outward. The
-  // surface is taken before the ears exist, so the hits land on the skull itself.
-  const headSurface = b.surface(skull);
+  // Horns: log-spiral coils sprouted from the skull's real surface, coiling back, down and outward.
+  const skullSurface = b.surface(skull);
   for (const s of [1, -1]) {
-    const hit = headSurface.around(skull.at).at(s * 55, 40);
+    const hit = skullSurface.around(skull.at).at(s * 60, 55);
     if (!hit) continue;
-    const coil = spiral(offset(hit, [0, -1, -0.3], head.s(0.075)), hit, [s, 0, 0], {
-      turns: -s * 1.15,
-      r1: head.s(0.035),
-      pitch: head.s(0.07),
+    const coil = spiral(offset(hit, [0, -1, -0.4], head.s(0.1)), hit, [s, 0, 0], {
+      turns: -s * 1.25,
+      r1: head.s(0.04),
+      pitch: head.s(0.08),
     });
-    b.sprout(`horn${s > 0 ? "L" : "R"}`, hit, coil, [head.s(0.04), head.s(0.008)], {
+    b.sprout(`horn${s > 0 ? "L" : "R"}`, hit, coil, [head.s(0.05), head.s(0.01)], {
       count: 0,
-      color: PALE,
+      color: HORN,
       caps: { start: "round", end: "point" },
       group: "head",
     });
   }
   for (const s of [1, -1]) {
-    head.part(new SphereGeometry(0.03, 10, 8), EYE, { bone: skull, at: [s * 0.1, 0.07, 0.12], group: "head" });
-    b.slab([head.p([s * 0.1, 0.13, -0.02]), head.p([s * 0.24, 0.3, -0.08]), head.p([s * 0.12, 0.2, -0.1])], {
-      thickness: head.s(0.02),
-      color: FUR,
-      bone: skull,
-      group: "head",
-    });
+    head.part(new SphereGeometry(0.026, 12, 10), EYE, { at: [s * 0.085, 0.04, 0.12], group: "head" });
+    head.part(new SphereGeometry(0.008, 8, 6), "#ffffff", { at: [s * 0.1, 0.055, 0.135], group: "head" });
+    // Ears: a leaf pointing out and back, with a paler inner leaf just in front.
+    const ear: V3[] = [
+      [s * 0.08, 0.06, -0.02],
+      [s * 0.2, 0.09, -0.08],
+      [s * 0.26, 0.05, -0.1],
+      [s * 0.19, 0.02, -0.06],
+    ];
+    b.slab(
+      ear.map((p) => head.p(p)),
+      { thickness: head.s(0.015), color: FLANK, bone: skull, group: "head" },
+    );
+    b.slab(
+      ear.map(([x, y, z]) => head.p([x * 0.95, y + 0.008, z + 0.012])),
+      { thickness: head.s(0.006), color: EAR, bone: skull, group: "head" },
+    );
   }
-  // A nose ray-cast from the front onto the snout.
-  const nose = b.surface(skull).ray(head.p([0, -0.03, 1]), head.d([0, 0, -1]));
-  if (nose) b.stick(new SphereGeometry(0.03, 8, 6), HOOF, nose, { embed: 0.4 });
 
-  // Spots on the flanks and back scales on the real body surface; scales shingle backwards (flow = -Z).
-  const bodySurface = b.surface(body);
-  const random = rng(7);
-  for (const hit of bodySurface.scatter(22, { rng: random, minDist: 0.12, filter: (h) => Math.abs(h.n.x) > 0.6 }))
-    b.stick(new CylinderGeometry(0.05, 0.05, 0.012, 10), SPOT, hit, { embed: 0.5, scale: 0.6 + random() * 0.6 });
-  for (const hit of bodySurface.scatter(18, { rng: rng(11), minDist: 0.08, filter: (h) => h.n.y > 0.8 }))
-    b.stick(new BoxGeometry(0.06, 0.02, 0.08), PALE, hit, { flow: [0, 0, -1], spin: 0, embed: 0.4 });
-
-  // A saddle blanket placed on the frame of the back point nearest to a guess (so it takes that hit's bone), and
-  // brass rivets ringed around the blanket's own facing axis: the part is a Line, the rivets inherit its bone.
-  const saddle = b.part(new BoxGeometry(0.26, 0.03, 0.22), SPOT, { frame: bodySurface.nearest([0, 1.5, -0.1]) });
-  b.ring(saddle, { count: 10, radius: 0.1 }, (rivet) =>
-    b.part(new SphereGeometry(0.014, 8, 6), BRASS, { at: offset(rivet, saddle, 0.016) }),
-  );
-
-  // A flower on the forehead: petals ringed around a made-up line (a frame from nothing, so the petals fall back
-  // to the nearest joint, the skull).
-  const stem = frame(head.p([0, 0.1, 0.17]), head.d([0, 0.35, 1]));
-  b.part(new SphereGeometry(0.025, 10, 8), BRASS, { at: stem });
-  b.ring(stem, { count: 6, radius: 0.035, tilt: 20 }, (petal) =>
-    b.part(new SphereGeometry(1, 10, 6), PETAL, { frame: petal, scale: [0.018, 0.03, 0.008] }),
-  );
-
-  // A chest strap: a rough closed loop around the body, draped onto the skin, swept as a seamless ring.
-  const loop = catmull(
-    [
-      [0.45, 0.95, 0.2],
-      [0, 1.5, 0.2],
-      [-0.45, 0.95, 0.2],
-      [0, 0.5, 0.2],
-    ],
-    { closed: true },
-  );
-  // The draped path starts on a body hit, so the strap inherits that hit's spine joint.
-  b.sweep(bodySurface.drape(loop, { lift: 0.012 }), 0.018, { color: STRAP });
-
-  // Tail sprouted from the rump: its root is buried in the body, its first joint sits on the surface.
-  const rump = bodySurface.ray([0, 0.98, -1.6], [0, 0, 1])!;
-  const tail = b.sprout("tail", rump, catmull([rump, [0, 0.92, -1.05], [0, 0.78, -1.22]]), [0.07, 0.03], {
-    count: 2,
-    names: ["tailBase", "tailTip"],
-    role: "tail",
-    group: "tail",
-    bands: [
-      [0.7, FUR],
-      [1, SPOT],
-    ],
+  // Pale dapples on the back. Stuck parts copy the skin's weights, so the ones on a bend bend with it.
+  const skin = b.surface(body);
+  const random = rng(5);
+  const dapples = skin.scatter(28, {
+    rng: random,
+    minDist: 0.075,
+    filter: (h) => h.n.y > 0.35 && h.at.z > -0.55 && h.at.z < 0.32,
   });
+  for (const hit of dapples)
+    b.stick(new CylinderGeometry(0.028, 0.028, 0.01, 12), DAPPLE, hit, { embed: 0.5, scale: 0.7 + random() * 0.6 });
 
-  // Rest-pose edits after building: open the jaw and raise the tail. +deg about +X tips forward-pointing bones
-  // down and backward-pointing bones up.
-  b.pose(jaw, { axis: [1, 0, 0], deg: 14 });
-  b.pose(tail.chain!.joints[0], { axis: [1, 0, 0], deg: 30 });
+  // Collar: points ringed around the neck line, draped onto the real neck and swept as a closed loop.
+  const around = b.ring(spine.at(0.8), { count: 10, radius: 0.18 });
+  const collarPath = skin.drape(catmull(around.items, { closed: true }), { lift: 0.012 });
+  b.sweep(collarPath, 0.016, { color: COLLAR, group: "body" });
+  let lowest = collarPath.at(0);
+  for (let i = 1; i < 60; i++) if (collarPath.at(i / 60).y < lowest.y) lowest = collarPath.at(i / 60);
+  b.part(new SphereGeometry(0.03, 12, 10), BELL, { at: offset(lowest, [0, -1, 0.3], 0.032), group: "body" });
+
+  // Rest-pose edits after building: open the jaw a little and lift the tail.
+  b.pose(jaw, { axis: [1, 0, 0], deg: 10 });
+  b.pose(tail.joints[0], { axis: [1, 0, 0], deg: 25 });
 
   return b.root;
 }

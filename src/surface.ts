@@ -1,8 +1,8 @@
 // Surface queries on the REAL built triangles (no analytic stand-ins) and `stick()` to seat parts on any frame.
 import { Box3, Quaternion, Triangle, Vector3 } from "three";
 import type { BufferGeometry, Mesh, Object3D } from "three";
-import { boneFor } from "./context";
-import type { Ctx, JointRef, Tags } from "./context";
+import { mix, rigid, vertexWeights } from "./context";
+import type { Ctx, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, flatten, rng as makeRng, toDirection, toFrame, toPoint, vec } from "./math";
 import type { DirectionInput, FrameInput, PointInput, V3 } from "./math";
@@ -12,15 +12,15 @@ import type { PathInput } from "./path";
 import { Joint } from "./skeleton";
 import { Sweep } from "./sweep";
 
-/** A frame on a surface: +Y = the outward face normal `n`, owned by the hit mesh's bone. */
+/** A frame on a surface: +Y = the outward face normal `n`, with the skin's weights there (the mesh's bone if rigid). */
 export class Hit extends Spot {
   constructor(
     at: Vector3,
     n: Vector3,
     readonly mesh: Mesh,
-    bone: Joint,
+    weights: Weights,
   ) {
-    super(at, aim(n), bone);
+    super(at, aim(n), weights);
   }
 
   get n() {
@@ -50,6 +50,8 @@ export class Surface {
   private tris: number[] = [];
   private normals: Vector3[] = [];
   private owner: number[] = [];
+  /** Vertex ids of each triangle's corners in its mesh, 3 per triangle. */
+  private corners: number[] = [];
   private cumArea: number[] = [];
   private box = new Box3();
   private eps = 0;
@@ -81,6 +83,7 @@ export class Surface {
     this.tris = [];
     this.normals = [];
     this.owner = [];
+    this.corners = [];
     this.cumArea = [];
     this.box = new Box3();
     const a = new Vector3();
@@ -92,8 +95,8 @@ export class Surface {
       const position = geometry.getAttribute("position");
       const index = geometry.index;
       const count = index ? index.count : position.count;
-      const corner = (i: number, v: Vector3) =>
-        v.fromBufferAttribute(position, index ? index.getX(i) : i).applyMatrix4(mesh.matrixWorld);
+      const id = (i: number) => (index ? index.getX(i) : i);
+      const corner = (i: number, v: Vector3) => v.fromBufferAttribute(position, id(i)).applyMatrix4(mesh.matrixWorld);
       for (let i = 0; i < count; i += 3) {
         corner(i, a);
         corner(i + 1, b);
@@ -104,6 +107,7 @@ export class Surface {
         this.tris.push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z);
         this.normals.push(n.normalize());
         this.owner.push(m);
+        this.corners.push(id(i), id(i + 1), id(i + 2));
         total += area;
         this.cumArea.push(total);
         this.box.expandByPoint(a).expandByPoint(b).expandByPoint(c);
@@ -122,8 +126,16 @@ export class Surface {
     );
   }
 
+  /** A hit on triangle `i`; on a blend-skinned mesh its weights interpolate the corners' weights. */
   private hit(i: number, p: Vector3) {
-    return new Hit(p, this.normals[i].clone(), this.meshes[this.owner[i]], this.joints[this.owner[i]]);
+    const mesh = this.meshes[this.owner[i]];
+    let weights = rigid(this.joints[this.owner[i]]);
+    if (mesh.userData.skinBones) {
+      const bary = this.triangle(i).getBarycoord(p, new Vector3()) ?? new Vector3(1, 0, 0);
+      const c = this.corners.slice(i * 3, i * 3 + 3);
+      weights = mix(c.map((vertex, k) => [vertexWeights(this.ctx, mesh, vertex), bary.getComponent(k)] as const));
+    }
+    return new Hit(p, this.normals[i].clone(), mesh, weights);
   }
 
   /** All ray intersections (distance, triangle), any facing, excluding triangle `skip`. */
@@ -218,7 +230,7 @@ export class Surface {
     const hits = Array.from({ length: count + 1 }, (_, i) => this.nearest(source.at(i / count)));
     const pts = hits.map((hit) => hit.at.addScaledVector(hit.n, options.lift ?? 0));
     const indices = [...new Set(source.knots.map((t) => Math.round(t * count)))];
-    return smoothPath(pts, null, { indices }, source.closed, hits[0].bone);
+    return smoothPath(pts, null, { indices }, source.closed, hits[0].weights);
   }
 
   /** True when `p` (on triangle `i`) lies inside another closed part of this surface. */
@@ -280,7 +292,7 @@ export type StickOptions = Tags & {
   flow?: DirectionInput;
   /** Degrees about the normal. */
   spin?: number;
-  /** Default: the frame's bone (a hit's mesh owner), else the nearest joint. */
+  /** Rigid on this bone. Default: the frame's weights (a hit on a bend bends with it), else the nearest joint. */
   bone?: JointRef;
   scale?: number | V3;
 };
@@ -302,5 +314,5 @@ export function stick(ctx: Ctx, geometry: BufferGeometry, color: string, on: Fra
   const height = (max.y - min.y) * scale;
   const embed = options.embed ?? 0.2;
   const at = base.at.addScaledVector(n, -(min.y * scale + embed * height));
-  return part(ctx, geometry, color, { ...options, bone: boneFor(ctx, options.bone, [base], base.at), at, quat });
+  return part(ctx, geometry, color, { ...options, frame: base, at, quat });
 }

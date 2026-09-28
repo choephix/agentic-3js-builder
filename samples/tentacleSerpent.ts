@@ -1,5 +1,6 @@
 // Tentacle serpent. The skeleton is rooted mid-body with two chains growing both ways along one
-// body curve. The tail has a belly sector under its stripes and plates along its back, a dorsal fin stands on
+// body curve. The neck is one smooth-skinned tube; the tail is armour, `skin: "rigid"`, one striped hinged piece per
+// joint, with a belly sector under its stripes and plates along its back. A dorsal fin stands on
 // the neck's skin line, a spike collar and a closed ring circle the tilted neck, a twisted tusk juts from the
 // head, and tentacles sprouted from the head surface curl on arcs. A frill of 13 ribs rings the neck on 4 group
 // joints; the jaw is posed open at the end. Every ringed or along-placed item inherits the bone of what it rings.
@@ -41,8 +42,9 @@ export default function build() {
   const front = b.chain("front", body.slice(rootT, 1), { parent: core, count: 5, role: "neck", group: "neck" });
   const back = b.chain("back", body.slice(rootT, 0), { parent: core, count: 7, role: "tail", group: "tail" });
   const frontTube = b.sweep(front, [0.2, 0.19, 0.16, 0.14], { color: SKIN, sides: 10, sectors: [[110, 250, BELLY]] });
-  // Stripes per tail joint, and a pale belly sector under all of them.
+  // Armoured tail: rigid skin, one hinged segment per joint with alternating stripes, a pale belly under all.
   const backTube = b.sweep(back, [0.2, 0.17, 0.12, 0.07, 0.04], {
+    skin: "rigid",
     sides: 10,
     color: (t) => (Math.floor(t * 7) % 2 ? SKIN : STRIPE),
     sectors: [[110, 250, BELLY]],
@@ -107,7 +109,7 @@ export default function build() {
       at: head.local([s * 0.12, 0.12, 0.08]),
       group: "head",
     });
-    // Antenna: a point-array sweep with a sharp elbow (split into round-capped segments inside one mesh).
+    // Antenna: a point-array sweep with a sharp elbow, rounded by the smooth skin.
     const root = head.local([s * 0.06, 0.08, 0.12]);
     b.sweep(
       [root, offset(root, head.dir([s * 0.3, -0.2, 1]), 0.22), offset(root, head.dir([s * 0.8, 0.9, 1.4]), 0.36)],
@@ -121,8 +123,8 @@ export default function build() {
     );
   }
 
-  // Tentacles sprouted from the head's real surface: straight out, then an arc curl. Alternate ones use colour
-  // bands (round cuts) or overlap cuts; every third is pronated a quarter turn along its chain.
+  // Tentacles sprouted from the head's real surface: straight out, then an arc curl. Alternate ones have pink tips;
+  // every third is pronated a quarter turn along its chain.
   const headSurface = b.surface(head);
   b.ring(frame(lerp(head, head.local([0, 0.22, 0]), 0.1), head), { count: 6, radius: 0.12 }, ({ i, outward, at }) => {
     const hit = headSurface.nearest(at);
@@ -137,7 +139,7 @@ export default function build() {
       caps: { start: "round", end: "point" },
       group: `tentacle${i + 1}`,
       ...(i % 2
-        ? { overlap: 0.8, color: TENTACLE }
+        ? { color: TENTACLE }
         : {
             bands: [
               [0.75, TENTACLE],

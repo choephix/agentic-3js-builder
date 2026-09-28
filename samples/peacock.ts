@@ -180,7 +180,7 @@ export default function build() {
         [s * 0.18, 0.58, -0.06],
         [s * 0.15, 0.66, -0.28],
       ],
-      { thickness: 0.015, color: WING, split: "a", group: `wing${side}` },
+      { thickness: 0.015, color: WING, group: `wing${side}` },
     );
   }
 

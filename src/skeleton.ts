@@ -1,8 +1,8 @@
-// Joints and chains: the only helpers that create bones. Also `pose()`, which re-poses a joint after building,
-// and `Capture`, which keeps model-space data taken at build time valid after later poses.
+// Joints and chains: the only helpers that create bones. Also `pose()`, which re-poses a joint after building and
+// re-deforms blend-skinned meshes.
 import { Group, Matrix4, Quaternion, Vector3 } from "three";
-import { boneFor, resolveJoint, setWorld } from "./context";
-import type { Ctx, JointRef } from "./context";
+import { boneFor, Capture, resolveJoint, rigid, setWorld, spanWeights } from "./context";
+import type { Ctx, JointRef, Weights } from "./context";
 import { Frame, Spot } from "./frame";
 import { aim, DEG, toDirection, toFrame, toPoint } from "./math";
 import type { DirectionInput, FrameInput, PointInput } from "./math";
@@ -13,7 +13,7 @@ import type { Role } from "./rig";
 
 const JOINT_NAME = /^[A-Za-z][A-Za-z0-9_]*$/;
 
-/** A bone: a Frame read live from the scene (its `axis` is the bone's +Y). `bone` is the joint itself. */
+/** A bone: a Frame read live from the scene (its `axis` is the bone's +Y), weighted fully on itself. */
 export class Joint extends Frame {
   constructor(
     readonly name: string,
@@ -31,28 +31,12 @@ export class Joint extends Frame {
     return new Quaternion().setFromRotationMatrix(this.object.matrixWorld);
   }
 
+  get weights(): Weights {
+    return [[this, 1]];
+  }
+
   get bone(): Joint {
     return this;
-  }
-}
-
-/**
- * Model-space data captured at one moment (a chain's curve, a sweep's rings, a fan's items). Data owned by a
- * joint follows that joint: `motion(joint)` maps from capture time to the joint's current pose, so handles stay
- * valid after `pose()` while the scene graph remains the one source of truth.
- */
-export class Capture {
-  private readonly inverse = new Map<Joint, Matrix4>();
-
-  constructor(joints: Iterable<Joint>) {
-    for (const joint of joints) this.inverse.set(joint, joint.object.matrixWorld.clone().invert());
-  }
-
-  /** Rigid transform from capture time to now for data owned by `joint`. */
-  motion(joint: Joint) {
-    const inverse = this.inverse.get(joint);
-    if (!inverse) throw new Error(`Joint "${joint.name}" was not captured`);
-    return joint.object.matrixWorld.clone().multiply(inverse);
   }
 }
 
@@ -116,8 +100,8 @@ export type PoseRotation =
 
 /**
  * Rotate a joint, with everything under it: a new rest pose (open a jaw, raise a tail, fold a ring's joint group)
- * without rebuilding. Joints read the scene, frames are stored on their bone, and chains, sweeps and surfaces map
- * their build-time data through each joint's motion, so every handle stays valid.
+ * without rebuilding. Joints read the scene, frames are stored on their bones, chains, sweeps and surfaces map
+ * their build-time data through each joint's motion, and blend-skinned meshes re-deform, so every handle stays valid.
  */
 export function pose(ctx: Ctx, ref: JointRef, rotation: PoseRotation) {
   const joint = resolveJoint(ctx, ref);
@@ -143,6 +127,7 @@ export function pose(ctx: Ctx, ref: JointRef, rotation: PoseRotation) {
     .multiply(world)
     .decompose(object.position, object.quaternion, object.scale);
   object.updateMatrixWorld(true);
+  for (const skin of ctx.skins) skin();
   ctx.poses++;
   return joint;
 }
@@ -165,15 +150,16 @@ export type ChainOptions = {
   contact?: PointInput;
 };
 
-/** A frame on a chain: +Y = tangent, +Z = transported normal (the joints' +Z side), +X = binormal. */
+/** A frame on a chain, rigid on that span's joint: +Y = tangent, +Z = transported normal, +X = binormal. */
 export class ChainPoint extends Spot {
   constructor(
     readonly t: number,
     at: Vector3,
     quat: Quaternion,
-    bone: Joint,
+    joint: Joint,
+    capture: Capture,
   ) {
-    super(at, quat, bone);
+    super(at, quat, rigid(joint), undefined, capture);
   }
 
   get tangent() {
@@ -208,22 +194,36 @@ export class Chain {
     return this.path.length;
   }
 
-  /** The frame at arc-length t in the current pose (each span follows its joint), owned by that span's joint. */
+  /** The frame at arc-length t in the current pose (each span follows its joint), rigid on that span's joint. */
   at(t: number) {
-    const joint = this.jointAt(t);
-    const motion = this.capture.motion(joint);
     const tangent = this.path.tangentAt(t);
     const normal = this.frames.normalAt(t);
-    const basis = new Matrix4().makeBasis(tangent.clone().cross(normal), tangent, normal).premultiply(motion);
-    const quat = new Quaternion().setFromRotationMatrix(basis);
-    return new ChainPoint(t, this.path.at(t).applyMatrix4(motion), quat, joint);
+    const quat = new Quaternion().setFromRotationMatrix(
+      new Matrix4().makeBasis(tangent.clone().cross(normal), tangent, normal),
+    );
+    return new ChainPoint(t, this.path.at(t), quat, this.jointAt(t), this.capture);
+  }
+
+  /**
+   * Smooth weights at t: one joint mid-span, the two neighbours blended over ±25% of the shorter span around each
+   * joint (how membranes on a chain bend).
+   */
+  weightsAt(t: number) {
+    const L = this.path.length;
+    const starts = this.ts.map((s) => s * L);
+    return spanWeights(
+      this.joints,
+      starts,
+      t * L,
+      (k) => 0.25 * Math.min(starts[k] - starts[k - 1], starts[k + 1] - starts[k]),
+    );
   }
 
   /** The chain's curve in the current pose, with knots at the joints (a Path input: `along`, `membrane`, ...). */
   curve() {
     const count = Math.max(16, this.joints.length * 8);
     const pts = Array.from({ length: count + 1 }, (_, i) => this.at(i / count).at);
-    return smoothPath(pts, null, { indices: this.ts.map((t) => Math.round(t * count)) }, false, this.joints[0]);
+    return smoothPath(pts, null, { indices: this.ts.map((t) => Math.round(t * count)) }, false, rigid(this.joints[0]));
   }
 
   /** The joint whose current bone segment passes closest to `p`. */

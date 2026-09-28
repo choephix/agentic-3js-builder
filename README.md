@@ -8,13 +8,13 @@ Why each helper exists, with the evidence from 100 builds: [`docs/DESIGN.md`](do
 
 Bones work, and so does any other point, line or frame: an eye, a horn, a surface hit, a point on a tube, or something you make up. Every helper takes one of five geometric kinds and converts whatever you pass.
 
-| Kind          | What it is                                                                    | What converts to it                                                                                                                                                                                                                                                                     |
-| ------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Point**     | a position                                                                    | `[x, y, z]`, `Vector3`, a raw `Mesh` (bounding-box centre), and anything that converts to a Frame (its position)                                                                                                                                                                        |
-| **Direction** | a vector                                                                      | `[x, y, z]`, `Vector3`, and anything that converts to a Frame (its facing `axis`)                                                                                                                                                                                                       |
-| **Line**      | a point plus a direction                                                      | any Frame: its position and facing `axis`. `line(a, b)` makes one from two points                                                                                                                                                                                                       |
-| **Frame**     | a point with a full orientation, a facing `axis` and the `bone` it moves with | a `Joint` (bone +Y), a `Part` (the axis it was aimed or stuck along), a `Sweep` (its start, along the tube), a `Hit` (its normal), `chain.at(t)` (the tangent), `sweep.at(t)` (the surface normal), a `Region`, ring and along items, `frame(at, dir, up?)`, `line(a, b)`, `f.moved(p)` |
-| **Path**      | an arc-length curve                                                           | a point array (any Points), `polyline`, `bezier`, `catmull`, `arc`, `spiral`, a `Chain` or a `Sweep` (its current centreline), `sweep.line(deg)`, `surface.drape(path)`                                                                                                                 |
+| Kind          | What it is                                                                   | What converts to it                                                                                                                                                                                                                                                                     |
+| ------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Point**     | a position                                                                   | `[x, y, z]`, `Vector3`, a raw `Mesh` (bounding-box centre), and anything that converts to a Frame (its position)                                                                                                                                                                        |
+| **Direction** | a vector                                                                     | `[x, y, z]`, `Vector3`, and anything that converts to a Frame (its facing `axis`)                                                                                                                                                                                                       |
+| **Line**      | a point plus a direction                                                     | any Frame: its position and facing `axis`. `line(a, b)` makes one from two points                                                                                                                                                                                                       |
+| **Frame**     | a point with a full orientation, a facing `axis` and the bones it moves with | a `Joint` (bone +Y), a `Part` (the axis it was aimed or stuck along), a `Sweep` (its start, along the tube), a `Hit` (its normal), `chain.at(t)` (the tangent), `sweep.at(t)` (the surface normal), a `Region`, ring and along items, `frame(at, dir, up?)`, `line(a, b)`, `f.moved(p)` |
+| **Path**      | an arc-length curve                                                          | a point array (any Points), `polyline`, `bezier`, `catmull`, `arc`, `spiral`, a `Chain` or a `Sweep` (its current centreline), `sweep.line(deg)`, `surface.drape(path)`                                                                                                                 |
 
 | Helper                                                                                            | Takes                                                          |
 | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
@@ -27,9 +27,11 @@ Bones work, and so does any other point, line or frame: an eye, a horn, a surfac
 | `b.ring(line, ...)`, `b.pose(joint, { about })`                                                   | Line                                                           |
 | `surface.nearest/ray/around`, `aim`, `offset`, `lerp`, `mid`, `bezier/catmull/arc/spiral`         | Points and Directions                                          |
 
-**Bone inheritance.** Geometry and joints built from an input that came from something built take that thing's bone: a spike on `sweep.at(t)` rides that tube joint, lashes ringed around an eye ride the eye's bone, a rod from an eye to a joint rides the eye's bone (the first endpoint), a sweep of `bezier(hit, ...)` rides the hit's bone. An input made from nothing (a tuple, a `Vector3`, `frame()`/`line()` from literals) has no bone, and the geometry goes to the joint whose bone passes closest to it (a bone runs from a joint to each child joint and belongs to the parent). An explicit `bone:` always wins. Items handed to `ring` and `along` callbacks carry their bone, so callbacks don't pass `bone:`. `offset()`, `lerp()` and `f.local()` return plain `Vector3`s; use `f.moved(p)` for a derived point that keeps `f`'s bone.
+**Bone inheritance.** Geometry and joints built from an input that came from something built take that thing's bones: a spike on `sweep.at(t)` rides the tube there (both bones inside a joint's blend window), lashes ringed around an eye ride the eye's bone, a rod from an eye to a joint rides the eye's bone (the first endpoint), a sweep of `bezier(hit, ...)` rides the hit's bone. An input made from nothing (a tuple, a `Vector3`, `frame()`/`line()` from literals) has no bone, and the geometry goes to the joint whose bone passes closest to it (a bone runs from a joint to each child joint and belongs to the parent). An explicit `bone:` always wins. Items handed to `ring` and `along` callbacks carry their bone, so callbacks don't pass `bone:`. `offset()`, `lerp()` and `f.local()` return plain `Vector3`s; use `f.moved(p)` for a derived point that keeps `f`'s bone.
 
-Frames stay valid under `pose()`: each is stored relative to its bone.
+Frames stay valid under `pose()`: each is stored relative to its bones.
+
+**Skinning.** Tubes, lofts and membranes on a chain are one continuous mesh that bends smoothly at every joint: each vertex near a joint is shared by the two bones there, so bodies, necks, tails and legs don't crack or crease. Add `skin: "rigid"` for the old puppet style, one hinged piece per bone. Anything you place on a point takes that point's bones: a spot stuck on a bend bends with the skin, a horn on the head stays rigid on the head, and an explicit `bone:` always makes it rigid on that bone.
 
 ## Target
 
@@ -43,7 +45,7 @@ A creature module that:
 
 - Exactly one root joint (the first `joint` without `parent`); a second one throws. Joint names match `/^[A-Za-z][A-Za-z0-9_]*$/` and are unique.
 - Joints and everything above them are unscaled. Scale lives on meshes (`part({ scale })`, `region`).
-- Every mesh sits under the joint that owns it (rigid skinning: one bone per mesh). Geometry that must follow several bones is split into one mesh per bone span.
+- Every mesh sits under its heaviest bone. A mesh that follows several bones carries per-vertex weights (`skinIndex` / `skinWeight` attributes indexing `userData.skinBones`, at most 4 bones per vertex); the creature-lab harness exports them as they are. Everything else is rigid: every vertex on that one bone.
 - One shared `MeshStandardMaterial` per colour (roughness 0.72, metalness 0.04).
 - Deterministic: randomness only through an `rng` you pass (`rng(seed)` here, or `kit.rng(seed)`).
 - You still own the lab's limits (1000 parts, 120k triangles, 160 joints, 64 colours) and resting on y = 0.
@@ -72,10 +74,10 @@ Every helper copies its inputs and returns fresh vectors. `V3` is a literal `[x,
 
 ## Frames
 
-Every Frame has `at`, `quat`, `axis` (facing, unit), `bone` (a `Joint`, or null for frames made from nothing), `local(p)` (a point in the frame, meters, to model space), `dir(v)` and `moved(p)` (the frame shifted to a local point, same orientation and bone).
+Every Frame has `at`, `quat`, `axis` (facing, unit), `weights` (the bones it moves with, heaviest first: one for a rigid point, two on a smooth bend, none for frames made from nothing), `bone` (the heaviest, or null), `local(p)` (a point in the frame, meters, to model space), `dir(v)` and `moved(p)` (the frame shifted to a local point, same orientation and bone).
 
-- `frame(at, dir, up?)` faces `dir` with roll from `up` (see `aim`); it takes `at`'s bone when `at` came from something built.
-- `line(a, b)` faces from `a` to `b` and adds `length` and `end`; it takes `a`'s bone, else `b`'s.
+- `frame(at, dir, up?)` faces `dir` with roll from `up` (see `aim`); it takes `at`'s bones when `at` came from something built.
+- `line(a, b)` faces from `a` to `b` and adds `length` and `end`; it takes `a`'s bones, else `b`'s.
 - A `Joint`'s axis is its bone (+Y). A `Part` faces the axis it was aimed along (`aim`/`dir` with `axis`, default +Y); a stuck part faces the surface normal; a slab faces its polygon's normal. A `Sweep` converts to its start frame (+Y along the tube). A `Hit` faces its normal `n`. `chain.at(t)` faces the tangent (+Z = `normal`, +X = `binormal`). `sweep.at(t)` faces the outward surface normal `n` (+Z = `tangent`).
 
 ## Orientation: `aim` and the roll convention
@@ -136,7 +138,7 @@ const back = b.chain("back", body.slice(rootT, 0), { parent: core, count: 7 });
 
 ## Parts
 
-`b.part(geometry, color, { bone?, frame?, at?, quat? | aim? | dir? (+ up?, axis?) | rotation?, scale?, group?, name? })` places a mesh in model space under its bone and returns a `Part`: a Frame at the geometry's origin and orientation, with `mesh`. The bone is `bone`, else the bone of `at`/`frame`, else the nearest joint to `at` (with no position at all: the root). `frame` places the geometry on a frame (its position, and its orientation unless another orientation option is given); `at` sets the position alone. Orientation priority is `quat`, then `aim`/`dir`, then `rotation` (XYZ degrees), then `frame`, then world axes. `axis` picks which geometry axis `aim`/`dir` points (default "y", the axis of three's cylinders and cones) and is the part's facing `axis`.
+`b.part(geometry, color, { bone?, frame?, at?, quat? | aim? | dir? (+ up?, axis?) | rotation?, scale?, group?, name? })` places a mesh in model space under its bone and returns a `Part`: a Frame at the geometry's origin and orientation, with `mesh`. It follows `bone` (rigid), else the bones of `at`/`frame` (on a smooth bend: both, blended), else the nearest joint to `at` (with no position at all: the root). `frame` places the geometry on a frame (its position, and its orientation unless another orientation option is given); `at` sets the position alone. Orientation priority is `quat`, then `aim`/`dir`, then `rotation` (XYZ degrees), then `frame`, then world axes. `axis` picks which geometry axis `aim`/`dir` points (default "y", the axis of three's cylinders and cones) and is the part's facing `axis`.
 
 ```ts
 const eye = b.part(new THREE.SphereGeometry(0.035), DARK, {
@@ -154,18 +156,18 @@ b.rod(eye, crest, 0.012, { color: BONE }); // from an eye to a joint, on the eye
 
 `b.sweep(source, radius, options?)` returns a `Sweep`. Use it for every tube: bodies, necks, tails, limbs, horns, tentacles, whiskers.
 
-- `source` is a Path input (one mesh on `bone`; default: the path's own bone when it was made from built inputs, else the joint nearest its start) or a `Chain` (one mesh per joint span, each on its joint). For a path that runs along a chain in the same direction (a loft body over a spine), `bone: chain` cuts it where it passes each joint, one mesh per joint. `from`/`to` restrict the source range.
+- `source` is a Path input (one mesh; its bones are `bone`, else the path's own bones when it was made from built inputs, else the joint nearest its start) or a `Chain`. For a path that runs along a chain in the same direction (a loft body over a spine), `bone: chain` skins it to that chain like a chain source. `from`/`to` restrict the source range.
 - `radius` is `r`, `[r0, r1]` (linear), `number[]` (evenly keyed, smooth), `(t) => r` or `(t) => [rx, ry]`. `rx` runs sideways (binormal) and `ry` along the frame normal. For boxes these are half extents. Radius, shift, colour, bands and `at` all use t from 0 to 1 over the swept range.
 - `shift` is `[x, y]` or `(t) => [x, y]` in the same axes as `[rx, ry]`: it moves the section centre off the path, so a heavy belly hangs below the spine while the bones stay on the spine line.
 - `section` is `"circle"` (default, `sides` = 8 × `detail`, smooth), `"box"` or `{ ngon: n }` (faceted). `smooth` overrides the shading. Circles are circumscribed: flat faces sit exactly at `r`, top and bottom are flat, so a tube of radius r whose axis is at height r touches the floor.
 - `caps` is `"round"` (default), `"flat"`, `"point"`, `"none"`, or `{ start, end }`. With round caps, a 2-point sweep is a capsule. `extend: d | [start, end]` continues the tube straight past its ends at the end radius (meters) before the cap.
-- Chain cuts get round caps on both pieces. Each cap stays inside the continuing tube's radius, so it is hidden while straight (even on a fast taper) and fills the gap when the joint bends. You never add filler spheres. `overlap: k` instead extends each piece k × radius past the cut with a flat end. Point-array sweeps are split the same way at corners sharper than 20°, inside one mesh.
-- `color` is a string or `(t) => string`, evaluated once per piece. `bands: [[tEnd, color], ...]` splits the tube along its length at band edges, keeping the same bone and no cap.
+- `skin` is `"smooth"` (default) or `"rigid"`. Smooth: one continuous mesh; around each joint the rings blend the two bones either side over about ±1 local radius (at most 45% of either span), and corners of the path are rounded over the same distance, so the tube bends like skin. Rigid: one piece per joint span, cut with round caps on both pieces; each cap stays inside the continuing tube's radius, so it is hidden while straight and fills the gap when the joint bends. `overlap: k` (rigid only) instead extends each piece k × radius past the cut with a flat end. Rigid point-array sweeps are split the same way at corners sharper than 20°, inside one mesh.
+- `color` is a string or `(t) => string`; a colour function splits the tube exactly where the colour changes. `bands: [[tEnd, color], ...]` splits it at band edges. Colour pieces share their boundary vertices and weights, so they bend together with no gap.
 - `sectors: [[fromDeg, toDeg, color], ...]` colours strips around the tube on the dorsal clock (0 = the side facing world up, 180 = belly, +90 clockwise looking along the tube). Uncovered angles keep the piece colour. Each sector is its own mesh per piece, sector edges have no walls, and neighbouring sectors share their edge vertices exactly. This composes with bands and chain splits. For countershading, use `sectors: [[-65, 65, DARK], [125, 235, CREAM]]`.
 - Path sources take `up` (start roll) and `twist` (total degrees or `(t) => deg`, as on `chain`). Chain sources use the chain's roll.
 - Ring spacing adapts to curvature and twist (about 10° per ring) and to radius or shift change. Straight constant tubes use 2 rings.
 
-`sweep.at(t, angleDeg = 0, lift = 0)` returns a `SweepPoint` frame on the built surface (on the same dorsal clock) with `t`, `n`, `tangent` and `radius`, owned by the tube joint there. `sweep.line(angleDeg, lift = 0)` returns the `Path` along the built surface at that clock angle, with knots at the bone cuts; closed tubes give closed lines. Use it as a membrane or sweep edge that lies on the skin (dorsal fins, manes, ridges). `sweep.meshes` lists the meshes, `sweep.bone` is the joint at its start, `sweep.frame` its start frame (what it converts to as a Point, Line or Frame) and `sweep.curve()` its centreline Path in the current pose.
+`sweep.at(t, angleDeg = 0, lift = 0)` returns a `SweepPoint` frame on the built surface (on the same dorsal clock) with `t`, `n`, `tangent` and `radius`, with the tube's weights there (both bones inside a blend window). `sweep.line(angleDeg, lift = 0)` returns the `Path` along the built surface at that clock angle, with knots at the bone cuts; closed tubes give closed lines. Use it as a membrane or sweep edge that lies on the skin (dorsal fins, manes, ridges). `sweep.meshes` lists the meshes, `sweep.bone` is the joint at its start, `sweep.frame` its start frame (what it converts to as a Point, Line or Frame) and `sweep.curve()` its centreline Path in the current pose.
 
 ```ts
 const tail = b.chain(
@@ -196,9 +198,9 @@ These shorthands are each one call to `sweep`:
 | `b.capsule(a, b, r \| [r0, r1], opts?)`         | round ends                                                                                                                                |
 | `b.spike(base, dirOrTip, len, r, opts?)`        | cone to a point; `len` number means direction (a frame gives its axis: `spike(hit, hit, len, r)`), `len` null means `dirOrTip` is the tip |
 | `b.frustumBox(a, b, [w0, h0], [w1, h1], opts?)` | box section, full width × height, flat ends                                                                                               |
-| `b.loft([{ at, w, h }, ...], opts?)`            | catmull through station centres, full width/height interpolated; `bone: chain` splits it per joint                                        |
+| `b.loft([{ at, w, h }, ...], opts?)`            | catmull through station centres, full width/height interpolated; `bone: chain` skins it to that chain                                     |
 
-`b.sprout(name, on, pathOrTip, radius, { count?, bury?, names?, twist?, role?, ...sweep options })` roots an appendage (limb, horn, tentacle, neck) on another volume at a Frame (usually a surface hit) and returns `{ chain, sweep }`. `pathOrTip` is a tip Point (straight out) or a Path; the frame's point is prepended when the path starts elsewhere. The first joint sits at the frame's point, parented to its bone (else the nearest joint), and `count` joints follow (default one per knot span). With `count: 0` there are no joints (`chain` is null) and the tube rides on that bone. The tube's root continues `bury` (default: the root radius) back along its start tangent into the parent, so it never floats on a curved surface and no joint is wasted inside the body.
+`b.sprout(name, on, pathOrTip, radius, { count?, bury?, names?, twist?, role?, ...sweep options })` roots an appendage (limb, horn, tentacle, neck) on another volume at a Frame (usually a surface hit) and returns `{ chain, sweep }`. `pathOrTip` is a tip Point (straight out) or a Path; the frame's point is prepended when the path starts elsewhere. The first joint sits at the frame's point, parented to its heaviest bone (else the nearest joint), and `count` joints follow (default one per knot span). With `count: 0` there are no joints (`chain` is null) and the tube rides on that bone. The tube's root continues `bury` (default: the root radius) back along its start tangent into the parent, so it never floats on a curved surface and no joint is wasted inside the body.
 
 ```ts
 const hit = b
@@ -214,13 +216,13 @@ b.sprout("tail", rump, catmull([rump, mid, tip]), [0.07, 0.03], { count: 2, name
 
 `b.surface(targets)` takes meshes, `Part`s, a `Sweep`, a `Joint` (its meshes) or nested arrays, and returns a `Surface` that queries the built triangles.
 
-- `.nearest(p)` returns a `Hit`: a Frame facing the outward face normal `n`, with `mesh`, owned by the mesh's bone.
+- `.nearest(p)` returns a `Hit`: a Frame facing the outward face normal `n`, with `mesh`, with the skin's weights there (interpolated on a blend-skinned mesh, else the mesh's bone).
 - `.ray(origin, dir)` returns the first hit or null.
 - `.around(center?).at(azimuthDeg, elevationDeg)` returns the outermost hit in that direction from `center` (default: bounding-box centre). Azimuth 0 is +Z, 90 is +X; elevation 90 is up.
 - `.scatter(count, { rng?, minDist?, keepOut?, filter? })` returns area-weighted hits, deterministic for a given `rng`. It rejects points buried inside other target meshes.
-- `.drape(path, { lift? })` pulls a path onto the built surface: every sample moves to its nearest surface point, then `lift` out along the normal. Knots and closedness carry over, and the path takes the bone of its first hit. Draw a rough loop around the body and drape it for a strap or collar, or drape a short curve for a mouth line or gill slit, then sweep it.
+- `.drape(path, { lift? })` pulls a path onto the built surface: every sample moves to its nearest surface point, then `lift` out along the normal. Knots and closedness carry over, and the path takes the weights of its first hit. Draw a rough loop around the body and drape it for a strap or collar, or drape a short curve for a mouth line or gill slit, then sweep it.
 
-`b.stick(geometry, color, on, { embed = 0.2, flow?, spin?, bone?, scale?, group?, name? })` seats a part on any Frame (a hit, a tube point, a ring item, a joint) and returns the `Part`. Local +Y follows the frame's facing axis (a hit's normal), and the part sinks by `embed` × its own height along it, so resizing the part needs no retuning. `flow` is the preferred surface direction for the part's +Z (scales, shingles), `spin` is degrees about the axis, and the bone defaults to the frame's bone.
+`b.stick(geometry, color, on, { embed = 0.2, flow?, spin?, bone?, scale?, group?, name? })` seats a part on any Frame (a hit, a tube point, a ring item, a joint) and returns the `Part`. Local +Y follows the frame's facing axis (a hit's normal), and the part sinks by `embed` × its own height along it, so resizing the part needs no retuning. `flow` is the preferred surface direction for the part's +Z (scales, shingles), `spin` is degrees about the axis, and it takes the frame's weights (a spot on a bend bends with the skin) unless `bone` makes it rigid.
 
 ```ts
 const skin = b.surface(bodyLoft);
@@ -237,14 +239,14 @@ const loop = catmull(
   ],
   { closed: true },
 );
-b.sweep(skin.drape(loop, { lift: 0.012 }), 0.018, { color: STRAP }); // bone: the draped path's first hit
+b.sweep(skin.drape(loop, { lift: 0.012 }), 0.018, { color: STRAP }); // weights: the draped path's first hit
 ```
 
 ## Membranes and slabs
 
-`b.membrane(edgeA, edgeB, { color, thickness, rows?, cols?, scallop?, split?, bone?, group?, name? })` skins between two edges (each a `Chain`, path or points), resampled by arc length. Chain edges are read in their current pose. `rows` defaults to 4 × `detail`. It returns one closed, double-sided mesh per bone. With `split: "mid"` (default), cells nearer A go to A's joint at that t and cells nearer B go to B's. `"a"` or `"b"` assigns everything to one edge. Cells on path edges go to `bone`, which is a joint, or a Chain whose nearest joint takes each cell; without `bone`, to the path's own bone, else the other edge's chain joints, else the nearest joint. A fin between `tube.line(0)` and a raised line then follows the spine. Every bone span boundary gets a column. `scallop` (a fraction of the length) pulls the trailing edge between the two tips inward. Run both edges in the same direction, from root to tip.
+`b.membrane(edgeA, edgeB, { color, thickness, rows?, cols?, scallop?, skin?, split?, bone?, group?, name? })` skins between two edges (each a `Chain`, path or points), resampled by arc length. Chain edges are read in their current pose. `rows` defaults to 4 × `detail`. It returns closed, double-sided meshes. Smooth (default): one mesh whose vertices blend from edge A's bones to edge B's across the width, and between neighbouring joints along each chain edge. `skin: "rigid"`: one mesh per bone; with `split: "mid"` (default) cells nearer A go to A's joint at that t and cells nearer B go to B's, and `"a"` or `"b"` assigns everything to one edge. Path edges follow `bone`, which is a joint, or a Chain followed along its nearest point; without `bone`, the path's own bones, else the other edge's chain, else the nearest joint. A fin between `tube.line(0)` and a raised line then follows the spine. Every bone span boundary gets a column. `scallop` (a fraction of the length) pulls the trailing edge between the two tips inward. Run both edges in the same direction, from root to tip.
 
-`b.slab(points, { color, thickness, bone?, group?, name? })` turns a roughly planar polygon (any Points) into a thin closed prism for fins, ears, leaves and plates, and returns a `Part` centred on it, facing its normal. The bone is `bone`, else the first built point's bone, else the nearest joint.
+`b.slab(points, { color, thickness, bone?, group?, name? })` turns a roughly planar polygon (any Points) into a thin closed prism for fins, ears, leaves and plates, and returns a `Part` centred on it, facing its normal. It follows `bone` (rigid), else the first built point's bones, else the nearest joint.
 
 ```ts
 b.membrane(finger1, finger2, { thickness: 0.02, color: WING, scallop: 0.18 });
@@ -259,9 +261,9 @@ b.membrane(neckTube.line(0, -0.01).slice(0.05, 0.45), neckTube.line(0, 0.12).sli
 ## Distribution, IK, regions
 
 - `b.ring(line, { count, radius?, fromDeg?, toDeg?, tilt?, joints?, name?, names?, parent?, group?, role? }, (item) => {})` places `count` frames on a circle around any Line (see "Rings and joint groups") and returns `{ joints, items }`.
-- `b.along(chain | sweep | path, count, (at) => {}, { from?, to? })` places frames at the centres of `count` equal parts and returns them: `chain.at(t)`, `sweep.at(t)` (dorsal surface point) or a `PathPoint` (`t`, facing the `tangent`, +Z the transported normal, owned by the path's bone).
+- `b.along(chain | sweep | path, count, (at) => {}, { from?, to? })` places frames at the centres of `count` equal parts and returns them: `chain.at(t)`, `sweep.at(t)` (dorsal surface point) or a `PathPoint` (`t`, facing the `tangent`, +Z the transported normal, with the path's bones).
 - `limb(root, target, lengths, bends, { sole? })` returns the joint points `[root, ..., end]` of a limb whose segments have exactly `lengths` and whose end lands exactly on `target`. Build the chain through them and put feet at `y = footRadius`. `bends` gives one direction per inner joint, or one for all, saying which way that joint points. Alternate them for digitigrade legs (knee forward, hock back); keep them the same for an even curl. The limb lies in the plane of root, target and the first hint. For 3 or more segments, the last one runs parallel to root→target (a vertical cannon under a hip) when that respects its hint and reach; otherwise every joint turns by the same angle. With `sole: dir`, the last segment points exactly along `dir` (a toe or flat foot on the floor) and the rest solves to its heel. Targets out of reach straighten the limb toward them. Two lengths is plain two-bone IK.
-- `b.region({ at, scale = 1, quat?, bone? })` is an authoring Frame, not a scene node. It rides on `bone` (default: `at`'s bone when it came from something built) and follows its later poses. It has `.p(localPoint)`, `.d(dir)`, `.s(length)`, `.q(quat?)`, plus `.part(...)`, which bakes region scale into mesh scale, and `.joint(...)`, which moves and rotates joints but never scales them. Literal points and directions given to these are in region units; built inputs (joints, hits, parts) are already in model space and pass through. `region.local(p)` is in meters, `region.p(p)` in region units. Resize a head by editing one number.
+- `b.region({ at, scale = 1, quat?, bone? })` is an authoring Frame, not a scene node. It rides on `bone` (default: `at`'s bones when it came from something built) and follows its later poses. It has `.p(localPoint)`, `.d(dir)`, `.s(length)`, `.q(quat?)`, plus `.part(...)`, which bakes region scale into mesh scale, and `.joint(...)`, which moves and rotates joints but never scales them. Literal points and directions given to these are in region units; built inputs (joints, hits, parts) are already in model space and pass through. `region.local(p)` is in meters, `region.p(p)` in region units. Resize a head by editing one number.
 
 ```ts
 const hind = limb(
@@ -321,7 +323,8 @@ b.pose(crest, { about: line(eyeR, eyeL), deg: -25 }); // hinge a crest about the
 Every handle stays valid afterwards, and anything built later lands in the new pose:
 
 - `joint.at`, `quat`, `local()` and `dir()` read the scene.
-- Every other Frame (parts, hits, tube and chain points, ring and along items, regions, `frame()`/`line()` results with a bone) is stored relative to its bone.
+- Every other Frame (parts, hits, tube and chain points, ring and along items, regions, `frame()`/`line()` results with bones) is stored relative to its bones, blended when it has two.
+- Blend-skinned meshes are re-deformed from their weights.
 - `chain.at`, `sweep.at`, `sweep.line` and `sweep.curve()` map their build-time data through each owning joint's motion since it was captured.
 - Surfaces re-read their meshes on the next query after a pose.
 - Sweeps and membranes built on a chain after a pose follow the posed chain.

@@ -82,7 +82,7 @@ export default function build() {
     return eye;
   });
   for (const s of [1, -1]) {
-    // Brow ring: a closed polyline; its sharp corners (the seam included) get round-capped joins.
+    // Brow ring: a closed polyline; its corners are rounded, and the seam corner gets round-capped ends.
     const brow = [
       [0.07, 0.14],
       [0.02, 0.07],
@@ -116,7 +116,7 @@ export default function build() {
   b.pose(crest, { about: line(eyes[1], eyes[0]), deg: -25 });
   for (const eye of eyes) b.rod(eye, crest, [0.014, 0.008], { color: BONE, group: "head" });
 
-  // Tail: chain + one continuous tapering sweep with round caps at every cut.
+  // Tail: chain + one continuous tapering sweep, smooth-skinned over its six joints.
   const tail = b.chain(
     "tail",
     catmull([

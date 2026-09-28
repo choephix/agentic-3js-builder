@@ -1,17 +1,22 @@
-// `sweep()`: the one tube primitive. A section swept along a path (one mesh on one bone) or a chain (one mesh
-// per joint span), with continuous radius, parallel-transported roll, adaptive ring spacing, caps, colour bands
-// along the tube and colour sectors around it.
-import { Matrix4, Quaternion, Vector3 } from "three";
+// `sweep()`: the one tube primitive. A section swept along a path or a chain, with continuous radius,
+// parallel-transported roll, adaptive ring spacing, caps, colour bands along the tube and colour sectors around it.
+// On a chain the tube is one continuous blend-skinned mesh by default ("smooth": each ring blends the two bones
+// either side of a joint over about ±1 local radius, and corners are rounded); `skin: "rigid"` cuts it into one
+// round-capped piece per bone instead.
+import { Matrix3, Matrix4, Quaternion, Vector3 } from "three";
 import type { Mesh } from "three";
-import { boneFor, meshFromWorld } from "./context";
-import type { Ctx, JointRef, Tags } from "./context";
+import { Capture, meshFromWorld, rigid, spanWeights, weightsFor } from "./context";
+import type { Ctx, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, flatten } from "./math";
 import type { DirectionInput } from "./math";
 import { smoothPath, toPath } from "./path";
 import type { Corner, Frames, Path, PathInput, Twist } from "./path";
-import { Capture, Chain } from "./skeleton";
+import { Chain } from "./skeleton";
 import type { Joint } from "./skeleton";
+
+/** "smooth": one continuous mesh that bends across joints. "rigid": one piece per bone, hinged like a puppet. */
+export type Skin = "smooth" | "rigid";
 
 export type Cap = "round" | "flat" | "point" | "none";
 export type Section = "circle" | "box" | { ngon: number };
@@ -22,16 +27,18 @@ export type Section = "circle" | "box" | { ngon: number };
 export type Radius = number | readonly number[] | ((t: number) => number | readonly [number, number]);
 
 export type SweepOptions = Tags & {
-  /** Color of every piece, or per piece from its mid t. Optional when `bands` cover the whole sweep. */
+  /** Colour, or `(t) => colour`: the tube is split exactly where the colour changes. Optional when `bands` cover it. */
   color?: string | ((t: number) => string);
   /** `[[tEnd, color], ...]` ascending: color bands; each band edge splits the mesh (same bone, no cap). */
   bands?: ReadonlyArray<readonly [number, string]>;
   /**
-   * Owner for a Path source: a joint, or a Chain the path runs along (same direction): one mesh per joint, cut
-   * where the path passes each joint. Default: the bone of the path's first built input, else the joint nearest
-   * the path's start. Chain sources always use their own joints.
+   * Bones for a Path source: a joint (rigid), or a Chain the path runs along in the same direction (a body over a
+   * spine: skinned to that chain like a chain source). Default: the weights of the path's first built input, else
+   * the joint nearest the path's start. Chain sources always use their own joints.
    */
   bone?: JointRef | Chain;
+  /** "smooth" (default): one continuous mesh bending across joints. "rigid": one round-capped piece per bone. */
+  skin?: Skin;
   /** Range of the source to sweep, in source t. All other t (radius, color, bands, at) run 0..1 over this range. */
   from?: number;
   to?: number;
@@ -41,7 +48,7 @@ export type SweepOptions = Tags & {
   /** Smooth normals (default: circle smooth, box/ngon faceted). */
   smooth?: boolean;
   caps?: Cap | { start?: Cap; end?: Cap };
-  /** Instead of round caps at bone cuts, extend each piece past the cut by `overlap` × local radius (flat end). */
+  /** Rigid only: instead of round caps at bone cuts, extend each piece past the cut by `overlap` × radius (flat end). */
   overlap?: number;
   /** Extend straight past the start / end along the end tangent at the end radius, in meters (number = both). */
   extend?: number | readonly [number, number];
@@ -68,9 +75,10 @@ export class SweepPoint extends Spot {
     tangent: Vector3,
     /** Distance from the section centre. */
     readonly radius: number,
-    bone: Joint,
+    weights: Weights,
+    capture: Capture,
   ) {
-    super(at, aim(n, tangent), bone);
+    super(at, aim(n, tangent), weights, undefined, capture);
   }
 
   get n() {
@@ -97,10 +105,12 @@ type Tube = {
   closed: boolean;
   /** Averaged tangent at the seam of a closed tube whose seam is smooth; both end rings use it. */
   seam: Vector3 | null;
-  /** Owner frames when the curve was taken: rings owned by a joint follow its later poses. */
+  /** Smooth skin: rounded corners, a quadratic bezier over source arc length [s0, s1] around each corner c. */
+  fillets: Array<{ s0: number; s1: number; p0: Vector3; c: Vector3; p1: Vector3 }>;
+  /** The bones when the curve was taken: rings follow their later poses. */
   capture: Capture;
 };
-/** A ring: sweep t, centre, tangent/normal/binormal, radii, polar angle of the dorsal side in (B, N). */
+/** A ring: sweep t, centre, tangent/normal/binormal, radii, polar angle of the dorsal side in (B, N), weights. */
 type Frame = {
   t: number;
   c: Vector3;
@@ -111,6 +121,7 @@ type Frame = {
   s: readonly [number, number];
   ref: number;
   mandatory: boolean;
+  w: Weights;
 };
 /** A clock interval in degrees (a0 < a1) with its colour; null = the piece colour. */
 type Arc = { a0: number; a1: number; color: string | null };
@@ -215,26 +226,60 @@ function sectionPoint(shape: Shape, r: [number, number], dx: number, dy: number)
 }
 
 /**
- * The ring at sweep t in the current pose (`motion` = the owning joint's `Capture.motion`). `side`: incoming
- * tangent at a corner ("left"), outgoing ("right") or their average.
+ * The ring at sweep t as the curve was captured (bind pose). `side`: incoming tangent at a corner ("left"),
+ * outgoing ("right") or their average. Rounded corners (smooth skin) replace the path there.
  */
-function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", motion: Matrix4, mandatory = false): Frame {
+function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", mandatory = false): Frame {
   const t = tube.from + u * (tube.to - tube.from);
   const seamEnd = tube.seam !== null && (u <= 0 || u >= 1);
   let T = seamEnd ? tube.seam!.clone() : tube.path.tangentAt(t, side === "left");
+  let centre = tube.path.at(t);
   if (side === "corner") {
     const corner = tube.corners.find((c) => Math.abs(c.t - t) < 1e-9);
     if (corner) T = corner.tin.clone().add(corner.tout).normalize();
   }
+  const arc = t * tube.path.length;
+  const fillet = tube.fillets.find((f) => arc > f.s0 && arc < f.s1);
+  if (fillet) {
+    const g = (arc - fillet.s0) / (fillet.s1 - fillet.s0);
+    const { p0, c, p1 } = fillet;
+    centre = p0
+      .clone()
+      .multiplyScalar((1 - g) ** 2)
+      .addScaledVector(c, 2 * g * (1 - g))
+      .addScaledVector(p1, g * g);
+    T = c
+      .clone()
+      .sub(p0)
+      .multiplyScalar(1 - g)
+      .addScaledVector(p1.clone().sub(c), g)
+      .normalize();
+  }
   const N = flatten(tube.frames.normalAt(seamEnd ? 0 : t, side === "left"), T).normalize();
-  const s = tube.shift(u);
-  const c = tube.path.at(t).addScaledVector(T.clone().cross(N), s[0]).addScaledVector(N, s[1]).applyMatrix4(motion);
-  T.transformDirection(motion);
-  N.transformDirection(motion);
   const B = T.clone().cross(N);
+  const s = tube.shift(u);
   const up = flatten(new Vector3(0, 1, 0), T);
   const ref = up.lengthSq() > 1e-6 ? up.normalize() : N;
-  return { t: u, c, T, N, B, r: tube.radius(u), s, ref: Math.atan2(ref.dot(N), ref.dot(B)), mandatory };
+  return {
+    t: u,
+    c: centre.addScaledVector(B, s[0]).addScaledVector(N, s[1]),
+    T,
+    N,
+    B,
+    r: tube.radius(u),
+    s,
+    ref: Math.atan2(ref.dot(N), ref.dot(B)),
+    mandatory,
+    w: [],
+  };
+}
+
+/** A bind frame moved into the current pose by its weights (linear blend skinning of the ring). */
+function posed(tube: Tube, f: Frame, w: Weights): Frame {
+  const m = tube.capture.blend(w);
+  const r = new Matrix3().setFromMatrix4(m);
+  const move = (v: Vector3) => v.clone().applyMatrix3(r);
+  return { ...f, w, c: f.c.clone().applyMatrix4(m), T: move(f.T), N: move(f.N), B: move(f.B) };
 }
 
 /** The built surface point at clock `angleDeg` (0 = dorsal, +90 = clockwise looking along the tube). */
@@ -250,37 +295,33 @@ export class Sweep {
 
   constructor(
     private readonly tube: Tube,
-    private readonly jointAt: (sourceT: number) => Joint,
-    /** Sweep t of the start, every bone cut and the end. */
+    /** The weights of the ring at sweep t. */
+    private readonly weightAt: (u: number) => Weights,
+    /** Sweep t of the start, every joint and the end. */
     private readonly knots: number[],
   ) {}
 
-  /** The bone at the start of the tube. */
+  /** The heaviest bone at the start of the tube. */
   get bone() {
-    return this.jointAt(this.tube.from);
+    return this.weightAt(0)[0][0];
   }
 
   /** The centreline frame at the start (+Y along the tube, +Z its normal), in the current pose: a Point/Line/Frame. */
   get frame() {
-    const bone = this.bone;
-    const f = frameAt(this.tube, 0, "right", this.tube.capture.motion(bone));
-    return new Spot(f.c, new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(f.B, f.T, f.N)), bone);
+    const f = frameAt(this.tube, 0, "right");
+    const quat = new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(f.B, f.T, f.N));
+    return new Spot(f.c, quat, this.weightAt(0), undefined, this.tube.capture);
   }
 
-  /** The centreline (section centres) in the current pose, with knots at the bone cuts. */
+  /** The centreline (section centres) in the current pose, with knots at the joints. */
   curve() {
     const count = 64;
-    const pts = Array.from({ length: count + 1 }, (_, i) => {
-      const u = i / count;
-      return frameAt(
-        this.tube,
-        u,
-        "right",
-        this.tube.capture.motion(this.jointAt(this.tube.from + u * (this.tube.to - this.tube.from))),
-      ).c;
-    });
+    const pts = Array.from(
+      { length: count + 1 },
+      (_, i) => posed(this.tube, frameAt(this.tube, i / count, "right"), this.weightAt(i / count)).c,
+    );
     const indices = [...new Set(this.knots.map((u) => Math.round(u * count)))];
-    return smoothPath(pts, null, { indices }, this.tube.seam !== null, this.bone);
+    return smoothPath(pts, null, { indices }, this.tube.seam !== null, this.weightAt(0));
   }
 
   /**
@@ -289,17 +330,15 @@ export class Sweep {
    * +90 = a quarter turn clockwise seen looking along the tube (for a tube running toward +Z: its -X side).
    */
   at(t: number, angleDeg = 0, lift = 0): SweepPoint {
-    const sourceT = this.tube.from + t * (this.tube.to - this.tube.from);
-    const joint = this.jointAt(sourceT);
-    const motion = this.tube.capture.motion(joint);
-    const f = frameAt(this.tube, t, "right", motion);
+    const f = frameAt(this.tube, t, "right");
     const { p, q, nSec } = surfacePoint(this.tube, f, angleDeg);
-    const ahead = surfacePoint(this.tube, frameAt(this.tube, Math.min(1, t + 1e-3), "right", motion), angleDeg).p;
-    const behind = surfacePoint(this.tube, frameAt(this.tube, Math.max(0, t - 1e-3), "right", motion), angleDeg).p;
+    const ahead = surfacePoint(this.tube, frameAt(this.tube, Math.min(1, t + 1e-3), "right"), angleDeg).p;
+    const behind = surfacePoint(this.tube, frameAt(this.tube, Math.max(0, t - 1e-3), "right"), angleDeg).p;
     const along = ahead.sub(behind);
     const lean = f.T.dot(along);
     const n = (Math.abs(lean) > 1e-12 ? nSec.addScaledVector(f.T, -nSec.dot(along) / lean) : nSec).normalize();
-    return new SweepPoint(t, p.addScaledVector(n, lift), n, f.T, Math.hypot(q.x, q.y), joint);
+    const radius = Math.hypot(q.x, q.y);
+    return new SweepPoint(t, p.addScaledVector(n, lift), n, f.T, radius, this.weightAt(t), this.tube.capture);
   }
 
   /**
@@ -310,7 +349,7 @@ export class Sweep {
     const count = 64;
     const pts = Array.from({ length: count + 1 }, (_, i) => this.at(i / count, angleDeg, lift).at);
     const indices = [...new Set(this.knots.map((u) => Math.round(u * count)))];
-    return smoothPath(pts, null, { indices }, this.tube.seam !== null, this.bone);
+    return smoothPath(pts, null, { indices }, this.tube.seam !== null, this.weightAt(0));
   }
 }
 
@@ -338,14 +377,13 @@ function clockArcs(sectors: SweepOptions["sectors"]): Arc[] {
 class MeshBuffer {
   readonly positions: number[] = [];
   readonly index: number[] = [];
+  readonly weights: Weights[] = [];
 
-  constructor(
-    readonly color: string,
-    readonly joint: Joint,
-  ) {}
+  constructor(readonly color: string) {}
 
-  vertex(p: Vector3) {
+  vertex(p: Vector3, w: Weights) {
     this.positions.push(p.x, p.y, p.z);
+    this.weights.push(w);
     return this.positions.length / 3 - 1;
   }
 
@@ -375,7 +413,9 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   if (!(from < to)) throw new Error(`sweep(): from (${from}) must be less than to (${to})`);
   const toT = (u: number) => from + u * (to - from);
   const toU = (t: number) => (t - from) / (to - from);
+  const L = path.length;
   const { twist, shift } = options;
+  const rigidSkin = options.skin === "rigid";
   const frames = chain
     ? chain.frames
     : path.frames(options.up, typeof twist === "function" ? (t) => twist(toU(t)) : twist);
@@ -388,29 +428,66 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const seamOut = path.tangentAt(0);
   const seamSmooth = closed && seamIn.angleTo(seamOut) <= CORNER_SPLIT;
   const corners = path.corners(from, to);
-  // Bone boundaries in source t.
+  const rOf = radiusFn(radius);
+  const rMaxAt = (t: number) => Math.max(...rOf(Math.min(Math.max(toU(t), 0), 1)));
+
+  // Bones: a chain (the source, or `bone: chain` for a path along it) with joint starts in source t, else one
+  // fixed set of weights for the whole tube (the path's own, or `bone`).
   const owner = options.bone;
   const bones = chain ?? (owner instanceof Chain ? owner : null);
   const boneTs = chain ? chain.ts.slice(0, -1) : bones ? bones.joints.map((j) => path.closestT(j.at)) : [0];
-  const boneJoints = bones ? bones.joints : [boneFor(ctx, owner as JointRef | undefined, [path], path.at(from))];
+  const starts = boneTs.map((t) => t * L);
+  const uniform = bones ? null : weightsFor(ctx, owner as JointRef | undefined, [path], path.at(from));
   const jointAt = (t: number) => {
     let i = 0;
     while (i < boneTs.length - 1 && boneTs[i + 1] <= t) i++;
-    return boneJoints[i];
+    return bones!.joints[i];
   };
+  // Smooth blend window around joint k: ±1 local radius, at most 45% of either neighbouring span.
+  const half = (k: number) =>
+    Math.min(rMaxAt(boneTs[k]), 0.45 * (starts[k] - starts[k - 1]), 0.45 * ((starts[k + 1] ?? L) - starts[k]));
+  const weightAt = (u: number): Weights =>
+    uniform
+      ? rigidSkin
+        ? rigid(uniform[0][0])
+        : uniform
+      : rigidSkin
+        ? rigid(jointAt(toT(u)))
+        : spanWeights(bones!.joints, starts, toT(u) * L, half);
+
+  // Smooth skin rounds every corner inside the range with a bezier over ±1 local radius.
+  const fillets: Tube["fillets"] = [];
+  if (!rigidSkin) {
+    const sharp = corners.filter((c) => c.angle > 1e-3);
+    sharp.forEach((corner, i) => {
+      const s = corner.t * L;
+      const before = s - (i > 0 ? sharp[i - 1].t * L : from * L);
+      const after = (i + 1 < sharp.length ? sharp[i + 1].t * L : to * L) - s;
+      const d = Math.min(rMaxAt(corner.t), 0.45 * before, 0.45 * after);
+      const c = path.at(corner.t);
+      fillets.push({
+        s0: s - d,
+        s1: s + d,
+        p0: c.clone().addScaledVector(corner.tin, -d),
+        c,
+        p1: c.clone().addScaledVector(corner.tout, d),
+      });
+    });
+  }
 
   const tube: Tube = {
     path,
     frames,
     from,
     to,
-    radius: radiusFn(radius),
+    radius: rOf,
     shift: typeof shift === "function" ? shift : () => shift ?? [0, 0],
     shape,
-    corners,
+    corners: rigidSkin ? corners : [],
     closed,
     seam: seamSmooth ? seamIn.add(seamOut).normalize() : null,
-    capture: chain ? chain.capture : new Capture(boneJoints),
+    fillets,
+    capture: chain ? chain.capture : new Capture(bones ? bones.joints : uniform!.map(([joint]) => joint)),
   };
   const caps = typeof options.caps === "object" ? options.caps : { start: options.caps, end: options.caps };
   const seamCap: Cap = seamSmooth ? "none" : "round";
@@ -422,7 +499,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
       ? [options.extend, options.extend]
       : (options.extend ?? [0, 0]);
 
-  // Cuts, in sweep t (u), ascending.
+  // Cuts, in sweep t (u), ascending: colour changes always; joints and sharp corners only for rigid skin.
   const cuts: Cut[] = [];
   const addCut = (u: number, kind: Cut["kind"]) => {
     if (u <= 1e-6 || u >= 1 - 1e-6) return;
@@ -430,14 +507,33 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     if (!existing) cuts.push({ t: u, kind });
     else if (kind === "joint" || (kind === "corner" && existing.kind === "band")) existing.kind = kind;
   };
-  for (const t of boneTs.slice(1)) addCut(toU(t), "joint");
-  for (const corner of corners) if (corner.angle > CORNER_SPLIT) addCut(toU(corner.t), "corner");
+  const jointUs = boneTs.slice(1).map(toU);
+  if (rigidSkin) {
+    for (const u of jointUs) addCut(u, "joint");
+    for (const corner of corners) if (corner.angle > CORNER_SPLIT) addCut(toU(corner.t), "corner");
+  }
   for (const [tEnd] of options.bands ?? []) addCut(tEnd, "band");
+  const colorFn = options.color;
+  if (typeof colorFn === "function") {
+    const steps = 256;
+    for (let k = 1; k <= steps; k++) {
+      let lo = (k - 1) / steps;
+      let hi = k / steps;
+      const before = colorFn(lo);
+      if (colorFn(hi) === before) continue;
+      for (let n = 0; n < 30; n++) {
+        const m = (lo + hi) / 2;
+        if (colorFn(m) === before) lo = m;
+        else hi = m;
+      }
+      addCut(hi, "band");
+    }
+  }
   cuts.sort((a, b) => a.t - b.t);
 
   const colorAt = (u: number) => {
     for (const [tEnd, color] of options.bands ?? []) if (u <= tEnd) return color;
-    const color = typeof options.color === "function" ? options.color(u) : options.color;
+    const color = typeof colorFn === "function" ? colorFn(u) : colorFn;
     if (!color) throw new Error("sweep(): no color for t=" + u.toFixed(3) + "; pass `color` or cover it with `bands`");
     return color;
   };
@@ -448,7 +544,8 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   /** Ring vertices of `arc` at frame `f`, scaled toward the centre by `scale` (caps). Full rings are closed. */
   const ring = (buf: MeshBuffer, f: Frame, arc: Arc, scale = 1) => {
     const r: [number, number] = [f.r[0] * scale, f.r[1] * scale];
-    const point = (x: number, y: number) => buf.vertex(f.c.clone().addScaledVector(f.B, x).addScaledVector(f.N, y));
+    const point = (x: number, y: number) =>
+      buf.vertex(f.c.clone().addScaledVector(f.B, x).addScaledVector(f.N, y), f.w);
     if (Math.max(r[0], r[1]) < 1e-9) return new Array<number>(full ? sides : 2).fill(point(0, 0));
     if (full) return shape.pts.map(([x, y]) => point(x * r[0], y * r[1]));
     // Increasing polar angle (the winding of full rings) runs from the arc's clock end to its clock start.
@@ -494,7 +591,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const capRings = (buf: MeshBuffer, f: Frame, arc: Arc, cap: Cap, sign: number, inside: boolean) => {
     const rmax = Math.max(f.r[0], f.r[1]);
     if (rmax < 1e-9 || cap === "none" || cap === "flat") return [];
-    const span = (to - from) * path.length;
+    const span = (to - from) * L;
     const dome = (d: number, scale: number): Frame => {
       const c = f.c.clone().addScaledVector(f.T, sign * d);
       if (!inside) return { ...f, c, r: [f.r[0] * scale, f.r[1] * scale] };
@@ -516,7 +613,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
 
   const flatCap = (buf: MeshBuffer, f: Frame, arc: Arc, sign: number) => {
     if (Math.max(f.r[0], f.r[1]) < 1e-9) return;
-    const center = buf.vertex(f.c);
+    const center = buf.vertex(f.c, f.w);
     const rim = ring(buf, f, arc);
     const count = full ? sides : rim.length - 1;
     for (let k = 0; k < count; k++) {
@@ -537,18 +634,28 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
             ? "flat"
             : "round";
 
-  const result = new Sweep(tube, jointAt, [0, ...cuts.filter((c) => c.kind === "joint").map((c) => c.t), 1]);
+  const result = new Sweep(tube, weightAt, [0, ...jointUs.filter((u) => u > 1e-6 && u < 1 - 1e-6), 1]);
   const bounds = [0, ...cuts.map((c) => c.t), 1];
   const kinds: string[] = ["start", ...cuts.map((c) => c.kind), "end"];
   const weld = seamSmooth && bounds.length === 2;
   const tags = { name: options.name ?? "sweep", group: options.group };
+  const span = (to - from) * L;
+  // Smooth skin: rings at the edges, quarter points and centre of every joint's blend window, so weights ramp evenly.
+  const windowUs = rigidSkin
+    ? []
+    : jointUs.flatMap((u, i) => [-1, -0.5, 0, 0.5, 1].map((f) => u + (f * half(i + 1)) / span));
+  const filletUs = fillets.flatMap((f) =>
+    Array.from({ length: 7 }, (_, k) => toU((f.s0 + ((f.s1 - f.s0) * (k + 1)) / 8) / L)),
+  );
   let buffers: MeshBuffer[] = [];
   let groupColor = "";
   let groupJoint: Joint | null = null;
   const flush = () => {
     for (const buf of buffers)
       if (buf.index.length)
-        result.meshes.push(meshFromWorld(ctx, buf.positions, buf.index, buf.color, buf.joint, smooth, tags));
+        result.meshes.push(
+          meshFromWorld(ctx, buf.positions, buf.index, buf.color, (v) => buf.weights[v], smooth, tags),
+        );
     buffers = [];
   };
 
@@ -557,40 +664,39 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     let b = bounds[i + 1];
     const mid = (a + b) / 2;
     const color = colorAt(mid);
-    const joint = jointAt(toT(mid));
-    if (kinds[i] !== "corner" || color !== groupColor || joint !== groupJoint) {
+    // Rigid: the whole piece rides one joint. Smooth: every ring has its own weights.
+    const pieceWeights = rigidSkin ? weightAt(mid) : null;
+    const pieceJoint = pieceWeights?.[0][0] ?? null;
+    if (kinds[i] !== "corner" || color !== groupColor || pieceJoint !== groupJoint) {
       flush();
       groupColor = color;
-      groupJoint = joint;
-      buffers = arcs.map((arc) => new MeshBuffer(arc.color ?? color, joint));
+      groupJoint = pieceJoint;
+      buffers = arcs.map((arc) => new MeshBuffer(arc.color ?? color));
     }
-    const motion = tube.capture.motion(joint);
-    const span = (to - from) * path.length;
-    if (options.overlap) {
+    if (options.overlap && rigidSkin) {
       if (kinds[i] === "joint") a = Math.max(0, a - (options.overlap * Math.max(...tube.radius(a))) / span);
       if (kinds[i + 1] === "joint") b = Math.min(1, b + (options.overlap * Math.max(...tube.radius(b))) / span);
     }
+    const inPiece = (u: number) => u > a + 1e-6 && u < b - 1e-6;
 
     // Candidate ring positions, then greedy selection by turning, roll and radius/shift linearity.
-    const smallCorners = corners
+    const smallCorners = tube.corners
       .filter((c) => c.angle <= CORNER_SPLIT)
       .map((c) => toU(c.t))
-      .filter((u) => u > a + 1e-6 && u < b - 1e-6);
-    const us = new Set<number>([a, b, ...smallCorners]);
+      .filter(inPiece);
+    const mandatory = new Set([...smallCorners, ...windowUs.filter(inPiece)]);
+    const us = new Set<number>([a, b, ...mandatory, ...filletUs.filter(inPiece)]);
     const steps = Math.ceil(32 * Math.max(1, ctx.detail));
     for (let k = 1; k < steps; k++) us.add(a + ((b - a) * k) / steps);
-    for (const t of path.samples(from, to)) {
-      const u = toU(t);
-      if (u > a + 1e-6 && u < b - 1e-6) us.add(u);
-    }
+    for (const t of path.samples(from, to)) if (inPiece(toU(t))) us.add(toU(t));
     const cand = [...us]
       .sort((x, y) => x - y)
       .map((u) =>
         u === b
-          ? frameAt(tube, u, "left", motion, true)
+          ? frameAt(tube, u, "left", true)
           : smallCorners.includes(u)
-            ? frameAt(tube, u, "corner", motion, true)
-            : frameAt(tube, u, "right", motion, u === a),
+            ? frameAt(tube, u, "corner", true)
+            : frameAt(tube, u, "right", u === a || mandatory.has(u)),
       );
     const rmax = Math.max(...cand.map((f) => Math.max(...f.r)));
     const tol = (0.03 / ctx.detail) * rmax + 1e-6;
@@ -606,16 +712,17 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
       }
       return true;
     };
-    const kept = [cand[0]];
+    const chosen = [cand[0]];
     for (let k = 0; k < cand.length - 1; ) {
       let best = k + 1;
       for (let j = k + 1; j < cand.length && fits(k, j); j++) {
         best = j;
         if (cand[j].mandatory) break;
       }
-      kept.push(cand[best]);
+      chosen.push(cand[best]);
       k = best;
     }
+    const kept = chosen.map((f) => posed(tube, f, pieceWeights ?? weightAt(f.t)));
     const pushed = (f: Frame, d: number) => ({ ...f, c: f.c.clone().addScaledVector(f.T, d) });
     if (i === 0 && extendStart > 0) kept.unshift(pushed(kept[0], -extendStart));
     if (i === bounds.length - 2 && extendEnd > 0) kept.push(pushed(kept[kept.length - 1], extendEnd));
