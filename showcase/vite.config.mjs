@@ -84,6 +84,17 @@ const showcaseData = {
       "/__sample-source",
       byName(([slug], response) => sendText(response, join(sampleRoot, `${slug}.ts`))),
     );
+    // When each sample file was created (newest first in the sample list). Falls back to mtime where the
+    // filesystem records no birth time.
+    server.middlewares.use("/__sample-created", async (_request, response) => {
+      const files = (await list(sampleRoot)).filter((file) => file.endsWith(".ts"));
+      const times = await Promise.all(files.map((file) => stat(join(sampleRoot, file))));
+      const created = Object.fromEntries(
+        files.map((file, i) => [basename(file, ".ts"), times[i].birthtimeMs || times[i].mtimeMs]),
+      );
+      response.setHeader("Content-Type", "application/json; charset=utf-8");
+      response.end(JSON.stringify(created));
+    });
     server.middlewares.use(
       "/__render-source",
       byName(([slug, arm, tag], response) =>

@@ -140,7 +140,12 @@ function set(patch: Partial<State>) {
 
 async function refreshEntries() {
   const paths = Object.keys(current.modules);
-  const modules = await Promise.allSettled(paths.map((path) => current.modules[path]()));
+  const [modules, created] = await Promise.all([
+    Promise.allSettled(paths.map((path) => current.modules[path]())),
+    fetch("/__sample-created")
+      .then((response) => (response.ok ? response.json() : {}))
+      .catch(() => ({})) as Promise<Record<string, number>>,
+  ]);
   entries = paths
     .map((path, i) => {
       const result = modules[i];
@@ -155,7 +160,8 @@ async function refreshEntries() {
         latest: snapshotsBySlug.get(slug)?.tags[0]?.tag ?? null,
       };
     })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    // Newest sample first; name order among samples with no known creation time.
+    .sort((a, b) => (created[b.slug] ?? 0) - (created[a.slug] ?? 0) || a.name.localeCompare(b.name));
   renderList();
   for (const entry of entries) if (!snapshotsBySlug.has(entry.slug)) void refreshSnapshots(entry.slug);
 }
