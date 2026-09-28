@@ -29,6 +29,11 @@ All commits are local; nothing is pushed.
 | dcaafa4 | samples | veiledChameleon (tapered extruded casque with inset core, sawtooth crests that follow the spine; lathed eye turrets on eye joints, claws; 24.6k tris). Opus, 4 renders.                                                                    |
 | 55efe7d | samples | mantaRay (extruded jaw, pelvic and dorsal fins, remora fins; lathed eyes, spiracles and remora bodies; 23.0k tris). Opus, 5 renders.                                                                                                       |
 | 9a95789 | samples | griffin (extruded wing feathers, coverts, body feathers and ears; lathed cere, eyes and pads; 44.0k tris). Opus, 5 renders.                                                                                                                |
+| 104ac5e | 7       | `sweep`/`loft` `bone` takes a list of chains and joints, in any order and either direction along the path, so tail, trunk and neck can be one tube over a skeleton that forks at the hips.                                                 |
+| 8eaed1e | samples | triceratops converted: one loft from tail tip to skull over `[tail, hips, spine]`.                                                                                                                                                         |
+| ffc0eff | samples | stegosaurus converted the same way; plates and thagomizer remapped onto the one tube.                                                                                                                                                      |
+| f65bccf | samples | snowLeopard converted; the tail keeps full rings and a black tip by sweeping the same curve and bones in two ranges, since sectors run the whole tube.                                                                                     |
+| 5ac9f8d | samples | nileCrocodile converted with the same two-range split; dorsal scutes, nuchal shield and tail crests remapped.                                                                                                                              |
 
 ## Guide test run
 
