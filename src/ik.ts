@@ -1,8 +1,8 @@
 // Limb IK: joint positions for a chain of fixed segment lengths that ends exactly on a target (feet planted on
 // the floor). One solver for 2-bone arms, digitigrade 3-segment hind legs, 4-segment insect legs and curls.
 import { Vector3 } from "three";
-import { flatten, vec } from "./math";
-import type { V3 } from "./math";
+import { flatten, toDirection, toPoint } from "./math";
+import type { DirectionInput, PointInput } from "./math";
 
 /** In-plane segment angles for equal turns of `k` radians, each joint turning away from its side. */
 function turned(sides: readonly number[], k: number) {
@@ -66,26 +66,26 @@ function fold(lengths: readonly number[], sides: readonly number[], dist: number
  * and the rest solves to its heel. With two lengths this is classic two-bone IK.
  */
 export function limb(
-  root: V3,
-  target: V3,
+  root: PointInput,
+  target: PointInput,
   lengths: readonly number[],
-  bends: V3 | readonly V3[],
-  options: { sole?: V3 } = {},
+  bends: DirectionInput | readonly DirectionInput[],
+  options: { sole?: DirectionInput } = {},
 ): Vector3[] {
   const n = lengths.length;
   const hints =
     Array.isArray(bends) && typeof bends[0] !== "number"
-      ? (bends as readonly V3[]).map(vec)
-      : lengths.slice(1).map(() => vec(bends as V3));
+      ? (bends as readonly DirectionInput[]).map(toDirection)
+      : lengths.slice(1).map(() => toDirection(bends as DirectionInput));
   if (hints.length < n - 1) throw new Error(`limb(): ${n - 1} inner joints but ${hints.length} bend hints`);
   if (options.sole) {
-    const sole = vec(options.sole).normalize();
+    const sole = toDirection(options.sole).normalize();
     const last = lengths[n - 1];
-    const upper = limb(root, vec(target).addScaledVector(sole, -last), lengths.slice(0, -1), hints.slice(0, n - 2));
+    const upper = limb(root, toPoint(target).addScaledVector(sole, -last), lengths.slice(0, -1), hints.slice(0, n - 2));
     return [...upper, upper[upper.length - 1].clone().addScaledVector(sole, last)];
   }
-  const a = vec(root);
-  const toTarget = vec(target).sub(a);
+  const a = toPoint(root);
+  const toTarget = toPoint(target).sub(a);
   const d = toTarget.length();
   const dir = d > 1e-9 ? toTarget.normalize() : new Vector3(0, -1, 0);
   let across = flatten(hints[0] ?? new Vector3(0, 0, 1), dir);

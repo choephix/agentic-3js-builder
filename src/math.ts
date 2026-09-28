@@ -1,9 +1,20 @@
-// Model-space vector helpers and the one orientation primitive, `aim()`.
-import { Matrix4, Quaternion, Vector3 } from "three";
+// Model-space vector helpers, the geometric input kinds every helper accepts (and their coercions), and the one
+// orientation primitive, `aim()`.
+import { Box3, Matrix4, Quaternion, Vector3 } from "three";
+import type { Mesh } from "three";
+import type { Frame } from "./frame";
 
-/** A model-space point or direction: a `[x, y, z]` tuple or a `THREE.Vector3`. */
+/** A literal model-space point or direction: a `[x, y, z]` tuple or a `THREE.Vector3`. */
 export type V3 = Vector3 | readonly [number, number, number];
 export type Axis = "x" | "y" | "z";
+/** Something with a start frame: a Sweep (and so every rod, capsule, spike, horn...). */
+export type HasFrame = { readonly frame: Frame };
+/** A Frame (point + orientation + facing axis + owning bone), or something with one. Lines are frames too. */
+export type FrameInput = Frame | HasFrame;
+/** A point: literal, a raw mesh (its bounding-box centre), or any Frame's position. */
+export type PointInput = V3 | Mesh | FrameInput;
+/** A direction: literal, or any Frame's facing axis. */
+export type DirectionInput = V3 | FrameInput;
 
 export const DEG = Math.PI / 180;
 
@@ -12,17 +23,34 @@ export function vec(p: V3) {
   return "isVector3" in p ? p.clone() : new Vector3(p[0], p[1], p[2]);
 }
 
-export function lerp(a: V3, b: V3, t: number) {
-  return vec(a).lerp(vec(b), t);
+/** The Frame of a Frame input. */
+export function toFrame(x: FrameInput) {
+  return "frame" in x ? x.frame : x;
 }
 
-export function mid(a: V3, b: V3) {
+/** A fresh model-space point from any point input. */
+export function toPoint(x: PointInput) {
+  if (Array.isArray(x) || "isVector3" in x) return vec(x as V3);
+  if ("isMesh" in x) return new Box3().setFromObject(x as Mesh).getCenter(new Vector3());
+  return toFrame(x as FrameInput).at;
+}
+
+/** A fresh direction (not normalised) from any direction input: literal, or a Frame's facing axis. */
+export function toDirection(x: DirectionInput) {
+  return Array.isArray(x) || "isVector3" in x ? vec(x as V3) : toFrame(x as FrameInput).axis;
+}
+
+export function lerp(a: PointInput, b: PointInput, t: number) {
+  return toPoint(a).lerp(toPoint(b), t);
+}
+
+export function mid(a: PointInput, b: PointInput) {
   return lerp(a, b, 0.5);
 }
 
 /** `p` moved `dist` along the direction `dir` (normalised). */
-export function offset(p: V3, dir: V3, dist: number) {
-  return vec(p).addScaledVector(vec(dir).normalize(), dist);
+export function offset(p: PointInput, dir: DirectionInput, dist: number) {
+  return toPoint(p).addScaledVector(toDirection(dir).normalize(), dist);
 }
 
 /** `v` with its component along the unit vector `n` removed. */
@@ -53,10 +81,10 @@ function perpendicular(hint: Vector3, d: Vector3) {
  *   axis "z" keeps local +X = world +X, axis "x" keeps local +Z = world +Z.
  * An explicit `up` parallel to `dir` falls back to the default rule. Deterministic for every input.
  */
-export function aim(dir: V3, up?: V3, axis: Axis = "y") {
-  const d = vec(dir).normalize();
+export function aim(dir: DirectionInput, up?: DirectionInput, axis: Axis = "y") {
+  const d = toDirection(dir).normalize();
   if (d.lengthSq() === 0) throw new Error("aim(): zero-length direction");
-  let s = up ? perpendicular(vec(up).normalize(), d) : null;
+  let s = up ? perpendicular(toDirection(up).normalize(), d) : null;
   if (!s) {
     if (axis === "y") s = perpendicular(d.clone().cross(X), d) ?? perpendicular(Y, d)!;
     else if (axis === "z") s = perpendicular(Y, d) ?? d.clone().cross(X).normalize();

@@ -1,8 +1,9 @@
 // State shared by every builder helper: the root group, the joint registry, mesh ownership, the material cache,
-// the detail level, the pose counter and the rig records, plus the two placement primitives every helper uses
-// (`setWorld`, `meshFromWorld`).
+// the detail level, the pose counter and the rig records; the bone-inheritance rule (`boneFor`); and the two
+// placement primitives every helper uses (`setWorld`, `meshFromWorld`).
 import { BufferGeometry, Float32BufferAttribute, Group, Matrix4, Mesh, MeshStandardMaterial, Vector3 } from "three";
 import type { Object3D, Quaternion } from "three";
+import { ownerOf } from "./frame";
 import type { RigRecord } from "./rig";
 import type { Joint } from "./skeleton";
 
@@ -47,6 +48,42 @@ export class Ctx {
     }
     return cached;
   }
+}
+
+/**
+ * The joint whose bone passes closest to `p`. A bone runs from a joint to each of its child joints and belongs to
+ * the parent (it moves when the parent rotates); a joint without children counts as its point.
+ */
+export function nearestJoint(ctx: Ctx, p: Vector3) {
+  let best: Joint | null = null;
+  let bestD = Infinity;
+  const consider = (joint: Joint, a: Vector3, b: Vector3) => {
+    const seg = b.clone().sub(a);
+    const f = Math.min(Math.max(p.clone().sub(a).dot(seg) / Math.max(seg.lengthSq(), 1e-12), 0), 1);
+    const d = a.clone().addScaledVector(seg, f).distanceToSquared(p);
+    if (d < bestD - 1e-12) [best, bestD] = [joint, d];
+  };
+  for (const joint of ctx.joints.values()) {
+    const at = joint.at;
+    consider(joint, at, at);
+    if (joint.parent) consider(joint.parent, joint.parent.at, at);
+  }
+  if (!best) throw new Error("No joints yet: create the root joint with b.joint(name, { at }) first");
+  return best as Joint;
+}
+
+/**
+ * The bone for new geometry or joints: explicit `bone`, else the bone of the first input that came from something
+ * built (a joint, part, hit, sweep, tube or chain point, or a path made from them), else the joint nearest to `at`.
+ */
+export function boneFor(ctx: Ctx, explicit: JointRef | undefined, inputs: readonly unknown[], at: Vector3) {
+  if (explicit !== undefined) return resolveJoint(ctx, explicit);
+  for (const input of inputs) {
+    const owner =
+      ownerOf(input) ?? (input && typeof input === "object" && "isMesh" in input ? ctx.owner.get(input as Mesh) : null);
+    if (owner) return owner;
+  }
+  return nearestJoint(ctx, at);
 }
 
 /** The joint for `ref`; omitted = the root joint. */

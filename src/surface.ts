@@ -1,18 +1,34 @@
-// Surface queries on the REAL built triangles (no analytic stand-ins) and `stick()` to seat parts on hits.
+// Surface queries on the REAL built triangles (no analytic stand-ins) and `stick()` to seat parts on any frame.
 import { Box3, Quaternion, Triangle, Vector3 } from "three";
 import type { BufferGeometry, Mesh, Object3D } from "three";
+import { boneFor } from "./context";
 import type { Ctx, JointRef, Tags } from "./context";
-import { aim, DEG, flatten, rng as makeRng, vec } from "./math";
-import type { V3 } from "./math";
-import { part } from "./parts";
+import { Spot } from "./frame";
+import { aim, DEG, flatten, rng as makeRng, toDirection, toFrame, toPoint, vec } from "./math";
+import type { DirectionInput, FrameInput, PointInput, V3 } from "./math";
+import { part, Part } from "./parts";
 import { smoothPath, toPath } from "./path";
-import type { PathLike } from "./path";
+import type { PathInput } from "./path";
 import { Joint } from "./skeleton";
 import { Sweep } from "./sweep";
 
-/** A point on a surface: position, outward face normal, the mesh hit and the joint that owns it. */
-export type Hit = { p: Vector3; n: Vector3; mesh: Mesh; joint: Joint };
-export type SurfaceTarget = Mesh | Sweep | Joint | readonly SurfaceTarget[];
+/** A frame on a surface: +Y = the outward face normal `n`, owned by the hit mesh's bone. */
+export class Hit extends Spot {
+  constructor(
+    at: Vector3,
+    n: Vector3,
+    readonly mesh: Mesh,
+    bone: Joint,
+  ) {
+    super(at, aim(n), bone);
+  }
+
+  get n() {
+    return this.axis;
+  }
+}
+
+export type SurfaceTarget = Mesh | Part | Sweep | Joint | readonly SurfaceTarget[];
 
 export type ScatterOptions = {
   /** Random source in [0, 1) (e.g. `rng(7)` or `kit.rng(7)`); default `rng(1)`. */
@@ -45,6 +61,7 @@ export class Surface {
   ) {
     const add = (target: SurfaceTarget) => {
       if (target instanceof Sweep) target.meshes.forEach(add);
+      else if (target instanceof Part) add(target.mesh);
       else if (target instanceof Joint) (ctx.meshes.get(target) ?? []).forEach(add);
       else if ("isMesh" in target) {
         if (!this.meshes.includes(target)) {
@@ -105,8 +122,8 @@ export class Surface {
     );
   }
 
-  private hit(i: number, p: Vector3): Hit {
-    return { p, n: this.normals[i].clone(), mesh: this.meshes[this.owner[i]], joint: this.joints[this.owner[i]] };
+  private hit(i: number, p: Vector3) {
+    return new Hit(p, this.normals[i].clone(), this.meshes[this.owner[i]], this.joints[this.owner[i]]);
   }
 
   /** All ray intersections (distance, triangle), any facing, excluding triangle `skip`. */
@@ -140,9 +157,9 @@ export class Surface {
   }
 
   /** Closest surface point to `p`. */
-  nearest(p: V3): Hit {
+  nearest(p: PointInput): Hit {
     this.sync();
-    const q = vec(p);
+    const q = toPoint(p);
     let best = -1;
     let bestD = Infinity;
     const closest = new Vector3();
@@ -160,10 +177,10 @@ export class Surface {
   }
 
   /** First surface hit along the ray, or null. */
-  ray(origin: V3, dir: V3): Hit | null {
+  ray(origin: PointInput, dir: DirectionInput): Hit | null {
     this.sync();
-    const o = vec(origin);
-    const d = vec(dir).normalize();
+    const o = toPoint(origin);
+    const d = toDirection(dir).normalize();
     const found = this.intersections(o, d);
     if (!found.length) return null;
     const first = found.reduce((x, y) => (y.dist < x.dist ? y : x));
@@ -175,9 +192,9 @@ export class Surface {
    * the OUTERMOST surface point in that direction (ray cast inward from outside). Azimuth 0 = +Z (front),
    * 90 = +X (left); elevation 90 = straight up.
    */
-  around(center?: V3) {
+  around(center?: PointInput) {
     this.sync();
-    const c = center ? vec(center) : this.box.getCenter(new Vector3());
+    const c = center ? toPoint(center) : this.box.getCenter(new Vector3());
     const far = this.box.getSize(new Vector3()).length() * 2 + this.box.distanceToPoint(c);
     return {
       at: (azimuthDeg: number, elevationDeg: number) => {
@@ -193,17 +210,15 @@ export class Surface {
    * `path` pulled onto the built surface: every sample moves to its nearest surface point, then `lift` out along
    * the face normal. Knots and closedness carry over, so a loop drawn roughly around a body becomes a strap.
    */
-  drape(path: PathLike, options: { lift?: number } = {}) {
+  drape(path: PathInput, options: { lift?: number } = {}) {
     this.sync();
     const source = toPath(path);
     const step = this.box.getSize(new Vector3()).length() / 150;
     const count = Math.max(32, Math.ceil(source.length / step));
-    const pts = Array.from({ length: count + 1 }, (_, i) => {
-      const hit = this.nearest(source.at(i / count));
-      return hit.p.addScaledVector(hit.n, options.lift ?? 0);
-    });
+    const hits = Array.from({ length: count + 1 }, (_, i) => this.nearest(source.at(i / count)));
+    const pts = hits.map((hit) => hit.at.addScaledVector(hit.n, options.lift ?? 0));
     const indices = [...new Set(source.knots.map((t) => Math.round(t * count)))];
-    return smoothPath(pts, null, { indices }, source.closed);
+    return smoothPath(pts, null, { indices }, source.closed, hits[0].bone);
   }
 
   /** True when `p` (on triangle `i`) lies inside another closed part of this surface. */
@@ -239,7 +254,7 @@ export class Surface {
       const tri = this.triangle(lo);
       const p = tri.a.clone().addScaledVector(tri.b.clone().sub(tri.a), u).addScaledVector(tri.c.clone().sub(tri.a), v);
       if (options.keepOut?.(p)) continue;
-      if (options.minDist && hits.some((h) => h.p.distanceTo(p) < options.minDist!)) continue;
+      if (options.minDist && hits.some((h) => h.at.distanceTo(p) < options.minDist!)) continue;
       const hit = this.hit(lo, p);
       if (options.filter && !options.filter(hit)) continue;
       if (this.buried(p, lo)) continue;
@@ -262,18 +277,22 @@ export type StickOptions = Tags & {
   /** Penetration as a fraction of the part's own height along the normal (default 0.2). */
   embed?: number;
   /** Preferred direction for the part's +Z along the surface (scales, shingles); default per `aim()`. */
-  flow?: V3;
+  flow?: DirectionInput;
   /** Degrees about the normal. */
   spin?: number;
-  /** Default: the hit's joint. */
+  /** Default: the frame's bone (a hit's mesh owner), else the nearest joint. */
   bone?: JointRef;
   scale?: number | V3;
 };
 
-/** Seat a part on a hit: local +Y along the normal, sunk by `embed` × its own height. */
-export function stick(ctx: Ctx, geometry: BufferGeometry, color: string, hit: Hit, options: StickOptions = {}) {
-  const n = hit.n.clone().normalize();
-  const flow = options.flow ? flatten(vec(options.flow), n) : null;
+/**
+ * Seat a part on any frame (a surface hit, a tube point, a ring item, a joint...): local +Y along the frame's
+ * facing axis (a hit's normal), sunk by `embed` × the part's own height. The part faces that axis.
+ */
+export function stick(ctx: Ctx, geometry: BufferGeometry, color: string, on: FrameInput, options: StickOptions = {}) {
+  const base = toFrame(on);
+  const n = base.axis;
+  const flow = options.flow ? flatten(toDirection(options.flow), n) : null;
   const quat = aim(n, flow && flow.lengthSq() > 1e-10 ? flow : undefined);
   if (options.spin) quat.premultiply(new Quaternion().setFromAxisAngle(n, options.spin * DEG));
   const scale =
@@ -282,6 +301,6 @@ export function stick(ctx: Ctx, geometry: BufferGeometry, color: string, hit: Hi
   const { min, max } = geometry.boundingBox!;
   const height = (max.y - min.y) * scale;
   const embed = options.embed ?? 0.2;
-  const at = hit.p.clone().addScaledVector(n, -(min.y * scale + embed * height));
-  return part(ctx, geometry, color, { ...options, bone: options.bone ?? hit.joint, at, quat });
+  const at = base.at.addScaledVector(n, -(min.y * scale + embed * height));
+  return part(ctx, geometry, color, { ...options, bone: boneFor(ctx, options.bone, [base], base.at), at, quat });
 }

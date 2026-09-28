@@ -1,15 +1,16 @@
 // Thin closed skins: `membrane()` between two edges (split per bone) and `slab()` from one polygon.
 import { ShapeUtils, Vector2, Vector3 } from "three";
-import { meshFromWorld, resolveJoint } from "./context";
+import { boneFor, meshFromWorld, nearestJoint, resolveJoint } from "./context";
 import type { Ctx, JointRef, Tags } from "./context";
-import { aim, vec } from "./math";
-import type { V3 } from "./math";
+import { aim, toPoint } from "./math";
+import type { PointInput } from "./math";
+import { Part } from "./parts";
 import { toPath } from "./path";
-import type { PathLike } from "./path";
+import type { PathInput } from "./path";
 import { Chain } from "./skeleton";
 import type { Joint } from "./skeleton";
 
-export type MembraneEdge = Chain | PathLike;
+export type MembraneEdge = Chain | PathInput;
 
 export type MembraneOptions = Tags & {
   color: string;
@@ -24,8 +25,9 @@ export type MembraneOptions = Tags & {
   /** Which bone owns a cell: "mid" = the nearer edge's joint at that t, "a" / "b" = always that edge. */
   split?: "mid" | "a" | "b";
   /**
-   * Owner of cells on Path / point edges (default: the other edge's joints, else the root joint). A Chain gives
-   * each cell to the chain joint nearest to it: a fin on `sweep.line(0)` follows the spine.
+   * Owner of cells on Path / point edges. A Chain gives each cell to the chain joint nearest to it: a fin on
+   * `sweep.line(0)` follows the spine. Default: the edge's own bone (a path made from built inputs), else the other
+   * edge's chain joints, else the joint nearest to the cell.
    */
   bone?: JointRef | Chain;
 };
@@ -80,11 +82,11 @@ function prism(grid: Grid, normals: Grid, cells: Array<[number, number]>, half: 
 export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions) {
   const chainA = edgeA instanceof Chain ? edgeA : null;
   const chainB = edgeB instanceof Chain ? edgeB : null;
-  const pathA = chainA ? null : toPath(edgeA as PathLike);
-  const pathB = chainB ? null : toPath(edgeB as PathLike);
+  const pathA = chainA ? null : toPath(edgeA as PathInput);
+  const pathB = chainB ? null : toPath(edgeB as PathInput);
   // Chain edges are read in their current pose.
-  const pointA = (t: number) => (chainA ? chainA.at(t).p : pathA!.at(t));
-  const pointB = (t: number) => (chainB ? chainB.at(t).p : pathB!.at(t));
+  const pointA = (t: number) => (chainA ? chainA.at(t).at : pathA!.at(t));
+  const pointB = (t: number) => (chainB ? chainB.at(t).at : pathB!.at(t));
   const rows = options.rows ?? Math.max(1, Math.round(4 * ctx.detail));
   const scallop = options.scallop ?? 0;
   const split = options.split ?? "mid";
@@ -95,7 +97,7 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     if (own) return own.jointAt(t);
     if (owner instanceof Chain) return owner.nearestJoint(at);
     if (owner !== undefined) return resolveJoint(ctx, owner);
-    return other?.jointAt(t) ?? resolveJoint(ctx);
+    return (side === "a" ? pathA : pathB)!.bone ?? other?.jointAt(t) ?? nearestJoint(ctx, at);
   };
 
   let width = 0;
@@ -161,11 +163,15 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
   });
 }
 
+/** `bone` default: the first built point's bone, else the joint nearest the polygon's centre. */
 export type SlabOptions = Tags & { color: string; thickness: number; bone?: JointRef };
 
-/** A (roughly) planar polygon as a thin closed prism: fins, leaves, plates, ears. */
-export function slab(ctx: Ctx, points: readonly V3[], options: SlabOptions) {
-  const pts = points.map(vec);
+/**
+ * A (roughly) planar polygon as a thin closed prism: fins, leaves, plates, ears. Returns a Part whose frame sits at
+ * the polygon's centre, facing its normal (counter-clockwise points seen from the front face you).
+ */
+export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptions) {
+  const pts = points.map(toPoint);
   if (pts.length < 3) throw new Error("slab() needs at least 3 points");
   // Newell normal.
   const n = new Vector3();
@@ -207,8 +213,10 @@ export function slab(ctx: Ctx, points: readonly V3[], options: SlabOptions) {
     tri(top[b], top[a], bottom[a]);
     tri(top[b], bottom[a], bottom[b]);
   }
-  return meshFromWorld(ctx, positions, index, options.color, resolveJoint(ctx, options.bone), false, {
+  const bone = boneFor(ctx, options.bone, points, center);
+  const mesh = meshFromWorld(ctx, positions, index, options.color, bone, false, {
     name: options.name ?? "slab",
     group: options.group,
   });
+  return new Part(mesh, center, frame, bone, [0, 0, 1]);
 }

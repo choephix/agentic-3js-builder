@@ -2,11 +2,13 @@
 // two-bone front legs from `limb`, with rigging names and rig roles (legs record their floor contact); a
 // region-scaled head riding on the neck, re-posed mid-build, with a frustumBox snout and spiral ram horns sprouted
 // from its surface; spots, scales and a draped strap on the real body surface; jaw opened and tail raised by
-// posing after everything is built.
+// posing after everything is built; a saddle with rivets ringed around its own axis and a flower whose petals
+// ring a made-up line.
 import { BoxGeometry, CylinderGeometry, SphereGeometry } from "three";
 import { createBuilder } from "../src/builder";
+import { frame } from "../src/frame";
 import { limb } from "../src/ik";
-import { aim, offset, rng } from "../src/math";
+import { offset, rng } from "../src/math";
 import type { V3 } from "../src/math";
 import { catmull, spiral } from "../src/path";
 
@@ -20,6 +22,8 @@ const CREAM = "#f0dcb0";
 const STRAP = "#8c1d2c";
 const HOOF = "#302621";
 const EYE = "#101010";
+const BRASS = "#c9a227";
+const PETAL = "#e9e4f5";
 
 /** Change this one number to resize the whole head; joints move, never scale. */
 const HEAD_SCALE = 1.15;
@@ -171,7 +175,7 @@ export default function build() {
   for (const s of [1, -1]) {
     const hit = headSurface.around(skull.at).at(s * 55, 40);
     if (!hit) continue;
-    const coil = spiral(offset(hit.p, [0, -1, -0.3], head.s(0.075)), hit.p, [s, 0, 0], {
+    const coil = spiral(offset(hit, [0, -1, -0.3], head.s(0.075)), hit, [s, 0, 0], {
       turns: -s * 1.15,
       r1: head.s(0.035),
       pitch: head.s(0.07),
@@ -204,9 +208,20 @@ export default function build() {
   for (const hit of bodySurface.scatter(18, { rng: rng(11), minDist: 0.08, filter: (h) => h.n.y > 0.8 }))
     b.stick(new BoxGeometry(0.06, 0.02, 0.08), PALE, hit, { flow: [0, 0, -1], spin: 0, embed: 0.4 });
 
-  // A saddle blanket seated at the point of the back nearest to a model-space guess.
-  const saddle = bodySurface.nearest([0, 1.5, -0.1]);
-  b.part(new BoxGeometry(0.26, 0.03, 0.22), SPOT, { bone: saddle.joint, at: saddle.p, quat: aim(saddle.n, [0, 0, 1]) });
+  // A saddle blanket placed on the frame of the back point nearest to a guess (so it takes that hit's bone), and
+  // brass rivets ringed around the blanket's own facing axis: the part is a Line, the rivets inherit its bone.
+  const saddle = b.part(new BoxGeometry(0.26, 0.03, 0.22), SPOT, { frame: bodySurface.nearest([0, 1.5, -0.1]) });
+  b.ring(saddle, { count: 10, radius: 0.1 }, (rivet) =>
+    b.part(new SphereGeometry(0.014, 8, 6), BRASS, { at: offset(rivet, saddle, 0.016) }),
+  );
+
+  // A flower on the forehead: petals ringed around a made-up line (a frame from nothing, so the petals fall back
+  // to the nearest joint, the skull).
+  const stem = frame(head.p([0, 0.1, 0.17]), head.d([0, 0.35, 1]));
+  b.part(new SphereGeometry(0.025, 10, 8), BRASS, { at: stem });
+  b.ring(stem, { count: 6, radius: 0.035, tilt: 20 }, (petal) =>
+    b.part(new SphereGeometry(1, 10, 6), PETAL, { frame: petal, scale: [0.018, 0.03, 0.008] }),
+  );
 
   // A chest strap: a rough closed loop around the body, draped onto the skin, swept as a seamless ring.
   const loop = catmull(
@@ -218,14 +233,12 @@ export default function build() {
     ],
     { closed: true },
   );
-  b.sweep(bodySurface.drape(loop, { lift: 0.012 }), 0.018, {
-    bone: bodySurface.nearest([0, 1.4, 0.2]).joint,
-    color: STRAP,
-  });
+  // The draped path starts on a body hit, so the strap inherits that hit's spine joint.
+  b.sweep(bodySurface.drape(loop, { lift: 0.012 }), 0.018, { color: STRAP });
 
   // Tail sprouted from the rump: its root is buried in the body, its first joint sits on the surface.
   const rump = bodySurface.ray([0, 0.98, -1.6], [0, 0, 1])!;
-  const tail = b.sprout("tail", rump, catmull([rump.p, [0, 0.92, -1.05], [0, 0.78, -1.22]]), [0.07, 0.03], {
+  const tail = b.sprout("tail", rump, catmull([rump, [0, 0.92, -1.05], [0, 0.78, -1.22]]), [0.07, 0.03], {
     count: 2,
     names: ["tailBase", "tailTip"],
     role: "tail",

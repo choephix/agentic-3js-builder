@@ -1,14 +1,15 @@
 // `sweep()`: the one tube primitive. A section swept along a path (one mesh on one bone) or a chain (one mesh
 // per joint span), with continuous radius, parallel-transported roll, adaptive ring spacing, caps, colour bands
 // along the tube and colour sectors around it.
-import { Vector3 } from "three";
-import type { Matrix4, Mesh } from "three";
-import { meshFromWorld, resolveJoint } from "./context";
+import { Matrix4, Quaternion, Vector3 } from "three";
+import type { Mesh } from "three";
+import { boneFor, meshFromWorld } from "./context";
 import type { Ctx, JointRef, Tags } from "./context";
-import { DEG, flatten } from "./math";
-import type { V3 } from "./math";
+import { Spot } from "./frame";
+import { aim, DEG, flatten } from "./math";
+import type { DirectionInput } from "./math";
 import { smoothPath, toPath } from "./path";
-import type { Corner, Frames, Path, PathLike, Twist } from "./path";
+import type { Corner, Frames, Path, PathInput, Twist } from "./path";
 import { Capture, Chain } from "./skeleton";
 import type { Joint } from "./skeleton";
 
@@ -26,8 +27,9 @@ export type SweepOptions = Tags & {
   /** `[[tEnd, color], ...]` ascending: color bands; each band edge splits the mesh (same bone, no cap). */
   bands?: ReadonlyArray<readonly [number, string]>;
   /**
-   * Owner for a Path source: a joint (default: the root joint), or a Chain the path runs along (same direction):
-   * one mesh per joint, cut where the path passes each joint. Chain sources always use their own joints.
+   * Owner for a Path source: a joint, or a Chain the path runs along (same direction): one mesh per joint, cut
+   * where the path passes each joint. Default: the bone of the path's first built input, else the joint nearest
+   * the path's start. Chain sources always use their own joints.
    */
   bone?: JointRef | Chain;
   /** Range of the source to sweep, in source t. All other t (radius, color, bands, at) run 0..1 over this range. */
@@ -52,13 +54,33 @@ export type SweepOptions = Tags & {
   /** Section centre offset `[x, y]` in the same (binormal, normal) axes as `(t) => [rx, ry]`: a sagging belly. */
   shift?: readonly [number, number] | ((t: number) => readonly [number, number]);
   /** Path sources: start roll, the section's normal (ry direction) leans toward `up`. */
-  up?: V3;
+  up?: DirectionInput;
   /** Path sources: roll about the tangent after parallel transport, total degrees or `(t) => deg` (chains: on `chain()`). */
   twist?: Twist;
 };
 
-/** A point on a sweep's built surface. */
-export type SweepPoint = { t: number; p: Vector3; n: Vector3; tangent: Vector3; radius: number; joint: Joint };
+/** A frame on a sweep's built surface: +Y = the outward surface normal `n`, +Z = along the tube (`tangent`). */
+export class SweepPoint extends Spot {
+  constructor(
+    readonly t: number,
+    at: Vector3,
+    n: Vector3,
+    tangent: Vector3,
+    /** Distance from the section centre. */
+    readonly radius: number,
+    bone: Joint,
+  ) {
+    super(at, aim(n, tangent), bone);
+  }
+
+  get n() {
+    return this.axis;
+  }
+
+  get tangent() {
+    return this.dir([0, 0, 1]);
+  }
+}
 
 type Shape = { pts: Array<[number, number]>; smooth: boolean };
 type Cut = { t: number; kind: "joint" | "corner" | "band" };
@@ -233,8 +255,32 @@ export class Sweep {
     private readonly knots: number[],
   ) {}
 
-  get path() {
-    return this.tube.path;
+  /** The bone at the start of the tube. */
+  get bone() {
+    return this.jointAt(this.tube.from);
+  }
+
+  /** The centreline frame at the start (+Y along the tube, +Z its normal), in the current pose: a Point/Line/Frame. */
+  get frame() {
+    const bone = this.bone;
+    const f = frameAt(this.tube, 0, "right", this.tube.capture.motion(bone));
+    return new Spot(f.c, new Quaternion().setFromRotationMatrix(new Matrix4().makeBasis(f.B, f.T, f.N)), bone);
+  }
+
+  /** The centreline (section centres) in the current pose, with knots at the bone cuts. */
+  curve() {
+    const count = 64;
+    const pts = Array.from({ length: count + 1 }, (_, i) => {
+      const u = i / count;
+      return frameAt(
+        this.tube,
+        u,
+        "right",
+        this.tube.capture.motion(this.jointAt(this.tube.from + u * (this.tube.to - this.tube.from))),
+      ).c;
+    });
+    const indices = [...new Set(this.knots.map((u) => Math.round(u * count)))];
+    return smoothPath(pts, null, { indices }, this.tube.seam !== null, this.bone);
   }
 
   /**
@@ -253,7 +299,7 @@ export class Sweep {
     const along = ahead.sub(behind);
     const lean = f.T.dot(along);
     const n = (Math.abs(lean) > 1e-12 ? nSec.addScaledVector(f.T, -nSec.dot(along) / lean) : nSec).normalize();
-    return { t, p: p.addScaledVector(n, lift), n, tangent: f.T, radius: Math.hypot(q.x, q.y), joint };
+    return new SweepPoint(t, p.addScaledVector(n, lift), n, f.T, Math.hypot(q.x, q.y), joint);
   }
 
   /**
@@ -262,9 +308,9 @@ export class Sweep {
    */
   line(angleDeg: number, lift = 0) {
     const count = 64;
-    const pts = Array.from({ length: count + 1 }, (_, i) => this.at(i / count, angleDeg, lift).p);
+    const pts = Array.from({ length: count + 1 }, (_, i) => this.at(i / count, angleDeg, lift).at);
     const indices = [...new Set(this.knots.map((u) => Math.round(u * count)))];
-    return smoothPath(pts, null, { indices }, this.tube.seam !== null);
+    return smoothPath(pts, null, { indices }, this.tube.seam !== null, this.bone);
   }
 }
 
@@ -321,7 +367,7 @@ class MeshBuffer {
   }
 }
 
-export function sweep(ctx: Ctx, source: PathLike | Chain, radius: Radius, options: SweepOptions = {}) {
+export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, options: SweepOptions = {}) {
   const chain = source instanceof Chain ? source : null;
   const path = source instanceof Chain ? source.path : toPath(source);
   const from = options.from ?? 0;
@@ -346,7 +392,7 @@ export function sweep(ctx: Ctx, source: PathLike | Chain, radius: Radius, option
   const owner = options.bone;
   const bones = chain ?? (owner instanceof Chain ? owner : null);
   const boneTs = chain ? chain.ts.slice(0, -1) : bones ? bones.joints.map((j) => path.closestT(j.at)) : [0];
-  const boneJoints = bones ? bones.joints : [resolveJoint(ctx, owner instanceof Chain ? undefined : owner)];
+  const boneJoints = bones ? bones.joints : [boneFor(ctx, owner as JointRef | undefined, [path], path.at(from))];
   const jointAt = (t: number) => {
     let i = 0;
     while (i < boneTs.length - 1 && boneTs[i + 1] <= t) i++;

@@ -1,12 +1,12 @@
 // Example 3: a tentacled serpent. The skeleton is rooted mid-body with two chains growing both ways along one
-// body curve. A frill of 13 ribs on 4 fan banks rings the neck behind the head; the jaw is posed open at the end. The tail has a belly sector under its stripes and plates along its back, a dorsal fin stands on
+// body curve. The tail has a belly sector under its stripes and plates along its back, a dorsal fin stands on
 // the neck's skin line, a spike collar and a closed ring circle the tilted neck, a twisted tusk juts from the
-// head, and tentacles sprouted from the head surface curl on arcs.
+// head, and tentacles sprouted from the head surface curl on arcs. A frill of 13 ribs rings the neck on 4 group
+// joints; the jaw is posed open at the end. Every ringed or along-placed item inherits the bone of what it rings.
 import { BoxGeometry, SphereGeometry } from "three";
-import type { Vector3 } from "three";
 import { createBuilder } from "../src/builder";
-import { along, ring } from "../src/distribute";
-import { aim, lerp, offset } from "../src/math";
+import { frame } from "../src/frame";
+import { lerp, offset } from "../src/math";
 import { arc, catmull, polyline } from "../src/path";
 
 export const meta = { name: "SDK smoke: serpent" };
@@ -56,41 +56,31 @@ export default function build() {
   });
 
   // Dorsal plates seated on the top of the tail tube.
-  along(
-    backTube,
-    9,
-    (at) => b.part(new BoxGeometry(0.12, 0.04, 0.09), PLATE, { bone: at.joint, at: at.p, quat: aim(at.n, at.tangent) }),
-    { from: 0.02, to: 0.85 },
-  );
+  b.along(backTube, 9, (at) => b.part(new BoxGeometry(0.12, 0.04, 0.09), PLATE, { frame: at }), {
+    from: 0.02,
+    to: 0.85,
+  });
 
   // Tail fluke: flattened sideways by rolling the section with `up`.
   const tip = back.at(1);
-  b.sweep([tip.p, offset(tip.p, tip.tangent, 0.28)], (t) => [0.02, 0.14 * (1 - t) + 0.02], {
-    bone: back.joints[6],
+  b.sweep([tip, offset(tip, tip, 0.28)], (t) => [0.02, 0.14 * (1 - t) + 0.02], {
     up: [1, 0, 0],
     color: PLATE,
   });
 
   // Spike collar around the tilted neck axis, and a seamless closed ring on the skin just below it.
-  const collar = front.at(0.55);
-  ring(collar.p, collar.tangent, 0.13, 9, (p, out) =>
-    b.spike(p, out, 0.12, 0.03, { bone: collar.joint, color: PLATE }),
-  );
-  const band = front.at(0.5);
-  const bandPoints: Vector3[] = [];
-  ring(band.p, band.tangent, frontTube.at(0.5).radius, 8, (p) => bandPoints.push(p));
-  b.sweep(catmull(bandPoints, { closed: true }), 0.025, { bone: band.joint, color: TIP });
+  b.ring(front.at(0.55), { count: 9, radius: 0.13 }, (spike) => b.spike(spike, spike, 0.12, 0.03, { color: PLATE }));
+  const band = b.ring(front.at(0.5), { count: 8, radius: frontTube.at(0.5).radius });
+  b.sweep(catmull(band.items, { closed: true }), 0.025, { color: TIP });
 
   // Head with jaw.
-  const neckEnd = front.at(1);
   const head = b.joint("head", {
-    parent: front.joints[4],
-    at: neckEnd.p,
+    at: front.at(1),
     dir: [0, -0.2, 1],
     role: "head",
     group: "head",
   });
-  b.capsule(head.at, head.local([0, 0.22, 0]), [0.15, 0.1], { bone: head, color: SKIN, group: "head" });
+  b.capsule(head, head.local([0, 0.22, 0]), [0.15, 0.1], { color: SKIN, group: "head" });
   const jaw = b.joint("jaw", {
     parent: head,
     at: head.local([0, 0.02, -0.07]),
@@ -131,12 +121,12 @@ export default function build() {
   // Tentacles sprouted from the head's real surface: straight out, then an arc curl. Alternate ones use colour
   // bands (round cuts) or overlap cuts; every third is pronated a quarter turn along its chain.
   const headSurface = b.surface(head);
-  ring(lerp(head.at, head.local([0, 0.22, 0]), 0.1), head.dir([0, 1, 0]), 0.12, 6, (p, out, i) => {
-    const hit = headSurface.nearest(p);
-    const reach = offset(hit.p, out, 0.18);
+  b.ring(frame(lerp(head, head.local([0, 0.22, 0]), 0.1), head), { count: 6, radius: 0.12 }, ({ i, outward, at }) => {
+    const hit = headSurface.nearest(at);
+    const reach = offset(hit, outward, 0.18);
     const back = head.dir([0, -1, 0]);
-    const curl = arc(offset(reach, back, 0.12), reach, out.clone().cross(back), 160);
-    b.sprout(`tentacle${i + 1}`, hit, polyline([hit.p, reach]).concat(curl), [0.035, 0.01], {
+    const curl = arc(offset(reach, back, 0.12), reach, outward.cross(back), 160);
+    b.sprout(`tentacle${i + 1}`, hit, polyline([hit, reach]).concat(curl), [0.035, 0.01], {
       count: 5,
       role: "tentacle",
       twist: i % 3 === 0 ? 90 : 0,
@@ -154,36 +144,28 @@ export default function build() {
     });
   });
 
-  // Frill: 13 ribs from the neck skin, spread 200° over the top of the neck and swept back 25°, owned by 4 bank
-  // joints instead of 13. Each rib carries a web slab reaching halfway to the next rib.
-  const frillAt = frontTube.at(0.8);
-  const axis = frillAt.tangent;
-  const side = frontTube.at(0.8, 100).p.sub(frillAt.p.clone().addScaledVector(frillAt.n, -frillAt.radius)).normalize();
-  // Negative: from the right side, turning left-handed about the tangent carries the ribs over the top.
-  const spread = -200;
-  b.fan(
-    "frill",
+  // Frill: 13 ribs ringed around the neck's centre line from the right side over the top to the left, leaning back
+  // 25°, owned by 4 group joints instead of 13. Each rib carries a web slab reaching toward the next rib; the slab
+  // inherits the rib item's group joint through its first point.
+  const step = -200 / 12;
+  b.ring(
+    front.at(0.8),
     {
-      parent: frillAt.joint,
-      at: frillAt.p.clone().addScaledVector(frillAt.n, -frillAt.radius),
-      axis,
-      from: side.multiplyScalar(Math.cos(0.44)).addScaledVector(axis, -Math.sin(0.44)),
-      angleDeg: spread,
       count: 13,
-      banks: 4,
-      radius: frillAt.radius * 0.9,
+      radius: frontTube.at(0.8).radius * 0.9,
+      fromDeg: 100,
+      toDeg: -100,
+      tilt: -25,
+      joints: 4,
+      name: "frill",
       group: "neck",
     },
-    (item) => {
-      const tip = offset(item.p, item.dir, 0.24);
-      b.spike(item.p, tip, null, 0.016, { bone: item.joint, color: PLATE });
-      if (item.i === 12) return;
-      const next = item.dir.clone().applyAxisAngle(axis, ((spread / 12) * Math.PI) / 180);
-      b.slab([item.p, tip, offset(offset(item.p, next, 0.2), item.dir, 0.02)], {
-        thickness: 0.01,
-        color: FIN,
-        bone: item.joint,
-      });
+    (rib) => {
+      const tip = offset(rib, rib, 0.24);
+      b.spike(rib, tip, null, 0.016, { color: PLATE });
+      if (rib.i === 12) return;
+      const next = rib.outward.applyAxisAngle(front.at(0.8).tangent, step * (Math.PI / 180));
+      b.slab([rib, tip, offset(offset(rib, next, 0.2), rib, 0.02)], { thickness: 0.01, color: FIN });
     },
   );
 

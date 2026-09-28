@@ -1,8 +1,10 @@
-// Example 4: a peacock. A 24-feather train on 6 fan banks, built lying back and then raised into display by posing
-// the banks; a 7-feather crest fan (cone-tilted); bird legs from `limb`; rig roles on every part of the skeleton;
-// `detail` sets the tessellation budget in one place.
+// Example 4: a peacock. A 24-feather train ringed around a vertical line behind the rump on 6 group joints, built
+// lying back and then raised into display by posing those 6 joints; a 7-feather crest ringed around the head's
+// forward line on 2 joints; bird legs from `limb`; rig roles on every part of the skeleton; `detail` sets the
+// tessellation budget in one place. Feather geometry never names a bone: each item carries its group joint.
 import { SphereGeometry, Vector3 } from "three";
 import { createBuilder } from "../src/builder";
+import { frame } from "../src/frame";
 import { limb } from "../src/ik";
 import { aim, offset } from "../src/math";
 import { bezier, catmull } from "../src/path";
@@ -55,13 +57,12 @@ export default function build() {
   b.sweep(neck, [0.075, 0.045], { color: BLUE });
 
   const head = b.joint("head", {
-    parent: neck.joints[2],
-    at: neck.at(1).p,
+    at: neck.at(1),
     dir: [0, -0.1, 1],
     role: "head",
     group: "head",
   });
-  b.capsule(head.at, head.local([0, 0.08, 0]), [0.055, 0.04], { bone: head, color: BLUE, group: "head" });
+  b.capsule(head, head.local([0, 0.08, 0]), [0.055, 0.04], { color: BLUE, group: "head" });
   b.spike(head.local([0, 0.08, 0.005]), head.dir([0, 1, -0.1]), 0.07, 0.018, {
     bone: head,
     color: BEAK,
@@ -73,7 +74,7 @@ export default function build() {
     dir: head.dir([0, 1, -0.3]),
     role: "jaw",
   });
-  b.spike(jaw.at, jaw.dir([0, 1, 0]), 0.06, 0.012, { bone: jaw, color: BEAK, group: "jaw" });
+  b.spike(jaw, jaw, 0.06, 0.012, { color: BEAK, group: "jaw" });
   for (const s of [1, -1])
     b.part(new SphereGeometry(0.012, b.segments(8), b.segments(6)), "#101010", {
       bone: head,
@@ -81,57 +82,46 @@ export default function build() {
       group: "head",
     });
 
-  // Crest: 7 feathers on 2 banks, spread 60° across the top of the head (a fan about the head's forward axis).
-  const forward = head.dir([0, 1, 0]);
-  b.fan(
-    "crest",
-    {
-      parent: head,
-      at: head.local([0, 0.03, 0.04]),
-      axis: forward,
-      from: head.dir([0, 0.25, 1]).applyAxisAngle(forward, (-30 * Math.PI) / 180),
-      angleDeg: 60,
-      count: 7,
-      banks: 2,
-      group: "head",
-    },
-    (item) => {
-      const tip = offset(item.p, item.dir, 0.12);
-      b.rod(item.p, tip, 0.004, { bone: item.joint, color: BLUE });
-      b.part(new SphereGeometry(0.012, b.segments(8), b.segments(6)), TEAL, { bone: item.joint, at: tip });
+  // Crest: 7 feathers on 2 joints, spread 60° over the top of the head around its forward line, leaning forward.
+  b.ring(
+    frame(head.local([0, 0.03, 0.04]), head),
+    { count: 7, radius: 0, fromDeg: -30, toDeg: 30, tilt: 14, joints: 2, name: "crest", parent: head, group: "head" },
+    (feather) => {
+      b.rod(feather, feather.moved([0, 0.12, 0]), 0.004, { color: BLUE });
+      b.part(new SphereGeometry(0.012, b.segments(8), b.segments(6)), TEAL, { at: feather.moved([0, 0.12, 0]) });
     },
   );
 
-  // Train: 24 feathers on 6 banks (4 per bank), fanned 110° behind the rump and tilted slightly down.
+  // Train: 24 feathers on 6 joints (4 per joint), fanned 110° behind the rump around a made-up vertical line and
+  // tilted slightly down.
   const up = new Vector3(0, 1, 0);
-  const train = b.fan(
-    "train",
+  const train = b.ring(
+    frame([0, 0.62, -0.3], up),
     {
-      parent: hips,
-      at: [0, 0.62, -0.3],
-      axis: up,
-      from: new Vector3(0, -0.15, -1).normalize().applyAxisAngle(up, (-55 * Math.PI) / 180),
-      angleDeg: 110,
       count: 24,
-      banks: 6,
+      fromDeg: 125,
+      toDeg: 235,
+      tilt: -8.5,
+      joints: 6,
+      name: "train",
+      parent: hips,
       role: "tail",
       group: "train",
     },
-    (item) => {
-      const tip = offset(item.p, item.dir, 1.05);
-      const bend = offset(offset(item.p, item.dir, 0.5), up, 0.05);
-      b.sweep(bezier(item.p, bend, tip), [0.012, 0.005], { bone: item.joint, color: GREEN, caps: { end: "point" } });
-      const eye = offset(item.p, item.dir, 0.93);
+    (feather) => {
+      const tip = offset(feather, feather, 1.05);
+      const bend = offset(offset(feather, feather, 0.5), up, 0.05);
+      b.sweep(bezier(feather, bend, tip), [0.012, 0.005], { color: GREEN, caps: { end: "point" } });
+      const eye = feather.moved([0, 0.93, 0]);
       b.part(new SphereGeometry(1, b.segments(10), b.segments(6)), GOLD, {
-        bone: item.joint,
         at: eye,
-        quat: aim(up, item.dir),
+        quat: aim(up, feather),
         scale: [0.055, 0.01, 0.075],
       });
       b.part(new SphereGeometry(1, b.segments(10), b.segments(6)), EYE, {
-        bone: item.joint,
+        frame: eye,
         at: offset(eye, up, 0.004),
-        quat: aim(up, item.dir),
+        quat: aim(up, feather),
         scale: [0.028, 0.01, 0.036],
       });
     },
@@ -167,7 +157,7 @@ export default function build() {
     );
     b.sweep(leg, [0.05, 0.02], { color: LEG });
     for (const dx of [-0.025, 0, 0.025])
-      b.spike(leg.at(1).p.add(new Vector3(dx, 0, 0)), [0, -0.2, 1], 0.05, 0.012, { bone: leg.joints[3], color: LEG });
+      b.spike(leg.at(1).moved([dx, 0, 0]), [0, -0.2, 1], 0.05, 0.012, { color: LEG });
 
     // Folded wing along the flank: a wing chain with a membrane down to a line on the flank.
     const wing = b.chain(
@@ -191,8 +181,8 @@ export default function build() {
     );
   }
 
-  // Display: raise the train by posing its 6 banks. +deg about a bank's local X lifts it out of the fan plane.
-  for (const bank of train.banks) b.pose(bank, { axis: bank.dir([1, 0, 0]), deg: 72 });
+  // Display: raise the train by posing its 6 group joints. +deg about a joint's local X lifts its run up.
+  for (const joint of train.joints) b.pose(joint, { axis: joint.dir([1, 0, 0]), deg: 72 });
 
   return b.root;
 }

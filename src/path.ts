@@ -3,11 +3,15 @@
 // concatenation and framing path.
 import { CatmullRomCurve3, CubicBezierCurve3, QuadraticBezierCurve3, Quaternion, Vector3 } from "three";
 import type { Curve } from "three";
-import { aim, DEG, flatten, vec } from "./math";
-import type { V3 } from "./math";
+import { ownerOf } from "./frame";
+import { aim, DEG, flatten, toDirection, toPoint } from "./math";
+import type { DirectionInput, PointInput } from "./math";
+import type { Joint } from "./skeleton";
 
-/** A `Path`, or a point array (read as a polyline). */
-export type PathLike = Path | readonly V3[];
+/** Something that can give its curve in the current pose: a Chain, a Sweep (its centreline). */
+export type Curved = { curve(): Path };
+/** A Path input: a `Path`, a point array (read as a polyline; any point inputs), a Chain or a Sweep. */
+export type PathInput = Path | readonly PointInput[] | Curved;
 /** A corner of a path: where the incoming and outgoing tangents differ, with the turn in radians. */
 export type Corner = { t: number; tin: Vector3; tout: Vector3; angle: number };
 /** Roll about the tangent in degrees after parallel transport: total from start to end (even), or per path t. */
@@ -26,6 +30,7 @@ export class Path {
    * @param straight per segment: true = a polyline segment (constant tangent), false = interpolate tangents
    * @param knotS arc-length positions of the defining points (chains default to one joint per knot span)
    * @param closed the last sample equals the first and the curve continues through it (loops, rims, straps)
+   * @param bone the bone of the first defining input that came from something built (for bone inheritance)
    */
   constructor(
     private readonly pts: Vector3[],
@@ -34,6 +39,7 @@ export class Path {
     private readonly straight: boolean[],
     private readonly knotS: number[],
     readonly closed = false,
+    readonly bone: Joint | null = null,
   ) {
     if (pts.length < 2) throw new Error("Path needs at least 2 distinct points");
     this.cum = [0];
@@ -95,8 +101,8 @@ export class Path {
   }
 
   /** t of the point on the path closest to `p`. */
-  closestT(p: V3) {
-    const q = vec(p);
+  closestT(p: PointInput) {
+    const q = toPoint(p);
     let best = 0;
     let bestD = Infinity;
     const seg = new Vector3();
@@ -113,7 +119,7 @@ export class Path {
   }
 
   /** This path followed by `other` (joined by a straight segment if they don't touch). The result is open. */
-  concat(other: PathLike) {
+  concat(other: PathInput) {
     const b = toPath(other);
     const pts = [...this.pts];
     const tin = [...this.tin];
@@ -138,7 +144,7 @@ export class Path {
     }
     straight.push(...b.straight);
     for (const s of b.knotS) if (s > EPS || gap > 1e-6) knotS.push(base + s);
-    return new Path(pts, tin, tout, straight, knotS);
+    return new Path(pts, tin, tout, straight, knotS, false, this.bone ?? b.bone);
   }
 
   /** The open part between t0 and t1; t1 < t0 gives it reversed (chains growing both ways from a mid-body root). */
@@ -166,13 +172,15 @@ export class Path {
     const total = (b - a) * this.length;
     const inner = this.knotS.filter((s) => s > s0 + 1e-7 && s < s0 + total - 1e-7).map((s) => s - s0);
     const knotS = [0, ...inner, total];
-    if (t1 >= t0) return new Path(pts, tin, tout, straight, knotS);
+    if (t1 >= t0) return new Path(pts, tin, tout, straight, knotS, false, this.bone);
     return new Path(
       pts.reverse(),
       tout.reverse().map((v) => v.negate()),
       tin.reverse().map((v) => v.negate()),
       straight.reverse(),
       knotS.map((s) => total - s).reverse(),
+      false,
+      this.bone,
     );
   }
 
@@ -181,7 +189,7 @@ export class Path {
    * rolled by `twist`. On a closed path the transport's leftover rotation is spread along the loop so the
    * frame meets itself at the seam (a twist should total a multiple of 360° there).
    */
-  frames(up?: V3, twist?: Twist) {
+  frames(up?: DirectionInput, twist?: Twist) {
     return new Frames(this, this.pts, this.tin, this.tout, this.cum, up, twist);
   }
 }
@@ -199,7 +207,7 @@ export class Frames {
     tin: Vector3[],
     private readonly tout: Vector3[],
     private readonly cum: number[],
-    up?: V3,
+    up?: DirectionInput,
     twist: Twist = 0,
   ) {
     let n = new Vector3(0, 0, 1).applyQuaternion(aim(tout[0], up));
@@ -242,6 +250,7 @@ export function smoothPath(
   tangents: Vector3[] | null,
   knots: { indices: number[] } | { spans: number },
   closed = false,
+  bone: Joint | null = null,
 ) {
   const keep = [0];
   for (let i = 1; i < pts.length; i++) if (pts[i].distanceTo(pts[keep[keep.length - 1]]) > 1e-7) keep.push(i);
@@ -279,8 +288,12 @@ export function smoothPath(
     new Array(last).fill(false),
     knotS,
     closed,
+    bone,
   );
 }
+
+/** The bone of the first input that came from something built. */
+const firstOwner = (inputs: readonly unknown[]) => inputs.map(ownerOf).find((bone) => bone) ?? null;
 
 function sampleCurve(curve: Curve<Vector3>, count: number) {
   const pts: Vector3[] = [];
@@ -293,10 +306,10 @@ function sampleCurve(curve: Curve<Vector3>, count: number) {
 }
 
 /** Straight segments through `points`; knots at the points. `closed` adds the segment back to the first point. */
-export function polyline(points: readonly V3[], options: { closed?: boolean } = {}) {
+export function polyline(points: readonly PointInput[], options: { closed?: boolean } = {}) {
   const pts: Vector3[] = [];
   for (const p of points) {
-    const v = vec(p);
+    const v = toPoint(p);
     if (!pts.length || v.distanceTo(pts[pts.length - 1]) > EPS) pts.push(v);
   }
   const closed = options.closed ?? false;
@@ -308,39 +321,40 @@ export function polyline(points: readonly V3[], options: { closed?: boolean } = 
   const tout = pts.map((_, i) => (i === last ? dirs[closed ? 0 : i - 1] : dirs[i]).clone());
   const knotS = [0];
   for (let i = 1; i < pts.length; i++) knotS.push(knotS[i - 1] + pts[i].distanceTo(pts[i - 1]));
-  return new Path(pts, tin, tout, new Array(last).fill(true), knotS, closed);
+  return new Path(pts, tin, tout, new Array(last).fill(true), knotS, closed, firstOwner(points));
 }
 
 /** Quadratic (3 points) or cubic (4 points) bezier. Knots: 4 equal arc-length spans. */
-export function bezier(p0: V3, p1: V3, p2: V3, p3?: V3) {
+export function bezier(p0: PointInput, p1: PointInput, p2: PointInput, p3?: PointInput) {
   const curve = p3
-    ? new CubicBezierCurve3(vec(p0), vec(p1), vec(p2), vec(p3))
-    : new QuadraticBezierCurve3(vec(p0), vec(p1), vec(p2));
+    ? new CubicBezierCurve3(toPoint(p0), toPoint(p1), toPoint(p2), toPoint(p3))
+    : new QuadraticBezierCurve3(toPoint(p0), toPoint(p1), toPoint(p2));
   const { pts, tangents } = sampleCurve(curve, 48);
-  return smoothPath(pts, tangents, { spans: 4 });
+  return smoothPath(pts, tangents, { spans: 4 }, false, firstOwner([p0, p1, p2, p3]));
 }
 
 /**
  * Smooth spline through `points` (centripetal, or classic catmull-rom with `tension`). Knots: the points.
  * `closed` continues smoothly from the last point back to the first (rims, collars, straps).
  */
-export function catmull(points: readonly V3[], options: { tension?: number; closed?: boolean } = {}) {
-  const vs = points.map(vec);
+export function catmull(points: readonly PointInput[], options: { tension?: number; closed?: boolean } = {}) {
+  const vs = points.map(toPoint);
   const closed = options.closed ?? false;
-  if (vs.length === 2 && !closed) return polyline(vs);
+  if (vs.length === 2 && !closed) return polyline(points);
   const type = options.tension === undefined ? "centripetal" : "catmullrom";
   const curve = new CatmullRomCurve3(vs, closed, type, options.tension);
   const perSpan = 16;
   const spans = closed ? vs.length : vs.length - 1;
   const { pts, tangents } = sampleCurve(curve, spans * perSpan);
-  return smoothPath(pts, tangents, { indices: Array.from({ length: spans + 1 }, (_, i) => i * perSpan) }, closed);
+  const indices = Array.from({ length: spans + 1 }, (_, i) => i * perSpan);
+  return smoothPath(pts, tangents, { indices }, closed, firstOwner(points));
 }
 
 /** Circular arc around `axis` through `center`, starting at `from`, sweeping `angleDeg` (right-hand rule). */
-export function arc(center: V3, from: V3, axis: V3, angleDeg: number) {
-  const c = vec(center);
-  const r0 = vec(from).sub(c);
-  const ax = vec(axis).normalize();
+export function arc(center: PointInput, from: PointInput, axis: DirectionInput, angleDeg: number) {
+  const c = toPoint(center);
+  const r0 = toPoint(from).sub(c);
+  const ax = toDirection(axis).normalize();
   const count = Math.max(8, Math.ceil(Math.abs(angleDeg) / 4));
   const pts: Vector3[] = [];
   const tangents: Vector3[] = [];
@@ -349,7 +363,8 @@ export function arc(center: V3, from: V3, axis: V3, angleDeg: number) {
     pts.push(c.clone().add(r));
     tangents.push(ax.clone().cross(r).multiplyScalar(Math.sign(angleDeg)));
   }
-  return smoothPath(pts, tangents, { spans: Math.max(1, Math.ceil(Math.abs(angleDeg) / 45)) });
+  const spans = Math.max(1, Math.ceil(Math.abs(angleDeg) / 45));
+  return smoothPath(pts, tangents, { spans }, false, firstOwner([from, center]));
 }
 
 /**
@@ -357,10 +372,15 @@ export function arc(center: V3, from: V3, axis: V3, angleDeg: number) {
  * fractional or negative). The radius goes from |from − axis| to `r1` geometrically (a log spiral: ram horns,
  * shells); `pitch` is the advance along `axis` per turn (0 = planar coil, else a helix). Knots every 90°.
  */
-export function spiral(center: V3, from: V3, axis: V3, options: { turns: number; r1?: number; pitch?: number }) {
-  const c = vec(center);
-  const ax = vec(axis).normalize();
-  const rel = vec(from).sub(c);
+export function spiral(
+  center: PointInput,
+  from: PointInput,
+  axis: DirectionInput,
+  options: { turns: number; r1?: number; pitch?: number },
+) {
+  const c = toPoint(center);
+  const ax = toDirection(axis).normalize();
+  const rel = toPoint(from).sub(c);
   const h0 = rel.dot(ax);
   const u = flatten(rel, ax);
   const r0 = u.length();
@@ -386,9 +406,11 @@ export function spiral(center: V3, from: V3, axis: V3, options: { turns: number;
     pts.push(point(i / count));
     tangents.push(point(i / count + 1e-5).sub(point(i / count - 1e-5)));
   }
-  return smoothPath(pts, tangents, { spans: Math.max(1, Math.ceil(Math.abs(turns) * 4)) });
+  const spans = Math.max(1, Math.ceil(Math.abs(turns) * 4));
+  return smoothPath(pts, tangents, { spans }, false, firstOwner([from, center]));
 }
 
-export function toPath(source: PathLike) {
-  return source instanceof Path ? source : polyline(source);
+/** The Path of any path input (a Chain or Sweep in its current pose). */
+export function toPath(source: PathInput) {
+  return source instanceof Path ? source : "curve" in source ? source.curve() : polyline(source);
 }

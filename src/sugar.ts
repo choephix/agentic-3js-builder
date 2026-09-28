@@ -1,36 +1,59 @@
-// Shapes over `sweep()` (and `chain()` for sprout). None of these has its own geometry code.
+// Shapes over `sweep()` (and `chain()` for sprout). None of these has its own geometry code. Every endpoint is a
+// Point input, so a rod can run from an eye to a joint; the tube belongs to the first endpoint's bone.
+import { boneFor } from "./context";
 import type { Ctx } from "./context";
-import { offset, vec } from "./math";
-import type { V3 } from "./math";
+import { offset, toFrame, toPoint } from "./math";
+import type { DirectionInput, FrameInput, PointInput } from "./math";
 import { catmull, Path, polyline, toPath } from "./path";
-import type { PathLike } from "./path";
+import type { PathInput } from "./path";
 import { createChain } from "./skeleton";
 import type { ChainOptions } from "./skeleton";
-import type { Hit } from "./surface";
 import { interpolate, radiusFn, sweep } from "./sweep";
 import type { Radius, SweepOptions } from "./sweep";
 
 /** Straight tube with flat ends. `r` = radius or [r0, r1] taper. */
-export function rod(ctx: Ctx, a: V3, b: V3, r: number | readonly [number, number], options: SweepOptions = {}) {
+export function rod(
+  ctx: Ctx,
+  a: PointInput,
+  b: PointInput,
+  r: number | readonly [number, number],
+  options: SweepOptions = {},
+) {
   return sweep(ctx, [a, b], r, { caps: "flat", ...options });
 }
 
 /** Straight tube with round ends (a tapered capsule when r = [r0, r1]). */
-export function capsule(ctx: Ctx, a: V3, b: V3, r: number | readonly [number, number], options: SweepOptions = {}) {
+export function capsule(
+  ctx: Ctx,
+  a: PointInput,
+  b: PointInput,
+  r: number | readonly [number, number],
+  options: SweepOptions = {},
+) {
   return sweep(ctx, [a, b], r, { caps: "round", ...options });
 }
 
-/** Cone from `base` (radius r) to a point. `len` number: `dirOrTip` is a direction; `len` null: it is the tip. */
-export function spike(ctx: Ctx, base: V3, dirOrTip: V3, len: number | null, r: number, options: SweepOptions = {}) {
-  const tip = len === null ? vec(dirOrTip) : offset(base, dirOrTip, len);
+/**
+ * Cone from `base` (radius r) to a point. `len` number: `dirOrTip` is a direction (a frame gives its facing axis,
+ * so `spike(hit, hit, len, r)` stands on a surface); `len` null: `dirOrTip` is the tip point.
+ */
+export function spike(
+  ctx: Ctx,
+  base: PointInput,
+  dirOrTip: PointInput,
+  len: number | null,
+  r: number,
+  options: SweepOptions = {},
+) {
+  const tip = len === null ? toPoint(dirOrTip) : offset(base, dirOrTip as DirectionInput, len);
   return sweep(ctx, [base, tip], [r, 0], { caps: { start: "flat", end: "point" }, ...options });
 }
 
 /** Box tube from a to b: full width (side) × height (up) going from [w0, h0] to [w1, h1]. Roll from `up`. */
 export function frustumBox(
   ctx: Ctx,
-  a: V3,
-  b: V3,
+  a: PointInput,
+  b: PointInput,
   [w0, h0]: readonly [number, number],
   [w1, h1]: readonly [number, number],
   options: SweepOptions = {},
@@ -42,7 +65,7 @@ export function frustumBox(
   });
 }
 
-export type Station = { at: V3; w: number; h: number };
+export type Station = { at: PointInput; w: number; h: number };
 
 /**
  * Smooth body through station centres (catmull), full width/height interpolated between stations.
@@ -68,34 +91,40 @@ export function loft(ctx: Ctx, stations: readonly Station[], options: SweepOptio
 
 export type SproutOptions = Omit<SweepOptions, "bone" | "extend"> &
   Pick<ChainOptions, "names" | "twist" | "role" | "contact"> & {
-    /** Joints along the appendage (default: one per knot span); 0 = no joints, the tube rides on `hit.joint`. */
+    /** Joints along the appendage (default: one per knot span); 0 = no joints, the tube rides on the root's bone. */
     count?: number;
     /** How far the root runs back into the parent volume, along the start tangent (default: the root radius). */
     bury?: number;
   };
 
 /**
- * An appendage (limb, horn, tentacle, neck) rooted on another volume at a surface hit. `pathOrTip` is a tip point
- * (straight out) or a path / points (prefixed with the hit point when it starts elsewhere). The first joint sits
- * at the hit, parented to `hit.joint`; the tube's root continues `bury` into the parent so it never floats.
+ * An appendage (limb, horn, tentacle, neck) rooted on another volume at a frame: a surface hit, a tube point, a
+ * part, a joint. `pathOrTip` is a tip point (straight out) or a path (prefixed with the frame's point when it starts
+ * elsewhere). The first joint sits at the frame's point, parented to its bone (else the nearest joint); the tube's
+ * root continues `bury` back into the parent so it never floats.
  */
 export function sprout(
   ctx: Ctx,
   name: string,
-  hit: Hit,
-  pathOrTip: PathLike | V3,
+  on: FrameInput,
+  pathOrTip: PathInput | PointInput,
   radius: Radius,
   options: SproutOptions = {},
 ) {
   const { count, bury, names, role, contact, ...rest } = options;
-  const tip = !(pathOrTip instanceof Path) && ("isVector3" in pathOrTip || typeof pathOrTip[0] === "number");
-  const given = tip ? polyline([hit.p, pathOrTip as V3]) : toPath(pathOrTip as PathLike);
-  const path = given.at(0).distanceTo(hit.p) > 1e-6 ? polyline([hit.p, given.at(0)]).concat(given) : given;
+  const root = toFrame(on);
+  const start = root.at;
+  const parent = boneFor(ctx, undefined, [root], start);
+  const isPath =
+    pathOrTip instanceof Path ||
+    (Array.isArray(pathOrTip) ? typeof pathOrTip[0] !== "number" : "curve" in (pathOrTip as object));
+  const given = isPath ? toPath(pathOrTip as PathInput) : polyline([start, toPoint(pathOrTip as PointInput)]);
+  const path = given.at(0).distanceTo(start) > 1e-6 ? polyline([start, given.at(0)]).concat(given) : given;
   const chain =
     count === 0
       ? null
       : createChain(ctx, name, path, {
-          parent: hit.joint,
+          parent,
           count,
           names,
           role,
@@ -107,7 +136,7 @@ export function sprout(
   const sweepOptions = {
     name,
     ...rest,
-    bone: hit.joint,
+    bone: parent,
     extend: [bury ?? Math.max(...radiusFn(radius)(0)), 0] as const,
   };
   return { chain, sweep: sweep(ctx, chain ?? path, radius, sweepOptions) };

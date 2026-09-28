@@ -1,42 +1,38 @@
 // Joints and chains: the only helpers that create bones. Also `pose()`, which re-poses a joint after building,
 // and `Capture`, which keeps model-space data taken at build time valid after later poses.
 import { Group, Matrix4, Quaternion, Vector3 } from "three";
-import { resolveJoint, setWorld } from "./context";
+import { boneFor, resolveJoint, setWorld } from "./context";
 import type { Ctx, JointRef } from "./context";
-import { aim, DEG, vec } from "./math";
-import type { V3 } from "./math";
-import { toPath } from "./path";
-import type { Frames, Path, PathLike, Twist } from "./path";
+import { Frame, Spot } from "./frame";
+import { aim, DEG, toDirection, toFrame, toPoint } from "./math";
+import type { DirectionInput, FrameInput, PointInput } from "./math";
+import { smoothPath, toPath } from "./path";
+import type { Frames, Path, PathInput, Twist } from "./path";
 import { sideOf, tuple } from "./rig";
 import type { Role } from "./rig";
 
 const JOINT_NAME = /^[A-Za-z][A-Za-z0-9_]*$/;
 
-export class Joint {
+/** A bone: a Frame read live from the scene (its `axis` is the bone's +Y). `bone` is the joint itself. */
+export class Joint extends Frame {
   constructor(
     readonly name: string,
     readonly object: Group,
     readonly parent: Joint | null,
-  ) {}
+  ) {
+    super();
+  }
 
-  /** World (model-space) position. */
   get at() {
     return new Vector3().setFromMatrixPosition(this.object.matrixWorld);
   }
 
-  /** World orientation. */
   get quat() {
     return new Quaternion().setFromRotationMatrix(this.object.matrixWorld);
   }
 
-  /** A point given in this joint's frame (bone +Y along the bone), in model space. */
-  local(p: V3) {
-    return vec(p).applyMatrix4(this.object.matrixWorld);
-  }
-
-  /** A vector given in this joint's frame, rotated into model space (length kept). */
-  dir(v: V3) {
-    return vec(v).applyQuaternion(this.quat);
+  get bone(): Joint {
+    return this;
   }
 }
 
@@ -61,15 +57,18 @@ export class Capture {
 }
 
 export type JointOptions = {
-  /** Omitted = this is the root joint (only one allowed). */
+  /**
+   * Omitted: the first joint is the root; later joints take the bone of `at` when it came from something built,
+   * else the nearest joint.
+   */
   parent?: JointRef;
-  at: V3;
+  at: PointInput;
   /** Target point: bone +Y points at it. */
-  aim?: V3;
+  aim?: PointInput;
   /** Direction: bone +Y points along it. */
-  dir?: V3;
+  dir?: DirectionInput;
   /** Roll: local +Z leans toward `up` (see `aim()`). */
-  up?: V3;
+  up?: DirectionInput;
   group?: string;
   /** Rig answer key: what this joint is. "jaw" / "hinge" record the hinge axis (the bone's local X). */
   role?: Role;
@@ -78,11 +77,9 @@ export type JointOptions = {
 export function createJoint(ctx: Ctx, name: string, options: JointOptions) {
   if (!JOINT_NAME.test(name)) throw new Error(`Joint name "${name}" must match ${JOINT_NAME}`);
   if (ctx.joints.has(name)) throw new Error(`Joint "${name}" already exists`);
-  const parent = options.parent === undefined ? null : resolveJoint(ctx, options.parent);
-  if (!parent && ctx.rootJoint)
-    throw new Error(`Joint "${name}" has no parent but root joint "${ctx.rootJoint.name}" already exists`);
-  const at = vec(options.at);
-  const direction = options.aim ? vec(options.aim).sub(at) : options.dir ? vec(options.dir) : null;
+  const at = toPoint(options.at);
+  const parent = options.parent === undefined && !ctx.rootJoint ? null : boneFor(ctx, options.parent, [options.at], at);
+  const direction = options.aim ? toPoint(options.aim).sub(at) : options.dir ? toDirection(options.dir) : null;
   const quat = direction ? aim(direction, options.up) : (parent?.quat ?? new Quaternion());
   const object = new Group();
   object.name = name;
@@ -106,27 +103,38 @@ export function createJoint(ctx: Ctx, name: string, options: JointOptions) {
 }
 
 /**
- * A rotation for `pose()`, in model space: a quaternion, `{ axis, deg }` (right-hand rule), or the smallest swing
- * that points the bone (+Y) along `dir` or at `aim`.
+ * A rotation for `pose()`, in model space. About the joint's own position: a quaternion, `{ axis, deg }`
+ * (right-hand rule; `axis` may be any direction input, e.g. a frame's facing axis), or the smallest swing that
+ * points the bone (+Y) along `dir` or at `aim`. About any Line in space: `{ about, deg }` (a made-up hinge).
  */
-export type PoseRotation = Quaternion | { axis: V3; deg: number } | { dir: V3 } | { aim: V3 };
+export type PoseRotation =
+  | Quaternion
+  | { axis: DirectionInput; deg: number }
+  | { about: FrameInput; deg: number }
+  | { dir: DirectionInput }
+  | { aim: PointInput };
 
 /**
- * Rotate a joint, with everything under it, about the joint's own position: a new rest pose (open a jaw, raise a
- * tail, fold a fan bank) without rebuilding. Joint handles read the scene, and chains, sweeps, fans, surfaces and
- * attached regions map their build-time data through each joint's motion, so every handle stays valid.
+ * Rotate a joint, with everything under it: a new rest pose (open a jaw, raise a tail, fold a ring's joint group)
+ * without rebuilding. Joints read the scene, frames are stored on their bone, and chains, sweeps and surfaces map
+ * their build-time data through each joint's motion, so every handle stays valid.
  */
 export function pose(ctx: Ctx, ref: JointRef, rotation: PoseRotation) {
   const joint = resolveJoint(ctx, ref);
-  const at = joint.at;
+  let pivot = joint.at;
   let delta: Quaternion;
   if ("isQuaternion" in rotation) delta = rotation.clone();
-  else if ("axis" in rotation)
-    delta = new Quaternion().setFromAxisAngle(vec(rotation.axis).normalize(), rotation.deg * DEG);
+  else if ("about" in rotation) {
+    const hinge = toFrame(rotation.about);
+    pivot = hinge.at;
+    delta = new Quaternion().setFromAxisAngle(hinge.axis, rotation.deg * DEG);
+  } else if ("axis" in rotation)
+    delta = new Quaternion().setFromAxisAngle(toDirection(rotation.axis).normalize(), rotation.deg * DEG);
   else {
-    const to = "dir" in rotation ? vec(rotation.dir) : vec(rotation.aim).sub(at);
-    delta = new Quaternion().setFromUnitVectors(joint.dir([0, 1, 0]).normalize(), to.normalize());
+    const to = "dir" in rotation ? toDirection(rotation.dir) : toPoint(rotation.aim).sub(pivot);
+    delta = new Quaternion().setFromUnitVectors(joint.axis, to.normalize());
   }
+  const at = joint.at.sub(pivot).applyQuaternion(delta).add(pivot);
   const world = new Matrix4().compose(at, delta.multiply(joint.quat), new Vector3(1, 1, 1));
   const { object } = joint;
   object
@@ -140,9 +148,10 @@ export function pose(ctx: Ctx, ref: JointRef, rotation: PoseRotation) {
 }
 
 export type ChainOptions = {
-  parent: JointRef;
+  /** Default: the bone of the path's start when it came from something built, else the nearest joint. */
+  parent?: JointRef;
   /** Start roll: the chain's normal (joint +Z) leans toward `up`, then is parallel-transported along the path. */
-  up?: V3;
+  up?: DirectionInput;
   group?: string;
   /** Number of joints, evenly spaced by arc length. Default: one joint per knot span of the path. */
   count?: number;
@@ -153,11 +162,32 @@ export type ChainOptions = {
   /** Rig answer key: what this chain is (a "leg" also records its ground contact). */
   role?: Role;
   /** Ground contact for the rig answer key (default for legs: the chain's tip, i.e. the `limb` target). */
-  contact?: V3;
+  contact?: PointInput;
 };
 
-/** A point on a chain's path with its transported frame and owning joint. */
-export type ChainPoint = { t: number; p: Vector3; tangent: Vector3; normal: Vector3; binormal: Vector3; joint: Joint };
+/** A frame on a chain: +Y = tangent, +Z = transported normal (the joints' +Z side), +X = binormal. */
+export class ChainPoint extends Spot {
+  constructor(
+    readonly t: number,
+    at: Vector3,
+    quat: Quaternion,
+    bone: Joint,
+  ) {
+    super(at, quat, bone);
+  }
+
+  get tangent() {
+    return this.axis;
+  }
+
+  get normal() {
+    return this.dir([0, 0, 1]);
+  }
+
+  get binormal() {
+    return this.dir([1, 0, 0]);
+  }
+}
 
 export class Chain {
   readonly capture: Capture;
@@ -178,23 +208,28 @@ export class Chain {
     return this.path.length;
   }
 
-  /**
-   * Point, tangent, transported normal (= joint +Z side), binormal (tangent × normal) and joint at arc-length t,
-   * in the current pose: each span follows its joint.
-   */
-  at(t: number): ChainPoint {
+  /** The frame at arc-length t in the current pose (each span follows its joint), owned by that span's joint. */
+  at(t: number) {
     const joint = this.jointAt(t);
     const motion = this.capture.motion(joint);
-    const tangent = this.path.tangentAt(t).transformDirection(motion);
-    const normal = this.frames.normalAt(t).transformDirection(motion);
-    const p = this.path.at(t).applyMatrix4(motion);
-    return { t, p, tangent, normal, binormal: tangent.clone().cross(normal), joint };
+    const tangent = this.path.tangentAt(t);
+    const normal = this.frames.normalAt(t);
+    const basis = new Matrix4().makeBasis(tangent.clone().cross(normal), tangent, normal).premultiply(motion);
+    const quat = new Quaternion().setFromRotationMatrix(basis);
+    return new ChainPoint(t, this.path.at(t).applyMatrix4(motion), quat, joint);
+  }
+
+  /** The chain's curve in the current pose, with knots at the joints (a Path input: `along`, `membrane`, ...). */
+  curve() {
+    const count = Math.max(16, this.joints.length * 8);
+    const pts = Array.from({ length: count + 1 }, (_, i) => this.at(i / count).at);
+    return smoothPath(pts, null, { indices: this.ts.map((t) => Math.round(t * count)) }, false, this.joints[0]);
   }
 
   /** The joint whose current bone segment passes closest to `p`. */
-  nearestJoint(p: V3) {
-    const q = vec(p);
-    const ends = [...this.joints.map((joint) => joint.at), this.at(1).p];
+  nearestJoint(p: PointInput) {
+    const q = toPoint(p);
+    const ends = [...this.joints.map((joint) => joint.at), this.at(1).at];
     let best = 0;
     let bestD = Infinity;
     for (let i = 0; i < this.joints.length; i++) {
@@ -219,8 +254,9 @@ export class Chain {
   }
 }
 
-export function createChain(ctx: Ctx, name: string, source: PathLike, options: ChainOptions) {
+export function createChain(ctx: Ctx, name: string, source: PathInput, options: ChainOptions) {
   const path = toPath(source);
+  const parent = boneFor(ctx, options.parent, [path], path.at(0));
   const frames = path.frames(options.up, options.twist);
   const { names } = options;
   const nameOf = (i: number) =>
@@ -234,7 +270,7 @@ export function createChain(ctx: Ctx, name: string, source: PathLike, options: C
     const at = path.at(ts[i]);
     joints.push(
       createJoint(ctx, nameOf(i), {
-        parent: i === 0 ? options.parent : joints[i - 1],
+        parent: i === 0 ? parent : joints[i - 1],
         at,
         aim: path.at(ts[i + 1]),
         up: frames.normalAt(ts[i]),
@@ -245,7 +281,7 @@ export function createChain(ctx: Ctx, name: string, source: PathLike, options: C
   const chain = new Chain(name, path, frames, ts, joints);
   const { role } = options;
   if (role) {
-    const contact = options.contact ? vec(options.contact) : role === "leg" ? path.at(1) : null;
+    const contact = options.contact ? toPoint(options.contact) : role === "leg" ? path.at(1) : null;
     const last = joints[joints.length - 1];
     ctx.rig.push(() => ({
       chain: {

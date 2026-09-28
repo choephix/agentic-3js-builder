@@ -4,14 +4,14 @@
 import type { BufferGeometry } from "three";
 import { Ctx } from "./context";
 import type { JointRef } from "./context";
-import { fan } from "./fan";
-import type { FanItem, FanOptions } from "./fan";
+import { along, ring } from "./distribute";
+import type { RingItem, RingOptions } from "./distribute";
 import { membrane, slab } from "./membrane";
 import type { MembraneEdge, MembraneOptions, SlabOptions } from "./membrane";
-import type { V3 } from "./math";
+import type { FrameInput, PointInput } from "./math";
 import { part } from "./parts";
 import type { PartOptions } from "./parts";
-import type { PathLike } from "./path";
+import type { PathInput } from "./path";
 import { Region } from "./region";
 import type { RegionOptions } from "./region";
 import { rigBlock } from "./rig";
@@ -20,7 +20,7 @@ import type { Chain, ChainOptions, JointOptions, PoseRotation } from "./skeleton
 import { capsule, frustumBox, loft, rod, spike, sprout } from "./sugar";
 import type { SproutOptions, Station } from "./sugar";
 import { stick, Surface } from "./surface";
-import type { Hit, StickOptions, SurfaceTarget } from "./surface";
+import type { StickOptions, SurfaceTarget } from "./surface";
 import { sweep } from "./sweep";
 import type { Radius, SweepOptions } from "./sweep";
 
@@ -56,13 +56,16 @@ export class Builder {
     return createJoint(this.ctx, name, options);
   }
 
-  chain(name: string, path: PathLike, options: ChainOptions) {
+  chain(name: string, path: PathInput, options: ChainOptions = {}) {
     return createChain(this.ctx, name, path, options);
   }
 
-  fan(name: string, options: FanOptions, build: (item: FanItem) => void) {
-    return fan(this.ctx, name, options, build);
+  ring(line: FrameInput, options: RingOptions, fn?: (item: RingItem) => void) {
+    return ring(this.ctx, line, options, fn);
   }
+
+  /** Frames along a chain (`chain.at`), a sweep (`sweep.at`, dorsal) or any path input. */
+  readonly along = along;
 
   pose(joint: JointRef, rotation: PoseRotation) {
     return pose(this.ctx, joint, rotation);
@@ -72,23 +75,29 @@ export class Builder {
     return part(this.ctx, geometry, color, options);
   }
 
-  sweep(source: PathLike | Chain, radius: Radius, options?: SweepOptions) {
+  sweep(source: PathInput | Chain, radius: Radius, options?: SweepOptions) {
     return sweep(this.ctx, source, radius, options);
   }
 
-  rod(a: V3, b: V3, r: number | readonly [number, number], options?: SweepOptions) {
+  rod(a: PointInput, b: PointInput, r: number | readonly [number, number], options?: SweepOptions) {
     return rod(this.ctx, a, b, r, options);
   }
 
-  capsule(a: V3, b: V3, r: number | readonly [number, number], options?: SweepOptions) {
+  capsule(a: PointInput, b: PointInput, r: number | readonly [number, number], options?: SweepOptions) {
     return capsule(this.ctx, a, b, r, options);
   }
 
-  spike(base: V3, dirOrTip: V3, len: number | null, r: number, options?: SweepOptions) {
+  spike(base: PointInput, dirOrTip: PointInput, len: number | null, r: number, options?: SweepOptions) {
     return spike(this.ctx, base, dirOrTip, len, r, options);
   }
 
-  frustumBox(a: V3, b: V3, start: readonly [number, number], end: readonly [number, number], options?: SweepOptions) {
+  frustumBox(
+    a: PointInput,
+    b: PointInput,
+    start: readonly [number, number],
+    end: readonly [number, number],
+    options?: SweepOptions,
+  ) {
     return frustumBox(this.ctx, a, b, start, end, options);
   }
 
@@ -96,23 +105,23 @@ export class Builder {
     return loft(this.ctx, stations, options);
   }
 
-  sprout(name: string, hit: Hit, pathOrTip: PathLike | V3, radius: Radius, options?: SproutOptions) {
-    return sprout(this.ctx, name, hit, pathOrTip, radius, options);
+  sprout(name: string, on: FrameInput, pathOrTip: PathInput | PointInput, radius: Radius, options?: SproutOptions) {
+    return sprout(this.ctx, name, on, pathOrTip, radius, options);
   }
 
   surface(targets: SurfaceTarget) {
     return new Surface(this.ctx, targets);
   }
 
-  stick(geometry: BufferGeometry, color: string, hit: Hit, options?: StickOptions) {
-    return stick(this.ctx, geometry, color, hit, options);
+  stick(geometry: BufferGeometry, color: string, on: FrameInput, options?: StickOptions) {
+    return stick(this.ctx, geometry, color, on, options);
   }
 
   membrane(edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions) {
     return membrane(this.ctx, edgeA, edgeB, options);
   }
 
-  slab(points: readonly V3[], options: SlabOptions) {
+  slab(points: readonly PointInput[], options: SlabOptions) {
     return slab(this.ctx, points, options);
   }
 
