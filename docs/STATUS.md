@@ -20,6 +20,10 @@ All commits are local; nothing is pushed.
 | 842f88d | 5       | Smooth skinning by default for sweeps, lofts and membranes on chains: one continuous mesh, weights blended ±1 local radius at joints. `skin: "rigid"` opts out.                                                                            |
 | 729f43b | guide   | `GUIDE.md`, the reusable brief for a builder agent, and `npm run snap`.                                                                                                                                                                    |
 | ea6266c | guide   | giantAnteater, committed by its Astra builder with type errors (see to-dos).                                                                                                                                                               |
+| 73f24ca | 6       | `extrude` (a 2D outline in any plane; taper, self-fitting bevel, corner-cut smoothing, "sharp" corners) and `lathe` (the same outline spun around an axis). Crossing outlines throw.                                                       |
+| 115bc75 | samples | Outline showcase, each built by Claude Opus 5.5 from `GUIDE.md`: stegosaurus (extruded plates, lathed beak and pads; 40.3k tris).                                                                                                          |
+| 0235b83 | samples | sailfish (extruded sail split per spine bone with membrane gap strips, fins and forked tail; lathed eyes and gill cover; 20.5k tris).                                                                                                      |
+| 0a62e8b | samples | indianPeafowl (66 extruded eye feathers with stacked extruded eye spots on a 9-joint ring; lathed beak and eyes; 52.0k tris).                                                                                                              |
 
 ## Guide test run
 
