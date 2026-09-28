@@ -1,7 +1,7 @@
 // Indo-Pacific sailfish (Istiophorus platypterus), 1.8 m from bill tip to tail tips.
-// A swimming rest pose flattened straight: the body chain runs level from the neck to the tail fork, the sail is
-// raised to full height and every fin is spread. The sail is extruded in one piece per spine bone, split on its
-// fin rays so it bends with the body; the pectoral, pelvic, anal, second dorsal and lunate caudal fins, and the
+// A swimming rest pose flattened straight: one smooth skin runs from the tail fork through the spine into the head,
+// the sail is raised to full height and every fin is spread. The sail is extruded in one piece per spine bone, split
+// on its fin rays so it bends with the body; the pectoral, pelvic, anal, second dorsal and lunate caudal fins, and the
 // peduncle keels, are extrudes too. The eyes (orbit, iris, lens) and the gill covers are turned lathe profiles.
 import { CylinderGeometry, SphereGeometry } from "three";
 import { createBuilder } from "../src/builder";
@@ -81,8 +81,9 @@ export default function build() {
     group: "jaw",
   });
 
-  // ---------------------------------------------------------------- Body
-  // Half height and half width along z, from the neck to the tail fork; a slightly deeper belly up front.
+  // ---------------------------------------------------------------- Body and head
+  // One curve runs from the tail fork through the spine and into the head. The two ranges keep the old body/head
+  // groups, but share their ring at the root; all dimensions are half-width/half-height for sweep.
   const halfH = curve([
     [TAIL_END_Z, 0.026],
     [-0.6, 0.03],
@@ -113,46 +114,85 @@ export default function build() {
     [0.2, -0.008],
     [NECK_Z, -0.004],
   ]);
-  const bodyLength = NECK_Z - TAIL_END_Z;
-  const zAt = (t: number) => NECK_Z - t * bodyLength;
-  const tAt = (z: number) => (NECK_Z - z) / bodyLength;
+  const centre = (z: number): V3 => [0, Y0 + sag(z), z];
+  const headPath: V3[] = [
+    centre(NECK_Z),
+    [0, Y0 + 0.002, 0.44],
+    [0, Y0 + 0.002, 0.51],
+    [0, Y0 - 0.002, 0.58],
+    [0, Y0 - 0.006, 0.61],
+  ];
+  const wholePath = catmull([
+    centre(TAIL_END_Z),
+    ...jointZ
+      .slice()
+      .reverse()
+      .map((z): V3 => centre(z)),
+    ...headPath.slice(1),
+  ]);
+  const headStart = wholePath.closestT(centre(NECK_Z));
+  const headHalfW = curve([
+    [NECK_Z, halfW(NECK_Z)],
+    [0.44, 0.036],
+    [0.51, 0.025],
+    [0.58, 0.016],
+    [0.61, 0.013],
+  ]);
+  const headHalfH = curve([
+    [NECK_Z, halfH(NECK_Z)],
+    [0.44, 0.052],
+    [0.51, 0.033],
+    [0.58, 0.019],
+    [0.61, 0.014],
+  ]);
   const dorsalY = (z: number) => Y0 + sag(z) + halfH(z);
-
-  // Vertical flank bars: pale bands between the dark back and the silver belly.
-  const bands: [number, string][] = [];
-  const BARS = 16;
-  for (let i = 0; i < BARS; i++) {
-    const z = 0.26 - (i / (BARS - 1)) * 0.66;
-    bands.push([tAt(z + 0.007), FLANK], [tAt(z - 0.007), BAR]);
-  }
-  bands.push([1, FLANK]);
   const countershade: [number, number, string][] = [
     [-66, 66, DORSAL],
     [66, 84, MIDBLUE],
     [-84, -66, MIDBLUE],
     [124, 236, BELLY],
   ];
-  const bodyTube = b.sweep(spine, (t) => [halfW(zAt(t)), halfH(zAt(t))], {
-    shift: (t) => [0, sag(zAt(t))],
-    bands,
-    sectors: countershade,
-    sides: 16,
-    group: "body",
-  });
-
-  // ---------------------------------------------------------------- Head
-  const headLoft = b.loft(
-    [
-      { at: [0, Y0 - 0.004, 0.28], w: 0.104, h: 0.172 },
-      { at: [0, Y0 - 0.002, 0.36], w: 0.096, h: 0.156 },
-      { at: [0, Y0 + 0.002, 0.44], w: 0.072, h: 0.104 },
-      { at: [0, Y0 + 0.002, 0.51], w: 0.05, h: 0.066 },
-      { at: [0, Y0 - 0.002, 0.58], w: 0.032, h: 0.038 },
-      { at: [0, Y0 - 0.006, 0.61], w: 0.026, h: 0.028 },
-    ],
-    { bone: head, color: FLANK, sectors: countershade, sides: 16, group: "head" },
+  const BARS = 16;
+  const bodyColor = (z: number) => {
+    for (let i = 0; i < BARS; i++) {
+      const centreZ = 0.26 - (i / (BARS - 1)) * 0.66;
+      if (z >= centreZ - 0.007 && z <= centreZ + 0.007) return BAR;
+    }
+    return FLANK;
+  };
+  const bodyTube = b.sweep(
+    wholePath,
+    (u) => {
+      const z = wholePath.at(u * headStart).z;
+      return [halfW(z), halfH(z)];
+    },
+    {
+      color: (u) => bodyColor(wholePath.at(u * headStart).z),
+      bone: [spine, head],
+      to: headStart,
+      sectors: countershade,
+      sides: 16,
+      caps: { start: "round", end: "none" },
+      group: "body",
+    },
   );
-  const headSurface = b.surface([headLoft, bodyTube]);
+  const headTube = b.sweep(
+    wholePath,
+    (u) => {
+      const z = wholePath.at(headStart + u * (1 - headStart)).z;
+      return [headHalfW(z), headHalfH(z)];
+    },
+    {
+      bone: [spine, head],
+      from: headStart,
+      color: FLANK,
+      sectors: countershade,
+      sides: 16,
+      caps: { start: "none", end: "round" },
+      group: "head",
+    },
+  );
+  const headSurface = b.surface([headTube, bodyTube]);
 
   // The bill: a long round spear off the upper jaw, dark above.
   b.sweep(
