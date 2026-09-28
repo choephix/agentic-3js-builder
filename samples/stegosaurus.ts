@@ -1,11 +1,11 @@
-// Stegosaurus at 1/4 scale (2 m), four-square in a rigging rest pose. One smooth-skinned trunk and neck lofted over
-// a spine chain arches up to the hips; the tail is its own eight-joint chain held straight out and ends in a
-// four-spike thagomizer. The dorsal plates are the signature: two staggered rows of extruded outlines drawn in four
-// families (rounded neck plates, upright back plates, broad hip plates, swept tail plates) that grow toward the hips
-// and shrink toward the head and tail. Each plate is two extrudes, a tapered red-rimmed blade with a thicker ochre
-// core carrying vascular grooves, seated on a ray hit so it takes the skin's weights and rides the spine or tail when
-// they bend. Hoof nails and leaf-shaped cheek teeth are small extrudes too. Turned shapes are lathes: the elephantine
-// foot pads, the keratin beak on both jaws, the eyelid rings, the throat ossicles and the skin tubercles.
+// Stegosaurus at 1/4 scale (2 m), four-square in a rigging rest pose. Tail, trunk and neck are one smooth-skinned tube
+// drawn from the tail tip through the hips to the base of the skull, over an eight-joint tail chain running back from
+// the hips and a spine chain running forward. The dorsal plates are the signature: two staggered rows of extruded
+// outlines drawn in four families (rounded neck plates, upright back plates, broad hip plates, swept tail plates) that
+// grow toward the hips and shrink toward the head and tail. Each plate is two extrudes, a tapered red-rimmed blade
+// with a thicker ochre core carrying vascular grooves, seated on a ray hit so it takes the skin's weights and rides the
+// one tube when it bends. Hoof nails and leaf-shaped cheek teeth are small extrudes too. Turned shapes are lathes: the
+// elephantine foot pads, the keratin beak on both jaws, the eyelid rings, the throat ossicles and the skin tubercles.
 import { SphereGeometry, Vector3 } from "three";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
@@ -86,11 +86,14 @@ export default function build() {
   const b = createBuilder({ name: "stegosaurus" });
   const random = rng(17);
 
-  // ---------------------------------------------------------------- trunk and neck
-  // Station centres from the rump to the base of the skull; w/h are full width and height. The back peaks over the
-  // hips and falls steeply to a low neck, so the short forelimbs and the long hind limbs both reach the floor.
+  // ---------------------------------------------------------------- tail, trunk and neck
+  // One tube from the tail tip to the base of the skull; w/h are full width and height. It tapers from the tail,
+  // swells into the rump over the hips, then falls steeply to a low neck.
   const stations = [
-    { at: [0, 0.57, -0.44], w: 0.28, h: 0.32 },
+    { at: [0, 0.39, -1.22], w: 0.044, h: 0.052 },
+    { at: [0, 0.43, -1.02], w: 0.09, h: 0.1 },
+    { at: [0, 0.5, -0.78], w: 0.16, h: 0.18 },
+    { at: [0, 0.57, -0.48], w: 0.26, h: 0.3 },
     { at: [0, 0.6, -0.2], w: 0.38, h: 0.42 },
     { at: [0, 0.54, 0.04], w: 0.44, h: 0.44 },
     { at: [0, 0.45, 0.25], w: 0.38, h: 0.38 },
@@ -99,64 +102,32 @@ export default function build() {
     { at: [0, 0.31, 0.61], w: 0.12, h: 0.12 },
   ] as const;
   const curve = catmull(stations.map((s) => s.at));
-  const hips = b.joint("hips", { at: stations[1].at, role: "spine", group: "body" });
-  const spine = b.chain("spine", curve.slice(curve.knots[1], 1), {
+  const hipsT = curve.knots[4];
+  const hips = b.joint("hips", { at: stations[4].at, role: "spine", group: "body" });
+  const spine = b.chain("spine", curve.slice(hipsT, 1), {
     parent: hips,
     count: 5,
     names: ["spine1", "spine2", "chest", "neck1", "neck2"],
     role: "spine",
     group: "body",
   });
-  const belly = (t: number) => Math.sin(Math.PI * Math.min(Math.max((t - 0.1) / 0.6, 0), 1));
-  // Faint dark stripes across the flanks; the back and belly sectors keep their own colours.
-  const stripe = (t: number) => (t > 0.18 && t < 0.72 && ((t - 0.18) / 0.075) % 1 > 0.62 ? STRIPE : HIDE);
+  const tail = b.chain("tail", curve.slice(hipsT, 0), { parent: hips, count: 8, role: "tail", group: "tail" });
+  const zAt = (t: number) => curve.at(t).z;
+  const belly = (z: number) => Math.sin(Math.PI * Math.min(Math.max((z + 0.75) / 1.25, 0), 1));
+  const stripe = (t: number) => {
+    const z = zAt(t);
+    return z > -1.12 && z < 0.52 && ((z + 1.12) / 0.12) % 1 > 0.6 ? STRIPE : HIDE;
+  };
   const body = b.loft(stations, {
-    bone: spine,
+    bone: [tail, hips, spine],
     color: stripe,
     sectors: [
       [-58, 58, BACK],
       [118, 242, BELLY],
     ],
-    shift: (t) => [0, -0.03 * belly(t)],
+    shift: (t) => [0, -0.03 * belly(zAt(t))],
     sides: 16,
     group: "body",
-  });
-
-  // ---------------------------------------------------------------- tail
-  const tail = b.chain(
-    "tail",
-    catmull([
-      [0, 0.6, -0.2],
-      [0, 0.57, -0.48],
-      [0, 0.5, -0.78],
-      [0, 0.43, -1.02],
-      [0, 0.39, -1.22],
-    ]),
-    { parent: hips, count: 8, role: "tail", group: "tail" },
-  );
-  const tailRx: [number, number][] = [
-    [0, 0.17],
-    [0.2, 0.13],
-    [0.5, 0.08],
-    [0.8, 0.045],
-    [1, 0.022],
-  ];
-  const tailRy: [number, number][] = [
-    [0, 0.19],
-    [0.2, 0.15],
-    [0.5, 0.09],
-    [0.8, 0.05],
-    [1, 0.026],
-  ];
-  const tailStripe = (t: number) => (t > 0.12 && t < 0.7 && ((t - 0.12) / 0.09) % 1 > 0.6 ? STRIPE : HIDE);
-  const tailTube = b.sweep(tail, (t) => [interp(tailRx, t), interp(tailRy, t)], {
-    color: tailStripe,
-    sectors: [
-      [-52, 52, BACK],
-      [125, 235, BELLY],
-    ],
-    sides: 14,
-    group: "tail",
   });
 
   // ---------------------------------------------------------------- head
@@ -429,7 +400,7 @@ export default function build() {
   // ---------------------------------------------------------------- dorsal plates
   // Walk from the neck to the tail; each step is half a plate so neighbours in one row never touch, and the rows
   // alternate sides. Size peaks over the hips and the base of the tail.
-  const back = b.surface([body, tailTube]);
+  const back = b.surface(body);
   const size: [number, number][] = [
     [-0.9, 0.3],
     [-0.7, 0.55],
@@ -501,7 +472,7 @@ export default function build() {
       [1, 0.8, [s * 1, 0.55, -0.3], 0.19],
       [2, 0.9, [s * 0.75, 0.55, -0.75], 0.2],
     ] as const) {
-      const base = tailTube.at(t, s * 58);
+      const base = body.at(hipsT * (1 - t), s * 58);
       const d = new Vector3(...dir).normalize();
       const tip = offset(offset(base.at, d, len), [0, 1, 0], 0.03);
       b.sprout(
@@ -547,7 +518,7 @@ export default function build() {
     [0.012, 0.003],
     [0, 0.009, "sharp"],
   ];
-  const trunk = b.surface([body, tailTube]);
+  const trunk = b.surface(body);
   for (const [surface, count, minDist, filter, colors] of [
     [trunk, 46, 0.06, (h: Hit) => Math.abs(h.n.y) < 0.6 && h.at.z > -0.7 && h.at.z < 0.4, [BUMP, STUD]],
     [trunk, 30, 0.05, (h: Hit) => h.n.y >= 0.6 && Math.abs(h.at.x) > 0.06 && h.at.z > -0.8 && h.at.z < 0.45, [BUMP]],
