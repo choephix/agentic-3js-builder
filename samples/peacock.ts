@@ -1,13 +1,15 @@
 // Peacock. A 24-feather train ringed around a vertical line behind the rump on 6 group joints, built
-// lying back and then raised into display by posing those 6 joints; a 7-feather crest ringed around the head's
-// forward line on 2 joints; bird legs from `limb`; rig roles on every part of the skeleton; `detail` sets the
-// tessellation budget in one place. Feather geometry never names a bone: each item carries its group joint.
+// lying back and then raised into display by posing those 6 joints; the body and neck are one smooth-skinned tube
+// over the spine and neck chains; a 7-feather crest ringed around the head's forward line on 2 joints; bird legs
+// from `limb`; rig roles on every part of the skeleton; `detail` sets the tessellation budget in one place. Feather
+// geometry never names a bone: each item carries its group joint.
 import { SphereGeometry, Vector3 } from "three";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
 import { limb } from "../src/ik";
 import { aim, offset } from "../src/math";
 import { bezier, catmull } from "../src/path";
+import { interpolate } from "../src/sweep";
 
 export const meta = {
   name: "Peacock",
@@ -28,6 +30,22 @@ export default function build() {
   // detail 0.8: every default side count, ring spacing and b.segments() scales down: 6.3k triangles (10.7k at 1).
   const b = createBuilder({ name: "peacock", detail: 0.8 });
 
+  const bodyStations = [
+    { at: [0, 0.6, -0.34], w: 0.16, h: 0.16 },
+    { at: [0, 0.62, -0.1], w: 0.34, h: 0.36 },
+    { at: [0, 0.68, 0.12], w: 0.3, h: 0.34 },
+    { at: [0, 0.76, 0.28], w: 0.16, h: 0.18 },
+  ] as const;
+  const bodyCurve = catmull(bodyStations.map((station) => station.at));
+  const neckCurve = catmull([
+    [0, 0.74, 0.28],
+    [0, 0.9, 0.36],
+    [0, 1.04, 0.37],
+    [0, 1.12, 0.42],
+  ]);
+  const fullCurve = bodyCurve.concat(neckCurve);
+  const bodyT = bodyCurve.length / fullCurve.length;
+
   const hips = b.joint("hips", { at: [0, 0.62, -0.1], role: "spine" });
   const spine = b.chain(
     "spine",
@@ -38,27 +56,42 @@ export default function build() {
     ],
     { parent: hips, role: "spine", group: "body" },
   );
-  b.loft(
-    [
-      { at: [0, 0.6, -0.34], w: 0.16, h: 0.16 },
-      { at: [0, 0.62, -0.1], w: 0.34, h: 0.36 },
-      { at: [0, 0.68, 0.12], w: 0.3, h: 0.34 },
-      { at: [0, 0.76, 0.28], w: 0.16, h: 0.18 },
-    ],
-    { bone: spine, color: BLUE, sectors: [[125, 235, TEAL]], group: "body" },
-  );
+  const neck = b.chain("neck", neckCurve, {
+    parent: spine.joints[1],
+    count: 3,
+    role: "neck",
+    group: "neck",
+  });
 
-  const neck = b.chain(
-    "neck",
-    catmull([
-      [0, 0.74, 0.28],
-      [0, 0.9, 0.36],
-      [0, 1.04, 0.37],
-      [0, 1.12, 0.42],
-    ]),
-    { parent: spine.joints[1], count: 3, role: "neck", group: "neck" },
-  );
-  b.sweep(neck, [0.075, 0.045], { color: BLUE });
+  const bodyRadius = (t: number): [number, number] => [
+    interpolate(
+      bodyCurve.knots,
+      bodyStations.map((station) => station.w / 2),
+      t,
+    ),
+    interpolate(
+      bodyCurve.knots,
+      bodyStations.map((station) => station.h / 2),
+      t,
+    ),
+  ];
+  b.sweep(fullCurve, bodyRadius, {
+    from: 0,
+    to: bodyT,
+    bone: [spine, neck],
+    color: BLUE,
+    sectors: [[125, 235, TEAL]],
+    caps: { end: "none" },
+    group: "body",
+  });
+  b.sweep(fullCurve, (t) => [0.08 - 0.035 * t, 0.09 - 0.045 * t], {
+    from: bodyT,
+    to: 1,
+    bone: [spine, neck],
+    color: BLUE,
+    caps: { start: "none" },
+    group: "neck",
+  });
 
   const head = b.joint("head", {
     at: neck.at(1),
