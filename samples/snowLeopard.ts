@@ -1,7 +1,8 @@
-// Snow leopard. A long, low, smooth-skinned body from rump to head (a loft over the spine and neck joints) with a
-// deep chest and tucked loin, countershaded smoky grey over a white belly. Digitigrade legs placed joint by joint,
-// each ending in a toe segment flat on the floor under a broad snowshoe paw; a very thick tail on eight joints with
-// dark rings and a solid black tip. A domed, short-muzzled head on a region: eyes and nose set onto the face by ray
+// Snow leopard. A long, low, smooth-skinned body from rump tip through the tail to the head (one loft over the tail,
+// hips and spine joints) with a deep chest and tucked loin, countershaded smoky grey over a white belly. Digitigrade
+// legs placed joint by joint, each ending in a toe segment flat on the floor under a broad snowshoe paw; a very thick
+// tail on eight joints with dark rings and a solid black tip. A domed, short-muzzled head on a region: eyes and nose
+// set onto the face by ray
 // hits, a separate lower jaw with canines and tongue, dotted whisker pads, whiskers, and small rounded ears with
 // dark backs. Broken rosettes (partial tori around a fawn centre) are scattered over the real skin and bend with it;
 // solid spots on the head and legs, dashes down the spine.
@@ -40,9 +41,13 @@ export default function build() {
   const b = createBuilder({ name: "snowLeopard" });
   const random = rng(11);
 
-  // Body profile, rump tip to the base of the skull. w/h are full width and height at each station.
+  // One profile from tail tip through the hips to the base of the skull; w/h are full width and height.
   const stations = [
-    { at: [0, 0.48, -0.48], w: 0.21, h: 0.23 },
+    { at: [0, 0.49, -1.4], w: 0.14, h: 0.14 },
+    { at: [0, 0.43, -1.21], w: 0.145, h: 0.145 },
+    { at: [0, 0.42, -0.96], w: 0.15, h: 0.15 },
+    { at: [0, 0.46, -0.7], w: 0.145, h: 0.145 },
+    { at: [0, 0.48, -0.48], w: 0.14, h: 0.14 },
     { at: [0, 0.49, -0.35], w: 0.33, h: 0.32 },
     { at: [0, 0.48, -0.08], w: 0.3, h: 0.3 },
     { at: [0, 0.48, 0.16], w: 0.33, h: 0.35 },
@@ -51,24 +56,46 @@ export default function build() {
     { at: [0, 0.67, 0.5], w: 0.19, h: 0.2 },
   ] as const;
   const curve = catmull(stations.map((s) => s.at));
-  const root = b.joint("hips", { at: stations[1].at });
-  const spine = b.chain("spine", curve.slice(curve.knots[1], 1), {
-    parent: root,
+  const hipsT = curve.knots[4];
+  const hips = b.joint("hips", { at: stations[4].at });
+  const spine = b.chain("spine", curve.slice(hipsT, 1), {
+    parent: hips,
+    count: 5,
     names: ["spine1", "spine2", "chest", "neck1", "neck2"],
     role: "spine",
     group: "body",
   });
-  // A deep chest hanging below the spine line, the loin tucked up behind it.
-  const bump = (t: number, c: number, w: number) => Math.exp(-(((t - c) / w) ** 2));
+  const tail = b.chain("tail", curve.slice(hipsT, 0), { parent: hips, count: 8, role: "tail", group: "tail" });
+  const zAt = (t: number) => curve.at(t).z;
+  const stripe = (t: number) => {
+    const z = zAt(t);
+    if (z < -1.3) return ROSETTE;
+    if ((z > -1.23 && z < -1.17) || (z > -1.1 && z < -1.04) || (z > -0.99 && z < -0.93)) return ROSETTE;
+    return FUR;
+  };
+  const belly = (z: number) => Math.exp(-(((z - 0.02) / 0.18) ** 2));
+  const tailBody = b.loft(stations, {
+    bone: [tail, hips, spine],
+    from: 0,
+    to: hipsT,
+    color: stripe,
+    shift: (t) => [0, -0.035 * belly(zAt(t))],
+    sides: 14,
+    caps: { start: "round", end: "none" },
+    group: "body",
+  });
   const body = b.loft(stations, {
-    bone: spine,
-    color: FUR,
+    bone: [tail, hips, spine],
+    from: hipsT,
+    to: 1,
+    color: stripe,
     sectors: [
       [-60, 60, BACK],
       [130, 230, BELLY],
     ],
-    shift: (t) => [0, -0.035 * bump(t, 0.5, 0.12) + 0.015 * bump(t, 0.3, 0.1)],
+    shift: (t) => [0, -0.035 * belly(zAt(t))],
     sides: 14,
+    caps: { start: "none", end: "round" },
     group: "body",
   });
   // Elongated dark dashes running down the spine, laid along the skin.
@@ -81,7 +108,7 @@ export default function build() {
         flow: at.tangent,
         scale: [1, 1, 2.6],
       }),
-    { from: 0.08, to: 0.62 },
+    { from: hipsT + 0.03, to: 0.62 },
   );
 
   // Legs, digitigrade: upper, lower and metapodial bones, then a toe segment flat on the floor under a broad paw.
@@ -120,7 +147,7 @@ export default function build() {
         [s * 0.12, toeR, -0.2],
       ],
       {
-        parent: root,
+        parent: hips,
         names: ["hip", "knee", "hock", "foot"].map((n) => n + side),
         role: "leg",
         contact: [s * 0.12, 0, -0.23],
@@ -194,46 +221,6 @@ export default function build() {
         scale: 0.7 + random() * 0.6,
       });
   }
-
-  // Tail: nearly as thick as a forearm all the way, curling up gently at the tip.
-  const tail = b.chain(
-    "tail",
-    catmull([
-      [0, 0.5, -0.45],
-      [0, 0.46, -0.7],
-      [0, 0.42, -0.96],
-      [0, 0.43, -1.21],
-      [0, 0.49, -1.4],
-    ]),
-    { parent: root, count: 8, role: "tail", group: "tail" },
-  );
-  // Pale underneath with dark rings, then a solid black tip (its own sweep, so the belly sector stops short of it).
-  const tailR = (t: number) => 0.07 - 0.014 * Math.sin(Math.PI * t) + 0.004 * t;
-  const tipT = 0.93;
-  const tailTube = b.sweep(tail, (t) => tailR(t * tipT), {
-    to: tipT,
-    color: FUR,
-    bands: (
-      [
-        [0.6, FUR],
-        [0.645, ROSETTE],
-        [0.73, FUR],
-        [0.775, ROSETTE],
-        [0.86, FUR],
-        [0.9, ROSETTE],
-        [tipT, FUR],
-      ] as const
-    ).map(([t, color]) => [t / tipT, color] as [number, string]),
-    sectors: [[140, 220, BELLY]],
-    sides: 14,
-    caps: { start: "round", end: "none" },
-  });
-  b.sweep(tail, (t) => tailR(tipT + (1 - tipT) * t), {
-    from: tipT,
-    color: ROSETTE,
-    sides: 14,
-    caps: { start: "none", end: "round" },
-  });
 
   // Head: a region on the skull joint, +Z forward and +Y up in head units.
   const headDir: V3 = [0, -0.12, 1];
@@ -424,16 +411,17 @@ export default function build() {
     }
   };
   const skin = b.surface(body);
+  const tailSkin = b.surface(tailBody);
   for (const hit of skin.scatter(60, {
     rng: random,
     minDist: 0.065,
-    filter: (h) => h.n.y > -0.25 && h.at.z < 0.52,
+    filter: (h) => h.n.y > -0.25 && h.at.z < 0.52 && h.at.z > -0.45,
   }))
     rosette(hit, 0.024 + random() * 0.012, 0.0055);
-  for (const hit of b.surface(tailTube).scatter(14, {
+  for (const hit of tailSkin.scatter(14, {
     rng: random,
     minDist: 0.07,
-    filter: (h) => h.n.y > -0.3 && h.at.z > -0.93,
+    filter: (h) => h.n.y > -0.3 && h.at.z > -0.93 && h.at.z < -0.6,
   }))
     rosette(hit, 0.022 + random() * 0.008, 0.005);
 
