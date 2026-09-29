@@ -41,6 +41,9 @@ body.with-panel {
 body.with-panel:has(#panel-body[data-panel^="code:"]) {
   --panel-width: clamp(440px, 38vw, 700px);
 }
+body.with-panel:has(#panel-body[data-panel^="textures:"]) {
+  --panel-width: 460px;
+}
 
 [hidden] {
   display: none !important;
@@ -1241,6 +1244,71 @@ button.tag-row:hover {
 #panel-body .report h3 {
   margin: 0 0 2px;
   padding: 0;
+}
+
+/* ── Textures ────────────────────────────────────────────────────────── */
+
+.tex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+}
+.tex-thumb {
+  display: grid;
+  gap: 1px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  text-align: left;
+  font-size: 12px;
+}
+.tex-thumb:hover {
+  background: var(--hover);
+}
+.tex-thumb.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.tex-thumb .name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* Transparent texels show as a checkerboard. */
+.tex-frame,
+.tex-view {
+  background: repeating-conic-gradient(#dfe3e8 0 25%, #ffffff 0 50%) 0 0 / 12px 12px;
+  border: 1px solid var(--border);
+}
+.tex-frame {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+.tex-frame .tex-canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+.tex-view {
+  position: relative;
+  margin: 6px 0 2px;
+  cursor: zoom-in;
+}
+.tex-view .tex-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.tex-canvas {
+  image-rendering: pixelated;
+}
+.tex-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 /* ── Overlays ────────────────────────────────────────────────────────── */

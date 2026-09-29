@@ -77,7 +77,11 @@ type Log = {
   touches: Touch[];
 };
 
-function parseLog(file: string, text: string): Log {
+/**
+ * One session log. `seen` holds the ids of entries already read from other logs: a continued session copies its
+ * parent's history into a new file, and its subagents' logs with it, and those copies must not count twice.
+ */
+function parseLog(file: string, text: string, seen: Set<string>): Log {
   const entries: Entry[] = [];
   let title = "";
   for (const line of text.split("\n")) {
@@ -85,6 +89,10 @@ function parseLog(file: string, text: string): Log {
     try {
       const entry = JSON.parse(line) as Entry;
       if (entry.type === "title" && entry.title) title = entry.title;
+      if (entry.id && entry.type !== "session") {
+        if (seen.has(entry.id)) continue;
+        seen.add(entry.id);
+      }
       if (entry.timestamp) entries.push(entry);
     } catch {
       // A session may be mid-write on its last line.
@@ -168,9 +176,10 @@ function loadLogs() {
       .map((name) => join(root, name)),
   );
   const logs: Log[] = [];
+  const seen = new Set<string>();
   for (const file of files) {
     const bytes = readFileSync(file);
-    if (bytes.includes(needle)) logs.push(parseLog(file, bytes.toString("utf8")));
+    if (bytes.includes(needle)) logs.push(parseLog(file, bytes.toString("utf8"), seen));
   }
   return logs;
 }

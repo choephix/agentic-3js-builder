@@ -10,16 +10,19 @@ import type { Inspection } from "./inspect";
 import { age, count, delta, Lightbox, loadReport, loadSnapshots, loadText, versionsPanel } from "./renders";
 import type { Snapshots } from "./renders";
 import { diffListing, listing, originalLine } from "./source";
+import { texturesPanel } from "./textures";
+import type { TexturesView } from "./textures";
 import { FLEX_DEGREES, Viewer } from "./viewer";
 import type { ColorMode, Focus } from "./viewer";
 
-type Panel = "info" | "tree" | "rig" | "code" | "versions";
+type Panel = "info" | "tree" | "rig" | "code" | "versions" | "textures";
 const PANELS: Array<{ id: Panel; label: string; key: string }> = [
   { id: "info", label: "Info", key: "i" },
   { id: "tree", label: "Tree", key: "t" },
   { id: "rig", label: "Rig", key: "r" },
   { id: "code", label: "Code", key: "c" },
   { id: "versions", label: "Versions", key: "v" },
+  { id: "textures", label: "Textures", key: "x" },
 ];
 const MODES: Array<{ id: ColorMode; label: string; key: string; tip: string }> = [
   { id: "shaded", label: "Shaded", key: "1", tip: "Sample colours" },
@@ -43,6 +46,8 @@ type State = {
   compare: string | null;
   /** Versions panel: the selected tag. */
   tag: string | null;
+  /** Textures panel: the selected texture's index. */
+  texture: number;
 };
 
 type Entry = { slug: string; path: string; name: string; failed: boolean; latest: string | null };
@@ -67,6 +72,8 @@ let loading = 0;
 let preview: string | null = null;
 let liveBend = 0;
 const snapshotsBySlug = new Map<string, Snapshots>();
+/** The open Textures panel, which draws the focused part's UVs. */
+let texturesView: TexturesView | null = null;
 
 const viewer = new Viewer($("viewport"));
 const lightbox = new Lightbox();
@@ -95,6 +102,7 @@ function parse(): State {
     focus: params.get("focus"),
     compare: params.get("compare"),
     tag: params.get("tag"),
+    texture: Math.max(0, Math.round(number("tex", 0))),
   };
 }
 
@@ -112,6 +120,7 @@ function format(state: State) {
   if (state.focus) add("focus", state.focus);
   if (state.compare) add("compare", state.compare);
   if (state.tag) add("tag", state.tag);
+  if (state.texture) add("tex", state.texture);
   return `#${state.slug}${params.length ? `?${params.join("&")}` : ""}`;
 }
 
@@ -131,7 +140,11 @@ function set(patch: Partial<State>) {
   if (state.wiggle !== before.wiggle) viewer.wiggle(state.wiggle);
   if (state.bend !== before.bend || state.seed !== before.seed) viewer.pose(state.bend ?? 0, state.seed);
   if (state.panel !== before.panel) document.body.classList.toggle("with-panel", state.panel !== null);
-  const panelChanged = state.panel !== before.panel || state.compare !== before.compare || state.tag !== before.tag;
+  const panelChanged =
+    state.panel !== before.panel ||
+    state.compare !== before.compare ||
+    state.tag !== before.tag ||
+    state.texture !== before.texture;
   if (panelChanged) renderPanel();
   syncViewer();
   renderChrome();
@@ -195,7 +208,7 @@ function renderList() {
         "a",
         {
           class: `item${entry.slug === state.slug ? " on" : ""}${entry.failed ? " failed" : ""}`,
-          href: format({ ...state, slug: entry.slug, focus: null, compare: null, tag: null }),
+          href: format({ ...state, slug: entry.slug, focus: null, compare: null, tag: null, texture: 0 }),
           "data-tip": buildTip(builds[entry.slug]),
           onclick: (event: MouseEvent) => {
             if (event.metaKey || event.ctrlKey || event.shiftKey) return;
@@ -215,7 +228,7 @@ function renderList() {
 
 function select(slug: string) {
   document.body.classList.remove("menu");
-  set({ slug, focus: null, compare: null, tag: null });
+  set({ slug, focus: null, compare: null, tag: null, texture: 0 });
 }
 
 function step(by: number) {
@@ -333,6 +346,7 @@ function syncViewer() {
   viewer.setRigMarkers(state.panel === "rig", chain);
   for (const element of document.querySelectorAll<HTMLElement>("[data-focus]"))
     element.classList.toggle("on", element.dataset.focus === state.focus);
+  texturesView?.highlight(key?.startsWith("part:") ? Number(key.slice(5)) : null);
 }
 
 // ── Chrome: header, tools, stats, legend, bend bar, focus chip ───────────────────────────────────────────────────
@@ -520,10 +534,16 @@ function renderPanel() {
   const body = $("panel-body");
   const scroll = body.scrollTop;
   const panel = state.panel;
+  texturesView = null;
   if (!panel || !loaded) {
     body.replaceChildren();
     return;
   }
+  if (panel === "textures" && loaded.info)
+    texturesView = texturesPanel(loaded.info, state.texture, loaded.snaps.tags[0], {
+      select: (texture) => set({ texture }),
+      lightbox: (items, index) => lightbox.show(items, index),
+    });
   const content =
     panel === "info"
       ? infoPanel(loaded)
@@ -533,11 +553,13 @@ function renderPanel() {
           ? rigPanel(loaded)
           : panel === "code"
             ? codePanel(loaded)
-            : versionsPanel(loaded.slug, loaded.snaps, state.tag, {
-                select: (tag) => set({ tag }),
-                compare: (from, to) => set({ panel: "code", compare: `${from}..${to}` }),
-                lightbox: (items, index) => lightbox.show(items, index),
-              });
+            : panel === "textures"
+              ? (texturesView?.element ?? missing("Nothing built."))
+              : versionsPanel(loaded.slug, loaded.snaps, state.tag, {
+                  select: (tag) => set({ tag }),
+                  compare: (from, to) => set({ panel: "code", compare: `${from}..${to}` }),
+                  lightbox: (items, index) => lightbox.show(items, index),
+                });
   const same = body.dataset.panel === `${panel}:${loaded.slug}`;
   body.dataset.panel = `${panel}:${loaded.slug}`;
   body.replaceChildren(content);
@@ -1085,6 +1107,7 @@ const KEYS: Record<string, () => void> = {
   r: () => togglePanel("rig"),
   c: () => togglePanel("code"),
   v: () => togglePanel("versions"),
+  x: () => togglePanel("textures"),
   p: toggleBuilds,
   "?": () => ($("help").hidden = !$("help").hidden),
 };

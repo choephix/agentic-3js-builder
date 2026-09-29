@@ -33,7 +33,7 @@ npm run typecheck
 npm run snap -- <slug> v01
 ```
 
-- `snap` bakes the sample on the shared NVIDIA GPU and prints issues, counts, size and the skeleton tree. It writes a contact sheet (front, three-quarter, side, back, top, low hero angle, head close-up, bone colours, two skeleton x-rays and two flex tests that bend every bone at random), the single shots, a report and the GLBs to `~/tmp/public/nilo/agentic-3js-builder/snaps/<slug>/`. Look at the contact sheet and both flex shots every round.
+- `snap` bakes the sample on the shared NVIDIA GPU and prints issues, counts, size and the skeleton tree. It writes a contact sheet (front, three-quarter, side, back, top, low hero angle, head close-up, bone colours, two skeleton x-rays and two flex tests that bend every bone at random), the single shots, the texture atlas (`<tag>-atlas.png`: every colour, paint and drawing the model uses, packed into the one texture its GLBs carry), a report and the GLBs to `~/tmp/public/nilo/agentic-3js-builder/snaps/<slug>/`. Look at the contact sheet and both flex shots every round.
 - `--report-only` prints the checks without rendering.
 - Every snapshot takes a new tag: `v02`, `v03`, `v04-legs`.
 - The browser on port 9333 is shared and already running; `snap` connects to it.

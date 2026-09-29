@@ -16,6 +16,7 @@ export type Snapshot = {
 export type Download = { name: string; arm: "A" | "B"; bytes: number; url: string };
 export type Snapshots = { tags: Snapshot[]; downloads: Download[] };
 export type Issue = { level: "error" | "warning"; message: string };
+export type Placed = { x: number; y: number; w: number; h: number };
 export type Report = {
   tag: string;
   parts: number;
@@ -24,7 +25,13 @@ export type Report = {
   colors: number;
   /** Absent in reports from before textures. */
   textures?: number;
-  atlas?: { size: number; tiles: number; alpha: boolean };
+  atlas?: {
+    size: number;
+    tiles: number;
+    alpha: boolean;
+    /** Where each tile sits, in texels from the bottom-left (v up). Absent in reports from before it. */
+    layout?: { colors: Placed; textures: Array<Placed & { texture: string; tint: string }> };
+  };
   size: [number, number, number];
   bounds: { min: number[]; max: number[] };
   groups: Array<{ name: string; parts: number }>;

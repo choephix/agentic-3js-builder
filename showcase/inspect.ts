@@ -16,6 +16,8 @@ export type Part = {
   triangles: number;
   vertices: number;
   color: string | null;
+  /** The texture its material maps (a paint sheet, an SVG drawing), else null. */
+  map: Texture | null;
 };
 
 export type JointInfo = {
@@ -91,6 +93,7 @@ export function inspect(root: Object3D): Inspection {
       triangles: (geometry.index ? geometry.index.count : vertices) / 3,
       vertices,
       color,
+      map: material?.map ?? null,
     });
   });
   for (const joint of joints) {
