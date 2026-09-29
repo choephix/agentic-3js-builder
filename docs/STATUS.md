@@ -57,6 +57,7 @@ All commits are local; nothing is pushed.
 | 46c27ac         | samples | `meta.builtBy` on every sample, from its build record (a parallel session).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | 69e6884         | tools   | Per-version provenance: every rendered tag in `<slug>.build.json` `versions` names the session, model and effort that rendered it, found as the shell call running the harness when the contact sheet was written (loops, computed tags and backgrounded jobs count). All 280 tags on disk attributed. The showcase header's "by" line comes from the record (builder model, then any later models); the Versions panel has a "by" column. Creature lab d01b82d exports `MODEL_NAMES`.                                                                                                                                                                                                |
 | 09c8d79         | samples | Art-style round: ten Sonnet builds (see "Art-style round").                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 721711d 571441d | samples | Round 3: 22 Sonnet builds (see "Round 3"). Provenance: `scratch/` files don't make a session shared; a sample assembled by a shell command gets the session of its first render as builder.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 ## Guide test run
 
@@ -123,6 +124,18 @@ On 2026-09-29 ten Sonnet 5.5 (high) builders each got `GUIDE.md`, one subject an
 
 Recurring friction: no emissive, glossy, unlit or toon material (neon, glass, porcelain, lacquer and cel styles all faked it in paint); no decal helper for a drawing on a curved surface; textured parts are one-sided; `svg()` can't be previewed without a render; paints on a round end cap see a constant `t` (octopus crown, alebrije legs).
 
+## Round 3
+
+On 2026-09-29 22 Sonnet 5.5 (high) builders, same 3-render limit and a `scratch/` folder for throwaway scripts. Half retro/pixel, four clockwork, five humanoids, two dioramas. All 22 finished on v03 with a clean report. Contact sheet: `~/tmp/public/nilo/agentic-3js-builder/showcase/round3.jpg`.
+
+- Humanoids: retroActionHero (1996 shooter, $4.90), clockworkAutomaton ($7.72, 45.9k tris), wanderingMerchant (80 SVG planes, $5.86), dreadKnight (Warcraft, $7.62), littleLich (chibi, $5.48).
+- Dioramas: bunnyBakeryIsland (pixel, $7.27, 32 min), clockworkCarousel (toy clockwork, $9.22, 46.0k tris).
+- Clockwork: clockworkStag ($12.96, 42 min, the most expensive build so far), clockworkCrocodile ($5.72, 627 parts).
+- Retro/pixel: nesBoar, gameboyFrog, jrpgCockatrice, ps1CaveSpider, pixelCapybara, dosBasilisk, atariAnglerfish, pixelMammoth ($1.73-$4.32).
+- Other: rubberhoseCat, jadeSerpent, blossomDeer, tinToyDragon, toonRedPanda ($1.66, 7 min, the cheapest).
+
+Friction repeated across builders: `b.part` on model-space merged geometry needs `at: [0, 0, 0]` (six builders); `ngon` sections put a vertex on top, so flat-faced tubes need `sides` with `smooth: false`; pixel styles need a UV-box / per-face crop helper; no outline, emissive or unlit material; `Box3.setFromObject` misreads bone-local meshes.
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
@@ -154,6 +167,7 @@ Friction the builders reported:
 - [ ] The 3-render limit surfaced that `--report-only` gives no visual preview; several builders spent a render on a paint or SVG change.
 - [ ] Materials are fixed (MeshStandardMaterial, roughness 0.72): art styles want emissive, gloss, unlit/toon and a back-face outline.
 - [ ] A decal helper (`b.decal(drawing, hit, size)`) that conforms a drawing to a curved surface; three builders wrote their own.
+- [ ] `b.part` with `bone` and no `at` puts pre-positioned (model-space) geometry at the bone; six round-3 builders hit it.
 - [ ] The lean-mesh GUIDE line (batch 11) is untested on a fresh builder: rerun one texture-round subject and compare triangles against its batch 10 build.
 
 Samples:
