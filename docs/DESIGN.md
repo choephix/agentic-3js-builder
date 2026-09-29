@@ -238,3 +238,14 @@ Stefan, in wireframe again: the cow's hooves and eyes were finely cut spheres, i
 - **Every sample thinned** by hand (four density-pass agents plus the cow and scarecrow): explicit sphere, cylinder and torus counts, sides, lathe steps, extrude smoothing and bevel `detail`. Kept a little more on hero features (irises, beaks, eye turrets) and where fewer segments broke a detail (the hammerhead's gill rims, the manta's horn seam, the bonsai's training wire).
 
 The library went from 483.7k triangles after batch 11 to 283.9k (531.6k before batch 11): the cow 37.1k → 17.4k, the scarecrow 33.9k → 9.1k, the snow leopard 34.3k → 16.6k, the stegosaurus 40.3k → 19.1k.
+
+## Batch 13: kits, decals, preview and agent docs
+
+The cost analysis of 37 builds from the style rounds ($148.61, 1,961 model calls) showed 61% of the spend before the first render and a median context of 171k tokens per call, so whatever a builder reads early it pays for on every later call. Renders themselves were 6%. Three kinds of wheel-spinning dominated: re-deriving helpers other samples already had (about $36 of reading other samples), reading `src/` for conventions the docs didn't state (about $21), and writing preview scripts (about $10).
+
+- **Style kits** (`kits/pixel`, `kits/toon`, `kits/clockwork`) consolidate what the samples each re-wrote: pixel grids, square-texel box crops, skin boxes and quantised dithered paints (crab, beetle, bakery, raptor, boar, basilisk, hero, anglerfish); cel, fur-edge and ink paints and the anime eye (fennec, red panda); gear geometry, drawings, meshing trains and metal paints (owl, crocodile, stag, automaton, carousel). They sit on top of `src/`, which stays style-neutral.
+- **`b.decal`**: three builders wrote the same ray-cast quad grid to put eyes on a curved head. It is generic, so it is in `src/`.
+- **`flat: true`** on `part`/`stick`: the flat-colour builders each wrote a `facet()` helper.
+- **`docs/conventions.md`** answers the questions builders read `src/` for (section orientation, paint coordinates per shape, caps and seams, cards, bounds, `b.part` without `at`). Loading the whole SDK source instead would add about 55-60k tokens to every call, roughly the same cost as the digging it replaces, and it answers behaviour questions less directly than a page written for them.
+- **`npm run preview`**: textures, a parts table with world bounds, floor offenders and optional quick shots in about a second, without a render. `snap` and `preview` take a file path, so smoke files live in `scratch/`.
+- **Docs split**: `docs/api.md` (the API, formerly README) and `docs/conventions.md` are for agents; `README.md` is for people.

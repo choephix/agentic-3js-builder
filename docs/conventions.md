@@ -1,6 +1,6 @@
 # Conventions
 
-The behaviours and conventions to know before building with the SDK. Each answer is checked against `src/`. The API reference is `README.md`.
+The behaviours and conventions to know before building with the SDK. Each answer is checked against `src/`. The API reference is [`api.md`](api.md).
 
 ## Handedness and frames
 
