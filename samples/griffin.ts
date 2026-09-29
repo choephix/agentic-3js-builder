@@ -151,7 +151,6 @@ export default function build() {
   });
   const tail = b.chain("tail", curve.slice(hipsT, 0), { parent: hips, count: 8, role: "tail", group: "tail" });
   const bump = (t: number, c: number, w: number) => Math.exp(-(((t - c) / w) ** 2));
-  const zAt = (t: number) => curve.at(t).z;
   const body = b.loft(stations, {
     bone: [tail, hips, spine, neck],
     color: (t) => (t < hipsT ? LION : t < neckT ? LION : WHITE),

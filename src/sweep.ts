@@ -110,6 +110,8 @@ type Tube = {
   fillets: Array<{ s0: number; s1: number; p0: Vector3; c: Vector3; p1: Vector3 }>;
   /** The bones when the curve was taken: rings follow their later poses. */
   capture: Capture;
+  /** World-up reference angle at source t, continuous along the whole path (`continuousRef`); null while built. */
+  refAt: ((t: number, raw: number) => number) | null;
 };
 /** A ring: sweep t, centre, tangent/normal/binormal, radii, polar angle of the dorsal side in (B, N), weights. */
 type Frame = {
@@ -261,6 +263,7 @@ function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", manda
   const s = tube.shift(u);
   const up = flatten(new Vector3(0, 1, 0), T);
   const ref = up.lengthSq() > 1e-6 ? up.normalize() : N;
+  const raw = Math.atan2(ref.dot(N), ref.dot(B));
   return {
     t: u,
     c: centre.addScaledVector(B, s[0]).addScaledVector(N, s[1]),
@@ -269,9 +272,36 @@ function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", manda
     B,
     r: tube.radius(u),
     s,
-    ref: Math.atan2(ref.dot(N), ref.dot(B)),
+    ref: tube.refAt ? tube.refAt(t, raw) : raw,
     mandatory,
     w: [],
+  };
+}
+
+/**
+ * World up projected into the section flips to the other side wherever the tube passes vertical (every half turn
+ * of a coil), which would jump sectors and `at()` points across the tube. Sample it along the whole source path,
+ * keep it continuous across those flips, then pick the overall side that agrees with world up where the path lies
+ * most level. Sampling the whole path, not the swept range, keeps range splits of one path on the same side.
+ * Returns the continuous angle for any source t, given that ring's raw angle.
+ */
+function continuousRef(tube: Tube) {
+  const whole: Tube = { ...tube, from: 0, to: 1, refAt: null };
+  const count = 256;
+  const angles: number[] = [];
+  let agreement = 0;
+  for (let i = 0; i <= count; i++) {
+    const f = frameAt(whole, i / count, "right");
+    const angle = i === 0 ? f.ref : f.ref + Math.PI * Math.round((angles[i - 1] - f.ref) / Math.PI);
+    angles.push(angle);
+    agreement += flatten(new Vector3(0, 1, 0), f.T).length() * Math.cos(angle - f.ref);
+  }
+  const flip = agreement < 0 ? Math.PI : 0;
+  return (t: number, raw: number) => {
+    const x = Math.min(Math.max(t, 0), 1) * count;
+    const i = Math.min(Math.floor(x), count - 1);
+    const expected = angles[i] + (angles[i + 1] - angles[i]) * (x - i) + flip;
+    return raw + Math.PI * Math.round((expected - raw) / Math.PI);
   };
 }
 
@@ -519,7 +549,9 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     seam: seamSmooth ? seamIn.add(seamOut).normalize() : null,
     fillets,
     capture: chain ? chain.capture : new Capture(boneJoints ?? uniform!.map(([joint]) => joint)),
+    refAt: null,
   };
+  tube.refAt = continuousRef(tube);
   const caps = typeof options.caps === "object" ? options.caps : { start: options.caps, end: options.caps };
   const seamCap: Cap = seamSmooth ? "none" : "round";
   const capStart = closed ? seamCap : (caps.start ?? "round");
