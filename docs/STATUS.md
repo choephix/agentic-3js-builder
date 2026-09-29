@@ -156,6 +156,20 @@ On 2026-09-29 ten Gemini 3.8 Flash builders (Antigravity; the task tool's `med` 
 
 Friction they reported: `b.chain` with names wants one name per span (points − 1) (two builders); `catmull`/station points need tuple casts; joint roll on +Z-aimed bones puts local +Z dorsal (two builders); `role` has no `pelvis`/`foot`; a scenery rig with only a root joint throws in the harness. `npm run provenance` run from a worktree only finds that worktree's sessions and rewrites every other record without its builder; the other records were restored.
 
+## Astra round and Gemini game assets
+
+On 2026-09-29, same worktree and rules as the Gemini round (GUIDE.md, one subject, 3 renders, `scratch/<slug>/`, no redos): twenty GPT-6 Astra builders (task `med` effort, logged as `high`), eleven of them in named retro pixel styles and two dioramas; then five Gemini 3.8 Flash builders (logged `low`) briefed for game assets (a game role, silhouette at gameplay distance, lean rig, held items on their own bones). All 25 end on v03 with a clean report. Astra ≈ $95.6 ($2.86-$8.12, 6-17 min); Gemini game assets $9.07 ($0.76-$2.97, 4-8 min). Contact sheet: `~/tmp/public/nilo/agentic-3js-builder/showcase/astra-round.jpg`.
+
+- Retro (Astra): nesGoblinShaman, gbcSlimeKing, snesRedDragon, voxelWolf (288 tris), ps1Mech, amigaSeaTurtle, vgaSkeletonWarrior, arcadeTentacleAlien, pixelHarvestVillage (pixel diorama), nesYeti, pico8Rooster.
+- Other (Astra): witchCottageDiorama (plain objects, no joints), samuraiWarrior, hydra, bengalTiger, pangolin, moose, centaurArcher, leafySeadragon, silverbackGorilla.
+- Game assets (Gemini): mushroomGolemBoss (16.8k tris), jetpackPenguinMerc, cactusGunslinger, teapotDragon, siegeSnail.
+- Known failures, reported by the builders themselves and kept as built: nesYeti has four legs instead of two and a jaw above the head; gbcSlimeKing's crown floats and it rendered v03 twice (four renders); centaurArcher's hooves are detached from the legs, and its jaw and beard sit behind the face. Two builders asked for a fourth render and were refused.
+- snesRedDragon stands on long bare legs with the body high; cactusGunslinger aims forward instead of the rest pose.
+- jetpackPenguinMerc fails typecheck (3 errors, left as built). pico8Rooster's final file differs from v03 by type-only edits (a dropped third `c.pick` argument, two unused constants).
+- Six Astra records (gbcSlimeKing, voxelWolf, samuraiWarrior, bengalTiger, pangolin, centaurArcher) hold only whole-session totals: provenance counts their `scratch/<slug>/` files as other files.
+
+Friction: `b.chain` names are one per span (most builders); `Region.joint()` takes region-local coordinates while `region.p()` returns model space (tiger, gorilla, yeti jaws); `Cell.pick` takes `(ramp, value)` though docs suggest a threshold; `stripes()` wants a vector axis, not `"z"`; textured `tileBox` parts need a `#ffffff` tint; emissive material flags are ignored on plain-object samples.
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
