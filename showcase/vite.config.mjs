@@ -1,11 +1,15 @@
 // Local endpoints and their static-build equivalents for sample sources, harness renders (`npm run snap`) and the
-// sidebar thumbnails. Development serves renders and thumbnails through `/@fs/`; production copies the referenced
-// files into the build.
+// sidebar thumbnails. Development serves renders through `/@fs/`; production copies the referenced files into the
+// build. Thumbnails live in the public folder, so both serve them as `/thumbs/`.
+import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { watch } from "node:fs";
 import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
+import { promisify } from "node:util";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
+
+const run = promisify(execFile);
 
 const sampleRoot = resolve("samples");
 const snapshotRoot = resolve("/home/cx/tmp/public/nilo/agentic-3js-builder/snaps");
@@ -78,18 +82,52 @@ const sendText = async (response, path) => {
   response.end(text);
 };
 
+/**
+ * When each sample joined the library: the earlier of the commit that added it and its file's birth time. A fresh
+ * checkout gives every file the same birth time, so the commit decides there; an uncommitted sample has only its
+ * birth time (or mtime where the filesystem records none).
+ */
 async function sampleCreated() {
   const files = (await list(sampleRoot)).filter((file) => file.endsWith(".ts"));
-  const times = await Promise.all(files.map((file) => stat(join(sampleRoot, file))));
-  return Object.fromEntries(files.map((file, i) => [basename(file, ".ts"), times[i].birthtimeMs || times[i].mtimeMs]));
+  const [times, added] = await Promise.all([
+    Promise.all(files.map((file) => stat(join(sampleRoot, file)))),
+    gitAdded(),
+  ]);
+  return Object.fromEntries(
+    files.map((file, i) => [
+      basename(file, ".ts"),
+      Math.min(times[i].birthtimeMs || times[i].mtimeMs, added.get(file) ?? Infinity),
+    ]),
+  );
+}
+
+/** Sample file name → when the commit that added it was made (the latest such commit), in ms. */
+async function gitAdded() {
+  const log = await run("git", ["log", "--diff-filter=A", "--name-only", "--format=%x00%ct", "--", "samples/*.ts"], {
+    cwd: dirname(sampleRoot),
+  }).then(
+    (result) => result.stdout,
+    () => "",
+  );
+  const added = new Map();
+  for (const block of log.split("\0").slice(1)) {
+    const [time, ...paths] = block.trim().split("\n");
+    for (const path of paths.filter(Boolean)) {
+      const file = basename(path);
+      if (!added.has(file)) added.set(file, Number(time) * 1000);
+    }
+  }
+  return added;
 }
 
 // ── Sidebar thumbnails ───────────────────────────────────────────────────────────────────────────────────────────
-// The page renders a thumbnail and posts it here; one image per sample is kept in `.cache/thumbs/`, named by a key
-// that hashes everything the picture depends on: the sample, the SDK and the page code that draws it. A kept image
-// whose key no longer matches is stale: the page shows it until its replacement arrives.
+// The page renders a thumbnail and posts it here; one image per sample is kept in `showcase/public/thumbs/`
+// (committed, and copied into the build as `/thumbs/`), named by a key that hashes everything the picture depends
+// on: the sample, the SDK and the page code that draws it. A kept image whose key no longer matches is stale: the
+// page shows it until its replacement arrives.
 
-const thumbRoot = resolve(".cache/thumbs");
+const thumbRoot = resolve("showcase/public/thumbs");
+const thumbUrl = (file) => `/thumbs/${file}`;
 const THUMB_FILE = /^([A-Za-z0-9_-]+)-([0-9a-f]{12})\.(webp|png)$/;
 const THUMB_TYPES = { "image/webp": "webp", "image/png": "png" };
 
@@ -112,7 +150,7 @@ const thumbKey = async (slug, shared) =>
     .slice(0, 12);
 
 /** Per sample: its current key, the kept image (fresh or stale) and whether it is fresh. */
-async function thumbIndex(fileUrl = url) {
+async function thumbIndex() {
   const [slugs, shared, files] = await Promise.all([
     list(sampleRoot).then((names) => names.filter((file) => file.endsWith(".ts")).map((file) => basename(file, ".ts"))),
     sharedDigest(),
@@ -123,7 +161,7 @@ async function thumbIndex(fileUrl = url) {
     const key = await thumbKey(slug, shared);
     const kept = files.map((file) => THUMB_FILE.exec(file)).filter((match) => match?.[1] === slug);
     const pick = kept.find((match) => match[2] === key) ?? kept[0];
-    index[slug] = { key, fresh: pick?.[2] === key, url: pick ? fileUrl(join(thumbRoot, pick[0])) : null };
+    index[slug] = { key, fresh: pick?.[2] === key, url: pick ? thumbUrl(pick[0]) : null };
   }
   return index;
 }
@@ -145,7 +183,7 @@ async function keepThumb(slug, key, request) {
   await writeFile(join(thumbRoot, file), Buffer.concat(chunks));
   for (const old of await list(thumbRoot))
     if (old !== file && THUMB_FILE.exec(old)?.[1] === slug) await rm(join(thumbRoot, old), { force: true });
-  return { status: 200, body: { url: url(join(thumbRoot, file)) } };
+  return { status: 200, body: { url: thumbUrl(file) } };
 }
 
 let buildDirectory;
@@ -185,14 +223,7 @@ const showcaseData = {
       await json(`__snapshots/${slug}`, await snapshots(slug, fileUrl, sourceUrl));
       for (const [route, path] of assets) await copy(path, route);
     }
-    const thumbs = new Map();
-    const thumbUrl = (path) => {
-      const route = `thumbs/${basename(path)}`;
-      thumbs.set(route, path);
-      return `/${route}`;
-    };
-    await json("__thumbs", await thumbIndex(thumbUrl));
-    for (const [route, path] of thumbs) await copy(path, route);
+    await json("__thumbs", await thumbIndex());
   },
   configureServer(server) {
     // samples/ sits outside the Vite root, so only files already loaded are watched. Watching the folder lets the
@@ -203,8 +234,7 @@ const showcaseData = {
       "/__sample-source",
       byName(([slug], response) => sendText(response, join(sampleRoot, `${slug}.ts`))),
     );
-    // When each sample file was created (newest first in the sample list). Falls back to mtime where the
-    // filesystem records no birth time.
+    // When each sample joined the library (newest first in the sample list); see `sampleCreated`.
     server.middlewares.use("/__sample-created", async (_request, response) => {
       const created = await sampleCreated();
       response.setHeader("Content-Type", "application/json; charset=utf-8");
