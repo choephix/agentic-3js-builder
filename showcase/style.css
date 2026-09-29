@@ -119,13 +119,11 @@ details.parts summary,
 
 /* ── Sidebar ─────────────────────────────────────────────────────────── */
 
-/* As wide as the longest name plus its tag, like an explorer. */
+/* Two columns of square thumbnails, about 128 px each. */
 #side {
   display: flex;
   flex-direction: column;
-  width: max-content;
-  min-width: 150px;
-  max-width: 240px;
+  width: 262px;
   min-height: 0;
   background: var(--bar);
   border-right: 1px solid var(--border);
@@ -177,46 +175,70 @@ details.parts summary,
 #list {
   flex: 1;
   overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Auto rows would shrink to fit the list's height: the tiles clip their overflow, so their minimum is zero. */
+  grid-auto-rows: max-content;
+  gap: 2px;
+  padding: 0 2px 2px;
 }
-#list .item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 22px;
-  padding: 0 8px;
+#list .tile {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--bg);
   color: var(--fg);
   text-decoration: none;
-  white-space: nowrap;
-  border: 1px solid transparent;
 }
-#list .item:hover {
-  background: var(--hover);
+#list .tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
-#list .item.on {
-  background: var(--active);
-  border-color: var(--accent);
-}
+/* The name shows on hover, on the open sample and on a failed one; without an image it stands in for one. */
 #list .name {
-  flex: 1;
-  min-width: 0;
+  position: absolute;
+  inset: auto 0 0;
+  padding: 1px 5px;
   overflow: hidden;
-  text-overflow: ellipsis;
-}
-#list .latest {
   font-size: 11px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: rgb(255 255 255 / 0.85);
+  opacity: 0;
+}
+#list .tile:hover .name,
+#list .tile.on .name,
+#list .tile.failed .name {
+  opacity: 1;
+}
+#list .tile:not(:has(img)) .name {
+  inset: 0;
+  display: grid;
+  place-items: center;
+  white-space: normal;
+  text-align: center;
+  background: none;
   color: var(--fg-3);
+  opacity: 1;
 }
-#list .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--bad);
+#list .tile.on::after,
+#list .tile.failed::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--accent);
+  pointer-events: none;
 }
-#list .item.failed .name {
+#list .tile.failed::after {
+  border-color: var(--bad);
+}
+#list .tile.failed .name {
   color: var(--bad);
 }
 #list .none {
-  padding: 3px 8px;
+  grid-column: 1 / -1;
+  padding: 3px 6px;
   color: var(--fg-3);
 }
 .side-foot {

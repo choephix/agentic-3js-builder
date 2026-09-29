@@ -1,7 +1,9 @@
-// Local endpoints and their static-build equivalents for sample sources and harness renders (`npm run snap`).
-// Development serves renders through `/@fs/`; production copies the referenced files into the build.
+// Local endpoints and their static-build equivalents for sample sources, harness renders (`npm run snap`) and the
+// sidebar thumbnails. Development serves renders and thumbnails through `/@fs/`; production copies the referenced
+// files into the build.
+import { createHash } from "node:crypto";
 import { watch } from "node:fs";
-import { copyFile, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
 
@@ -82,6 +84,70 @@ async function sampleCreated() {
   return Object.fromEntries(files.map((file, i) => [basename(file, ".ts"), times[i].birthtimeMs || times[i].mtimeMs]));
 }
 
+// ── Sidebar thumbnails ───────────────────────────────────────────────────────────────────────────────────────────
+// The page renders a thumbnail and posts it here; one image per sample is kept in `.cache/thumbs/`, named by a key
+// that hashes everything the picture depends on: the sample, the SDK and the page code that draws it. A kept image
+// whose key no longer matches is stale: the page shows it until its replacement arrives.
+
+const thumbRoot = resolve(".cache/thumbs");
+const THUMB_FILE = /^([A-Za-z0-9_-]+)-([0-9a-f]{12})\.(webp|png)$/;
+const THUMB_TYPES = { "image/webp": "webp", "image/png": "png" };
+
+async function sharedDigest() {
+  const sdk = (await readdir(resolve("src"), { recursive: true }))
+    .filter((file) => file.endsWith(".ts"))
+    .sort()
+    .map((file) => join(resolve("src"), file));
+  const hash = createHash("sha1");
+  for (const file of [...sdk, resolve("showcase/viewer.ts"), resolve("showcase/thumbs.ts")])
+    hash.update(file).update(await readFile(file));
+  return hash.digest("hex");
+}
+
+const thumbKey = async (slug, shared) =>
+  createHash("sha1")
+    .update(shared)
+    .update(await readFile(join(sampleRoot, `${slug}.ts`)))
+    .digest("hex")
+    .slice(0, 12);
+
+/** Per sample: its current key, the kept image (fresh or stale) and whether it is fresh. */
+async function thumbIndex(fileUrl = url) {
+  const [slugs, shared, files] = await Promise.all([
+    list(sampleRoot).then((names) => names.filter((file) => file.endsWith(".ts")).map((file) => basename(file, ".ts"))),
+    sharedDigest(),
+    list(thumbRoot),
+  ]);
+  const index = {};
+  for (const slug of slugs) {
+    const key = await thumbKey(slug, shared);
+    const kept = files.map((file) => THUMB_FILE.exec(file)).filter((match) => match?.[1] === slug);
+    const pick = kept.find((match) => match[2] === key) ?? kept[0];
+    index[slug] = { key, fresh: pick?.[2] === key, url: pick ? fileUrl(join(thumbRoot, pick[0])) : null };
+  }
+  return index;
+}
+
+/** Keep a posted thumbnail if it was drawn from the current key, replacing the sample's older image. */
+async function keepThumb(slug, key, request) {
+  const extension = THUMB_TYPES[request.headers["content-type"]];
+  if (!extension) return { status: 415 };
+  if (key !== (await thumbKey(slug, await sharedDigest()))) return { status: 409 };
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of request) {
+    size += chunk.length;
+    if (size > 4 << 20) return { status: 413 };
+    chunks.push(chunk);
+  }
+  const file = `${slug}-${key}.${extension}`;
+  await mkdir(thumbRoot, { recursive: true });
+  await writeFile(join(thumbRoot, file), Buffer.concat(chunks));
+  for (const old of await list(thumbRoot))
+    if (old !== file && THUMB_FILE.exec(old)?.[1] === slug) await rm(join(thumbRoot, old), { force: true });
+  return { status: 200, body: { url: url(join(thumbRoot, file)) } };
+}
+
 let buildDirectory;
 
 const showcaseData = {
@@ -119,6 +185,14 @@ const showcaseData = {
       await json(`__snapshots/${slug}`, await snapshots(slug, fileUrl, sourceUrl));
       for (const [route, path] of assets) await copy(path, route);
     }
+    const thumbs = new Map();
+    const thumbUrl = (path) => {
+      const route = `thumbs/${basename(path)}`;
+      thumbs.set(route, path);
+      return `/${route}`;
+    };
+    await json("__thumbs", await thumbIndex(thumbUrl));
+    for (const [route, path] of thumbs) await copy(path, route);
   },
   configureServer(server) {
     // samples/ sits outside the Vite root, so only files already loaded are watched. Watching the folder lets the
@@ -149,6 +223,25 @@ const showcaseData = {
         response.end(JSON.stringify(await snapshots(slug)));
       }),
     );
+    server.middlewares.use("/__thumbs", async (request, response, next) => {
+      const path = request.url?.split("?")[0] ?? "";
+      const send = (status, body) => {
+        response.statusCode = status;
+        if (body === undefined) return response.end();
+        response.setHeader("Content-Type", "application/json; charset=utf-8");
+        response.end(JSON.stringify(body));
+      };
+      try {
+        if (request.method === "GET" && path === "/") return send(200, await thumbIndex());
+        const [slug, key, ...rest] = path.split("/").slice(1);
+        if (request.method !== "POST" || rest.length || !SLUG.test(slug ?? "") || !/^[0-9a-f]{12}$/.test(key ?? ""))
+          return next();
+        const { status, body } = await keepThumb(slug, key, request);
+        send(status, body);
+      } catch {
+        send(404);
+      }
+    });
     let timer;
     const changed = new Set();
     try {

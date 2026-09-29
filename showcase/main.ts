@@ -12,6 +12,7 @@ import type { Snapshots } from "./renders";
 import { diffListing, listing, originalLine } from "./source";
 import { texturesPanel } from "./textures";
 import type { TexturesView } from "./textures";
+import { Thumbs } from "./thumbs";
 import { FLEX_DEGREES, Viewer } from "./viewer";
 import type { ColorMode, Focus } from "./viewer";
 
@@ -50,7 +51,7 @@ type State = {
   texture: number;
 };
 
-type Entry = { slug: string; path: string; name: string; failed: boolean; latest: string | null };
+type Entry = { slug: string; path: string; name: string; failed: boolean };
 type Loaded = {
   slug: string;
   meta: SampleModule["meta"];
@@ -151,6 +152,21 @@ function set(patch: Partial<State>) {
 }
 
 // ── Sample list ──────────────────────────────────────────────────────────────────────────────────────────────────
+// Two columns of thumbnails, drawn and kept by `thumbs.ts`.
+
+const thumbs = new Thumbs(
+  (slug) => {
+    const entry = entries.find((item) => item.slug === slug);
+    return entry ? current.modules[entry.path]() : Promise.reject(new Error(`No sample "${slug}" in samples/.`));
+  },
+  (slug) => {
+    const entry = entries.find((item) => item.slug === slug);
+    if (entry)
+      $("list")
+        .querySelector(`[data-slug="${CSS.escape(slug)}"]`)
+        ?.replaceWith(tile(entry));
+  },
+);
 
 async function refreshEntries() {
   const paths = Object.keys(current.modules);
@@ -159,6 +175,7 @@ async function refreshEntries() {
     fetch("/__sample-created")
       .then((response) => (response.ok ? response.json() : {}))
       .catch(() => ({})) as Promise<Record<string, number>>,
+    thumbs.reload(),
   ]);
   entries = paths
     .map((path, i) => {
@@ -166,26 +183,17 @@ async function refreshEntries() {
       const slug = slugOf(path);
       const name = result.status === "fulfilled" ? (result.value.meta?.name ?? slug) : slug;
       const previous = entries.find((entry) => entry.slug === slug);
-      return {
-        slug,
-        path,
-        name,
-        failed: result.status === "rejected" || (previous?.failed ?? false),
-        latest: snapshotsBySlug.get(slug)?.tags[0]?.tag ?? null,
-      };
+      return { slug, path, name, failed: result.status === "rejected" || (previous?.failed ?? false) };
     })
     // Newest sample first; name order among samples with no known creation time.
     .sort((a, b) => (created[b.slug] ?? 0) - (created[a.slug] ?? 0) || a.name.localeCompare(b.name));
   renderList();
-  for (const entry of entries) if (!snapshotsBySlug.has(entry.slug)) void refreshSnapshots(entry.slug);
+  thumbs.update(entries.map((entry) => entry.slug));
 }
 
 async function refreshSnapshots(slug: string) {
   const snaps = await loadSnapshots(slug);
   snapshotsBySlug.set(slug, snaps);
-  const entry = entries.find((item) => item.slug === slug);
-  if (entry) entry.latest = snaps.tags[0]?.tag ?? null;
-  renderList();
   if (loaded?.slug === slug) {
     loaded.snaps = snaps;
     if (state.panel === "versions" || state.panel === "info" || state.panel === "code") renderPanel();
@@ -199,30 +207,30 @@ function visibleEntries() {
   return entries.filter((entry) => !query || `${entry.name} ${entry.slug}`.toLowerCase().includes(query));
 }
 
+function tile(entry: Entry) {
+  const url = thumbs.url(entry.slug);
+  return h(
+    "a",
+    {
+      class: `tile${entry.slug === state.slug ? " on" : ""}${entry.failed ? " failed" : ""}`,
+      href: format({ ...state, slug: entry.slug, focus: null, compare: null, tag: null, texture: 0 }),
+      "data-slug": entry.slug,
+      "data-tip": entry.failed ? "Threw on its last run" : buildTip(builds[entry.slug]),
+      onclick: (event: MouseEvent) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+        event.preventDefault();
+        select(entry.slug);
+      },
+    },
+    url ? h("img", { src: url, alt: "", decoding: "async" }) : null,
+    h("span", { class: "name" }, entry.name),
+  );
+}
+
 function renderList() {
   const shown = visibleEntries();
   $("count").textContent = String(entries.length);
-  $("list").replaceChildren(
-    ...shown.map((entry) =>
-      h(
-        "a",
-        {
-          class: `item${entry.slug === state.slug ? " on" : ""}${entry.failed ? " failed" : ""}`,
-          href: format({ ...state, slug: entry.slug, focus: null, compare: null, tag: null, texture: 0 }),
-          "data-tip": buildTip(builds[entry.slug]),
-          onclick: (event: MouseEvent) => {
-            if (event.metaKey || event.ctrlKey || event.shiftKey) return;
-            event.preventDefault();
-            select(entry.slug);
-          },
-        },
-        h("span", { class: "name" }, entry.name),
-        entry.failed ? h("span", { class: "dot", "data-tip": "Threw on its last run" }) : null,
-        entry.latest ? h("span", { class: "latest" }, entry.latest) : null,
-      ),
-    ),
-    ...(shown.length ? [] : [h("div", { class: "none" }, "No match")]),
-  );
+  $("list").replaceChildren(...shown.map(tile), ...(shown.length ? [] : [h("div", { class: "none" }, "No match")]));
   $("list").querySelector(".on")?.scrollIntoView({ block: "nearest" });
 }
 
@@ -287,10 +295,7 @@ async function run(keepCamera: boolean) {
       next.phase = "build";
     }
   }
-  if (entry) {
-    entry.failed = next.error !== null;
-    entry.latest = next.snaps.tags[0]?.tag ?? null;
-  }
+  if (entry) entry.failed = next.error !== null;
   const sameSample = loaded?.slug === slug;
   loaded = next;
   try {

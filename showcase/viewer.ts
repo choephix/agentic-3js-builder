@@ -147,6 +147,8 @@ export class Viewer {
   private seed = 11;
   private wiggleStart: number | null = null;
   private dirty = true;
+  /** Settles once the shown sample's SVG textures have drawn. */
+  private textures: Promise<unknown> = Promise.resolve();
   /** The camera is still where `frame()` put it, so a resize re-frames instead of cropping. */
   private framed = true;
   private pointer: { x: number; y: number } | null = null;
@@ -181,9 +183,16 @@ export class Viewer {
   };
   private readonly hingeMaterial = new LineBasicMaterial({ color: "#9b3fd6", depthTest: false });
 
-  constructor(private readonly host: HTMLElement) {
+  /**
+   * `pixelRatio` fixes the drawing buffer's scale (default: the screen's, at most 2); `grid: false` leaves the floor
+   * grid out and keeps only the contact shadow.
+   */
+  constructor(
+    private readonly host: HTMLElement,
+    private readonly options: { pixelRatio?: number; grid?: boolean } = {},
+  ) {
     const renderer = this.renderer;
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setPixelRatio(options.pixelRatio ?? Math.min(devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = SRGBColorSpace;
     renderer.toneMapping = NeutralToneMapping;
@@ -308,10 +317,17 @@ export class Viewer {
           .map((material) => (material as MeshStandardMaterial).map?.userData.ready as Promise<unknown> | undefined)
           .filter(Boolean) as Array<Promise<unknown>>,
     );
-    if (pending.length)
-      void Promise.allSettled(pending).then(() => {
-        if (this.root === root) this.dirty = true;
-      });
+    this.textures = Promise.allSettled(pending).then(() => {
+      if (this.root === root) this.dirty = true;
+    });
+  }
+
+  /** The shown sample as a bitmap of the canvas, once its textures are in. */
+  async snapshot() {
+    await this.textures;
+    // Draw and copy in the same task: without `preserveDrawingBuffer` the buffer is only good until it is shown.
+    this.renderer.render(this.scene, this.camera);
+    return createImageBitmap(this.canvas);
   }
 
   /** Swap a skinned part for a `SkinnedMesh` bound to its bones at rest; returns what painting needs. */
@@ -428,25 +444,28 @@ export class Viewer {
     shadow.rotation.x = -Math.PI / 2;
     shadow.position.copy(center);
     shadow.receiveShadow = true;
-    // 10 cm cells with metre lines for small objects, 50 cm and 5 m for large ones; the grid fades out with distance.
-    const grid = new Mesh(
-      new PlaneGeometry(extent * 8, extent * 8).rotateX(-Math.PI / 2),
-      new ShaderMaterial({
-        uniforms: {
-          cellSize: { value: extent > 3 ? 0.5 : 0.1 },
-          center: { value: center.clone() },
-          radius: { value: extent * 1.3 },
-          minor: { value: new Color("#a4a9b1") },
-          major: { value: new Color("#80868f") },
-        },
-        vertexShader: GRID_VERTEX,
-        fragmentShader: GRID_FRAGMENT,
-        transparent: true,
-        depthWrite: false,
-      }),
-    );
-    grid.position.set(center.x, 0.0005, center.z);
-    this.floor.add(shadow, grid);
+    this.floor.add(shadow);
+    if (this.options.grid !== false) {
+      // 10 cm cells with metre lines for small objects, 50 cm and 5 m for large ones; the grid fades out with distance.
+      const grid = new Mesh(
+        new PlaneGeometry(extent * 8, extent * 8).rotateX(-Math.PI / 2),
+        new ShaderMaterial({
+          uniforms: {
+            cellSize: { value: extent > 3 ? 0.5 : 0.1 },
+            center: { value: center.clone() },
+            radius: { value: extent * 1.3 },
+            minor: { value: new Color("#a4a9b1") },
+            major: { value: new Color("#80868f") },
+          },
+          vertexShader: GRID_VERTEX,
+          fragmentShader: GRID_FRAGMENT,
+          transparent: true,
+          depthWrite: false,
+        }),
+      );
+      grid.position.set(center.x, 0.0005, center.z);
+      this.floor.add(grid);
+    }
 
     const radius = extent * 0.0075;
     const ball = new SphereGeometry(radius, 14, 10);
