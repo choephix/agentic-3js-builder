@@ -15,6 +15,7 @@ import { svg } from "../src/texture";
 
 export const meta = {
   name: "Koi Carp",
+  builtBy: "Claude Opus 5.5",
   description:
     "A 70 cm Taisho Sanke koi in a straight swimming rest pose: snow-white body under stepped red hi and black sumi, a thousand scale cards that carry the pattern, rayed fins with black tejima stripes, thick lips over a separate lower jaw, two pairs of barbels and gold-ringed eyes.",
 };

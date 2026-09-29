@@ -13,6 +13,7 @@ import { catmull, polyline } from "../src/path";
 
 export const meta = {
   name: "Giant Manta Ray",
+  builtBy: "Claude Opus 5.5",
   description:
     "A 4.6 m oceanic manta gliding with wings spread: black back with pale shoulder chevrons, rolled cephalic fins, a spotted white belly with gill slits, a whip tail and two remoras riding underneath.",
 };

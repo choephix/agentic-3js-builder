@@ -17,6 +17,7 @@ import { svg } from "../src/texture";
 
 export const meta = {
   name: "Golden pheasant",
+  builtBy: "Claude Opus 5.5",
   description:
     "A male golden pheasant: silky gold crest, barred orange cape, green mantle, scarlet breast, blue tertials and a metre-long reticulated tail, feathered with SVG-drawn cards.",
 };

@@ -10,6 +10,7 @@ import type { Joint } from "../src/skeleton";
 
 export const meta = {
   name: "Juniper Bonsai",
+  builtBy: "Claude Opus 5.5",
   description:
     "A 45 cm juniper bonsai with spiralling deadwood and cloud-pruned foliage pads in a cobalt nama-glazed pot, rigged through trunk and branches to sway.",
 };

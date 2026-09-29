@@ -14,6 +14,7 @@ import type { Hit } from "../src/surface";
 
 export const meta = {
   name: "Indian peafowl",
+  builtBy: "Claude Opus 5.5",
   description:
     "A displaying peacock: a raised semicircle of extruded eye and fishtail feathers, a lathed beak and eyes, a spatulate crest, barred wings and chestnut primaries.",
 };

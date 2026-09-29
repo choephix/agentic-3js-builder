@@ -17,6 +17,7 @@ import { svg } from "../src/texture";
 
 export const meta = {
   name: "Flower Hedgehog",
+  builtBy: "Claude Sonnet 5.5",
   description:
     "A 30 cm flat-colour low-poly hedgehog whose spines are mixed with leaves, daisies, poppies, berries and clover: banded quill cards, SVG-drawn foliage, faceted 3D flower sprigs and extruded leaves on a rig with a curling spine, four legs, jaw and ears.",
 };

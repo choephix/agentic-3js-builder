@@ -25,6 +25,7 @@ import { svg } from "../src/texture";
 
 export const meta = {
   name: "Tin Toy Crab",
+  builtBy: "Claude Sonnet 5.5",
   description:
     "A vintage lithographed wind-up tin crab, 25 cm across: a faceted pressed-tin carapace printed in off-register red, yellow, blue and black with a sunburst, halftone shading and a fake maker's logo, a rolled rim with crimped tabs, a turning wind-up key, googly printed eyes on tin stalks, two toothed claws with openable pincers and eight rivet-jointed strip legs.",
 };

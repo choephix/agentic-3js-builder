@@ -20,6 +20,7 @@ import { svg } from "../src/texture";
 
 export const meta = {
   name: "Alebrije Jaguar",
+  builtBy: "Claude Sonnet 5.5",
   description:
     "An Oaxacan alebrije: a 1.25 m painted copal-wood jaguar with eagle wings on feather-group joints, a coiled lizard tail, little striped horns and an openable jaw, carved in knife-cut facets and covered in dense folk-art patterns.",
 };

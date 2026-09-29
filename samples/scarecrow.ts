@@ -19,6 +19,7 @@ import { svg } from "../src/texture";
 
 export const meta = {
   name: "Scarecrow",
+  builtBy: "Claude Opus 5.5",
   description:
     "A burlap-headed scarecrow on its post: flannel tartan, patched denim overalls, a coiled straw hat with a sunflower, straw bursting from every cuff, and a crow on its arm.",
 };

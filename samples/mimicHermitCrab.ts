@@ -17,6 +17,7 @@ import { svg } from "../src/texture";
 
 export const meta = {
   name: "Mimic hermit crab",
+  builtBy: "Claude Opus 5.5",
   description:
     "Pixel-art hermit crab living in an iron-banded treasure chest: hinged lid, spilling coins and gems, one giant claw.",
 };

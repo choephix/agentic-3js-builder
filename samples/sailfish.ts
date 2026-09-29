@@ -15,6 +15,7 @@ import type { Joint } from "../src/skeleton";
 
 export const meta = {
   name: "Sailfish",
+  builtBy: "Claude Opus 5.5",
   description:
     "A 1.8 m sailfish in a straight swimming rest pose: a towering spotted sail on fin rays that bends with the spine, a spear bill over a separate lower jaw, barred countershaded flanks, ribbon pelvic fins and a lunate forked tail.",
 };

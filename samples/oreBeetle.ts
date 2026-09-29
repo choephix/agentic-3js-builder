@@ -15,6 +15,7 @@ import { svg } from "../src/texture";
 
 export const meta = {
   name: "Ore beetle",
+  builtBy: "Claude Sonnet 5.5",
   description:
     "Cave-mining rhinoceros beetle in pixel art: horn with a hanging lantern, elytra of stone plates with ore crystals, hinged shell, jaws and antennae.",
 };

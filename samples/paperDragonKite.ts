@@ -15,6 +15,7 @@ import { svg } from "../src/texture";
 
 export const meta = {
   name: "Paper dragon kite",
+  builtBy: "Claude Sonnet 5.5",
   description:
     "A 2.5 m Chinese dragon kite: a chain of paper drums on bamboo hoops, a folded paper head with an open jaw, cut-paper brows, mane and scale shingles, four small clawed legs and a tail of paper streamers.",
 };
