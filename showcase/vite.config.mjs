@@ -6,9 +6,11 @@ import { watch } from "node:fs";
 import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
+import { roundLog } from "./round-log.mjs";
 
 const sampleRoot = resolve("samples");
 const snapshotRoot = resolve("/home/cx/tmp/public/nilo/agentic-3js-builder/snaps");
+const experimentRoot = resolve("experiments");
 const SLUG = /^[A-Za-z0-9_-]+$/;
 
 const url = (path) => `/@fs${path}`;
@@ -164,6 +166,15 @@ async function keepThumb(slug, key, request) {
     if (old !== file && THUMB_FILE.exec(old)?.[1] === slug) await rm(join(thumbRoot, old), { force: true });
   return { status: 200, body: { url: thumbUrl(file) } };
 }
+/** Every experiment round's manifest, `experiments/<id>/round.json` (the round page, round.html). */
+async function roundManifests() {
+  const found = [];
+  for (const name of await list(experimentRoot)) {
+    const text = await readFile(join(experimentRoot, name, "round.json"), "utf8").catch(() => null);
+    if (text) found.push(JSON.parse(text));
+  }
+  return found;
+}
 
 let buildDirectory;
 
@@ -186,8 +197,13 @@ const showcaseData = {
     };
     const created = await sampleCreated();
     await json("__sample-created", created);
-    for (const slug of Object.keys(created)) {
-      await copy(join(sampleRoot, `${slug}.ts`), `__sample-source/${slug}`);
+    const rounds = await roundManifests();
+    // A round's toolkit tests are deleted once their builders move on; their renders stay on the round page.
+    const tests = rounds
+      .flatMap((round) => round.arms.map((arm) => `${arm.id}Test`))
+      .filter((slug) => !(slug in created));
+    for (const slug of [...Object.keys(created), ...tests]) {
+      if (slug in created) await copy(join(sampleRoot, `${slug}.ts`), `__sample-source/${slug}`);
       const assets = new Map();
       const fileUrl = (path) => {
         const route = `renders/${relative(snapshotRoot, path).split(sep).join("/")}`;
@@ -202,12 +218,24 @@ const showcaseData = {
       await json(`__snapshots/${slug}`, await snapshots(slug, fileUrl, sourceUrl));
       for (const [route, path] of assets) await copy(path, route);
     }
+    for (const round of rounds) await json(`__round/${round.id}`, await roundLog(round, resolve(".")));
     await json("__thumbs", await thumbIndex());
   },
   configureServer(server) {
     // samples/ sits outside the Vite root, so only files already loaded are watched. Watching the folder lets the
     // `samples/*` globs in catalog.ts and builds.ts see files being added or removed.
     server.watcher.add(sampleRoot);
+    // The round page's markdown and toolkit globs, which builders add files to while a round runs.
+    server.watcher.add([experimentRoot, resolve("src")]);
+    // What each builder of a round did, parsed from its session log on every request (round-log.mjs).
+    server.middlewares.use(
+      "/__round",
+      byName(async ([id], response) => {
+        const manifest = JSON.parse(await readFile(join(experimentRoot, id, "round.json"), "utf8"));
+        response.setHeader("Content-Type", "application/json; charset=utf-8");
+        response.end(JSON.stringify(await roundLog(manifest, resolve("."))));
+      }),
+    );
     // Sources go out as raw text: a `.ts` file fetched through `/@fs/` would come back transformed.
     server.middlewares.use(
       "/__sample-source",
@@ -272,5 +300,9 @@ const showcaseData = {
 
 export default defineConfig({
   server: { fs: { allow: [searchForWorkspaceRoot(process.cwd()), snapshotRoot] } },
+  // Two pages: the sample showcase and the experiment round page.
+  build: {
+    rolldownOptions: { input: { main: resolve("showcase/index.html"), round: resolve("showcase/round.html") } },
+  },
   plugins: [showcaseData],
 });

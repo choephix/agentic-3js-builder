@@ -86,6 +86,8 @@ export type Hit =
   | { kind: "part"; part: Part; weights: Array<[string, number]> | null }
   | { kind: "joint"; joint: JointInfo };
 export type Display = { mode: ColorMode; skeleton: boolean; wire: boolean; focus: Focus | null };
+/** Where the orbit camera sits and looks, for keeping several viewers in step. */
+export type CameraView = { position: [number, number, number]; target: [number, number, number] };
 
 /** harness/kit.ts rng: deterministic PRNG in [0, 1). */
 function rng(seed: number) {
@@ -122,6 +124,9 @@ export class Viewer {
   onPick: (hit: Hit | null) => void = () => {};
   /** Called every frame the wiggle runs, with the current bend (-1 to 1). */
   onBend: (amount: number) => void = () => {};
+  /** Called when the reader moves the camera (orbit, pan, zoom), not when `setView` does. */
+  onView: (view: CameraView) => void = () => {};
+  private settingView = false;
 
   private readonly renderer = new WebGLRenderer({ antialias: true, alpha: true });
   private readonly scene = new Scene();
@@ -210,7 +215,10 @@ export class Viewer {
     this.controls = new OrbitControls(this.camera, this.canvas);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.12;
-    this.controls.addEventListener("change", () => (this.dirty = true));
+    this.controls.addEventListener("change", () => {
+      this.dirty = true;
+      if (!this.settingView) this.onView(this.view);
+    });
     this.controls.addEventListener("start", () => (this.framed = false));
     new ResizeObserver(() => this.resize()).observe(host);
     this.canvas.addEventListener("pointermove", (event) => {
@@ -562,6 +570,24 @@ export class Viewer {
     this.controls.update();
     this.dirty = true;
     this.framed = true;
+  }
+
+  get view(): CameraView {
+    return {
+      position: this.camera.position.toArray() as CameraView["position"],
+      target: this.controls.target.toArray() as CameraView["target"],
+    };
+  }
+
+  /** Put the camera where another viewer's is; the orbit's limits stay this sample's. */
+  setView(view: CameraView) {
+    this.settingView = true;
+    this.camera.position.fromArray(view.position);
+    this.controls.target.fromArray(view.target);
+    this.controls.update();
+    this.settingView = false;
+    this.framed = false;
+    this.dirty = true;
   }
 
   setDisplay(display: Partial<Display>) {

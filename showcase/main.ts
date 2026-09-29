@@ -13,6 +13,7 @@ import { diffListing, listing, originalLine } from "./source";
 import { texturesPanel } from "./textures";
 import type { TexturesView } from "./textures";
 import { Thumbs } from "./thumbs";
+import { roundSlugs } from "./rounds";
 import { FLEX_DEGREES, Viewer } from "./viewer";
 import type { ColorMode, Focus } from "./viewer";
 
@@ -169,7 +170,8 @@ const thumbs = new Thumbs(
 );
 
 async function refreshEntries() {
-  const paths = Object.keys(current.modules);
+  // A round's samples belong to the round page (round.html), not this list.
+  const paths = Object.keys(current.modules).filter((path) => !roundSlugs.has(slugOf(path)));
   const [modules, created] = await Promise.all([
     Promise.allSettled(paths.map((path) => current.modules[path]())),
     fetch("/__sample-created")

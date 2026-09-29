@@ -5,6 +5,7 @@
 // Shown in the Info panel's Build section, the sample list's tooltips and the Builds table.
 import { h } from "./dom";
 import type { Child } from "./dom";
+import { roundSlugs } from "./rounds";
 
 export type Tokens = { input: number; output: number; cacheRead: number; cacheWrite: number; total: number };
 
@@ -114,11 +115,11 @@ export type Build = {
   caveats: Record<string, string>;
 };
 
+/** Every library sample's build record; a round's samples belong to the round page (rounds.ts). */
 export const builds: Record<string, Build> = Object.fromEntries(
-  Object.values(import.meta.glob<Build>("../samples/*.build.json", { eager: true, import: "default" })).map((build) => [
-    build.slug,
-    build,
-  ]),
+  Object.values(import.meta.glob<Build>("../samples/*.build.json", { eager: true, import: "default" }))
+    .filter((build) => !roundSlugs.has(build.slug))
+    .map((build) => [build.slug, build]),
 );
 
 const money = (value: number) => `$${value.toFixed(2)}`;

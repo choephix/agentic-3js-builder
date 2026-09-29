@@ -411,9 +411,12 @@ export function writeWeights(geometry: BufferGeometry, count: number, weightAt: 
   return bones;
 }
 
+const skinners = new WeakMap<Mesh, () => void>();
+
 /**
  * Make a mesh with `skinIndex` / `skinWeight` over `bones` follow them: `userData.skinBones` names them for the
  * exporter, and every later `pose()` re-deforms the vertices from their current (bind) positions by linear blend.
+ * Skinning a mesh again (after its geometry was replaced) replaces its earlier skin.
  */
 export function skinMesh(ctx: Ctx, mesh: Mesh, bones: readonly Joint[]) {
   mesh.userData.skinBones = bones.map((joint) => joint.name);
@@ -432,7 +435,7 @@ export function skinMesh(ctx: Ctx, mesh: Mesh, bones: readonly Joint[]) {
     new Vector3().fromBufferAttribute(normal, i).applyMatrix3(normalToWorld),
   );
   const capture = new Capture(bones);
-  ctx.skins.push(() => {
+  const skin = () => {
     const motions = bones.map((joint) => capture.motion(joint));
     const turns = motions.map((m) => new Matrix3().setFromMatrix4(m));
     const toLocal = mesh.matrixWorld.clone().invert();
@@ -457,7 +460,11 @@ export function skinMesh(ctx: Ctx, mesh: Mesh, bones: readonly Joint[]) {
     normal.needsUpdate = true;
     geometry.boundingBox = null;
     geometry.boundingSphere = null;
-  });
+  };
+  const earlier = skinners.get(mesh);
+  if (earlier) ctx.skins.splice(ctx.skins.indexOf(earlier), 1);
+  skinners.set(mesh, skin);
+  ctx.skins.push(skin);
 }
 
 /** The weights of one vertex of a built mesh (its skin attributes, else rigid on its bone). */
