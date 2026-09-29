@@ -167,7 +167,7 @@ b.rod(eye, crest, 0.012, { color: BONE }); // from an eye to a joint, on the eye
 - A `bone` list suits a path that runs along those chains. Each joint owns the path from where it projects onto it; joints that project past the path's far end own none of it and are left out, so a feather or fin swept along part of a longer chain keeps its tip on the last bone it reaches. A path that crosses a chain (a ray standing up from a spine) rides one bone: `bone: joint`.
 - `radius` is `r`, `[r0, r1]` (linear), `number[]` (evenly keyed over the swept range, smooth), `(t) => r` or `(t) => [rx, ry]`. `rx` runs sideways (binormal) and `ry` along the frame normal. For boxes these are half extents. Every t is source t, the t of the path or chain you swept: radius and shift functions, colour functions, `bands`, sector ranges, twist and `sweep.at(t)`. A profile keyed at `chain.ts` or at curve knots therefore stays put when you sweep only part of the source, and sweeping `[0, a]` and `[a, 1]` with the same options gives the two halves of one tube.
 - `shift` is `[x, y]` or `(t) => [x, y]` in the same axes as `[rx, ry]`: it moves the section centre off the path, so a heavy belly hangs below the spine while the bones stay on the spine line.
-- `section` is `"circle"` (default, `sides` = 8 × `detail`, smooth), `"box"` or `{ ngon: n }` (faceted). `smooth` overrides the shading. Circles are circumscribed: flat faces sit exactly at `r`, top and bottom are flat, so a tube of radius r whose axis is at height r touches the floor.
+- `section` is `"circle"` (default, `sides` = 8 × `detail`, smooth), `"box"` or `{ ngon: n }` (faceted). `smooth` overrides the shading. Circles are circumscribed: flat faces sit exactly at `r`, top and bottom are flat, so a tube of radius r whose axis is at height r touches the floor. `detail` sets this tube's own tessellation (default sides, rings along it), see "Detail and budget".
 - `caps` is `"round"` (default), `"flat"`, `"point"`, `"none"`, or `{ start, end }`. With round caps, a 2-point sweep is a capsule. `extend: d | [start, end]` continues the tube straight past its ends at the end radius (meters) before the cap.
 - `skin` is `"smooth"` (default) or `"rigid"`. Smooth: one continuous mesh; around each joint the rings blend the two bones either side over about ±1 local radius (at most 45% of either span), and corners of the path are rounded over the same distance, so the tube bends like skin. Rigid: one piece per joint span, cut with round caps on both pieces; each cap stays inside the continuing tube's radius, so it is hidden while straight and fills the gap when the joint bends. `overlap: k` (rigid only) instead extends each piece k × radius past the cut with a flat end. Rigid point-array sweeps are split the same way at corners sharper than 20°, inside one mesh.
 - `color` is a string or `(t) => string`; a colour function splits the tube exactly where the colour changes. `bands: [[tEnd, color], ...]` splits it at band edges. Colour pieces share their boundary vertices and weights, so they bend together with no gap.
@@ -255,7 +255,7 @@ b.sweep(skin.drape(loop, { lift: 0.012 }), 0.018, { color: STRAP }); // weights:
 
 ## Membranes and slabs
 
-`b.membrane(edgeA, edgeB, { color, thickness, rows?, cols?, scallop?, skin?, split?, bone?, group?, name? })` skins between two edges (each a `Chain`, path or points), resampled by arc length. Chain edges are read in their current pose. `rows` defaults to 4 × `detail`. It returns closed, double-sided meshes. Smooth (default): one mesh whose vertices blend from edge A's bones to edge B's across the width, and between neighbouring joints along each chain edge. `skin: "rigid"`: one mesh per bone; with `split: "mid"` (default) cells nearer A go to A's joint at that t and cells nearer B go to B's, and `"a"` or `"b"` assigns everything to one edge. Path edges follow `bone`, which is a joint, or a Chain followed along its nearest point; without `bone`, the path's own bones, else the other edge's chain, else the nearest joint. A fin between `tube.line(0)` and a raised line then follows the spine. Every bone span boundary gets a column. `scallop` (a fraction of the length) pulls the trailing edge between the two tips inward. Run both edges in the same direction, from root to tip.
+`b.membrane(edgeA, edgeB, { color, thickness, rows?, cols?, detail?, scallop?, skin?, split?, bone?, group?, name? })` skins between two edges (each a `Chain`, path or points), resampled by arc length. Chain edges are read in their current pose. `rows` defaults to 4 × `detail`. It returns closed, double-sided meshes. Smooth (default): one mesh whose vertices blend from edge A's bones to edge B's across the width, and between neighbouring joints along each chain edge. `skin: "rigid"`: one mesh per bone; with `split: "mid"` (default) cells nearer A go to A's joint at that t and cells nearer B go to B's, and `"a"` or `"b"` assigns everything to one edge. Path edges follow `bone`, which is a joint, or a Chain followed along its nearest point; without `bone`, the path's own bones, else the other edge's chain, else the nearest joint. A fin between `tube.line(0)` and a raised line then follows the spine. Every bone span boundary gets a column. `scallop` (a fraction of the length) pulls the trailing edge between the two tips inward. Run both edges in the same direction, from root to tip.
 
 `b.slab(points, { color, thickness, bone?, group?, name? })` turns a roughly planar polygon (any Points) into a thin closed prism for fins, ears, leaves and plates, and returns a `Part` centred on it, facing its normal. It follows `bone` (rigid), else the first built point's bones, else the nearest joint. Use it when the corners come from built things (hits, tube points); to draw a shape, use `extrude`.
 
@@ -275,15 +275,15 @@ Both take an outline: at least 3 corners `[x, y]` in meters, drawn in order arou
 
 - `smoothing: 0..3` cuts every unsharp corner into two, a quarter of the way along each neighbouring edge, per round. Few points plus smoothing 2 draws a leaf or petal. It throws when a cut corner would cross another edge, naming the corners; mark one "sharp" or lower it.
 
-`b.extrude(outline, { at, x?, y?, thickness, bevel?, smoothing?, color, bone?, group?, name? })` pushes the outline into a flat slab whose silhouette is the drawing: fins, sails, blades, plates, leaves, feathers, ears, crests.
+`b.extrude(outline, { at, x?, y?, thickness, bevel?, smoothing?, detail?, color, bone?, group?, name? })` pushes the outline into a flat slab whose silhouette is the drawing: fins, sails, blades, plates, leaves, feathers, ears, crests.
 
 - The outline's origin sits at `at`; its +x runs along the model-space Direction `x` (default `[0, 0, 1]`, forward) and its +y along `y` (default `[0, 1, 0]`, up), so the default is a side view. Thickness runs along x × y, centred on the drawing.
 - `thickness` is a number, or `[atLowest, atHighest]` for a linear taper from the outline's lowest y to its highest y. Either end can be 0 for a knife edge. Both faces stay flat.
-- `bevel` rounds the front and back rims inward along a quarter circle, so the outline stays the silhouette. It is capped at half the thickness and shrinks until it fits sharp and concave corners.
+- `bevel` rounds the front and back rims inward along a quarter circle, so the outline stays the silhouette. It is capped at half the thickness and shrinks until it fits sharp and concave corners. It is drawn in 3 × `detail` steps; one step is a plain chamfer.
 - The returned Part's local x, y and z are the outline's x, y and the thickness axis: `fin.local([u, v, 0])` is a point of the drawing, and `fin.local([u, v, t / 2])` is on its front face. Build spots and ribs from it.
 - Mirror a pair by mirroring the directions: `x: [s, 0, 0]`, or `x: [0, 0, 1], y: [s * 0.3, 1, 0]`. The outline stays the same.
 
-`b.lathe(outline, { at, axis?, segments?, spin?, smoothing?, color, bone?, group?, name? })` spins half a cross-section around `axis` (default `[0, 1, 0]`) through `at`: hats, domes, bells, collars, bottles, vases, buttons, beaks, turned legs and anything round whose profile doubles back, which a sweep can't draw.
+`b.lathe(outline, { at, axis?, segments?, detail?, spin?, smoothing?, color, bone?, group?, name? })` spins half a cross-section around `axis` (default `[0, 1, 0]`) through `at`: hats, domes, bells, collars, bottles, vases, buttons, beaks, turned legs and anything round whose profile doubles back, which a sweep can't draw.
 
 - The outline's x is the distance from the axis and never negative; its y is the height along `axis`. For a solid, run from the axis out around the shape and back to it. For a shell (a bell, a hat brim), draw both walls so the loop has thickness.
 - `segments` (3 to 64, default 16 × `detail`) is the steps around. Below 12 the sides shade flat: 6 gives a hex column, 4 a square spire. `spin` turns the first step by that many degrees.
@@ -336,7 +336,7 @@ Every `color` option also takes a **Paint**: a colour at each surface point, fro
 - `paint((p, n, s) => colour)` makes your own, and may return another paint (`p.y < 0.2 ? SOCK : coat`). Build them with `noise(p, size, seed?)` (smooth, 0..1), `cells(p, size, seed?)` (Worley: `{ d1, d2, id, center }`, with `d2 - d1` 0 on a cell border), `mix(a, b, t)` and `smoothstep(e0, e1, x)`. Read `p`, `n` and `s`; leave them unchanged. Typecheck rejects unused parameters, so name them with a leading underscore: `paint((_p, _n, s) => ...)`.
 - `s` is the part's own surface coordinates at the point, for patterns that follow the shape rather than space: sweeps and lofts give `[t, deg]` (source t, and the dorsal clock angle of `sweep.at`: 0 faces world up, 180 the belly), so a stripe spiralling round a trunk or bands across a curled tail are one condition on `s`. `extrude` gives the outline's `[x, y]` in meters (rays on a fin), `lathe` `[height, deg]`, membranes `[along, across]` (0..1 from edge A's start), slabs `[x, y]` in meters in the polygon's plane, three.js geometries their `uv`, and anything else `[0, 0]`.
 - The same seed gives the same field everywhere, so two parts with one paint continue each other.
-- The paint sheet is 1024 texels wide, shared by every painted part at one density: a few millimetres a texel on a 1.5 m animal. `createBuilder({ detail: 1.25 })` (any detail above 1) doubles it to 2048 for fine weaves, stitches and hairline stripes.
+- The paint sheet is 1024 texels wide, shared by every painted part at one density: a few millimetres a texel on a 1.5 m animal. `createBuilder({ paintSize: 2048 })` doubles it for fine weaves, stitches and hairline stripes (512 halves it). It doesn't change any geometry.
 
 ```ts
 const coat = countershade(stripes(ORANGE, BLACK, { size: 0.09 }), CREAM, { level: -0.3 });
@@ -364,13 +364,13 @@ b.part(new THREE.SphereGeometry(0.1, 16, 12), coat, { bone: head, at: head.local
 - `lean` (degrees, default 0) tips the card from the facing axis toward `flow`: 0 stands straight out, 90 lies along the surface.
 - `flow` (default `[0, -0.3, -1]`, back and down), flattened onto the surface: the way cards lean and curl. `(frame, i) => direction` gives each card its own (flight feathers fanning out, hair parting along a spine).
 - A card's face looks along `flow`: with the default flow, standing cards face front and back and are seen edge-on from the side. Seen from downstream (from `flow`'s side, looking back), the drawing reads as drawn; `mirror: true` flips it left to right, for the other side of a body.
-- `bend` (degrees, default 0) curls each card further toward `flow` from root to tip, drawn in 4 segments.
+- `bend` (degrees, default 0) curls each card further toward `flow` from root to tip, one segment per 20° of curl (2 at least).
 - `cross: true` adds a second card at right angles through each one, so a tuft reads from every side.
 - `vary` (a share: 0.3 means 70% to 130% size), `spin` (± degrees about the facing axis) and `rng` randomise them. With a list of textures, `rng` picks one per card; list a texture twice to pick it twice as often.
 - `color` tints the cards: one colour string, or a Paint read at each card's root.
 - `sink` (default 0.1 of the length) roots each card that far back into the surface. `bone` makes them all rigid on one bone.
 - Cards are shaded with their frame's facing axis as the normal, so they light like the surface they grow from. To lay a card flat and lit from above, give it a frame facing up (`frame(at, [0, 1, 0])`) and `lean: 90`.
-- A card is 4 triangles, 16 with `bend`; `cross` doubles that. Parts count meshes, so a thousand cards of one texture are one part.
+- A card is 4 triangles flat and 8 per curl segment with `bend` (16 at `bend: 40`); `cross` doubles that. Parts count meshes, so a thousand cards of one texture are one part.
 - `surface.scatter` spaces one set of points evenly. For finer cards in one region (a throat, a face), scatter that region on its own with a smaller `minDist`.
 
 ```ts
@@ -381,7 +381,7 @@ b.cards(hits, tuft, { size: [0.03, 0.07], lean: 65, bend: 30, vary: 0.3, rng: rn
 
 ### Budget
 
-The harness bakes the model into one mesh with one texture, the atlas: a block of flat colour cells, the paint sheet (1024 texels wide, 2048 at `detail` above 1) and every texture with its tint. It packs up to 4096 texels square and shrinks textures when they don't fit; the report prints the atlas size.
+The harness bakes the model into one mesh with one texture, the atlas: a block of flat colour cells, the paint sheet (`paintSize` texels wide) and every texture with its tint. It packs up to 4096 texels square and shrinks textures when they don't fit; the report prints the atlas size.
 
 ## Distribution, IK, regions
 
@@ -456,7 +456,9 @@ Every handle stays valid afterwards, and anything built later lands in the new p
 
 ## Detail and budget
 
-`createBuilder({ detail })` scales the tessellation the SDK chooses: default circle sides (8 × detail), ring spacing (a ring per 10° / detail of turn), radius tolerance and membrane cells. `b.segments(n)` gives `max(3, round(n × detail))` for your own geometry (`new SphereGeometry(r, b.segments(12), b.segments(8))`), so hitting the triangle budget is one edit. Explicit `sides`, `rows` and `cols` still win. Triangles scale roughly with detail²: the peacock example has 10.7k triangles at detail 1 and 6.3k at 0.8.
+`createBuilder({ detail })` scales the tessellation the SDK chooses: default circle sides (8 × detail), ring spacing (a ring per 10° / detail of turn), radius tolerance, membrane cells, lathe steps, bevel steps and card curl segments. Every shape also takes its own `detail`, which replaces the builder's for that shape: `sweep`, `loft`, the tube helpers, `sprout`, `membrane`, `extrude`, `lathe` and `cards`. `b.segments(n, detail?)` gives `max(3, round(n × detail))` for your own geometry (`new SphereGeometry(r, b.segments(12), b.segments(8))`). Explicit `sides`, `segments`, `rows` and `cols` still win.
+
+Rings along a tube follow its shape: straight, even stretches take few rings, bends and radius changes take more, and every joint of a smooth-skinned tube adds three (the edges and middle of its bend). Triangles scale roughly with detail²: the peacock example has 10.7k triangles at detail 1 and 6.3k at 0.8. The mesh reads best when each part has the fewest segments that keep its silhouette smooth at the size it is seen; paints, textures and cards carry the fine detail.
 
 ## Rig answer key
 

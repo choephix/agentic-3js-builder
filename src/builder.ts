@@ -31,8 +31,8 @@ import type { Radius, SweepOptions } from "./sweep";
 export class Builder {
   private readonly ctx: Ctx;
 
-  constructor(name = "creature", detail = 1) {
-    this.ctx = new Ctx(name, detail);
+  constructor(name = "creature", detail = 1, paintSize = 1024) {
+    this.ctx = new Ctx(name, detail, paintSize);
   }
 
   /**
@@ -50,9 +50,12 @@ export class Builder {
     return this.ctx.detail;
   }
 
-  /** `n` segments scaled by `detail` (at least 3), for your own geometry: `new SphereGeometry(r, b.segments(12), b.segments(8))`. */
-  segments(n: number) {
-    return this.ctx.segments(n);
+  /**
+   * `n` segments scaled by `detail` (at least 3), for your own geometry: `new SphereGeometry(r, b.segments(12),
+   * b.segments(8))`. Pass a second `detail` to scale one part on its own: `b.segments(12, 0.5)`.
+   */
+  segments(n: number, detail?: number) {
+    return this.ctx.segments(n, this.ctx.detailOf("segments()", detail));
   }
 
   /** The shared matte material for `color`. */
@@ -150,7 +153,10 @@ export class Builder {
   }
 }
 
-/** `detail` scales the SDK's default tessellation (sides, ring spacing, membrane cells): 0.5 halves it. */
-export function createBuilder(options: { name?: string; detail?: number } = {}) {
-  return new Builder(options.name, options.detail);
+/**
+ * `detail` scales the SDK's default tessellation (sides, ring spacing, membrane cells): 0.5 halves it. `paintSize`
+ * is the paint sheet's width in texels (512, 1024 or 2048; default 1024).
+ */
+export function createBuilder(options: { name?: string; detail?: number; paintSize?: number } = {}) {
+  return new Builder(options.name, options.detail, options.paintSize);
 }

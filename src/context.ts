@@ -146,14 +146,24 @@ export class Ctx {
     name: string,
     /** Tessellation multiplier: default sides, ring density and membrane cells scale with it. */
     readonly detail: number,
+    /** Paint sheet width in texels. */
+    readonly paintSize: number,
   ) {
     if (!(detail > 0)) throw new Error(`detail must be positive, got ${detail}`);
+    if (![512, 1024, 2048].includes(paintSize)) throw new Error(`paintSize is 512, 1024 or 2048, got ${paintSize}`);
     this.root.name = name;
   }
 
   /** `n` segments scaled by `detail` (at least 3): for the SDK's defaults and for your own geometry. */
-  segments(n: number) {
-    return Math.max(3, Math.round(n * this.detail));
+  segments(n: number, detail = this.detail) {
+    return Math.max(3, Math.round(n * detail));
+  }
+
+  /** A shape's own `detail` option, else the builder's. */
+  detailOf(call: string, detail: number | undefined) {
+    if (detail === undefined) return this.detail;
+    if (!(detail > 0)) throw new Error(`${call}: detail must be positive, got ${detail}`);
+    return detail;
   }
 
   /** One shared matte material per colour, like the creature-lab kit. */
@@ -194,7 +204,7 @@ export class Ctx {
   /** Paint every painted mesh into the sheet; again only when meshes were painted since the last bake. */
   bake() {
     if (this.paints.length === this.baked) return;
-    bakeSheet(this.paints, this.paintMaterial(), this.detail > 1 ? 2048 : 1024);
+    bakeSheet(this.paints, this.paintMaterial(), this.paintSize);
     this.baked = this.paints.length;
   }
 }

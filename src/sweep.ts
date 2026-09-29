@@ -52,8 +52,13 @@ export type SweepOptions = Tags & {
   from?: number;
   to?: number;
   section?: Section;
-  /** Circle sides (default 8 × the builder's `detail`). */
+  /** Circle sides (default 8 × `detail`). */
   sides?: number;
+  /**
+   * This tube's own tessellation multiplier (default: the builder's `detail`): default sides, ring spacing along
+   * the tube and radius tolerance. 0.5 on a small horn or toe; explicit `sides` still wins.
+   */
+  detail?: number;
   /** Smooth normals (default: circle smooth, box/ngon faceted). */
   smooth?: boolean;
   caps?: Cap | { start?: Cap; end?: Cap };
@@ -517,8 +522,9 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const { twist, shift } = options;
   const rigidSkin = options.skin === "rigid";
   const frames = chain ? chain.frames : path.frames(options.up, twist);
-  const shape = sectionShape(options.section ?? "circle", options.sides ?? ctx.segments(8));
-  const maxTurn = MAX_TURN / ctx.detail;
+  const detail = ctx.detailOf("sweep()", options.detail);
+  const shape = sectionShape(options.section ?? "circle", options.sides ?? ctx.segments(8, detail));
+  const maxTurn = MAX_TURN / detail;
   const smooth = options.smooth ?? shape.smooth;
   const sides = shape.pts.length;
   const closed = path.closed && from === 0 && to === 1;
@@ -775,10 +781,8 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const weld = seamSmooth && bounds.length === 2;
   const tags = { name: options.name ?? "sweep", group: options.group };
   const span = (to - from) * L;
-  // Smooth skin: rings at the edges, quarter points and centre of every joint's blend window, so weights ramp evenly.
-  const windowUs = rigidSkin
-    ? []
-    : jointUs.flatMap((u, i) => [-1, -0.5, 0, 0.5, 1].map((f) => u + (f * half(i + 1)) / span));
+  // Smooth skin: rings at the edges and centre of every joint's blend window, so the bend has a middle.
+  const windowUs = rigidSkin ? [] : jointUs.flatMap((u, i) => [-1, 0, 1].map((f) => u + (f * half(i + 1)) / span));
   const filletUs = fillets.flatMap((f) =>
     Array.from({ length: 7 }, (_, k) => toU((f.s0 + ((f.s1 - f.s0) * (k + 1)) / 8) / L)),
   );
@@ -828,7 +832,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
       .filter(inPiece);
     const mandatory = new Set([...smallCorners, ...windowUs.filter(inPiece)]);
     const us = new Set<number>([a, b, ...mandatory, ...filletUs.filter(inPiece)]);
-    const steps = Math.ceil(32 * Math.max(1, ctx.detail));
+    const steps = Math.ceil(32 * Math.max(1, detail));
     for (let k = 1; k < steps; k++) us.add(a + ((b - a) * k) / steps);
     for (const t of path.samples(from, to)) if (inPiece(toU(t))) us.add(toU(t));
     const cand = [...us]
@@ -841,7 +845,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
             : frameAt(tube, u, "right", u === a || mandatory.has(u)),
       );
     const rmax = Math.max(...cand.map((f) => Math.max(...f.r)));
-    const tol = (0.03 / ctx.detail) * rmax + 1e-6;
+    const tol = (0.03 / detail) * rmax + 1e-6;
     const keys = (f: Frame) => [...f.r, ...f.s];
     const fits = (k: number, j: number) => {
       if (cand[k].T.angleTo(cand[j].T) > maxTurn || cand[k].N.angleTo(cand[j].N) > maxTurn) return false;

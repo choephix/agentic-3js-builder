@@ -23,8 +23,13 @@ export type CardOptions = Tags & {
    * function gives each card its own: `(frame, i) => direction`.
    */
   flow?: DirectionInput | ((frame: Frame, i: number) => DirectionInput);
-  /** Extra degrees each card curls toward `flow` from root to tip, drawn in 4 segments. Default 0 (flat). */
+  /**
+   * Extra degrees each card curls toward `flow` from root to tip, one segment per 20° / `detail` (2 at least, 8 at
+   * most). Default 0 (flat, one segment).
+   */
   bend?: number;
+  /** These cards' own tessellation multiplier for their curl segments (default: the builder's `detail`). */
+  detail?: number;
   /** Add a second card at right angles through each one: tufts, grass clumps, leaves seen from any side. */
   cross?: boolean;
   /** Random size change, ± this share (0.3 = 70% to 130%). Default 0. */
@@ -46,7 +51,8 @@ export type CardOptions = Tags & {
   mirror?: boolean;
 };
 
-const SEGMENTS = 4;
+/** Curl drawn per segment at detail 1. */
+const SEGMENT_DEG = 20;
 
 /**
  * One card per frame, built from `texture` (or one picked at random per card from a list; list a texture twice to
@@ -65,7 +71,8 @@ export function cards(
   const random = options.rng ?? rng(1);
   const lean = (options.lean ?? 0) * DEG;
   const bend = (options.bend ?? 0) * DEG;
-  const segments = bend ? SEGMENTS : 1;
+  const detail = ctx.detailOf("cards()", options.detail);
+  const segments = bend ? Math.min(8, Math.max(2, Math.ceil((Math.abs(options.bend!) * detail) / SEGMENT_DEG))) : 1;
   const flowFor = (frame: Frame, i: number) =>
     typeof options.flow === "function"
       ? toDirection(options.flow(frame, i))

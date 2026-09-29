@@ -17,8 +17,10 @@ export type MembraneOptions = Tags & {
   color: Fill;
   /** Total thickness; the skin is offset ± thickness/2 along its normal and closed with side walls. */
   thickness: number;
-  /** Cells between the edges (default 4 × the builder's `detail`). */
+  /** Cells between the edges (default 4 × `detail`). */
   rows?: number;
+  /** This membrane's own tessellation multiplier for its default `rows` and `cols` (default: the builder's). */
+  detail?: number;
   /** Cells along the edges (default from the aspect ratio); every bone span boundary also gets a column. */
   cols?: number;
   /** Trailing-edge inset between the two edge tips, as a fraction of the edge length (0.25 = a deep scallop). */
@@ -100,7 +102,8 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
   // Chain edges are read in their current pose.
   const pointA = (t: number) => (chainA ? chainA.at(t).at : pathA!.at(t));
   const pointB = (t: number) => (chainB ? chainB.at(t).at : pathB!.at(t));
-  const rows = options.rows ?? Math.max(1, Math.round(4 * ctx.detail));
+  const detail = ctx.detailOf("membrane()", options.detail);
+  const rows = options.rows ?? Math.max(1, Math.round(4 * detail));
   const scallop = options.scallop ?? 0;
   const split = options.split ?? "mid";
   const smooth = (options.skin ?? "smooth") === "smooth";
@@ -122,7 +125,8 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
   for (let k = 0; k <= 8; k++) width += pointA(k / 8).distanceTo(pointB(k / 8)) / 9;
   const length = Math.max((chainA ?? pathA!).length, (chainB ?? pathB!).length);
   const cols =
-    options.cols ?? Math.min(ctx.segments(24), Math.max(4, Math.round((length / Math.max(width, 1e-6)) * rows)));
+    options.cols ??
+    Math.min(ctx.segments(24, detail), Math.max(4, Math.round((length / Math.max(width, 1e-6)) * rows)));
   const us = new Set<number>();
   for (let i = 0; i <= cols; i++) us.add(i / cols);
   for (const chain of [chainA, chainB]) for (const t of chain?.ts ?? []) us.add(t);

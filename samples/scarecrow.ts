@@ -80,8 +80,7 @@ const planar = (p: Vector3, n: Vector3): [number, number] => {
   return [p.x, p.y];
 };
 /** A running stitch `d` meters inside an edge, dashed along `along`. */
-const stitch = (d: number, along: number, inset = 0.006) =>
-  Math.abs(d - inset) < 0.0014 && fract(along / 0.011) < 0.58;
+const stitch = (d: number, along: number, inset = 0.006) => Math.abs(d - inset) < 0.0014 && fract(along / 0.011) < 0.58;
 const shade = (c: Rgb, k: number): Rgb => [c[0] * k, c[1] * k, c[2] * k];
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -236,7 +235,7 @@ function patch(
 }
 
 export default function build() {
-  const b = createBuilder({ name: "scarecrow", detail: 1.25 });
+  const b = createBuilder({ name: "scarecrow", paintSize: 2048 });
   const random = rng(17);
   const straws = [strawTexture(1), strawTexture(2), strawTexture(3)];
   const grass = [grassTexture(4), grassTexture(5)];
@@ -352,7 +351,15 @@ export default function build() {
     minDist: 0.05,
     filter: (h) => h.n.y > 0.6 && Math.hypot(h.at.x, h.at.z) < 0.2,
   });
-  b.cards(fallen, straws, { size: [0.03, 0.09], lean: 84, spin: 180, vary: 0.3, rng: rng(26), bone: root, group: "ground" });
+  b.cards(fallen, straws, {
+    size: [0.03, 0.09],
+    lean: 84,
+    spin: 180,
+    vary: 0.3,
+    rng: rng(26),
+    bone: root,
+    group: "ground",
+  });
 
   // Pumpkin at the foot of the post: lobes around a stem, ribbed with grain, a curling vine and a leaf.
   const PK: V3 = [0.4, 0, 0.26];
@@ -412,7 +419,15 @@ export default function build() {
     const r = 0.13 + random() * 0.07;
     pumpkinGrass.push(frame([PK[0] + Math.sin(a) * r, 0.008, PK[2] + Math.cos(a) * r], [0, 1, 0]));
   }
-  b.cards(pumpkinGrass, grass, { size: [0.07, 0.07], cross: true, vary: 0.3, spin: 180, rng: rng(34), bone: root, group: "ground" });
+  b.cards(pumpkinGrass, grass, {
+    size: [0.07, 0.07],
+    cross: true,
+    vary: 0.3,
+    spin: 180,
+    rng: rng(34),
+    bone: root,
+    group: "ground",
+  });
 
   // ---------------------------------------------------------------------------------------------------------
   // Torso: one loft from crotch to shoulders, painted as overalls over a flannel shirt.
@@ -467,15 +482,30 @@ export default function build() {
   // Brass buttons where the straps meet the bib.
   for (const s of [1, -1]) {
     const hit = torsoSurface.nearest([s * 0.1, bibTop - 0.018, BZ + 0.3]);
-    const btn = b.stick(new CylinderGeometry(0.013, 0.013, 0.008, b.segments(12)), BRASS, hit, { embed: 0.3, group: "body" });
+    const btn = b.stick(new CylinderGeometry(0.013, 0.013, 0.008, b.segments(12)), BRASS, hit, {
+      embed: 0.3,
+      group: "body",
+    });
     b.stick(new CylinderGeometry(0.006, 0.006, 0.004, b.segments(8)), "#8d6a22", btn.moved([0, 0.004, 0]), {
       embed: 0.3,
       group: "body",
     });
   }
   // Straw bursting from the torn seam.
-  const tearHits = torsoSurface.scatter(9, { rng: rng(41), minDist: 0.006, filter: (h) => h.at.distanceTo(TEAR) < 0.014 });
-  b.cards(tearHits, straws, { size: [0.035, 0.09], vary: 0.3, spin: 40, lean: 25, flow: [0.3, -1, 0], rng: rng(42), group: "body" });
+  const tearHits = torsoSurface.scatter(9, {
+    rng: rng(41),
+    minDist: 0.006,
+    filter: (h) => h.at.distanceTo(TEAR) < 0.014,
+  });
+  b.cards(tearHits, straws, {
+    size: [0.035, 0.09],
+    vary: 0.3,
+    spin: 40,
+    lean: 25,
+    flow: [0.3, -1, 0],
+    rng: rng(42),
+    group: "body",
+  });
   // Rope tying the waist to the post.
   b.sweep(
     catmull(
@@ -541,7 +571,11 @@ export default function build() {
       group: `arm${sides[i][1]}`,
     });
     // Rolled cuff.
-    b.rod([s * 0.68, ARM_Y, AZ], [s * 0.725, ARM_Y, AZ], 0.063, { bone: elbow, color: tartan, group: `arm${sides[i][1]}` });
+    b.rod([s * 0.68, ARM_Y, AZ], [s * 0.725, ARM_Y, AZ], 0.063, {
+      bone: elbow,
+      color: tartan,
+      group: `arm${sides[i][1]}`,
+    });
     // Ties round sleeve and crossbar.
     for (const [x, bone] of [
       [0.3, shoulder],
@@ -618,7 +652,11 @@ export default function build() {
     // Boot: shaft, foot, sole and a round toe, riding the ankle.
     const toe = leg.at(1).at;
     const foot = frame(A, toe.clone().sub(A));
-    b.rod([A.x, A.y + 0.06, A.z], foot.local([0, 0.01, 0]), 0.056, { bone: ankle, color: leather, group: `leg${side}` });
+    b.rod([A.x, A.y + 0.06, A.z], foot.local([0, 0.01, 0]), 0.056, {
+      bone: ankle,
+      color: leather,
+      group: `leg${side}`,
+    });
     b.frustumBox(foot.local([0, -0.05, -0.02]), foot.local([0, 0.12, -0.03]), [0.1, 0.1], [0.095, 0.075], {
       bone: ankle,
       color: leather,
@@ -638,11 +676,16 @@ export default function build() {
     });
     // Laces across the instep.
     for (let k = 0; k < 3; k++)
-      b.rod(foot.local([0.035, 0.02 + k * 0.03, 0.03 - k * 0.004]), foot.local([-0.035, 0.02 + k * 0.03, 0.03 - k * 0.004]), 0.004, {
-        bone: ankle,
-        color: ROPE_DK,
-        group: `leg${side}`,
-      });
+      b.rod(
+        foot.local([0.035, 0.02 + k * 0.03, 0.03 - k * 0.004]),
+        foot.local([-0.035, 0.02 + k * 0.03, 0.03 - k * 0.004]),
+        0.004,
+        {
+          bone: ankle,
+          color: ROPE_DK,
+          group: `leg${side}`,
+        },
+      );
   });
 
   // ---------------------------------------------------------------------------------------------------------
@@ -817,7 +860,15 @@ export default function build() {
     });
   }
   const fray = b.ring(frame(hatAt.clone().addScaledVector(hatAxis, -0.002), hatAxis), { count: 90, radius: 0.258 });
-  b.cards(fray.items, straws, { size: [0.02, 0.035], vary: 0.4, spin: 30, rng: rng(71), bone: head, sink: 0.25, group: "head" });
+  b.cards(fray.items, straws, {
+    size: [0.02, 0.035],
+    vary: 0.4,
+    spin: 30,
+    rng: rng(71),
+    bone: head,
+    sink: 0.25,
+    group: "head",
+  });
 
   // ---------------------------------------------------------------------------------------------------------
   // A crow perched on the left forearm, looking at the scarecrow.
@@ -838,7 +889,11 @@ export default function build() {
     scale: [0.85, 0.9, 1.55],
     group: "crow",
   });
-  b.part(new SphereGeometry(0.034, b.segments(12), b.segments(10)), feathers, { bone: elbowL, at: C(0.07, 0.125), group: "crow" });
+  b.part(new SphereGeometry(0.034, b.segments(12), b.segments(10)), feathers, {
+    bone: elbowL,
+    at: C(0.07, 0.125),
+    group: "crow",
+  });
   b.part(new ConeGeometry(0.012, 0.05, b.segments(8)), BEAK, {
     bone: elbowL,
     at: C(0.118, 0.118),
@@ -847,7 +902,11 @@ export default function build() {
   });
   for (const sd of [1, -1]) {
     b.part(new SphereGeometry(0.0075, 8, 6), EYE, { bone: elbowL, at: C(0.088, 0.135, sd * 0.026), group: "crow" });
-    b.part(new SphereGeometry(0.0025, 6, 4), "#ffffff", { bone: elbowL, at: C(0.092, 0.139, sd * 0.031), group: "crow" });
+    b.part(new SphereGeometry(0.0025, 6, 4), "#ffffff", {
+      bone: elbowL,
+      at: C(0.092, 0.139, sd * 0.031),
+      group: "crow",
+    });
     b.extrude(
       [
         [0.05, 0.02],
@@ -870,7 +929,11 @@ export default function build() {
       },
     );
     b.rod(C(0.005, 0.04, sd * 0.016), C(0.01, 0.002, sd * 0.018), 0.004, { bone: elbowL, color: BEAK, group: "crow" });
-    b.rod(C(-0.01, 0.002, sd * 0.018), C(0.035, 0.002, sd * 0.02), 0.0035, { bone: elbowL, color: BEAK, group: "crow" });
+    b.rod(C(-0.01, 0.002, sd * 0.018), C(0.035, 0.002, sd * 0.02), 0.0035, {
+      bone: elbowL,
+      color: BEAK,
+      group: "crow",
+    });
   }
   b.extrude(
     [
