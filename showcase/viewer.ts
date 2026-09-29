@@ -322,6 +322,11 @@ export class Viewer {
     });
   }
 
+  /** Settles once the shown sample's SVG textures have drawn. */
+  get ready() {
+    return this.textures;
+  }
+
   /** The shown sample as a bitmap of the canvas, once its textures are in. */
   async snapshot() {
     await this.textures;

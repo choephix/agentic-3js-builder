@@ -248,6 +248,12 @@ function step(by: number) {
 
 // ── Loading a sample ─────────────────────────────────────────────────────────────────────────────────────────────
 
+/** The loading bar and chip, shown while a sample imports, builds and draws its textures. */
+function showLoading(name: string | null) {
+  $("loading").hidden = name === null;
+  if (name !== null) $("loading-name").textContent = name;
+}
+
 async function run(keepCamera: boolean) {
   const token = ++loading;
   if (!state.slug && entries.length) {
@@ -256,6 +262,9 @@ async function run(keepCamera: boolean) {
   }
   const slug = state.slug;
   const entry = entries.find((item) => item.slug === slug);
+  showLoading(entry?.name ?? slug);
+  // The clicked tile takes the selection now, not once the sample is in.
+  renderList();
   const next: Loaded = {
     slug,
     meta: undefined,
@@ -271,6 +280,12 @@ async function run(keepCamera: boolean) {
     entry ? current.sources[entry.path]() : Promise.resolve(null),
     loadSnapshots(slug),
   ]);
+  if (token !== loading) return;
+  // The build blocks the page, so let the indicator paint first (hidden tabs get no animation frames); its
+  // animations then run off the main thread.
+  await new Promise((resolve) =>
+    document.hidden ? setTimeout(resolve) : requestAnimationFrame(() => setTimeout(resolve)),
+  );
   if (token !== loading) return;
   if (source.status === "fulfilled") next.source = source.value;
   if (snaps.status === "fulfilled") {
@@ -317,6 +332,8 @@ async function run(keepCamera: boolean) {
   renderPanel();
   syncViewer();
   renderChrome();
+  await viewer.ready;
+  if (token === loading) showLoading(null);
 }
 
 // ── Viewer sync ──────────────────────────────────────────────────────────────────────────────────────────────────
