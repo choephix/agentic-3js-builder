@@ -5,6 +5,7 @@ import {
   DataTexture,
   LinearFilter,
   LinearMipmapLinearFilter,
+  NearestFilter,
   RGBAFormat,
   SRGBColorSpace,
   UnsignedByteType,
@@ -18,9 +19,10 @@ const DEFAULT_SIZE = 256;
  * A texture drawn from SVG markup. The drawing fills the texture: its left edge is u = 0, its bottom edge v = 0.
  * `size` is the longest side of the raster in pixels (default 256, 8 to 2048); the other side keeps the drawing's
  * aspect (its `viewBox`, else `width`/`height`). Reuse one texture for many cards and parts: each distinct texture
- * takes its own space in the creature's texture atlas.
+ * takes its own space in the creature's texture atlas. `pixelated` draws the SVG with crisp (unantialiased) edges
+ * and magnifies it without smoothing, so every raster pixel shows as a hard-edged square.
  */
-export function svg(markup: string, options: { size?: number } = {}) {
+export function svg(markup: string, options: { size?: number; pixelated?: boolean } = {}) {
   const open = /<svg\b[^>]*>/i.exec(markup);
   if (!open) throw new Error("svg(): the markup has no <svg> element");
   const attr = (name: string) => new RegExp(`\\s${name}\\s*=\\s*["']([^"']*)["']`, "i").exec(open[0])?.[1];
@@ -40,7 +42,7 @@ export function svg(markup: string, options: { size?: number } = {}) {
     .replace(/\s(width|height)\s*=\s*["'][^"']*["']/gi, "")
     .replace(
       /^<svg\b/i,
-      `<svg width="${width}" height="${height}"${/\sxmlns\s*=/.test(open[0]) ? "" : ' xmlns="http://www.w3.org/2000/svg"'}`,
+      `<svg width="${width}" height="${height}"${/\sxmlns\s*=/.test(open[0]) ? "" : ' xmlns="http://www.w3.org/2000/svg"'}${options.pixelated && !/\sshape-rendering\s*=/i.test(open[0]) ? ' shape-rendering="crispEdges"' : ""}`,
     );
   const source = markup.replace(open[0], tag);
 
@@ -48,7 +50,7 @@ export function svg(markup: string, options: { size?: number } = {}) {
   const texture = new DataTexture(data, width, height, RGBAFormat, UnsignedByteType);
   texture.name = "svg";
   texture.colorSpace = SRGBColorSpace;
-  texture.magFilter = LinearFilter;
+  texture.magFilter = options.pixelated ? NearestFilter : LinearFilter;
   texture.minFilter = LinearMipmapLinearFilter;
   texture.generateMipmaps = true;
   texture.anisotropy = 8;
