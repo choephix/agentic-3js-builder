@@ -41,6 +41,8 @@ export type SessionTotals = {
 };
 
 export type Render = { tag: string; errors: number; warnings: number; note?: string };
+/** What the rendering session spent, from the logged model calls in a time window. */
+export type Spend = { cost: number; tokens: number; calls: number; seconds: number };
 /** One rendered version (an `npm run snap` tag) and the session and model that rendered it. */
 export type Version = {
   tag: string;
@@ -56,6 +58,13 @@ export type Version = {
   modelId: string | null;
   /** Reasoning effort in force at that command. */
   effort: string | null;
+  /**
+   * This iteration: the rendering session's model calls since its previous render of this sample (or since it
+   * started), up to this render. Null when that session also worked on other samples, so its usage can't be split.
+   */
+  spent: Spend | null;
+  /** If the build had stopped here: `spent` summed over this and every earlier version. Null when any is null. */
+  total: Spend | null;
   note?: string;
 };
 
@@ -114,13 +123,13 @@ export const builds: Record<string, Build> = Object.fromEntries(
 
 const money = (value: number) => `$${value.toFixed(2)}`;
 
-function duration(seconds: number) {
+export function duration(seconds: number) {
   if (seconds < 60) return `${seconds}s`;
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, "0")}s`;
   return `${Math.floor(seconds / 3600)}h ${String(Math.floor((seconds % 3600) / 60)).padStart(2, "0")}m`;
 }
 
-function tokens(value: number) {
+export function tokens(value: number) {
   if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
   if (value >= 1e3) return `${Math.round(value / 1e3)}k`;
   return String(value);

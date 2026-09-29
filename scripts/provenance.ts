@@ -14,7 +14,7 @@ import { existsSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileS
 import { homedir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { Build, Builder, Render, SessionTotals, Tokens, Version } from "../showcase/builds";
+import type { Build, Builder, Render, SessionTotals, Spend, Tokens, Version } from "../showcase/builds";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 /** The nilo profile's logs, where earlier builders ran; logs from other profiles are named by their path from home. */
@@ -47,7 +47,7 @@ type Message = {
   provider?: string;
   model?: string;
   api?: string;
-  usage?: { input?: number; output?: number; cacheRead?: number };
+  usage?: { input?: number; output?: number; cacheRead?: number; totalTokens?: number; cost?: { total?: number } };
   content?: Part[] | string;
   toolCallId?: string;
   isError?: boolean;
@@ -363,6 +363,22 @@ const renderCalls = logs.flatMap((log) =>
     .map((call) => ({ log, call, text: `${call.args.command}\n${call.output}` })),
 );
 
+/** The session's model calls with `after < timestamp <= upTo`, summed. */
+function spendBetween(log: Log, after: string, upTo: string): Spend {
+  const spend: Spend = { cost: 0, tokens: 0, calls: 0, seconds: 0 };
+  for (const entry of log.entries) {
+    if (entry.type !== "message" || entry.message?.role !== "assistant") continue;
+    if (entry.timestamp! <= after || entry.timestamp! > upTo) continue;
+    const usage = entry.message.usage ?? {};
+    spend.calls++;
+    spend.cost += usage.cost?.total ?? 0;
+    spend.tokens += usage.totalTokens ?? (usage.input ?? 0) + (usage.output ?? 0) + (usage.cacheRead ?? 0);
+  }
+  spend.cost = Number(spend.cost.toFixed(4));
+  spend.seconds = Math.max(0, Math.round((Date.parse(upTo) - Date.parse(after)) / 1000));
+  return spend;
+}
+
 /**
  * Every rendered version of `slug` (a contact sheet on disk, as the showcase lists them) and who rendered it: the
  * shell call that was running the harness when the sheet was written, which holds for loops over samples and computed
@@ -370,6 +386,7 @@ const renderCalls = logs.flatMap((log) =>
  */
 function versionsOf(slug: string): Version[] {
   const versions: Version[] = [];
+  const paths = pathsBySlug.get(slug)!;
   for (const arm of ["B", "A"] as const) {
     const directory = join(SNAPS, slug, arm, "snaps");
     if (!existsSync(directory)) continue;
@@ -395,6 +412,8 @@ function versionsOf(slug: string): Version[] {
         model: modelId ? (lab.MODEL_NAMES[modelId.slice(modelId.indexOf("/") + 1)] ?? modelId) : null,
         modelId,
         effort: run?.call.effort ?? null,
+        spent: null,
+        total: null,
         ...(run
           ? {}
           : {
@@ -405,7 +424,36 @@ function versionsOf(slug: string): Version[] {
       });
     }
   }
-  return versions.sort((a, b) => (a.rendered < b.rendered ? -1 : a.rendered > b.rendered ? 1 : 0));
+  versions.sort((a, b) => (a.rendered < b.rendered ? -1 : a.rendered > b.rendered ? 1 : 0));
+  // Spend per iteration, from the rendering session's own calls; a session that wrote other samples can't be split.
+  const cut = new Map<Log, string>();
+  let total: Spend | null = { cost: 0, tokens: 0, calls: 0, seconds: 0 };
+  for (const version of versions) {
+    const log = logs.find((item) => item.session === version.session);
+    if (!log) {
+      total = null;
+      continue;
+    }
+    const shared = log.touches.some((touch) => !paths.has(touch.path));
+    const after = cut.get(log) ?? log.entries[0].timestamp!;
+    cut.set(log, version.rendered);
+    if (shared) {
+      version.note ??= `${log.agent} also worked on other samples, so its usage can't be split per version.`;
+      total = null;
+      continue;
+    }
+    version.spent = spendBetween(log, after, version.rendered);
+    if (total) {
+      total = {
+        cost: Number((total.cost + version.spent.cost).toFixed(4)),
+        tokens: total.tokens + version.spent.tokens,
+        calls: total.calls + version.spent.calls,
+        seconds: total.seconds + version.spent.seconds,
+      };
+      version.total = total;
+    }
+  }
+  return versions;
 }
 
 const statsCache = new Map<Log, Stats>();

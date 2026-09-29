@@ -1,5 +1,6 @@
 // Harness renders (`npm run snap`): the per-sample index from the dev server, the reports it points at, the
 // Versions panel and the image lightbox.
+import { duration, tokens as tokenText } from "./builds";
 import type { Version } from "./builds";
 import { h } from "./dom";
 import type { RigBlock } from "../src/rig";
@@ -196,6 +197,54 @@ export function versionsPanel(
   body.append(
     h("section", null, h("h3", null, `${snapshots.tags.length} version${snapshots.tags.length > 1 ? "s" : ""}`), table),
   );
+  if (versions.some((version) => version.spent)) {
+    const spend = h(
+      "div",
+      { class: "tags" },
+      h(
+        "div",
+        { class: "tag-row spend head" },
+        h("span", null, "tag"),
+        h("span", { class: "n", "data-tip": "Cost of this iteration alone" }, "step"),
+        h("span", { class: "n", "data-tip": "Total if the build had stopped at this version" }, "total"),
+        h("span", { class: "n" }, "tokens"),
+        h("span", { class: "n" }, "time"),
+      ),
+    );
+    for (const snapshot of snapshots.tags) {
+      const version = versions.find((item) => item.tag === snapshot.tag);
+      const step = version?.spent;
+      const total = version?.total;
+      spend.append(
+        h(
+          "div",
+          {
+            class: "tag-row spend",
+            "data-tip": step
+              ? `${snapshot.tag}: ${step.calls} model calls, ${tokenText(step.tokens)} tokens, ${duration(step.seconds)} this iteration`
+              : (version?.note ?? "No usage recorded for this version."),
+          },
+          h("span", { class: "tag" }, snapshot.tag),
+          h("span", { class: "n" }, step ? `$${step.cost.toFixed(2)}` : "?"),
+          h("span", { class: "n" }, total ? `$${total.cost.toFixed(2)}` : "?"),
+          h("span", { class: "n" }, total ? tokenText(total.tokens) : "?"),
+          h("span", { class: "n" }, total ? duration(total.seconds) : "?"),
+        ),
+      );
+    }
+    body.append(
+      h(
+        "section",
+        null,
+        h(
+          "h3",
+          { "data-tip": "What the builder session spent up to each render. Iteration 1 includes reading the docs." },
+          "Cost by iteration",
+        ),
+        spend,
+      ),
+    );
+  }
   /** "Claude Opus 5.5 high · AgentName", or why the render has no model. */
   const renderedBy = (version: Version | undefined) =>
     !version
