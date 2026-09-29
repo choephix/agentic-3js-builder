@@ -50,6 +50,7 @@ All commits are local; nothing is pushed.
 | abb86a1 | 9       | Paint, SVG textures and cards. Every `color` takes a Paint (colour from model-space position and normal: `mottle`, `spots`, `stripes`, `patches`, `scales`, `countershade`, `gradient`, `grain`, or your own with `noise`/`cells`), baked at `b.root` into one sheet through per-mesh charts. `svg()` makes textures for `part`/`stick` (`texture:`) and `b.cards`, double-sided cut-out quads on frames that lean, curl, cross and take their frame's bones. The harness (creature lab 73be71a) packs flat colours, textures and the paint sheet into one sprite-sheet atlas; ramFawn, griffin, snowLeopard and lantern render pixel-identically. giantAnteater's type errors fixed. |
 | f02ac4b | samples | Texture round: juniperBonsai, goldenPheasant, highlandCow, koiCarp, scarecrow, one Opus 5.5 (high) builder each (see "Texture round"). Provenance now also reads the main omp profile's session logs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | f36aabb | 10      | Friction from the texture round: paints take the part's own surface coordinates `s`; cards take a per-card `flow` and `mirror` and merge repeated textures; sweep `bone` lists drop spans past the path's end (fixes the hammerhead's tail shards in flex A). Harness (creature lab daffb11, 6979c92): x-ray keeps cut-out models, a warm-up render per shot, inside-out only for closed parts, 5 mm floor check, part labels with bone and group.                                                                                                                                                                                                                                    |
+| 47d859c | 11      | Lean meshes: `detail` on every shape (`sweep`/`loft`/tube helpers/`sprout`, `membrane`, `extrude`, `lathe`, `cards`, `b.segments(n, detail)`), 3 rings per smooth joint instead of 5, card curls one segment per 20°, bevel steps scale with detail, `createBuilder({ paintSize })` separate from `detail`; GUIDE asks for lean meshes. Library triangles −9% (531.6k → 483.7k); highlandCow 37.1k → 22.4k, scarecrow (now `paintSize: 2048`, detail 1) 33.9k → 22.6k. Cow, scarecrow, snowLeopard `v30-lowpoly` match their finals.                                                                                                                                                  |
 
 ## Guide test run
 
@@ -104,6 +105,7 @@ Friction the builders reported:
 - [x] Sweep `sectors` on narrow colour-split pieces triggered the harness's inside-out false alarm; the check now needs a closed part (6979c92).
 - [ ] README has lines over 1,000 characters (the `b.chain` and membrane paragraphs), which read tools truncate.
 - [ ] One broken sample fails `npm run typecheck` for everyone.
+- [ ] The lean-mesh GUIDE line (batch 11) is untested on a fresh builder: rerun one texture-round subject and compare triangles against its batch 10 build.
 
 Samples:
 
@@ -112,7 +114,7 @@ Samples:
 
 Known geometry issues:
 
-- [ ] `sweep.at` can sit 3-5 mm off the mesh between rings on strongly curved tubes.
+- [ ] `sweep.at` can sit 3-5 mm off the mesh between rings on strongly curved tubes; fewer rings per joint (batch 11) may widen this on bent smooth joints.
 - [ ] The round start of a leg tube bumps out of the flank when flexed.
 - [ ] Draped collars lag on hard neck bends.
 - [ ] Sector edges are saw-toothed.
