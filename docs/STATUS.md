@@ -54,6 +54,9 @@ All commits are local; nothing is pushed.
 | 25dcd67 253036b | 12      | Low-poly look: tube rings follow the section (360°/sides, 45° max), never closer than 0.7 edge length, chord may stray ≤ half the radius, one window ring where the blend is narrow; caps sides/4; lathe default 12. Harness (creature lab 637377e) reports "Fine meshes". README/GUIDE state the low-poly look. Every sample thinned (cow, scarecrow by hand; 21 by four density-pass agents). Library 483.7k → 283.9k; cow 17.4k, scarecrow 9.1k. Final renders `vNN-lowpoly`, all 0 errors (barnOwl +13 mm and tentacleSerpent −5 mm floor warnings predate). Wireframe comparisons: `smoke/lowpoly/*-compare.png`.                                                                |
 | 90f7667         | 13      | `svg(markup, { pixelated: true })`: crisp raster, nearest magnification. Harness (creature lab d934caa): the atlas magnifies nearest when any source texture does, so one pixelated texture makes the whole atlas pixelated.                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | 7c03043         | samples | Style round: mimicHermitCrab, islandTortoise, oreBeetle, flowerHedgehog, paperDragonKite, tinToyCrab, alebrijeJaguar (see "Style round"). Provenance refresh records the batch 12 thinning agents as later editors.                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 46c27ac         | samples | `meta.builtBy` on every sample, from its build record (a parallel session).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 69e6884         | tools   | Per-version provenance: every rendered tag in `<slug>.build.json` `versions` names the session, model and effort that rendered it, found as the shell call running the harness when the contact sheet was written (loops, computed tags and backgrounded jobs count). All 280 tags on disk attributed. The showcase header's "by" line comes from the record (builder model, then any later models); the Versions panel has a "by" column. Creature lab d01b82d exports `MODEL_NAMES`.                                                                                                                                                                                                |
+| 09c8d79         | samples | Art-style round: ten Sonnet builds (see "Art-style round").                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 ## Guide test run
 
@@ -101,6 +104,25 @@ On 2026-09-29 seven builders each got `GUIDE.md`, one subject and a named art st
 
 The task tool's `med` effort ran Opus at medium and Sonnet at high.
 
+## Art-style round
+
+On 2026-09-29 ten Sonnet 5.5 (high) builders each got `GUIDE.md`, one subject and a well-known art style, with the same 3-render limit. All ten finished on v03 with a clean report and pass typecheck. Contact sheet of all ten: `~/tmp/public/nilo/agentic-3js-builder/showcase/art-style-round.jpg`.
+
+| Sample            | Style                     | Cost  | Active | Triangles | Note                                                                    |
+| ----------------- | ------------------------- | ----- | ------ | --------- | ----------------------------------------------------------------------- |
+| toonFennec        | cel-shaded cartoon        | $1.97 | 10 min | 4.1k      | two-tone paints by normal, SVG anime eyes on a skull-following patch    |
+| clayWalrus        | claymation                | $3.11 | 16 min | 21.7k     | noise-displaced blobs, thumbprint and tool-mark paint                   |
+| ps1Raptor         | PS1-era retro             | $2.28 | 11 min | 2.9k      | hand-unwrapped 64 px pixelated head sheet, Bayer-dithered coat paint    |
+| stainedGlassMoth  | Art Nouveau stained glass | $4.37 | 19 min | 12.7k     | ~90-pane SVG glass decals on both wing faces, bronze body               |
+| ukiyoeOctopus     | ukiyo-e woodblock         | $2.70 | 15 min | 9.6k      | known bug: the mantle crown cap prints solid cream (fix in its report)  |
+| clockworkOwl      | steampunk clockwork       | $3.95 | 19 min | 16.0k     | ~300 engraved plate cards, open chest movement, pipe perch              |
+| neonScorpion      | synthwave neon            | $2.33 | 13 min | 4.9k      | final file differs from v03 by one type-only line                       |
+| porcelainElephant | blue-and-white porcelain  | $8.80 | 29 min | 9.3k      | dragon and peony SVG cards, key-fret and wave paints                    |
+| amigurumiNarwhal  | amigurumi crochet         | $3.02 | 16 min | 3.9k      | per-row stitch counts from girth, V-stitch paint                        |
+| artDecoFalcon     | Art Deco                  | $2.64 | 14 min | 13.3k     | ziggurat feathers, lacquer and gold paints with fake highlights, plinth |
+
+Recurring friction: no emissive, glossy, unlit or toon material (neon, glass, porcelain, lacquer and cel styles all faked it in paint); no decal helper for a drawing on a curved surface; textured parts are one-sided; `svg()` can't be previewed without a render; paints on a round end cap see a constant `t` (octopus crown, alebrije legs).
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
@@ -130,6 +152,8 @@ Friction the builders reported:
 - [ ] Paints can't tell a sweep's round cap or an extrude's side wall from the face (`s` collapses there); the alebrije's leg caps rendered black in v01.
 - [ ] `b.stick` seats by each part's own bounding box, so multi-colour sprigs sharing one frame sink by different amounts.
 - [ ] The 3-render limit surfaced that `--report-only` gives no visual preview; several builders spent a render on a paint or SVG change.
+- [ ] Materials are fixed (MeshStandardMaterial, roughness 0.72): art styles want emissive, gloss, unlit/toon and a back-face outline.
+- [ ] A decal helper (`b.decal(drawing, hit, size)`) that conforms a drawing to a curved surface; three builders wrote their own.
 - [ ] The lean-mesh GUIDE line (batch 11) is untested on a fresh builder: rerun one texture-round subject and compare triangles against its batch 10 build.
 
 Samples:
