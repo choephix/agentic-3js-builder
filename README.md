@@ -4,14 +4,14 @@ A TypeScript SDK for writing primitive-built, skeleton-rigged three.js models in
 
 ## Layout
 
-| Path                | What it is                                                                                                                                  |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/`              | The generic SDK: skeleton, shapes, surfaces, paint, textures, cards, decals, rig answer key. Style-neutral.                                 |
-| `kits/`             | Opinionated style kits built on top of `src/` (`pixel`, `toon`, `clockwork`). `src/` never imports a kit; a model imports the one it wants. |
-| `samples/`          | The sample library: one script per model, each with a build record (`<slug>.build.json`).                                                   |
-| `showcase/`         | The local and published viewer for the samples.                                                                                             |
-| `scripts/`          | `snap` (harness render), `preview` (quick inspection), `provenance` (build records).                                                        |
-| `docs/`             | Agent guidance (`api.md`, `conventions.md`), design notes (`DESIGN.md`) and project status (`STATUS.md`).                                   |
+| Path        | What it is                                                                                                                                  |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/`      | The generic SDK: skeleton, shapes, surfaces, paint, textures, cards, decals, rig answer key. Style-neutral.                                 |
+| `kits/`     | Opinionated style kits built on top of `src/` (`pixel`, `toon`, `clockwork`). `src/` never imports a kit; a model imports the one it wants. |
+| `samples/`  | The sample library: one script per model, each with a build record (`<slug>.build.json`).                                                   |
+| `showcase/` | The local and published viewer for the samples.                                                                                             |
+| `scripts/`  | `snap` (harness render), `preview` (quick inspection), `provenance` (build records).                                                        |
+| `docs/`     | Agent guidance (`api.md`, `conventions.md`), design notes (`DESIGN.md`) and project status (`STATUS.md`).                                   |
 
 ## Documentation
 
@@ -77,4 +77,3 @@ The showcase (`showcase/`, Vite with plain TypeScript, `npm run showcase`) disco
 - **Textures** (`X`): every texture the live sample uses (the paint sheet, each SVG drawing), shown upright over a checkerboard with the UV wireframes of the parts that use it; hover a part to single out its UVs and the part itself, click the picture to enlarge it. Below, the atlas of the latest render, the one texture the exported GLBs carry, with its colour block and every tile outlined as you hover its row. `npm run snap` saves that atlas as `<tag>-atlas.png` beside the shots, and the report's `atlas.layout` says where each tile sits.
 - **Builds** (`P`, or the table icon beside the sample list header): every sample's builder, model, effort, cost, time, tokens, calls, edits, tags and report issues in one sortable table. Hovering a sample in the list shows its model, cost and time.
 - An error thrown while loading or building a sample shows in the page, with its stack mapped to source lines, without affecting other samples. Editing a sample, or any SDK file it imports, re-runs it in place and keeps the camera; a sample file added to or removed from `samples/` joins or leaves the list without a restart; new renders appear as they land.
-

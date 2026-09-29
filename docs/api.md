@@ -393,7 +393,8 @@ The harness bakes the model into one mesh with one texture, the atlas: a block o
 
 ```ts
 const eye = animeEye({ iris: "#27dccb" }); // kits/toon
-for (const s of [1, -1]) b.decal(head, eye, { at: head.local([s * 0.09, 0.05, 0.2]), dir: [0, 0, -1], size: [0.1, 0.14], mirror: s > 0 });
+for (const s of [1, -1])
+  b.decal(head, eye, { at: head.local([s * 0.09, 0.05, 0.2]), dir: [0, 0, -1], size: [0.1, 0.14], mirror: s > 0 });
 ```
 
 ## Distribution, IK, regions
@@ -498,4 +499,3 @@ Reading `b.root` writes `root.userData.rig`, evaluated in the current pose. The 
 ## Non-goals
 
 Auto weights for plain meshes, a mirroring helper, grid/row helpers, a ground-shift helper, auto-merge batching, repeating (tiled) textures and UV-mapped images on SDK shapes (paint those). Mirror with `for (const s of [1, -1])`.
-
