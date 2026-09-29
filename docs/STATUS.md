@@ -178,6 +178,11 @@ Friction: `b.chain` names are one per span (most builders); `Region.joint()` tak
 - The Astra builders (giantAnteater, barnOwl) ran on auto thinking; the level it chose isn't logged.
 - The Gemini builders (redFox, hammerheadShark) ran through cursor-agent, which logs one message per prompt, so model calls are unknown. The dropped run logged no input tokens or cost, so their cost and tokens are lower bounds.
 
+## Showcase performance
+
+- Thumbnail regeneration waits for 750 ms without pointer, wheel or keyboard input between synchronous builds, so stale sidebar images no longer block camera interaction.
+- Orbit hover raycasts are suspended during an `OrbitControls` gesture and run once after it ends; camera rotation does not compete with per-mesh picking.
+
 ## To-do
 
 Friction the builders reported:
