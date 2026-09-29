@@ -121,6 +121,9 @@ const showcaseData = {
     }
   },
   configureServer(server) {
+    // samples/ sits outside the Vite root, so only files already loaded are watched. Watching the folder lets the
+    // `samples/*` globs in catalog.ts and builds.ts see files being added or removed.
+    server.watcher.add(sampleRoot);
     // Sources go out as raw text: a `.ts` file fetched through `/@fs/` would come back transformed.
     server.middlewares.use(
       "/__sample-source",
