@@ -456,6 +456,18 @@ function versionsOf(slug: string): Version[] {
   return versions;
 }
 
+// A file assembled by a shell command (`cat parts > sample.ts`) has no logged write; the session that rendered its
+// first version built it.
+const assembled = new Set<string>();
+for (const slug of slugs) {
+  if (creations.has(slug)) continue;
+  const first = versionsOf(slug).find((version) => version.session);
+  const log = first && logs.find((candidate) => candidate.session === first.session);
+  if (!log) continue;
+  creations.set(slug, { log, at: first.rendered });
+  assembled.add(slug);
+}
+
 const statsCache = new Map<Log, Stats>();
 async function statsOf(log: Log) {
   if (!statsCache.has(log)) {
@@ -489,6 +501,9 @@ async function buildOf(slug: string): Promise<Build> {
   laterEdits.sort((a, b) => (a.first < b.first ? -1 : a.first > b.first ? 1 : 0));
 
   const caveats: Record<string, string> = {};
+  if (assembled.has(slug))
+    caveats.created =
+      "No logged write created this file (a shell command assembled it); the builder is the session that rendered its first version, and `created` is that render.";
   if (!creation) {
     caveats.builder =
       "No logged write created this file (it may have come from a shell command or an unlogged session).";
@@ -528,7 +543,12 @@ async function buildOf(slug: string): Promise<Build> {
   const topModel = mostCommon(replies.map((entry) => `${entry.message!.provider}/${entry.message!.model}`));
   const api = mostCommon(replies.map((entry) => entry.message!.api ?? ""));
 
-  const others = new Set(log.touches.filter((touch) => !paths.has(touch.path)).map((touch) => touch.path));
+  // Throwaway scripts under scratch/ (gitignored) belong to the build, not to other work.
+  const others = new Set(
+    log.touches
+      .filter((touch) => !paths.has(touch.path) && !touch.path.startsWith(`scratch${sep}`))
+      .map((touch) => touch.path),
+  );
   const shared = others.size > 0;
   const builder: Builder = {
     agent: log.agent,
