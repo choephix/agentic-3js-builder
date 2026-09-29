@@ -136,6 +136,25 @@ On 2026-09-29 22 Sonnet 5.5 (high) builders, same 3-render limit and a `scratch/
 
 Friction repeated across builders: `b.part` on model-space merged geometry needs `at: [0, 0, 0]` (six builders); `ngon` sections put a vertex on top, so flat-faced tubes need `sides` with `smooth: false`; pixel styles need a UV-box / per-face crop helper; no outline, emissive or unlit material; `Box3.setFromObject` misreads bone-local meshes.
 
+## Gemini round
+
+On 2026-09-29 ten Gemini 3.8 Flash builders (Antigravity; the task tool's `med` effort logged as `low` thinking) each got `GUIDE.md`, one subject, the 3-render limit and `scratch/`, in worktree branch `worktree/green-meadow-a32b`. No redos. All ten finished on v03 with a clean report; two fail typecheck (lighthouseCove: `"sharp"` outline points typed as `[number, number][]` plus two unused names; spaceMarine: one unused const), left as built. Total $14.08, 4-10 min each. Contact sheet: `~/tmp/public/nilo/agentic-3js-builder/showcase/gemini-round.jpg`.
+
+| Sample           | Cost  | Active | Parts | Triangles | Joints | Note                                                                     |
+| ---------------- | ----- | ------ | ----- | --------- | ------ | ------------------------------------------------------------------------ |
+| lizardfolkHunter | $1.46 | 8 min  | 137   | 9.3k      | 54     | frill, harness, spear; readable                                          |
+| lighthouseCove   | $0.54 | 4 min  | 59    | 7.4k      | 8      | diorama, the best of the round; typecheck fails                          |
+| tyrannosaurus    | $2.03 | 10 min | 80    | 3.7k      | 44     | stripes and teeth; arms barely visible                                   |
+| spaceMarine      | $1.86 | 8 min  | 181   | 9.1k      | 23     | blocky; used the Ultramarines crest despite the brief; chainsword floats |
+| chestMimic       | $1.97 | 10 min | 234   | 7.1k      | 22     | teeth, coins, gems, tongue, six legs                                     |
+| emperorPenguin   | $1.06 | 6 min  | 40    | 2.2k      | 26     | body weighted to the hips alone; feet stand apart from the body          |
+| owlbear          | $1.46 | 8 min  | 85    | 7.2k      | 26     | facial disc and beak read; feather mantle sparse                         |
+| giraffe          | $1.09 | 6 min  | 31    | 1.9k      | 30     | reticulated paint carries it                                             |
+| flyingFox        | $1.02 | 5 min  | 91    | 6.6k      | 36     | crude: box head, flat black membranes                                    |
+| mantisShrimp     | $1.59 | 9 min  | 94    | 7.0k      | 67     | vivid; eyes and antennae read                                            |
+
+Friction they reported: `b.chain` with names wants one name per span (points − 1) (two builders); `catmull`/station points need tuple casts; joint roll on +Z-aimed bones puts local +Z dorsal (two builders); `role` has no `pelvis`/`foot`; a scenery rig with only a root joint throws in the harness. `npm run provenance` run from a worktree only finds that worktree's sessions and rewrites every other record without its builder; the other records were restored.
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
