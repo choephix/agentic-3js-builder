@@ -64,6 +64,14 @@ On 2026-09-28 six builders each got `GUIDE.md` and one animal.
 - Gemini ran through the Cursor account: Antigravity quota is out until 2026-09-29 15:02 UTC. Cursor dropped mid-run and both Gemini builders were resumed.
 - Opus build time is almost all model generation (~600 s of ~620 s, ~55k output tokens, 10-13 rounds). A render takes 1-2 s.
 
+## Build records
+
+`npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
+
+- The five SDK-author samples (wyvern, ramFawn, tentacleSerpent, peacock, lantern) came from SdkBuilder's one session, which also wrote the SDK and showcase. Only its whole-session totals are known ($62.48, 343 calls); cost, time, tokens and typechecks can't be split per sample, and it rendered through the harness directly, so they have no snapshot tags.
+- The Astra builders (giantAnteater, barnOwl) ran on auto thinking; the level it chose isn't logged.
+- The Gemini builders (redFox, hammerheadShark) ran through cursor-agent, which logs one message per prompt, so model calls are unknown. The dropped run logged no input tokens or cost, so their cost and tokens are lower bounds.
+
 ## To-do
 
 Friction the builders reported:

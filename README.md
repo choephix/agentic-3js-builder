@@ -411,6 +411,7 @@ The sample contract:
 - It may export `meta = { name, description?, builtBy? }`. The showcase lists it by `meta.name`, falling back to the slug, and shows `builtBy` when present.
 - Anything goes: creatures, people, props, environments. The SDK and a skeleton are optional; `samples/lantern.ts` is plain three.js.
 - Samples are part of the codebase: `tsc` checks them, and an SDK change that breaks a sample updates the sample in the same change.
+- `samples/<slug>.build.json` records how the sample was built. `npm run provenance` writes it from the omp session log of the agent that first wrote the file and the harness reports of its tags. It holds the builder, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections and later editors. Values the logs can't give are null, with the reason in `caveats`. Builders don't write it. The fields are documented in `showcase/builds.ts`.
 
 ```ts
 import { createBuilder } from "../src/builder";
@@ -428,7 +429,8 @@ The showcase (`showcase/`, Vite with plain TypeScript, `npm run showcase`) disco
 
 - **View**: Shaded, Bones (false colour by owning bone; smooth-skinned parts blend by weight) or Groups; a skeleton x-ray; wireframe. Outside Shaded, hover a part for its bone, group and skin weights. Click a part, or a row in any list, to single out that part, bone (weight paint) or group.
 - **Bend test**: bends every bone but the root by a seeded random angle, up to ±28° per axis like the harness flex shots, as a wiggle or at a chosen amount. Skinned parts deform through their `skinIndex` / `skinWeight`; rigid parts ride their joint.
-- **Panels**, closed by default: Info (meta, live stats, colours, latest render vs live), Tree (joint tree, part groups, every part with its bone and group), Rig (`root.userData.rig`: chains, hinges, rings, with contacts and hinge axes drawn in the view), Code (the source, or a diff between any rendered version and live) and Versions (every `npm run snap` tag with its report numbers, sheet, shots and the latest GLBs to download).
+- **Panels**, closed by default: Info (meta, live stats, colours, latest render vs live, and a collapsed Build section from the build record), Tree (joint tree, part groups, every part with its bone and group), Rig (`root.userData.rig`: chains, hinges, rings, with contacts and hinge axes drawn in the view), Code (the source, or a diff between any rendered version and live) and Versions (every `npm run snap` tag with its report numbers, sheet, shots and the latest GLBs to download).
+- **Builds** (`P`, or the table icon beside the sample list header): every sample's builder, model, effort, cost, time, tokens, calls, edits, tags and report issues in one sortable table. Hovering a sample in the list shows its model, cost and time.
 - An error thrown while loading or building a sample shows in the page, with its stack mapped to source lines, without affecting other samples. Editing a sample, or any SDK file it imports, re-runs it in place and keeps the camera; new renders appear as they land.
 
 ## Non-goals
@@ -443,6 +445,7 @@ npm run typecheck        # src, samples and showcase
 npm run showcase         # dev server with hot reload
 npm run showcase:build   # static build in showcase/dist
 npm run snap -- <slug> v01   # render a sample through the creature-lab harness
+npm run provenance       # rewrite samples/*.build.json from the session logs
 ```
 
 `snap` renders on the shared NVIDIA Chromium (port 9333) and writes the contact sheet, shots, report and GLBs to `~/tmp/public/nilo/agentic-3js-builder/snaps/<slug>/` (arm B with joints, A for plain objects). It needs `~/workspace/nilo-creature-lab` checked out; its `harness/snap.ts` reads `CREATURE_LAB_DIR` for the output folder.

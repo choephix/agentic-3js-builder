@@ -1,5 +1,6 @@
 // The showcase page. One sample at a time in one viewer; everything else (data panels, legends, the bend bar) is a
 // key or a click away and lives in the URL: `#redFox?mode=bones&skeleton&bend=40&seed=11&panel=tree&focus=bone:neck1`.
+import { buildSection, buildTip, builds, buildsTable } from "./builds";
 import * as catalog from "./catalog";
 import type { Catalog, SampleModule } from "./catalog";
 import { h } from "./dom";
@@ -195,6 +196,7 @@ function renderList() {
         {
           class: `item${entry.slug === state.slug ? " on" : ""}${entry.failed ? " failed" : ""}`,
           href: format({ ...state, slug: entry.slug, focus: null, compare: null, tag: null }),
+          "data-tip": buildTip(builds[entry.slug]),
           onclick: (event: MouseEvent) => {
             if (event.metaKey || event.ctrlKey || event.shiftKey) return;
             event.preventDefault();
@@ -663,6 +665,7 @@ function infoPanel(sample: Loaded) {
         h("p", { class: "muted" }, "Not rendered yet: ", h("code", null, `npm run snap -- ${sample.slug} v01`)),
       ),
     );
+  body.append(h("section", null, buildSection(builds[sample.slug])));
   return body;
 }
 
@@ -997,6 +1000,19 @@ const reseed = () =>
   });
 const togglePanel = (panel: Panel) => set({ panel: state.panel === panel ? null : panel });
 
+/** The Builds table over the page; picking a row opens that sample. */
+function toggleBuilds() {
+  const overlay = $("builds");
+  overlay.hidden = !overlay.hidden;
+  if (!overlay.hidden)
+    $("builds-body").replaceChildren(
+      buildsTable(state.slug, (slug) => {
+        overlay.hidden = true;
+        select(slug);
+      }),
+    );
+}
+
 for (const button of document.querySelectorAll<HTMLButtonElement>("[data-mode]"))
   button.onclick = () => set({ mode: button.dataset.mode as ColorMode });
 for (const button of document.querySelectorAll<HTMLButtonElement>("[data-panel]"))
@@ -1019,6 +1035,8 @@ $<HTMLInputElement>("seed").onchange = (event) =>
   set({ seed: Math.max(1, Math.round(Number((event.target as HTMLInputElement).value) || 11)) });
 $("help-button").onclick = () => ($("help").hidden = !$("help").hidden);
 $("help").onclick = (event) => event.target === $("help") && ($("help").hidden = true);
+$("builds-button").onclick = toggleBuilds;
+$("builds").onclick = (event) => event.target === $("builds") && ($("builds").hidden = true);
 // A mouse click leaves no focus behind, so Space and Enter stay shortcuts instead of re-pressing the last button.
 addEventListener("click", (event) => {
   if (event.detail > 0) (event.target as HTMLElement).closest("button")?.blur();
@@ -1066,6 +1084,7 @@ const KEYS: Record<string, () => void> = {
   r: () => togglePanel("rig"),
   c: () => togglePanel("code"),
   v: () => togglePanel("versions"),
+  p: toggleBuilds,
   "?": () => ($("help").hidden = !$("help").hidden),
 };
 
@@ -1086,6 +1105,7 @@ addEventListener("keydown", (event) => {
   }
   if (event.key === "Escape") {
     if (!$("help").hidden) $("help").hidden = true;
+    else if (!$("builds").hidden) $("builds").hidden = true;
     else if (document.body.classList.contains("menu")) document.body.classList.remove("menu");
     else if (state.focus) set({ focus: null });
     else if (state.panel) set({ panel: null });
@@ -1137,6 +1157,7 @@ $("help-body").replaceChildren(
       [
         ["↑ ↓ J K", "Previous / next"],
         ["/", "Filter"],
+        ["P", "Builds: model, cost, time"],
       ],
     ],
     [

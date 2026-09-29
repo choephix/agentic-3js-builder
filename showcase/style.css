@@ -137,6 +137,9 @@ details.parts summary,
 .side-head .muted {
   font-size: 11px;
 }
+#builds-button {
+  margin: 0 -4px 0 auto;
+}
 /* Zero intrinsic width, so the input never widens the sidebar. */
 .filter {
   position: relative;
@@ -939,6 +942,22 @@ details.parts summary::before {
 details.parts[open] summary::before {
   transform: rotate(90deg);
 }
+details.build dl.grid {
+  grid-template-columns: 76px minmax(0, 1fr);
+  margin-bottom: 4px;
+}
+details.build .chip {
+  margin-left: 6px;
+}
+/* A value the logs can't give, or only as a lower bound: the reason is on hover. */
+.caveat {
+  text-decoration: underline dotted var(--fg-3);
+  text-underline-offset: 3px;
+  cursor: help;
+}
+.warn {
+  color: var(--warn);
+}
 .part-row {
   display: grid;
   grid-template-columns: 10px minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 0.8fr) 38px;
@@ -1277,7 +1296,8 @@ button.tag-row:hover {
 }
 
 /* The command-palette look for the shortcut sheet. */
-#help {
+#help,
+#builds {
   position: fixed;
   inset: 0;
   z-index: 20;
@@ -1310,6 +1330,60 @@ button.tag-row:hover {
 #help-body h3 {
   margin-bottom: 2px;
 }
+.builds-card {
+  width: min(1240px, calc(100vw - 32px));
+  max-height: 80vh;
+  overflow: auto;
+}
+.builds-card h2 .muted {
+  margin-left: 6px;
+  font-weight: 400;
+}
+table.builds {
+  width: 100%;
+  margin-top: 6px;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+table.builds th,
+table.builds td {
+  height: 22px;
+  padding: 0 6px;
+  text-align: left;
+}
+table.builds th {
+  position: sticky;
+  top: -8px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  color: var(--fg-2);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+}
+table.builds th:hover {
+  color: var(--fg);
+}
+table.builds th.sorted::after {
+  content: " ↑";
+}
+table.builds th.sorted.down::after {
+  content: " ↓";
+}
+table.builds .num {
+  text-align: right;
+}
+table.builds tbody tr {
+  cursor: pointer;
+}
+table.builds tbody tr:hover {
+  background: var(--hover);
+}
+table.builds tbody tr.on {
+  background: var(--active);
+}
 .key-row {
   display: flex;
   justify-content: space-between;
@@ -1331,7 +1405,9 @@ button.tag-row:hover {
   background: #f8f8f8;
   color: var(--fg);
   font-size: 12px;
-  white-space: nowrap;
+  /* One line up to 480 px; longer tips (a build caveat) wrap. */
+  width: max-content;
+  max-width: min(480px, calc(100vw - 12px));
   pointer-events: none;
   box-shadow: 0 2px 8px rgb(0 0 0 / 0.16);
 }
