@@ -17,7 +17,11 @@ import { fileURLToPath } from "node:url";
 import type { Build, Builder, Render, SessionTotals, Tokens } from "../showcase/builds";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+/** The nilo profile's logs, where earlier builders ran; logs from other profiles are named by their path from home. */
 const SESSIONS = join(homedir(), ".omp/profiles/nilo/agent/sessions");
+const OTHER_SESSIONS = [join(homedir(), ".omp/agent/sessions")];
+const sessionName = (file: string) =>
+  file.startsWith(SESSIONS + sep) ? relative(SESSIONS, file) : relative(homedir(), file);
 const SNAPS = join(homedir(), "tmp/public/nilo/agentic-3js-builder/snaps");
 const STATS = join(homedir(), "workspace/nilo-creature-lab/site/scripts/stats.ts");
 
@@ -142,12 +146,12 @@ function parseLog(file: string, text: string): Log {
   const subagent = existsSync(`${dirname(file)}.jsonl`);
   return {
     file,
-    session: relative(SESSIONS, file),
+    session: sessionName(file),
     // A top-level session without a title goes by its id's leading, time-ordered part (full path in `session`).
     agent: subagent
       ? basename(file, ".jsonl")
       : title || `session ${head?.id?.slice(0, 13) ?? basename(file, ".jsonl")}`,
-    parent: head?.parentSession ? relative(SESSIONS, head.parentSession) : null,
+    parent: head?.parentSession ? sessionName(head.parentSession) : null,
     entries,
     calls: ran,
     touches,
@@ -157,12 +161,14 @@ function parseLog(file: string, text: string): Log {
 /** Every session log that mentions this repo. */
 function loadLogs() {
   const needle = Buffer.from(relative(homedir(), ROOT));
-  const files = readdirSync(SESSIONS, { recursive: true, encoding: "utf8" })
-    .filter((name) => name.endsWith(".jsonl"))
-    .sort();
+  const files = [SESSIONS, ...OTHER_SESSIONS].flatMap((root) =>
+    readdirSync(root, { recursive: true, encoding: "utf8" })
+      .filter((name) => name.endsWith(".jsonl"))
+      .sort()
+      .map((name) => join(root, name)),
+  );
   const logs: Log[] = [];
-  for (const name of files) {
-    const file = join(SESSIONS, name);
+  for (const file of files) {
     const bytes = readFileSync(file);
     if (bytes.includes(needle)) logs.push(parseLog(file, bytes.toString("utf8")));
   }
