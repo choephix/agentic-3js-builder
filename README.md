@@ -25,6 +25,7 @@ Bones work, and so does any other point, line or frame: an eye, a horn, a surfac
 | `b.part({ at, frame, aim, dir, up })`                                                             | Point, Frame, Point, Direction, Direction                      |
 | `b.extrude(outline, { at, x, y })`, `b.lathe(outline, { at, axis })`                              | 2D outline, then a Point and Directions                        |
 | `b.stick(geo, color, on)`, `b.sprout(name, on, ...)`                                              | Frame (seated along its facing axis)                           |
+| `b.cards(frames, texture, ...)`                                                                   | Frames (one card on each, standing along its facing axis)      |
 | `b.ring(line, ...)`, `b.pose(joint, { about })`                                                   | Line                                                           |
 | `surface.nearest/ray/around`, `aim`, `offset`, `lerp`, `mid`, `bezier/catmull/arc/spiral`         | Points and Directions                                          |
 
@@ -47,9 +48,9 @@ A creature module that:
 - Exactly one root joint (the first `joint` without `parent`); a second one throws. Joint names match `/^[A-Za-z][A-Za-z0-9_]*$/` and are unique.
 - Joints and everything above them are unscaled. Scale lives on meshes (`part({ scale })`, `region`).
 - Every mesh sits under its heaviest bone. A mesh that follows several bones carries per-vertex weights (`skinIndex` / `skinWeight` attributes indexing `userData.skinBones`, at most 4 bones per vertex); the creature-lab harness exports them as they are. Everything else is rigid: every vertex on that one bone.
-- One shared `MeshStandardMaterial` per colour (roughness 0.72, metalness 0.04).
+- Materials: one shared `MeshStandardMaterial` per colour string (roughness 0.72, metalness 0.04). Painted parts share one material whose map is the paint sheet; textured parts and cards get one material per texture and tint, cut away where the texture is transparent (`alphaTest` 0.5).
 - Deterministic: randomness only through an `rng` you pass (`rng(seed)` here, or `kit.rng(seed)`).
-- You still own the lab's limits (1000 parts, 120k triangles, 160 joints, 64 colours) and resting on y = 0.
+- You still own the lab's limits (1000 parts, 120k triangles with a 60k soft budget, 160 joints, 64 flat colours) and resting on y = 0. Textures and paints don't count as colours; they share one atlas (see "Paint, textures and cards").
 
 ## Module
 
@@ -60,6 +61,8 @@ import { frame, line } from "/home/cx/noodlespace/agentic-3js-builder/src/frame"
 import { aim, lerp, mid, offset, rng } from "/home/cx/noodlespace/agentic-3js-builder/src/math";
 import { arc, bezier, catmull, polyline, spiral } from "/home/cx/noodlespace/agentic-3js-builder/src/path";
 import { limb } from "/home/cx/noodlespace/agentic-3js-builder/src/ik";
+import { countershade, paint, spots, stripes } from "/home/cx/noodlespace/agentic-3js-builder/src/paint";
+import { svg } from "/home/cx/noodlespace/agentic-3js-builder/src/texture";
 
 export default function build() {
   const b = createBuilder({ name: "wyvern" }); // { detail } scales tessellation, see "Detail and budget"
@@ -306,6 +309,67 @@ b.lathe(
 ); // a wide-brimmed hat
 ```
 
+## Paint, textures and cards
+
+### Paint
+
+Every `color` option also takes a **Paint**: a colour at each surface point, from its model-space position `p` and outward normal `n`. That covers sweeps, lofts, `part`, `stick`, membranes, slabs, `extrude`, `lathe`, and sweep `bands` and `sectors`. Reading `b.root` bakes every painted part into one shared texture at one texel density over the whole model, so a pattern keeps its size in meters and runs on across body, legs, tail and head when they share the paint. A part is painted where it stands when it is built, and the pattern stays on it through later poses. The paints come from `src/paint`:
+
+| Paint                                                            | Look                                                                                    |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `mottle(a, b, { size, contrast?, seed? })`                       | soft cloudy blotches about `size` across: mottled skin, lichen, stone, moss             |
+| `spots(base, spot, { size, amount?, rosette?, seed? })`          | spots about `size` apart, `amount` 0..1 (default 0.5) of cover; `rosette` rings them    |
+| `stripes(base, stripe, { size, axis?, width?, wobble?, seed? })` | wavy, tapering bands across `axis` (default z, so they ring a body): tiger, zebra, wasp |
+| `patches(base, patch, { size, gap?, seed? })`                    | irregular patches split by `base` lines: giraffe, cow, tortoiseshell, cracked mud       |
+| `scales(base, edge, { size, width?, seed? })`                    | outlined cells, each shaded a little differently: scales, plates, cobbles, bark plates  |
+| `countershade(back, belly, { level?, soft? })`                   | `back` where the surface faces up, `belly` where it faces down (level −1..1, default 0) |
+| `gradient(a, b, from, to)`                                       | `a` at point `from` to `b` at point `to`: socks, tail tips, faded tops                  |
+| `grain(a, b, { size, axis?, seed? })`                            | fine streaks along `axis` (default y): wood, bark, reeds, hair                          |
+
+- Every colour argument takes a colour string, `[r, g, b]` (sRGB, 0..1) or another paint, so paints nest. `spot`, `patch` and the `base` of `scales` also take a list: each cell gets one of them.
+- `paint((p, n) => colour)` makes your own, and may return another paint (`p.y < 0.2 ? SOCK : coat`). Build them with `noise(p, size, seed?)` (smooth, 0..1), `cells(p, size, seed?)` (Worley: `{ d1, d2, id, center }`, with `d2 - d1` 0 on a cell border), `mix(a, b, t)` and `smoothstep(e0, e1, x)`. Read `p` and `n`; leave them unchanged.
+- The same seed gives the same field everywhere, so two parts with one paint continue each other.
+
+```ts
+const coat = countershade(stripes(ORANGE, BLACK, { size: 0.09 }), CREAM, { level: -0.3 });
+b.sweep(body, radii, { bone: [tail, hips, spine], color: coat });
+b.sweep(legL, [0.07, 0.05], { color: gradient(coat, DARK, [0, 0.25, 0], [0, 0.04, 0]) });
+b.part(new THREE.SphereGeometry(0.1, 16, 12), coat, { bone: head, at: head.local([0, 0.05, 0.1]) });
+```
+
+### Textures
+
+`svg(markup, { size? })` from `src/texture` turns an SVG drawing into a texture. It is rasterised at `size` pixels on its longest side (default 256, up to 2048), with the aspect of its `viewBox`. Transparent pixels cut the surface away. The drawing's bottom edge is v = 0 and its left edge u = 0. Use one texture for many parts; each distinct texture (and tint) takes its own space in the atlas.
+
+- `b.cards(frames, texture, ...)`, below.
+- `b.part` and `b.stick` take `texture:`, mapped by the geometry's own UVs: three.js geometries have them (a `PlaneGeometry` shows the whole drawing, a `CircleGeometry` a disc of it, a sphere wraps it around). The part's `color` string tints it; "#ffffff" keeps the drawing's own colours.
+- Sweeps, lofts, `extrude`, `lathe`, membranes and slabs take paints.
+
+### Cards
+
+`b.cards(frames, texture | texture[], options)` roots one double-sided textured quad on each frame and returns the meshes, one per texture. The frames can be hits from `surface.scatter`, `sweep.at` points, ring and along items, joints or `frame()`. A card's bottom edge (the drawing's bottom) sits on its frame, and the card stands along the frame's facing axis. Each card takes its frame's bones, so a coat of cards bends with the skin under it.
+
+- `size`: `[width, length]` in meters, or one number for both.
+- `lean` (degrees, default 0) tips the card from the facing axis toward `flow`: 0 stands straight out, 90 lies along the surface.
+- `flow` (default `[0, -0.3, -1]`, back and down), flattened onto the surface: the way cards lean and curl.
+- `bend` (degrees, default 0) curls each card further toward `flow` from root to tip, drawn in 4 segments.
+- `cross: true` adds a second card at right angles through each one.
+- `vary` (a share: 0.3 means 70% to 130% size), `spin` (± degrees about the facing axis) and `rng` randomise them. With a list of textures, `rng` picks one per card.
+- `color` tints the cards: one colour string, or a Paint read at each card's root.
+- `sink` (default 0.1 of the length) roots each card that far back into the surface. `bone` makes them all rigid on one bone.
+- Cards are shaded with their frame's facing axis as the normal, so they light like the surface they grow from.
+- A card is 4 triangles, 16 with `bend`; `cross` doubles that. Parts count meshes, so a thousand cards of one texture are one part.
+
+```ts
+const tuft = svg(`<svg viewBox="0 0 32 64">...</svg>`, { size: 128 });
+const hits = b.surface(bodyTube).scatter(600, { rng: rng(3), minDist: 0.02, filter: (h) => h.n.y > -0.3 });
+b.cards(hits, tuft, { size: [0.03, 0.07], lean: 65, bend: 30, vary: 0.3, rng: rng(4), color: coat });
+```
+
+### Budget
+
+The harness bakes the model into one mesh with one texture, the atlas: a block of flat colour cells, the paint sheet (1024 texels wide, 2048 at `detail` above 1) and every texture with its tint. It packs up to 4096 texels square and shrinks textures when they don't fit; the report prints the atlas size.
+
 ## Distribution, IK, regions
 
 - `b.ring(line, { count, radius?, fromDeg?, toDeg?, tilt?, joints?, name?, names?, parent?, group?, role? }, (item) => {})` places `count` frames on a circle around any Line (see "Rings and joint groups") and returns `{ joints, items }`.
@@ -435,7 +499,7 @@ The showcase (`showcase/`, Vite with plain TypeScript, `npm run showcase`) disco
 
 ## Non-goals
 
-No textures, auto weights for plain meshes, mirroring helper, grid/row helpers, ground-shift helper or auto-merge batching. Mirror with `for (const s of [1, -1])`.
+Auto weights for plain meshes, a mirroring helper, grid/row helpers, a ground-shift helper, auto-merge batching, repeating (tiled) textures and UV-mapped images on SDK shapes (paint those). Mirror with `for (const s of [1, -1])`.
 
 ## Development
 

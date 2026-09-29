@@ -2,7 +2,7 @@
 // `userData.bone` or `userData.joint` up its parents, its group the nearest `userData.group`, else its bone, else
 // "body"; a mesh with `userData.skinBones` and `skinIndex` / `skinWeight` attributes is smooth-skinned.
 import { Box3, Vector3 } from "three";
-import type { Material, Mesh, MeshStandardMaterial, Object3D } from "three";
+import type { Material, Mesh, MeshStandardMaterial, Object3D, Texture } from "three";
 import type { RigBlock } from "../src/rig";
 
 export type Part = {
@@ -35,6 +35,8 @@ export type Inspection = {
   joints: JointInfo[];
   groups: Array<{ name: string; parts: number }>;
   colors: string[];
+  /** Distinct textures (the paint sheet counts as one). */
+  textures: Texture[];
   triangles: number;
   vertices: number;
   bounds: Box3;
@@ -60,6 +62,7 @@ export function inspect(root: Object3D): Inspection {
   const parts: Part[] = [];
   const joints: JointInfo[] = [];
   const colors: string[] = [];
+  const textures: Texture[] = [];
   root.traverse((object) => {
     if (typeof object.userData.joint === "string") {
       const parent = inherited(object.parent, (at) => at.userData.joint);
@@ -74,7 +77,9 @@ export function inspect(root: Object3D): Inspection {
     const skinned = Array.isArray(names) && geometry.getAttribute("skinIndex") && geometry.getAttribute("skinWeight");
     const material = ([] as Material[]).concat(mesh.material)[0] as MeshStandardMaterial | undefined;
     const color = material?.color ? `#${material.color.getHexString()}` : null;
-    if (color && !colors.includes(color)) colors.push(color);
+    if (material?.map) {
+      if (!textures.includes(material.map)) textures.push(material.map);
+    } else if (color && !colors.includes(color)) colors.push(color);
     const vertices = geometry.getAttribute("position")?.count ?? 0;
     parts.push({
       index: parts.length,
@@ -103,6 +108,7 @@ export function inspect(root: Object3D): Inspection {
     joints,
     groups: [...groups].map(([name, count]) => ({ name, parts: count })),
     colors,
+    textures,
     triangles: parts.reduce((sum, part) => sum + part.triangles, 0),
     vertices: parts.reduce((sum, part) => sum + part.vertices, 0),
     bounds,

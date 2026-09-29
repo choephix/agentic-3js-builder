@@ -3,7 +3,7 @@
 // Extrudes taper across the outline's height and take a bevel that shrinks itself until it fits.
 import { Matrix4, Quaternion, ShapeUtils, Vector2, Vector3 } from "three";
 import { meshFromWorld, weightsFor } from "./context";
-import type { Ctx, JointRef, Tags } from "./context";
+import type { Ctx, Fill, JointRef, Tags } from "./context";
 import { aim, DEG, toDirection, toPoint } from "./math";
 import type { DirectionInput, PointInput } from "./math";
 import { Part } from "./parts";
@@ -14,7 +14,7 @@ export type OutlinePoint = readonly [number, number] | readonly [number, number,
 type Vec2 = [number, number];
 
 export type ExtrudeOptions = Tags & {
-  color: string;
+  color: Fill;
   /** Outline origin in model space. Default bone: `at`'s bones when it came from something built, else the nearest joint. */
   at: PointInput;
   /** Model-space direction of the outline's +x (default [0, 0, 1], forward: a side-view drawing). */
@@ -34,7 +34,7 @@ export type ExtrudeOptions = Tags & {
 };
 
 export type LatheOptions = Tags & {
-  color: string;
+  color: Fill;
   /** Where the outline's origin sits on the axis. Default bone: as for `extrude`. */
   at: PointInput;
   /** Model-space spin axis, the outline's +y (default [0, 1, 0], up). */

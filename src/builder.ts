@@ -1,9 +1,11 @@
 // Entry point: `createBuilder()` composes every helper around one shared context. Return `b.root` from a
-// creature module; it satisfies the creature-lab contract (joint/bone/group tags, one root joint, no joint scale)
-// and carries the rig answer key in `userData.rig`.
-import type { BufferGeometry } from "three";
+// creature module; it satisfies the creature-lab contract (joint/bone/group tags, one root joint, no joint scale),
+// carries the rig answer key in `userData.rig`, and has every painted part baked into the paint sheet.
+import type { BufferGeometry, Texture } from "three";
+import { cards } from "./cards";
+import type { CardOptions } from "./cards";
 import { Ctx } from "./context";
-import type { JointRef } from "./context";
+import type { Fill, JointRef } from "./context";
 import { along, ring } from "./distribute";
 import type { RingItem, RingOptions } from "./distribute";
 import { membrane, slab } from "./membrane";
@@ -33,9 +35,13 @@ export class Builder {
     this.ctx = new Ctx(name, detail);
   }
 
-  /** The Group to return from the creature module. Reading it (re)writes the rig answer key for the current pose. */
+  /**
+   * The Group to return from the creature module. Reading it (re)writes the rig answer key for the current pose and
+   * bakes the paints of parts painted since the last read.
+   */
   get root() {
     this.ctx.root.userData.rig = rigBlock(this.ctx.rig);
+    this.ctx.bake();
     return this.ctx.root;
   }
 
@@ -73,7 +79,7 @@ export class Builder {
     return pose(this.ctx, joint, rotation);
   }
 
-  part(geometry: BufferGeometry, color: string, options?: PartOptions) {
+  part(geometry: BufferGeometry, color: Fill, options?: PartOptions) {
     return part(this.ctx, geometry, color, options);
   }
 
@@ -115,8 +121,12 @@ export class Builder {
     return new Surface(this.ctx, targets);
   }
 
-  stick(geometry: BufferGeometry, color: string, on: FrameInput, options?: StickOptions) {
+  stick(geometry: BufferGeometry, color: Fill, on: FrameInput, options?: StickOptions) {
     return stick(this.ctx, geometry, color, on, options);
+  }
+
+  cards(on: readonly FrameInput[], texture: Texture | readonly Texture[], options: CardOptions) {
+    return cards(this.ctx, on, texture, options);
   }
 
   membrane(edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions) {

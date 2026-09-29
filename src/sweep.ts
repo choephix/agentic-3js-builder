@@ -6,7 +6,7 @@
 import { Matrix3, Matrix4, Quaternion, Vector3 } from "three";
 import type { Mesh } from "three";
 import { Capture, meshFromWorld, resolveJoint, rigid, spanWeights, weightsFor } from "./context";
-import type { Ctx, JointRef, Tags, Weights } from "./context";
+import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, flatten } from "./math";
 import type { DirectionInput } from "./math";
@@ -28,10 +28,13 @@ export type Section = "circle" | "box" | { ngon: number };
 export type Radius = number | readonly number[] | ((t: number) => number | readonly [number, number]);
 
 export type SweepOptions = Tags & {
-  /** Colour, or `(t) => colour`: the tube is split exactly where the colour changes. Optional when `bands` cover it. */
-  color?: string | ((t: number) => string);
+  /**
+   * Colour or Paint, or `(t) => colour`: the tube is split exactly where the colour changes. Optional when `bands`
+   * cover it.
+   */
+  color?: Fill | ((t: number) => Fill);
   /** `[[tEnd, color], ...]` ascending, in source t: color bands; each band edge splits the mesh (same bone, no cap). */
-  bands?: ReadonlyArray<readonly [number, string]>;
+  bands?: ReadonlyArray<readonly [number, Fill]>;
   /**
    * Bones for a Path source: a joint (rigid), or the chains and joints the path runs through, as one Chain or a list
    * in any order (a body drawn from tail tip to snout: `[tail, hips, spine, neck, head]`). The tube is then one mesh
@@ -74,7 +77,7 @@ export type SweepOptions = Tags & {
   twist?: Twist;
 };
 
-export type Sector = readonly [number, number, string] | readonly [number, number, string, number, number];
+export type Sector = readonly [number, number, Fill] | readonly [number, number, Fill, number, number];
 
 /** A frame on a sweep's built surface: +Y = the outward surface normal `n`, +Z = along the tube (`tangent`). */
 export class SweepPoint extends Spot {
@@ -138,7 +141,7 @@ type Frame = {
   w: Weights;
 };
 /** A clock interval in degrees (a0 < a1) with its colour; null = the piece colour. */
-type Arc = { a0: number; a1: number; color: string | null };
+type Arc = { a0: number; a1: number; color: Fill | null };
 
 const CORNER_SPLIT = 20 * (Math.PI / 180);
 /** Ring spacing at detail 1: at most this much turn or roll between rings. */
@@ -437,7 +440,7 @@ class MeshBuffer {
   readonly index: number[] = [];
   readonly weights: Weights[] = [];
 
-  constructor(readonly color: string) {}
+  constructor(readonly color: Fill) {}
 
   vertex(p: Vector3, w: Weights) {
     this.positions.push(p.x, p.y, p.z);
@@ -631,7 +634,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const colorAt = (u: number) => {
     const t = toT(u);
     for (const [tEnd, color] of options.bands ?? []) if (t <= tEnd) return color;
-    const color = colorOf ? colorOf(u) : (colorFn as string | undefined);
+    const color = colorOf ? colorOf(u) : (colorFn as Fill | undefined);
     if (!color) throw new Error("sweep(): no color for t=" + t.toFixed(3) + "; pass `color` or cover it with `bands`");
     return color;
   };
@@ -764,7 +767,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     Array.from({ length: 7 }, (_, k) => toU((f.s0 + ((f.s1 - f.s0) * (k + 1)) / 8) / L)),
   );
   let buffers: MeshBuffer[] = [];
-  let groupColor = "";
+  let groupColor: Fill = "";
   let groupJoint: Joint | null = null;
   let groupArcs = "";
   const flush = () => {

@@ -18,13 +18,13 @@ You build one sample for the agentic-3js-builder library: a three.js script that
 - Real size, per the brief.
 - Creatures are built skeleton first and stand in a rest pose for rigging and animation: a neutral, readable pose, the non-humanoid equivalent of a T-pose, with limbs, digits, wings, tails and tentacles separated and extended, and the mouth built as a separate upper and lower jaw so it can open.
 - Joints carry names a rigger recognises (`hipL`, `kneeL`, `jaw`, `tail3`) and chains carry a `role`, so the rig answer key describes the whole skeleton.
-- Limits: 1000 parts, 60k triangles, 160 joints, 64 colours.
+- Limits: 1000 parts, 60k triangles, 160 joints, 64 flat colours. Paints and textures share one atlas, which the report sizes.
 
 ## Art direction, from Stefan
 
 > By lots of detail I mean mostly a simple base. Each of these is still made out of primitives so they should retain that blocky shape expected of a puppet made out of primitives. The composition, the color and material choice, and the little details on top of those simple shapes should be what give me that wow factor.
 
-Use as many primitives as you need to make it look good.
+Use as many primitives as you need to make it look good. Surfaces can carry more than flat colour: paints (patterns in meters, baked into textures), SVG drawings as textures, and cards (many small textured cut-outs). README's "Paint, textures and cards" covers them.
 
 ## Snapshot loop
 

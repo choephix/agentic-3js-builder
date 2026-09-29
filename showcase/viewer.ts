@@ -112,6 +112,8 @@ type View = {
   blend: BufferAttribute | null;
   /** Weight paint for the focused bones, and which bones it was painted for. */
   heat: { key: string; colors: BufferAttribute } | null;
+  /** The part's own vertex colours (tinted cards), put back when it is shown shaded. */
+  own: BufferAttribute | null;
 };
 
 export class Viewer {
@@ -153,7 +155,6 @@ export class Viewer {
 
   private readonly palette = new Map<string, MeshStandardMaterial>();
   private readonly variants = new Map<Material, Map<string, Material>>();
-  private readonly vertexColored = new MeshStandardMaterial({ vertexColors: true, roughness: 0.8, metalness: 0 });
   private readonly ghost = new MeshStandardMaterial({
     color: "#aab1ba",
     transparent: true,
@@ -299,6 +300,18 @@ export class Viewer {
     if (!keepCamera) this.frame();
     this.applyPose();
     this.paint();
+    // SVG textures draw asynchronously; show them once they are in.
+    const pending = info.parts.flatMap(
+      (part) =>
+        ([] as Material[])
+          .concat(part.mesh.material)
+          .map((material) => (material as MeshStandardMaterial).map?.userData.ready as Promise<unknown> | undefined)
+          .filter(Boolean) as Array<Promise<unknown>>,
+    );
+    if (pending.length)
+      void Promise.allSettled(pending).then(() => {
+        if (this.root === root) this.dirty = true;
+      });
   }
 
   /** Swap a skinned part for a `SkinnedMesh` bound to its bones at rest; returns what painting needs. */
@@ -327,7 +340,14 @@ export class Viewer {
       part.mesh = mesh = skinned;
       blend = this.weightColors(part, (name) => this.boneColors.get(name) ?? NONE);
     }
-    return { part, mesh, shaded: mesh.material, blend, heat: null };
+    return {
+      part,
+      mesh,
+      shaded: mesh.material,
+      blend,
+      heat: null,
+      own: (mesh.geometry.getAttribute("color") as BufferAttribute | undefined) ?? null,
+    };
   }
 
   /** Per-vertex colour mixed from each skin bone's colour by its weight. */
@@ -355,10 +375,20 @@ export class Viewer {
         (object as Mesh).geometry?.dispose();
         (object as SkinnedMesh).skeleton?.dispose();
       });
-      for (const view of this.views) for (const material of ([] as Material[]).concat(view.shaded)) material.dispose();
+      for (const view of this.views)
+        for (const material of ([] as Material[]).concat(view.shaded)) {
+          (material as MeshStandardMaterial).map?.dispose();
+          material.dispose();
+        }
     }
     for (const variants of this.variants.values()) for (const material of variants.values()) material.dispose();
     this.variants.clear();
+    // Cut-out solids hold this sample's textures.
+    for (const [key, material] of this.palette)
+      if (key.includes("|")) {
+        material.dispose();
+        this.palette.delete(key);
+      }
     for (const object of this.floor.children)
       ([] as Material[]).concat((object as Mesh).material).forEach((m) => m.dispose());
     for (const group of [this.floor, this.overlay, this.markers]) {
@@ -569,18 +599,20 @@ export class Viewer {
           if (!faded && view.heat?.key !== key)
             view.heat = { key, colors: this.weightColors(part, (name) => (bones.has(name) ? ACCENT : COLD)) };
           if (!faded) mesh.geometry.setAttribute("color", view.heat!.colors);
-          material = this.vertexColored;
+          material = this.solid(null, view);
         } else {
-          material = this.solid(ACCENT);
+          material = this.solid(ACCENT, view);
           faded = !bones.has(part.bone ?? "");
         }
       } else {
-        if (mode === "shaded") material = view.shaded;
-        else if (mode === "bones" && view.blend) {
+        if (mode === "shaded") {
+          material = view.shaded;
+          if (view.own) mesh.geometry.setAttribute("color", view.own);
+        } else if (mode === "bones" && view.blend) {
           mesh.geometry.setAttribute("color", view.blend);
-          material = this.vertexColored;
-        } else if (mode === "bones") material = this.solid(this.boneColors.get(part.bone ?? "") ?? NONE);
-        else material = this.solid(this.groupColors.get(part.group) ?? NONE);
+          material = this.solid(null, view);
+        } else if (mode === "bones") material = this.solid(this.boneColors.get(part.bone ?? "") ?? NONE, view);
+        else material = this.solid(this.groupColors.get(part.group) ?? NONE, view);
         if (focus?.groups && !focus.groups.includes(part.group)) faded = true;
         if (focus?.part !== undefined && focus.part !== part.index) faded = true;
       }
@@ -605,11 +637,25 @@ export class Viewer {
     this.paint();
   }
 
-  private solid(color: Color) {
-    const key = color.getHexString();
+  /**
+   * A flat matte colour, or the vertex colours (weight paint, bone blends) when `color` is null. A cut-out part
+   * (cards) keeps its texture's shape.
+   */
+  private solid(color: Color | null, view?: View) {
+    const cut = ([] as Material[]).concat(view?.shaded ?? [])[0] as MeshStandardMaterial | undefined;
+    const shape = cut?.map && cut.alphaTest > 0 ? cut.map : null;
+    const key = `${color ? color.getHexString() : "vertex"}${shape ? `|${shape.uuid}` : ""}`;
     let material = this.palette.get(key);
     if (!material)
-      this.palette.set(key, (material = new MeshStandardMaterial({ color, roughness: 0.8, metalness: 0 })));
+      this.palette.set(
+        key,
+        (material = new MeshStandardMaterial({
+          ...(color ? { color } : { vertexColors: true }),
+          roughness: 0.8,
+          metalness: 0,
+          ...(shape ? { map: shape, alphaTest: 0.5 } : {}),
+        })),
+      );
     return material;
   }
 

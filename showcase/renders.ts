@@ -22,6 +22,9 @@ export type Report = {
   triangles: number;
   vertices: number;
   colors: number;
+  /** Absent in reports from before textures. */
+  textures?: number;
+  atlas?: { size: number; tiles: number; alpha: boolean };
   size: [number, number, number];
   bounds: { min: number[]; max: number[] };
   groups: Array<{ name: string; parts: number }>;
@@ -265,6 +268,9 @@ function reportSummary(report: Report) {
     ["Triangles", count(report.triangles)],
     ["Vertices", count(report.vertices)],
     ["Colours", String(report.colors)],
+    ...(report.textures
+      ? ([["Textures", `${report.textures} · atlas ${report.atlas?.size ?? "?"} px`]] as Array<[string, string]>)
+      : []),
     ["Joints", String(report.joints.length)],
     ["Size", `${report.size.map((v) => v.toFixed(2)).join(" × ")} m`],
     ["Bounds", `${vec(report.bounds.min)} – ${vec(report.bounds.max)}`],

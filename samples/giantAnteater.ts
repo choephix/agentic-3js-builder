@@ -97,7 +97,7 @@ export default function build() {
       [-68, 68, BACK],
       [125, 235, BELLY],
     ],
-    shift: (t) => [0, -0.045 * bellyDip(t), 0],
+    shift: (t) => [0, -0.045 * bellyDip(t)],
     caps: { start: "none", end: "round" },
     sides: 14,
     group: "body",
@@ -285,7 +285,7 @@ export default function build() {
   })) {
     b.stick(new ConeGeometry(0.022, 0.075, b.segments(6)), BACK, hit, {
       embed: 0.45,
-      flow: hit.tangent,
+      flow: [0, 0, -1],
       scale: 0.65 + random() * 0.55,
       group: "body",
     });

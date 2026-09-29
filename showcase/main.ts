@@ -372,6 +372,7 @@ function renderChrome() {
           `${count(info.triangles)} tris`,
           `${info.joints.length} joints`,
           `${info.colors.length} colours`,
+          info.textures.length ? `${info.textures.length} textures` : "",
           `${info.size
             .toArray()
             .map((v) => v.toFixed(2))

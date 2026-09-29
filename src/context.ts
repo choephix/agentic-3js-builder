@@ -1,7 +1,7 @@
 // State shared by every builder helper: the root group, the joint registry, mesh ownership, the material cache,
-// the detail level, the pose counter, the rig records and the skins to refresh after a pose; bone weights and the
-// inheritance rule (`weightsFor`); `Capture`, which keeps build-time data valid after poses; and the placement
-// primitives every helper uses (`setWorld`, `meshFromWorld`, `skinMesh`).
+// the detail level, the pose counter, the rig records, the skins to refresh after a pose and the painted meshes to
+// bake; bone weights and the inheritance rule (`weightsFor`); `Capture`, which keeps build-time data valid after
+// poses; and the placement primitives every helper uses (`setWorld`, `meshFromWorld`, `makeMesh`, `skinMesh`).
 import {
   BufferGeometry,
   Float32BufferAttribute,
@@ -14,10 +14,16 @@ import {
   Uint16BufferAttribute,
   Vector3,
 } from "three";
-import type { Object3D } from "three";
+import type { Object3D, Texture } from "three";
+import { bakeSheet, chartify } from "./bake";
+import type { Painted } from "./bake";
 import type { Frame } from "./frame";
+import { Paint } from "./paint";
 import type { RigRecord } from "./rig";
 import type { Joint } from "./skeleton";
+
+/** What every `color` option takes: a colour string, or a Paint baked into a texture over the surface. */
+export type Fill = string | Paint;
 
 /** A joint handle or a joint name. */
 export type JointRef = Joint | string;
@@ -131,6 +137,10 @@ export class Ctx {
   /** Bumped by every `pose()`, so cached world-space data (surfaces) knows to refresh. */
   poses = 0;
   private readonly materials = new Map<string, MeshStandardMaterial>();
+  /** Painted meshes, packed into one paint sheet when the root is read. */
+  readonly paints: Painted[] = [];
+  private baked = 0;
+  private sheet: MeshStandardMaterial | null = null;
 
   constructor(
     name: string,
@@ -155,6 +165,37 @@ export class Ctx {
       this.materials.set(key, cached);
     }
     return cached;
+  }
+
+  /** The one material every painted mesh shares; its map is the paint sheet. */
+  paintMaterial() {
+    this.sheet ??= new MeshStandardMaterial({ color: "#ffffff", roughness: 0.72, metalness: 0.04, name: "paint" });
+    return this.sheet;
+  }
+
+  /** `texture` tinted by `tint` (and by vertex colours when the mesh has them), cut away where it is transparent. */
+  textured(texture: Texture, tint: string, vertexColors: boolean) {
+    const key = `${texture.uuid}|${tint.toLowerCase()}|${vertexColors}`;
+    let cached = this.materials.get(key);
+    if (!cached) {
+      cached = new MeshStandardMaterial({
+        color: tint.toLowerCase(),
+        map: texture,
+        alphaTest: 0.5,
+        vertexColors,
+        roughness: 0.72,
+        metalness: 0.04,
+      });
+      this.materials.set(key, cached);
+    }
+    return cached;
+  }
+
+  /** Paint every painted mesh into the sheet; again only when meshes were painted since the last bake. */
+  bake() {
+    if (this.paints.length === this.baked) return;
+    bakeSheet(this.paints, this.paintMaterial(), this.detail > 1 ? 2048 : 1024);
+    this.baked = this.paints.length;
   }
 }
 
@@ -249,6 +290,9 @@ export function addMesh(ctx: Ctx, mesh: Mesh, joint: Joint, tags: Tags) {
   else ctx.meshes.set(joint, [mesh]);
 }
 
+/** Per-vertex extras for `meshFromWorld`: model-space normals (else computed), uvs, linear vertex colours, a texture. */
+export type MeshExtras = { normals?: number[]; uvs?: number[]; colors?: number[]; texture?: Texture };
+
 /**
  * A mesh from WORLD-space triangles with weights per vertex. It hangs under its heaviest bone with an identity
  * local transform; vertices on other bones are blend-skinned (`skinMesh`). `smooth` shares vertices (smooth
@@ -258,10 +302,11 @@ export function meshFromWorld(
   ctx: Ctx,
   positions: number[],
   index: number[],
-  color: string,
+  fill: Fill,
   weightAt: (vertex: number) => Weights,
   smooth: boolean,
   tags: Tags,
+  extras: MeshExtras = {},
 ) {
   const count = positions.length / 3;
   const totals = new Map<Joint, number>();
@@ -275,16 +320,46 @@ export function meshFromWorld(
   }
   let geometry = new BufferGeometry();
   geometry.setAttribute("position", new Float32BufferAttribute(local, 3));
+  if (extras.normals) {
+    const turn = new Matrix3().getNormalMatrix(inverse);
+    const normals = new Float32Array(extras.normals.length);
+    for (let i = 0; i < normals.length; i += 3)
+      v.fromArray(extras.normals, i).applyMatrix3(turn).normalize().toArray(normals, i);
+    geometry.setAttribute("normal", new Float32BufferAttribute(normals, 3));
+  }
+  if (extras.uvs) geometry.setAttribute("uv", new Float32BufferAttribute(extras.uvs, 2));
+  if (extras.colors) geometry.setAttribute("color", new Float32BufferAttribute(extras.colors, 3));
   geometry.setIndex(index);
   const bones = totals.size > 1 ? writeWeights(geometry, count, weightAt) : null;
   if (!smooth) geometry = geometry.toNonIndexed();
-  geometry.computeVertexNormals();
-  const mesh = new Mesh(geometry, ctx.material(color));
+  if (!extras.normals) geometry.computeVertexNormals();
+  const mesh = makeMesh(ctx, geometry, fill, joint.object.matrixWorld, extras.texture);
   joint.object.add(mesh);
   mesh.updateMatrixWorld(true);
   addMesh(ctx, mesh, joint, tags);
   if (bones) skinMesh(ctx, mesh, bones);
   return mesh;
+}
+
+/**
+ * A mesh with the material its fill asks for. A colour string shares the matte material for that colour (with a
+ * `texture`, the textured material tinted by it). A Paint cuts the geometry into charts and registers it for the
+ * paint sheet. `toWorld` is where the mesh will sit in model space.
+ */
+export function makeMesh(ctx: Ctx, geometry: BufferGeometry, fill: Fill, toWorld: Matrix4, texture?: Texture) {
+  if (fill instanceof Paint) {
+    if (texture) throw new Error("A textured part takes a colour string as its tint, not a paint");
+    const cut = chartify(geometry, toWorld);
+    const mesh = new Mesh(cut.geometry, ctx.paintMaterial());
+    ctx.paints.push({ mesh, paint: fill, charts: cut.charts, flat: cut.flat, world: cut.world, normal: cut.normal });
+    return mesh;
+  }
+  if (!texture) return new Mesh(geometry, ctx.material(fill));
+  if (!geometry.getAttribute("uv"))
+    throw new Error(
+      "`texture` needs geometry with UVs: a three.js geometry, or cards; SDK shapes take a paint instead",
+    );
+  return new Mesh(geometry, ctx.textured(texture, fill, Boolean(geometry.getAttribute("color"))));
 }
 
 /** `skinIndex` / `skinWeight` attributes (indices into the returned bone list), up to 4 influences per vertex. */

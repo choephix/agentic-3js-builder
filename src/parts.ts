@@ -2,10 +2,10 @@
 // `Part`: a Frame (the geometry's origin and orientation, facing the axis it was aimed along) that follows its bone.
 // A part placed on a smooth-skinned point (a bend in a tube, a hit on a bend) takes that point's weights and bends
 // with the skin under it.
-import { Euler, Mesh, Quaternion, Vector3 } from "three";
-import type { BufferGeometry } from "three";
-import { addMesh, resolveJoint, rigid, setWorld, skinMesh, weightsFor, writeWeights } from "./context";
-import type { Ctx, JointRef, Tags, Weights } from "./context";
+import { Euler, Matrix4, Quaternion, Vector3 } from "three";
+import type { BufferGeometry, Mesh, Texture } from "three";
+import { addMesh, makeMesh, resolveJoint, rigid, setWorld, skinMesh, weightsFor, writeWeights } from "./context";
+import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, toDirection, toFrame, toPoint, vec } from "./math";
 import type { Axis, DirectionInput, FrameInput, PointInput, V3 } from "./math";
@@ -45,9 +45,14 @@ export type PartOptions = Tags & {
   /** Euler XYZ in degrees, model space. */
   rotation?: V3;
   scale?: number | V3;
+  /**
+   * An image mapped by the geometry's own UVs (three.js geometries have them), e.g. from `svg()`. `color` tints it
+   * (a colour string; "#ffffff" keeps it as drawn), and transparent pixels cut the part away.
+   */
+  texture?: Texture;
 };
 
-export function part(ctx: Ctx, geometry: BufferGeometry, color: string, options: PartOptions = {}) {
+export function part(ctx: Ctx, geometry: BufferGeometry, color: Fill, options: PartOptions = {}) {
   const placed = options.at ?? options.frame;
   const weights = placed
     ? weightsFor(ctx, options.bone, [options.at, options.frame], toPoint(placed))
@@ -69,7 +74,13 @@ export function part(ctx: Ctx, geometry: BufferGeometry, color: string, options:
         ? new Vector3().setScalar(options.scale)
         : vec(options.scale);
   const blended = weights.length > 1;
-  const mesh = new Mesh(blended ? geometry.clone() : geometry, ctx.material(color));
+  const mesh = makeMesh(
+    ctx,
+    blended ? geometry.clone() : geometry,
+    color,
+    new Matrix4().compose(at, quat, scale),
+    options.texture,
+  );
   setWorld(mesh, joint.object, at, quat, scale);
   addMesh(ctx, mesh, joint, options);
   if (blended)

@@ -1,8 +1,8 @@
 // Surface queries on the REAL built triangles (no analytic stand-ins) and `stick()` to seat parts on any frame.
 import { Box3, Quaternion, Triangle, Vector3 } from "three";
-import type { BufferGeometry, Mesh, Object3D } from "three";
+import type { BufferGeometry, Mesh, Object3D, Texture } from "three";
 import { mix, rigid, vertexWeights } from "./context";
-import type { Ctx, JointRef, Tags, Weights } from "./context";
+import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, flatten, rng as makeRng, toDirection, toFrame, toPoint, vec } from "./math";
 import type { DirectionInput, FrameInput, PointInput, V3 } from "./math";
@@ -295,13 +295,15 @@ export type StickOptions = Tags & {
   /** Rigid on this bone. Default: the frame's weights (a hit on a bend bends with it), else the nearest joint. */
   bone?: JointRef;
   scale?: number | V3;
+  /** An image mapped by the geometry's UVs, tinted by `color`; see `part`. */
+  texture?: Texture;
 };
 
 /**
  * Seat a part on any frame (a surface hit, a tube point, a ring item, a joint...): local +Y along the frame's
  * facing axis (a hit's normal), sunk by `embed` × the part's own height. The part faces that axis.
  */
-export function stick(ctx: Ctx, geometry: BufferGeometry, color: string, on: FrameInput, options: StickOptions = {}) {
+export function stick(ctx: Ctx, geometry: BufferGeometry, color: Fill, on: FrameInput, options: StickOptions = {}) {
   const base = toFrame(on);
   const n = base.axis;
   const flow = options.flow ? flatten(toDirection(options.flow), n) : null;

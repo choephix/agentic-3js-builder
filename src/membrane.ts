@@ -1,7 +1,7 @@
 // Thin closed skins: `membrane()` between two edges (blend-skinned, or split per bone) and `slab()` from one polygon.
 import { ShapeUtils, Vector2, Vector3 } from "three";
 import { meshFromWorld, mix, nearestJoint, resolveJoint, rigid, weightsFor } from "./context";
-import type { Ctx, JointRef, Tags, Weights } from "./context";
+import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { aim, toPoint } from "./math";
 import type { PointInput } from "./math";
 import { Part } from "./parts";
@@ -14,7 +14,7 @@ import type { Skin } from "./sweep";
 export type MembraneEdge = Chain | PathInput;
 
 export type MembraneOptions = Tags & {
-  color: string;
+  color: Fill;
   /** Total thickness; the skin is offset ± thickness/2 along its normal and closed with side walls. */
   thickness: number;
   /** Cells between the edges (default 4 × the builder's `detail`). */
@@ -199,7 +199,7 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
 }
 
 /** `bone` (rigid) default: the first built point's weights, else the joint nearest the polygon's centre. */
-export type SlabOptions = Tags & { color: string; thickness: number; bone?: JointRef };
+export type SlabOptions = Tags & { color: Fill; thickness: number; bone?: JointRef };
 
 /**
  * A (roughly) planar polygon as a thin closed prism: fins, leaves, plates, ears. Returns a Part whose frame sits at

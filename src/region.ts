@@ -4,7 +4,7 @@
 import { Euler, Quaternion } from "three";
 import type { BufferGeometry } from "three";
 import { resolveJoint, rigid, weightsOf } from "./context";
-import type { Ctx, JointRef } from "./context";
+import type { Ctx, Fill, JointRef } from "./context";
 import { Spot } from "./frame";
 import { DEG, toDirection, toPoint, vec } from "./math";
 import type { DirectionInput, PointInput, V3 } from "./math";
@@ -51,7 +51,7 @@ export class Region extends Spot {
   }
 
   /** `b.part` with every option in region units; the region scale is baked into the mesh scale. */
-  part(geometry: BufferGeometry, color: string, options: PartOptions = {}) {
+  part(geometry: BufferGeometry, color: Fill, options: PartOptions = {}) {
     let quat: Quaternion | undefined;
     if (options.quat) quat = this.q(options.quat);
     else if (!options.aim && !options.dir && !options.frame) {
