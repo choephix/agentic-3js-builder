@@ -99,6 +99,7 @@ Known geometry issues:
 - [ ] Draped collars lag on hard neck bends.
 - [ ] Sector edges are saw-toothed.
 - [ ] Box sections: round caps can leave wedges at the corners of sharp bends.
+- [ ] Colour pieces are separate meshes under different bones, so a shared edge can rasterize with hairline pixel cracks where background shows behind it (redFox v10/v11 rump ring). The vertices match; skinning each mesh from its own bone rounds differently. One mesh per sweep with material groups, or vertex colours, would close it.
 
 ## Sibling repos
 
@@ -107,7 +108,6 @@ Known geometry issues:
   - 3964259: keep per-vertex bone weights a part already carries.
   - 1c352fb: `CREATURE_LAB_DIR` sets the snap output folder.
   - The creature-lab site hasn't been redeployed since.
-- [ ] Colour pieces are separate meshes under different bones, so a shared edge can rasterize with hairline pixel cracks where background shows behind it (redFox v10/v11 rump ring). The vertices match; skinning each mesh from its own bone rounds differently. One mesh per sweep with material groups, or vertex colours, would close it.
 - `~/tmp/public/nilo/creature-lab/GUIDE.md`: the lab's creature contract, which SDK output meets.
 
 ## Output locations
