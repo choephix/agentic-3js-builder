@@ -710,13 +710,12 @@ export default function build() {
       },
     );
     const [, t1, t2, t3] = hind.ts;
-    // Heavy haunch, lean shank, slim ankle; ry runs front to back. The sweep stops at the paw joint, and its radius
-    // t runs 0..1 over that range.
+    // Heavy haunch, lean shank, slim ankle; ry runs front to back. The sweep stops at the paw joint.
     const keys: [number, number, number][] = [
       [0, 0.16, 0.22],
-      [t1 / t3, 0.085, 0.1],
-      [t2 / t3, 0.055, 0.068],
-      [1, pawR, pawR],
+      [t1, 0.085, 0.1],
+      [t2, 0.055, 0.068],
+      [t3, pawR, pawR],
     ];
     const radius = (t: number): [number, number] => {
       const next = keys.findIndex((k) => k[0] > t);

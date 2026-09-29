@@ -67,12 +67,12 @@ export default function build() {
     interpolate(
       bodyCurve.knots,
       bodyStations.map((station) => station.w / 2),
-      t,
+      t / bodyT,
     ),
     interpolate(
       bodyCurve.knots,
       bodyStations.map((station) => station.h / 2),
-      t,
+      t / bodyT,
     ),
   ];
   b.sweep(fullCurve, bodyRadius, {
@@ -84,14 +84,21 @@ export default function build() {
     caps: { end: "none" },
     group: "body",
   });
-  b.sweep(fullCurve, (t) => [0.08 - 0.035 * t, 0.09 - 0.045 * t], {
-    from: bodyT,
-    to: 1,
-    bone: [spine, neck],
-    color: BLUE,
-    caps: { start: "none" },
-    group: "neck",
-  });
+  b.sweep(
+    fullCurve,
+    (t) => {
+      const neckT = (t - bodyT) / (1 - bodyT);
+      return [0.08 - 0.035 * neckT, 0.09 - 0.045 * neckT];
+    },
+    {
+      from: bodyT,
+      to: 1,
+      bone: [spine, neck],
+      color: BLUE,
+      caps: { start: "none" },
+      group: "neck",
+    },
+  );
 
   const head = b.joint("head", {
     at: neck.at(1),

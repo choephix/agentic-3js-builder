@@ -98,22 +98,30 @@ export default function build() {
     [0.75, 0.006],
     [1, 0.0028],
   ];
-  const tailTube = b.sweep(wholePath, (t) => [interp(tailRx, t), interp(tailRy, t)], {
-    bone: [spine, hips, tail],
-    from: tailT,
-    color: SKIN,
-    sectors: [
-      [-45, 45, BACK],
-      [135, 225, BELLY],
-    ],
-    sides: 14,
-    caps: { start: "none", end: "round" },
-    group: "tail",
-  });
+  const tailTube = b.sweep(
+    wholePath,
+    (t) => {
+      const tailLocalT = (t - tailT) / (1 - tailT);
+      return [interp(tailRx, tailLocalT), interp(tailRy, tailLocalT)];
+    },
+    {
+      bone: [spine, hips, tail],
+      from: tailT,
+      color: SKIN,
+      sectors: [
+        [-45, 45, BACK],
+        [135, 225, BELLY],
+      ],
+      sides: 14,
+      caps: { start: "none", end: "round" },
+      group: "tail",
+    },
+  );
   const body = b.sweep(
     wholePath,
     (t) => {
-      const bodyT = hipsT + (1 - t) * (1 - hipsT);
+      const bodyLocalT = t / tailT;
+      const bodyT = hipsT + (1 - bodyLocalT) * (1 - hipsT);
       return [interp(bodyWidth, bodyT), interp(bodyHeight, bodyT)];
     },
     {
@@ -124,7 +132,10 @@ export default function build() {
         [-55, 55, BACK],
         [125, 235, BELLY],
       ],
-      shift: (t) => [0, -0.0015 * Math.sin(Math.PI * (hipsT + (1 - t) * (1 - hipsT)))],
+      shift: (t) => {
+        const bodyLocalT = t / tailT;
+        return [0, -0.0015 * Math.sin(Math.PI * (hipsT + (1 - bodyLocalT) * (1 - hipsT)))];
+      },
       sides: 16,
       caps: { start: "round", end: "none" },
       group: "body",
@@ -153,7 +164,8 @@ export default function build() {
     const pts: Vector3[] = [];
     for (let i = 0; i <= finSamples; i++) {
       const t = (i / finSamples) * 0.97;
-      const p = tailTube.at(t, angle, -0.0006).at;
+      const tailSourceT = tailT + t * (1 - tailT);
+      const p = tailTube.at(tailSourceT, angle, -0.0006).at;
       pts.push(p.add(new Vector3(0, sign * (interp(heights, t) - inset), 0)));
     }
     pts.push(offset(tip, tail.at(1).axis, -inset));
@@ -182,7 +194,8 @@ export default function build() {
   for (let i = 0; i <= 8; i++) {
     const z = 0.022 - (i / 8) * 0.06;
     const curveT = (z - stations[0].at[2]) / (stations[5].at[2] - stations[0].at[2]);
-    const p = body.at(1 - (curveT - hipsT) / (1 - hipsT), 0, -0.0006).at;
+    const bodySourceT = (1 - (curveT - hipsT) / (1 - hipsT)) * tailT;
+    const p = body.at(bodySourceT, 0, -0.0006).at;
     ridgeBase.push(p.clone());
     ridgeTop.push(p.add(new Vector3(0, 0.0032 * Math.pow(i / 8, 1.3), 0)));
   }

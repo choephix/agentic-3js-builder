@@ -98,7 +98,7 @@ export default function build() {
   const bodyPath = catmull(bodyStations.map((station) => station.at));
   const tailT = bodyPath.closestT([0, Y0, -0.95]);
   const mergedBones = [tail, spine, root] as const;
-  b.sweep(bodyPath, (u) => 0.036 * u ** 1.3 + 0.003, {
+  b.sweep(bodyPath, (u) => 0.036 * (u / tailT) ** 1.3 + 0.003, {
     bone: mergedBones,
     to: tailT,
     color: BACK,

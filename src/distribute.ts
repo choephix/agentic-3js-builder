@@ -158,8 +158,8 @@ export class PathPoint extends Spot {
 type AlongOptions = { from?: number; to?: number };
 
 /**
- * `count` evenly spaced frames at the centres of equal parts of [from, to] (default 0..1): a Chain gives
- * `chain.at(t)`, a Sweep `sweep.at(t)` (on the dorsal surface), any other path input a PathPoint.
+ * `count` evenly spaced frames at the centres of equal parts of [from, to] (default 0..1, a Sweep's own swept range):
+ * a Chain gives `chain.at(t)`, a Sweep `sweep.at(t)` (on the dorsal surface), any other path input a PathPoint.
  */
 export function along(source: Chain, count: number, fn: (at: ChainPoint) => void, options?: AlongOptions): ChainPoint[];
 export function along(source: Sweep, count: number, fn: (at: SweepPoint) => void, options?: AlongOptions): SweepPoint[];
@@ -175,8 +175,8 @@ export function along(
   fn: (at: never) => void,
   options: AlongOptions = {},
 ) {
-  const from = options.from ?? 0;
-  const to = options.to ?? 1;
+  const from = options.from ?? (source instanceof Sweep ? source.from : 0);
+  const to = options.to ?? (source instanceof Sweep ? source.to : 1);
   const path = source instanceof Chain || source instanceof Sweep ? null : toPath(source);
   const frames = path?.frames();
   const items = Array.from({ length: count }, (_, i) => {

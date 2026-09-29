@@ -76,17 +76,7 @@ export function loft(ctx: Ctx, stations: readonly Station[], options: SweepOptio
   const ts = path.knots;
   const ws = stations.map((s) => s.w / 2);
   const hs = stations.map((s) => s.h / 2);
-  const from = options.from ?? 0;
-  const to = options.to ?? 1;
-  return sweep(
-    ctx,
-    path,
-    (u) => {
-      const t = from + u * (to - from);
-      return [interpolate(ts, ws, t), interpolate(ts, hs, t)];
-    },
-    options,
-  );
+  return sweep(ctx, path, (t) => [interpolate(ts, ws, t), interpolate(ts, hs, t)], options);
 }
 
 export type SproutOptions = Omit<SweepOptions, "bone" | "extend"> &

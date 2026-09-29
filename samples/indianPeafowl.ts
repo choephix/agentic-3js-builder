@@ -171,8 +171,8 @@ export default function build() {
     to: neckStart,
     color: MANTLE,
     bands: [
-      [0.5, MANTLE],
-      [1, BLUE],
+      [neckStart * 0.5, MANTLE],
+      [neckStart, BLUE],
     ],
     sectors: [[122, 238, BELLY]],
     caps: { start: "round", end: "none" },

@@ -8,6 +8,7 @@ import { frame } from "../src/frame";
 import { aim, offset, rng } from "../src/math";
 import type { V3 } from "../src/math";
 import { catmull } from "../src/path";
+import { interpolate } from "../src/sweep";
 import type { Chain } from "../src/skeleton";
 
 export const meta = {
@@ -77,26 +78,60 @@ export default function build() {
     group: "tail",
   });
 
-  // Chest hangs slightly below the spine, loin tucked up
+  // Chest hangs slightly below the spine, loin tucked up. `u` runs 0 at the rump .. 1 at the skull.
   const bellySag = (t: number) => {
-    // Dip down around chest (t ~ 0.5 - 0.7), tucked at waist (t ~ 0.2 - 0.4)
-    const chestDip = Math.exp(-(((t - 0.55) / 0.18) ** 2)) * 0.035;
-    const loinTuck = Math.exp(-(((t - 0.3) / 0.12) ** 2)) * -0.015;
+    const u = (t - tailBaseT) / (1 - tailBaseT);
+    // Dip down around chest (u ~ 0.5 - 0.7), tucked at waist (u ~ 0.2 - 0.4)
+    const chestDip = Math.exp(-(((u - 0.55) / 0.18) ** 2)) * 0.035;
+    const loinTuck = Math.exp(-(((u - 0.3) / 0.12) ** 2)) * -0.015;
     return -chestDip + loinTuck;
   };
 
-  const body = b.loft(stations, {
-    from: tailBaseT,
-    to: 1,
+  // The tail stretch (source t 0 = tip .. tailBaseT = rump) has its own brush profile: it leaves the rump at the
+  // body's own size, narrows a little at the tail root, swells into the brush and rounds off at the tip. Past the
+  // rump the stations set the radius.
+  const rump: [number, number] = [stations[tailBaseIndex].w / 2, stations[tailBaseIndex].h / 2];
+  const brushKeys: ReadonlyArray<readonly [number, number]> = [
+    [0, 0.028], // Tip (the round cap closes it)
+    [0.1, 0.05],
+    [0.28, 0.072],
+    [0.5, 0.08], // Fullest brush
+    [0.7, 0.07],
+    [0.86, 0.052], // Tail root
+  ];
+  const tailRadius = (t: number): [number, number] => {
+    const s = Math.min(Math.max(t / tailBaseT, 0), 1); // 0 = tip, 1 = rump
+    if (s >= 0.86) {
+      const k = (s - 0.86) / 0.14;
+      const e = k * k * (3 - 2 * k);
+      return [0.052 * 0.95 + (rump[0] - 0.052 * 0.95) * e, 0.052 * 1.08 + (rump[1] - 0.052 * 1.08) * e];
+    }
+    const i = brushKeys.findIndex((key) => key[0] > s) - 1;
+    const [sa, ra] = brushKeys[i];
+    const [sb, rb] = brushKeys[i + 1];
+    const k = (s - sa) / (sb - sa);
+    const r = ra + (rb - ra) * k * k * (3 - 2 * k);
+    return [r * 0.95, r * 1.08];
+  };
+  const knots = curve.knots;
+  const widths = stations.map((st) => st.w / 2);
+  const heights = stations.map((st) => st.h / 2);
+  const radius = (t: number): [number, number] =>
+    t < tailBaseT ? tailRadius(t) : [interpolate(knots, widths, t), interpolate(knots, heights, t)];
+
+  // Tail, rump, back and neck are one tube. The white tag is a colour band on the brush; the darker back runs
+  // from the tag to the skull and the white belly from the rump forward.
+  const tagT = tailBaseT * 0.22; // White tag on the last 22% of the tail
+  const body = b.sweep(curve, radius, {
     bone: [tail, root, spine],
     color: RED_FOX,
+    bands: [[tagT, WHITE]],
     sectors: [
-      [-65, 65, RED_BACK],
-      [125, 235, WHITE],
+      [-65, 65, RED_BACK, tagT, 1],
+      [125, 235, WHITE, tailBaseT, 1],
     ],
-    shift: (t) => [0, bellySag(t)],
+    shift: (t) => [0, bellySag(Math.max(t, tailBaseT))],
     sides: 16,
-    caps: { start: "none", end: "round" },
     group: "body",
   });
 
@@ -166,8 +201,8 @@ export default function build() {
     const frontChain = b.chain(
       `legF${side}`,
       [
-        [s * 0.085, 0.39, 0.19], // Shoulder
-        [s * 0.088, 0.24, 0.14], // Elbow
+        [s * 0.055, 0.39, 0.19], // Shoulder, inside the chest so the upper arm grows out of it
+        [s * 0.078, 0.24, 0.14], // Elbow
         [s * 0.088, 0.085, 0.165], // Wrist (carpus)
         [s * 0.088, toeR, 0.2], // Metacarpal ball
         [s * 0.088, toeR, 0.26], // Paw tip
@@ -186,8 +221,8 @@ export default function build() {
     const hindChain = b.chain(
       `legH${side}`,
       [
-        [s * 0.09, 0.4, -0.23], // Hip
-        [s * 0.1, 0.25, -0.13], // Knee
+        [s * 0.06, 0.4, -0.23], // Hip, inside the haunch
+        [s * 0.095, 0.25, -0.13], // Knee
         [s * 0.095, 0.13, -0.24], // Hock (calcaneus)
         [s * 0.095, toeR, -0.19], // Metatarsal ball
         [s * 0.095, toeR, -0.13], // Paw tip
@@ -233,26 +268,15 @@ export default function build() {
       return [xa + (xb - xa) * e, ya + (yb - ya) * e];
     };
 
-    // Upper leg in red fur, transitioning to black socks from mid-limb down
-    // Front: black starts around elbow (t1); Hind: black starts near hock (t2)
+    // One tube per leg: red fur above, black sock from mid-limb down as a colour band on the same profile.
+    // Front: black starts just above the elbow (t1); Hind: black starts between knee and hock.
     const sockT = front ? t1 * 0.85 : t1 + (t2 - t1) * 0.6;
-
-    // Red upper portion
     b.sweep(chain, legRadius, {
-      to: sockT,
-      color: RED_FOX,
-      sides: 14,
-      caps: { start: "round", end: "none" },
-      group: chain.name,
-    });
-
-    // Black sock lower portion
-    b.sweep(chain, legRadius, {
-      from: sockT,
       to: t3,
       color: BLACK,
+      bands: [[sockT, RED_FOX]],
       sides: 14,
-      caps: { start: "none", end: "flat" },
+      caps: { start: "round", end: "flat" },
       group: chain.name,
     });
 
@@ -307,95 +331,19 @@ export default function build() {
   }
 
   // ---------------------------------------------------------------------------
-  // Bushy Brush Tail with Pure White Tag and Scent Gland Spot
+  // Scent gland spot on the brush tail (the tail itself is part of the body tube)
   // ---------------------------------------------------------------------------
-  // Very thick spindle profile: narrow base, massive fluffy middle, tapered end. The red brush and the white tag
-  // each carry the whole profile over their own stretch, so the tag reads as a round white bulb; the tag's profile
-  // runs from the tip back to the brush, where both are at their narrowest and meet ring for ring.
-  const tailRadius = (t: number): [number, number] => {
-    // Bulges up to radius 0.065 (13cm thick!), slightly taller than wide
-    const bulge = Math.sin(Math.PI * Math.min(t / 0.85, 1));
-    const r = 0.026 + 0.04 * bulge - 0.016 * Math.max(0, (t - 0.75) / 0.25);
-    return [r * 0.95, r * 1.08];
-  };
-  // Behind the rump station the body rounds off like a cap while the narrow tail base grows out of it: near the
-  // rump the tube's radius is the smooth maximum of that rounded rump and the brush, so both are one surface that
-  // meets the body loft ring for ring.
-  const rump: [number, number] = [stations[tailBaseIndex].w / 2, stations[tailBaseIndex].h / 2];
-  const rumpDepth = Math.max(...rump);
-  const smoothMax = (a: number, b: number, k = 0.015) => {
-    const h = Math.max(k - Math.abs(a - b), 0) / k;
-    return Math.max(a, b) + (h * h * k) / 4;
-  };
 
-  const tagSplit = 0.78; // White tag on the last 22% of the tail
-  const tagT = tailBaseT * (1 - tagSplit);
-  const tailBones = [tail, root, spine] as const;
-
-  // Red brush, from the white-tag boundary (u = 0) to the rump (u = 1).
-  b.sweep(
-    curve,
-    (u) => {
-      const d = (1 - u) * (tailBaseT - tagT) * curve.length;
-      const dome = Math.sqrt(Math.max(0, 1 - (d / rumpDepth) ** 2));
-      const [tx, ty] = tailRadius(1 - u);
-      // Past the dome the brush alone sets the radius, so it meets the white tag exactly.
-      return dome > 0 ? [smoothMax(rump[0] * dome, tx), smoothMax(rump[1] * dome, ty)] : [tx, ty];
-    },
-    {
-      from: tagT,
-      to: tailBaseT,
-      bone: tailBones,
-      color: RED_FOX,
-      sectors: [
-        [-60, 60, RED_BACK], // Darker dorsal ridge on tail
-      ],
-      sides: 16,
-      caps: { start: "none", end: "none" },
-      group: "tail",
-    },
-  );
-
-  // White tag, from the tip (u = 0) to the brush (u = 1).
-  b.sweep(curve, (u) => tailRadius(u), {
-    from: 0,
-    to: tagT,
-    bone: tailBones,
-    color: WHITE,
-    sides: 16,
-    caps: { start: "round", end: "none" },
-    group: "tail",
-  });
-
-  // Tail details use the original base -> tip parameter, mapped onto the shared chain.
-  const tailAt = (t: number) => tail.at((hipsT - tailBaseT * (1 - t)) / hipsT);
-
-  // Dark supracaudal scent gland mark (violet gland) near tail base
-  const glandPt = tailAt(0.12);
-  const glandR = tailRadius(0.12)[1];
+  // Dark supracaudal scent gland mark (violet gland) near the tail base
+  const glandT = tailBaseT * 0.88;
+  const glandPt = tail.at((hipsT - glandT) / hipsT);
   b.part(new CylinderGeometry(0.012, 0.012, 0.004, 12), VIOLET_GLAND, {
     bone: glandPt.bone ?? tail.joints[0],
-    at: [0, glandPt.at.y + glandR - 0.001, glandPt.at.z],
+    at: [0, glandPt.at.y + tailRadius(glandT)[1] - 0.001, glandPt.at.z],
     dir: [0, 1, 0],
     scale: [0.8, 1, 1.6],
     group: "tail",
   });
-
-  // Fluffy fur tufts along the sides of the tail
-  for (let i = 0; i < 8; i++) {
-    const t = 0.22 + i * 0.07;
-    for (const s of [1, -1]) {
-      const pt = tailAt(t);
-      const rad = tailRadius(t)[0];
-      const tuftPos: V3 = [s * (rad + 0.004), pt.at.y + (i % 2 === 0 ? 0.008 : -0.008), pt.at.z];
-      b.spike(tuftPos, [s * 0.03, -0.01, -0.05], 0.05, 0.014, {
-        bone: pt.bone ?? undefined,
-        color: t > tagSplit ? WHITE : RED_FOX,
-        sides: 4,
-        group: "tail",
-      });
-    }
-  }
 
   // ---------------------------------------------------------------------------
   // Head, Muzzle, Ears, Eyes, and Jaws

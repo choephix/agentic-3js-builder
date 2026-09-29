@@ -21,15 +21,16 @@ export type Skin = "smooth" | "rigid";
 export type Cap = "round" | "flat" | "point" | "none";
 export type Section = "circle" | "box" | { ngon: number };
 /**
- * number | [r0, r1] (linear) | number[] (evenly keyed, smooth) | (t) => number | (t) => [rx, ry].
- * rx runs along the binormal (side), ry along the normal (up). For "box", these are half extents.
+ * number | [r0, r1] (linear) | number[] (evenly keyed over the swept range, smooth) | (t) => number | (t) => [rx, ry]
+ * with t in source t (see `from`). rx runs along the binormal (side), ry along the normal (up). For "box", these are
+ * half extents.
  */
 export type Radius = number | readonly number[] | ((t: number) => number | readonly [number, number]);
 
 export type SweepOptions = Tags & {
   /** Colour, or `(t) => colour`: the tube is split exactly where the colour changes. Optional when `bands` cover it. */
   color?: string | ((t: number) => string);
-  /** `[[tEnd, color], ...]` ascending: color bands; each band edge splits the mesh (same bone, no cap). */
+  /** `[[tEnd, color], ...]` ascending, in source t: color bands; each band edge splits the mesh (same bone, no cap). */
   bands?: ReadonlyArray<readonly [number, string]>;
   /**
    * Bones for a Path source: a joint (rigid), or the chains and joints the path runs through, as one Chain or a list
@@ -40,7 +41,11 @@ export type SweepOptions = Tags & {
   bone?: JointRef | Chain | ReadonlyArray<JointRef | Chain>;
   /** "smooth" (default): one continuous mesh bending across joints. "rigid": one round-capped piece per bone. */
   skin?: Skin;
-  /** Range of the source to sweep, in source t. All other t (radius, color, bands, at) run 0..1 over this range. */
+  /**
+   * Range of the source to sweep, in source t. It only crops: every other t (radius and shift functions, `color`,
+   * `bands`, sector ranges, twist, `Sweep.at`) is source t too, so sweeping [0, 0.4] and [0.4, 1] with the same
+   * options gives the two halves of the one tube. Radius arrays spread over the swept range.
+   */
   from?: number;
   to?: number;
   section?: Section;
@@ -56,9 +61,11 @@ export type SweepOptions = Tags & {
   /**
    * Colour sectors around the tube, `[[fromDeg, toDeg, color], ...]` on the dorsal clock of `Sweep.at` (0 = the
    * side facing world up, 180 = belly). Uncovered angles keep the piece colour. One mesh per sector per piece;
-   * sector edges get no walls and neighbours share them exactly.
+   * sector edges get no walls and neighbours share them exactly. Add `fromT, toT` (source t) to limit a sector to
+   * that stretch of the tube: `[-60, 60, DARK, 0.2, 1]` darkens the back of all but the tip. Sectors only have to
+   * avoid overlapping where their stretches meet.
    */
-  sectors?: ReadonlyArray<readonly [number, number, string]>;
+  sectors?: ReadonlyArray<Sector>;
   /** Section centre offset `[x, y]` in the same (binormal, normal) axes as `(t) => [rx, ry]`: a sagging belly. */
   shift?: readonly [number, number] | ((t: number) => readonly [number, number]);
   /** Path sources: start roll, the section's normal (ry direction) leans toward `up`. */
@@ -66,6 +73,8 @@ export type SweepOptions = Tags & {
   /** Path sources: roll about the tangent after parallel transport, total degrees or `(t) => deg` (chains: on `chain()`). */
   twist?: Twist;
 };
+
+export type Sector = readonly [number, number, string] | readonly [number, number, string, number, number];
 
 /** A frame on a sweep's built surface: +Y = the outward surface normal `n`, +Z = along the tube (`tangent`). */
 export class SweepPoint extends Spot {
@@ -99,7 +108,9 @@ type Tube = {
   frames: Frames;
   from: number;
   to: number;
+  /** Radii at source t. */
   radius: (t: number) => [number, number];
+  /** Section centre offset at source t. */
   shift: (t: number) => readonly [number, number];
   shape: Shape;
   corners: Corner[];
@@ -260,7 +271,7 @@ function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", manda
   }
   const N = flatten(tube.frames.normalAt(seamEnd ? 0 : t, side === "left"), T).normalize();
   const B = T.clone().cross(N);
-  const s = tube.shift(u);
+  const s = tube.shift(t);
   const up = flatten(new Vector3(0, 1, 0), T);
   const ref = up.lengthSq() > 1e-6 ? up.normalize() : N;
   const raw = Math.atan2(ref.dot(N), ref.dot(B));
@@ -270,7 +281,7 @@ function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", manda
     T,
     N,
     B,
-    r: tube.radius(u),
+    r: tube.radius(t),
     s,
     ref: tube.refAt ? tube.refAt(t, raw) : raw,
     mandatory,
@@ -337,6 +348,15 @@ export class Sweep {
     return this.weightAt(0)[0][0];
   }
 
+  /** The swept range, in source t. */
+  get from() {
+    return this.tube.from;
+  }
+
+  get to() {
+    return this.tube.to;
+  }
+
   /** The centreline frame at the start (+Y along the tube, +Z its normal), in the current pose: a Point/Line/Frame. */
   get frame() {
     const f = frameAt(this.tube, 0, "right");
@@ -356,20 +376,27 @@ export class Sweep {
   }
 
   /**
-   * A point on the built tube surface at sweep t, pushed out `lift` along the surface normal. `angleDeg` goes
-   * around the section: 0 = the side facing world up (the tube's normal side where the tube is vertical),
-   * +90 = a quarter turn clockwise seen looking along the tube (for a tube running toward +Z: its -X side).
+   * A point on the built tube surface at source t (the same t as `from`/`to`), pushed out `lift` along the surface
+   * normal. `angleDeg` goes around the section: 0 = the side facing world up (the tube's normal side where the tube
+   * is vertical), +90 = a quarter turn clockwise seen looking along the tube (for a tube running toward +Z: its -X
+   * side).
    */
   at(t: number, angleDeg = 0, lift = 0): SweepPoint {
-    const f = frameAt(this.tube, t, "right");
+    return this.atU((t - this.tube.from) / (this.tube.to - this.tube.from), angleDeg, lift);
+  }
+
+  /** `at()` by sweep t: 0..1 over the swept range. */
+  private atU(u: number, angleDeg: number, lift: number): SweepPoint {
+    const f = frameAt(this.tube, u, "right");
     const { p, q, nSec } = surfacePoint(this.tube, f, angleDeg);
-    const ahead = surfacePoint(this.tube, frameAt(this.tube, Math.min(1, t + 1e-3), "right"), angleDeg).p;
-    const behind = surfacePoint(this.tube, frameAt(this.tube, Math.max(0, t - 1e-3), "right"), angleDeg).p;
+    const ahead = surfacePoint(this.tube, frameAt(this.tube, Math.min(1, u + 1e-3), "right"), angleDeg).p;
+    const behind = surfacePoint(this.tube, frameAt(this.tube, Math.max(0, u - 1e-3), "right"), angleDeg).p;
     const along = ahead.sub(behind);
     const lean = f.T.dot(along);
     const n = (Math.abs(lean) > 1e-12 ? nSec.addScaledVector(f.T, -nSec.dot(along) / lean) : nSec).normalize();
     const radius = Math.hypot(q.x, q.y);
-    return new SweepPoint(t, p.addScaledVector(n, lift), n, f.T, radius, this.weightAt(t), this.tube.capture);
+    const t = this.tube.from + u * (this.tube.to - this.tube.from);
+    return new SweepPoint(t, p.addScaledVector(n, lift), n, f.T, radius, this.weightAt(u), this.tube.capture);
   }
 
   /**
@@ -378,7 +405,7 @@ export class Sweep {
    */
   line(angleDeg: number, lift = 0) {
     const count = 64;
-    const pts = Array.from({ length: count + 1 }, (_, i) => this.at(i / count, angleDeg, lift).at);
+    const pts = Array.from({ length: count + 1 }, (_, i) => this.atU(i / count, angleDeg, lift).at);
     const indices = [...new Set(this.knots.map((u) => Math.round(u * count)))];
     return smoothPath(pts, null, { indices }, this.tube.seam !== null, this.weightAt(0));
   }
@@ -472,9 +499,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const L = path.length;
   const { twist, shift } = options;
   const rigidSkin = options.skin === "rigid";
-  const frames = chain
-    ? chain.frames
-    : path.frames(options.up, typeof twist === "function" ? (t) => twist(toU(t)) : twist);
+  const frames = chain ? chain.frames : path.frames(options.up, twist);
   const shape = sectionShape(options.section ?? "circle", options.sides ?? ctx.segments(8));
   const maxTurn = MAX_TURN / ctx.detail;
   const smooth = options.smooth ?? shape.smooth;
@@ -484,8 +509,9 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const seamOut = path.tangentAt(0);
   const seamSmooth = closed && seamIn.angleTo(seamOut) <= CORNER_SPLIT;
   const corners = path.corners(from, to);
-  const rOf = radiusFn(radius);
-  const rMaxAt = (t: number) => Math.max(...rOf(Math.min(Math.max(toU(t), 0), 1)));
+  const keyed = radiusFn(radius);
+  const rOf = typeof radius === "function" ? keyed : (t: number) => keyed(toU(t));
+  const rMaxAt = (t: number) => Math.max(...rOf(Math.min(Math.max(t, from), to)));
 
   // Bones: joint spans in source t (a chain source's own joints, or `bone` as chains and joints laid onto the path),
   // else one fixed set of weights for the whole tube (the path's own, or `bone`).
@@ -575,62 +601,89 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     for (const u of jointUs) addCut(u, "joint");
     for (const corner of corners) if (corner.angle > CORNER_SPLIT) addCut(toU(corner.t), "corner");
   }
-  for (const [tEnd] of options.bands ?? []) addCut(tEnd, "band");
+  for (const [tEnd] of options.bands ?? []) addCut(toU(tEnd), "band");
   const colorFn = options.color;
-  if (typeof colorFn === "function") {
+  const colorOf = typeof colorFn === "function" ? (u: number) => colorFn(toT(u)) : null;
+  if (colorOf) {
     const steps = 256;
     for (let k = 1; k <= steps; k++) {
       let lo = (k - 1) / steps;
       let hi = k / steps;
-      const before = colorFn(lo);
-      if (colorFn(hi) === before) continue;
+      const before = colorOf(lo);
+      if (colorOf(hi) === before) continue;
       for (let n = 0; n < 30; n++) {
         const m = (lo + hi) / 2;
-        if (colorFn(m) === before) lo = m;
+        if (colorOf(m) === before) lo = m;
         else hi = m;
       }
       addCut(hi, "band");
     }
   }
+  const sectors = options.sectors ?? [];
+  for (const sector of sectors) {
+    if (sector.length !== 5) continue;
+    if (!(sector[3] < sector[4])) throw new Error(`sweep(): sector t range [${sector[3]}, ${sector[4]}] must ascend`);
+    addCut(toU(sector[3]), "band");
+    addCut(toU(sector[4]), "band");
+  }
   cuts.sort((a, b) => a.t - b.t);
 
   const colorAt = (u: number) => {
-    for (const [tEnd, color] of options.bands ?? []) if (u <= tEnd) return color;
-    const color = typeof colorFn === "function" ? colorFn(u) : colorFn;
-    if (!color) throw new Error("sweep(): no color for t=" + u.toFixed(3) + "; pass `color` or cover it with `bands`");
+    const t = toT(u);
+    for (const [tEnd, color] of options.bands ?? []) if (t <= tEnd) return color;
+    const color = colorOf ? colorOf(u) : (colorFn as string | undefined);
+    if (!color) throw new Error("sweep(): no color for t=" + t.toFixed(3) + "; pass `color` or cover it with `bands`");
     return color;
   };
-
-  const arcs = clockArcs(options.sectors);
-  const full = arcs.length === 1;
+  /** Clock arcs of the sectors covering sweep t `u` (ranged sectors only inside their stretch). */
+  const arcsAt = (u: number) => {
+    const t = toT(u);
+    return clockArcs(sectors.filter((s) => s.length === 3 || (t >= s[3] && t <= s[4])));
+  };
+  const isFull = (arc: Arc) => arc.a1 - arc.a0 >= 360 - 1e-9;
+  // With ranged sectors, pieces either side of a range edge carry different arcs. Every ring then gets a vertex at
+  // every sector edge angle, so neighbouring rings share their vertices and the cut has no T-junction cracks.
+  const mod360 = (a: number) => ((a % 360) + 360) % 360;
+  const splitDegs = sectors.some((s) => s.length === 5)
+    ? [...new Set(sectors.flatMap(([a0, a1]) => [mod360(a0), mod360(a1)]))].sort((x, y) => x - y)
+    : [];
+  /** Full rings without edge vertices: the polygon itself, connected index by index. */
+  const indexed = (arc: Arc) => isFull(arc) && !splitDegs.length;
 
   /** Ring vertices of `arc` at frame `f`, scaled toward the centre by `scale` (caps). Full rings are closed. */
   const ring = (buf: MeshBuffer, f: Frame, arc: Arc, scale = 1) => {
     const r: [number, number] = [f.r[0] * scale, f.r[1] * scale];
     const point = (x: number, y: number) =>
       buf.vertex(f.c.clone().addScaledVector(f.B, x).addScaledVector(f.N, y), f.w);
-    if (Math.max(r[0], r[1]) < 1e-9) return new Array<number>(full ? sides : 2).fill(point(0, 0));
-    if (full) return shape.pts.map(([x, y]) => point(x * r[0], y * r[1]));
+    if (Math.max(r[0], r[1]) < 1e-9) return new Array<number>(indexed(arc) ? sides : 2).fill(point(0, 0));
+    if (indexed(arc)) return shape.pts.map(([x, y]) => point(x * r[0], y * r[1]));
+    // A full ring with edge vertices runs once round from the first edge angle and closes on its first vertex.
+    const full = isFull(arc);
+    const [a0, a1] = full ? [splitDegs[0], splitDegs[0] + 360] : [arc.a0, arc.a1];
     // Increasing polar angle (the winding of full rings) runs from the arc's clock end to its clock start.
-    const p0 = f.ref - arc.a1 * DEG;
-    const p1 = f.ref - arc.a0 * DEG;
+    const p0 = f.ref - a1 * DEG;
+    const p1 = f.ref - a0 * DEG;
+    const wrap = (phi: number) => p0 + ((((phi - p0) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI));
     const boundary = (phi: number) => {
       const q = sectionPoint(shape, r, Math.cos(phi), Math.sin(phi));
       return point(q.x, q.y);
     };
-    const inside = shape.pts
-      .map(([x, y]) => {
-        const phi = Math.atan2(y * r[1], x * r[0]);
-        return { x: x * r[0], y: y * r[1], phi: p0 + ((((phi - p0) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) };
-      })
+    const inside = [
+      ...shape.pts.map(([x, y]) => ({
+        phi: wrap(Math.atan2(y * r[1], x * r[0])),
+        make: () => point(x * r[0], y * r[1]),
+      })),
+      ...splitDegs.map((d) => ({ phi: wrap(f.ref - d * DEG), make: () => boundary(f.ref - d * DEG) })),
+    ]
       .filter((c) => c.phi > p0 + 1e-6 && c.phi < p1 - 1e-6)
       .sort((a, b) => a.phi - b.phi);
-    return [boundary(p0), ...inside.map((c) => point(c.x, c.y)), boundary(p1)];
+    const first = boundary(p0);
+    return [first, ...inside.map((c) => c.make()), full ? first : boundary(p1)];
   };
 
   /** Triangles between consecutive rings (open arcs may differ in vertex count). */
-  const connect = (buf: MeshBuffer, a: number[], b: number[]) => {
-    if (full) {
+  const connect = (buf: MeshBuffer, arc: Arc, a: number[], b: number[]) => {
+    if (indexed(arc)) {
       for (let k = 0; k < sides; k++) {
         const k1 = (k + 1) % sides;
         buf.tri(a[k], b[k], b[k1]);
@@ -659,8 +712,8 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
       const c = f.c.clone().addScaledVector(f.T, sign * d);
       if (!inside) return { ...f, c, r: [f.r[0] * scale, f.r[1] * scale] };
       const u = Math.min(Math.max(f.t + (sign * d) / span, 0), 1);
-      const [rx, ry] = tube.radius(u);
-      const s = tube.shift(u);
+      const [rx, ry] = tube.radius(toT(u));
+      const s = tube.shift(toT(u));
       c.addScaledVector(f.B, s[0] - f.s[0]).addScaledVector(f.N, s[1] - f.s[1]);
       return { ...f, c, r: [Math.min(f.r[0] * scale, rx), Math.min(f.r[1] * scale, ry)] };
     };
@@ -678,7 +731,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     if (Math.max(f.r[0], f.r[1]) < 1e-9) return;
     const center = buf.vertex(f.c, f.w);
     const rim = ring(buf, f, arc);
-    const count = full ? sides : rim.length - 1;
+    const count = indexed(arc) ? sides : rim.length - 1;
     for (let k = 0; k < count; k++) {
       const k1 = (k + 1) % rim.length;
       if (sign > 0) buf.tri(center, rim[k1], rim[k]);
@@ -713,6 +766,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   let buffers: MeshBuffer[] = [];
   let groupColor = "";
   let groupJoint: Joint | null = null;
+  let groupArcs = "";
   const flush = () => {
     for (const buf of buffers)
       if (buf.index.length)
@@ -730,15 +784,18 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     // Rigid: the whole piece rides one joint. Smooth: every ring has its own weights.
     const pieceWeights = rigidSkin ? weightAt(mid) : null;
     const pieceJoint = pieceWeights?.[0][0] ?? null;
-    if (kinds[i] !== "corner" || color !== groupColor || pieceJoint !== groupJoint) {
+    const arcs = arcsAt(mid);
+    const arcKey = arcs.map((arc) => `${arc.a0}:${arc.a1}:${arc.color}`).join();
+    if (kinds[i] !== "corner" || color !== groupColor || pieceJoint !== groupJoint || arcKey !== groupArcs) {
       flush();
       groupColor = color;
       groupJoint = pieceJoint;
+      groupArcs = arcKey;
       buffers = arcs.map((arc) => new MeshBuffer(arc.color ?? color));
     }
     if (options.overlap && rigidSkin) {
-      if (kinds[i] === "joint") a = Math.max(0, a - (options.overlap * Math.max(...tube.radius(a))) / span);
-      if (kinds[i + 1] === "joint") b = Math.min(1, b + (options.overlap * Math.max(...tube.radius(b))) / span);
+      if (kinds[i] === "joint") a = Math.max(0, a - (options.overlap * Math.max(...tube.radius(toT(a)))) / span);
+      if (kinds[i + 1] === "joint") b = Math.min(1, b + (options.overlap * Math.max(...tube.radius(toT(b)))) / span);
     }
     const inPiece = (u: number) => u > a + 1e-6 && u < b - 1e-6;
 
@@ -803,7 +860,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
         ...body,
         ...capRings(buf, last, arc, endCap, 1, kinds[i + 1] !== "end"),
       ];
-      for (let j = 0; j < rings.length - 1; j++) connect(buf, rings[j], rings[j + 1]);
+      for (let j = 0; j < rings.length - 1; j++) connect(buf, arc, rings[j], rings[j + 1]);
       if (startCap === "flat") flatCap(buf, first, arc, -1);
       if (endCap === "flat") flatCap(buf, last, arc, 1);
     });

@@ -517,10 +517,9 @@ export default function build() {
         contact: [end.x, 0, end.z],
         group,
       });
-      // The tube stops at the foot joint; its t runs 0..1 over that range, keyed at the hip, knee, ankle and foot.
-      const tubeTs = chain.ts.slice(0, 4).map((t) => t / chain.ts[3]);
-      const rx = leg.rx.map((r, i) => [tubeTs[i], r] as const);
-      const ry = leg.ry.map((r, i) => [tubeTs[i], r] as const);
+      // The tube stops at the foot joint; radii are keyed at the hip, knee, ankle and foot.
+      const rx = leg.rx.map((r, i) => [chain.ts[i], r] as const);
+      const ry = leg.ry.map((r, i) => [chain.ts[i], r] as const);
       legTubes.push(
         b.sweep(chain, (t) => [interp(rx, t), interp(ry, t)], { to: chain.ts[3], color: HIDE, sides: 14, group }),
       );

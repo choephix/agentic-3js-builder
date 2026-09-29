@@ -139,22 +139,21 @@ export default function build() {
   // One curve and one bone list, swept in two ranges: the tail keeps only its belly sector, the body its lateral
   // stripes. The rings at the cut coincide and share weights, so there is no seam.
   const bone = [tail, hips, spine];
-  const tailTube = b.sweep(fullPath, (u) => radiusAt(u * tailT), {
+  const tailTube = b.sweep(fullPath, radiusAt, {
     bone,
     from: 0,
     to: tailT,
-    color: (u) => colorAt(u * tailT),
+    color: colorAt,
     sectors: [[135, 225, BELLY]],
     caps: { end: "none" },
     sides: 16,
     group: "tail",
   });
-  const bodyAt = (u: number) => tailT + u * (1 - tailT);
-  const bodyTube = b.sweep(fullPath, (u) => radiusAt(bodyAt(u)), {
+  const bodyTube = b.sweep(fullPath, radiusAt, {
     bone,
     from: tailT,
     to: 1,
-    color: (u) => colorAt(bodyAt(u)),
+    color: colorAt,
     sectors: [
       [120, 132, STRIPE],
       [132, 228, BELLY],
@@ -512,12 +511,12 @@ export default function build() {
     );
   };
   for (let i = 0; i < 14; i++) {
-    crestAt(tailTube, 1, 1 - (0.02 + i * 0.03), 0.0055 - i * 0.0005, 0.0065, "tail");
+    crestAt(tailTube, 1, (1 - (0.02 + i * 0.03)) * tailT, 0.0055 - i * 0.0005, 0.0065, "tail");
   }
   for (let i = 0; i < 12; i++) {
     const u = 0.15 + i * 0.065;
     const k = Math.sin(Math.PI * (0.15 + 0.8 * u));
-    crestAt(bodyTube, -1, u, 0.004 + 0.006 * k, 0.006 + 0.002 * k, "body");
+    crestAt(bodyTube, -1, tailT + u * (1 - tailT), 0.004 + 0.006 * k, 0.006 + 0.002 * k, "body");
   }
 
   // ---------------------------------------------------------------- skin details

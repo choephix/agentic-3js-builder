@@ -163,11 +163,11 @@ export default function build() {
   const bodyTube = b.sweep(
     wholePath,
     (u) => {
-      const z = wholePath.at(u * headStart).z;
+      const z = wholePath.at(u).z;
       return [halfW(z), halfH(z)];
     },
     {
-      color: (u) => bodyColor(wholePath.at(u * headStart).z),
+      color: (u) => bodyColor(wholePath.at(u).z),
       bone: [spine, head],
       to: headStart,
       sectors: countershade,
@@ -179,7 +179,7 @@ export default function build() {
   const headTube = b.sweep(
     wholePath,
     (u) => {
-      const z = wholePath.at(headStart + u * (1 - headStart)).z;
+      const z = wholePath.at(u).z;
       return [headHalfW(z), headHalfH(z)];
     },
     {

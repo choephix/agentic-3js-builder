@@ -78,8 +78,8 @@ export default function build() {
     bone: [tail, hips, spine],
     from: 0,
     to: hipsT,
-    color: stripe,
-    shift: (t) => [0, -0.035 * belly(zAt(t))],
+    color: (t) => stripe(t / hipsT),
+    shift: (t) => [0, -0.035 * belly(zAt(t / hipsT))],
     sides: 14,
     caps: { start: "round", end: "none" },
     group: "body",
@@ -88,12 +88,12 @@ export default function build() {
     bone: [tail, hips, spine],
     from: hipsT,
     to: 1,
-    color: stripe,
+    color: (t) => stripe((t - hipsT) / (1 - hipsT)),
     sectors: [
       [-60, 60, BACK],
       [130, 230, BELLY],
     ],
-    shift: (t) => [0, -0.035 * belly(zAt(t))],
+    shift: (t) => [0, -0.035 * belly(zAt((t - hipsT) / (1 - hipsT)))],
     sides: 14,
     caps: { start: "none", end: "round" },
     group: "body",
@@ -108,7 +108,7 @@ export default function build() {
         flow: at.tangent,
         scale: [1, 1, 2.6],
       }),
-    { from: hipsT + 0.03, to: 0.62 },
+    { from: hipsT + 0.03 * (1 - hipsT), to: hipsT + 0.62 * (1 - hipsT) },
   );
 
   // Legs, digitigrade: upper, lower and metapodial bones, then a toe segment flat on the floor under a broad paw.
@@ -181,7 +181,12 @@ export default function build() {
       const e = k * k * (3 - 2 * k);
       return [xa + (xb - xa) * e, ya + (yb - ya) * e];
     };
-    const legTube = b.sweep(chain, radius, { to: t3, color: FUR, sides: 14, caps: { start: "round", end: "flat" } });
+    const legTube = b.sweep(chain, radius, {
+      to: t3,
+      color: FUR,
+      sides: 14,
+      caps: { start: "round", end: "flat" },
+    });
 
     // Paw: a broad flattened pad on the toe joint, four toes in front of it, bottoms on the floor.
     const paw = chain.joints[3];

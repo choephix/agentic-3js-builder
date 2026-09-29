@@ -139,7 +139,7 @@ export default function build() {
     bone: [tail, hips, spine],
     from: 0,
     to: hipsT,
-    color: (t) => tailColor(1 - t),
+    color: (t) => tailColor(1 - t / hipsT),
     sectors: [
       [-40, 40, BACK],
       [132, 228, BELLY],
@@ -159,7 +159,7 @@ export default function build() {
       [128, 232, BELLY],
       [232, 256, LATERAL],
     ],
-    shift: (t) => [0, -0.035 * belly(t)],
+    shift: (t) => [0, -0.035 * belly((t - hipsT) / (1 - hipsT))],
     caps: { start: "none", end: "round" },
     sides: 14,
     group: "body",
@@ -431,8 +431,7 @@ export default function build() {
   const scute = scuteGeometry(0.06, 0.068, 0.014, 0.016);
   const smallScute = scuteGeometry(0.045, 0.05, 0.012, 0.012);
   // A point on the skin at full-curve t: the tail range below the hips, the body range above.
-  const skinAt = (t: number, angle: number) =>
-    t < hipsT ? tailBody.at(t / hipsT, angle) : body.at((t - hipsT) / (1 - hipsT), angle);
+  const skinAt = (t: number, angle: number) => (t < hipsT ? tailBody.at(t, angle) : body.at(t, angle));
   let row = 0;
   for (let z = 0.74; z > -0.3; z -= 0.072, row++) {
     const t = curve.closestT([0, 0.35, z]);
@@ -476,15 +475,26 @@ export default function build() {
     const color = tailColor(t) === BAND ? BAND : SCUTE;
     const scale = 1 - 0.5 * t;
     if (t < 0.55)
-      for (const s of [1, -1]) b.stick(crest, color, tailBody.at(u, s * 27), { flow: [0, 0, 1], embed: 0.3, scale });
-    else b.stick(crest, color, tailBody.at(u, 0), { flow: [0, 0, 1], embed: 0.3, scale: [scale, scale * 1.1, scale] });
+      for (const s of [1, -1])
+        b.stick(crest, color, tailBody.at(u * hipsT, s * 27), { flow: [0, 0, 1], embed: 0.3, scale });
+    else
+      b.stick(crest, color, tailBody.at(u * hipsT, 0), {
+        flow: [0, 0, 1],
+        embed: 0.3,
+        scale: [scale, scale * 1.1, scale],
+      });
     if (t < 0.8)
       for (const s of [1, -1])
-        b.stick(sideScale, tailColor(t + 0.0225) === BAND ? BAND : SCUTE, tailBody.at(1 - t - 0.0225, s * 72), {
-          flow: [0, 0, 1],
-          embed: 0.3,
-          scale: 1.2 - 0.6 * t,
-        });
+        b.stick(
+          sideScale,
+          tailColor(t + 0.0225) === BAND ? BAND : SCUTE,
+          tailBody.at((1 - t - 0.0225) * hipsT, s * 72),
+          {
+            flow: [0, 0, 1],
+            embed: 0.3,
+            scale: 1.2 - 0.6 * t,
+          },
+        );
   }
 
   // Dark spots on the flanks and legs.
