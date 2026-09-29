@@ -164,7 +164,7 @@ export default function build() {
       [130, 230, LION_BELLY],
     ],
     shift: (t) => [0, -0.05 * bump(t, 0.66, 0.14) + 0.02 * bump(t, 0.42, 0.1)],
-    sides: 16,
+    sides: 12,
     group: "body",
   });
 
@@ -241,7 +241,7 @@ export default function build() {
       { at: head.p([0, 0.035, 0.07]), w: 0.2, h: 0.18 },
       { at: head.p([0, 0.01, 0.13]), w: 0.14, h: 0.13 },
     ],
-    { bone: skull, color: WHITE, sides: 16, group: "head" },
+    { bone: skull, color: WHITE, sides: 12, group: "head" },
   );
   // Nape feathers sweeping back over the top of the neck.
   for (let r = 0; r < 3; r++)
@@ -270,7 +270,7 @@ export default function build() {
         [1, BEAK_TIP],
       ],
       caps: { start: "round", end: "point" },
-      sides: 14,
+      sides: 10,
       group: "head",
     },
   );
@@ -289,6 +289,7 @@ export default function build() {
       at: offset(beakPath.at(0.1), cereAxis, -0.03),
       axis: cereAxis,
       bone: skull,
+      segments: 8,
       smoothing: 1,
       color: CERE,
       group: "head",
@@ -307,7 +308,7 @@ export default function build() {
   b.sweep([jaw.at, head.p([0, -0.02, 0.25])], (t) => [0.044 - 0.028 * t, 0.024 - 0.012 * t], {
     bone: jaw,
     color: BEAK,
-    sides: 12,
+    sides: 8,
     group: "jaw",
   });
 
@@ -316,7 +317,7 @@ export default function build() {
     // Nostril slit on the side of the cere.
     const nostril = cereSkin.ray(head.p([s * 0.3, 0.035, 0.14]), head.d([-s, 0, 0]));
     if (nostril)
-      b.stick(new SphereGeometry(0.009, 8, 6), TALON, nostril, {
+      b.stick(new SphereGeometry(0.009, 5, 4), TALON, nostril, {
         embed: 0.5,
         scale: [1.6, 1, 0.8],
         bone: skull,
@@ -338,6 +339,7 @@ export default function build() {
         at: offset(socket, gaze, -0.004),
         axis: gaze,
         bone: skull,
+        segments: 10,
         color: EYE_SKIN,
         group: "head",
         name: `eyeRing${side}`,
@@ -352,7 +354,7 @@ export default function build() {
         [0.016, 0.015],
         [0, 0.018],
       ],
-      { at: irisAt, axis: gaze, bone: skull, smoothing: 1, color: IRIS, group: "head", name: `eye${side}` },
+      { at: irisAt, axis: gaze, bone: skull, segments: 10, color: IRIS, group: "head", name: `eye${side}` },
     );
     b.lathe(
       [
@@ -361,9 +363,9 @@ export default function build() {
         [0.01, 0.004],
         [0, 0.0065],
       ],
-      { at: offset(irisAt, gaze, 0.013), axis: gaze, bone: skull, smoothing: 1, color: PUPIL, group: "head" },
+      { at: offset(irisAt, gaze, 0.013), axis: gaze, bone: skull, segments: 8, color: PUPIL, group: "head" },
     );
-    b.part(new SphereGeometry(0.004, 8, 6), GLINT, {
+    b.part(new SphereGeometry(0.004, 5, 4), GLINT, {
       bone: skull,
       at: offset(offset(irisAt, gaze, 0.019), head.d([0, 1, 0]), 0.006),
       group: "head",
@@ -384,6 +386,7 @@ export default function build() {
         y: head.d([s, -0.25, 0]),
         thickness: 0.018,
         bevel: 0.006,
+        detail: 0.5,
         smoothing: 1,
         bone: skull,
         color: WHITE_SHADE,
@@ -407,6 +410,7 @@ export default function build() {
         y: head.d([s * 0.3, 1, -0.35]),
         thickness: 0.014,
         bevel: 0.004,
+        detail: 0.5,
         smoothing: 1,
         bone: skull,
         color: WHITE_SHADE,
@@ -607,7 +611,7 @@ export default function build() {
           : t < tCuff
             ? 0.072 - 0.75 * (t - tCuff + 0.04)
             : 0.042 - 0.006 * ((t - tCuff) / (1 - tCuff)),
-      { bands: scutes, sides: 12, group: g },
+      { bands: scutes, sides: 10, group: g },
     );
     for (let r = 0; r < 5; r++) {
       const t = 0.2 + r * ((tCuff - 0.24) / 4);
@@ -648,7 +652,15 @@ export default function build() {
         [0.04, 0.046],
         [0, 0.056],
       ],
-      { at: [ball.x, 0, ball.z], bone: wrist, smoothing: 1, color: SCUTE, group: g, name: `footPad${side}` },
+      {
+        at: [ball.x, 0, ball.z],
+        bone: wrist,
+        segments: 8,
+        smoothing: 1,
+        color: SCUTE,
+        group: g,
+        name: `footPad${side}`,
+      },
     );
     [
       { yaw: s * 30, len: 0.15 },
@@ -676,6 +688,7 @@ export default function build() {
           [0.85, SCUTE_DARK],
           [1, SCUTE],
         ],
+        sides: 6,
         group: g,
       });
       const talonTip = offset(end, d, k === 3 ? 0.1 : 0.085).setY(0.004);
@@ -683,6 +696,7 @@ export default function build() {
         bone: toe.joints[1],
         color: TALON,
         caps: { start: "round", end: "point" },
+        sides: 5,
         group: g,
       });
     });
@@ -729,7 +743,7 @@ export default function build() {
     b.sweep(hind, radius, {
       to: t3,
       color: LION,
-      sides: 16,
+      sides: 12,
       caps: { start: "round", end: "flat" },
       group: g,
     });
@@ -749,6 +763,7 @@ export default function build() {
       {
         at: [heel.x, 0, (heel.z + tip.z) / 2],
         bone: paw,
+        segments: 8,
         smoothing: 1,
         color: LION,
         group: g,
@@ -761,7 +776,7 @@ export default function build() {
       [0.018, 0],
       [0.05, -0.02],
     ])
-      b.part(new SphereGeometry(0.034, b.segments(12), b.segments(10)), LION, {
+      b.part(new SphereGeometry(0.034, b.segments(7), b.segments(5)), LION, {
         bone: paw,
         at: [tip.x + dx * s, 0.034 * 0.85, tip.z + dz],
         scale: [1, 0.85, 1.15],
@@ -796,7 +811,7 @@ export default function build() {
         x: lock.dir([1, 0, 0]),
         y: lock.axis,
         thickness: [0.016, 0.004],
-        smoothing: 2,
+        smoothing: 1,
         color: TUFT_DARK,
         group: "tail",
         name: "tuftLock",

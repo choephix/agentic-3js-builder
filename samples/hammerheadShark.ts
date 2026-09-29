@@ -200,6 +200,7 @@ export default function build() {
       bone: spine,
       color: LATERAL,
       caps: "round",
+      sides: 5,
       group: "body",
     });
 
@@ -214,6 +215,7 @@ export default function build() {
       bone: tail,
       color: LATERAL,
       caps: "round",
+      sides: 5,
       group: "tail",
     });
   }
@@ -312,21 +314,21 @@ export default function build() {
         [-60, 60, DORSAL],
         [120, 240, VENTRAL],
       ],
-      sides: 12,
+      sides: 8,
       group: "head",
     });
 
     // Lateral eyeball at the extreme outer edge of the cephalofoil.
     const eyeCenter: V3 = [s * 0.565, 0.6, 1.26];
     // Eyeball sclera
-    b.part(new SphereGeometry(0.022, b.segments(12), b.segments(8)), EYE, {
+    b.part(new SphereGeometry(0.022, b.segments(7), b.segments(5)), EYE, {
       bone: skull,
       at: eyeCenter,
       dir: [s, 0, 0.2],
       group: "head",
     });
     // Dark pupil facing outward and slightly forward
-    b.part(new SphereGeometry(0.013, b.segments(10), b.segments(8)), PUPIL, {
+    b.part(new SphereGeometry(0.013, b.segments(6), b.segments(4)), PUPIL, {
       bone: skull,
       at: offset(eyeCenter, [s, 0, 0.2], 0.012),
       dir: [s, 0, 0.2],
@@ -344,7 +346,7 @@ export default function build() {
         { closed: true },
       ),
       0.005,
-      { bone: skull, color: EYELID, group: "head" },
+      { bone: skull, color: EYELID, sides: 5, group: "head" },
     );
 
     // Incurrent nare (nostril) on the anterior ventral edge near the eye.
@@ -467,6 +469,7 @@ export default function build() {
     b.capsule(jaw.local([s * 0.105, -0.01, 0.03]), jaw.local([s * 0.115, 0.005, 0.07]), 0.01, {
       bone: jaw,
       color: FLANK,
+      sides: 6,
       group: "jaw",
     });
   }
@@ -490,6 +493,7 @@ export default function build() {
         bone: neck1,
         color: GILL,
         caps: "round",
+        sides: 5,
         group: "body",
       });
       // Dark internal backing slot
@@ -624,6 +628,7 @@ export default function build() {
     b.capsule([s * 0.06, 0.41, -0.48], [s * 0.05, 0.38, -0.68], [0.014, 0.009], {
       bone: hips,
       color: CLASPER,
+      sides: 6,
       group: `pelvic${side}`,
     });
   }
@@ -653,6 +658,7 @@ export default function build() {
     b.capsule([s * 0.06, 0.58, -1.45], [s * 0.04, 0.58, -1.68], [0.012, 0.006], {
       bone: tail2,
       color: FLANK,
+      sides: 6,
       group: "tail",
     });
   }

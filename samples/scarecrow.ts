@@ -315,7 +315,12 @@ export default function build() {
       ],
       { closed: true },
     );
-    b.sweep(loop, 0.009, { bone: root, color: grain(ROPE, ROPE_DK, { size: 0.004, seed: 12 }), group: "post" });
+    b.sweep(loop, 0.009, {
+      sides: 5,
+      bone: root,
+      color: grain(ROPE, ROPE_DK, { size: 0.004, seed: 12 }),
+      group: "post",
+    });
   }
 
   const soil = spots(mottle(SOIL, SOIL_DK, { size: 0.06, seed: 21 }), PEBBLE, { size: 0.035, amount: 0.12, seed: 22 });
@@ -327,7 +332,7 @@ export default function build() {
       [0.17, 0.06],
       [0, 0.072],
     ],
-    { at: [0, 0, 0], smoothing: 2, segments: 20, bone: root, color: soil, group: "ground" },
+    { at: [0, 0, 0], smoothing: 1, segments: 12, bone: root, color: soil, group: "ground" },
   );
   const moundHits = b.surface(mound).scatter(70, {
     rng: rng(23),
@@ -367,7 +372,7 @@ export default function build() {
   for (let i = 0; i < 7; i++) {
     const a = (i / 7) * Math.PI * 2;
     const dir: V3 = [Math.sin(a), 0, Math.cos(a)];
-    b.part(new SphereGeometry(0.07, b.segments(14), b.segments(10)), rind, {
+    b.part(new SphereGeometry(0.07, 8, 6), rind, {
       bone: root,
       at: [PK[0] + dir[0] * 0.05, 0.0668, PK[2] + dir[2] * 0.05],
       dir,
@@ -379,6 +384,7 @@ export default function build() {
   b.sweep(bezier([PK[0], 0.11, PK[2]], [PK[0], 0.16, PK[2]], [PK[0] + 0.03, 0.18, PK[2] - 0.01]), [0.014, 0.01], {
     bone: root,
     color: grain(STEM, "#4a3d1f", { size: 0.005, seed: 32 }),
+    sides: 6,
     caps: { start: "flat", end: "flat" },
     group: "ground",
   });
@@ -389,7 +395,7 @@ export default function build() {
       pitch: 0.012,
     }),
     0.0035,
-    { bone: root, color: LEAF, group: "ground" },
+    { sides: 4, bone: root, color: LEAF, group: "ground" },
   );
   b.extrude(
     [
@@ -476,17 +482,17 @@ export default function build() {
       { at: [0, 1.43, BZ], w: 0.42, h: 0.23 },
       { at: [0, 1.51, BZ], w: 0.24, h: 0.16 },
     ],
-    { bone: spine, color: torsoPaint, sides: 16, group: "body" },
+    { bone: spine, color: torsoPaint, sides: 10, group: "body" },
   );
   const torsoSurface = b.surface(torso);
   // Brass buttons where the straps meet the bib.
   for (const s of [1, -1]) {
     const hit = torsoSurface.nearest([s * 0.1, bibTop - 0.018, BZ + 0.3]);
-    const btn = b.stick(new CylinderGeometry(0.013, 0.013, 0.008, b.segments(12)), BRASS, hit, {
+    const btn = b.stick(new CylinderGeometry(0.013, 0.013, 0.008, 8), BRASS, hit, {
       embed: 0.3,
       group: "body",
     });
-    b.stick(new CylinderGeometry(0.006, 0.006, 0.004, b.segments(8)), "#8d6a22", btn.moved([0, 0.004, 0]), {
+    b.stick(new CylinderGeometry(0.006, 0.006, 0.004, 6), "#8d6a22", btn.moved([0, 0.004, 0]), {
       embed: 0.3,
       group: "body",
     });
@@ -519,7 +525,7 @@ export default function build() {
       { closed: true },
     ),
     0.009,
-    { bone: hips, color: grain(ROPE, ROPE_DK, { size: 0.004, seed: 13 }), group: "body" },
+    { sides: 5, bone: hips, color: grain(ROPE, ROPE_DK, { size: 0.004, seed: 13 }), group: "body" },
   );
 
   // Collar flaps and the straw poking out round the neck.
@@ -596,7 +602,7 @@ export default function build() {
             { closed: true },
           ),
           0.0075,
-          { bone, color: rope, group: `arm${sides[i][1]}` },
+          { sides: 5, bone, color: rope, group: `arm${sides[i][1]}` },
         );
       }
     }
@@ -662,7 +668,7 @@ export default function build() {
       color: leather,
       group: `leg${side}`,
     });
-    b.part(new SphereGeometry(0.05, b.segments(12), b.segments(8)), leather, {
+    b.part(new SphereGeometry(0.05, 8, 5), leather, {
       bone: ankle,
       at: foot.local([0, 0.12, -0.035]),
       dir: foot.axis,
@@ -698,12 +704,13 @@ export default function build() {
       [0.118, -0.07],
       [0.108, -0.074],
     ],
-    { at: [0, 1.555, BZ], segments: 20, bone: neck, color: burlapCloth, group: "head" },
+    { at: [0, 1.555, BZ], segments: 10, bone: neck, color: burlapCloth, group: "head" },
   );
   const neckRope = b.ring(frame([0, 1.556, BZ], [0, 1, 0]), { count: 10, radius: 0.058 });
-  b.sweep(catmull(neckRope.items, { closed: true }), 0.0095, { bone: neck, color: rope, group: "head" });
+  b.sweep(catmull(neckRope.items, { closed: true }), 0.0095, { sides: 5, bone: neck, color: rope, group: "head" });
   for (const s of [1, -1])
     b.sweep(bezier([s * 0.012, 1.553, BZ + 0.062], [s * 0.03, 1.53, BZ + 0.075], [s * 0.022, 1.49, BZ + 0.1]), 0.0075, {
+      sides: 5,
       bone: neck,
       color: rope,
       group: "head",
@@ -746,7 +753,7 @@ export default function build() {
     {
       at: [0, MOUTH_Y, BZ],
       smoothing: 1,
-      segments: 24,
+      segments: 12,
       bone: head,
       color: paint((p, n) => (n.y < -0.95 && p.y < MOUTH_Y + 0.002 ? MOUTH : face)),
       group: "head",
@@ -764,7 +771,7 @@ export default function build() {
     {
       at: [0, MOUTH_Y, BZ],
       smoothing: 1,
-      segments: 24,
+      segments: 12,
       bone: jaw,
       color: paint((p, n) => (n.y > 0.95 && p.y > MOUTH_Y - 0.002 ? MOUTH : face)),
       group: "head",
@@ -782,13 +789,13 @@ export default function build() {
     // The drawn face is a paper-thin disc lifted off the sack (a cylinder's cap shows the texture as a disc),
     // ringed by a torus so the button has a rim and thickness without a surface right behind the drawing.
     const seat = frame(offset(hit, hit, 0.004), hit);
-    b.stick(new CylinderGeometry(e.r, e.r, 0.001, b.segments(20)), "#ffffff", seat, {
+    b.stick(new CylinderGeometry(e.r, e.r, 0.001, 10), "#ffffff", seat, {
       embed: 0,
       bone: head,
       texture: e.tex,
       group: "head",
     });
-    b.stick(new TorusGeometry(e.r, 0.0045, 8, b.segments(20)).rotateX(-Math.PI / 2), e.rim, seat, {
+    b.stick(new TorusGeometry(e.r, 0.0045, 4, 10).rotateX(-Math.PI / 2), e.rim, seat, {
       embed: 0.5,
       bone: head,
       group: "head",
@@ -836,7 +843,7 @@ export default function build() {
       [0.1, 0.155],
       [0, 0.16],
     ],
-    { at: hatAt, axis: hatAxis, smoothing: 1, segments: 32, bone: head, color: braid, group: "head" },
+    { at: hatAt, axis: hatAxis, smoothing: 1, segments: 14, bone: head, color: braid, group: "head" },
   );
   const band = b.lathe(
     [
@@ -845,13 +852,13 @@ export default function build() {
       [0.135, 0.058],
       [0.123, 0.058],
     ],
-    { at: hatAt, axis: hatAxis, segments: 32, bone: head, color: BAND, group: "head" },
+    { at: hatAt, axis: hatAxis, segments: 14, bone: head, color: BAND, group: "head" },
   );
   // A sunflower tucked into the band, standing clear of the brim.
   const bandHit = b.surface(band).around(hatAt.clone().addScaledVector(hatAxis, 0.045)).at(62, 0);
   if (bandHit) {
     const tucked = frame(offset(offset(bandHit, bandHit, 0.003), hatAxis, 0.02), bandHit);
-    b.stick(new CylinderGeometry(0.044, 0.044, 0.001, b.segments(24)), "#ffffff", tucked, {
+    b.stick(new CylinderGeometry(0.044, 0.044, 0.001, 12), "#ffffff", tucked, {
       embed: 0,
       bone: head,
       spin: 20,
@@ -881,7 +888,7 @@ export default function build() {
   const C = (f: number, u: number, sd = 0) =>
     base.clone().addScaledVector(fwd, f).addScaledVector(up, u).addScaledVector(side, sd);
   const tiltUp = fwd.clone().addScaledVector(up, 0.35).normalize();
-  b.part(new SphereGeometry(0.05, b.segments(14), b.segments(10)), feathers, {
+  b.part(new SphereGeometry(0.05, 8, 6), feathers, {
     bone: elbowL,
     at: C(0, 0.075),
     dir: tiltUp,
@@ -889,20 +896,20 @@ export default function build() {
     scale: [0.85, 0.9, 1.55],
     group: "crow",
   });
-  b.part(new SphereGeometry(0.034, b.segments(12), b.segments(10)), feathers, {
+  b.part(new SphereGeometry(0.034, 7, 5), feathers, {
     bone: elbowL,
     at: C(0.07, 0.125),
     group: "crow",
   });
-  b.part(new ConeGeometry(0.012, 0.05, b.segments(8)), BEAK, {
+  b.part(new ConeGeometry(0.012, 0.05, 5), BEAK, {
     bone: elbowL,
     at: C(0.118, 0.118),
     dir: fwd.clone().addScaledVector(up, -0.2),
     group: "crow",
   });
   for (const sd of [1, -1]) {
-    b.part(new SphereGeometry(0.0075, 8, 6), EYE, { bone: elbowL, at: C(0.088, 0.135, sd * 0.026), group: "crow" });
-    b.part(new SphereGeometry(0.0025, 6, 4), "#ffffff", {
+    b.part(new SphereGeometry(0.0075, 5, 4), EYE, { bone: elbowL, at: C(0.088, 0.135, sd * 0.026), group: "crow" });
+    b.part(new SphereGeometry(0.0025, 4, 3), "#ffffff", {
       bone: elbowL,
       at: C(0.092, 0.139, sd * 0.031),
       group: "crow",
@@ -923,6 +930,7 @@ export default function build() {
         thickness: 0.01,
         bevel: 0.003,
         smoothing: 1,
+        detail: 0.34,
         bone: elbowL,
         color: feathers,
         group: "crow",

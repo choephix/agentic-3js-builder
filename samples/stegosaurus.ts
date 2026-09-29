@@ -126,7 +126,7 @@ export default function build() {
       [118, 242, BELLY],
     ],
     shift: (t) => [0, -0.03 * belly(zAt(t))],
-    sides: 16,
+    sides: 12,
     group: "body",
   });
 
@@ -158,7 +158,7 @@ export default function build() {
         [-55, 55, BACK],
         [140, 220, MOUTH],
       ],
-      sides: 12,
+      sides: 8,
       group: "head",
     },
   );
@@ -184,7 +184,7 @@ export default function build() {
         [-40, 40, MOUTH],
         [125, 235, BELLY],
       ],
-      sides: 12,
+      sides: 8,
       group: "jaw",
     },
   );
@@ -201,7 +201,8 @@ export default function build() {
     {
       at: head.p([0, -0.013, 0.128]),
       axis: head.d([0, -0.4, 1]),
-      smoothing: 2,
+      segments: 8,
+      smoothing: 1,
       color: BEAK,
       bone: skull,
       group: "head",
@@ -215,7 +216,15 @@ export default function build() {
       [0.009, 0.02],
       [0, 0.025, "sharp"],
     ],
-    { at: head.p([0, -0.042, 0.108]), axis: head.d([0, 0.15, 1]), smoothing: 2, color: BEAK, bone: jaw, group: "jaw" },
+    {
+      at: head.p([0, -0.042, 0.108]),
+      axis: head.d([0, 0.15, 1]),
+      segments: 8,
+      smoothing: 1,
+      color: BEAK,
+      bone: jaw,
+      group: "jaw",
+    },
   );
 
   // Leaf-shaped cheek teeth along both jaw margins, seen when the jaw drops.
@@ -240,7 +249,7 @@ export default function build() {
           x: head.d([0, 0, 1]),
           y: head.d([0, -1, 0]),
           thickness: 0.003,
-          smoothing: 1,
+          smoothing: 0,
           color: TOOTH,
           bone: skull,
           group: "head",
@@ -252,7 +261,7 @@ export default function build() {
           x: head.d([0, 0, 1]),
           y: head.d([0, 1, 0]),
           thickness: 0.003,
-          smoothing: 1,
+          smoothing: 0,
           color: TOOTH,
           bone: jaw,
           group: "jaw",
@@ -264,8 +273,8 @@ export default function build() {
   for (const s of [1, -1]) {
     const gaze = head.d([s * 0.85, 0.3, 0.25]).normalize();
     const eye = head.p([s * 0.038, 0.024, 0.02]);
-    b.part(new SphereGeometry(0.014, 16, 12), EYE, { bone: skull, at: eye, group: "head" });
-    b.part(new SphereGeometry(0.007, 10, 8), PUPIL, { bone: skull, at: offset(eye, gaze, 0.0105), group: "head" });
+    b.part(new SphereGeometry(0.014, 8, 5), EYE, { bone: skull, at: eye, group: "head" });
+    b.part(new SphereGeometry(0.007, 6, 4), PUPIL, { bone: skull, at: offset(eye, gaze, 0.0105), group: "head" });
     b.lathe(
       [
         [0.009, -0.003],
@@ -274,12 +283,12 @@ export default function build() {
         [0.014, 0.005],
         [0.0095, 0.003],
       ],
-      { at: offset(eye, gaze, 0.006), axis: gaze, smoothing: 1, color: HIDE, bone: skull, group: "head" },
+      { at: offset(eye, gaze, 0.006), axis: gaze, segments: 8, smoothing: 0, color: HIDE, bone: skull, group: "head" },
     );
     // Nostrils just behind the beak, seated on the snout's skin.
     const nose = upperSurface.ray(head.p([s * 0.06, 0.03, 0.108]), head.d([-s, -0.5, 0]));
     if (nose)
-      b.stick(new SphereGeometry(0.5, 8, 6), PUPIL, nose, {
+      b.stick(new SphereGeometry(0.5, 6, 4), PUPIL, nose, {
         bone: skull,
         flow: head.d([0, 0, 1]),
         scale: [0.007, 0.004, 0.012],
@@ -354,7 +363,7 @@ export default function build() {
         b.sweep(chain, (t) => [interp(rx, t), interp(ry, t)], {
           to: chain.ts[3],
           color: HIDE,
-          sides: 12,
+          sides: 8,
           group: `leg${leg.kind}${side}`,
         }),
       );
@@ -371,7 +380,8 @@ export default function build() {
         ],
         {
           at: [end.x, 0, end.z],
-          smoothing: 2,
+          segments: 10,
+          smoothing: 1,
           color: PAD,
           bone: footJoint,
           group: `leg${leg.kind}${side}`,
@@ -387,7 +397,8 @@ export default function build() {
             y: [0, 1, 0],
             thickness: leg.kind === "hind" ? 0.03 : 0.022,
             bevel: 0.006,
-            smoothing: 2,
+            smoothing: 1,
+            detail: 0.34,
             color: NAIL,
             bone: footJoint,
             group: `leg${leg.kind}${side}`,
@@ -428,7 +439,17 @@ export default function build() {
       const t0 = 0.012 + 0.018 * k;
       const t1 = 0.004;
       const group = z > -0.2 ? "body" : "tail";
-      b.extrude(outline, { at: hit, x, y, thickness: [t0, t1], bevel: 0.005, smoothing: 2, color: RIM, group });
+      b.extrude(outline, {
+        at: hit,
+        x,
+        y,
+        thickness: [t0, t1],
+        bevel: 0.005,
+        smoothing: 1,
+        detail: 0.5,
+        color: RIM,
+        group,
+      });
       // The ochre core: the same drawing shrunk toward its root, standing proud of both faces by the same margin.
       const inner = outline.map(([u, v, sharp]): OutlinePoint => {
         const p: [number, number] = [u * 0.78, -bury + (v + bury) * 0.78];
@@ -441,7 +462,8 @@ export default function build() {
         y,
         thickness: [t0 + e, t0 + 0.78 * (t1 - t0) + e],
         bevel: 0.004,
-        smoothing: 2,
+        smoothing: 1,
+        detail: 0.5,
         color: PLATE,
         group,
       });
@@ -457,7 +479,7 @@ export default function build() {
             [-0.28 * L + 0.3 * lean, 0.4 * H],
             [0.24 * L + 0.3 * lean, 0.34 * H],
           ])
-            b.rod(face(0.05 * lean, 0.03 * H, s), face(u, v, s), [0.0024, 0.0012], { color: RIM, sides: 6, group });
+            b.rod(face(0.05 * lean, 0.03 * H, s), face(u, v, s), [0.0024, 0.0012], { color: RIM, sides: 4, group });
       }
     }
     z -= 0.5 * L;
@@ -486,7 +508,7 @@ export default function build() {
             [0.72, SPIKE],
             [1, SPIKE_TIP],
           ],
-          sides: 10,
+          sides: 7,
           group: "tail",
         },
       );
@@ -507,7 +529,7 @@ export default function build() {
     minDist: 0.022,
     filter: (h) => h.n.y < -0.35 && h.at.z > 0.44,
   }))
-    b.lathe(stud, { at: hit, axis: hit, segments: 8, spin: random() * 45, smoothing: 1, color: STUD, group: "body" });
+    b.lathe(stud, { at: hit, axis: hit, segments: 6, spin: random() * 45, smoothing: 0, color: STUD, group: "body" });
 
   // Rounded tubercles: pale and dark on the flanks and the base of the tail, dark along the back between the plate
   // rows, and smaller ones down the legs.
@@ -527,8 +549,8 @@ export default function build() {
       b.lathe(tubercle, {
         at: hit,
         axis: hit,
-        segments: 7,
-        smoothing: 1,
+        segments: 6,
+        smoothing: 0,
         color: colors[Math.floor(random() * colors.length)],
       });
 

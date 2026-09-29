@@ -171,7 +171,7 @@ export default function build() {
       bone: [spine, head],
       to: headStart,
       sectors: countershade,
-      sides: 16,
+      sides: 12,
       caps: { start: "round", end: "none" },
       group: "body",
     },
@@ -187,7 +187,7 @@ export default function build() {
       from: headStart,
       color: FLANK,
       sectors: countershade,
-      sides: 16,
+      sides: 12,
       caps: { start: "none", end: "round" },
       group: "head",
     },
@@ -227,10 +227,11 @@ export default function build() {
     b.rod([s * 0.028, Y0 - 0.03, 0.44], [s * 0.012, Y0 - 0.021, 0.6], 0.0022, {
       bone: head,
       color: GILL,
+      sides: 5,
       group: "head",
     });
     const nostril = headSurface.ray([s * 0.3, Y0 + 0.012, 0.525], [-s, 0, 0]);
-    if (nostril) b.stick(new SphereGeometry(0.0035, 8, 6), GILL, nostril, { embed: 0.6, bone: head, group: "head" });
+    if (nostril) b.stick(new SphereGeometry(0.0035, 5, 4), GILL, nostril, { embed: 0.6, bone: head, group: "head" });
 
     // Eye: a turned orbit collar, a gold iris disc and a black lens dome, with a catchlight.
     const eyeHit = headSurface.ray([s * 0.3, Y0 + 0.012, 0.475], [-s, 0, 0]);
@@ -244,7 +245,7 @@ export default function build() {
         [0.021, 0.005],
         [0.017, 0.003],
       ],
-      { at: eyeHit, axis: gaze, bone: head, smoothing: 1, color: ORBIT, group: "head" },
+      { at: eyeHit, axis: gaze, bone: head, segments: 10, color: ORBIT, group: "head" },
     );
     b.lathe(
       [
@@ -254,7 +255,7 @@ export default function build() {
         [0.012, 0.004],
         [0, 0.004],
       ],
-      { at: eyeHit, axis: gaze, bone: head, color: IRIS, group: "head" },
+      { at: eyeHit, axis: gaze, bone: head, segments: 10, color: IRIS, group: "head" },
     );
     const lens = b.lathe(
       [
@@ -264,9 +265,9 @@ export default function build() {
         [0.006, 0.0075],
         [0, 0.0085],
       ],
-      { at: eyeHit, axis: gaze, bone: head, smoothing: 2, color: LENS, group: "head" },
+      { at: eyeHit, axis: gaze, bone: head, segments: 10, color: LENS, group: "head" },
     );
-    b.part(new SphereGeometry(0.0022, 8, 6), GLINT, {
+    b.part(new SphereGeometry(0.0022, 5, 4), GLINT, {
       bone: head,
       at: lens.local([0.003, 0.0075, 0.003]),
     });
@@ -284,14 +285,14 @@ export default function build() {
       const r = 0.06 * (1 - i / 6);
       cap.push([r, Math.sqrt(CAP_R * CAP_R - r * r) - CAP_R + 0.004]);
     }
-    b.lathe(cap, { at: coverHit, axis: coverHit.n, bone: head, color: OPERCLE, group: "head" });
+    b.lathe(cap, { at: coverHit, axis: coverHit.n, bone: head, segments: 10, color: OPERCLE, group: "head" });
     // Each slit point is cast in from the side, so it lands on the outermost skin where head and body overlap.
     const slit = Array.from({ length: 9 }, (_, i) => {
       const phi = (-80 + (160 * i) / 8) * DEG;
       const [z, y] = [coverHit.at.z - 0.05 * Math.cos(phi), coverHit.at.y + 0.062 * Math.sin(phi)];
       return headSurface.ray([s * 0.3, y, z], [-s, 0, 0]);
     }).filter((hit) => hit !== null);
-    b.sweep(catmull(slit), 0.003, { bone: head, color: GILL, group: "head" });
+    b.sweep(catmull(slit), 0.003, { bone: head, color: GILL, sides: 5, group: "head" });
   }
 
   // ---------------------------------------------------------------- Sail
@@ -354,7 +355,8 @@ export default function build() {
       bone: piece.joint,
       thickness: [sailThickness(Math.min(...vs)), sailThickness(Math.max(...vs))],
       bevel: 0.002,
-      smoothing: 2,
+      smoothing: 1,
+      detail: 0.5,
       color: SAIL,
       group: "sail",
       name: `sail${pi + 1}`,
@@ -373,7 +375,7 @@ export default function build() {
           sail.local([u0, v0 - 0.01, (side * sailThickness(v0 - 0.01)) / 2]),
           sail.local([u1, v1, (side * sailThickness(v1)) / 2]),
           lead ? [0.0045, 0.002] : [0.0026, 0.001],
-          { bone: piece.joint, color: RAY, group: "sail" },
+          { bone: piece.joint, color: RAY, sides: 5, group: "sail" },
         );
     }
 
@@ -391,7 +393,7 @@ export default function build() {
         const radius = 0.005 + 0.004 * random();
         for (const side of [1, -1])
           b.stick(
-            new CylinderGeometry(radius, radius, 0.0016, 10),
+            new CylinderGeometry(radius, radius, 0.0016, 6),
             SPOT,
             frame(sail.moved([u, v, (side * sailThickness(v)) / 2]), sail.dir([0, 0, side])),
             { bone: piece.joint, group: "sail" },
@@ -414,6 +416,7 @@ export default function build() {
       );
     b.membrane(edge(front, STRIP_REACH), edge(rear, -STRIP_REACH), {
       thickness: 0.0024,
+      detail: 0.5,
       color: SAIL,
       group: "sail",
       name: `sailHinge${p + 1}`,
@@ -434,7 +437,7 @@ export default function build() {
           fin.local([u0, v0, (side * thicknessAt(v0)) / 2]),
           fin.local([u1, v1, (side * thicknessAt(v1)) / 2]),
           [0.0018, 0.0008],
-          { bone, color: RAY, group },
+          { bone, color: RAY, sides: 5, group },
         );
   };
 
@@ -470,7 +473,8 @@ export default function build() {
         y: [0, 0.3, 1],
         thickness: [0.002, 0.012],
         bevel: 0.0025,
-        smoothing: 2,
+        smoothing: 1,
+        detail: 0.5,
         color: FIN,
         group: `pectoral${side}`,
       },
@@ -509,6 +513,7 @@ export default function build() {
         thickness: [0.003, 0.006],
         bevel: 0.0015,
         smoothing: 1,
+        detail: 0.5,
         color: FIN,
         group: `pelvic${side}`,
       },
@@ -533,6 +538,7 @@ export default function build() {
           thickness: 0.006,
           bevel: 0.002,
           smoothing: 1,
+          detail: 0.5,
           color: DORSAL,
           group: "tail",
         },
@@ -556,7 +562,8 @@ export default function build() {
       bone: tail1,
       thickness: [0.002, 0.009],
       bevel: 0.002,
-      smoothing: 2,
+      smoothing: 1,
+      detail: 0.5,
       color: FIN,
       group: "tail",
     },
@@ -577,6 +584,7 @@ export default function build() {
         thickness: d > 0 ? [0.007, 0.002] : [0.002, 0.007],
         bevel: 0.0015,
         smoothing: 1,
+        detail: 0.5,
         color: FIN,
         group: "tail",
       },
@@ -610,7 +618,8 @@ export default function build() {
     bone: caudal,
     thickness: [0.013, 0.002],
     bevel: 0.003,
-    smoothing: 2,
+    smoothing: 1,
+    detail: 0.5,
     color: FIN,
     group: "tail",
     name: "caudalUpper",
@@ -625,7 +634,8 @@ export default function build() {
     bone: caudal,
     thickness: [0.002, 0.012],
     bevel: 0.003,
-    smoothing: 2,
+    smoothing: 1,
+    detail: 0.5,
     color: FIN,
     group: "tail",
     name: "caudalLower",

@@ -78,7 +78,7 @@ export default function build() {
   b.capsule(jaw.at, jaw.local([0, 0.28, 0]), [0.08, 0.05], { bone: jaw, color: BELLY, group: "jaw" });
   const eyes = [1, -1].map((s) => {
     // The eye faces its gaze (out, forward and a little up), so the part itself is a Line along the gaze.
-    const eye = b.part(new SphereGeometry(0.035, 10, 8), DARK, {
+    const eye = b.part(new SphereGeometry(0.035, 7, 5), DARK, {
       bone: head,
       at: head.local([s * 0.09, 0.07, 0.12]),
       dir: head.dir([s * 0.8, 0.5, 0.3]),
@@ -97,7 +97,7 @@ export default function build() {
       [0.02, 0.07],
       [0.1, 0.07],
     ].map(([y, z]) => head.local([s * 0.11, y, z]));
-    b.sweep(polyline(brow, { closed: true }), 0.012, { bone: head, color: BONE, group: "head" });
+    b.sweep(polyline(brow, { closed: true }), 0.012, { bone: head, color: BONE, sides: 6, group: "head" });
     // Curved horn: bezier sweep tapering to a point.
     const base = head.local([s * 0.07, 0.02, 0.1]);
     b.sweep(bezier(base, offset(base, [s * 0.1, 0.15, -0.1], 0.18), head.local([s * 0.2, -0.35, 0.12])), [0.045, 0], {

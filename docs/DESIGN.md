@@ -225,3 +225,16 @@ Stefan, looking at the Highland cow in wireframe: the body, legs, horns and ears
 - **GUIDE asks for lean meshes** as a goal: the fewest segments that keep each silhouette smooth at the size it is seen, with paints, textures and cards carrying the fine detail.
 
 Across the 24 samples, triangles fell 9% (531.6k to 483.7k) with no sample edited except the scarecrow's builder line: the Highland cow 37.1k to 22.4k, the golden pheasant 24.2k to 15.6k, the scarecrow 33.9k to 22.6k, the bonsai 29.7k to 23.4k. The cow, scarecrow and snow leopard renders (`v11-lowpoly`, `v18-lowpoly`, `v20-lowpoly`) match their earlier finals, flex tests included.
+
+## Batch 12: the low-poly look
+
+Stefan, in wireframe again: the cow's hooves and eyes were finely cut spheres, its legs had too many sides and smoothly rounded joints, the horns had too many rings, and the scarecrow had dense rope rings round its arms, dense eyes and a 32-step hat. "We are seeking a wow factor in terms of creativity. Smoothness is not a requirement." Batch 11 had made density controllable; the defaults and the rules for rings along a tube still produced bunches.
+
+- **Rings follow the section.** A ring per step round the section (360° / sides, 45° at most) of bend or roll replaces the fixed 10°: an 8-sided rope loop is an octagon, as its cross-section is. Rings are never closer than 0.7 of the edge length round the tube, so bends, fillets, tapers and blend windows can't stack rings; a joint whose blend window is narrower than that gap gets its middle ring only. A thin tube may not cut a corner by more than half its radius, so a lip line or gill slit draped on a curved head still follows the skin (the density pass found them sinking under the 45° rule alone).
+- **Round caps** take sides / 4 steps (a quarter circle in the same angle steps as the section), not sides / 3.
+- **Lathe default** 12 steps, not 16.
+- **The report lists "Fine meshes"** (creature lab 637377e): parts whose mean triangle edge is under 1/150 of the model's diagonal, most triangles first, named by name or geometry class with bone and group; cut-out parts are left out. A builder can't see a wireframe; this gives it the same signal as text.
+- **README and GUIDE** state the look: low-poly, facets are part of it, each part gets only enough segments to read as its shape at the size it is seen, spread evenly; paints, textures and cards carry the fine detail.
+- **Every sample thinned** by hand (four density-pass agents plus the cow and scarecrow): explicit sphere, cylinder and torus counts, sides, lathe steps, extrude smoothing and bevel `detail`. Kept a little more on hero features (irises, beaks, eye turrets) and where fewer segments broke a detail (the hammerhead's gill rims, the manta's horn seam, the bonsai's training wire).
+
+The library went from 483.7k triangles after batch 11 to 283.9k (531.6k before batch 11): the cow 37.1k → 17.4k, the scarecrow 33.9k → 9.1k, the snow leopard 34.3k → 16.6k, the stegosaurus 40.3k → 19.1k.

@@ -207,11 +207,17 @@ export default function build() {
   // ---- Pot -----------------------------------------------------------------------------------------------------
   for (const sx of [1, -1])
     for (const sz of [1, -1])
-      b.frustumBox([sx * 0.128, 0, sz * 0.078], [sx * 0.128, FOOT_H + 0.004, sz * 0.078], [0.05, 0.036], [0.056, 0.04], {
-        bone: root,
-        color: glaze,
-        name: "potFoot",
-      });
+      b.frustumBox(
+        [sx * 0.128, 0, sz * 0.078],
+        [sx * 0.128, FOOT_H + 0.004, sz * 0.078],
+        [0.05, 0.036],
+        [0.056, 0.04],
+        {
+          bone: root,
+          color: glaze,
+          name: "potFoot",
+        },
+      );
   const potBody = b.frustumBox([0, FOOT_H, 0], [0, BODY_TOP, 0], [...BODY_BOTTOM_SIZE], [...BODY_TOP_SIZE], {
     bone: root,
     color: glaze,
@@ -241,11 +247,17 @@ export default function build() {
     });
 
   // ---- Soil ----------------------------------------------------------------------------------------------------
-  const soilTop = b.frustumBox([0, 0.07, 0], [0, SOIL_Y, 0], [rimX * 2 - 0.02, rimZ * 2 - 0.02], [rimX * 2 - 0.02, rimZ * 2 - 0.02], {
-    bone: root,
-    color: soil,
-    name: "soil",
-  });
+  const soilTop = b.frustumBox(
+    [0, 0.07, 0],
+    [0, SOIL_Y, 0],
+    [rimX * 2 - 0.02, rimZ * 2 - 0.02],
+    [rimX * 2 - 0.02, rimZ * 2 - 0.02],
+    {
+      bone: root,
+      color: soil,
+      name: "soil",
+    },
+  );
 
   // ---- Trunk ---------------------------------------------------------------------------------------------------
   const trunkPath = catmull([
@@ -264,7 +276,7 @@ export default function build() {
       const r = 0.012 + 0.024 * (1 - t) ** 1.25 + 0.02 * Math.max(0, 1 - t / 0.14) ** 2;
       return [r * (1 + 0.13 * Math.sin(t * 19 + 1)), r * (1 + 0.13 * Math.cos(t * 15))];
     },
-    { color: trunkBark, sides: 12, caps: { start: "flat", end: "round" } },
+    { color: trunkBark, sides: 10, caps: { start: "flat", end: "round" } },
   );
   const trunkSurface = b.surface(trunkTube);
 
@@ -295,11 +307,15 @@ export default function build() {
   });
   // A broken lower branch left as a jin.
   const stubHit = trunkSurface.nearest(offset(trunkPath.at(0.22), [-1, -0.2, 0.3], 0.1));
-  b.sweep(catmull([stubHit, offset(stubHit, [-1, 0.1, 0.2], 0.03), offset(stubHit, [-1, 0.5, 0.1], 0.055)]), [0.006, 0.0012], {
-    color: grain(DEAD, DEAD_GREY, { size: 0.003, axis: [-1, 0.3, 0], seed: 33 }),
-    caps: { start: "flat", end: "point" },
-    name: "jinLow",
-  });
+  b.sweep(
+    catmull([stubHit, offset(stubHit, [-1, 0.1, 0.2], 0.03), offset(stubHit, [-1, 0.5, 0.1], 0.055)]),
+    [0.006, 0.0012],
+    {
+      color: grain(DEAD, DEAD_GREY, { size: 0.003, axis: [-1, 0.3, 0], seed: 33 }),
+      caps: { start: "flat", end: "point" },
+      name: "jinLow",
+    },
+  );
 
   // ---- Branches and foliage pads -------------------------------------------------------------------------------
   const sprays = [sprayTexture(101), sprayTexture(202), sprayTexture(303)];
@@ -316,7 +332,7 @@ export default function build() {
   ) => {
     const r = rng(seed);
     const [rx, ry, rz] = size;
-    const sphere = new THREE.SphereGeometry(1, b.segments(12), b.segments(8));
+    const sphere = new THREE.SphereGeometry(1, 8, 6);
     const blobs = [b.part(sphere, foliage, { bone, at: center, scale: [rx, ry, rz], name: "pad" })];
     const side = new THREE.Vector3(-outward.z, 0, outward.x);
     for (let k = 0; k < 3; k++) {
@@ -326,7 +342,11 @@ export default function build() {
         .multiplyScalar(Math.cos(a) * rx * 0.62)
         .addScaledVector(outward, Math.sin(a) * rz * 0.62);
       const s = 0.5 + 0.18 * r();
-      const blobAt: [number, number, number] = [center[0] + off.x, center[1] + ry * (0.05 + 0.15 * r()), center[2] + off.z];
+      const blobAt: [number, number, number] = [
+        center[0] + off.x,
+        center[1] + ry * (0.05 + 0.15 * r()),
+        center[2] + off.z,
+      ];
       blobs.push(b.part(sphere, foliage, { bone, at: blobAt, scale: [rx * s, ry * (s + 0.15), rz * s], name: "pad" }));
       // A branchlet from the branch into each dome, seen from below.
       b.rod(from, [blobAt[0], blobAt[1] - ry * 0.35, blobAt[2]], [0.0032, 0.0015], {
@@ -452,7 +472,14 @@ export default function build() {
     pad(joints[2], tip, [tip.x, tip.y + spec.tipPad[1] * 0.4, tip.z], spec.tipPad, outward, 500 + i);
     if (spec.midPad) {
       const at = sweep.at(0.5).at;
-      pad(joints[1], at, [at.x - outward.z * 0.03, at.y + 0.022, at.z + outward.x * 0.03], spec.midPad, outward, 600 + i);
+      pad(
+        joints[1],
+        at,
+        [at.x - outward.z * 0.03, at.y + 0.022, at.z + outward.x * 0.03],
+        spec.midPad,
+        outward,
+        600 + i,
+      );
     }
     if (spec.wired) {
       // Six turns of wire coiled on the bark, one point every 45°, bending with the branch.
@@ -465,7 +492,14 @@ export default function build() {
   });
 
   // The crown pad around the dead leader.
-  pad(trunk.joints[4], top, [-0.05, 0.392, 0.018], [0.085, 0.036, 0.07], new THREE.Vector3(-0.5, 0, 0.8).normalize(), 700);
+  pad(
+    trunk.joints[4],
+    top,
+    [-0.05, 0.392, 0.018],
+    [0.085, 0.036, 0.07],
+    new THREE.Vector3(-0.5, 0, 0.8).normalize(),
+    700,
+  );
 
   // ---- Moss and pebbles on the soil ----------------------------------------------------------------------------
   const soilSurface = b.surface(soilTop);
@@ -490,7 +524,7 @@ export default function build() {
     minDist: 0.02,
     filter: (h) => h.n.y > 0.9 && noise(h.at, 0.05, 7) < 0.45 && h.at.distanceTo(trunkBase) > 0.05,
   });
-  const pebble = new THREE.SphereGeometry(1, 7, 5);
+  const pebble = new THREE.SphereGeometry(1, 5, 4);
   for (const hit of pebbles) {
     const s = 0.004 + 0.004 * pebbleRng();
     b.stick(pebble, ["#8d8579", "#6f6a62", "#a89a86"][Math.floor(pebbleRng() * 3)], hit, {

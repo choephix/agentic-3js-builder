@@ -80,7 +80,7 @@ export default function build() {
     to: hipsT,
     color: (t) => stripe(t / hipsT),
     shift: (t) => [0, -0.035 * belly(zAt(t / hipsT))],
-    sides: 14,
+    sides: 10,
     caps: { start: "round", end: "none" },
     group: "body",
   });
@@ -94,7 +94,7 @@ export default function build() {
       [130, 230, BELLY],
     ],
     shift: (t) => [0, -0.035 * belly(zAt((t - hipsT) / (1 - hipsT)))],
-    sides: 14,
+    sides: 10,
     caps: { start: "none", end: "round" },
     group: "body",
   });
@@ -103,7 +103,7 @@ export default function build() {
     body,
     9,
     (at) =>
-      b.stick(new CylinderGeometry(0.014, 0.014, 0.005, b.segments(12)), ROSETTE, at, {
+      b.stick(new CylinderGeometry(0.014, 0.014, 0.005, 7), ROSETTE, at, {
         embed: 0.5,
         flow: at.tangent,
         scale: [1, 1, 2.6],
@@ -184,7 +184,7 @@ export default function build() {
     const legTube = b.sweep(chain, radius, {
       to: t3,
       color: FUR,
-      sides: 14,
+      sides: 10,
       caps: { start: "round", end: "flat" },
     });
 
@@ -199,7 +199,7 @@ export default function build() {
         [tip.x, pawH, tip.z - 0.03],
       ],
       () => [0.054, pawH],
-      { bone: paw, color: PAW, sides: 16 },
+      { bone: paw, color: PAW, sides: 10 },
     );
     for (const [dx, dz] of [
       [-0.034, -0.014],
@@ -207,7 +207,7 @@ export default function build() {
       [0.012, 0],
       [0.034, -0.014],
     ]) {
-      b.part(new SphereGeometry(0.022, b.segments(12), b.segments(10)), PAW, {
+      b.part(new SphereGeometry(0.022, 7, 5), PAW, {
         bone: paw,
         at: [tip.x + dx * s, 0.022 * 0.85, tip.z + dz],
         scale: [1, 0.85, 1.15],
@@ -221,7 +221,7 @@ export default function build() {
       minDist: 0.045,
       filter: (h) => h.n.x * s > 0.2 && h.at.y > 0.14,
     }))
-      b.stick(new CylinderGeometry(0.012, 0.012, 0.005, b.segments(12)), SPOT, hit, {
+      b.stick(new CylinderGeometry(0.012, 0.012, 0.005, 7), SPOT, hit, {
         embed: 0.5,
         scale: 0.7 + random() * 0.6,
       });
@@ -246,18 +246,18 @@ export default function build() {
       { at: head.p([0, 0.0, 0.15]), w: head.s(0.13), h: head.s(0.11) },
       { at: head.p([0, -0.01, 0.18]), w: head.s(0.105), h: head.s(0.08) },
     ],
-    { bone: skull, color: FUR, sectors: [[135, 225, BELLY]], sides: 16, group: "head" },
+    { bone: skull, color: FUR, sectors: [[135, 225, BELLY]], sides: 12, group: "head" },
   );
   const face = b.surface(cranium);
   const front = (x: number, y: number) => face.ray(head.p([x, y, 0.4]), head.d([0, 0, -1]));
   for (const s of [1, -1]) {
     // Full cheeks and white whisker pads dotted with dark follicles.
-    head.part(new SphereGeometry(0.046, b.segments(14), b.segments(10)), FUR, {
+    head.part(new SphereGeometry(0.046, 8, 6), FUR, {
       at: [s * 0.056, -0.02, 0.055],
       scale: [0.85, 0.8, 1.35],
       group: "head",
     });
-    const pad = head.part(new SphereGeometry(0.03, b.segments(14), b.segments(10)), BELLY, {
+    const pad = head.part(new SphereGeometry(0.03, 8, 6), BELLY, {
       at: [s * 0.028, -0.03, 0.176],
       scale: [1, 0.85, 0.85],
       group: "head",
@@ -271,7 +271,7 @@ export default function build() {
       [68, 2],
     ]) {
       const dot = padSkin.around(pad.at).at(s * az, el);
-      if (dot) b.stick(new SphereGeometry(0.0028, 6, 4), SPOT, dot, { embed: 0.4, bone: skull });
+      if (dot) b.stick(new SphereGeometry(0.0028, 4, 3), SPOT, dot, { embed: 0.4, bone: skull });
     }
     // Whiskers fanning out and back from each pad.
     for (let i = 0; i < 4; i++) {
@@ -285,7 +285,7 @@ export default function build() {
     const eyeR = 0.021 * HEAD_SCALE;
     const socket = front(s * 0.048, 0.045);
     if (!socket) throw new Error("snowLeopard: no face under the eye");
-    const iris = b.part(new SphereGeometry(eyeR, b.segments(16), b.segments(12)), IRIS, {
+    const iris = b.part(new SphereGeometry(eyeR, 10, 7), IRIS, {
       bone: skull,
       at: offset(socket, gaze, -eyeR * 0.3),
       dir: gaze,
@@ -293,18 +293,18 @@ export default function build() {
       scale: [1, 1, 0.75],
       group: "head",
     });
-    b.part(new SphereGeometry(eyeR * 0.5, b.segments(12), b.segments(8)), PUPIL, {
+    b.part(new SphereGeometry(eyeR * 0.5, 7, 5), PUPIL, {
       frame: iris.moved([0, 0, eyeR * 0.62]),
       bone: skull,
       scale: [0.9, 1, 0.4],
       group: "head",
     });
-    b.part(new SphereGeometry(eyeR * 0.17, 8, 6), "#ffffff", {
+    b.part(new SphereGeometry(eyeR * 0.17, 5, 4), "#ffffff", {
       at: iris.local([-s * eyeR * 0.28, eyeR * 0.34, eyeR * 0.74]),
       bone: skull,
       group: "head",
     });
-    b.part(new TorusGeometry(eyeR * 1.02, 0.003, 6, b.segments(20)), LIP, {
+    b.part(new TorusGeometry(eyeR * 1.02, 0.003, 4, 12), LIP, {
       frame: iris,
       bone: skull,
       group: "head",
@@ -377,7 +377,7 @@ export default function build() {
   b.sweep([jaw.at, head.p([0, -0.058, 0.165])], (t) => [head.s(0.05 - 0.018 * t), head.s(0.02 - 0.003 * t)], {
     bone: jaw,
     color: BELLY,
-    sides: 12,
+    sides: 8,
     group: "jaw",
   });
   b.sweep([head.p([0, -0.045, 0.07]), head.p([0, -0.05, 0.145])], (t) => [head.s(0.024 - 0.006 * t), head.s(0.008)], {
@@ -398,19 +398,19 @@ export default function build() {
     minDist: 0.014,
     filter: (h) => h.n.y > 0.4,
   }))
-    b.stick(new CylinderGeometry(0.0038, 0.0038, 0.003, b.segments(12)), SPOT, hit, {
+    b.stick(new CylinderGeometry(0.0038, 0.0038, 0.003, 6), SPOT, hit, {
       embed: 0.5,
       scale: 0.55 + random() * 0.8,
     });
 
   // Broken rosettes: two or three dark arcs around a slightly darker centre, stuck on the skin so they bend with it.
   const rosette = (hit: FrameInput, r: number, tube: number) => {
-    b.stick(new CylinderGeometry(r * 0.75, r * 0.75, 0.004, b.segments(14)), ROSE_FILL, hit, { embed: 0.5 });
+    b.stick(new CylinderGeometry(r * 0.75, r * 0.75, 0.004, 8), ROSE_FILL, hit, { embed: 0.5 });
     const arcs = 2 + Math.floor(random() * 2);
     let start = random() * 360;
     for (let i = 0; i < arcs; i++) {
       const sweepDeg = 360 / arcs - 30 - random() * 25;
-      const geo = new TorusGeometry(r, tube, 4, b.segments(8), (sweepDeg * Math.PI) / 180).rotateX(Math.PI / 2);
+      const geo = new TorusGeometry(r, tube, 3, 6, (sweepDeg * Math.PI) / 180).rotateX(Math.PI / 2);
       b.stick(geo, ROSETTE, hit, { embed: 0.4, spin: start, scale: [1, 0.5, 1] });
       start += 360 / arcs;
     }

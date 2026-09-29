@@ -86,7 +86,7 @@ export default function build() {
       [tailFraction, DARK_BROWN],
     ],
     caps: { start: "round", end: "none" },
-    sides: 14,
+    sides: 12,
     group: "tail",
   });
   const body = b.loft(joinedStations, {
@@ -99,7 +99,7 @@ export default function build() {
     ],
     shift: (t) => [0, -0.045 * bellyDip(t)],
     caps: { start: "none", end: "round" },
-    sides: 14,
+    sides: 12,
     group: "body",
   });
 
@@ -127,7 +127,7 @@ export default function build() {
     );
     b.sweep(front, (t) => [0.078 - 0.045 * t, 0.092 - 0.055 * t], {
       color: FUR,
-      sides: 10,
+      sides: 8,
       caps: { start: "round", end: "flat" },
     });
     const frontPaw = front.joints[3];
@@ -161,7 +161,7 @@ export default function build() {
     );
     b.sweep(hind, (t) => [0.1 - 0.065 * t, 0.115 - 0.07 * t], {
       color: FUR,
-      sides: 10,
+      sides: 8,
       caps: { start: "round", end: "flat" },
     });
     const hindPaw = hind.joints[3];
@@ -192,7 +192,7 @@ export default function build() {
     { bone: skull, color: FUR, sectors: [[120, 240, BELLY]], sides: 10, group: "head" },
   );
   // The dark nose caps the pencil-thin muzzle.
-  head.part(new SphereGeometry(0.048, b.segments(12), b.segments(8)), NOSE, { at: [0, -0.045, 0.8], group: "head" });
+  head.part(new SphereGeometry(0.048, b.segments(8), b.segments(5)), NOSE, { at: [0, -0.045, 0.8], group: "head" });
   const jaw = head.joint("jaw", {
     parent: skull,
     at: [0, -0.08, 0.18],
@@ -213,15 +213,15 @@ export default function build() {
 
   // Eyes sit high on the wedge, with a warm iris and a tiny glint.
   for (const s of [1, -1]) {
-    head.part(new SphereGeometry(0.029, b.segments(10), b.segments(8)), IRIS, {
+    head.part(new SphereGeometry(0.029, b.segments(8), b.segments(5)), IRIS, {
       at: [s * 0.105, 0.075, 0.2],
       group: "head",
     });
-    head.part(new SphereGeometry(0.014, b.segments(8), b.segments(6)), EYE, {
+    head.part(new SphereGeometry(0.014, b.segments(6), b.segments(4)), EYE, {
       at: [s * 0.112, 0.077, 0.215],
       group: "head",
     });
-    head.part(new SphereGeometry(0.0045, b.segments(6), b.segments(5)), "#fff5dc", {
+    head.part(new SphereGeometry(0.0045, b.segments(4), b.segments(3)), "#fff5dc", {
       at: [s * 0.116, 0.087, 0.225],
       group: "head",
     });
@@ -283,7 +283,7 @@ export default function build() {
     minDist: 0.08,
     filter: (h) => h.n.y > 0.45 && h.at.z > -0.45 && h.at.z < 0.35,
   })) {
-    b.stick(new ConeGeometry(0.022, 0.075, b.segments(6)), BACK, hit, {
+    b.stick(new ConeGeometry(0.022, 0.075, b.segments(5)), BACK, hit, {
       embed: 0.45,
       flow: [0, 0, -1],
       scale: 0.65 + random() * 0.55,

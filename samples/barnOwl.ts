@@ -110,13 +110,13 @@ export default function build() {
 
   // Eyes sit on the disk, with warm irises and inset black pupils.
   for (const s of [1, -1]) {
-    const eye = b.part(new SphereGeometry(1, b.segments(10), b.segments(7)), EYE, {
+    const eye = b.part(new SphereGeometry(1, b.segments(10), b.segments(6)), EYE, {
       bone: head,
       at: head.local([s * 0.073, 0.253, 0.075]),
       scale: [0.043, 0.043, 0.02],
       group: "face",
     });
-    b.part(new SphereGeometry(1, b.segments(9), b.segments(6)), PUPIL, {
+    b.part(new SphereGeometry(1, b.segments(7), b.segments(5)), PUPIL, {
       bone: head,
       at: head.local([s * 0.073, 0.276, 0.075]),
       scale: [0.019, 0.019, 0.009],

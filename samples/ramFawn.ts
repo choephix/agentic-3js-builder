@@ -63,7 +63,7 @@ export default function build() {
       [125, 235, CREAM],
     ],
     shift: (t) => [0, -0.05 * belly(t)],
-    sides: 12,
+    sides: 10,
     group: "body",
   });
 
@@ -77,7 +77,7 @@ export default function build() {
       limb([s * 0.12, 0.78, 0.28], [s * 0.13, 0.1, 0.33], [0.37, 0.35], [0, 0, -1]),
       { parent: spine.joints[2], names: [`shoulder${side}`, `elbow${side}`], role: "leg", group: `legF${side}` },
     );
-    b.sweep(front, [0.075, 0.05, 0.042], { color: FLANK, sides: 10 });
+    b.sweep(front, [0.075, 0.05, 0.042], { color: FLANK, sides: 8 });
     const hind = b.chain(
       `legH${side}`,
       limb(
@@ -103,7 +103,7 @@ export default function build() {
         const thigh = Math.max(0, 1 - t / 0.45);
         return [0.042 + 0.04 * thigh, 0.045 + 0.075 * thigh];
       },
-      { color: FLANK, sides: 10 },
+      { color: FLANK, sides: 8 },
     );
     for (const leg of [front, hind]) {
       const ankle = leg.at(1).at;
@@ -177,8 +177,8 @@ export default function build() {
     });
   }
   for (const s of [1, -1]) {
-    head.part(new SphereGeometry(0.026, 12, 10), EYE, { at: [s * 0.085, 0.04, 0.12], group: "head" });
-    head.part(new SphereGeometry(0.008, 8, 6), "#ffffff", { at: [s * 0.1, 0.055, 0.135], group: "head" });
+    head.part(new SphereGeometry(0.026, 8, 6), EYE, { at: [s * 0.085, 0.04, 0.12], group: "head" });
+    head.part(new SphereGeometry(0.008, 5, 4), "#ffffff", { at: [s * 0.1, 0.055, 0.135], group: "head" });
     // Ears: a leaf pointing out and back, with a paler inner leaf just in front.
     const ear: V3[] = [
       [s * 0.08, 0.06, -0.02],
@@ -205,15 +205,15 @@ export default function build() {
     filter: (h) => h.n.y > 0.35 && h.at.z > -0.55 && h.at.z < 0.32,
   });
   for (const hit of dapples)
-    b.stick(new CylinderGeometry(0.028, 0.028, 0.01, 12), DAPPLE, hit, { embed: 0.5, scale: 0.7 + random() * 0.6 });
+    b.stick(new CylinderGeometry(0.028, 0.028, 0.01, 8), DAPPLE, hit, { embed: 0.5, scale: 0.7 + random() * 0.6 });
 
   // Collar: points ringed around the neck line, draped onto the real neck and swept as a closed loop.
   const around = b.ring(spine.at(0.8), { count: 10, radius: 0.18 });
   const collarPath = skin.drape(catmull(around.items, { closed: true }), { lift: 0.012 });
-  b.sweep(collarPath, 0.016, { color: COLLAR, group: "body" });
+  b.sweep(collarPath, 0.016, { color: COLLAR, sides: 6, group: "body" });
   let lowest = collarPath.at(0);
   for (let i = 1; i < 60; i++) if (collarPath.at(i / 60).y < lowest.y) lowest = collarPath.at(i / 60);
-  b.part(new SphereGeometry(0.03, 12, 10), BELL, { at: offset(lowest, [0, -1, 0.3], 0.032), group: "body" });
+  b.part(new SphereGeometry(0.03, 8, 6), BELL, { at: offset(lowest, [0, -1, 0.3], 0.032), group: "body" });
 
   // Rest-pose edits after building: open the jaw a little and lift the tail.
   b.pose(jaw, { axis: [1, 0, 0], deg: 10 });

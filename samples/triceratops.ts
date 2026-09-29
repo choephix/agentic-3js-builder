@@ -155,7 +155,7 @@ export default function build() {
       [120, 240, BELLY],
     ],
     shift: (t) => [0, -0.12 * belly(zAt(t))],
-    sides: 18,
+    sides: 12,
     group: "body",
   });
 
@@ -187,7 +187,7 @@ export default function build() {
         [-55, 55, BACK],
         [145, 215, MOUTH],
       ],
-      sides: 16,
+      sides: 10,
       group: "head",
     },
   );
@@ -213,7 +213,7 @@ export default function build() {
         [-40, 40, MOUTH],
         [125, 235, BELLY],
       ],
-      sides: 14,
+      sides: 10,
       group: "jaw",
     },
   );
@@ -236,7 +236,8 @@ export default function build() {
       y: head.d([0, 1, 0]),
       thickness: [0.1, 0.27],
       bevel: 0.05,
-      smoothing: 2,
+      smoothing: 1,
+      detail: 0.5,
       color: BEAK,
       bone: skull,
       group: "head",
@@ -257,7 +258,8 @@ export default function build() {
       y: head.d([0, 1, 0]),
       thickness: [0.12, 0.18],
       bevel: 0.04,
-      smoothing: 2,
+      smoothing: 1,
+      detail: 0.5,
       color: BEAK,
       bone: jaw,
       group: "jaw",
@@ -271,8 +273,8 @@ export default function build() {
     if (side) {
       const gaze = head.d([s * 0.85, 0.25, 0.3]).normalize();
       const eye = offset(side.at, side.n, -0.02);
-      b.part(new SphereGeometry(0.075, 16, 12), EYE, { bone: skull, at: eye, group: "head" });
-      b.part(new SphereGeometry(0.038, 10, 8), PUPIL, { bone: skull, at: offset(eye, gaze, 0.056), group: "head" });
+      b.part(new SphereGeometry(0.075, 8, 6), EYE, { bone: skull, at: eye, group: "head" });
+      b.part(new SphereGeometry(0.038, 6, 4), PUPIL, { bone: skull, at: offset(eye, gaze, 0.056), group: "head" });
       b.lathe(
         [
           [0.05, -0.015],
@@ -281,7 +283,15 @@ export default function build() {
           [0.075, 0.028],
           [0.052, 0.015],
         ],
-        { at: offset(eye, gaze, 0.031), axis: gaze, smoothing: 1, color: HIDE, bone: skull, group: "head" },
+        {
+          at: offset(eye, gaze, 0.031),
+          axis: gaze,
+          segments: 8,
+          smoothing: 0,
+          color: HIDE,
+          bone: skull,
+          group: "head",
+        },
       );
     }
 
@@ -296,7 +306,7 @@ export default function build() {
           [0.1, 0.08],
           [0, 0.09, "sharp"],
         ],
-        { at: brow, axis: brow, smoothing: 1, color: HIDE, bone: skull, group: "head" },
+        { at: brow, axis: brow, segments: 8, smoothing: 1, color: HIDE, bone: skull, group: "head" },
       );
       const rise = head.d([s * 0.2, 0.8, 0.55]).normalize();
       const reach = head.d([s * 0.12, 0.3, 1]).normalize();
@@ -313,7 +323,7 @@ export default function build() {
             [0.72, HORN],
             [1, HORN_TIP],
           ],
-          sides: 14,
+          sides: 8,
           group: "head",
         },
       );
@@ -333,6 +343,7 @@ export default function build() {
         {
           at: cheek,
           axis: head.d([s * 0.8, -0.55, -0.1]),
+          segments: 8,
           smoothing: 1,
           color: HORN,
           bone: skull,
@@ -343,7 +354,7 @@ export default function build() {
     // Nostrils high on the snout just behind the beak.
     const nose = upperSkin.ray(head.p([s * 1, 0.04, 0.9]), head.d([-s, -0.3, 0]));
     if (nose)
-      b.stick(new SphereGeometry(0.5, 10, 6), PUPIL, nose, {
+      b.stick(new SphereGeometry(0.5, 6, 4), PUPIL, nose, {
         bone: skull,
         flow: head.d([0, 0.4, 1]),
         scale: [0.04, 0.02, 0.08],
@@ -363,7 +374,7 @@ export default function build() {
         [0.045, 0.2],
         [0, 0.36, "sharp"],
       ],
-      { at: nasal, axis: head.d([0, 1, 0.45]), smoothing: 1, color: HORN, bone: skull, group: "head" },
+      { at: nasal, axis: head.d([0, 1, 0.45]), segments: 8, smoothing: 1, color: HORN, bone: skull, group: "head" },
     );
 
   // ---------------------------------------------------------------- frill
@@ -383,7 +394,8 @@ export default function build() {
     y: frillY,
     thickness: [t0, t1],
     bevel: 0.025,
-    smoothing: 2,
+    smoothing: 1,
+    detail: 0.5,
     color: RIM,
     bone: skull,
     group: "head",
@@ -407,7 +419,8 @@ export default function build() {
     y: frillY,
     thickness: [thick(Math.min(...coreYs)) + e, thick(Math.max(...coreYs)) + e],
     bevel: 0.014,
-    smoothing: 2,
+    smoothing: 1,
+    detail: 0.5,
     color: FRILL,
     bone: skull,
     group: "head",
@@ -435,7 +448,8 @@ export default function build() {
           {
             at: onFace(shrink(rimPoint(tt, 0), 0.6), face),
             axis,
-            smoothing: 1,
+            segments: 8,
+            smoothing: 0,
             color: SPOT,
             bone: skull,
             group: "head",
@@ -521,7 +535,7 @@ export default function build() {
       const rx = leg.rx.map((r, i) => [chain.ts[i], r] as const);
       const ry = leg.ry.map((r, i) => [chain.ts[i], r] as const);
       legTubes.push(
-        b.sweep(chain, (t) => [interp(rx, t), interp(ry, t)], { to: chain.ts[3], color: HIDE, sides: 14, group }),
+        b.sweep(chain, (t) => [interp(rx, t), interp(ry, t)], { to: chain.ts[3], color: HIDE, sides: 10, group }),
       );
       const footJoint = chain.joints[3];
       const [padR, padH] = leg.pad;
@@ -534,7 +548,7 @@ export default function build() {
           [padR * 0.78, padH],
           [0, padH, "sharp"],
         ],
-        { at: [end.x, 0, end.z], smoothing: 2, color: PAD, bone: footJoint, group },
+        { at: [end.x, 0, end.z], segments: 10, smoothing: 1, color: PAD, bone: footJoint, group },
       );
       b.ring(
         frame(pad, [0, 1, 0]),
@@ -546,7 +560,8 @@ export default function build() {
             y: [0, 1, 0],
             thickness: leg.kind === "hind" ? 0.14 : 0.1,
             bevel: 0.02,
-            smoothing: 2,
+            smoothing: 1,
+            detail: 0.34,
             color: NAIL,
             bone: footJoint,
             group,
@@ -574,8 +589,8 @@ export default function build() {
       b.lathe(tubercle(r * (0.75 + random() * 0.5)), {
         at: hit,
         axis: hit,
-        segments: 7,
-        smoothing: 1,
+        segments: 6,
+        smoothing: 0,
         color: colors[Math.floor(random() * colors.length)],
       });
 

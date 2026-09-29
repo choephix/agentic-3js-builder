@@ -153,6 +153,8 @@ const CORNER_SPLIT = 20 * (Math.PI / 180);
 const turnLimit = (sides: number) => (2 * Math.PI) / Math.max(sides, 8);
 /** Closest spacing of rings along a tube, as a share of the edge length around it (unless a joint or cut needs one). */
 const RING_GAP = 0.7;
+/** Farthest a chord between rings may stray from the path, as a share of the local radius (0.15 × the widest at least). */
+const SAG = 0.5;
 
 /** Smooth interpolation through (xs[i], ys[i]); linear for 2 keys. */
 export function interpolate(xs: readonly number[], ys: readonly number[], x: number) {
@@ -784,8 +786,15 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const weld = seamSmooth && bounds.length === 2;
   const tags = { name: options.name ?? "sweep", group: options.group };
   const span = (to - from) * L;
-  // Smooth skin: rings at the edges and centre of every joint's blend window, so the bend has a middle.
-  const windowUs = rigidSkin ? [] : jointUs.flatMap((u, i) => [-1, 0, 1].map((f) => u + (f * half(i + 1)) / span));
+  // Smooth skin: rings at the edges and centre of every joint's blend window, so the bend has a middle. Where the
+  // window is narrower than the ring gap (a thick body on short spans), the middle ring alone.
+  const windowUs = rigidSkin
+    ? []
+    : jointUs.flatMap((u, i) => {
+        const w = half(i + 1);
+        const wide = w >= (RING_GAP * 2 * Math.PI * rMaxAt(boneTs[i + 1])) / sides;
+        return (wide ? [-1, 0, 1] : [0]).map((f) => u + (f * w) / span);
+      });
   const filletUs = fillets.flatMap((f) =>
     Array.from({ length: 7 }, (_, k) => toU((f.s0 + ((f.s1 - f.s0) * (k + 1)) / 8) / L)),
   );
@@ -856,11 +865,17 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
       if ((cand[j].t - cand[k].t) * span < gap(cand[k])) return true;
       if (cand[k].T.angleTo(cand[j].T) > maxTurn || cand[k].N.angleTo(cand[j].N) > maxTurn) return false;
       const [ka, kb] = [keys(cand[k]), keys(cand[j])];
+      const chord = cand[j].c.clone().sub(cand[k].c);
+      const chordSq = Math.max(chord.lengthSq(), 1e-18);
       for (let m = k + 1; m < j; m++) {
         const s = (cand[m].t - cand[k].t) / (cand[j].t - cand[k].t);
         const km = keys(cand[m]);
         for (let axis = 0; axis < km.length; axis++)
           if (Math.abs(km[axis] - (ka[axis] + (kb[axis] - ka[axis]) * s)) > tol) return false;
+        // A thin tube still follows its path: the chord between rings strays at most half its radius from it.
+        const off = cand[m].c.clone().sub(cand[k].c);
+        const stray = off.addScaledVector(chord, -off.dot(chord) / chordSq).length();
+        if (stray > SAG * Math.max(Math.min(...cand[m].r), 0.15 * rmax)) return false;
       }
       return true;
     };

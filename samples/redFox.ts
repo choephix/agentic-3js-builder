@@ -131,7 +131,7 @@ export default function build() {
       [125, 235, WHITE, tailBaseT, 1],
     ],
     shift: (t) => [0, bellySag(Math.max(t, tailBaseT))],
-    sides: 16,
+    sides: 12,
     group: "body",
   });
 
@@ -142,7 +142,7 @@ export default function build() {
     minDist: 0.05,
     filter: (h) => h.n.y > 0.4 && h.at.z < 0.25 && h.at.z > -0.28,
   })) {
-    b.stick(new CylinderGeometry(0.003, 0.003, 0.004, 6), RED_BACK, hit, {
+    b.stick(new CylinderGeometry(0.003, 0.003, 0.004, 5), RED_BACK, hit, {
       embed: 0.5,
       scale: [1, 1, 2.2],
       flow: [0, 0, -1],
@@ -159,17 +159,13 @@ export default function build() {
     [0.46, 0.3, 0.11, 0.12, 0.016, 3], // neck1
     [0.52, 0.36, 0.09, 0.1, 0.014, 4], // neck2
   ]) {
-    b.part(
-      new CylinderGeometry((width as number) * 0.4, (width as number) * 0.5, len as number, b.segments(12)),
-      WHITE,
-      {
-        bone: spine.joints[jointIndex as number],
-        at: [0, yOff as number, zOff as number],
-        dir: [0, -0.4, 0.9],
-        scale: [1, 1, (thick as number) / ((width as number) * 0.5)],
-        group: "body",
-      },
-    );
+    b.part(new CylinderGeometry((width as number) * 0.4, (width as number) * 0.5, len as number, 8), WHITE, {
+      bone: spine.joints[jointIndex as number],
+      at: [0, yOff as number, zOff as number],
+      dir: [0, -0.4, 0.9],
+      scale: [1, 1, (thick as number) / ((width as number) * 0.5)],
+      group: "body",
+    });
   }
 
   // Fur spikes along the chest bib giving pointed winter coat fluff
@@ -275,7 +271,7 @@ export default function build() {
       to: t3,
       color: BLACK,
       bands: [[sockT, RED_FOX]],
-      sides: 14,
+      sides: 10,
       caps: { start: "round", end: "flat" },
       group: chain.name,
     });
@@ -296,7 +292,7 @@ export default function build() {
       {
         bone: pawJoint,
         color: BLACK,
-        sides: 12,
+        sides: 8,
         group: chain.name,
       },
     );
@@ -306,7 +302,7 @@ export default function build() {
     const toeXs = [-0.016, -0.006, 0.006, 0.016];
     for (const dx of toeXs) {
       const toeCenter: V3 = [tipPt.x + dx * s, pawH * 0.85, tipPt.z + (Math.abs(dx) > 0.01 ? -0.006 : toeDz)];
-      b.part(new SphereGeometry(0.011, b.segments(10), b.segments(8)), BLACK, {
+      b.part(new SphereGeometry(0.011, 6, 4), BLACK, {
         bone: pawJoint,
         at: toeCenter,
         scale: [0.95, 0.8, 1.1],
@@ -337,7 +333,7 @@ export default function build() {
   // Dark supracaudal scent gland mark (violet gland) near the tail base
   const glandT = tailBaseT * 0.88;
   const glandPt = tail.at((hipsT - glandT) / hipsT);
-  b.part(new CylinderGeometry(0.012, 0.012, 0.004, 12), VIOLET_GLAND, {
+  b.part(new CylinderGeometry(0.012, 0.012, 0.004, 8), VIOLET_GLAND, {
     bone: glandPt.bone ?? tail.joints[0],
     at: [0, glandPt.at.y + tailRadius(glandT)[1] - 0.001, glandPt.at.z],
     dir: [0, 1, 0],
@@ -375,7 +371,7 @@ export default function build() {
         [-60, 60, RED_BACK], // Deep red forehead
         [120, 240, WHITE], // White throat and underside of muzzle
       ],
-      sides: 16,
+      sides: 12,
       group: "head",
     },
   );
@@ -386,7 +382,7 @@ export default function build() {
   // Symmetric facial features (ears, eyes, whisker pads, cheeks)
   for (const s of [1, -1]) {
     // 1. Prominent white cheek ruffs extending flared out from jawline
-    head.part(new SphereGeometry(0.035, b.segments(12), b.segments(8)), WHITE, {
+    head.part(new SphereGeometry(0.035, 8, 6), WHITE, {
       at: [s * 0.052, -0.015, 0.04],
       scale: [1.2, 0.8, 1.4],
       group: "head",
@@ -409,7 +405,7 @@ export default function build() {
     }
 
     // 2. White whisker pad beside the muzzle
-    const pad = head.part(new SphereGeometry(0.02, b.segments(12), b.segments(8)), WHITE, {
+    const pad = head.part(new SphereGeometry(0.02, 7, 5), WHITE, {
       at: [s * 0.024, -0.012, 0.145],
       scale: [0.9, 0.8, 1.2],
       group: "head",
@@ -424,7 +420,7 @@ export default function build() {
       [60, -2],
     ]) {
       const dot = padSkin.around(pad.at).at(s * az, el);
-      if (dot) b.stick(new SphereGeometry(0.0018, 6, 4), BLACK, dot, { embed: 0.35, bone: skull });
+      if (dot) b.stick(new SphereGeometry(0.0018, 4, 3), BLACK, dot, { embed: 0.35, bone: skull });
     }
 
     // 3. Delicate whiskers
@@ -506,7 +502,7 @@ export default function build() {
     const eyePos = socket ? offset(socket, gaze, -eyeR * 0.2) : head.p([s * 0.038, 0.032, 0.075]);
 
     // Iris
-    const iris = b.part(new SphereGeometry(eyeR, b.segments(14), b.segments(10)), AMBER_EYE, {
+    const iris = b.part(new SphereGeometry(eyeR, 8, 6), AMBER_EYE, {
       bone: skull,
       at: eyePos,
       dir: gaze,
@@ -516,7 +512,7 @@ export default function build() {
     });
 
     // Vertical slit pupil
-    b.part(new SphereGeometry(eyeR * 0.52, b.segments(10), b.segments(8)), PUPIL, {
+    b.part(new SphereGeometry(eyeR * 0.52, 6, 4), PUPIL, {
       frame: iris.moved([0, 0, eyeR * 0.62]),
       bone: skull,
       scale: [0.35, 1.05, 0.4],
@@ -524,14 +520,14 @@ export default function build() {
     });
 
     // Specular highlight
-    b.part(new SphereGeometry(eyeR * 0.16, 6, 6), EYE_SHINE, {
+    b.part(new SphereGeometry(eyeR * 0.16, 4, 3), EYE_SHINE, {
       at: iris.local([-s * eyeR * 0.22, eyeR * 0.32, eyeR * 0.7]),
       bone: skull,
       group: "head",
     });
 
     // Black eyeliner rim around the eye
-    b.part(new TorusGeometry(eyeR * 1.02, 0.0024, 6, b.segments(16)), PUPIL, {
+    b.part(new TorusGeometry(eyeR * 1.02, 0.0024, 4, 12), PUPIL, {
       frame: iris,
       bone: skull,
       group: "head",
@@ -594,7 +590,7 @@ export default function build() {
   b.sweep([jaw.at, head.p([0, -0.042, 0.175])], (t) => [head.s(0.038 - 0.016 * t), head.s(0.016 - 0.004 * t)], {
     bone: jaw,
     color: WHITE,
-    sides: 12,
+    sides: 8,
     caps: { start: "round", end: "point" },
     group: "jaw",
   });

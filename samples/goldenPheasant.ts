@@ -137,7 +137,8 @@ const TAIL_COVERT = svg(
   { size: 128 },
 );
 
-const PRIMARY_OUTLINE = "M9 128 C7 112 3 92 2.5 64 C2 36 4 14 9 3 C12 -1 17 2 20 10 C22.5 22 23 48 22.5 74 C22 98 17 116 11 128 Z";
+const PRIMARY_OUTLINE =
+  "M9 128 C7 112 3 92 2.5 64 C2 36 4 14 9 3 C12 -1 17 2 20 10 C22.5 22 23 48 22.5 74 C22 98 17 116 11 128 Z";
 /** A primary: blackish-brown, the narrow outer vane (left) barred buff, a pale shaft. `mirror` flips it. */
 const primary = (mirror: boolean) =>
   svg(
@@ -250,7 +251,7 @@ export default function build() {
   });
   // Head local axes: +Y forward, +Z up, +X toward the bird's right.
   const skull = b.part(
-    new SphereGeometry(1, b.segments(14), b.segments(10)),
+    new SphereGeometry(1, b.segments(8), b.segments(6)),
     gradient(THROAT, GOLD, head.local([0, 0, -0.002]), head.local([0, 0, 0.013])),
     { bone: head, frame: head.moved([0, 0.01, 0.004]), scale: [0.017, 0.023, 0.019], group: "head" },
   );
@@ -267,8 +268,7 @@ export default function build() {
       at: head.local([0, 0.027, 0.0]),
       axis: head.dir([0, 1, -0.3]),
       bone: head,
-      smoothing: 1,
-      segments: 12,
+      segments: 8,
       color: BEAK,
       group: "head",
       name: "beakUpper",
@@ -289,7 +289,15 @@ export default function build() {
       [0.0035, 0.011],
       [0, 0.0165],
     ],
-    { at: jaw.local([0, 0.002, 0]), axis: jaw.axis, bone: jaw, smoothing: 1, segments: 10, color: BEAK, group: "head", name: "beakLower" },
+    {
+      at: jaw.local([0, 0.002, 0]),
+      axis: jaw.axis,
+      bone: jaw,
+      segments: 8,
+      color: BEAK,
+      group: "head",
+      name: "beakLower",
+    },
   );
 
   const headSkin = b.surface(skull);
@@ -306,7 +314,15 @@ export default function build() {
         [0.0068, 0.0016],
         [0, 0.0022],
       ],
-      { at: offset(eye, n, -0.0012), axis: n, bone: head, segments: 14, color: SKIN, group: "head", name: `eyeSkin${side}` },
+      {
+        at: offset(eye, n, -0.0012),
+        axis: n,
+        bone: head,
+        segments: 8,
+        color: SKIN,
+        group: "head",
+        name: `eyeSkin${side}`,
+      },
     );
     b.lathe(
       [
@@ -316,7 +332,7 @@ export default function build() {
         [0.003, 0.0034],
         [0, 0.0039],
       ],
-      { at: eye, axis: n, bone: head, smoothing: 1, segments: 14, color: IRIS, group: "head", name: `eye${side}` },
+      { at: eye, axis: n, bone: head, segments: 8, color: IRIS, group: "head", name: `eye${side}` },
     );
     b.lathe(
       [
@@ -325,7 +341,15 @@ export default function build() {
         [0.0018, 0.0008],
         [0, 0.0011],
       ],
-      { at: offset(eye, n, 0.0033), axis: n, bone: head, segments: 10, color: PUPIL, group: "head", name: `pupil${side}` },
+      {
+        at: offset(eye, n, 0.0033),
+        axis: n,
+        bone: head,
+        segments: 6,
+        color: PUPIL,
+        group: "head",
+        name: `pupil${side}`,
+      },
     );
   }
 
@@ -370,7 +394,16 @@ export default function build() {
         eyes.every((e) => e.distanceTo(h.at) > 0.0085),
     }),
     CONTOUR,
-    { size: [0.007, 0.009], lean: 82, flow: [0, -0.5, -1], vary: 0.2, rng: rng(14), color: THROAT, bone: head, group: "head" },
+    {
+      size: [0.007, 0.009],
+      lean: 82,
+      flow: [0, -0.5, -1],
+      vary: 0.2,
+      rng: rng(14),
+      color: THROAT,
+      bone: head,
+      group: "head",
+    },
   );
 
   // ---- Body plumage: every feather a card, tinted or drawn per region ---------------------------------------
@@ -409,11 +442,16 @@ export default function build() {
     name: "nape",
   });
   // The rufous foreneck gets its own finer, denser scatter.
-  b.cards(
-    bodySkin.scatter(90, { rng: rng(5), minDist: 0.0055, filter: (h) => regionOf(h) === "throat" }),
-    CONTOUR,
-    { size: [0.011, 0.014], lean: 78, flow: [0, -1, 0], vary: 0.2, spin: 10, rng: rng(5), color: THROAT, group: "neck" },
-  );
+  b.cards(bodySkin.scatter(90, { rng: rng(5), minDist: 0.0055, filter: (h) => regionOf(h) === "throat" }), CONTOUR, {
+    size: [0.011, 0.014],
+    lean: 78,
+    flow: [0, -1, 0],
+    vary: 0.2,
+    spin: 10,
+    rng: rng(5),
+    color: THROAT,
+    group: "neck",
+  });
   b.cards(byRegion("mantle"), MANTLE_FEATHER, {
     size: [0.022, 0.028],
     lean: 76,
@@ -456,7 +494,17 @@ export default function build() {
       filter: (h) => h.at.z < -0.1 && h.n.y > -0.25 && h.n.z > -0.55,
     }),
     TAIL_COVERT,
-    { size: [0.016, 0.15], lean: 84, flow: [0, -0.12, -1], bend: 8, vary: 0.25, spin: 6, rng: rng(10), group: "body", name: "tailCoverts" },
+    {
+      size: [0.016, 0.15],
+      lean: 84,
+      flow: [0, -0.12, -1],
+      bend: 8,
+      vary: 0.25,
+      spin: 6,
+      rng: rng(10),
+      group: "body",
+      name: "tailCoverts",
+    },
   );
 
   // ---- Tail: a roof of rectrices over a five-joint chain -----------------------------------------------------
@@ -483,20 +531,26 @@ export default function build() {
         const t = (len * i) / 6;
         return tailPath
           .at(t)
-          .add(new Vector3(s * (0.004 + 0.012 * k) * (0.7 + 0.6 * t), -0.009 * k * (0.6 + t) + (s > 0 ? 0.0012 : 0), 0));
+          .add(
+            new Vector3(s * (0.004 + 0.012 * k) * (0.7 + 0.6 * t), -0.009 * k * (0.6 + t) + (s > 0 ? 0.0012 : 0), 0),
+          );
       });
       const roof = 16 * k * (Math.PI / 180);
       // Only the joints this feather reaches: a joint past its tip would take the tip with it.
       const reach = tail.joints.filter((j) => j.at.z > pts[6].z + 0.02);
-      const feather = b.sweep(catmull(pts), (t) => [Math.max(half * Math.min(1, 0.55 + 2.2 * t) * Math.min(1, (1 - t) * 3.2), 0.002), 0.0014], {
-        bone: reach,
-        section: "box",
-        up: [s * Math.sin(roof), Math.cos(roof), 0],
-        caps: "flat",
-        color: reticulated,
-        group: "tail",
-        name: "rectrix",
-      });
+      const feather = b.sweep(
+        catmull(pts),
+        (t) => [Math.max(half * Math.min(1, 0.55 + 2.2 * t) * Math.min(1, (1 - t) * 3.2), 0.002), 0.0014],
+        {
+          bone: reach,
+          section: "box",
+          up: [s * Math.sin(roof), Math.cos(roof), 0],
+          caps: "flat",
+          color: reticulated,
+          group: "tail",
+          name: "rectrix",
+        },
+      );
       b.sweep(feather.line(0, 0.0002).slice(0.02, 0.97), 0.0009, {
         bone: reach,
         sides: 4,
@@ -539,12 +593,30 @@ export default function build() {
     b.cards(
       b.surface(web).scatter(90, { rng: rng(20 + s), minDist: 0.007, filter: (h) => h.n.y > 0.4 }),
       COVERT_FEATHER,
-      { size: [0.018, 0.026], lean: 78, flow: [0, 0, -1], bend: 8, vary: 0.2, spin: 8, rng: rng(22 + s), color: wingPaint, group: g },
+      {
+        size: [0.018, 0.026],
+        lean: 78,
+        flow: [0, 0, -1],
+        bend: 8,
+        vary: 0.2,
+        spin: 8,
+        rng: rng(22 + s),
+        color: wingPaint,
+        group: g,
+      },
     );
 
     // One flight feather: a card laid flat from `root`, pointing along `dir`.
     const flight = (root: Vector3, dir: Vector3, len: number, w: number, tex: Texture, bone: Joint) =>
-      b.cards([frame(root, [0, 1, 0])], tex, { size: [w, len], lean: 90, flow: dir, bend: 7, sink: 0.05, bone, group: g });
+      b.cards([frame(root, [0, 1, 0])], tex, {
+        size: [w, len],
+        lean: 90,
+        flow: dir,
+        bend: 7,
+        sink: 0.05,
+        bone,
+        group: g,
+      });
 
     // Tertials: blue, from the upper arm, reaching back beside the rump.
     for (let i = 0; i < 4; i++) {
@@ -607,7 +679,16 @@ export default function build() {
     b.cards(
       b.surface(legTube).scatter(40, { rng: rng(30 + s), minDist: 0.006, filter: (h) => h.at.y > 0.1 }),
       CONTOUR,
-      { size: [0.013, 0.02], lean: 62, flow: [0, -1, 0.1], bend: 10, vary: 0.2, rng: rng(32 + s), color: THIGH, group: g },
+      {
+        size: [0.013, 0.02],
+        lean: 62,
+        flow: [0, -1, 0.1],
+        bend: 10,
+        vary: 0.2,
+        rng: rng(32 + s),
+        color: THIGH,
+        group: g,
+      },
     );
     const [, , tarsus, ball] = leg.joints;
     const b0 = new Vector3(ball.at.x, TOE_R, ball.at.z);
@@ -620,11 +701,21 @@ export default function build() {
     for (const [dx, l, fwd] of toes) {
       const dir = new Vector3(dx / 0.046, 0, fwd).normalize();
       const tip = b0.clone().addScaledVector(dir, l).setY(0.0045);
-      b.capsule(b0, tip, [0.0055, 0.004], { bone: ball, color: LEG, group: g });
-      b.spike(tip, dir.clone().add(new Vector3(0, -0.4, 0)), 0.009, 0.0028, { bone: ball, color: CLAW, group: g });
+      b.capsule(b0, tip, [0.0055, 0.004], { bone: ball, color: LEG, sides: 6, group: g });
+      b.spike(tip, dir.clone().add(new Vector3(0, -0.4, 0)), 0.009, 0.0028, {
+        bone: ball,
+        color: CLAW,
+        sides: 5,
+        group: g,
+      });
     }
     // The male's spur, low on the back of the tarsus.
-    b.spike(lerp(tarsus.at, ball.at, 0.7), [0, -0.2, -1], 0.012, 0.003, { bone: tarsus, color: CLAW, group: g });
+    b.spike(lerp(tarsus.at, ball.at, 0.7), [0, -0.2, -1], 0.012, 0.003, {
+      bone: tarsus,
+      color: CLAW,
+      sides: 5,
+      group: g,
+    });
   }
 
   return b.root;

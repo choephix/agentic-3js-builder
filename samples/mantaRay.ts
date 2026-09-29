@@ -104,7 +104,7 @@ export default function build() {
     color: BACK,
     sectors: [[125, 235, MARGIN]],
     caps: { start: "round", end: "none" },
-    sides: 24,
+    sides: 12,
     group: "tail",
   });
   const body = b.loft(bodyStations, {
@@ -113,7 +113,7 @@ export default function build() {
     color: BACK,
     sectors: [[100, 260, BELLY]],
     caps: { start: "none", end: "round" },
-    sides: 24,
+    sides: 12,
     group: "body",
   });
 
@@ -125,7 +125,7 @@ export default function build() {
       { at: [0, Y0 + 0.012, 0.92], w: 0.8, h: 0.15 },
       { at: [0, Y0 + 0.02, 1.0], w: 0.74, h: 0.09 },
     ],
-    { bone: head, color: BACK, sectors: [[110, 250, BELLY]], sides: 24, group: "head" },
+    { bone: head, color: BACK, sectors: [[110, 250, BELLY]], sides: 16, group: "head" },
   );
   const skin = b.surface([body, headLoft]);
 
@@ -152,6 +152,7 @@ export default function build() {
       y: [0, 0, 1],
       thickness: 0.05,
       bevel: 0.015,
+      detail: 0.5,
       smoothing: 1,
       color: MOUTH,
       group: "jaw",
@@ -169,7 +170,12 @@ export default function build() {
         [s * (x0 + 0.11), Y0 - 0.4, z + 0.018],
         [s * (x0 + 0.23), Y0 - 0.4, z - 0.004],
       ];
-      b.sweep(skin.drape(catmull(draft), { lift: 0.003 }), 0.009, { bone: spine1, color: GILL, group: "body" });
+      b.sweep(skin.drape(catmull(draft), { lift: 0.003 }), 0.009, {
+        bone: spine1,
+        color: GILL,
+        sides: 5,
+        group: "body",
+      });
     }
 
   // Belly spots between and behind the gills, each on its own patch of skin.
@@ -179,7 +185,7 @@ export default function build() {
     filter: (h) => h.n.y < -0.8 && Math.abs(h.at.x) < 0.3 && h.at.z < 0.62 && h.at.z > -0.45,
   })) {
     const r = 0.018 + 0.022 * random();
-    b.stick(new CylinderGeometry(r, r, 0.006, 12), SPOT, hit, { embed: 0.5, group: "body" });
+    b.stick(new CylinderGeometry(r, r, 0.006, 8), SPOT, hit, { embed: 0.5, group: "body" });
   }
 
   // ---------------------------------------------------------------- Wings
@@ -230,7 +236,7 @@ export default function build() {
       shift: (t) => [s * 0.05 * Math.sin(Math.PI * t), 0],
       color: BACK,
       sectors: [[...clock(94, 266), BELLY]],
-      sides: 28,
+      sides: 16,
       extend: [0.2, 0],
       group: `wing${side}`,
     });
@@ -254,7 +260,7 @@ export default function build() {
       b.membrane(edge(k), edge(k + 1), {
         thickness: 0.003,
         rows: 1,
-        cols: 22,
+        cols: 11,
         bone: wing,
         color: k === 0 ? SHOULDER_EDGE : SHOULDER,
         group: `wing${side}`,
@@ -322,9 +328,9 @@ export default function build() {
         [0.009, 0.014],
         [0, 0.016],
       ],
-      { at: eyeHit, axis: gaze, bone: head, smoothing: 2, color: LENS, group: "head" },
+      { at: eyeHit, axis: gaze, bone: head, color: LENS, group: "head" },
     );
-    b.part(new SphereGeometry(0.004, 8, 6), GLINT, { bone: head, at: lens.local([0.005, 0.014, 0.005]) });
+    b.part(new SphereGeometry(0.004, 4, 3), GLINT, { bone: head, at: lens.local([0.005, 0.014, 0.005]) });
 
     const spiracle = skin.ray([s * 0.3, Y0 + 1, 0.62], [0, -1, 0]);
     if (spiracle)
@@ -335,7 +341,7 @@ export default function build() {
           [0.022, 0.006],
           [0.014, 0.004],
         ],
-        { at: spiracle, axis: spiracle.n, bone: head, smoothing: 1, color: GAPE, group: "head" },
+        { at: spiracle, axis: spiracle.n, bone: head, color: GAPE, group: "head" },
       );
 
     // ---------------------------------------------------------------- Pelvic fins and claspers
@@ -355,7 +361,8 @@ export default function build() {
         y: [0, 0, -1],
         thickness: 0.026,
         bevel: 0.008,
-        smoothing: 2,
+        detail: 0.5,
+        smoothing: 1,
         color: BACK,
         group: "body",
       },
@@ -381,7 +388,8 @@ export default function build() {
       bone: tail1,
       thickness: [0.03, 0.006],
       bevel: 0.006,
-      smoothing: 2,
+      detail: 0.5,
+      smoothing: 1,
       color: BACK,
       group: "tail",
     },
@@ -414,7 +422,7 @@ export default function build() {
         [0.05 * L, 0.97 * L],
         [0, L],
       ],
-      { at: tailEnd, axis: [0, 0, 1], bone, smoothing: 2, color: REMORA, group: "remoras" },
+      { at: tailEnd, axis: [0, 0, 1], bone, smoothing: 1, color: REMORA, group: "remoras" },
     );
     // Dark lateral stripe, the forked tail and the long dorsal and anal fins.
     for (const s of [1, -1])
@@ -473,8 +481,7 @@ export default function build() {
         at: fish.local([0, 0.78 * L, R * 0.9]),
         axis: [0, 1, 0],
         bone,
-        segments: 20,
-        smoothing: 1,
+        segments: 12,
         color: DISC,
         group: "remoras",
       },

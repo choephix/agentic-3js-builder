@@ -146,7 +146,7 @@ export default function build() {
     color: colorAt,
     sectors: [[135, 225, BELLY]],
     caps: { end: "none" },
-    sides: 16,
+    sides: 10,
     group: "tail",
   });
   const bodyTube = b.sweep(fullPath, radiusAt, {
@@ -160,7 +160,7 @@ export default function build() {
       [228, 240, STRIPE],
     ],
     caps: { start: "none" },
-    sides: 16,
+    sides: 12,
     group: "body",
   });
 
@@ -185,7 +185,7 @@ export default function build() {
   ] as const;
   b.loft(
     upperKeys.map(([z, y, w, h]) => ({ at: head.p([0, y, z]), w, h })),
-    { bone: skull, color: GREEN, sectors: [[135, 225, MOUTH]], sides: 14, group: "head" },
+    { bone: skull, color: GREEN, sectors: [[135, 225, MOUTH]], sides: 12, group: "head" },
   );
   const jaw = head.joint("jaw", {
     parent: skull,
@@ -209,7 +209,7 @@ export default function build() {
         [-45, 45, MOUTH],
         [130, 230, LIME],
       ],
-      sides: 12,
+      sides: 10,
       group: "jaw",
     },
   );
@@ -233,6 +233,7 @@ export default function build() {
     y: head.d([0, 1, 0]),
     thickness: 0.004,
     bevel: 0.001,
+    detail: 0.34,
     color: CREST,
     bone: jaw,
     group: "jaw",
@@ -258,7 +259,8 @@ export default function build() {
     y: head.d([0, 1, 0]),
     thickness: casqueT,
     bevel: 0.002,
-    smoothing: 2,
+    smoothing: 1,
+    detail: 0.67,
     color: DEEP,
     bone: skull,
     group: "head",
@@ -277,7 +279,8 @@ export default function build() {
     y: head.d([0, 1, 0]),
     thickness: [casqueT[0] + 2 * e, casqueT[0] + 0.8 * (casqueT[1] - casqueT[0]) + 2 * e],
     bevel: 0.0015,
-    smoothing: 2,
+    smoothing: 1,
+    detail: 0.34,
     color: GREEN,
     bone: skull,
     group: "head",
@@ -291,7 +294,7 @@ export default function build() {
       {
         bone: skull,
         color: LIME,
-        sides: 6,
+        sides: 5,
         group: "head",
       },
     );
@@ -308,7 +311,7 @@ export default function build() {
       b.lathe(granule, {
         at: face(u, v),
         axis: casque.dir([0, 0, s]),
-        segments: 8,
+        segments: 6,
         smoothing: 1,
         color: TEAL,
         bone: skull,
@@ -338,11 +341,11 @@ export default function build() {
     const gaze = head.d([s, 0.25, 0.35]).normalize();
     const base = head.p([s * 0.013, 0.01, 0.03]);
     const eye = b.joint(`eye${side}`, { parent: skull, at: base, dir: gaze, group: "head" });
-    b.lathe(turret, { at: eye, axis: gaze, smoothing: 1, color: GREEN, bone: eye, group: "head" });
-    b.lathe(band, { at: eye, axis: gaze, smoothing: 1, color: YELLOW, bone: eye, group: "head" });
-    b.part(new SphereGeometry(0.0032, 12, 8), PUPIL, { bone: eye, at: offset(base, gaze, 0.0122), group: "head" });
+    b.lathe(turret, { at: eye, axis: gaze, segments: 10, smoothing: 1, color: GREEN, bone: eye, group: "head" });
+    b.lathe(band, { at: eye, axis: gaze, segments: 10, color: YELLOW, bone: eye, group: "head" });
+    b.part(new SphereGeometry(0.0032, 6, 4), PUPIL, { bone: eye, at: offset(base, gaze, 0.0122), group: "head" });
     // Nostril on the snout's flank.
-    b.part(new SphereGeometry(0.5, 8, 6), PUPIL, {
+    b.part(new SphereGeometry(0.5, 5, 4), PUPIL, {
       bone: skull,
       at: head.p([s * 0.0075, 0.001, 0.069]),
       dir: head.d([s * 0.4, 0, 1]),
@@ -422,7 +425,7 @@ export default function build() {
         b.sweep(chain, (t) => [interp(rx, t), interp(ry, t)], {
           color: GREEN,
           sectors: [[120, 240, LIME]],
-          sides: 12,
+          sides: 9,
           group,
         }),
       );
@@ -438,7 +441,7 @@ export default function build() {
           {
             at: offset(wrist, [0, 0, -1], 0.006),
             axis: [0, -0.3, -1],
-            segments: 8,
+            segments: 6,
             color: CREST,
             bone: chain.joints[2],
             group,
@@ -462,7 +465,7 @@ export default function build() {
         const fused = b.sweep(digits, (t) => [0.0082 + 0.0009 * bundle.toes - 0.0032 * t, 0.0072 - 0.0024 * t], {
           color: GREEN,
           sectors: [[120, 240, LIME]],
-          sides: 10,
+          sides: 7,
           group,
         });
         legTubes.push(fused);
@@ -472,11 +475,11 @@ export default function build() {
           const from = offset(digits.at(0.7).at, across, k * 0.005);
           // Toe tips curl down so the claws just touch the floor.
           const tip = offset(from, toeDir, 0.014).setY(0.0053);
-          b.capsule(from, tip, [0.0038, 0.003], { bone: digits.joints[1], color: GREEN, group });
+          b.capsule(from, tip, [0.0038, 0.003], { bone: digits.joints[1], color: GREEN, sides: 6, group });
           b.lathe(claw, {
             at: tip,
             axis: toeDir.clone().setY(-0.7),
-            segments: 8,
+            segments: 5,
             color: CLAW,
             bone: digits.joints[1],
             group,
@@ -505,6 +508,7 @@ export default function build() {
         y: p.n,
         thickness: [0.003, 0.001],
         bevel: 0.0005,
+        detail: 0.34,
         color: CREST,
         group,
       },
@@ -536,13 +540,13 @@ export default function build() {
     b.lathe(dome, {
       at: hit,
       axis: hit,
-      segments: 10,
+      segments: 6,
       smoothing: 1,
       color: random() < 0.6 ? TEAL : ORANGE,
       group: "body",
     });
   for (const hit of b.surface(legTubes).scatter(22, { rng: random, minDist: 0.012, filter: (h) => h.n.y > 0.1 }))
-    b.lathe(granule, { at: hit, axis: hit, segments: 8, smoothing: 1, color: LIME });
+    b.lathe(granule, { at: hit, axis: hit, segments: 6, smoothing: 1, color: LIME });
 
   // Rest pose: the jaw a little open.
   b.pose(jaw, { axis: head.d([1, 0, 0]), deg: 10 });

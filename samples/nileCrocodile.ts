@@ -145,7 +145,7 @@ export default function build() {
       [132, 228, BELLY],
     ],
     caps: { start: "round", end: "none" },
-    sides: 14,
+    sides: 12,
     group: "tail",
   });
   const body = b.loft(bodyStations, {
@@ -161,7 +161,7 @@ export default function build() {
     ],
     shift: (t) => [0, -0.035 * belly((t - hipsT) / (1 - hipsT))],
     caps: { start: "none", end: "round" },
-    sides: 14,
+    sides: 12,
     group: "body",
   });
 
@@ -195,7 +195,7 @@ export default function build() {
         [-58, 58, BACK],
         [132, 228, MOUTH],
       ],
-      sides: 12,
+      sides: 10,
       group: "head",
     },
   );
@@ -224,7 +224,7 @@ export default function build() {
         [-50, 50, MOUTH],
         [125, 235, BELLY],
       ],
-      sides: 12,
+      sides: 10,
       group: "jaw",
     },
   );
@@ -240,7 +240,7 @@ export default function build() {
       if (!hit) continue;
       const big = i === 2 || i === 5 ? 1.45 : i > 9 ? 0.7 : 1;
       const len = (0.026 + random() * 0.008) * big;
-      b.stick(new ConeGeometry(len * 0.3, len, 6), TOOTH, frame(hit, head.d([s * 0.18, -1, 0.06])), {
+      b.stick(new ConeGeometry(len * 0.3, len, 5), TOOTH, frame(hit, head.d([s * 0.18, -1, 0.06])), {
         bone: skull,
         embed: 0.3,
       });
@@ -251,7 +251,7 @@ export default function build() {
       if (!hit) continue;
       const big = i === 3 ? 1.7 : i === 0 ? 1.2 : i > 9 ? 0.7 : 1;
       const len = (0.024 + random() * 0.008) * big;
-      b.stick(new ConeGeometry(len * 0.3, len, 6), TOOTH, frame(hit, head.d([s * 0.12, 1, 0.04])), {
+      b.stick(new ConeGeometry(len * 0.3, len, 5), TOOTH, frame(hit, head.d([s * 0.12, 1, 0.04])), {
         bone: jaw,
         embed: 0.3,
       });
@@ -261,11 +261,11 @@ export default function build() {
   // Eyes: raised turrets on the back of the skull, yellow irises with a slit pupil, a bony brow over the top.
   for (const s of [1, -1]) {
     const socket = head.p([s * 0.08, 0.072, 0.12]);
-    b.part(new SphereGeometry(0.046, 14, 10), BACK, { bone: skull, at: socket, scale: [1, 0.85, 1.2] });
+    b.part(new SphereGeometry(0.046, 8, 5), BACK, { bone: skull, at: socket, scale: [1, 0.85, 1.2] });
     const gaze = head.d([s * 0.8, 0.35, 0.5]).normalize();
     const eye = offset(socket, gaze, 0.02);
-    b.part(new SphereGeometry(0.033, 18, 14), EYE, { bone: skull, at: eye });
-    b.part(new SphereGeometry(0.5, 8, 6), PUPIL, {
+    b.part(new SphereGeometry(0.033, 8, 6), EYE, { bone: skull, at: eye });
+    b.part(new SphereGeometry(0.5, 6, 4), PUPIL, {
       bone: skull,
       at: offset(eye, gaze, 0.031),
       dir: gaze,
@@ -273,7 +273,7 @@ export default function build() {
       scale: [0.008, 0.042, 0.01],
     });
     // Brow: a flat bony lid over the top and back of the eye.
-    b.part(new SphereGeometry(0.5, 14, 8), SCUTE, {
+    b.part(new SphereGeometry(0.5, 8, 4), SCUTE, {
       bone: skull,
       at: offset(offset(eye, head.d([0, 1, 0]), 0.026), head.d([0, 0, -1]), 0.012),
       dir: head.d([0, 0, 1]),
@@ -285,13 +285,13 @@ export default function build() {
   // Nostrils on a raised dome at the snout tip.
   const noseHit = upperSurface.ray(head.p([0, 0.3, 0.545]), head.d([0, -1, 0]));
   if (noseHit) {
-    const dome = b.stick(new SphereGeometry(0.5, 14, 8), BACK, noseHit, {
+    const dome = b.stick(new SphereGeometry(0.5, 8, 5), BACK, noseHit, {
       bone: skull,
       scale: [0.075, 0.035, 0.06],
       embed: 0.45,
     });
     for (const s of [1, -1])
-      b.part(new SphereGeometry(0.5, 8, 6), NOSTRIL, {
+      b.part(new SphereGeometry(0.5, 6, 4), NOSTRIL, {
         bone: skull,
         at: dome.local([s * 0.011, 0.016, 0.004]),
         dir: head.d([s * 0.4, 0, 1]),
@@ -345,7 +345,7 @@ export default function build() {
     ];
     const armTube = b.sweep(front, (t) => [interp(frontRx, t), interp(frontRy, t)], {
       color: FLANK,
-      sides: 12,
+      sides: 8,
       sectors: [[110, 250, BELLY]],
       group: `legF${side}`,
     });
@@ -382,7 +382,7 @@ export default function build() {
     ];
     const legTube = b.sweep(hind, (t) => [interp(hindRx, t), interp(hindRy, t)], {
       color: FLANK,
-      sides: 12,
+      sides: 8,
       sectors: [[110, 250, BELLY]],
       group: `legH${side}`,
     });
@@ -413,7 +413,7 @@ export default function build() {
           role: "digit",
           group: leg === front ? `legF${side}` : `legH${side}`,
         });
-        b.sweep(ch, (t) => [r * 1.05 * (1 - 0.35 * t), r * (1 - 0.3 * t)], { color: FLANK, sides: 8 });
+        b.sweep(ch, (t) => [r * 1.05 * (1 - 0.35 * t), r * (1 - 0.3 * t)], { color: FLANK, sides: 6 });
         if (i < 3) b.spike(ch.at(1).at, dir.clone().setY(-0.2), 0.034, r * 0.6, { bone: ch.joints[1], color: CLAW });
         chains.push(ch);
       }
@@ -422,7 +422,7 @@ export default function build() {
     digitSet(front, [0.07, 0.095, 0.105, 0.09, 0.07], [-46, -22, 0, 22, 44], 0.015, 0.024, "finger");
     const toes = digitSet(hind, [0.11, 0.15, 0.16, 0.135], [-30, -8, 14, 36], 0.017, 0.03, "toe");
     for (let i = 0; i < toes.length - 1; i++)
-      b.membrane(toes[i], toes[i + 1], { thickness: 0.006, color: WEB, scallop: 0.3 });
+      b.membrane(toes[i], toes[i + 1], { thickness: 0.006, color: WEB, scallop: 0.3, rows: 2, cols: 4 });
   }
 
   // ---------------------------------------------------------------- osteoderms
@@ -498,7 +498,7 @@ export default function build() {
   }
 
   // Dark spots on the flanks and legs.
-  const spot = new CylinderGeometry(0.02, 0.02, 0.006, 10);
+  const spot = new CylinderGeometry(0.02, 0.02, 0.006, 8);
   const skin = b.surface([tailBody, body]);
   for (const hit of skin.scatter(40, {
     rng: random,
@@ -520,7 +520,7 @@ export default function build() {
     b.stick(flankScute, SCUTE, hit, { flow: [0, 0, 1], embed: 0.35, scale: 0.55 + random() * 0.4 });
 
   // Sensory pits: tiny dark dots peppering the sides of both jaws.
-  const pit = new SphereGeometry(0.0032, 6, 4);
+  const pit = new SphereGeometry(0.0032, 4, 3);
   for (const [surface, count] of [
     [upperSurface, 40],
     [lowerSurface, 30],
@@ -533,7 +533,7 @@ export default function build() {
       b.stick(pit, SPOT, hit, { embed: 0.6 });
 
   // Rugose bumps on the snout between the eyes and the nose.
-  const bump = new SphereGeometry(0.5, 8, 5);
+  const bump = new SphereGeometry(0.5, 6, 4);
   for (const hit of upperSurface.scatter(26, {
     rng: random,
     minDist: 0.035,

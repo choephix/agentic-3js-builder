@@ -77,7 +77,7 @@ export default function build() {
   // Spike collar around the tilted neck axis, and a seamless closed ring on the skin just below it.
   b.ring(front.at(0.55), { count: 9, radius: 0.13 }, (spike) => b.spike(spike, spike, 0.12, 0.03, { color: PLATE }));
   const band = b.ring(front.at(0.5), { count: 8, radius: frontTube.at(0.5).radius });
-  b.sweep(catmull(band.items, { closed: true }), 0.025, { color: TIP });
+  b.sweep(catmull(band.items, { closed: true }), 0.025, { color: TIP, sides: 6 });
 
   // Head with jaw.
   const head = b.joint("head", {
@@ -105,7 +105,7 @@ export default function build() {
     group: "head",
   });
   for (const s of [1, -1]) {
-    b.part(new SphereGeometry(0.035, 10, 8), "#111111", {
+    b.part(new SphereGeometry(0.035, 7, 5), "#111111", {
       bone: head,
       at: head.local([s * 0.12, 0.12, 0.08]),
       group: "head",
@@ -118,6 +118,7 @@ export default function build() {
       {
         bone: head,
         color: TIP,
+        sides: 5,
         caps: { start: "round", end: "point" },
         group: "head",
       },

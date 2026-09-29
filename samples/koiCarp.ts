@@ -219,25 +219,21 @@ export default function build() {
   });
 
   // ---------------------------------------------------------------- Body and head
-  const bodyPath = catmull([
-    centre(TAIL_Z),
-    ...jointZ
-      .slice()
-      .reverse()
-      .map(centre),
-    centre(0.24),
-    centre(NOSE_Z),
-  ]);
-  const body = b.sweep(bodyPath, (t) => {
-    const z = bodyPath.at(t).z;
-    return [halfW(z), halfH(z)];
-  }, {
-    bone: [spine, head],
-    color: skin,
-    sides: 24,
-    caps: { start: "round", end: "round" },
-    group: "body",
-  });
+  const bodyPath = catmull([centre(TAIL_Z), ...jointZ.slice().reverse().map(centre), centre(0.24), centre(NOSE_Z)]);
+  const body = b.sweep(
+    bodyPath,
+    (t) => {
+      const z = bodyPath.at(t).z;
+      return [halfW(z), halfH(z)];
+    },
+    {
+      bone: [spine, head],
+      color: skin,
+      sides: 12,
+      caps: { start: "round", end: "round" },
+      group: "body",
+    },
+  );
   const bodySurface = b.surface(body);
   const side = (z: number, d: number, s: number) => {
     const hit = bodySurface.ray([s * 0.3, cy(z) + d * halfH(z), z], [-s, 0, 0]);
@@ -267,7 +263,7 @@ export default function build() {
       const target = ((j + (row % 2) * 0.5) / around) * perimeter;
       let k = 1;
       while (k < cum.length - 1 && cum[k] < target) k++;
-      const angle = ((k - 1) + (target - cum[k - 1]) / Math.max(cum[k] - cum[k - 1], 1e-9)) * 3;
+      const angle = (k - 1 + (target - cum[k - 1]) / Math.max(cum[k] - cum[k - 1], 1e-9)) * 3;
       const f = body.at(t, angle);
       const d = (f.at.y - cy(z)) / halfH(z);
       if (z > gillZ(Math.max(-1, Math.min(1, d))) - 0.006) continue;
@@ -296,7 +292,11 @@ export default function build() {
       const d = 0.72 - (1.6 * i) / 10;
       return side(gillZ(d), d, s);
     });
-    b.sweep(catmull(slit), 0.0012, { bone: head, color: GILL, group: "head" });
+    // In short pieces: a single low-sided tube takes a ring only every 72° of bend, and its chords would sink
+    // into the cheek.
+    const line = bodySurface.drape(catmull(slit));
+    for (let i = 0; i < 8; i++)
+      b.sweep(line.slice(i / 8, (i + 1) / 8), 0.0012, { bone: head, color: GILL, sides: 5, group: "head" });
   }
 
   // ---------------------------------------------------------------- Mouth
@@ -312,9 +312,9 @@ export default function build() {
       [-0.018, m - 0.024, 0.284],
     ]),
     0.005,
-    { bone: head, color: LIP, group: "head" },
+    { bone: head, color: LIP, sides: 6, group: "head" },
   );
-  b.part(new SphereGeometry(1, 16, 10), MOUTH, {
+  b.part(new SphereGeometry(1, 8, 5), MOUTH, {
     bone: head,
     at: [0, m - 0.024, 0.295],
     scale: [0.013, 0.008, 0.007],
@@ -335,7 +335,7 @@ export default function build() {
       [-0.017, m - 0.026, 0.284],
     ]),
     0.0042,
-    { bone: jaw, color: LIP, group: "jaw" },
+    { bone: jaw, color: LIP, sides: 6, group: "jaw" },
   );
 
   for (const s of [1, -1]) {
@@ -362,6 +362,7 @@ export default function build() {
         bone: head,
         color: BARBEL,
         caps: { start: "round", end: "round" },
+        sides: 5,
         group: "head",
       });
 
@@ -371,12 +372,15 @@ export default function build() {
       [0.264, 0.46],
     ] as const) {
       const hit = side(nz, nd, s);
-      b.stick(new SphereGeometry(0.0016, 10, 6), NOSTRIL, hit, { embed: 0.6, bone: head, group: "head" });
+      b.stick(new SphereGeometry(0.0016, 5, 4), NOSTRIL, hit, { embed: 0.6, bone: head, group: "head" });
     }
 
     // Eye: a turned orbit rim in the skin's own paint, an SVG-mapped dome, and a catchlight.
     const eyeHit = side(0.247, 0.22, s);
-    const gaze = eyeHit.n.clone().add(new Vector3(0, 0.12, 0.2)).normalize();
+    const gaze = eyeHit.n
+      .clone()
+      .add(new Vector3(0, 0.12, 0.2))
+      .normalize();
     b.lathe(
       [
         [0.0068, -0.004],
@@ -385,19 +389,19 @@ export default function build() {
         [0.0084, 0.0022],
         [0.0068, 0.0012],
       ],
-      { at: eyeHit, axis: gaze, bone: head, smoothing: 1, color: skin, group: "head" },
+      { at: eyeHit, axis: gaze, bone: head, segments: 10, color: skin, group: "head" },
     );
     const EYE_R = 0.0072;
     // A dome from the pole to 90°, its drawing stretched over that span; starting a hair off the pole keeps its UVs
     // inside 0..1.
-    const eye = b.part(new SphereGeometry(EYE_R, 24, 8, 0, Math.PI * 2, 1e-4, Math.PI / 2), "#ffffff", {
+    const eye = b.part(new SphereGeometry(EYE_R, 12, 4, 0, Math.PI * 2, 1e-4, Math.PI / 2), "#ffffff", {
       bone: head,
       at: eyeHit.at.clone().addScaledVector(gaze, -0.5 * EYE_R),
       dir: gaze,
       texture: EYE,
       group: "head",
     });
-    b.part(new SphereGeometry(0.0013, 8, 6), GLINT, {
+    b.part(new SphereGeometry(0.0013, 4, 3), GLINT, {
       bone: head,
       at: eye.local([0.0022, 0.0048 + 0.5 * EYE_R - 0.0016, 0.0024]),
       group: "head",
@@ -462,9 +466,15 @@ export default function build() {
         y: pecUp,
         thickness: 0.0035,
         bevel: 0.0012,
-        smoothing: 2,
-        color: rayed(planar(pecAt, pecDir, pecUp), [-0.012, 0], 11, 0.11, (ray, r, p) =>
-          tejima.includes(ray) && r > 0.22 + 0.08 * noise(p, 0.01, ray + 20) && r < 0.72 + 0.1 * noise(p, 0.012, ray),
+        smoothing: 1,
+        detail: 0.34,
+        color: rayed(
+          planar(pecAt, pecDir, pecUp),
+          [-0.012, 0],
+          11,
+          0.11,
+          (ray, r, p) =>
+            tejima.includes(ray) && r > 0.22 + 0.08 * noise(p, 0.01, ray + 20) && r < 0.72 + 0.1 * noise(p, 0.012, ray),
         ),
         group: `pectoral${sideName}`,
       },
@@ -499,8 +509,14 @@ export default function build() {
         y: pelUp,
         thickness: 0.003,
         bevel: 0.001,
-        smoothing: 2,
-        color: rayed(planar(pelAt, vec(pelTip).sub(vec(pelAt)).toArray() as V3, pelUp), [-0.01, 0], 12, pelReach + 0.01),
+        smoothing: 1,
+        detail: 0.34,
+        color: rayed(
+          planar(pelAt, vec(pelTip).sub(vec(pelAt)).toArray() as V3, pelUp),
+          [-0.01, 0],
+          12,
+          pelReach + 0.01,
+        ),
         group: `pelvic${sideName}`,
       },
     );
@@ -541,7 +557,7 @@ export default function build() {
   const dorsalFin = b.membrane(dorsalBase, dorsalTop, {
     thickness: 0.003,
     bone: spine,
-    cols: 24,
+    cols: 16,
     color: paint((p): ColorInput => {
       const hf = Math.max(0, (p.y - dorsalY(p.z)) / dorsalHeight(p.z));
       const q = (p.z + (p.y - dorsalY(p.z)) * 0.55) / 0.0105;
@@ -564,7 +580,7 @@ export default function build() {
       ]),
     ),
     [0.0026, 0.0009],
-    { color: FIN_RAY, caps: { start: "round", end: "round" }, group: "dorsal" },
+    { color: FIN_RAY, caps: { start: "round", end: "round" }, sides: 6, group: "dorsal" },
   );
 
   // Anal: a small rounded fin behind the vent.
@@ -622,7 +638,8 @@ export default function build() {
     bone: caudal,
     thickness: 0.004,
     bevel: 0.0014,
-    smoothing: 2,
+    smoothing: 1,
+    detail: 0.5,
     color: rayed(planar(tailAt, [0, 0, -1], [0, 1, 0]), [-0.03, 0], 16, 0.12),
     group: "tail",
     name: "caudalFin",

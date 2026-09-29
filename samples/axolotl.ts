@@ -112,7 +112,7 @@ export default function build() {
         [-45, 45, BACK],
         [135, 225, BELLY],
       ],
-      sides: 14,
+      sides: 10,
       caps: { start: "none", end: "round" },
       group: "tail",
     },
@@ -136,7 +136,7 @@ export default function build() {
         const bodyLocalT = t / tailT;
         return [0, -0.0015 * Math.sin(Math.PI * (hipsT + (1 - bodyLocalT) * (1 - hipsT)))];
       },
-      sides: 16,
+      sides: 12,
       caps: { start: "round", end: "none" },
       group: "body",
     },
@@ -173,7 +173,7 @@ export default function build() {
   };
   const dorsal = finEdge(0, dorsalH, 1, 0);
   const ventral = finEdge(180, ventralH, -1, 0);
-  b.membrane(dorsal, ventral, { thickness: 0.0012, color: FIN, bone: tail, rows: 6, group: "tail", name: "tailFin" });
+  b.membrane(dorsal, ventral, { thickness: 0.0012, color: FIN, bone: tail, rows: 4, group: "tail", name: "tailFin" });
   // A deeper pink rim along both fin edges, skinned the same way as the fin so it never parts from it.
   for (const [edge, heights, sign] of [
     [dorsal, dorsalH, 1],
@@ -203,7 +203,8 @@ export default function build() {
     thickness: 0.0012,
     color: FIN,
     bone: spine,
-    rows: 3,
+    rows: 1,
+    cols: 10,
     group: "body",
     name: "dorsalRidge",
   });
@@ -235,7 +236,7 @@ export default function build() {
         [-60, 60, BACK],
         [150, 210, MOUTH],
       ],
-      sides: 16,
+      sides: 12,
       group: "head",
     },
   );
@@ -261,7 +262,7 @@ export default function build() {
         [-45, 45, MOUTH],
         [120, 240, BELLY],
       ],
-      sides: 14,
+      sides: 10,
       group: "jaw",
     },
   );
@@ -287,8 +288,8 @@ export default function build() {
     if (!hit) continue;
     const gaze = hit.n.clone();
     const eye = offset(hit.at, gaze, -0.0006);
-    b.part(new SphereGeometry(0.0022, 16, 12), EYE, { bone: skull, at: eye, group: "head" });
-    b.part(new SphereGeometry(0.0006, 8, 6), GLINT, {
+    b.part(new SphereGeometry(0.0022, 8, 5), EYE, { bone: skull, at: eye, group: "head" });
+    b.part(new SphereGeometry(0.0006, 4, 3), GLINT, {
       bone: skull,
       at: offset(offset(eye, gaze, 0.0019), [0, 1, 0.4], 0.0008),
       group: "head",
@@ -301,7 +302,7 @@ export default function build() {
         [0.0026, 0.0009],
         [0.0021, 0.0004],
       ],
-      { at: hit, axis: gaze, smoothing: 1, color: SKIN, bone: skull, group: "head" },
+      { at: hit, axis: gaze, segments: 8, color: SKIN, bone: skull, group: "head" },
     );
     // Nostrils near the front of the snout.
     const nose = headSkin.ray(head.p([s * 0.008, 0.03, 0.037]), head.d([0, -1, 0]));
@@ -313,7 +314,7 @@ export default function build() {
           [0.0005, 0.0003],
           [0, 0.00035, "sharp"],
         ],
-        { at: nose, axis: nose, segments: 8, color: MOUTH, bone: skull, group: "head" },
+        { at: nose, axis: nose, segments: 6, color: MOUTH, bone: skull, group: "head" },
       );
   }
 
@@ -341,7 +342,7 @@ export default function build() {
         names: [`gill${side}${gi + 1}a`, `gill${side}${gi + 1}b`],
         role: "tentacle",
         color: GILL,
-        sides: 8,
+        sides: 6,
         group: `gills${side}`,
       });
       if (!chain) return;
@@ -372,7 +373,7 @@ export default function build() {
               x: dir,
               y,
               thickness: 0.0006,
-              smoothing: 2,
+              smoothing: 1,
               color: i % 2 === 0 ? FRINGE : FRINGE_LIGHT,
               group: `gills${side}`,
             },
@@ -449,7 +450,7 @@ export default function build() {
         [ts[2], 0.0024],
         [1, 0.0016],
       ];
-      b.sweep(chain, (t) => [interp(rx, t), interp(ry, t)], { color: SKIN, sides: 10, group });
+      b.sweep(chain, (t) => [interp(rx, t), interp(ry, t)], { color: SKIN, sides: 7, group });
 
       // Toes: one-joint chains fanned around the hand's heading, lying on the floor, tipped with a turned pad.
       const fwd = palmDir.clone().setY(0).normalize();
@@ -466,11 +467,10 @@ export default function build() {
           role: "digit",
           group,
         });
-        b.sweep(toe, [toeR * 1.1, toeR * 0.85], { color: SKIN, sides: 8, group });
+        b.sweep(toe, [toeR * 1.1, toeR * 0.85], { color: SKIN, sides: 5, group });
         b.lathe(pad, {
           at: [end.x, 0, end.z],
-          smoothing: 1,
-          segments: 10,
+          segments: 6,
           color: TOE,
           bone: toe.joints[0],
           group,
@@ -506,7 +506,7 @@ export default function build() {
         [0.0026, 0.0008],
         [0, 0.0014, "sharp"],
       ],
-      { at: vent, axis: vent, smoothing: 1, color: GROOVE, group: "body" },
+      { at: vent, axis: vent, segments: 8, color: GROOVE, group: "body" },
     );
 
   return b.root;

@@ -220,7 +220,7 @@ export default function build() {
     role: "neck",
     group: "body",
   });
-  const body = b.loft(stations, { bone: [hips, spine, neck], color: under, sides: 18, group: "body" });
+  const body = b.loft(stations, { bone: [hips, spine, neck], color: under, sides: 10, group: "body" });
 
   // Tail: from the top of the rump, hanging clear behind the hocks.
   const tail = b.chain(
@@ -234,7 +234,7 @@ export default function build() {
     ]),
     { parent: hips, count: 5, role: "tail", group: "tail" },
   );
-  const tailTube = b.sweep(tail, (t) => 0.042 * (1 - t) + 0.016, { color: under, group: "tail" });
+  const tailTube = b.sweep(tail, (t) => 0.042 * (1 - t) + 0.016, { color: under, sides: 6, group: "tail" });
 
   // Legs: short and straight under the body, each ending in a pastern that sets into a split hoof.
   const legs: { chain: Chain; front: boolean }[] = [];
@@ -304,7 +304,7 @@ export default function build() {
       const e = smoothstep(ta, tb, t);
       return [xa + (xb - xa) * e, ya + (yb - ya) * e];
     };
-    const tube = b.sweep(chain, radius, { color: under, sides: 12, caps: { start: "round", end: "flat" } });
+    const tube = b.sweep(chain, radius, { color: under, sides: 7, caps: { start: "round", end: "flat" } });
 
     // Two claws of the cloven hoof, flat on the floor, and two dewclaws behind the fetlock.
     const fetlock = chain.joints[3];
@@ -321,7 +321,7 @@ export default function build() {
         (t) => [0.025 - 0.004 * t, 0.065 - 0.027 * t],
         { section: "box", caps: "flat", shift: (t) => [0, 0.022 * t], bone: fetlock, color: hoof, group: chain.name },
       );
-      b.part(new SphereGeometry(0.017, b.segments(8), b.segments(6)), HOOF_DARK, {
+      b.part(new SphereGeometry(0.017, 5, 3), HOOF_DARK, {
         bone: fetlock,
         at: [heel.x + dx * 0.022, 0.105, heel.z - 0.032],
         scale: [1, 0.8, 1.4],
@@ -345,7 +345,7 @@ export default function build() {
       { at: head.p([0, -0.04, 0.4]), w: 0.22, h: 0.19 },
       { at: head.p([0, -0.045, 0.46]), w: 0.21, h: 0.16 },
     ],
-    { bone: skull, color: face, sides: 16, caps: { start: "round", end: "flat" }, group: "head" },
+    { bone: skull, color: face, sides: 10, caps: { start: "round", end: "flat" }, group: "head" },
   );
   // The flat, dark nose pad with nostrils, drawn in SVG, on the flat front of the muzzle.
   b.part(new PlaneGeometry(0.2, 0.148), "#ffffff", {
@@ -372,7 +372,7 @@ export default function build() {
       { at: head.p([0, -0.115, 0.22]), w: 0.16, h: 0.09 },
       { at: head.p([0, -0.125, 0.41]), w: 0.17, h: 0.07 },
     ],
-    { bone: jaw, color: gradient(coat, MUZZLE, head.p([0, 0, 0.36]), head.p([0, 0, 0.44])), sides: 12, group: "jaw" },
+    { bone: jaw, color: gradient(coat, MUZZLE, head.p([0, 0, 0.36]), head.p([0, 0, 0.44])), sides: 8, group: "jaw" },
   );
 
   // Eyes, set into the face by ray, a glint on each; the forelock falls over them.
@@ -380,14 +380,14 @@ export default function build() {
   for (const s of [1, -1]) {
     const socket = faceSkin.ray(head.p([s * 0.4, 0.03, 0.12]), head.d([-s, 0, 0]));
     if (!socket) throw new Error("highlandCow: no face under the eye");
-    const eye = b.part(new SphereGeometry(0.024, b.segments(14), b.segments(10)), EYE, {
+    const eye = b.part(new SphereGeometry(0.024, 7, 5), EYE, {
       bone: skull,
       at: socket.at,
       dir: socket.n,
       scale: [1, 0.7, 1.2],
       group: "head",
     });
-    b.part(new SphereGeometry(0.006, b.segments(6), b.segments(4)), GLINT, {
+    b.part(new SphereGeometry(0.006, 4, 3), GLINT, {
       bone: skull,
       at: eye.local([0.006, 0.014, 0.012]),
       group: "head",
@@ -408,14 +408,15 @@ export default function build() {
     const len2 = along.lengthSq();
     const hornPaint = paint((p) => {
       const t = Math.min(Math.max(p.clone().sub(base).dot(along) / len2, 0), 1);
-      const body = t < 0.5 ? mix(HORN_ROOT, IVORY, smoothstep(0, 0.5, t)) : mix(IVORY, HORN_TIP, smoothstep(0.72, 1, t));
+      const body =
+        t < 0.5 ? mix(HORN_ROOT, IVORY, smoothstep(0, 0.5, t)) : mix(IVORY, HORN_TIP, smoothstep(0.72, 1, t));
       const ridge = t < 0.3 ? smoothstep(0.55, 0.95, Math.sin(t * 150)) * (1 - t / 0.3) : 0;
       return mix(body, "#7a5a3a", ridge * 0.45);
     });
     b.sweep(path, (t) => 0.048 * (1 - t) ** 0.7 + 0.006, {
       bone: skull,
       color: hornPaint,
-      sides: 14,
+      sides: 6,
       caps: { start: "flat", end: "point" },
       extend: [0.04, 0],
       group: "head",
@@ -450,7 +451,8 @@ export default function build() {
       y: earUp,
       thickness: 0.018,
       bevel: 0.006,
-      smoothing: 2,
+      smoothing: 1,
+      detail: 0.34,
       color: paint((_p, n) => (n.dot(inward) > 0.5 ? EAR_IN : coat)),
       bone: earJoint,
       group: "head",

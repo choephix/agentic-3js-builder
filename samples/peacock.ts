@@ -120,7 +120,7 @@ export default function build() {
   });
   b.spike(jaw, jaw, 0.06, 0.012, { color: BEAK, group: "jaw" });
   for (const s of [1, -1])
-    b.part(new SphereGeometry(0.012, b.segments(8), b.segments(6)), "#101010", {
+    b.part(new SphereGeometry(0.012, b.segments(7), b.segments(5)), "#101010", {
       bone: head,
       at: head.local([s * 0.042, 0.05, 0.015]),
       group: "head",
@@ -132,7 +132,7 @@ export default function build() {
     { count: 7, radius: 0, fromDeg: -30, toDeg: 30, tilt: 14, joints: 2, name: "crest", parent: head, group: "head" },
     (feather) => {
       b.rod(feather, feather.moved([0, 0.12, 0]), 0.004, { color: BLUE });
-      b.part(new SphereGeometry(0.012, b.segments(8), b.segments(6)), TEAL, { at: feather.moved([0, 0.12, 0]) });
+      b.part(new SphereGeometry(0.012, b.segments(6), b.segments(5)), TEAL, { at: feather.moved([0, 0.12, 0]) });
     },
   );
 
@@ -157,12 +157,12 @@ export default function build() {
       const bend = offset(offset(feather, feather, 0.5), up, 0.05);
       b.sweep(bezier(feather, bend, tip), [0.012, 0.005], { color: GREEN, caps: { end: "point" } });
       const eye = feather.moved([0, 0.93, 0]);
-      b.part(new SphereGeometry(1, b.segments(10), b.segments(6)), GOLD, {
+      b.part(new SphereGeometry(1, b.segments(10), b.segments(5)), GOLD, {
         at: eye,
         quat: aim(up, feather),
         scale: [0.055, 0.01, 0.075],
       });
-      b.part(new SphereGeometry(1, b.segments(10), b.segments(6)), EYE, {
+      b.part(new SphereGeometry(1, b.segments(10), b.segments(5)), EYE, {
         frame: eye,
         at: offset(eye, up, 0.004),
         quat: aim(up, feather),

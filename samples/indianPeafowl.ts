@@ -194,7 +194,7 @@ export default function build() {
     minDist: 0.038,
     filter: (h) => h.n.y > 0.5 && h.at.z > -0.25 && h.at.z < 0.08,
   }))
-    b.stick(new SphereGeometry(1, b.segments(7), b.segments(4)), SCALE, hit, {
+    b.stick(new SphereGeometry(1, b.segments(5), b.segments(4)), SCALE, hit, {
       scale: [0.019, 0.008, 0.025],
       flow: [0, 0, -1],
       embed: 0.45,
@@ -210,14 +210,14 @@ export default function build() {
     group: "head",
   });
   // Head local axes: +Y forward, +Z up, +X toward the bird's right.
-  const skull = b.part(new SphereGeometry(1, b.segments(14), b.segments(10)), BLUE, {
+  const skull = b.part(new SphereGeometry(1, b.segments(10), b.segments(7)), BLUE, {
     bone: head,
     frame: head.moved([0, 0.012, 0.004]),
     scale: [0.035, 0.055, 0.04],
     group: "head",
   });
   // A darker blue throat patch under the chin.
-  b.part(new SphereGeometry(1, b.segments(10), b.segments(7)), BLUE_DEEP, {
+  b.part(new SphereGeometry(1, b.segments(8), b.segments(5)), BLUE_DEEP, {
     bone: head,
     frame: head.moved([0, 0.01, -0.018]),
     scale: [0.028, 0.04, 0.024],
@@ -237,8 +237,7 @@ export default function build() {
       at: head.local([0, 0.05, -0.004]),
       axis: head.dir([0, 1, -0.2]),
       bone: head,
-      smoothing: 1,
-      segments: 12,
+      segments: 8,
       color: BEAK,
       group: "head",
       name: "beakUpper",
@@ -263,8 +262,7 @@ export default function build() {
       at: jaw.local([0, 0.004, 0]),
       axis: jaw.axis,
       bone: jaw,
-      smoothing: 1,
-      segments: 12,
+      segments: 8,
       color: BEAK_DARK,
       group: "head",
       name: "beakLower",
@@ -289,7 +287,7 @@ export default function build() {
         at: offset(eye, n, -0.0015),
         axis: n,
         bone: head,
-        segments: 16,
+        segments: 10,
         color: FACE_WHITE,
         group: "head",
         name: `eyeRing${s > 0 ? "L" : "R"}`,
@@ -307,8 +305,7 @@ export default function build() {
         at: offset(eye, n, -0.002),
         axis: n,
         bone: head,
-        smoothing: 1,
-        segments: 14,
+        segments: 10,
         color: EYE_DARK,
         group: "head",
         name: `eye${s > 0 ? "L" : "R"}`,
@@ -323,7 +320,7 @@ export default function build() {
       b.sweep(headSkin.drape(catmull(stripe), { lift: 0.0005 }), [0.0016, 0.0032, 0.0032, 0.0015], {
         bone: head,
         color: FACE_WHITE,
-        sides: 6,
+        sides: 5,
         group: "head",
       });
   }
@@ -350,7 +347,7 @@ export default function build() {
         x: item.dir([1, 0, 0]),
         y: item.axis,
         thickness: [0.0024, 0.0012],
-        smoothing: 2,
+        smoothing: 1,
         color: CREST_TIP,
         group: "crest",
       });
@@ -474,8 +471,13 @@ export default function build() {
     const [, , tarsus, ball] = leg.joints;
     const b0 = new Vector3(ball.at.x, 0.009, ball.at.z);
     for (const dx of [-1, 1])
-      b.capsule(b0, [b0.x + dx * 0.04, 0.008, b0.z + 0.05], [0.009, 0.007], { bone: ball, color: LEG, group: g });
-    b.capsule(b0, [b0.x, 0.007, b0.z - 0.042], [0.008, 0.006], { bone: ball, color: LEG, group: g });
+      b.capsule(b0, [b0.x + dx * 0.04, 0.008, b0.z + 0.05], [0.009, 0.007], {
+        bone: ball,
+        color: LEG,
+        sides: 6,
+        group: g,
+      });
+    b.capsule(b0, [b0.x, 0.007, b0.z - 0.042], [0.008, 0.006], { bone: ball, color: LEG, sides: 6, group: g });
     b.spike(lerp(tarsus.at, ball.at, 0.55), [0, -0.25, -1], 0.022, 0.0045, {
       bone: tarsus,
       color: BEAK_DARK,
@@ -500,7 +502,7 @@ export default function build() {
       vane: 0.48,
       stem: 0.006,
       thick: [0.012, 0.004],
-      smoothing: 2,
+      smoothing: 1,
     },
     {
       count: 20,
@@ -587,7 +589,8 @@ export default function build() {
           y: item.axis,
           thickness: tier.thick,
           bevel: 0.0025,
-          smoothing: 2,
+          detail: 0.5,
+          smoothing: 1,
           bone,
           color: FISHTAIL,
           group: "train",
@@ -602,6 +605,7 @@ export default function build() {
         y: item.axis,
         thickness: tier.thick,
         bevel: 0.0025,
+        detail: 0.5,
         smoothing: tier.smoothing,
         bone,
         color: VANES[k],
@@ -687,7 +691,7 @@ export default function build() {
       axis: FAN_AXIS.clone().negate(),
       bone: rump,
       smoothing: 1,
-      segments: 14,
+      segments: 10,
       color: DOWN,
       group: "train",
       name: "undertail",
