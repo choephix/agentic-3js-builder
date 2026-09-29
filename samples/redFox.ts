@@ -309,35 +309,54 @@ export default function build() {
   // ---------------------------------------------------------------------------
   // Bushy Brush Tail with Pure White Tag and Scent Gland Spot
   // ---------------------------------------------------------------------------
-  // The shared curve is drawn tail-tip -> head, while the old tail profile was base -> tip. Remap every tail
-  // callback through tailBaseT so the thin tip and white tag stay exactly where they were.
+  // Very thick spindle profile: narrow base, massive fluffy middle, tapered end. The red brush and the white tag
+  // each carry the whole profile over their own stretch, so the tag reads as a round white bulb; the tag's profile
+  // runs from the tip back to the brush, where both are at their narrowest and meet ring for ring.
   const tailRadius = (t: number): [number, number] => {
     // Bulges up to radius 0.065 (13cm thick!), slightly taller than wide
     const bulge = Math.sin(Math.PI * Math.min(t / 0.85, 1));
     const r = 0.026 + 0.04 * bulge - 0.016 * Math.max(0, (t - 0.75) / 0.25);
     return [r * 0.95, r * 1.08];
   };
+  // Behind the rump station the body rounds off like a cap while the narrow tail base grows out of it: near the
+  // rump the tube's radius is the smooth maximum of that rounded rump and the brush, so both are one surface that
+  // meets the body loft ring for ring.
+  const rump: [number, number] = [stations[tailBaseIndex].w / 2, stations[tailBaseIndex].h / 2];
+  const rumpDepth = Math.max(...rump);
+  const smoothMax = (a: number, b: number, k = 0.015) => {
+    const h = Math.max(k - Math.abs(a - b), 0) / k;
+    return Math.max(a, b) + (h * h * k) / 4;
+  };
 
   const tagSplit = 0.78; // White tag on the last 22% of the tail
   const tagT = tailBaseT * (1 - tagSplit);
   const tailBones = [tail, root, spine] as const;
 
-  // Red main body of tail, from its white-tag boundary back to the shared rump surface.
-  b.sweep(curve, (u) => tailRadius(1 - u), {
-    from: tagT,
-    to: tailBaseT,
-    bone: tailBones,
-    color: RED_FOX,
-    sectors: [
-      [-60, 60, RED_BACK], // Darker dorsal ridge on tail
-    ],
-    sides: 16,
-    caps: { start: "none", end: "none" },
-    group: "tail",
-  });
+  // Red brush, from the white-tag boundary (u = 0) to the rump (u = 1).
+  b.sweep(
+    curve,
+    (u) => {
+      const d = (1 - u) * (tailBaseT - tagT) * curve.length;
+      const dome = Math.sqrt(Math.max(0, 1 - (d / rumpDepth) ** 2));
+      const [tx, ty] = tailRadius(1 - u);
+      // Past the dome the brush alone sets the radius, so it meets the white tag exactly.
+      return dome > 0 ? [smoothMax(rump[0] * dome, tx), smoothMax(rump[1] * dome, ty)] : [tx, ty];
+    },
+    {
+      from: tagT,
+      to: tailBaseT,
+      bone: tailBones,
+      color: RED_FOX,
+      sectors: [
+        [-60, 60, RED_BACK], // Darker dorsal ridge on tail
+      ],
+      sides: 16,
+      caps: { start: "none", end: "none" },
+      group: "tail",
+    },
+  );
 
-  // White tip ("tag") of the tail. Reverse the old profile so its rounded, bushy end stays at the tip; its
-  // narrow boundary matches the red sweep exactly, leaving no collar.
+  // White tag, from the tip (u = 0) to the brush (u = 1).
   b.sweep(curve, (u) => tailRadius(u), {
     from: 0,
     to: tagT,

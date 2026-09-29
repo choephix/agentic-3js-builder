@@ -73,7 +73,7 @@ export default function build() {
   const tailFraction = tailCurve.length / (tailCurve.length + curve.length);
   const bellyDip = (t: number) =>
     Math.sin(Math.PI * Math.min(Math.max(((t - tailFraction) / (1 - tailFraction) - 0.08) / 0.72, 0), 1));
-  const tailTube = b.loft(joinedStations, {
+  b.loft(joinedStations, {
     bone: [tail, root, spine],
     from: 0,
     to: tailFraction,
@@ -85,7 +85,7 @@ export default function build() {
       [0.82, FUR],
       [1, DARK_BROWN],
     ],
-    caps: "none",
+    caps: { start: "round", end: "none" },
     sides: 14,
     group: "tail",
   });
@@ -98,7 +98,7 @@ export default function build() {
       [125, 235, BELLY],
     ],
     shift: (t) => [0, -0.045 * bellyDip(t), 0],
-    caps: "none",
+    caps: { start: "none", end: "round" },
     sides: 14,
     group: "body",
   });
