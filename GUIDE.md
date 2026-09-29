@@ -24,6 +24,8 @@ You build one sample for the agentic-3js-builder library: a three.js script that
 
 > By lots of detail I mean mostly a simple base. Each of these is still made out of primitives so they should retain that blocky shape expected of a puppet made out of primitives. The composition, the color and material choice, and the little details on top of those simple shapes should be what give me that wow factor.
 
+The look is stylized unless the brief asks otherwise: bold, readable shapes and proportions, a clear colour palette, and features that are shaped with character and emphasised where that helps the subject read.
+
 Use as many primitives as you need to make it look good. Surfaces can carry more than flat colour: paints (patterns in meters, baked into textures), SVG drawings as textures, and cards (many small textured cut-outs). README's "Paint, textures and cards" covers them.
 
 The wow comes from creativity, not smoothness. The look is low-poly: facets are part of it, and every part gets only enough segments to read as its shape at the size it is seen, spread evenly with none bunched in one place. Paints, textures and cards carry the fine detail. The snap report's "Fine meshes" list names the parts to thin out; README's "Detail and budget" covers the controls.
