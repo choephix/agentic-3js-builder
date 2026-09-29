@@ -52,6 +52,8 @@ All commits are local; nothing is pushed.
 | f36aabb         | 10      | Friction from the texture round: paints take the part's own surface coordinates `s`; cards take a per-card `flow` and `mirror` and merge repeated textures; sweep `bone` lists drop spans past the path's end (fixes the hammerhead's tail shards in flex A). Harness (creature lab daffb11, 6979c92): x-ray keeps cut-out models, a warm-up render per shot, inside-out only for closed parts, 5 mm floor check, part labels with bone and group.                                                                                                                                                                                                                                    |
 | 47d859c         | 11      | Lean meshes: `detail` on every shape (`sweep`/`loft`/tube helpers/`sprout`, `membrane`, `extrude`, `lathe`, `cards`, `b.segments(n, detail)`), 3 rings per smooth joint instead of 5, card curls one segment per 20°, bevel steps scale with detail, `createBuilder({ paintSize })` separate from `detail`; GUIDE asks for lean meshes. Library triangles −9% (531.6k → 483.7k); highlandCow 37.1k → 22.4k, scarecrow (now `paintSize: 2048`, detail 1) 33.9k → 22.6k. Cow v11, scarecrow v18, snowLeopard v20 (`-lowpoly`) match their finals.                                                                                                                                       |
 | 25dcd67 253036b | 12      | Low-poly look: tube rings follow the section (360°/sides, 45° max), never closer than 0.7 edge length, chord may stray ≤ half the radius, one window ring where the blend is narrow; caps sides/4; lathe default 12. Harness (creature lab 637377e) reports "Fine meshes". README/GUIDE state the low-poly look. Every sample thinned (cow, scarecrow by hand; 21 by four density-pass agents). Library 483.7k → 283.9k; cow 17.4k, scarecrow 9.1k. Final renders `vNN-lowpoly`, all 0 errors (barnOwl +13 mm and tentacleSerpent −5 mm floor warnings predate). Wireframe comparisons: `smoke/lowpoly/*-compare.png`.                                                                |
+| 90f7667         | 13      | `svg(markup, { pixelated: true })`: crisp raster, nearest magnification. Harness (creature lab d934caa): the atlas magnifies nearest when any source texture does, so one pixelated texture makes the whole atlas pixelated.                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 7c03043         | samples | Style round: mimicHermitCrab, islandTortoise, oreBeetle, flowerHedgehog, paperDragonKite, tinToyCrab, alebrijeJaguar (see "Style round"). Provenance refresh records the batch 12 thinning agents as later editors.                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 
 ## Guide test run
 
@@ -83,6 +85,22 @@ On 2026-09-29 five Opus 5.5 (high) builders each got `GUIDE.md`, one subject and
 
 Friction they reported went into batch 10 (`docs/DESIGN.md`). Two builders hit a blank skeleton x-ray, which was the harness (fixed in creature lab daffb11).
 
+## Style round
+
+On 2026-09-29 seven builders each got `GUIDE.md`, one subject and a named art style, with a hard limit of 3 renders (v01-v03). Two styles ran on both models for comparison: pixel art (post-Minecraft low-poly, `pixelated` textures, quantised paints) and flat-colour detailed low-poly (no paints, flat-fill SVG textures, abundant foliage). All seven finished on v03 with a clean report and pass typecheck.
+
+| Sample          | Model / effort  | Style                         | Cost  | Active | Triangles | Result                                                                                        |
+| --------------- | --------------- | ----------------------------- | ----- | ------ | --------- | --------------------------------------------------------------------------------------------- |
+| mimicHermitCrab | Opus 5.5 medium | pixel art                     | $4.68 | 33 min | 5.7k      | crab in a plank-and-iron chest, hinged lid, coin spill; pixel tiles cropped per face          |
+| islandTortoise  | Opus 5.5 medium | flat-colour low-poly, foliage | $5.00 | 19 min | 10.9k     | island diorama on the shell: three trees, ferns, flowers, pool and waterfall, birdhouse, bird |
+| oreBeetle       | Sonnet 5.5 high | pixel art                     | $2.72 | 13 min | 2.7k      | ore-studded elytra, horn lantern; known bug: a level slab buries the rear elytra plates       |
+| flowerHedgehog  | Sonnet 5.5 high | flat-colour low-poly, foliage | $4.02 | 17 min | 15.4k     | ~1,000 quill cards, 24 flat SVG foliage drawings, faceted 3D flowers                          |
+| paperDragonKite | Sonnet 5.5 high | papercraft                    | $3.11 | 16 min | 13.4k     | 14 paper drums on bamboo hoops, scale cards, streamers; head still boxy                       |
+| tinToyCrab      | Sonnet 5.5 high | 1950s lithographed tin toy    | $2.47 | 14 min | 5.3k      | four misregistered ink plates in one paint, "CRABBY" decals, wind-up key joint                |
+| alebrijeJaguar  | Sonnet 5.5 high | Oaxacan alebrije carving      | $3.13 | 15 min | 16.3k     | pattern kit (dots, zigzags, scales, rosettes) laid along the anatomy, patterned feather wings |
+
+The task tool's `med` effort ran Opus at medium and Sonnet at high.
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
@@ -106,6 +124,12 @@ Friction the builders reported:
 - [x] Sweep `sectors` on narrow colour-split pieces triggered the harness's inside-out false alarm; the check now needs a closed part (6979c92).
 - [ ] README has lines over 1,000 characters (the `b.chain` and membrane paragraphs), which read tools truncate.
 - [ ] One broken sample fails `npm run typecheck` for everyone.
+- [ ] Pixel density: textures can't repeat and a box shows the whole drawing per face, so both pixel builders rewrote box UVs by hand to keep texels square (a per-face crop helper in each sample).
+- [ ] No flat-shading option on `part`/`stick`; flat-colour builders wrote `toNonIndexed()` + `computeVertexNormals()` helpers.
+- [ ] `b.ring` requires a callback even when only the items are wanted.
+- [ ] Paints can't tell a sweep's round cap or an extrude's side wall from the face (`s` collapses there); the alebrije's leg caps rendered black in v01.
+- [ ] `b.stick` seats by each part's own bounding box, so multi-colour sprigs sharing one frame sink by different amounts.
+- [ ] The 3-render limit surfaced that `--report-only` gives no visual preview; several builders spent a render on a paint or SVG change.
 - [ ] The lean-mesh GUIDE line (batch 11) is untested on a fresh builder: rerun one texture-round subject and compare triangles against its batch 10 build.
 
 Samples:
