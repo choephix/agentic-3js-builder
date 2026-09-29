@@ -41,6 +41,23 @@ export type SessionTotals = {
 };
 
 export type Render = { tag: string; errors: number; warnings: number; note?: string };
+/** One rendered version (an `npm run snap` tag) and the session and model that rendered it. */
+export type Version = {
+  tag: string;
+  arm: "A" | "B";
+  /** When its contact sheet was written. */
+  rendered: string;
+  /** The session that ran the render, as in `Builder`; all null with a `note` when no logged session did. */
+  agent: string | null;
+  session: string | null;
+  /** Display name of the model that issued the render command. */
+  model: string | null;
+  /** `provider/model` as logged. */
+  modelId: string | null;
+  /** Reasoning effort in force at that command. */
+  effort: string | null;
+  note?: string;
+};
 
 export type Build = {
   slug: string;
@@ -74,6 +91,8 @@ export type Build = {
   /** The builder submitted a result after its last prompt. */
   finished: boolean | null;
   session: SessionTotals | null;
+  /** Every rendered version on disk, oldest first, whoever rendered it. */
+  versions: Version[];
   /** Other sessions that edited the file afterwards, with write/edit calls. */
   laterEdits: Array<{
     agent: string;
@@ -129,6 +148,21 @@ export function buildTip(build: Build | undefined) {
   ]
     .filter(Boolean)
     .join(", ");
+}
+
+/**
+ * Who built the sample, from its build record: the builder's model and effort, then any other models that rendered
+ * later versions ("Claude Opus 5.5 high, then GPT-6 Sol"). Null without a record naming a model.
+ */
+export function builtBy(build: Build | undefined) {
+  if (!build) return null;
+  const first = build.builder?.model ?? build.versions.find((version) => version.model)?.model ?? null;
+  if (!first) return null;
+  const effort = build.builder?.model ? build.builder.effort : null;
+  const later = [...new Set(build.versions.map((version) => version.model))].filter(
+    (model): model is string => model !== null && model !== first,
+  );
+  return `${first}${effort ? ` ${effort}` : ""}${later.length ? `, then ${later.join(", ")}` : ""}`;
 }
 
 function issueText(build: Build) {

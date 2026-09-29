@@ -1,6 +1,6 @@
 // The showcase page. One sample at a time in one viewer; everything else (data panels, legends, the bend bar) is a
 // key or a click away and lives in the URL: `#redFox?mode=bones&skeleton&bend=40&seed=11&panel=tree&focus=bone:neck1`.
-import { buildSection, buildTip, builds, buildsTable } from "./builds";
+import { buildSection, buildTip, builds, buildsTable, builtBy } from "./builds";
 import * as catalog from "./catalog";
 import type { Catalog, SampleModule } from "./catalog";
 import { h } from "./dom";
@@ -355,7 +355,8 @@ function renderHeader() {
   const meta = loaded?.meta;
   $("name").textContent = meta?.name ?? state.slug;
   $("desc").textContent = meta?.description ?? "";
-  $("by").textContent = meta?.builtBy ? `by ${meta.builtBy}` : "";
+  const by = builtBy(builds[state.slug]) ?? meta?.builtBy;
+  $("by").textContent = by ? `by ${by}` : "";
   $("desc").title = meta?.description ?? "";
 }
 
@@ -555,7 +556,7 @@ function renderPanel() {
             ? codePanel(loaded)
             : panel === "textures"
               ? (texturesView?.element ?? missing("Nothing built."))
-              : versionsPanel(loaded.slug, loaded.snaps, state.tag, {
+              : versionsPanel(loaded.slug, loaded.snaps, builds[loaded.slug]?.versions ?? [], state.tag, {
                   select: (tag) => set({ tag }),
                   compare: (from, to) => set({ panel: "code", compare: `${from}..${to}` }),
                   lightbox: (items, index) => lightbox.show(items, index),
@@ -576,6 +577,7 @@ function infoPanel(sample: Loaded) {
   const info = sample.info;
   const meta = sample.meta;
   const latest = sample.snaps.tags[0];
+  const by = builtBy(builds[sample.slug]) ?? meta?.builtBy;
   const body = h(
     "div",
     { class: "info" },
@@ -584,12 +586,7 @@ function infoPanel(sample: Loaded) {
       { class: "meta" },
       h("h2", null, meta?.name ?? sample.slug),
       meta?.description ? h("p", null, meta.description) : null,
-      h(
-        "p",
-        { class: "muted small" },
-        h("code", null, `samples/${sample.slug}.ts`),
-        meta?.builtBy ? ` · built by ${meta.builtBy}` : "",
-      ),
+      h("p", { class: "muted small" }, h("code", null, `samples/${sample.slug}.ts`), by ? ` · built by ${by}` : ""),
     ),
   );
   if (info) {

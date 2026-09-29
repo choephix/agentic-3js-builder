@@ -1,5 +1,6 @@
 // Harness renders (`npm run snap`): the per-sample index from the dev server, the reports it points at, the
 // Versions panel and the image lightbox.
+import type { Version } from "./builds";
 import { h } from "./dom";
 import type { RigBlock } from "../src/rig";
 
@@ -135,8 +136,17 @@ export type VersionsActions = {
   lightbox(items: Array<{ url: string; caption: string }>, index: number): void;
 };
 
-/** The Versions panel: GLB downloads, every tag with its numbers, and the selected tag's sheet, shots and report. */
-export function versionsPanel(slug: string, snapshots: Snapshots, selected: string | null, actions: VersionsActions) {
+/**
+ * The Versions panel: GLB downloads, every tag with its numbers and the model that rendered it (`versions`, from the
+ * build record), and the selected tag's sheet, shots and report.
+ */
+export function versionsPanel(
+  slug: string,
+  snapshots: Snapshots,
+  versions: Version[],
+  selected: string | null,
+  actions: VersionsActions,
+) {
   if (!snapshots.tags.length)
     return h(
       "div",
@@ -177,7 +187,7 @@ export function versionsPanel(slug: string, snapshots: Snapshots, selected: stri
       "div",
       { class: "tag-row head" },
       h("span", null, "tag"),
-      h("span", null, "rendered"),
+      h("span", null, "by"),
       h("span", { class: "n" }, "parts"),
       h("span", { class: "n" }, "tris"),
       h("span", { class: "n" }, "issues"),
@@ -186,8 +196,16 @@ export function versionsPanel(slug: string, snapshots: Snapshots, selected: stri
   body.append(
     h("section", null, h("h3", null, `${snapshots.tags.length} version${snapshots.tags.length > 1 ? "s" : ""}`), table),
   );
+  /** "Claude Opus 5.5 high · AgentName", or why the render has no model. */
+  const renderedBy = (version: Version | undefined) =>
+    !version
+      ? "Not in the build record yet: run npm run provenance."
+      : version.model
+        ? `${version.model}${version.effort ? ` ${version.effort}` : ""} · ${version.agent}`
+        : (version.note ?? "unknown");
   snapshots.tags.forEach((snapshot, index) => {
     const older = snapshots.tags[index + 1];
+    const version = versions.find((item) => item.tag === snapshot.tag);
     const parts = h("span", { class: "n" });
     const tris = h("span", { class: "n" });
     const issues = h("span", { class: "n" });
@@ -195,8 +213,12 @@ export function versionsPanel(slug: string, snapshots: Snapshots, selected: stri
       h(
         "button",
         { class: `tag-row${snapshot === current ? " on" : ""}`, onclick: () => actions.select(snapshot.tag) },
-        h("span", { class: "tag" }, snapshot.tag),
-        h("span", { class: "muted" }, age(snapshot.time)),
+        h("span", { class: "tag", "data-tip": snapshot.tag }, snapshot.tag),
+        h(
+          "span",
+          { class: "model", "data-tip": `${age(snapshot.time)} · ${renderedBy(version)}` },
+          version?.model?.replace(/^(Claude|GPT-6) /, "") ?? "?",
+        ),
         parts,
         tris,
         issues,
@@ -229,7 +251,11 @@ export function versionsPanel(slug: string, snapshots: Snapshots, selected: stri
       "div",
       { class: "tag-head" },
       h("h3", null, current.tag),
-      h("span", { class: "muted" }, `${age(current.time)} · arm ${current.arm}`),
+      h(
+        "span",
+        { class: "muted" },
+        `${age(current.time)} · arm ${current.arm} · ${renderedBy(versions.find((item) => item.tag === current.tag))}`,
+      ),
       h(
         "span",
         { class: "actions" },

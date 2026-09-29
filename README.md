@@ -492,10 +492,11 @@ The sample contract:
 
 - One ES module per sample, `samples/<slug>.ts` (lowerCamel slug). It imports `three` and, if it wants, the SDK by relative path (`../src/builder`).
 - It default-exports a function that takes no arguments and returns a `THREE.Object3D`.
-- It may export `meta = { name, description?, builtBy? }`. The showcase lists it by `meta.name`, falling back to the slug, and shows `builtBy` when present.
+- It may export `meta = { name, description?, builtBy? }`. The showcase lists it by `meta.name`, falling back to the slug. The header's "by" line comes from the build record (below); `builtBy` shows only for a sample without one.
 - Anything goes: creatures, people, props, environments. The SDK and a skeleton are optional; `samples/lantern.ts` is plain three.js.
 - Samples are part of the codebase: `tsc` checks them, and an SDK change that breaks a sample updates the sample in the same change.
 - `samples/<slug>.build.json` records how the sample was built. `npm run provenance` writes it from the omp session log of the agent that first wrote the file and the harness reports of its tags. It holds the builder, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections and later editors. Values the logs can't give are null, with the reason in `caveats`. Builders don't write it. The fields are documented in `showcase/builds.ts`.
+- Its `versions` list every rendered tag on disk with the session, model and effort that rendered it: the logged shell call that was running the harness when the tag's contact sheet was written, so loops and computed tags count too. The Versions panel shows it per tag.
 
 ```ts
 import { createBuilder } from "../src/builder";

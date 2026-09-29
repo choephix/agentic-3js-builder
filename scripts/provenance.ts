@@ -14,7 +14,7 @@ import { existsSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileS
 import { homedir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { Build, Builder, Render, SessionTotals, Tokens } from "../showcase/builds";
+import type { Build, Builder, Render, SessionTotals, Tokens, Version } from "../showcase/builds";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 /** The nilo profile's logs, where earlier builders ran; logs from other profiles are named by their path from home. */
@@ -36,9 +36,12 @@ type Stats = {
 };
 // The lab repo is found from the home directory, like snap.ts's LAB_REPO; a static relative specifier would tie
 // this checkout's location to the lab's.
-const lab: { collectSession: (path: string) => Promise<{ stats: Stats } | null> } = await import(STATS);
+const lab: {
+  collectSession: (path: string) => Promise<{ stats: Stats } | null>;
+  MODEL_NAMES: Record<string, string>;
+} = await import(STATS);
 
-type Part = { type: string; id?: string; name?: string; arguments?: Record<string, unknown> };
+type Part = { type: string; id?: string; name?: string; text?: string; arguments?: Record<string, unknown> };
 type Message = {
   role?: string;
   provider?: string;
@@ -51,6 +54,8 @@ type Message = {
   stopReason?: string;
   errorMessage?: string;
   errorClassificationMessage?: string;
+  /** A backgrounded call's result: its job id, whose completion a later entry reports. */
+  details?: { async?: { jobId?: string } };
 };
 type Entry = {
   type?: string;
@@ -63,8 +68,22 @@ type Entry = {
   id?: string;
   cwd?: string;
   parentSession?: string;
+  thinkingLevel?: string;
 };
-type Call = { name: string; args: Record<string, unknown>; at: string; ran: boolean; failed: boolean };
+/** A tool call that ran, with the model that issued it and the reasoning effort in force then. */
+type Call = {
+  name: string;
+  args: Record<string, unknown>;
+  at: string;
+  ran: boolean;
+  failed: boolean;
+  model: string | null;
+  effort: string | null;
+  /** When its result was logged; "~" (after every timestamp) while it is still running. */
+  end: string;
+  /** The result's text. */
+  output: string;
+};
 /** A successful write or edit of a repo file; `path` is repo-relative. */
 type Touch = { path: string; at: string; write: boolean };
 type Log = {
@@ -108,17 +127,37 @@ function parseLog(file: string, text: string, seen: Set<string>): Log {
   const calls = new Map<string, Call>();
   const call = (id: string, at: string) => {
     let found = calls.get(id);
-    if (!found) calls.set(id, (found = { name: "", args: {}, at, ran: false, failed: false }));
+    if (!found)
+      calls.set(
+        id,
+        (found = {
+          name: "",
+          args: {},
+          at,
+          ran: false,
+          failed: false,
+          model: null,
+          effort: null,
+          end: "~",
+          output: "",
+        }),
+      );
     return found;
   };
+  let effort: string | null = null;
+  /** Backgrounded calls waiting for their completion report, by job id. */
+  const jobs = new Map<string, Call>();
   for (const entry of entries) {
     const message = entry.message;
+    if (entry.type === "thinking_level_change" && entry.thinkingLevel) effort = entry.thinkingLevel;
     if (entry.type === "message" && message?.role === "assistant" && Array.isArray(message.content))
       for (const part of message.content) {
         if (part.type !== "toolCall" || !part.id) continue;
         const found = call(part.id, entry.timestamp!);
         found.name ||= part.name ?? "";
         found.args = { ...found.args, ...part.arguments };
+        found.model = message.provider && message.model ? `${message.provider}/${message.model}` : null;
+        found.effort = effort;
       }
     if (entry.customType === "tool_execution_start" && entry.data?.toolCallId) {
       const found = call(entry.data.toolCallId, entry.data.startedAt ?? entry.timestamp!);
@@ -131,8 +170,26 @@ function parseLog(file: string, text: string, seen: Set<string>): Log {
       const found = call(message.toolCallId, entry.timestamp!);
       found.ran = true;
       found.failed = message.isError === true;
+      if (Array.isArray(message.content))
+        found.output = message.content.map((part) => (part.type === "text" ? (part.text ?? "") : "")).join("\n");
+      const job = message.details?.async?.jobId;
+      if (job) jobs.set(job, found);
+      else found.end = entry.timestamp!;
+      continue;
+    }
+    // A backgrounded job ends where a later entry reports it: a wait result lists it under its own heading, an
+    // async-result notice names it.
+    if (jobs.size) {
+      const text = JSON.stringify(entry.message?.content ?? entry);
+      for (const [job, found] of jobs)
+        if (text.includes(`### ${job} [`) || text.includes(`Background job ${job} has `)) {
+          found.end = entry.timestamp!;
+          found.output += `\n${text}`;
+          jobs.delete(job);
+        }
     }
   }
+  // A call with no result stays open-ended ("~"): it may still be running, or its session dropped mid-call.
   const ran = [...calls.values()].filter((item) => item.ran).sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0));
 
   const touches: Touch[] = [];
@@ -287,6 +344,70 @@ for (const slug of slugs) {
     }
 }
 
+/**
+ * Every shell call that ran the harness (`npm run snap`, `scripts/snap.ts` or `harness/snap.ts`) for a render, in any
+ * session. A command whose every harness run is `--report-only` renders nothing.
+ */
+const renderCalls = logs.flatMap((log) =>
+  log.calls
+    .filter(
+      (call) =>
+        call.name === "bash" &&
+        typeof call.args.command === "string" &&
+        call.args.command
+          .split(/&&|\|\||[;\n]/)
+          .some(
+            (part) => /npm run (?:-s |--silent )?snap\b|\bsnap\.ts\b/.test(part) && !part.includes("--report-only"),
+          ),
+    )
+    .map((call) => ({ log, call, text: `${call.args.command}\n${call.output}` })),
+);
+
+/**
+ * Every rendered version of `slug` (a contact sheet on disk, as the showcase lists them) and who rendered it: the
+ * shell call that was running the harness when the sheet was written, which holds for loops over samples and computed
+ * tags too. When several were running, the one whose command or output names the slug and tag, else the slug.
+ */
+function versionsOf(slug: string): Version[] {
+  const versions: Version[] = [];
+  for (const arm of ["B", "A"] as const) {
+    const directory = join(SNAPS, slug, arm, "snaps");
+    if (!existsSync(directory)) continue;
+    for (const name of readdirSync(directory).sort()) {
+      if (!name.endsWith("-sheet.jpg")) continue;
+      const tag = name.slice(0, -"-sheet.jpg".length);
+      if (versions.some((version) => version.tag === tag)) continue;
+      const rendered = statSync(join(directory, name)).mtime.toISOString();
+      let running = renderCalls.filter(({ call }) => call.at <= rendered && rendered <= call.end);
+      const exact = new RegExp(`${slug}/${arm}/snaps/${tag}-|\\b${slug}\\s+(?:[ABC]\\s+)?${tag}(?![\\w.-])`);
+      for (const names of [(text: string) => exact.test(text), (text: string) => text.includes(slug)]) {
+        const named = running.filter(({ text }) => names(text));
+        if (running.length > 1 && named.length) running = named;
+      }
+      const run = running.length === 1 ? running[0] : null;
+      const modelId = run?.call.model ?? null;
+      versions.push({
+        tag,
+        arm,
+        rendered,
+        agent: run?.log.agent ?? null,
+        session: run?.log.session ?? null,
+        model: modelId ? (lab.MODEL_NAMES[modelId.slice(modelId.indexOf("/") + 1)] ?? modelId) : null,
+        modelId,
+        effort: run?.call.effort ?? null,
+        ...(run
+          ? {}
+          : {
+              note: running.length
+                ? `${running.length} sessions were rendering ${slug} when this sheet was written.`
+                : "No logged session was running the harness when this sheet was written.",
+            }),
+      });
+    }
+  }
+  return versions.sort((a, b) => (a.rendered < b.rendered ? -1 : a.rendered > b.rendered ? 1 : 0));
+}
+
 const statsCache = new Map<Log, Stats>();
 async function statsOf(log: Log) {
   if (!statsCache.has(log)) {
@@ -345,6 +466,7 @@ async function buildOf(slug: string): Promise<Build> {
       compactions: null,
       finished: null,
       session: null,
+      versions: versionsOf(slug),
       laterEdits,
       caveats,
     };
@@ -421,6 +543,7 @@ async function buildOf(slug: string): Promise<Build> {
     compactions: log.entries.filter((entry) => entry.type === "compaction").length,
     finished: submits ? stats.finished : null,
     session: null,
+    versions: versionsOf(slug),
     laterEdits,
     caveats,
   };
