@@ -1,15 +1,11 @@
 // Local endpoints and their static-build equivalents for sample sources, harness renders (`npm run snap`) and the
 // sidebar thumbnails. Development serves renders through `/@fs/`; production copies the referenced files into the
 // build. Thumbnails live in the public folder, so both serve them as `/thumbs/`.
-import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { watch } from "node:fs";
 import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
-import { promisify } from "node:util";
 import { defineConfig, searchForWorkspaceRoot } from "vite";
-
-const run = promisify(execFile);
 
 const sampleRoot = resolve("samples");
 const snapshotRoot = resolve("/home/cx/tmp/public/nilo/agentic-3js-builder/snaps");
@@ -83,41 +79,23 @@ const sendText = async (response, path) => {
 };
 
 /**
- * When each sample joined the library: the earlier of the commit that added it and its file's birth time. A fresh
- * checkout gives every file the same birth time, so the commit decides there; an uncommitted sample has only its
- * birth time (or mtime where the filesystem records none).
+ * When each sample was created: the logged write that created it, from its build record (`npm run provenance`),
+ * which survives a fresh checkout; else its file's birth time (or mtime where the filesystem records none).
  */
 async function sampleCreated() {
   const files = (await list(sampleRoot)).filter((file) => file.endsWith(".ts"));
-  const [times, added] = await Promise.all([
-    Promise.all(files.map((file) => stat(join(sampleRoot, file)))),
-    gitAdded(),
-  ]);
-  return Object.fromEntries(
-    files.map((file, i) => [
-      basename(file, ".ts"),
-      Math.min(times[i].birthtimeMs || times[i].mtimeMs, added.get(file) ?? Infinity),
-    ]),
+  const times = await Promise.all(
+    files.map(async (file) => {
+      const record = await readFile(join(sampleRoot, `${basename(file, ".ts")}.build.json`), "utf8").then(
+        (text) => Date.parse(JSON.parse(text).created),
+        () => NaN,
+      );
+      if (Number.isFinite(record)) return record;
+      const details = await stat(join(sampleRoot, file));
+      return details.birthtimeMs || details.mtimeMs;
+    }),
   );
-}
-
-/** Sample file name → when the commit that added it was made (the latest such commit), in ms. */
-async function gitAdded() {
-  const log = await run("git", ["log", "--diff-filter=A", "--name-only", "--format=%x00%ct", "--", "samples/*.ts"], {
-    cwd: dirname(sampleRoot),
-  }).then(
-    (result) => result.stdout,
-    () => "",
-  );
-  const added = new Map();
-  for (const block of log.split("\0").slice(1)) {
-    const [time, ...paths] = block.trim().split("\n");
-    for (const path of paths.filter(Boolean)) {
-      const file = basename(path);
-      if (!added.has(file)) added.set(file, Number(time) * 1000);
-    }
-  }
-  return added;
+  return Object.fromEntries(files.map((file, i) => [basename(file, ".ts"), times[i]]));
 }
 
 // ── Sidebar thumbnails ───────────────────────────────────────────────────────────────────────────────────────────
@@ -137,8 +115,9 @@ async function sharedDigest() {
     .sort()
     .map((file) => join(resolve("src"), file));
   const hash = createHash("sha1");
+  // Paths relative to the repo, so every checkout agrees on the key.
   for (const file of [...sdk, resolve("showcase/viewer.ts"), resolve("showcase/thumbs.ts")])
-    hash.update(file).update(await readFile(file));
+    hash.update(relative(dirname(sampleRoot), file)).update(await readFile(file));
   return hash.digest("hex");
 }
 
