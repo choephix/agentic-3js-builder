@@ -1,0 +1,23 @@
+[build]
+  command = "npm run showcase:build"
+  publish = "showcase/dist"
+
+[[headers]]
+  for = "/__sample-created"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+
+[[headers]]
+  for = "/__snapshots/*"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+
+[[headers]]
+  for = "/__sample-source/*"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+  for = "/__render-source/*"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
