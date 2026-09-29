@@ -50,6 +50,8 @@ export type PartOptions = Tags & {
    * (a colour string; "#ffffff" keeps it as drawn), and transparent pixels cut the part away.
    */
   texture?: Texture;
+  /** Faceted shading: every triangle shades as one flat face (the geometry's vertices are split, normals redone). */
+  flat?: boolean;
 };
 
 export function part(ctx: Ctx, geometry: BufferGeometry, color: Fill, options: PartOptions = {}) {
@@ -74,13 +76,15 @@ export function part(ctx: Ctx, geometry: BufferGeometry, color: Fill, options: P
         ? new Vector3().setScalar(options.scale)
         : vec(options.scale);
   const blended = weights.length > 1;
-  const mesh = makeMesh(
-    ctx,
-    blended ? geometry.clone() : geometry,
-    color,
-    new Matrix4().compose(at, quat, scale),
-    options.texture,
-  );
+  const shaped = options.flat
+    ? geometry.index
+      ? geometry.toNonIndexed()
+      : geometry.clone()
+    : blended
+      ? geometry.clone()
+      : geometry;
+  if (options.flat) shaped.computeVertexNormals();
+  const mesh = makeMesh(ctx, shaped, color, new Matrix4().compose(at, quat, scale), options.texture);
   setWorld(mesh, joint.object, at, quat, scale);
   addMesh(ctx, mesh, joint, options);
   if (blended)

@@ -297,6 +297,8 @@ export type StickOptions = Tags & {
   scale?: number | V3;
   /** An image mapped by the geometry's UVs, tinted by `color`; see `part`. */
   texture?: Texture;
+  /** Faceted shading; see `part`. */
+  flat?: boolean;
 };
 
 /**

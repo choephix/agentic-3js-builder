@@ -6,6 +6,8 @@ import { cards } from "./cards";
 import type { CardOptions } from "./cards";
 import { Ctx } from "./context";
 import type { Fill, JointRef } from "./context";
+import { decal } from "./decal";
+import type { DecalOptions } from "./decal";
 import { along, ring } from "./distribute";
 import type { RingItem, RingOptions } from "./distribute";
 import { membrane, slab } from "./membrane";
@@ -126,6 +128,10 @@ export class Builder {
 
   stick(geometry: BufferGeometry, color: Fill, on: FrameInput, options?: StickOptions) {
     return stick(this.ctx, geometry, color, on, options);
+  }
+
+  decal(target: Surface | SurfaceTarget, texture: Texture, options: DecalOptions) {
+    return decal(this.ctx, target, texture, options);
   }
 
   cards(on: readonly FrameInput[], texture: Texture | readonly Texture[], options: CardOptions) {
