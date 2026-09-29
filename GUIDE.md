@@ -26,7 +26,7 @@ You build one sample for the agentic-3js-builder library: a three.js script that
 
 Use as many primitives as you need to make it look good. Surfaces can carry more than flat colour: paints (patterns in meters, baked into textures), SVG drawings as textures, and cards (many small textured cut-outs). README's "Paint, textures and cards" covers them.
 
-Keep each mesh lean: every part gets the fewest segments that keep its silhouette smooth at the size it is seen, and paints, textures and cards carry the fine detail. Small parts get few sides. README's "Detail and budget" covers the controls, per part and for the whole model.
+The wow comes from creativity, not smoothness. The look is low-poly: facets are part of it, and every part gets only enough segments to read as its shape at the size it is seen, spread evenly with none bunched in one place. Paints, textures and cards carry the fine detail. The snap report's "Fine meshes" list names the parts to thin out; README's "Detail and budget" covers the controls.
 
 ## Snapshot loop
 

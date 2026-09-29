@@ -44,7 +44,7 @@ export type LatheOptions = Tags & {
   at: PointInput;
   /** Model-space spin axis, the outline's +y (default [0, 1, 0], up). */
   axis?: DirectionInput;
-  /** Steps around the axis, 3 to 64 (default 16 × `detail`). Below 12 the sides shade flat: 6 is a hex column. */
+  /** Steps around the axis, 3 to 64 (default 12 × `detail`). Below 12 the sides shade flat: 6 is a hex column. */
   segments?: number;
   /** This part's own tessellation multiplier for its default `segments` (default: the builder's `detail`). */
   detail?: number;
@@ -331,7 +331,7 @@ export function lathe(ctx: Ctx, points: readonly OutlinePoint[], options: LatheO
   const negative = points.findIndex((p) => p[0] < 0);
   if (negative >= 0) throw new Error(`lathe(): point ${negative} has x < 0; x is the distance from the axis`);
   const outline = prepare("lathe()", points, options.smoothing);
-  const segments = options.segments ?? ctx.segments(16, ctx.detailOf("lathe()", options.detail));
+  const segments = options.segments ?? ctx.segments(12, ctx.detailOf("lathe()", options.detail));
   if (!Number.isInteger(segments) || segments < 3 || segments > 64)
     throw new Error(`lathe(): segments is a whole number from 3 to 64, got ${segments}`);
   const smooth = segments >= SMOOTH_LATHE_SEGMENTS;

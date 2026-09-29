@@ -149,8 +149,10 @@ type Frame = {
 type Arc = { a0: number; a1: number; color: Fill | null };
 
 const CORNER_SPLIT = 20 * (Math.PI / 180);
-/** Ring spacing at detail 1: at most this much turn or roll between rings. */
-const MAX_TURN = 10 * (Math.PI / 180);
+/** Ring spacing: at most one step round the section (360° / sides, 8 sides at least) of turn or roll between rings. */
+const turnLimit = (sides: number) => (2 * Math.PI) / Math.max(sides, 8);
+/** Closest spacing of rings along a tube, as a share of the edge length around it (unless a joint or cut needs one). */
+const RING_GAP = 0.7;
 
 /** Smooth interpolation through (xs[i], ys[i]); linear for 2 keys. */
 export function interpolate(xs: readonly number[], ys: readonly number[], x: number) {
@@ -524,9 +526,9 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const frames = chain ? chain.frames : path.frames(options.up, twist);
   const detail = ctx.detailOf("sweep()", options.detail);
   const shape = sectionShape(options.section ?? "circle", options.sides ?? ctx.segments(8, detail));
-  const maxTurn = MAX_TURN / detail;
-  const smooth = options.smooth ?? shape.smooth;
   const sides = shape.pts.length;
+  const maxTurn = turnLimit(sides);
+  const smooth = options.smooth ?? shape.smooth;
   const closed = path.closed && from === 0 && to === 1;
   const seamIn = path.tangentAt(1, true);
   const seamOut = path.tangentAt(0);
@@ -743,7 +745,8 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
       return { ...f, c, r: [Math.min(f.r[0] * scale, rx), Math.min(f.r[1] * scale, ry)] };
     };
     if (cap === "point") return [ring(buf, dome(rmax, 0), arc)];
-    const steps = Math.max(2, Math.round(sides / 3));
+    // A quarter circle in as many steps as a quarter of the way round: square quads, like the tube.
+    const steps = Math.max(2, Math.round(sides / 4));
     const rings: number[][] = [];
     for (let k = 1; k <= steps; k++) {
       const alpha = (k / steps) * (Math.PI / 2);
@@ -847,7 +850,10 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     const rmax = Math.max(...cand.map((f) => Math.max(...f.r)));
     const tol = (0.03 / detail) * rmax + 1e-6;
     const keys = (f: Frame) => [...f.r, ...f.s];
+    // Rings are never closer than about the edge length around the tube, so bends, tapers and joints don't clump.
+    const gap = (f: Frame) => (RING_GAP * 2 * Math.PI * Math.max(...f.r)) / sides;
     const fits = (k: number, j: number) => {
+      if ((cand[j].t - cand[k].t) * span < gap(cand[k])) return true;
       if (cand[k].T.angleTo(cand[j].T) > maxTurn || cand[k].N.angleTo(cand[j].N) > maxTurn) return false;
       const [ka, kb] = [keys(cand[k]), keys(cand[j])];
       for (let m = k + 1; m < j; m++) {

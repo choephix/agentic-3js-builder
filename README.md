@@ -286,7 +286,7 @@ Both take an outline: at least 3 corners `[x, y]` in meters, drawn in order arou
 `b.lathe(outline, { at, axis?, segments?, detail?, spin?, smoothing?, color, bone?, group?, name? })` spins half a cross-section around `axis` (default `[0, 1, 0]`) through `at`: hats, domes, bells, collars, bottles, vases, buttons, beaks, turned legs and anything round whose profile doubles back, which a sweep can't draw.
 
 - The outline's x is the distance from the axis and never negative; its y is the height along `axis`. For a solid, run from the axis out around the shape and back to it. For a shell (a bell, a hat brim), draw both walls so the loop has thickness.
-- `segments` (3 to 64, default 16 × `detail`) is the steps around. Below 12 the sides shade flat: 6 gives a hex column, 4 a square spire. `spin` turns the first step by that many degrees.
+- `segments` (3 to 64, default 12 × `detail`) is the steps around. Below 12 the sides shade flat: 6 gives a hex column, 4 a square spire. `spin` turns the first step by that many degrees.
 - Profile corners sharper than 35° stay creased; gentler ones (and smoothed curves) shade smooth.
 
 ```ts
@@ -456,9 +456,12 @@ Every handle stays valid afterwards, and anything built later lands in the new p
 
 ## Detail and budget
 
-`createBuilder({ detail })` scales the tessellation the SDK chooses: default circle sides (8 × detail), ring spacing (a ring per 10° / detail of turn), radius tolerance, membrane cells, lathe steps, bevel steps and card curl segments. Every shape also takes its own `detail`, which replaces the builder's for that shape: `sweep`, `loft`, the tube helpers, `sprout`, `membrane`, `extrude`, `lathe` and `cards`. `b.segments(n, detail?)` gives `max(3, round(n × detail))` for your own geometry (`new SphereGeometry(r, b.segments(12), b.segments(8))`). Explicit `sides`, `segments`, `rows` and `cols` still win.
+The look is low-poly: facets are part of it, and a part needs only enough segments to read as its shape at the size it is seen. A 2 cm eye is a 6 × 4 sphere, a horn or toe takes 6 to 8 sides, and paints, textures and cards carry the fine detail.
 
-Rings along a tube follow its shape: straight, even stretches take few rings, bends and radius changes take more, and every joint of a smooth-skinned tube adds three (the edges and middle of its bend). Triangles scale roughly with detail²: the peacock example has 10.7k triangles at detail 1 and 6.3k at 0.8. The mesh reads best when each part has the fewest segments that keep its silhouette smooth at the size it is seen; paints, textures and cards carry the fine detail.
+- **Per shape.** `sides` on a tube, `segments` on a lathe, `rows`/`cols` on a membrane, `smoothing` and `bevel` on an extrude, and the segment arguments of three.js geometries set the counts directly. Every shape also takes `detail`, a multiplier on the SDK's defaults for that shape alone: `sweep`, `loft`, the tube helpers, `sprout`, `membrane`, `extrude`, `lathe` and `cards`.
+- **Whole model.** `createBuilder({ detail })` scales every default: circle sides (8 × detail), lathe steps (12 × detail), membrane cells, bevel steps, card curl segments and the radius tolerance. `b.segments(n, detail?)` gives `max(3, round(n × detail))` for your own geometry.
+- **Rings along a tube** come from its shape: one ring per step round the section (360° / sides) of bend or roll, more where the radius or `shift` changes, three at each joint of a smooth-skinned tube (the edges and middle of the bend), and never closer together than about the edge length round the tube. Fewer sides therefore also means fewer rings.
+- **The snap report** lists "Fine meshes": the parts whose mean triangle edge is under 1/150 of the model's diagonal, most triangles first, named by `name` (or geometry class) with bone and group. Cards and other cut-out parts are left out.
 
 ## Rig answer key
 
