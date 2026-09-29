@@ -21,11 +21,31 @@ export type Skin = "smooth" | "rigid";
 export type Cap = "round" | "flat" | "point" | "none";
 export type Section = "circle" | "box" | { ngon: number };
 /**
+ * A section drawn per ring instead of scaled from a unit shape (see `src/experimental/contour.ts`). The polygon of a
+ * ring is its own list of vertices in meters, in the section axes (x along the binormal, y along the normal), around
+ * the path point.
+ */
+export interface Contour {
+  /** Vertices per ring by default (`sides` on the sweep wins); the polygon rounds it to a multiple of 4, at least 8. */
+  readonly sides: number;
+  /** Smooth normals by default. */
+  readonly smooth: boolean;
+  /** Reach of the section at source t: [right (+x), left (-x), front (+y), back (-y)] in meters. */
+  reach(t: number): readonly [number, number, number, number];
+  /** Numbers that change linearly where the section does: rings are dropped between rings that agree on them. */
+  keys(t: number): readonly number[];
+  /** Source t where the section changes fast: a ring always stands there. */
+  readonly knots: readonly number[];
+  /** The section's vertices at source t: `sides` of them, counter-clockwise from the upper left, faces on the axes. */
+  polygon(t: number, sides: number): Array<[number, number]>;
+}
+
+/**
  * number | [r0, r1] (linear) | number[] (evenly keyed over the swept range, smooth) | (t) => number | (t) => [rx, ry]
  * with t in source t (see `from`). rx runs along the binormal (side), ry along the normal (up). For "box", these are
  * half extents.
  */
-export type Radius = number | readonly number[] | ((t: number) => number | readonly [number, number]);
+export type Radius = number | readonly number[] | ((t: number) => number | readonly [number, number]) | Contour;
 
 export type SweepOptions = Tags & {
   /**
@@ -108,7 +128,7 @@ export class SweepPoint extends Spot {
   }
 }
 
-type Shape = { pts: Array<[number, number]>; smooth: boolean };
+type Shape = { pts: Array<[number, number]>; smooth: boolean; contour?: Contour };
 type Cut = { t: number; kind: "joint" | "corner" | "band" };
 /** Everything that places a ring: shared by mesh building and the surface queries of `Sweep`. */
 type Tube = {
@@ -121,6 +141,8 @@ type Tube = {
   /** Section centre offset at source t. */
   shift: (t: number) => readonly [number, number];
   shape: Shape;
+  /** A contoured section: every ring carries its own polygon. */
+  contour: Contour | null;
   corners: Corner[];
   closed: boolean;
   /** Averaged tangent at the seam of a closed tube whose seam is smooth; both end rings use it. */
@@ -144,6 +166,9 @@ type Frame = {
   ref: number;
   mandatory: boolean;
   w: Weights;
+  /** A contour's vertices at this ring (meters, section axes) and its `keys`. */
+  poly?: Array<[number, number]>;
+  key?: readonly number[];
 };
 /** A clock interval in degrees (a0 < a1) with its colour; null = the piece colour. */
 type Arc = { a0: number; a1: number; color: Fill | null };
@@ -183,6 +208,11 @@ export function interpolate(xs: readonly number[], ys: readonly number[], x: num
 }
 
 export function radiusFn(radius: Radius): (t: number) => [number, number] {
+  if (isContour(radius))
+    return (t) => {
+      const [right, left, front, back] = radius.reach(t);
+      return [Math.max(right, left), Math.max(front, back)];
+    };
   if (typeof radius === "number") return () => [radius, radius];
   if (typeof radius === "function")
     return (t) => {
@@ -194,6 +224,13 @@ export function radiusFn(radius: Radius): (t: number) => [number, number] {
     const r = Math.max(interpolate(xs, radius, t), 0);
     return [r, r];
   };
+}
+
+const isContour = (radius: Radius): radius is Contour => typeof radius === "object" && "polygon" in radius;
+
+/** The shape of a contoured tube: only its vertex count and shading matter, every ring carries its own polygon. */
+function contourShape(contour: Contour, sides: number, t: number): Shape {
+  return { pts: contour.polygon(t, sides), smooth: contour.smooth, contour };
 }
 
 function sectionShape(section: Section, sides: number): Shape {
@@ -223,15 +260,28 @@ function sectionShape(section: Section, sides: number): Shape {
   };
 }
 
-/** Where a ray from the section centre along (dx, dy) (binormal, normal components) meets the built polygon. */
-function sectionPoint(shape: Shape, r: [number, number], dx: number, dy: number) {
+/** A ring's polygon in meters around its centre: a contour's own vertices, else the section shape scaled by the radii. */
+function polygonOf(shape: Shape, f: Frame, scale = 1): Array<[number, number]> {
+  if (f.poly) return f.poly.map(([x, y]) => [x * scale, y * scale]);
+  const r = [f.r[0] * scale, f.r[1] * scale];
+  return shape.pts.map(([x, y]) => [x * r[0], y * r[1]]);
+}
+
+/** Where a ray from the section centre along (dx, dy) (binormal, normal components) meets the built polygon `pts`. */
+function sectionPoint(
+  shape: Shape,
+  pts: ReadonlyArray<readonly [number, number]>,
+  r: [number, number],
+  dx: number,
+  dy: number,
+) {
   if (Math.max(r[0], r[1]) < 1e-9) return { x: 0, y: 0, nx: dx, ny: dy };
-  const pts = shape.pts;
-  for (let k = 0; k < pts.length; k++) {
-    const vx = pts[k][0] * r[0];
-    const vy = pts[k][1] * r[1];
-    const ex = pts[(k + 1) % pts.length][0] * r[0] - vx;
-    const ey = pts[(k + 1) % pts.length][1] * r[1] - vy;
+  const count = pts.length;
+  for (let k = 0; k < count; k++) {
+    const vx = pts[k][0];
+    const vy = pts[k][1];
+    const ex = pts[(k + 1) % count][0] - vx;
+    const ey = pts[(k + 1) % count][1] - vy;
     const denom = dx * ey - dy * ex;
     if (Math.abs(denom) < 1e-12) continue;
     const lambda = (vx * ey - vy * ex) / denom;
@@ -241,7 +291,25 @@ function sectionPoint(shape: Shape, r: [number, number], dx: number, dy: number)
     const y = dy * lambda;
     let nx = ey;
     let ny = -ex;
-    if (shape.smooth) {
+    if (shape.smooth && shape.contour) {
+      // Vertex normals (the mean of the two faces at a vertex), blended along the face.
+      const face = (i: number) => {
+        const a = pts[(i + count) % count];
+        const c = pts[(i + 1 + count) % count];
+        const l = Math.hypot(c[0] - a[0], c[1] - a[1]) || 1;
+        return [(c[1] - a[1]) / l, -(c[0] - a[0]) / l];
+      };
+      const vertex = (i: number) => {
+        const [ax, ay] = face(i - 1);
+        const [bx, by] = face(i);
+        const l = Math.hypot(ax + bx, ay + by) || 1;
+        return [(ax + bx) / l, (ay + by) / l];
+      };
+      const [ax, ay] = vertex(k);
+      const [bx, by] = vertex(k + 1);
+      nx = ax + (bx - ax) * mu;
+      ny = ay + (by - ay) * mu;
+    } else if (shape.smooth) {
       nx = x / (r[0] * r[0] || 1e-12);
       ny = y / (r[1] * r[1] || 1e-12);
     }
@@ -294,6 +362,7 @@ function frameAt(tube: Tube, u: number, side: "left" | "right" | "corner", manda
     N,
     B,
     r: tube.radius(t),
+    ...(tube.contour ? { poly: tube.contour.polygon(t, tube.shape.pts.length), key: tube.contour.keys(t) } : {}),
     s,
     ref: tube.refAt ? tube.refAt(t, raw) : raw,
     mandatory,
@@ -339,7 +408,7 @@ function posed(tube: Tube, f: Frame, w: Weights): Frame {
 /** The built surface point at clock `angleDeg` (0 = dorsal, +90 = clockwise looking along the tube). */
 function surfacePoint(tube: Tube, f: Frame, angleDeg: number) {
   const phi = f.ref - angleDeg * DEG;
-  const q = sectionPoint(tube.shape, f.r, Math.cos(phi), Math.sin(phi));
+  const q = sectionPoint(tube.shape, polygonOf(tube.shape, f), f.r, Math.cos(phi), Math.sin(phi));
   const p = f.c.clone().addScaledVector(f.B, q.x).addScaledVector(f.N, q.y);
   return { p, q, nSec: f.B.clone().multiplyScalar(q.nx).addScaledVector(f.N, q.ny) };
 }
@@ -527,7 +596,10 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const rigidSkin = options.skin === "rigid";
   const frames = chain ? chain.frames : path.frames(options.up, twist);
   const detail = ctx.detailOf("sweep()", options.detail);
-  const shape = sectionShape(options.section ?? "circle", options.sides ?? ctx.segments(8, detail));
+  const contour = isContour(radius) ? radius : null;
+  const shape = contour
+    ? contourShape(contour, options.sides ?? ctx.segments(contour.sides, detail), from)
+    : sectionShape(options.section ?? "circle", options.sides ?? ctx.segments(8, detail));
   const sides = shape.pts.length;
   const maxTurn = turnLimit(sides);
   const smooth = options.smooth ?? shape.smooth;
@@ -537,7 +609,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const seamSmooth = closed && seamIn.angleTo(seamOut) <= CORNER_SPLIT;
   const corners = path.corners(from, to);
   const keyed = radiusFn(radius);
-  const rOf = typeof radius === "function" ? keyed : (t: number) => keyed(toU(t));
+  const rOf = typeof radius === "function" || contour ? keyed : (t: number) => keyed(toU(t));
   const rMaxAt = (t: number) => Math.max(...rOf(Math.min(Math.max(t, from), to)));
 
   // Bones: joint spans in source t (a chain source's own joints, or `bone` as chains and joints laid onto the path),
@@ -597,6 +669,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     radius: rOf,
     shift: typeof shift === "function" ? shift : () => shift ?? [0, 0],
     shape,
+    contour,
     corners: rigidSkin ? corners : [],
     closed,
     seam: seamSmooth ? seamIn.add(seamOut).normalize() : null,
@@ -685,7 +758,8 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     const point = (x: number, y: number) =>
       buf.vertex(f.c.clone().addScaledVector(f.B, x).addScaledVector(f.N, y), f.w, toT(f.t), deg(x, y));
     if (Math.max(r[0], r[1]) < 1e-9) return new Array<number>(indexed(arc) ? sides : 2).fill(point(0, 0));
-    if (indexed(arc)) return shape.pts.map(([x, y]) => point(x * r[0], y * r[1]));
+    const pts = polygonOf(shape, f, scale);
+    if (indexed(arc)) return pts.map(([x, y]) => point(x, y));
     // A full ring with edge vertices runs once round from the first edge angle and closes on its first vertex.
     const full = isFull(arc);
     const [a0, a1] = full ? [splitDegs[0], splitDegs[0] + 360] : [arc.a0, arc.a1];
@@ -694,13 +768,13 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     const p1 = f.ref - a0 * DEG;
     const wrap = (phi: number) => p0 + ((((phi - p0) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI));
     const boundary = (phi: number) => {
-      const q = sectionPoint(shape, r, Math.cos(phi), Math.sin(phi));
+      const q = sectionPoint(shape, pts, r, Math.cos(phi), Math.sin(phi));
       return point(q.x, q.y);
     };
     const inside = [
-      ...shape.pts.map(([x, y]) => ({
-        phi: wrap(Math.atan2(y * r[1], x * r[0])),
-        make: () => point(x * r[0], y * r[1]),
+      ...pts.map(([x, y]) => ({
+        phi: wrap(Math.atan2(y, x)),
+        make: () => point(x, y),
       })),
       ...splitDegs.map((d) => ({ phi: wrap(f.ref - d * DEG), make: () => boundary(f.ref - d * DEG) })),
     ]
@@ -737,14 +811,22 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     const rmax = Math.max(f.r[0], f.r[1]);
     if (rmax < 1e-9 || cap === "none" || cap === "flat") return [];
     const span = (to - from) * L;
+    /** A contour's dome polygon: scaled toward the centre, and inside the continuing tube's polygon when given. */
+    const shrunk = (scale: number, within?: Array<[number, number]>): Array<[number, number]> =>
+      f.poly!.map(([x, y], k) => {
+        if (!within) return [x * scale, y * scale];
+        const hold = (v: number, limit: number) => Math.sign(v) * Math.min(Math.abs(v), Math.abs(limit));
+        return [hold(x * scale, within[k][0]), hold(y * scale, within[k][1])];
+      });
     const dome = (d: number, scale: number): Frame => {
       const c = f.c.clone().addScaledVector(f.T, sign * d);
-      if (!inside) return { ...f, c, r: [f.r[0] * scale, f.r[1] * scale] };
+      if (!inside) return { ...f, c, r: [f.r[0] * scale, f.r[1] * scale], ...(f.poly ? { poly: shrunk(scale) } : {}) };
       const u = Math.min(Math.max(f.t + (sign * d) / span, 0), 1);
       const [rx, ry] = tube.radius(toT(u));
       const s = tube.shift(toT(u));
       c.addScaledVector(f.B, s[0] - f.s[0]).addScaledVector(f.N, s[1] - f.s[1]);
-      return { ...f, c, r: [Math.min(f.r[0] * scale, rx), Math.min(f.r[1] * scale, ry)] };
+      const held = f.poly ? { poly: shrunk(scale, tube.contour!.polygon(toT(u), sides)) } : {};
+      return { ...f, c, r: [Math.min(f.r[0] * scale, rx), Math.min(f.r[1] * scale, ry)], ...held };
     };
     if (cap === "point") return [ring(buf, dome(rmax, 0), arc)];
     // A quarter circle in as many steps as a quarter of the way round: square quads, like the tube.
@@ -842,7 +924,8 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
       .filter((c) => c.angle <= CORNER_SPLIT)
       .map((c) => toU(c.t))
       .filter(inPiece);
-    const mandatory = new Set([...smallCorners, ...windowUs.filter(inPiece)]);
+    const knotUs = contour ? contour.knots.map(toU) : [];
+    const mandatory = new Set([...smallCorners, ...windowUs.filter(inPiece), ...knotUs.filter(inPiece)]);
     const us = new Set<number>([a, b, ...mandatory, ...filletUs.filter(inPiece)]);
     const steps = Math.ceil(32 * Math.max(1, detail));
     for (let k = 1; k < steps; k++) us.add(a + ((b - a) * k) / steps);
@@ -858,7 +941,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
       );
     const rmax = Math.max(...cand.map((f) => Math.max(...f.r)));
     const tol = (0.03 / detail) * rmax + 1e-6;
-    const keys = (f: Frame) => [...f.r, ...f.s];
+    const keys = (f: Frame) => [...f.r, ...f.s, ...(f.key ?? [])];
     // Rings are never closer than about the edge length around the tube, so bends, tapers and joints don't clump.
     const gap = (f: Frame) => (RING_GAP * 2 * Math.PI * Math.max(...f.r)) / sides;
     const fits = (k: number, j: number) => {

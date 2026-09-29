@@ -31,7 +31,8 @@ import { sweep } from "./sweep";
 import type { Radius, SweepOptions } from "./sweep";
 
 export class Builder {
-  private readonly ctx: Ctx;
+  /** The shared context, for layers built on the SDK (src/experimental/sculpt.ts); samples don't use it. */
+  readonly ctx: Ctx;
 
   constructor(name = "creature", detail = 1, paintSize = 1024) {
     this.ctx = new Ctx(name, detail, paintSize);

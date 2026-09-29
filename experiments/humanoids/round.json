@@ -1,0 +1,61 @@
+{
+  "id": "humanoids",
+  "title": "Humanoid round",
+  "question": "Which toolkit lets a cheap model shape human body parts well: today's SDK, sculpt brushes on a sweep blockout, contoured sweep sections, or blended volumes?",
+  "started": "2026-09-29T17:21:40Z",
+  "model": "Claude Sonnet 5.5",
+  "modelId": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "brief": "brief.md",
+  "logDir": ".omp/agent/sessions/-noodlespace-agentic-3js-builder/2026-09-29T14-11-50-025Z_01a0ed81-ec89-767e-aece-91de0acbaeb4",
+  "subjects": [
+    {
+      "id": "lifeguard",
+      "name": "Lifeguard",
+      "summary": "Athletic man, 1.85 m, shirtless, red swim trunks, whistle, zinc nose"
+    },
+    {
+      "id": "sprinter",
+      "name": "Sprinter",
+      "summary": "Athletic woman, 1.70 m, crop top, running briefs, spikes, bib, ponytail"
+    }
+  ],
+  "arms": [
+    {
+      "id": "control",
+      "letter": "A",
+      "name": "Control",
+      "agent": "HumanoidControl",
+      "guide": "arms/control.md",
+      "toolkit": null,
+      "idea": "Today's SDK, no new tools"
+    },
+    {
+      "id": "sculpt",
+      "letter": "B",
+      "name": "Sculpt",
+      "agent": "HumanoidSculpt",
+      "guide": "arms/sculpt.md",
+      "toolkit": "src/experimental/sculpt.ts",
+      "idea": "Sweep blockout, then brushes: flatten, push, inflate, crease, smooth"
+    },
+    {
+      "id": "contour",
+      "letter": "C",
+      "name": "Contour",
+      "agent": "HumanoidContour",
+      "guide": "arms/contour.md",
+      "toolkit": "src/experimental/contour.ts",
+      "idea": "Sweep sections shaped by front, back, left, right reach and roundness"
+    },
+    {
+      "id": "blob",
+      "letter": "D",
+      "name": "Blob",
+      "agent": "HumanoidBlob",
+      "guide": "arms/blob.md",
+      "toolkit": "src/experimental/blob.ts",
+      "idea": "Blended volumes meshed into one skin, weights from the ingredients"
+    }
+  ]
+}
