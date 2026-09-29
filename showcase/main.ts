@@ -984,7 +984,7 @@ for (const host of [$("panel-body"), $("legend")]) {
 
 // ── Controls and keys ────────────────────────────────────────────────────────────────────────────────────────────
 
-const toggleBend = () => set(state.bend === null ? { bend: 0 } : { bend: null, wiggle: false });
+const toggleBend = () => set(state.bend === null ? { bend: 0, wiggle: true } : { bend: null, wiggle: false });
 const toggleWiggle = () =>
   set(state.wiggle ? { wiggle: false, bend: liveBend } : { wiggle: true, bend: state.bend ?? 0 });
 const nudgeBend = (by: number) =>
