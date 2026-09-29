@@ -37,11 +37,19 @@ export type Painted = {
   /** Bind-pose model-space positions and normals, 3 per vertex. */
   world: Float32Array;
   normal: Float32Array;
+  /** The part's own surface coordinates, 2 per vertex (`SurfaceCoords`); null when it has none. */
+  surface: Float32Array | null;
+  /** The second surface coordinate is an angle in degrees that wraps at 360. */
+  wrap: boolean;
 };
+
+/** The vertex attribute a shape stores its own surface coordinates in, until `chartify` takes them. */
+export const SURFACE = "_surface";
 
 /**
  * The geometry cut into charts: vertices shared between charts are split, every attribute is carried over, and a
- * `uv` attribute is added (filled in when the sheet is packed). `toWorld` places the geometry in model space.
+ * `uv` attribute is added (filled in when the sheet is packed). `toWorld` places the geometry in model space. The
+ * shape's surface coordinates come from its `_surface` attribute, else its own `uv`.
  */
 export function chartify(source: BufferGeometry, toWorld: Matrix4) {
   if (!source.getAttribute("normal")) source.computeVertexNormals();
@@ -147,8 +155,14 @@ export function chartify(source: BufferGeometry, toWorld: Matrix4) {
   for (const chart of charts) chart.size = [chart.size[0] - chart.min[0], chart.size[1] - chart.min[1]];
 
   const geometry = new BufferGeometry();
+  const own = source.getAttribute(SURFACE) ?? source.getAttribute("uv");
+  let surface: Float32Array | null = null;
+  if (own) {
+    surface = new Float32Array(sourceOf.length * 2);
+    sourceOf.forEach((src, i) => surface!.set([own.getX(src), own.getY(src)], i * 2));
+  }
   for (const [name, attribute] of Object.entries(source.attributes)) {
-    if (name === "uv") continue;
+    if (name === "uv" || name === SURFACE) continue;
     const size = attribute.itemSize;
     const from = attribute.array as TypedArray;
     const to = new (from.constructor as new (n: number) => TypedArray)(sourceOf.length * size);
@@ -168,6 +182,7 @@ export function chartify(source: BufferGeometry, toWorld: Matrix4) {
     geometry,
     charts,
     flat: Float32Array.from(flatList),
+    surface,
     world: pick(world),
     normal: pick(worldNormal),
   };
@@ -253,6 +268,9 @@ export function bakeSheet(painted: readonly Painted[], material: MeshStandardMat
       const ids = [chart.tris[t], chart.tris[t + 1], chart.tris[t + 2]];
       const xs = ids.map(px);
       const ys = ids.map(py);
+      // The triangle's surface coordinates, an angle unwrapped so a triangle across 0° doesn't average to 180°.
+      const ss = entry.surface ? ids.map((id) => [entry.surface![id * 2], entry.surface![id * 2 + 1]]) : null;
+      if (ss && entry.wrap) for (let k = 1; k < 3; k++) ss[k][1] += 360 * Math.round((ss[0][1] - ss[k][1]) / 360);
       const det = (ys[1] - ys[2]) * (xs[0] - xs[2]) + (xs[2] - xs[1]) * (ys[0] - ys[2]);
       if (Math.abs(det) < 1e-9) continue;
       // Half a texel of slack along each edge, so texels straddling an edge are painted from the nearest point.
@@ -291,7 +309,15 @@ export function bakeSheet(painted: readonly Painted[], material: MeshStandardMat
             n.z += entry.normal[o + 2] * w;
           });
           if (n.lengthSq() < 1e-12) n.set(0, 1, 0);
-          const color = entry.paint.at(p, n.normalize());
+          let s: [number, number] | undefined;
+          if (ss) {
+            s = [
+              (ss[0][0] * w0 + ss[1][0] * w1 + ss[2][0] * w2) / sum,
+              (ss[0][1] * w0 + ss[1][1] * w1 + ss[2][1] * w2) / sum,
+            ];
+            if (entry.wrap) s[1] = ((s[1] % 360) + 360) % 360;
+          }
+          const color = entry.paint.at(p, n.normalize(), s);
           data[texel * 4] = Math.round(Math.min(Math.max(color[0], 0), 1) * 255);
           data[texel * 4 + 1] = Math.round(Math.min(Math.max(color[1], 0), 1) * 255);
           data[texel * 4 + 2] = Math.round(Math.min(Math.max(color[2], 0), 1) * 255);

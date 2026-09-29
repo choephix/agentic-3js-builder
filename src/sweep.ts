@@ -439,12 +439,15 @@ class MeshBuffer {
   readonly positions: number[] = [];
   readonly index: number[] = [];
   readonly weights: Weights[] = [];
+  /** [source t, clock degrees] per vertex, for paints. */
+  readonly surface: number[] = [];
 
   constructor(readonly color: Fill) {}
 
-  vertex(p: Vector3, w: Weights) {
+  vertex(p: Vector3, w: Weights, t: number, deg: number) {
     this.positions.push(p.x, p.y, p.z);
     this.weights.push(w);
+    this.surface.push(t, deg);
     return this.positions.length / 3 - 1;
   }
 
@@ -472,23 +475,34 @@ const isBoneList = (x: SweepOptions["bone"]): x is ReadonlyArray<JointRef | Chai
  * A `bone` list laid onto the path, in path order: each joint owns source t from its span start to the next one. A
  * chain running with the path owns forward from each joint; one running against it (a tail on a curve drawn from
  * the tail tip) owns the stretch behind each joint, from its child or the chain tip. A lone joint owns from its
- * own position. Of several spans starting at one t, the last listed keeps it.
+ * own position. Of several spans starting at one t, the last listed keeps it. A span that would start beyond the
+ * path's end owns none of it and is left out (a chain longer than a feather swept along it), so the tip keeps the
+ * last bone it reaches.
  */
 function boneSpans(ctx: Ctx, path: Path, items: ReadonlyArray<JointRef | Chain>) {
-  const spans: Array<{ joint: Joint; t: number }> = [];
+  const slack = 1e-3 * path.length;
+  const past = (p: Vector3, t: number) =>
+    t >= 1 - 1e-6 && p.clone().sub(path.at(1)).dot(path.tangentAt(1, true)) > slack;
+  const spans: Array<{ joint: Joint; t: number; past: boolean }> = [];
   for (const item of items) {
     if (!(item instanceof Chain)) {
       const joint = resolveJoint(ctx, item);
-      spans.push({ joint, t: path.closestT(joint.at) });
+      const t = path.closestT(joint.at);
+      spans.push({ joint, t, past: past(joint.at, t) });
       continue;
     }
-    const ends = [...item.joints.map((joint) => path.closestT(joint.at)), path.closestT(item.at(1).at)];
+    const points = [...item.joints.map((joint) => joint.at), item.at(1).at];
+    const ends = points.map((p) => path.closestT(p));
     const forward = ends[ends.length - 1] >= ends[0];
-    item.joints.forEach((joint, i) => spans.push({ joint, t: forward ? ends[i] : ends[i + 1] }));
+    item.joints.forEach((joint, i) => {
+      const k = forward ? i : i + 1;
+      spans.push({ joint, t: ends[k], past: past(points[k], ends[k]) });
+    });
   }
   if (!spans.length) throw new Error("sweep(): the `bone` list is empty");
-  spans.sort((a, b) => a.t - b.t);
-  return spans.filter((span, i) => i === spans.length - 1 || spans[i + 1].t - span.t > 1e-6);
+  const kept = spans.some((span) => !span.past) ? spans.filter((span) => !span.past) : spans;
+  kept.sort((a, b) => a.t - b.t);
+  return kept.filter((span, i) => i === kept.length - 1 || kept[i + 1].t - span.t > 1e-6);
 }
 
 export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, options: SweepOptions = {}) {
@@ -656,8 +670,10 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   /** Ring vertices of `arc` at frame `f`, scaled toward the centre by `scale` (caps). Full rings are closed. */
   const ring = (buf: MeshBuffer, f: Frame, arc: Arc, scale = 1) => {
     const r: [number, number] = [f.r[0] * scale, f.r[1] * scale];
+    // Surface coordinates for paints: source t, and the dorsal clock angle of the point round the centre.
+    const deg = (x: number, y: number) => ((((f.ref - Math.atan2(y, x)) / DEG) % 360) + 360) % 360;
     const point = (x: number, y: number) =>
-      buf.vertex(f.c.clone().addScaledVector(f.B, x).addScaledVector(f.N, y), f.w);
+      buf.vertex(f.c.clone().addScaledVector(f.B, x).addScaledVector(f.N, y), f.w, toT(f.t), deg(x, y));
     if (Math.max(r[0], r[1]) < 1e-9) return new Array<number>(indexed(arc) ? sides : 2).fill(point(0, 0));
     if (indexed(arc)) return shape.pts.map(([x, y]) => point(x * r[0], y * r[1]));
     // A full ring with edge vertices runs once round from the first edge angle and closes on its first vertex.
@@ -732,7 +748,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
 
   const flatCap = (buf: MeshBuffer, f: Frame, arc: Arc, sign: number) => {
     if (Math.max(f.r[0], f.r[1]) < 1e-9) return;
-    const center = buf.vertex(f.c, f.w);
+    const center = buf.vertex(f.c, f.w, toT(f.t), 0);
     const rim = ring(buf, f, arc);
     const count = indexed(arc) ? sides : rim.length - 1;
     for (let k = 0; k < count; k++) {
@@ -774,7 +790,10 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
     for (const buf of buffers)
       if (buf.index.length)
         result.meshes.push(
-          meshFromWorld(ctx, buf.positions, buf.index, buf.color, (v) => buf.weights[v], smooth, tags),
+          meshFromWorld(ctx, buf.positions, buf.index, buf.color, (v) => buf.weights[v], smooth, tags, {
+            surface: buf.surface,
+            wrap: true,
+          }),
         );
     buffers = [];
   };

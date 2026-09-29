@@ -1,6 +1,7 @@
-// Paints: colour as a function of model-space position and surface normal. Any `color` option takes one; the SDK
-// bakes it into a texture over the part's surface, so a pattern runs on across body, legs and tail at one size in
-// meters. The ready-made paints below take colours or other paints for every colour, so they nest.
+// Paints: colour as a function of model-space position and surface normal (and, where the part has them, its own
+// surface coordinates). Any `color` option takes one; the SDK bakes it into a texture over the part's surface, so a
+// pattern runs on across body, legs and tail at one size in meters. The ready-made paints below take colours or
+// other paints for every colour, so they nest.
 import { Color, SRGBColorSpace, Vector3 } from "three";
 import { toPoint, vec } from "./math";
 import type { PointInput, V3 } from "./math";
@@ -11,17 +12,37 @@ export type Rgb = readonly [number, number, number];
 export type ColorInput = string | Rgb | Paint;
 /** One colour or a list; a list gives each spot, patch or scale one of them at random. */
 export type Colors = ColorInput | readonly ColorInput[];
+/**
+ * A part's own coordinates at a surface point: sweeps and lofts `[t, deg]` (source t, and the dorsal clock angle of
+ * `sweep.at`), extrude `[x, y]` (the outline's meters), lathe `[height, deg]`, membranes `[along, across]` (0..1),
+ * slabs `[x, y]` (meters in the polygon's plane), three.js geometries their `uv`, and `[0, 0]` elsewhere.
+ */
+export type SurfaceCoords = readonly [number, number];
+export type PaintFn = (p: Vector3, n: Vector3, s: SurfaceCoords) => ColorInput;
 
 let nextId = 0;
+const NOWHERE: SurfaceCoords = [0, 0];
+/** The surface coordinates of the point being painted, so paints nested inside another read them too. */
+let current: SurfaceCoords = NOWHERE;
 
-/** A colour at every surface point. `at(p, n)` reads it: `p` a model-space point, `n` the unit outward normal there. */
+/**
+ * A colour at every surface point. `at(p, n, s?)` reads it: `p` a model-space point, `n` the unit outward normal
+ * there, `s` the part's own surface coordinates (see `SurfaceCoords`).
+ */
 export class Paint {
   readonly id = ++nextId;
 
-  constructor(private readonly fn: (p: Vector3, n: Vector3) => ColorInput) {}
+  constructor(private readonly fn: PaintFn) {}
 
-  at(p: Vector3, n: Vector3): Rgb {
-    return resolve(this.fn(p, n), p, n);
+  at(p: Vector3, n: Vector3, s?: SurfaceCoords): Rgb {
+    if (!s) return resolve(this.fn(p, n, current), p, n);
+    const outer = current;
+    current = s;
+    try {
+      return resolve(this.fn(p, n, s), p, n);
+    } finally {
+      current = outer;
+    }
   }
 
   /** Sweeps compare colours as strings when they split a tube; every paint is its own colour. */
@@ -30,8 +51,11 @@ export class Paint {
   }
 }
 
-/** Your own paint: `(p, n) => colour`, where the colour may be another paint (`p.y < 0.3 ? SOCK : coat`). */
-export function paint(fn: (p: Vector3, n: Vector3) => ColorInput) {
+/**
+ * Your own paint: `(p, n, s) => colour`, where the colour may be another paint (`p.y < 0.3 ? SOCK : coat`) and `s`
+ * is the part's own surface coordinates (on a tube, a stripe that spirals round it depends on both t and angle).
+ */
+export function paint(fn: PaintFn) {
   return new Paint(fn);
 }
 

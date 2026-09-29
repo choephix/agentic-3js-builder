@@ -5,6 +5,7 @@ import { Vector3 } from "three";
 import type { Mesh, Texture } from "three";
 import { meshFromWorld, weightsFor } from "./context";
 import type { Ctx, JointRef, Tags, Weights } from "./context";
+import type { Frame } from "./frame";
 import { DEG, flatten, rng, toDirection, toFrame } from "./math";
 import type { DirectionInput, FrameInput } from "./math";
 import { Paint } from "./paint";
@@ -17,8 +18,11 @@ export type CardOptions = Tags & {
    * (grass, bristles, a crest), 90 lies along the surface (scales, shingles). Default 0.
    */
   lean?: number;
-  /** The direction cards lean and curl toward, flattened onto the surface; default [0, -0.3, -1] (back and down). */
-  flow?: DirectionInput;
+  /**
+   * The direction cards lean and curl toward, flattened onto the surface; default [0, -0.3, -1] (back and down). A
+   * function gives each card its own: `(frame, i) => direction`.
+   */
+  flow?: DirectionInput | ((frame: Frame, i: number) => DirectionInput);
   /** Extra degrees each card curls toward `flow` from root to tip, drawn in 4 segments. Default 0 (flat). */
   bend?: number;
   /** Add a second card at right angles through each one: tufts, grass clumps, leaves seen from any side. */
@@ -38,11 +42,16 @@ export type CardOptions = Tags & {
   bone?: JointRef;
   /** How far each card's root sinks back into the surface, as a share of its length. Default 0.1. */
   sink?: number;
+  /** Flip every drawing left to right: the other side of a body, with the same texture. */
+  mirror?: boolean;
 };
 
 const SEGMENTS = 4;
 
-/** One card per frame, built from `texture` (or one picked at random per card from a list); returns the meshes. */
+/**
+ * One card per frame, built from `texture` (or one picked at random per card from a list; list a texture twice to
+ * pick it twice as often); returns the meshes, one per distinct texture.
+ */
 export function cards(
   ctx: Ctx,
   on: readonly FrameInput[],
@@ -51,12 +60,19 @@ export function cards(
 ): Mesh[] {
   const textures = Array.isArray(texture) ? (texture as readonly Texture[]) : [texture as Texture];
   if (!textures.length) throw new Error("cards(): no texture");
+  const distinct = [...new Set(textures)];
   const [w0, h0] = typeof options.size === "number" ? [options.size, options.size] : options.size;
   const random = options.rng ?? rng(1);
   const lean = (options.lean ?? 0) * DEG;
   const bend = (options.bend ?? 0) * DEG;
   const segments = bend ? SEGMENTS : 1;
-  const flowWorld = options.flow ? toDirection(options.flow) : new Vector3(0, -0.3, -1);
+  const flowFor = (frame: Frame, i: number) =>
+    typeof options.flow === "function"
+      ? toDirection(options.flow(frame, i))
+      : options.flow
+        ? toDirection(options.flow)
+        : new Vector3(0, -0.3, -1);
+  const [u0, u1] = options.mirror ? [1, 0] : [0, 1];
   const sink = options.sink ?? 0.1;
   const tint = options.color instanceof Paint ? null : (options.color ?? "#ffffff");
   const tags = { name: options.name ?? "cards", group: options.group };
@@ -69,11 +85,11 @@ export function cards(
     index: number[];
     weights: Weights[];
   };
-  const batches = textures.map(
+  const batches = distinct.map(
     (): Batch => ({ positions: [], normals: [], uvs: [], colors: [], index: [], weights: [] }),
   );
 
-  for (const input of on) {
+  on.forEach((input, i) => {
     const f = toFrame(input);
     const root = f.at;
     const n = f.axis.normalize();
@@ -82,7 +98,7 @@ export function cards(
     const turn = (options.spin ?? 0) * (2 * random() - 1) * DEG;
     const w = w0 * scale;
     const h = h0 * scale;
-    let t = flatten(flowWorld, n);
+    let t = flatten(flowFor(f, i), n);
     if (t.lengthSq() < 1e-10) t = flatten(new Vector3(0, 0, -1), n);
     if (t.lengthSq() < 1e-10) t = flatten(new Vector3(1, 0, 0), n);
     t.normalize();
@@ -90,7 +106,7 @@ export function cards(
     const side = n.clone().cross(t).normalize();
     const weights = weightsFor(ctx, options.bone, [input], root);
     const color = options.color instanceof Paint ? options.color.at(root, n) : null;
-    const batch = batches[pickT];
+    const batch = batches[distinct.indexOf(textures[pickT])];
 
     // The card's spine: from the sunk root out along the leaning, curling direction.
     const dirAt = (s: number) => {
@@ -114,8 +130,8 @@ export function cards(
       spine.forEach((p, k) => {
         const half = across(k).multiplyScalar(w / 2);
         for (const [sign, u] of [
-          [-1, 0],
-          [1, 1],
+          [-1, u0],
+          [1, u1],
         ] as const) {
           const q = p.clone().addScaledVector(half, sign);
           batch.positions.push(q.x, q.y, q.z);
@@ -133,7 +149,7 @@ export function cards(
     };
     strip(() => side.clone());
     if (options.cross) strip((k) => dirs[k].clone().cross(side).normalize());
-  }
+  });
 
   const meshes: Mesh[] = [];
   batches.forEach((batch, k) => {
@@ -143,7 +159,7 @@ export function cards(
         normals: batch.normals,
         uvs: batch.uvs,
         colors: tint ? undefined : batch.colors,
-        texture: textures[k],
+        texture: distinct[k],
       }),
     );
   });

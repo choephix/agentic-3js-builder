@@ -173,7 +173,9 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     );
     const { positions, index, sources } = prism(grid, normals, cells, options.thickness / 2);
     return [
-      meshFromWorld(ctx, positions, index, options.color, (v) => weights[sources[v][0]][sources[v][1]], false, tags),
+      meshFromWorld(ctx, positions, index, options.color, (v) => weights[sources[v][0]][sources[v][1]], false, tags, {
+        surface: sources.flatMap(([i, j]) => [columns[i], j / rows]),
+      }),
     ];
   }
 
@@ -193,8 +195,10 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     else byJoint.set(joint, [[i, j]]);
   }
   return [...byJoint].map(([joint, group]) => {
-    const { positions, index } = prism(grid, normals, group, options.thickness / 2);
-    return meshFromWorld(ctx, positions, index, options.color, () => rigid(joint), false, tags);
+    const { positions, index, sources } = prism(grid, normals, group, options.thickness / 2);
+    return meshFromWorld(ctx, positions, index, options.color, () => rigid(joint), false, tags, {
+      surface: sources.flatMap(([i, j]) => [columns[i], j / rows]),
+    });
   });
 }
 
@@ -249,9 +253,21 @@ export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptio
     tri(top[b], bottom[a], bottom[b]);
   }
   const weights = weightsFor(ctx, options.bone, points, center);
-  const mesh = meshFromWorld(ctx, positions, index, options.color, () => weights, false, {
-    name: options.name ?? "slab",
-    group: options.group,
-  });
+  const q = new Vector3();
+  const surface: number[] = [];
+  for (let i = 0; i < positions.length; i += 3) {
+    q.fromArray(positions, i).sub(center);
+    surface.push(q.dot(u), q.dot(v));
+  }
+  const mesh = meshFromWorld(
+    ctx,
+    positions,
+    index,
+    options.color,
+    () => weights,
+    false,
+    { name: options.name ?? "slab", group: options.group },
+    { surface },
+  );
   return new Part(mesh, center, frame, weights, [0, 0, 1]);
 }

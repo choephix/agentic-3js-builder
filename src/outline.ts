@@ -303,10 +303,16 @@ export function extrude(ctx: Ctx, points: readonly OutlinePoint[], options: Extr
     new Matrix4().makeBasis(xDir, yDir, new Vector3().crossVectors(xDir, yDir)),
   );
   const weights = weightsFor(ctx, options.bone, [options.at], at);
-  const mesh = meshFromWorld(ctx, toWorld(local, at, quat), index, options.color, () => weights, false, {
-    name: options.name ?? "extrude",
-    group: options.group,
-  });
+  const mesh = meshFromWorld(
+    ctx,
+    toWorld(local, at, quat),
+    index,
+    options.color,
+    () => weights,
+    false,
+    { name: options.name ?? "extrude", group: options.group },
+    { surface: local.flatMap((value, i) => (i % 3 === 2 ? [] : [value])) },
+  );
   return new Part(mesh, at, quat, weights, [0, 0, 1]);
 }
 
@@ -336,6 +342,7 @@ export function lathe(ctx: Ctx, points: readonly OutlinePoint[], options: LatheO
     return d0[0] * d1[0] + d0[1] * d1[1] < Math.cos(LATHE_CREASE_DEG * DEG);
   });
   const local: number[] = [];
+  const surface: number[] = [];
   const index: number[] = [];
   const spin = (options.spin ?? 0) * DEG;
   const column = (p: Vec2) => {
@@ -343,6 +350,7 @@ export function lathe(ctx: Ctx, points: readonly OutlinePoint[], options: LatheO
     for (let s = 0; s < segments; s++) {
       const angle = spin + (s / segments) * Math.PI * 2;
       local.push(p[0] * Math.sin(angle), p[1], p[0] * Math.cos(angle));
+      surface.push(p[1], (((angle / DEG) % 360) + 360) % 360);
     }
     return start;
   };
@@ -365,9 +373,15 @@ export function lathe(ctx: Ctx, points: readonly OutlinePoint[], options: LatheO
   const at = toPoint(options.at);
   const quat = aim(toDirection(options.axis ?? [0, 1, 0]), undefined, "y");
   const weights = weightsFor(ctx, options.bone, [options.at], at);
-  const mesh = meshFromWorld(ctx, toWorld(local, at, quat), index, options.color, () => weights, smooth, {
-    name: options.name ?? "lathe",
-    group: options.group,
-  });
+  const mesh = meshFromWorld(
+    ctx,
+    toWorld(local, at, quat),
+    index,
+    options.color,
+    () => weights,
+    smooth,
+    { name: options.name ?? "lathe", group: options.group },
+    { surface, wrap: true },
+  );
   return new Part(mesh, at, quat, weights, [0, 1, 0]);
 }

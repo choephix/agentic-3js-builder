@@ -15,7 +15,7 @@ import {
   Vector3,
 } from "three";
 import type { Object3D, Texture } from "three";
-import { bakeSheet, chartify } from "./bake";
+import { bakeSheet, chartify, SURFACE } from "./bake";
 import type { Painted } from "./bake";
 import type { Frame } from "./frame";
 import { Paint } from "./paint";
@@ -290,8 +290,18 @@ export function addMesh(ctx: Ctx, mesh: Mesh, joint: Joint, tags: Tags) {
   else ctx.meshes.set(joint, [mesh]);
 }
 
-/** Per-vertex extras for `meshFromWorld`: model-space normals (else computed), uvs, linear vertex colours, a texture. */
-export type MeshExtras = { normals?: number[]; uvs?: number[]; colors?: number[]; texture?: Texture };
+/**
+ * Per-vertex extras for `meshFromWorld`: model-space normals (else computed), uvs, linear vertex colours, a texture,
+ * and the shape's own surface coordinates for paints (2 per vertex; `wrap` when the second is degrees round a loop).
+ */
+export type MeshExtras = {
+  normals?: number[];
+  uvs?: number[];
+  colors?: number[];
+  texture?: Texture;
+  surface?: number[];
+  wrap?: boolean;
+};
 
 /**
  * A mesh from WORLD-space triangles with weights per vertex. It hangs under its heaviest bone with an identity
@@ -329,11 +339,13 @@ export function meshFromWorld(
   }
   if (extras.uvs) geometry.setAttribute("uv", new Float32BufferAttribute(extras.uvs, 2));
   if (extras.colors) geometry.setAttribute("color", new Float32BufferAttribute(extras.colors, 3));
+  if (extras.surface && fill instanceof Paint)
+    geometry.setAttribute(SURFACE, new Float32BufferAttribute(extras.surface, 2));
   geometry.setIndex(index);
   const bones = totals.size > 1 ? writeWeights(geometry, count, weightAt) : null;
   if (!smooth) geometry = geometry.toNonIndexed();
   if (!extras.normals) geometry.computeVertexNormals();
-  const mesh = makeMesh(ctx, geometry, fill, joint.object.matrixWorld, extras.texture);
+  const mesh = makeMesh(ctx, geometry, fill, joint.object.matrixWorld, extras.texture, extras.wrap);
   joint.object.add(mesh);
   mesh.updateMatrixWorld(true);
   addMesh(ctx, mesh, joint, tags);
@@ -344,14 +356,22 @@ export function meshFromWorld(
 /**
  * A mesh with the material its fill asks for. A colour string shares the matte material for that colour (with a
  * `texture`, the textured material tinted by it). A Paint cuts the geometry into charts and registers it for the
- * paint sheet. `toWorld` is where the mesh will sit in model space.
+ * paint sheet, with the surface coordinates in its `_surface` attribute (else its uv; `wrap` for an angle).
+ * `toWorld` is where the mesh will sit in model space.
  */
-export function makeMesh(ctx: Ctx, geometry: BufferGeometry, fill: Fill, toWorld: Matrix4, texture?: Texture) {
+export function makeMesh(
+  ctx: Ctx,
+  geometry: BufferGeometry,
+  fill: Fill,
+  toWorld: Matrix4,
+  texture?: Texture,
+  wrap = false,
+) {
   if (fill instanceof Paint) {
     if (texture) throw new Error("A textured part takes a colour string as its tint, not a paint");
-    const cut = chartify(geometry, toWorld);
-    const mesh = new Mesh(cut.geometry, ctx.paintMaterial());
-    ctx.paints.push({ mesh, paint: fill, charts: cut.charts, flat: cut.flat, world: cut.world, normal: cut.normal });
+    const { geometry: cut, ...charts } = chartify(geometry, toWorld);
+    const mesh = new Mesh(cut, ctx.paintMaterial());
+    ctx.paints.push({ mesh, paint: fill, wrap, ...charts });
     return mesh;
   }
   if (!texture) return new Mesh(geometry, ctx.material(fill));
