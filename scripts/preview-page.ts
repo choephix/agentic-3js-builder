@@ -32,7 +32,7 @@ export type PreviewTexture = {
   png: string;
 };
 export type PreviewQuestion = {
-  kind: "gap" | "bones";
+  kind: "gap" | "bones" | "box";
   text: string;
   selectors: string[];
   error?: boolean;
@@ -195,8 +195,7 @@ const selectorMatch = (selector: string, parts: PreviewPart[], ownerBones: Array
   return null;
 };
 
-const closestNames = (selector: string, parts: PreviewPart[]) => {
-  const names = [...new Set(parts.flatMap((part) => [part.name, part.group, ...part.bones]))];
+const closestNames = (selector: string, names: string[]) => {
   const wanted = selector.toLowerCase();
   return names
     .map((name) => ({
@@ -215,8 +214,8 @@ const selectorLabel = (selector: string, match: SelectorMatch, parts: PreviewPar
   return `${selector} (${match.kind}, ${match.parts.length} parts)`;
 };
 
-const unmatched = (kind: "gap" | "bones", selector: string, parts: PreviewPart[]): PreviewQuestion => {
-  const suggestions = closestNames(selector, parts);
+const unmatched = (kind: PreviewQuestion["kind"], selector: string, names: string[]): PreviewQuestion => {
+  const suggestions = closestNames(selector, names);
   return {
     kind,
     selectors: [selector],
@@ -230,11 +229,13 @@ async function run({
   shot,
   gaps,
   bones,
+  boxes,
 }: {
   code: string;
   shot: boolean;
   gaps: Array<[string, string]>;
   bones: string[];
+  boxes: string[];
 }): Promise<PreviewResult> {
   // The creature bundle maps `three` to this global (so both share one copy) and assigns its exports to __creature.
   const page = globalThis as {
@@ -306,14 +307,21 @@ async function run({
   });
 
   const ownerBones = assembly.parts.map((part) => part.bone);
+  // What selectorMatch accepts, for suggestions: part names, groups and bones that own a part.
+  const selectable = [
+    ...new Set([
+      ...parts.flatMap((part) => [part.name, part.group]),
+      ...ownerBones.filter((bone) => bone !== undefined),
+    ]),
+  ];
   const questions: PreviewQuestion[] = [];
   const measure = gaps.length ? measureIndex(assembly) : undefined;
   const point = (values: number[]) => `[${values.map((value) => value.toFixed(3)).join(", ")}]`;
   for (const [aSelector, bSelector] of gaps) {
     const a = selectorMatch(aSelector, parts, ownerBones);
     const b = selectorMatch(bSelector, parts, ownerBones);
-    if (!a) questions.push(unmatched("gap", aSelector, parts));
-    if (!b) questions.push(unmatched("gap", bSelector, parts));
+    if (!a) questions.push(unmatched("gap", aSelector, selectable));
+    if (!b) questions.push(unmatched("gap", bSelector, selectable));
     if (!a || !b) continue;
     const measured = gap(measure!, a.parts, b.parts);
     const distance = measured.distance * 1000;
@@ -329,7 +337,7 @@ async function run({
   for (const selector of bones) {
     const match = selectorMatch(selector, parts, ownerBones);
     if (!match) {
-      questions.push(unmatched("bones", selector, parts));
+      questions.push(unmatched("bones", selector, selectable));
       continue;
     }
     const label = selectorLabel(selector, match, parts);
@@ -346,6 +354,22 @@ async function run({
       kind: "bones",
       selectors: [selector],
       text: `Bones of ${label}: ${details.join(", ") || "no bone weights"}`,
+    });
+  }
+  for (const selector of boxes) {
+    const match = selectorMatch(selector, parts, ownerBones);
+    if (!match) {
+      questions.push(unmatched("box", selector, selectable));
+      continue;
+    }
+    const lo = [0, 1, 2].map((axis) => Math.min(...match.parts.map((i) => min[i][axis])));
+    const hi = [0, 1, 2].map((axis) => Math.max(...match.parts.map((i) => max[i][axis])));
+    const size = hi.map((value, axis) => ((value - lo[axis]) * 1000).toFixed(1)).join(" × ");
+    const centre = hi.map((value, axis) => (value + lo[axis]) / 2);
+    questions.push({
+      kind: "box",
+      selectors: [selector],
+      text: `Box of ${selectorLabel(selector, match, parts)}: min ${point(lo)} max ${point(hi)}; size ${size} mm (x × y × z); centre ${point(centre)}`,
     });
   }
 

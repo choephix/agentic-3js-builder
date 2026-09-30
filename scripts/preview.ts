@@ -1,6 +1,6 @@
 // A quick look at a sample without spending a render: its textures, a parts table and, on request, two lit shots.
 //
-//   npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]...
+//   npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]... [--box <A>]...
 //
 // Builds the sample in the shared headless Chromium on :9333 and bakes it with the creature-lab harness's assemble(),
 // so its numbers match `npm run snap`. Writes to ~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/ (replaced on
@@ -19,7 +19,8 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const LAB_REPO = join(homedir(), "workspace/nilo-creature-lab");
 const OUT = join(homedir(), "tmp/public/nilo/agentic-3js-builder/preview");
 const CDP_URL = "http://127.0.0.1:9333";
-const USAGE = "Usage: npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]...";
+const USAGE =
+  "Usage: npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]... [--box <A>]...";
 
 const started = Date.now();
 const args = process.argv.slice(2);
@@ -27,6 +28,7 @@ let target: string | undefined;
 let shot = false;
 const gaps: Array<[string, string]> = [];
 const bones: string[] = [];
+const boxes: string[] = [];
 const usageError = (message: string): never => {
   console.error(`${message}\n${USAGE}`);
   process.exit(2);
@@ -44,6 +46,10 @@ for (let i = 0; i < args.length; i++) {
     const selector = args[++i];
     if (!selector || selector.startsWith("--")) usageError("The --bones flag needs one selector.");
     bones.push(selector);
+  } else if (arg === "--box") {
+    const selector = args[++i];
+    if (!selector || selector.startsWith("--")) usageError("The --box flag needs one selector.");
+    boxes.push(selector);
   } else if (arg.startsWith("--")) {
     usageError(`Unknown flag ${arg}.`);
   } else if (target === undefined) {
@@ -165,7 +171,7 @@ try {
     .evaluate(
       (options) =>
         (window as unknown as { preview: { run(options: unknown): Promise<PreviewResult> } }).preview.run(options),
-      { code: creatureBundle.outputFiles[0].text, shot, gaps, bones },
+      { code: creatureBundle.outputFiles[0].text, shot, gaps, bones, boxes },
     )
     .catch((reason: Error) => {
       console.error(`Build failed: ${reason.message.replace(/^page\.evaluate: /, "")}`);
