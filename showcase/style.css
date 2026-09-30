@@ -141,14 +141,46 @@ details.parts summary,
 #builds-button {
   margin: 0 -4px 0 auto;
 }
-/* Zero intrinsic width, so the input never widens the sidebar. */
-.filter {
-  position: relative;
-  width: 0;
-  min-width: calc(100% - 12px);
+/* Model filters stay visible; the name search is available from the icon or `/`. */
+.filter-tools {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
   margin: 0 6px 4px;
 }
-.filter input {
+#models {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 3px;
+  min-width: 0;
+}
+.model-filter {
+  min-height: 20px;
+  padding: 0 5px;
+  border: 1px solid #cecece;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--fg-2);
+  font-size: 11px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.model-filter:hover {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+.model-filter.on,
+.model-filter.on:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.filter-search {
+  position: relative;
+  margin: 0 6px 4px;
+}
+.filter-search input {
   width: 100%;
   height: 22px;
   padding: 0 22px 0 5px;
@@ -158,18 +190,18 @@ details.parts summary,
   font-size: 12px;
   outline: none;
 }
-.filter input:focus {
+.filter-search input:focus {
   border-color: var(--accent);
 }
-.filter input::-webkit-search-cancel-button {
+.filter-search input::-webkit-search-cancel-button {
   display: none;
 }
-.filter kbd {
+.filter-search kbd {
   position: absolute;
   right: 3px;
   top: 3px;
 }
-.filter input:focus + kbd {
+.filter-search input:focus + kbd {
   display: none;
 }
 #list {
@@ -387,6 +419,23 @@ details.parts summary,
   width: 100%;
   height: 100%;
   outline: none;
+}
+/* The opening sample's sidebar thumbnail, over the previous sample while the new one imports and builds. It shows at
+   once, with no fade-in: the page paints it in the frame before the build blocks, and a fade that has yet to start
+   then could stay invisible for the whole build. It paints under the floating panels. */
+#placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: inherit;
+  pointer-events: none;
+}
+#placeholder img {
+  height: 80%;
+  max-width: 80%;
+  aspect-ratio: 1;
+  object-fit: contain;
 }
 .float {
   position: absolute;

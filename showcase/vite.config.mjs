@@ -196,13 +196,17 @@ const showcaseData = {
       await writeFile(target, JSON.stringify(value));
     };
     const created = await sampleCreated();
-    await json("__sample-created", created);
     const rounds = await roundManifests();
-    // A round's toolkit tests are deleted once their builders move on; their renders stay on the round page.
-    const tests = rounds
-      .flatMap((round) => round.arms.map((arm) => `${arm.id}Test`))
-      .filter((slug) => !(slug in created));
-    for (const slug of [...Object.keys(created), ...tests]) {
+    // A round's own samples, toolkit tests included: those are deleted once their builders move on, and their
+    // renders stay on the round page.
+    const owned = rounds.flatMap((round) =>
+      round.arms.flatMap((arm) => [
+        ...round.subjects.map((subject) => `${subject.id}${arm.id[0].toUpperCase()}${arm.id.slice(1)}`),
+        `${arm.id}Test`,
+      ]),
+    );
+    await json("__sample-created", created);
+    for (const slug of new Set([...Object.keys(created), ...owned])) {
       if (slug in created) await copy(join(sampleRoot, `${slug}.ts`), `__sample-source/${slug}`);
       const assets = new Map();
       const fileUrl = (path) => {
@@ -300,7 +304,7 @@ const showcaseData = {
 
 export default defineConfig({
   server: { fs: { allow: [searchForWorkspaceRoot(process.cwd()), snapshotRoot] } },
-  // Two pages: the sample showcase and the experiment round page.
+  // Two pages: the sample showcase and the experiment round page (`/round`).
   build: {
     rolldownOptions: { input: { main: resolve("showcase/index.html"), round: resolve("showcase/round.html") } },
   },

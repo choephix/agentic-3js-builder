@@ -18,8 +18,14 @@
           <svg viewBox="0 0 16 16"><path d="M2.5 3.5h11v9h-11zM2.5 6.5h11M2.5 9.5h11M6.5 3.5v9" /></svg>
         </button>
       </header>
-      <div class="filter">
-        <input id="filter" type="search" placeholder="Filter" spellcheck="false" autocomplete="off" />
+      <div class="filter-tools">
+        <div id="models" aria-label="Filter by model"></div>
+        <button id="search-button" class="icon" data-tip="Search samples · /" aria-label="Search samples" aria-expanded="false">
+          <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.25" /><path d="m10.25 10.25 3.25 3.25" /></svg>
+        </button>
+      </div>
+      <div id="filter-search" class="filter-search" hidden>
+        <input id="filter" type="search" placeholder="Filter samples" spellcheck="false" autocomplete="off" />
         <kbd>/</kbd>
       </div>
       <nav id="list"></nav>
@@ -64,6 +70,7 @@
 
       <div id="stage">
         <div id="viewport"></div>
+        <div id="placeholder" hidden><img id="placeholder-image" alt="" /></div>
         <div id="loading" hidden>
           <div class="bar"></div>
           <div class="float chip"><span class="spinner"></span>Loading <strong id="loading-name"></strong></div>
