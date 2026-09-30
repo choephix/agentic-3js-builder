@@ -1,7 +1,7 @@
 // `region()`: a movable, scalable authoring frame (not a scene node) for heads, props and other sub-assemblies.
 // A region is a Frame; literal points and directions given to its methods are in region units, anything built
-// (joints, parts, hits...) is already in model space and passes through.
-import { Euler, Quaternion } from "three";
+// (joints, parts, hits...) and anything `p()`/`d()` returned is already in model space and passes through.
+import { Euler, Quaternion, Vector3 } from "three";
 import type { BufferGeometry } from "three";
 import { resolveJoint, rigid, weightsOf } from "./context";
 import type { Ctx, Fill, JointRef } from "./context";
@@ -16,7 +16,11 @@ import type { JointOptions } from "./skeleton";
 /** `bone` (default: the weights of `at` when it came from something built): the region rides on that joint. */
 export type RegionOptions = { at: PointInput; scale?: number; quat?: Quaternion; bone?: JointRef };
 
-const literal = (x: PointInput | DirectionInput): x is V3 => Array.isArray(x) || "isVector3" in x;
+/** A model-space vector from `region.p()`/`region.d()`: region methods pass it through instead of converting again. */
+class ModelVector extends Vector3 {}
+
+const literal = (x: PointInput | DirectionInput): x is V3 =>
+  Array.isArray(x) || ("isVector3" in x && !(x instanceof ModelVector));
 
 export class Region extends Spot {
   readonly scale: number;
@@ -31,13 +35,13 @@ export class Region extends Spot {
   }
 
   /** Region-local point (scaled, rotated, moved) → model space. Non-literal points pass through. */
-  p(local: PointInput) {
-    return literal(local) ? this.local(vec(local).multiplyScalar(this.scale)) : toPoint(local);
+  p(local: PointInput): Vector3 {
+    return literal(local) ? new ModelVector().copy(this.local(vec(local).multiplyScalar(this.scale))) : toPoint(local);
   }
 
   /** Region-local direction (rotated) → model space. Non-literal directions pass through. */
-  d(dir: DirectionInput) {
-    return literal(dir) ? this.dir(dir) : toDirection(dir);
+  d(dir: DirectionInput): Vector3 {
+    return literal(dir) ? new ModelVector().copy(this.dir(dir)) : toDirection(dir);
   }
 
   /** Region-local length → model space. */
@@ -66,8 +70,9 @@ export class Region extends Spot {
         : typeof options.scale === "number"
           ? options.scale * this.scale
           : vec(options.scale).multiplyScalar(this.scale);
-    // Literal positions take the region's weights (it is passed as the frame); built inputs keep their own.
-    const own = !options.frame && (!options.at || literal(options.at));
+    // Bare positions (literals and `p()` results) take the region's weights (it is passed as the frame); built inputs
+    // keep their own.
+    const own = !options.frame && (!options.at || literal(options.at) || options.at instanceof ModelVector);
     return part(this.ctx, geometry, color, {
       ...options,
       frame: own ? this : options.frame,

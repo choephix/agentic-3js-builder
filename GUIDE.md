@@ -2,7 +2,7 @@
 
 You build one sample for the agentic-3js-builder library: a three.js script that makes the subject named in your brief out of primitives. Creatures get a skeleton; props and scenery can be plain objects. The quality of the finished model is the top priority.
 
-Read these in full before you write code: [`docs/api.md`](docs/api.md), the API; [`docs/conventions.md`](docs/conventions.md), the coordinates, sections, paint coordinates, cards and bounds that every build relies on; and the style kit doc your brief names ([`kits/pixel.md`](kits/pixel.md), [`kits/toon.md`](kits/toon.md), [`kits/clockwork.md`](kits/clockwork.md)). A kit's helpers are the tested way to get its look; use them rather than writing your own. `samples/` has working scripts; open one only for a specific technique your brief points you to.
+Read these in full before you write code: [`docs/api.md`](docs/api.md), the API; [`docs/conventions.md`](docs/conventions.md), the coordinates, sections, paint coordinates, cards and bounds that every build relies on; and the style kit doc your brief names ([`kits/pixel.md`](kits/pixel.md), [`kits/toon.md`](kits/toon.md), [`kits/clockwork.md`](kits/clockwork.md)). A kit's helpers are the tested way to get its look; use them rather than writing your own. For self-lit surfaces (lanterns, windows, fire, glowing eyes, neon, crystals) in any style, read [`kits/glow.md`](kits/glow.md). `samples/` has working scripts; open one only for a specific technique your brief points you to.
 
 ## Your sample
 
@@ -33,18 +33,21 @@ The wow comes from creativity, not smoothness. The look is low-poly: facets are 
 ## Build loop
 
 ```
-npm run typecheck
+npm run typecheck -- <slug>
 npm run preview -- <slug> --shot
 npm run snap -- <slug> v01
+npm run sheet -- <slug>@v01 <slug>@v02 --view three-quarter
 ```
 
+- `typecheck -- <slug>` checks your file and what it imports with the project's settings (unused names are errors), and nothing else, so other samples never block or hide your result. It prints `No type errors in <slug>.` when you're clean.
 - `preview` takes about a second and costs no render. It writes every texture your model uses (each drawing and the paint sheet) as PNG, a parts table with world bounds, the parts below the floor with their depth, and with `--shot` a three-quarter and a front image, to `~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/`. Run it after every change you want to see: a drawing, a paint, a placement, the floor contact.
 - `snap` is the full render. It bakes the sample on the shared NVIDIA GPU and prints issues, counts, size and the skeleton tree. It writes a contact sheet (front, three-quarter, side, back, top, low hero angle, head close-up, bone colours, two skeleton x-rays and two flex tests that bend every bone at random), the single shots, the texture atlas (`<tag>-atlas.png`), a report and the GLBs to `~/tmp/public/nilo/agentic-3js-builder/snaps/<slug>/`. Look at the contact sheet and both flex shots every round.
 - `--report-only` prints the snap checks without rendering.
+- `sheet` lays rendered shots side by side without rendering anything: `<slug>@<tag>` picks a version, a bare slug its latest, `--view` one of the snap's single shots (`front`, `three-quarter`, `side`, `back`, `top`, `low`, `head`, `bones`, `skeleton`, `skeleton-side`, `flex-a`, `flex-b`). Use it to compare versions or to see your model next to a sample in the library. It prints where it wrote the image.
 - Every snapshot takes a new tag: `v02`, `v03`, `v04-legs`.
 - Throwaway scripts go in `scratch/<slug>/` (gitignored); both `preview` and `snap` take a path there as well as a slug. Delete them when you finish.
 - The browser on port 9333 is shared and already running; `preview` and `snap` connect to it.
-- You're done when typecheck passes, the report lists no issues, you're proud of the model from every angle and in both flex shots, and your last snapshot is of your final file.
+- You're done when `npm run typecheck -- <slug>` is clean, the report lists no issues, you're proud of the model from every angle and in both flex shots, and your last snapshot is of your final file.
 
 ## Final reply
 

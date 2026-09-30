@@ -569,10 +569,10 @@ function boneSpans(ctx: Ctx, path: Path, items: ReadonlyArray<JointRef | Chain>)
       spans.push({ joint, t, past: past(joint.at, t) });
       continue;
     }
-    const points = [...item.joints.map((joint) => joint.at), item.at(1).at];
+    const points = [...item.spanJoints.map((joint) => joint.at), item.at(1).at];
     const ends = points.map((p) => path.closestT(p));
     const forward = ends[ends.length - 1] >= ends[0];
-    item.joints.forEach((joint, i) => {
+    item.spanJoints.forEach((joint, i) => {
       const k = forward ? i : i + 1;
       spans.push({ joint, t: ends[k], past: past(points[k], ends[k]) });
     });
@@ -616,7 +616,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   // else one fixed set of weights for the whole tube (the path's own, or `bone`).
   const owner = options.bone;
   const spans = chain
-    ? chain.joints.map((joint, i) => ({ joint, t: chain.ts[i] }))
+    ? chain.spanJoints.map((joint, i) => ({ joint, t: chain.ts[i] }))
     : owner instanceof Chain || isBoneList(owner)
       ? boneSpans(ctx, path, owner instanceof Chain ? [owner] : owner)
       : null;

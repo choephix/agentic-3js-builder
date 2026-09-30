@@ -24,6 +24,30 @@ const sessionName = (file: string) =>
   file.startsWith(SESSIONS + sep) ? relative(SESSIONS, file) : relative(homedir(), file);
 const SNAPS = join(homedir(), "tmp/public/nilo/agentic-3js-builder/snaps");
 const STATS = join(homedir(), "workspace/nilo-creature-lab/site/scripts/stats.ts");
+const WORKTREES = (() => {
+  try {
+    return execFileSync("git", ["worktree", "list", "--porcelain"], { cwd: ROOT, encoding: "utf8" })
+      .split("\n")
+      .filter((line) => line.startsWith("worktree "))
+      .map((line) => line.slice("worktree ".length));
+  } catch {
+    return [ROOT];
+  }
+})();
+const CHECKOUTS = [...new Set([ROOT, ...WORKTREES])];
+
+function repoRelativePath(path: string, cwd: string) {
+  const checkout = CHECKOUTS.find((root) => path === root || path.startsWith(root + sep));
+  if (checkout) return relative(checkout, path);
+  const parts = cwd.split(sep);
+  const marker = parts.lastIndexOf("agentic-3js-builder");
+  if (marker < 1) return null;
+  const worktree = parts[marker - 1] === "worktrees";
+  const main = parts[marker - 1] === "noodlespace" || parts[marker - 1] === "workspace";
+  if (!worktree && !main) return null;
+  const inferred = parts.slice(0, marker + (worktree ? 2 : 1)).join(sep) || sep;
+  return path === inferred || path.startsWith(inferred + sep) ? relative(inferred, path) : null;
+}
 
 type Stats = {
   model: string;
@@ -196,14 +220,20 @@ function parseLog(file: string, text: string, seen: Set<string>): Log {
   for (const item of ran) {
     if (item.failed || (item.name !== "write" && item.name !== "edit")) continue;
     const targets = typeof item.args.path === "string" ? [item.args.path] : [];
-    if (typeof item.args.input === "string")
-      for (const match of item.args.input.matchAll(/^\[(.+)#[0-9A-F]{4}\]$/gm)) targets.push(match[1]);
+    if (typeof item.args.input === "string") {
+      // A hashline edit names each file on a `[path#TAG]` line. Its result repeats them resolved to the files it
+      // really changed (a mistyped `src/x.ts` anchor resolves to `samples/x.ts`), so the result wins when it has any.
+      const headers = (text: string) => [...text.matchAll(/^\[([^\s[\]]+)#[0-9A-F]{4}\]$/gm)].map((match) => match[1]);
+      const resolved = headers(item.output);
+      targets.push(...(resolved.length ? resolved : headers(item.args.input)));
+    }
     for (const target of targets) {
       if (/^[a-z]+:\/\//.test(target)) continue;
       const path = resolve(cwd, target.replace(/^~(?=\/)/, homedir()));
-      if (!path.startsWith(ROOT + sep)) continue;
+      const repoPath = repoRelativePath(path, cwd);
+      if (repoPath === null) continue;
       // cursor-agent rewrites whole files through "edit" with `stream_content`; it logs them as "write".
-      touches.push({ path: relative(ROOT, path), at: item.at, write: item.name === "write" || "content" in item.args });
+      touches.push({ path: repoPath, at: item.at, write: item.name === "write" || "content" in item.args });
     }
   }
 
@@ -223,20 +253,27 @@ function parseLog(file: string, text: string, seen: Set<string>): Log {
   };
 }
 
-/** Every session log that mentions this repo. */
+/**
+ * Every session log belonging to this repository, whichever checkout recorded it: every log whose session ran in a
+ * checkout (its own `cwd`, so removed worktrees count; a subagent filed under this repo's folder that ran in another
+ * project does not), and every other log that mentions a checkout's path. Roots keep their order (the nilo profile
+ * first) and each root is read in sorted order, because a continued session copies its parent's entries and the first
+ * log read owns them.
+ */
 function loadLogs() {
-  const needle = Buffer.from(relative(homedir(), ROOT));
-  const files = [SESSIONS, ...OTHER_SESSIONS].flatMap((root) =>
-    readdirSync(root, { recursive: true, encoding: "utf8" })
-      .filter((name) => name.endsWith(".jsonl"))
-      .sort()
-      .map((name) => join(root, name)),
-  );
+  const needles = CHECKOUTS.flatMap((path) => [path, relative(homedir(), path)]).map((path) => Buffer.from(path));
   const logs: Log[] = [];
   const seen = new Set<string>();
-  for (const file of files) {
-    const bytes = readFileSync(file);
-    if (bytes.includes(needle)) logs.push(parseLog(file, bytes.toString("utf8"), seen));
+  for (const root of [SESSIONS, ...OTHER_SESSIONS]) {
+    if (!existsSync(root)) continue;
+    for (const name of readdirSync(root, { recursive: true, encoding: "utf8" }).sort()) {
+      if (!name.endsWith(".jsonl")) continue;
+      const file = join(root, name);
+      const bytes = readFileSync(file);
+      const cwd = /"type":"session"[^\n]*?"cwd":"([^"]*)"/.exec(bytes.subarray(0, 8192).toString("utf8"))?.[1] ?? "";
+      if (cwd.split(sep).includes("agentic-3js-builder") || needles.some((needle) => bytes.includes(needle)))
+        logs.push(parseLog(file, bytes.toString("utf8"), seen));
+    }
   }
   return logs;
 }
@@ -434,7 +471,7 @@ function versionsOf(slug: string): Version[] {
       total = null;
       continue;
     }
-    const shared = log.touches.some((touch) => !paths.has(touch.path));
+    const shared = log.touches.some((touch) => !paths.has(touch.path) && !touch.path.startsWith(`scratch${sep}`));
     const after = cut.get(log) ?? log.entries[0].timestamp!;
     cut.set(log, version.rendered);
     if (shared) {

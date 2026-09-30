@@ -20,7 +20,7 @@ Agents get the guidance docs, not this README:
 - [`GUIDE.md`](GUIDE.md): the brief for a builder agent with one subject: the sample contract, the model conventions and the build loop.
 - [`docs/api.md`](docs/api.md): the full API reference.
 - [`docs/conventions.md`](docs/conventions.md): coordinates, sections, paint coordinates, cards and bounds, the behaviours to know before building.
-- [`kits/pixel.md`](kits/pixel.md), [`kits/toon.md`](kits/toon.md), [`kits/clockwork.md`](kits/clockwork.md): one per style kit.
+- [`kits/pixel.md`](kits/pixel.md), [`kits/toon.md`](kits/toon.md), [`kits/clockwork.md`](kits/clockwork.md): one per style kit. [`kits/glow.md`](kits/glow.md): self-lit parts in any style.
 
 For people: [`docs/DESIGN.md`](docs/DESIGN.md) explains why each helper exists, with the evidence from the builds that shaped it; [`docs/STATUS.md`](docs/STATUS.md) is the project history and to-do list.
 
@@ -31,10 +31,12 @@ A production app with its own agent setup hands its agents `docs/api.md`, `docs/
 ```
 npm install
 npm run typecheck        # src, kits, samples and showcase
+npm run typecheck -- <slug | path.ts> ...   # only those files and their imports
 npm run showcase         # dev server with hot reload
 npm run showcase:build   # static build in showcase/dist
 npm run snap -- <slug | path.ts> v01   # render through the creature-lab harness: contact sheet, report, GLBs
 npm run preview -- <slug | path.ts> [--shot]   # about a second: textures, parts with bounds, floor check, quick shots
+npm run sheet -- <slug | slug@tag> ... [--view three-quarter]   # collage of rendered shots (samples or versions)
 npm run provenance       # rewrite samples/*.build.json from the session logs
 ```
 

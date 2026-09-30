@@ -166,7 +166,7 @@ On 2026-09-29, same worktree and rules as the Gemini round (GUIDE.md, one subjec
 - Known failures, reported by the builders themselves and kept as built: nesYeti has four legs instead of two and a jaw above the head; gbcSlimeKing's crown floats and it rendered v03 twice (four renders); centaurArcher's hooves are detached from the legs, and its jaw and beard sit behind the face. Two builders asked for a fourth render and were refused.
 - snesRedDragon stands on long bare legs with the body high; cactusGunslinger aims forward instead of the rest pose.
 - jetpackPenguinMerc fails typecheck (3 errors, left as built). pico8Rooster's final file differs from v03 by type-only edits (a dropped third `c.pick` argument, two unused constants).
-- Six Astra records (gbcSlimeKing, voxelWolf, samuraiWarrior, bengalTiger, pangolin, centaurArcher) hold only whole-session totals: provenance counts their `scratch/<slug>/` files as other files.
+- Six Astra records (gbcSlimeKing, voxelWolf, samuraiWarrior, bengalTiger, pangolin, centaurArcher) now have per-sample totals; provenance ignores their `scratch/<slug>/` files and `agent://Main` messages when classifying shared work.
 
 Friction: `b.chain` names are one per span (most builders); `Region.joint()` takes region-local coordinates while `region.p()` returns model space (tiger, gorilla, yeti jaws); `Cell.pick` takes `(ramp, value)` though docs suggest a threshold; `stripes()` wants a vector axis, not `"z"`; textured `tileBox` parts need a `#ffffff` tint; emissive material flags are ignored on plain-object samples.
 

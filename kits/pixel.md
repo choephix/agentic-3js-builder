@@ -136,7 +136,7 @@ This paint works in square cells `size` meters across. Each surface point is tak
 - `axis`: the face orientation, `0` for ±x, `1` for ±y, `2` for ±z.
 - `n`, `s`: the point's normal and surface coordinates, as any paint gets them.
 - `threshold`: `bayer(u, v)` when `dither: true`, else `0.5`.
-- `pick(ramp, value)`: `pick(ramp, value, c.threshold)`.
+- `pick(ramp, value)`: two arguments; it picks with this cell's `threshold`, so it dithers exactly when the paint has `dither: true`.
 - `random(seed = 0)`: a fixed number in [0, 1) for this cell, for specks, grain and per-cell palette picks.
 
 With `dither: true`, a value between two ramp steps becomes an ordered 4 × 4 checker of both. Without it, the value rounds to the nearest step. Cells are baked into the shared paint sheet, which has a few millimetres per texel on a 1.5 m model. Keep `size` several paint texels wide (1.5 to 3 cm on an animal that size) so cell edges stay crisp; `createBuilder({ paintSize: 2048 })` makes the sheet finer.

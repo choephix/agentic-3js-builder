@@ -140,7 +140,10 @@ export type ChainOptions = {
   group?: string;
   /** Number of joints, evenly spaced by arc length. Default: one joint per knot span of the path. */
   count?: number;
-  /** Joint names, by index from 0 (auto-riggers key on names: hipHL, kneeHL, hockHL). Default `${name}1..N`. */
+  /**
+   * Joint names, by index from 0 (auto-riggers key on names: hipHL, kneeHL, hockHL). Default `${name}1..N`. One name
+   * per span; one more names a tip joint at the path's end (a hand, foot or hoof bone), last in `joints` and `tip`.
+   */
   names?: readonly string[] | ((i: number) => string);
   /** Roll about the path after parallel transport: total degrees start→end, or `(t) => deg`. Joints and sweeps follow. */
   twist?: Twist;
@@ -177,17 +180,23 @@ export class ChainPoint extends Spot {
 
 export class Chain {
   readonly capture: Capture;
+  /** Every joint: one per span, then the tip joint when `names` gave one. */
+  readonly joints: readonly Joint[];
 
   constructor(
     readonly name: string,
     /** The curve and frames as built; `at()` gives them in the current pose. */
     readonly path: Path,
     readonly frames: Frames,
-    /** Arc-length t of each joint, plus 1 for the tip. */
+    /** Arc-length t of each span joint, plus 1 for the tip. */
     readonly ts: readonly number[],
-    readonly joints: readonly Joint[],
+    /** One joint per span: the joints the chain's tubes and membranes bend with. */
+    readonly spanJoints: readonly Joint[],
+    /** The joint at the path's end, when `names` has one more entry than there are spans. */
+    readonly tip: Joint | null = null,
   ) {
-    this.capture = new Capture(joints);
+    this.capture = new Capture(spanJoints);
+    this.joints = tip ? [...spanJoints, tip] : spanJoints;
   }
 
   get length() {
@@ -212,7 +221,7 @@ export class Chain {
     const L = this.path.length;
     const starts = this.ts.map((s) => s * L);
     return spanWeights(
-      this.joints,
+      this.spanJoints,
       starts,
       t * L,
       (k) => 0.25 * Math.min(starts[k] - starts[k - 1], starts[k + 1] - starts[k]),
@@ -221,31 +230,37 @@ export class Chain {
 
   /** The chain's curve in the current pose, with knots at the joints (a Path input: `along`, `membrane`, ...). */
   curve() {
-    const count = Math.max(16, this.joints.length * 8);
+    const count = Math.max(16, this.spanJoints.length * 8);
     const pts = Array.from({ length: count + 1 }, (_, i) => this.at(i / count).at);
-    return smoothPath(pts, null, { indices: this.ts.map((t) => Math.round(t * count)) }, false, rigid(this.joints[0]));
+    return smoothPath(
+      pts,
+      null,
+      { indices: this.ts.map((t) => Math.round(t * count)) },
+      false,
+      rigid(this.spanJoints[0]),
+    );
   }
 
   /** The joint whose current bone segment passes closest to `p`. */
   nearestJoint(p: PointInput) {
     const q = toPoint(p);
-    const ends = [...this.joints.map((joint) => joint.at), this.at(1).at];
+    const ends = [...this.spanJoints.map((joint) => joint.at), this.at(1).at];
     let best = 0;
     let bestD = Infinity;
-    for (let i = 0; i < this.joints.length; i++) {
+    for (let i = 0; i < this.spanJoints.length; i++) {
       const seg = ends[i + 1].clone().sub(ends[i]);
       const f = Math.min(Math.max(q.clone().sub(ends[i]).dot(seg) / Math.max(seg.lengthSq(), 1e-12), 0), 1);
       const d = ends[i].clone().addScaledVector(seg, f).distanceToSquared(q);
       if (d < bestD) [best, bestD] = [i, d];
     }
-    return this.joints[best];
+    return this.spanJoints[best];
   }
 
   /** The joint whose span contains t. */
   jointAt(t: number) {
     let i = 0;
-    while (i < this.joints.length - 1 && this.ts[i + 1] <= t) i++;
-    return this.joints[i];
+    while (i < this.spanJoints.length - 1 && this.ts[i + 1] <= t) i++;
+    return this.spanJoints[i];
   }
 
   /** [t0, t1] of joint i's span. */
@@ -263,10 +278,14 @@ export function createChain(ctx: Ctx, name: string, source: PathInput, options: 
     names === undefined ? `${name}${i + 1}` : typeof names === "function" ? names(i) : names[i];
   const ts = options.count ? Array.from({ length: options.count + 1 }, (_, i) => i / options.count!) : path.knots;
   if (ts.length < 2) throw new Error(`Chain "${name}" needs at least one span`);
-  if (Array.isArray(names) && names.length !== ts.length - 1)
-    throw new Error(`Chain "${name}" has ${ts.length - 1} joints but ${names.length} names`);
+  const spans = ts.length - 1;
+  if (Array.isArray(names) && names.length !== spans && names.length !== spans + 1)
+    throw new Error(
+      `Chain "${name}" has ${spans} spans between its ${spans + 1} points, so it takes ${spans} names ` +
+        `(one joint per span) or ${spans + 1} (the last one a tip joint at the path's end), not ${names.length}`,
+    );
   const joints: Joint[] = [];
-  for (let i = 0; i < ts.length - 1; i++) {
+  for (let i = 0; i < spans; i++) {
     const at = path.at(ts[i]);
     joints.push(
       createJoint(ctx, nameOf(i), {
@@ -278,7 +297,17 @@ export function createChain(ctx: Ctx, name: string, source: PathInput, options: 
       }),
     );
   }
-  const chain = new Chain(name, path, frames, ts, joints);
+  const tip =
+    Array.isArray(names) && names.length === spans + 1
+      ? createJoint(ctx, names[spans], {
+          parent: joints[spans - 1],
+          at: path.at(1),
+          dir: path.tangentAt(1, true),
+          up: frames.normalAt(1),
+          group: options.group,
+        })
+      : null;
+  const chain = new Chain(name, path, frames, ts, joints, tip);
   const { role } = options;
   if (role) {
     const contact = options.contact ? toPoint(options.contact) : role === "leg" ? path.at(1) : null;
@@ -288,7 +317,7 @@ export function createChain(ctx: Ctx, name: string, source: PathInput, options: 
         name,
         role,
         side: sideOf(joints),
-        joints: joints.map((joint) => joint.name),
+        joints: chain.joints.map((joint) => joint.name),
         ...(contact ? { contact: tuple(contact.clone().applyMatrix4(chain.capture.motion(last))) } : {}),
       },
     }));
