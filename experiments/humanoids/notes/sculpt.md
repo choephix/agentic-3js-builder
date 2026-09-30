@@ -19,7 +19,7 @@ Both samples have the required skeleton (`hips`, `spine`, `spine1`, `spine2`, `n
 
 ## Toolkit
 
-`src/experimental/sculpt.ts`: `sculpt(b, { mirror? })` returns `sc` with five brushes that reshape already-built meshes (sweeps, lofts, `Part`s, joints' meshes, raw meshes). The module doc comment documents it in README style.
+`src/experimental/sculpt.ts`: `sculpt(b, { mirror? })` returns `sc` with five brushes that reshape already-built meshes (sweeps, lofts, `Part`s, joints' meshes, raw meshes). The module doc comment documents it in `docs/api.md` style.
 
 - `sc.push(t, { at | path, dir, amount, radius })`, `sc.flatten(t, { at | path, dir, radius, strength?, side? })`, `sc.inflate(t, { at | path, amount, radius })`, `sc.crease(t, { path, depth, radius })`, `sc.smooth(t, { at | path, radius, strength?, passes? })`. Common options: `core` (full-strength share of the radius), `mirror` (default true, across x = 0), `edge` (longest triangle edge left in the region).
 - `at` is any Point (joint, hit, `sweep.at(t)`, literal), `path` any Path (point array, `catmull`, chain, `sweep.line`); a path is a stroke, so one call sculpts a muscle. `dir` is any Direction. `radius`, `amount`, `depth` are a number, `[a, b]`, keyed numbers or `(t) => number` along the stroke.

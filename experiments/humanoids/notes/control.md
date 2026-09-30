@@ -2,21 +2,21 @@
 
 ## Result
 
-| | Lifeguard | Sprinter |
-| --- | --- | --- |
-| slug | `lifeguardControl` | `sprinterControl` |
-| final tag | `v03` (report: 0 errors, 0 warnings) | `v02` (report: 0 errors, 0 warnings) |
-| parts | 167 | 161 |
-| triangles | 16008 | 15596 |
-| joints | 53 | 57 (adds `ponytail1`–`ponytail4`) |
-| flat colours | 15 | 17 (+1 texture: the race bib drawing) |
-| height | 1.862 m (hair tufts included; body about 1.85) | 1.729 m (ponytail top; head crown about 1.70) |
+|              | Lifeguard                                      | Sprinter                                      |
+| ------------ | ---------------------------------------------- | --------------------------------------------- |
+| slug         | `lifeguardControl`                             | `sprinterControl`                             |
+| final tag    | `v03` (report: 0 errors, 0 warnings)           | `v02` (report: 0 errors, 0 warnings)          |
+| parts        | 167                                            | 161                                           |
+| triangles    | 16008                                          | 15596                                         |
+| joints       | 53                                             | 57 (adds `ponytail1`–`ponytail4`)             |
+| flat colours | 15                                             | 17 (+1 texture: the race bib drawing)         |
+| height       | 1.862 m (hair tufts included; body about 1.85) | 1.729 m (ponytail top; head crown about 1.70) |
 
 Both samples were formatted with prettier after the last snapshot (whitespace only).
 
 ## Toolkit
 
-The SDK as documented in `README.md`, unchanged: `createBuilder`, `joint`, `chain`, `sweep` (radius `(t) => [rx, ry]`, `shift`, `bone: [joints and chains]`, `bands`, `sectors`), `part`, `stick`, `surface().ray/drape`, `extrude`, `spike`, `capsule`, paint-free flat colours, and `svg()` for the bib. No `src/` file was changed.
+The SDK as documented in `docs/api.md`, unchanged: `createBuilder`, `joint`, `chain`, `sweep` (radius `(t) => [rx, ry]`, `shift`, `bone: [joints and chains]`, `bands`, `sectors`), `part`, `stick`, `surface().ray/drape`, `extrude`, `spike`, `capsule`, paint-free flat colours, and `svg()` for the bib. No `src/` file was changed.
 
 How the body is built: every anatomical volume is one of three things.
 
@@ -31,11 +31,13 @@ Clothing is the same sweep again, a centimetre out, on the same bones so it bend
 Free previews: I wrote throwaway scripts in `scratch/control/` (a node dump of world triangles with an emulation of linear-blend flexing, plus a numpy rasteriser) so most iteration happened without spending snaps.
 
 Lifeguard
+
 - `v01`: first full build: torso, legs, arms, hands with five fingers, feet with toes, head, trunks, whistle, glasses, zinc stripe. Showed the skull cap poking above the hair, flat-looking arms, thin calves.
 - `v02`: skull top lowered, thicker arms with biceps/triceps/forearm bellies, thicker legs, calf heads, nose/eyes/lips resized, hair tufts, trunks loosened over the thigh muscles.
 - `v03`: skull top cut under the hair, clavicle and neck tendons made subtle, zinc stripe changed to a round strip, feet lifted so the lowest point is y = 0. Final.
 
 Sprinter
+
 - `v01`: forked from the lifeguard structure with new female numbers (narrow waist, wider hips, lean limbs, smaller hands and face), crop top with cups and straps, curved race bib (svg drawing on a partial cylinder), briefs, socks, spike shoes with plate and pins, ponytail chain. Report warning: lowest point y = -0.009 (a toe-box radius was a circle, not an ellipse).
 - `v02`: toe box radius fixed, shoe raised, spike pins reach y = 0. Final, no warnings.
 

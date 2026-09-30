@@ -1,6 +1,6 @@
 # Status, 2026-09-29
 
-Where the work stands. The API is in `README.md`, the reasons behind it in `docs/DESIGN.md`.
+Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
 ## Origin
 
@@ -197,7 +197,7 @@ Friction the builders reported:
 - [ ] Sloped feet: the round end cap dips below the floor. The snap report now warns from 5 mm off the floor (6979c92).
 - [ ] `surface(joint)` finds no meshes on a smooth-skinned chain; the mesh sits under its heaviest bone.
 - [x] Sweep `sectors` on narrow colour-split pieces triggered the harness's inside-out false alarm; the check now needs a closed part (6979c92).
-- [ ] README has lines over 1,000 characters (the `b.chain` and membrane paragraphs), which read tools truncate.
+- [ ] `docs/api.md` has lines over 1,000 characters (the `b.chain` and membrane paragraphs), which read tools truncate.
 - [x] One broken sample fails `npm run typecheck` for everyone: `npm run typecheck -- <slug>` checks one file and its imports.
 - [x] Pixel density: `kits/pixel` `tileBox` crops whole texels per face at a fixed texel size; `skinBox` maps a sheet per face.
 - [x] Flat shading: `flat: true` on `part`/`stick`.
