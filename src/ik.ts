@@ -63,7 +63,8 @@ function fold(lengths: readonly number[], sides: readonly number[], dist: number
  * Rule for the extra freedom of 3+ segments: the last segment runs parallel to root→target (a vertical cannon
  * under a hip) when that respects its hint and reach; otherwise every joint turns by the same angle. Out of reach:
  * straight toward the target. `sole`: the last segment points exactly along `sole` (a flat foot along the floor)
- * and the rest solves to its heel. With two lengths this is classic two-bone IK.
+ * and the rest solves to its heel; the joint above the sole segment is set by `sole`, so it takes one bend hint
+ * fewer. With two lengths this is classic two-bone IK.
  */
 export function limb(
   root: PointInput,
@@ -77,7 +78,11 @@ export function limb(
     Array.isArray(bends) && typeof bends[0] !== "number"
       ? (bends as readonly DirectionInput[]).map((d) => toDirection(d, "limb()"))
       : lengths.slice(1).map(() => toDirection(bends as DirectionInput, "limb()"));
-  if (hints.length < n - 1) throw new Error(`limb(): ${n - 1} inner joints but ${hints.length} bend hints`);
+  const needed = options.sole ? n - 2 : n - 1;
+  if (hints.length < needed)
+    throw new Error(
+      `limb(): ${needed} bend hints needed (one per inner joint${options.sole ? " above the sole segment" : ""}), got ${hints.length}`,
+    );
   if (options.sole) {
     const sole = toDirection(options.sole, "limb()").normalize();
     const last = lengths[n - 1];

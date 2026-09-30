@@ -94,7 +94,7 @@ export type SproutOptions = Omit<SweepOptions, "bone" | "extend"> &
  * An appendage (limb, horn, tentacle, neck) rooted on another volume at a frame: a surface hit, a tube point, a
  * part, a joint. `pathOrTip` is a tip point (straight out) or a path (prefixed with the frame's point when it starts
  * elsewhere). The first joint sits at the frame's point, parented to its bone (else the nearest joint); the tube's
- * root continues `bury` back into the parent so it never floats.
+ * root continues `bury` back into the parent so it never floats. A single joint takes the sprout's own name.
  */
 export function sprout(
   ctx: Ctx,
@@ -115,13 +115,14 @@ export function sprout(
     ? toPath(pathOrTip as PathInput)
     : polyline([start, toPoint(pathOrTip as PointInput, "sprout()")]);
   const path = given.at(0).distanceTo(start) > 1e-6 ? polyline([start, given.at(0)]).concat(given) : given;
+  const joints = count ?? path.knots.length - 1;
   const chain =
     count === 0
       ? null
       : createChain(ctx, name, path, {
           parent,
           count,
-          names,
+          names: names ?? (joints === 1 ? [name] : undefined),
           role,
           contact,
           twist: rest.twist,

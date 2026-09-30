@@ -1,6 +1,7 @@
 // Renders a sample through the creature-lab harness (shared NVIDIA Chromium on :9333):
 //
-//   npm run snap -- <slug | path/to/file.ts> <tag> [--report-only]
+//   npm run snap -- <slug | path/to/file.ts> <tag>
+//   npm run snap -- <slug | path/to/file.ts> [<tag>] --report-only   (checks only, no render, tag optional)
 //
 // A slug names `samples/<slug>.ts`. A path renders any module with the sample contract, such as a throwaway smoke
 // file under scratch/, without adding it to samples/ (which the showcase publishes); its file name is the slug.
@@ -17,15 +18,24 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const LAB_REPO = join(homedir(), "workspace/nilo-creature-lab");
 const OUT = join(homedir(), "tmp/public/nilo/agentic-3js-builder/snaps");
 
-const args = process.argv.slice(2);
-const [target, tag] = args.filter((arg) => !arg.startsWith("--"));
-const isPath = target?.endsWith(".ts") ?? false;
-const sample = isPath ? resolve(process.cwd(), target) : join(ROOT, "samples", `${target}.ts`);
-const slug = isPath ? basename(target, ".ts") : target;
-if (!target || !existsSync(sample)) {
-  console.error(`Usage: npm run snap -- <slug | path/to/file.ts> <tag> [--report-only]\nNo sample at ${sample}.`);
+const USAGE =
+  "Usage: npm run snap -- <slug | path/to/file.ts> <tag>   (a render; tag v01, v02, v03-legs, ...)\n       npm run snap -- <slug | path/to/file.ts> --report-only   (checks only, no render)";
+function fail(message: string): never {
+  console.error(`${message}\n${USAGE}`);
   process.exit(2);
 }
+
+const args = process.argv.slice(2);
+const reportOnly = args.includes("--report-only");
+const [target, given] = args.filter((arg) => !arg.startsWith("--"));
+if (!target) fail("Missing <slug | path/to/file.ts>.");
+if (given !== undefined && !/^v\d{2}[a-z0-9-]*$/.test(given)) fail(`Invalid tag "${given}".`);
+if (!given && !reportOnly) fail("Missing <tag>.");
+const tag = given ?? "v00";
+const isPath = target.endsWith(".ts");
+const sample = isPath ? resolve(process.cwd(), target) : join(ROOT, "samples", `${target}.ts`);
+const slug = isPath ? basename(target, ".ts") : target;
+if (!existsSync(sample)) fail(`No sample at ${sample}.`);
 
 // The sample is chosen on the command line, so it can only be imported at run time.
 const built: Object3D = (await import(sample)).default();
@@ -37,12 +47,12 @@ mkdirSync(arm, { recursive: true });
 const from = JSON.stringify(sample);
 writeFileSync(join(arm, "creature.ts"), `export * from ${from};\nexport { default } from ${from};\n`);
 
-const harnessArgs = ["harness/snap.ts", slug, lane, ...args.filter((arg) => arg !== target)];
+const harnessArgs = ["harness/snap.ts", slug, lane, tag, ...args.filter((arg) => arg.startsWith("--"))];
 const result = spawnSync(join(LAB_REPO, "node_modules/.bin/tsx"), harnessArgs, {
   cwd: LAB_REPO,
   stdio: "inherit",
   env: { ...process.env, CREATURE_LAB_DIR: OUT },
 });
 const copy = join(arm, "snaps", `${tag}-creature.ts`);
-if (result.status === 0 && existsSync(copy)) copyFileSync(sample, copy);
+if (!reportOnly && result.status === 0 && existsSync(copy)) copyFileSync(sample, copy);
 process.exit(result.status ?? 1);

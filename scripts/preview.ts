@@ -3,10 +3,11 @@
 //   npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]... [--box <A>]...
 //
 // Builds the sample in the shared headless Chromium on :9333 and bakes it with the creature-lab harness's assemble(),
-// so its numbers match `npm run snap`. Writes to ~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/ (replaced on
-// every run): textures/*.png (each svg() drawing and the baked paint sheet, v up), parts.json (the parts table and
-// summary printed here) and with --shot three-quarter.png and front.png (900 px). Nothing lands in snaps/.
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+// so its numbers match `npm run snap`. Writes to ~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/ (textures/ and
+// parts.json are replaced on every run, the shots only by a run with --shot): textures/*.png (each svg() drawing and the
+// baked paint sheet, v up), parts.json (the parts table and summary printed here) and with --shot three-quarter.png and
+// front.png (900 px). Nothing lands in snaps/.
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { setTimeout } from "node:timers/promises";
@@ -183,7 +184,10 @@ try {
 }
 
 const dir = join(OUT, slug);
-rmSync(dir, { recursive: true, force: true });
+rmSync(join(dir, "textures"), { recursive: true, force: true });
+if (result.shots.length && existsSync(dir))
+  for (const file of readdirSync(dir, { withFileTypes: true }))
+    if (file.isFile() && file.name.endsWith(".png")) rmSync(join(dir, file.name));
 mkdirSync(join(dir, "textures"), { recursive: true });
 const decode = (dataUrl: string) => Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64");
 for (const texture of result.textures) writeFileSync(join(dir, "textures", texture.file), decode(texture.png));
