@@ -14,7 +14,7 @@ Read these in full before you write code: [`docs/api.md`](docs/api.md), the API;
 ## The model
 
 - Meters. +Y up, the model faces +Z, its left side is +X, centred on x = 0.
-- It rests on y = 0: its lowest point touches the floor.
+- It stands on y = 0: its lowest points touch the floor or sink into it by up to 2% of the model's height, and nothing hangs above it. A model the brief places off the ground (a bird in flight, a hanging lantern) keeps that height.
 - Real size, per the brief.
 - Creatures are built skeleton first and stand in a rest pose for rigging and animation: a neutral, readable pose, the non-humanoid equivalent of a T-pose, with limbs, digits, wings, tails and tentacles separated and extended, and the mouth built as a separate upper and lower jaw so it can open.
 - Joints carry names a rigger recognises (`hipL`, `kneeL`, `jaw`, `tail3`) and chains carry a `role`, so the rig answer key describes the whole skeleton.
@@ -40,7 +40,7 @@ npm run sheet -- <slug>@v01 <slug>@v02 --view three-quarter
 ```
 
 - `typecheck -- <slug>` checks your file and what it imports with the project's settings (unused names are errors), and nothing else, so other samples never block or hide your result. It prints `No type errors in <slug>.` when you're clean.
-- `preview` takes about a second and costs no render. It writes every texture your model uses (each drawing and the paint sheet) as PNG, a parts table with world bounds, the parts below the floor with their depth, and with `--shot` a three-quarter and a front image, to `~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/`. Run it after every change you want to see: a drawing, a paint, a placement, the floor contact.
+- `preview` takes about a second and costs no render. It writes every texture your model uses (each drawing and the paint sheet) as PNG, a parts table with world bounds, the parts sunk deeper than the floor allowance with their depth, and with `--shot` a three-quarter and a front image, to `~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/`. Run it after every change you want to see: a drawing, a paint, a placement, the floor contact.
 - `snap` is the full render. It bakes the sample on the shared NVIDIA GPU and prints issues, counts, size and the skeleton tree. It writes a contact sheet (front, three-quarter, side, back, top, low hero angle, head close-up, bone colours, two skeleton x-rays and two flex tests that bend every bone at random), the single shots, the texture atlas (`<tag>-atlas.png`), a report and the GLBs to `~/tmp/public/nilo/agentic-3js-builder/snaps/<slug>/`. Look at the contact sheet and both flex shots every round.
 - `--report-only` prints the snap checks without rendering.
 - `sheet` lays rendered shots side by side without rendering anything: `<slug>@<tag>` picks a version, a bare slug its latest, `--view` one of the snap's single shots (`front`, `three-quarter`, `side`, `back`, `top`, `low`, `head`, `bones`, `skeleton`, `skeleton-side`, `flex-a`, `flex-b`). Use it to compare versions or to see your model next to a sample in the library. It prints where it wrote the image.

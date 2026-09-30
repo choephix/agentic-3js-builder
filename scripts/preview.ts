@@ -165,9 +165,10 @@ const { parts, bounds } = result;
 const size = bounds.max.map((max, axis) => Number((max - bounds.min[axis]).toFixed(3)));
 const lowest = parts.length ? parts.reduce((best, part) => (part.min[1] < best.min[1] ? part : best)) : null;
 const highest = parts.length ? parts.reduce((best, part) => (part.max[1] > best.max[1] ? part : best)) : null;
-// Anything more than half a millimetre under the ground plane.
+// Parts may sink into the floor by up to 2% of the model's height; list the ones that go deeper.
+const sinkAllowance = 0.02 * (bounds.max[1] - bounds.min[1]);
 const below = parts
-  .filter((part) => part.min[1] < -0.0005)
+  .filter((part) => part.min[1] < -sinkAllowance)
   .sort((a, b) => a.min[1] - b.min[1])
   .map((part) => ({ index: part.index, name: part.name, group: part.group, depth: -part.min[1] }));
 writeFileSync(
@@ -225,8 +226,8 @@ if (lowest && highest) {
 }
 console.log(
   below.length
-    ? `Below y = 0 (${below.length}): ${below.map((part) => `#${part.index} ${part.name} ${(part.depth * 1000).toFixed(1)} mm`).join(", ")}`
-    : "Below y = 0: none",
+    ? `Sunk deeper than ${(sinkAllowance * 1000).toFixed(1)} mm (2% of height) (${below.length}): ${below.map((part) => `#${part.index} ${part.name} ${(part.depth * 1000).toFixed(1)} mm`).join(", ")}`
+    : `Sunk deeper than ${(sinkAllowance * 1000).toFixed(1)} mm (2% of height): none`,
 );
 console.log(
   `Textures (${result.textures.length}): ${result.textures.map((texture) => texture.file).join(", ") || "none"}`,

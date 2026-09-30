@@ -42,7 +42,7 @@ npm run provenance       # rewrite samples/*.build.json from the session logs
 
 `snap` renders on the shared NVIDIA Chromium (port 9333) and writes the contact sheet, shots, report and GLBs to `~/tmp/public/nilo/agentic-3js-builder/snaps/<slug>/` (arm B with joints, A for plain objects). It needs `~/workspace/nilo-creature-lab` checked out; its `harness/snap.ts` reads `CREATURE_LAB_DIR` for the output folder.
 
-`preview` builds the model in the same Chromium and writes every texture (each drawing and the paint sheet) as PNG, a parts table with world bounds, the parts below the floor and, with `--shot`, a three-quarter and a front image to `~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/`. It never counts as a render. Both commands take a file path as well as a slug, so a throwaway file under `scratch/` (gitignored) renders without joining `samples/`.
+`preview` builds the model in the same Chromium and writes every texture (each drawing and the paint sheet) as PNG, a parts table with world bounds, the parts sunk into the floor deeper than 2% of the model's height and, with `--shot`, a three-quarter and a front image to `~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/`. It never counts as a render. Both commands take a file path as well as a slug, so a throwaway file under `scratch/` (gitignored) renders without joining `samples/`.
 
 ## Samples and showcase
 
