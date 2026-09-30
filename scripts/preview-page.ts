@@ -3,6 +3,8 @@
 // its textures, per-part table and, on request, two lit shots. `creature-lab/*` resolves to the lab's harness modules.
 import * as THREE from "three";
 import { assemble, createStaticMesh } from "creature-lab/assemble";
+import { gap, measureIndex } from "creature-lab/measure";
+import { bonesOf } from "creature-lab/weights";
 import { createKit } from "creature-lab/kit";
 
 const SHOT_SIZE = 900;
@@ -29,6 +31,12 @@ export type PreviewTexture = {
   parts: string[];
   png: string;
 };
+export type PreviewQuestion = {
+  kind: "gap" | "bones";
+  text: string;
+  selectors: string[];
+  error?: boolean;
+};
 export type PreviewResult = {
   rigged: boolean;
   meta: unknown;
@@ -38,6 +46,7 @@ export type PreviewResult = {
   triangles: number;
   bounds: { min: Vec3; max: Vec3 };
   shots: Array<{ name: string; png: string }>;
+  questions?: PreviewQuestion[];
 };
 
 const slugify = (text: string) => text.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-|-$/g, "") || "part";
@@ -170,7 +179,63 @@ function shots(model: THREE.Mesh, bounds: { min: Vec3; max: Vec3 }) {
   return result;
 }
 
-async function run({ code, shot }: { code: string; shot: boolean }): Promise<PreviewResult> {
+type SelectorMatch = { kind: "part" | "group" | "bone"; parts: number[] };
+
+const selectorMatch = (selector: string, parts: PreviewPart[], ownerBones: Array<string | undefined>) => {
+  const index = /^#(\d+)$/.exec(selector);
+  if (index && Number(index[1]) < parts.length) {
+    return { kind: "part" as const, parts: [Number(index[1])] };
+  }
+  const byPart = parts.flatMap((part, i) => (part.name === selector ? [i] : []));
+  if (byPart.length) return { kind: "part" as const, parts: byPart };
+  const byGroup = parts.flatMap((part, i) => (part.group === selector ? [i] : []));
+  if (byGroup.length) return { kind: "group" as const, parts: byGroup };
+  const byBone = ownerBones.flatMap((bone, i) => (bone === selector ? [i] : []));
+  if (byBone.length) return { kind: "bone" as const, parts: byBone };
+  return null;
+};
+
+const closestNames = (selector: string, parts: PreviewPart[]) => {
+  const names = [...new Set(parts.flatMap((part) => [part.name, part.group, ...part.bones]))];
+  const wanted = selector.toLowerCase();
+  return names
+    .map((name) => ({
+      name,
+      rank: name.toLowerCase().startsWith(wanted) ? 0 : name.toLowerCase().includes(wanted) ? 1 : 2,
+    }))
+    .filter(({ rank }) => rank < 2 || !wanted)
+    .sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name))
+    .slice(0, 3)
+    .map(({ name }) => name);
+};
+
+const selectorLabel = (selector: string, match: SelectorMatch, parts: PreviewPart[]) => {
+  if (match.kind === "part" && match.parts.length === 1)
+    return `${parts[match.parts[0]].name} (part ${match.parts[0]})`;
+  return `${selector} (${match.kind}, ${match.parts.length} parts)`;
+};
+
+const unmatched = (kind: "gap" | "bones", selector: string, parts: PreviewPart[]): PreviewQuestion => {
+  const suggestions = closestNames(selector, parts);
+  return {
+    kind,
+    selectors: [selector],
+    error: true,
+    text: `No match for selector "${selector}".${suggestions.length ? ` Closest names: ${suggestions.join(", ")}` : " No close names found."}`,
+  };
+};
+
+async function run({
+  code,
+  shot,
+  gaps,
+  bones,
+}: {
+  code: string;
+  shot: boolean;
+  gaps: Array<[string, string]>;
+  bones: string[];
+}): Promise<PreviewResult> {
   // The creature bundle maps `three` to this global (so both share one copy) and assigns its exports to __creature.
   const page = globalThis as {
     THREE?: typeof THREE;
@@ -240,6 +305,50 @@ async function run({ code, shot }: { code: string; shot: boolean }): Promise<Pre
     };
   });
 
+  const ownerBones = assembly.parts.map((part) => part.bone);
+  const questions: PreviewQuestion[] = [];
+  const measure = gaps.length ? measureIndex(assembly) : undefined;
+  const point = (values: number[]) => `[${values.map((value) => value.toFixed(3)).join(", ")}]`;
+  for (const [aSelector, bSelector] of gaps) {
+    const a = selectorMatch(aSelector, parts, ownerBones);
+    const b = selectorMatch(bSelector, parts, ownerBones);
+    if (!a) questions.push(unmatched("gap", aSelector, parts));
+    if (!b) questions.push(unmatched("gap", bSelector, parts));
+    if (!a || !b) continue;
+    const measured = gap(measure!, a.parts, b.parts);
+    const distance = measured.distance * 1000;
+    const relation = measured.overlap ? "overlapping" : distance === 0 ? "touching" : `${distance.toFixed(1)} mm`;
+    questions.push({
+      kind: "gap",
+      selectors: [aSelector, bSelector],
+      text: `Gap ${selectorLabel(aSelector, a, parts)} ↔ ${selectorLabel(bSelector, b, parts)}: ${relation}${
+        distance === 0 ? "" : `; closest points ${point(measured.a.point)} and ${point(measured.b.point)}`
+      }`,
+    });
+  }
+  for (const selector of bones) {
+    const match = selectorMatch(selector, parts, ownerBones);
+    if (!match) {
+      questions.push(unmatched("bones", selector, parts));
+      continue;
+    }
+    const label = selectorLabel(selector, match, parts);
+    if (!rigged) {
+      questions.push({ kind: "bones", selectors: [selector], text: `Bones of ${label}: unrigged model` });
+      continue;
+    }
+    const shares = bonesOf(assembly, match.parts);
+    const visible = shares.filter(({ share }) => share >= 0.01);
+    const under = shares.length - visible.length;
+    const details = visible.map(({ bone, share }) => `${bone} ${Math.round(share * 100)}%`);
+    if (under) details.push(`+ ${under} more under 1%`);
+    questions.push({
+      kind: "bones",
+      selectors: [selector],
+      text: `Bones of ${label}: ${details.join(", ") || "no bone weights"}`,
+    });
+  }
+
   const counts = new Map<string, number>();
   // Only textures of baked (visible) parts; hidden meshes are not part of the model.
   const pictures = [...textures].flatMap(([key, texture]): PreviewTexture[] => {
@@ -265,6 +374,7 @@ async function run({ code, shot }: { code: string; shot: boolean }): Promise<Pre
     triangles: assembly.triangles,
     bounds: assembly.bounds,
     shots: shot && !errors && parts.length ? shots(createStaticMesh(assembly, "preview"), assembly.bounds) : [],
+    ...(questions.length ? { questions } : {}),
   };
 }
 

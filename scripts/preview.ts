@@ -1,6 +1,6 @@
 // A quick look at a sample without spending a render: its textures, a parts table and, on request, two lit shots.
 //
-//   npm run preview -- <slug | path/to/file.ts> [--shot]
+//   npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]...
 //
 // Builds the sample in the shared headless Chromium on :9333 and bakes it with the creature-lab harness's assemble(),
 // so its numbers match `npm run snap`. Writes to ~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/ (replaced on
@@ -19,18 +19,40 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const LAB_REPO = join(homedir(), "workspace/nilo-creature-lab");
 const OUT = join(homedir(), "tmp/public/nilo/agentic-3js-builder/preview");
 const CDP_URL = "http://127.0.0.1:9333";
-const USAGE = "Usage: npm run preview -- <slug | path/to/file.ts> [--shot]";
+const USAGE = "Usage: npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]...";
 
 const started = Date.now();
 const args = process.argv.slice(2);
-const flags = args.filter((arg) => arg.startsWith("--"));
-const [target] = args.filter((arg) => !arg.startsWith("--"));
-for (const flag of flags)
-  if (flag !== "--shot") {
-    console.error(`Unknown flag ${flag}.\n${USAGE}`);
-    process.exit(2);
+let target: string | undefined;
+let shot = false;
+const gaps: Array<[string, string]> = [];
+const bones: string[] = [];
+const usageError = (message: string): never => {
+  console.error(`${message}\n${USAGE}`);
+  process.exit(2);
+};
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i];
+  if (arg === "--shot") {
+    shot = true;
+  } else if (arg === "--gap") {
+    const a = args[++i];
+    const b = args[++i];
+    if (!a || !b || a.startsWith("--") || b.startsWith("--")) usageError("The --gap flag needs two selectors.");
+    gaps.push([a, b]);
+  } else if (arg === "--bones") {
+    const selector = args[++i];
+    if (!selector || selector.startsWith("--")) usageError("The --bones flag needs one selector.");
+    bones.push(selector);
+  } else if (arg.startsWith("--")) {
+    usageError(`Unknown flag ${arg}.`);
+  } else if (target === undefined) {
+    target = arg;
+  } else {
+    usageError(`Unexpected argument ${arg}.`);
   }
-const shot = flags.includes("--shot");
+}
+if (target === undefined) usageError("A sample is required.");
 const isPath = target?.endsWith(".ts") ?? false;
 const sample = isPath ? resolve(process.cwd(), target) : join(ROOT, "samples", `${target}.ts`);
 const slug = isPath ? basename(target, ".ts") : target;
@@ -143,7 +165,7 @@ try {
     .evaluate(
       (options) =>
         (window as unknown as { preview: { run(options: unknown): Promise<PreviewResult> } }).preview.run(options),
-      { code: creatureBundle.outputFiles[0].text, shot },
+      { code: creatureBundle.outputFiles[0].text, shot, gaps, bones },
     )
     .catch((reason: Error) => {
       console.error(`Build failed: ${reason.message.replace(/^page\.evaluate: /, "")}`);
@@ -187,6 +209,7 @@ writeFileSync(
       highest: highest && { index: highest.index, name: highest.name, group: highest.group, y: highest.max[1] },
       below,
       issues: result.issues,
+      ...(result.questions ? { questions: result.questions } : {}),
       textures: result.textures.map(({ png: _, ...texture }) => texture),
       parts,
     },
@@ -234,6 +257,8 @@ console.log(
 );
 if (result.shots.length) console.log(`Shots: ${result.shots.map((image) => `${image.name}.png`).join(", ")}`);
 else if (shot) console.log("Shots: skipped (the model has errors)");
+for (const question of result.questions ?? []) (question.error ? console.error : console.log)(question.text);
 console.log(`Output: ${dir}`);
 console.log(`Done in ${((Date.now() - started) / 1000).toFixed(1)} s (a preview, not a render)`);
-process.exit(result.issues.some((issue) => issue.level === "error") ? 1 : 0);
+const questionError = result.questions?.some((question) => question.error) ?? false;
+process.exit(questionError ? 2 : result.issues.some((issue) => issue.level === "error") ? 1 : 0);

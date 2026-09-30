@@ -36,6 +36,8 @@ npm run showcase         # dev server with hot reload
 npm run showcase:build   # static build in showcase/dist
 npm run snap -- <slug | path.ts> v01   # render through the creature-lab harness: contact sheet, report, GLBs
 npm run preview -- <slug | path.ts> [--shot]   # about a second: textures, parts with bounds, floor check, quick shots
+npm run preview -- <slug | path.ts> [--gap <A> <B>]...   # surface distance between two parts, groups or bones
+npm run preview -- <slug | path.ts> [--bones <A>]...      # which bones move a part, group or bone, by share
 npm run sheet -- <slug | slug@tag> ... [--view three-quarter]   # collage of rendered shots (samples or versions)
 npm run provenance       # rewrite samples/*.build.json from the session logs
 ```
