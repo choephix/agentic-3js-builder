@@ -33,7 +33,6 @@ export default function build() {
   const SKULL_WHITE = "#ded7cb"; // Bleached bone / skull badges
   const CHAIN_TEETH = "#e8eff7"; // Monomolecular razor teeth
   const HAZARD_YELLOW = "#f5b800"; // Hazard warning stripes
-  const WHITE_DECAL = "#f0f4f8"; // Chapter symbol white
 
   // ---------------------------------------------------------------------------
   // Chapter Heraldry & Decal Textures
@@ -98,9 +97,15 @@ export default function build() {
   const [spine1, spine2, chest] = spine.joints;
 
   // Neck & Head
-  const neck = b.joint("neck", { parent: chest, at: [0, 1.76, 0.04], aim: [0, 1.86, 0.07], role: "neck", group: "head" });
+  const neck = b.joint("neck", {
+    parent: chest,
+    at: [0, 1.76, 0.04],
+    aim: [0, 1.86, 0.07],
+    role: "neck",
+    group: "head",
+  });
   const head = b.joint("head", { parent: neck, at: [0, 1.86, 0.07], dir: [0, 1, 0], role: "head", group: "head" });
-  const jaw = b.joint("jaw", { parent: head, at: [0, 1.82, 0.08], aim: [0, 1.80, 0.22], role: "jaw", group: "head" });
+  const jaw = b.joint("jaw", { parent: head, at: [0, 1.82, 0.08], aim: [0, 1.8, 0.22], role: "jaw", group: "head" });
 
   // Legs (Sturdy, wide power-armoured stance)
   const legs = SIDES.map(([s, side]) =>
@@ -127,7 +132,7 @@ export default function build() {
   const arms = SIDES.map(([s, side]) => {
     const clav = b.joint(`clavicle${side}`, {
       parent: chest,
-      at: [s * 0.18, 1.70, 0.02],
+      at: [s * 0.18, 1.7, 0.02],
       aim: [s * 0.44, 1.68, -0.01],
       role: "arm",
       group: `arm${side}`,
@@ -138,16 +143,12 @@ export default function build() {
     const wristPt: [number, number, number] = [s * 0.94, 1.05, 0.08];
     const handPt: [number, number, number] = [s * 1.05, 0.92, 0.14];
 
-    const chain = b.chain(
-      `arm${side}`,
-      [shoulderPt, elbowPt, wristPt, handPt],
-      {
-        parent: clav,
-        names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`],
-        role: "arm",
-        group: `arm${side}`,
-      },
-    );
+    const chain = b.chain(`arm${side}`, [shoulderPt, elbowPt, wristPt, handPt], {
+      parent: clav,
+      names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`],
+      role: "arm",
+      group: `arm${side}`,
+    });
 
     return {
       s,
@@ -169,7 +170,7 @@ export default function build() {
       { at: [0, 1.18, 0.02], w: 0.52, h: 0.35 }, // Waist / Belt level
       { at: [0, 1.35, 0.03], w: 0.56, h: 0.38 }, // Abdomen
       { at: [0, 1.54, 0.05], w: 0.74, h: 0.46 }, // Broad chest
-      { at: [0, 1.68, 0.04], w: 0.70, h: 0.42 }, // Upper chest & shoulders
+      { at: [0, 1.68, 0.04], w: 0.7, h: 0.42 }, // Upper chest & shoulders
       { at: [0, 1.76, 0.04], w: 0.38, h: 0.32 }, // Neck base
     ],
     {
@@ -187,7 +188,7 @@ export default function build() {
     const aw = 0.36 + i * 0.04;
     b.part(new THREE.BoxGeometry(aw, 0.06, 0.08), ARMOR_DARK, {
       bone: i === 0 ? hips : i === 1 ? spine1 : spine2,
-      at: [0, ay, 0.20 + i * 0.015],
+      at: [0, ay, 0.2 + i * 0.015],
       rotation: [8 * DEG, 0, 0],
       group: "torso",
     });
@@ -224,12 +225,12 @@ export default function build() {
   }
 
   // Imperial Gorget (Protective high neck collar)
-  b.part(new THREE.CylinderGeometry(0.20, 0.23, 0.10, 16, 1, true, -Math.PI * 0.48, Math.PI * 0.96), ARMOR_BLUE, {
+  b.part(new THREE.CylinderGeometry(0.2, 0.23, 0.1, 16, 1, true, -Math.PI * 0.48, Math.PI * 0.96), ARMOR_BLUE, {
     bone: chest,
     at: [0, 1.76, 0.06],
     group: "torso",
   });
-  b.part(new THREE.TorusGeometry(0.20, 0.018, 8, 16, Math.PI * 0.96), TRIM_GOLD, {
+  b.part(new THREE.TorusGeometry(0.2, 0.018, 8, 16, Math.PI * 0.96), TRIM_GOLD, {
     bone: chest,
     at: [0, 1.81, 0.06],
     rotation: [90 * DEG, 0, -Math.PI * 0.98],
@@ -246,7 +247,7 @@ export default function build() {
   });
   b.part(new THREE.BoxGeometry(0.034, 0.028, 0.03), EAGLE_GOLD, {
     bone: chest,
-    at: [0, 1.60, 0.33],
+    at: [0, 1.6, 0.33],
     group: "torso",
   });
   // Tiered Aquila Wing Feathers spreading across the chest outwards and upwards
@@ -273,7 +274,7 @@ export default function build() {
 
   // --- 2. BACKPACK POWER PLANT ---
   // Main reactor housing box
-  b.part(new THREE.BoxGeometry(0.52, 0.50, 0.24), ARMOR_BLUE, {
+  b.part(new THREE.BoxGeometry(0.52, 0.5, 0.24), ARMOR_BLUE, {
     bone: chest,
     at: [0, 1.64, -0.21],
     group: "torso",
@@ -304,14 +305,14 @@ export default function build() {
   });
   b.part(new THREE.SphereGeometry(0.025, 8, 6), SKULL_WHITE, {
     bone: chest,
-    at: [0, 1.64, -0.40],
+    at: [0, 1.64, -0.4],
     group: "torso",
   });
 
   // Dual stabilizer exhaust ball nozzles on angled side pylons
   for (const [s] of SIDES) {
     const pylonPath = catmull([
-      [s * 0.20, 1.70, -0.19],
+      [s * 0.2, 1.7, -0.19],
       [s * 0.36, 1.84, -0.19],
     ]);
     b.sweep(pylonPath, 0.045, {
@@ -333,7 +334,7 @@ export default function build() {
     });
     b.part(new THREE.TorusGeometry(0.078, 0.012, 8, 14), TRIM_GOLD, {
       bone: chest,
-      at: [s * 0.40, 1.81, -0.26],
+      at: [s * 0.4, 1.81, -0.26],
       rotation: [40 * DEG, s * 22 * DEG, 0],
       group: "torso",
     });
@@ -347,7 +348,7 @@ export default function build() {
   }
 
   // --- 3. WAIST, BELT & FAULDS ---
-  b.part(new THREE.CylinderGeometry(0.28, 0.29, 0.10, 16), LEATHER_BROWN, {
+  b.part(new THREE.CylinderGeometry(0.28, 0.29, 0.1, 16), LEATHER_BROWN, {
     bone: hips,
     at: [0, 1.16, 0.02],
     scale: [1.1, 1, 0.9],
@@ -380,7 +381,7 @@ export default function build() {
   }
 
   // Tassets / Groin plate
-  b.part(new THREE.BoxGeometry(0.20, 0.22, 0.06), ARMOR_BLUE, {
+  b.part(new THREE.BoxGeometry(0.2, 0.22, 0.06), ARMOR_BLUE, {
     bone: hips,
     at: [0, 1.02, 0.17],
     rotation: [-10 * DEG, 0, 0],
@@ -428,7 +429,7 @@ export default function build() {
     });
   }
   // Lower jaw & Vox Grille
-  b.part(new THREE.ConeGeometry(0.10, 0.14, 4), ARMOR_BLUE, {
+  b.part(new THREE.ConeGeometry(0.1, 0.14, 4), ARMOR_BLUE, {
     bone: jaw,
     at: [0, 1.86, 0.16],
     rotation: [-50 * DEG, 45 * DEG, 0],
@@ -451,7 +452,7 @@ export default function build() {
   for (const [s] of SIDES) {
     const tubePath = catmull([
       [s * 0.04, 1.84, 0.19],
-      [s * 0.08, 1.80, 0.14],
+      [s * 0.08, 1.8, 0.14],
       [s * 0.085, 1.77, 0.06],
     ]);
     b.sweep(tubePath, 0.014, {
@@ -479,7 +480,7 @@ export default function build() {
       group: `arm${side}`,
     });
 
-    const pCenter: [number, number, number] = [s * 0.48, 1.70, 0.0];
+    const pCenter: [number, number, number] = [s * 0.48, 1.7, 0.0];
     b.part(new THREE.SphereGeometry(0.24, 18, 14), ARMOR_BLUE, {
       bone: shoulder,
       at: pCenter,
@@ -490,7 +491,7 @@ export default function build() {
     b.part(new THREE.CylinderGeometry(0.27, 0.28, 0.08, 16), TRIM_GOLD, {
       bone: shoulder,
       at: [s * 0.48, 1.58, 0.0],
-      scale: [1.16, 1, 1.30],
+      scale: [1.16, 1, 1.3],
       group: `arm${side}`,
     });
     b.part(new THREE.CylinderGeometry(0.275, 0.275, 0.04, 16), ARMOR_DARK, {
@@ -517,7 +518,7 @@ export default function build() {
     if (s > 0) {
       b.part(new THREE.CircleGeometry(0.13, 16), "#ffffff", {
         bone: shoulder,
-        at: [0.77, 1.70, 0.0],
+        at: [0.77, 1.7, 0.0],
         dir: [1, 0, 0],
         axis: "z",
         texture: CHAPTER_DECAL,
@@ -544,7 +545,7 @@ export default function build() {
     } else {
       b.part(new THREE.CircleGeometry(0.13, 16), "#ffffff", {
         bone: shoulder,
-        at: [-0.77, 1.70, 0.0],
+        at: [-0.77, 1.7, 0.0],
         dir: [-1, 0, 0],
         axis: "z",
         texture: TACTICAL_DECAL,
@@ -557,7 +558,7 @@ export default function build() {
   for (const { s, side, shoulder, elbow, wrist } of arms) {
     const bicepPath = catmull([
       [s * 0.48, 1.63, -0.02],
-      [s * 0.60, 1.48, -0.03],
+      [s * 0.6, 1.48, -0.03],
     ]);
     b.sweep(bicepPath, 0.11, {
       bone: shoulder,
@@ -583,7 +584,7 @@ export default function build() {
       [s * 0.88, 1.15, 0.04],
       [s * 0.94, 1.05, 0.08],
     ]);
-    b.sweep(forearmPath, (t) => 0.10 + 0.035 * t, {
+    b.sweep(forearmPath, (t) => 0.1 + 0.035 * t, {
       bone: elbow,
       color: ARMOR_BLUE,
       section: { ngon: 8 },
@@ -630,7 +631,7 @@ export default function build() {
     const side = s > 0 ? "L" : "R";
 
     const thighPath = catmull([
-      [s * 0.23, 1.10, -0.01],
+      [s * 0.23, 1.1, -0.01],
       [s * 0.24, 0.85, 0.02],
       [s * 0.25, 0.65, 0.05],
     ]);
@@ -652,7 +653,7 @@ export default function build() {
       rotation: [-15 * DEG, 0, 0],
       group: `leg${side}`,
     });
-    b.part(new THREE.BoxGeometry(0.12, 0.10, 0.03), TRIM_GOLD, {
+    b.part(new THREE.BoxGeometry(0.12, 0.1, 0.03), TRIM_GOLD, {
       bone: kneeJ,
       at: [s * 0.25, 0.64, 0.19],
       rotation: [-15 * DEG, 0, 0],
@@ -682,16 +683,16 @@ export default function build() {
       group: `leg${side}`,
     });
 
-    b.part(new THREE.SphereGeometry(0.10, 10, 8), JOINT_RUBBER, {
+    b.part(new THREE.SphereGeometry(0.1, 10, 8), JOINT_RUBBER, {
       bone: ankleJ,
-      at: [s * 0.26, 0.20, 0.0],
+      at: [s * 0.26, 0.2, 0.0],
       group: `leg${side}`,
     });
 
     // Massive Armoured Boots (Sabatons)
     b.part(new THREE.BoxGeometry(0.23, 0.18, 0.24), ARMOR_BLUE, {
       bone: ankleJ,
-      at: [s * 0.26, 0.10, 0.04],
+      at: [s * 0.26, 0.1, 0.04],
       group: `leg${side}`,
     });
     b.part(new THREE.BoxGeometry(0.25, 0.11, 0.22), ARMOR_DARK, {
@@ -701,7 +702,7 @@ export default function build() {
     });
     b.part(new THREE.BoxGeometry(0.255, 0.065, 0.08), METAL_SILVER, {
       bone: toeJ,
-      at: [s * 0.26, 0.035, 0.30],
+      at: [s * 0.26, 0.035, 0.3],
       group: `leg${side}`,
     });
     b.part(new THREE.BoxGeometry(0.26, 0.03, 0.44), GUN_BLACK, {
@@ -715,7 +716,7 @@ export default function build() {
   const rightWrist = arms[1].wrist;
   b.part(new THREE.BoxGeometry(0.12, 0.22, 0.58), GUN_BLACK, {
     bone: rightWrist,
-    at: [-1.06, 0.90, 0.26],
+    at: [-1.06, 0.9, 0.26],
     rotation: [20 * DEG, 10 * DEG, -5 * DEG],
     group: "armR",
   });
@@ -771,10 +772,10 @@ export default function build() {
   });
   b.part(new THREE.SphereGeometry(0.036, 10, 8), SKULL_WHITE, {
     bone: leftWrist,
-    at: [1.01, 0.90, -0.01],
+    at: [1.01, 0.9, -0.01],
     group: "armL",
   });
-  b.part(new THREE.BoxGeometry(0.15, 0.06, 0.10), TRIM_GOLD, {
+  b.part(new THREE.BoxGeometry(0.15, 0.06, 0.1), TRIM_GOLD, {
     bone: leftWrist,
     at: [1.01, 0.98, 0.23],
     rotation: [-20 * DEG, 0, 0],
@@ -787,7 +788,7 @@ export default function build() {
   });
 
   // Motor chassis
-  b.part(new THREE.BoxGeometry(0.10, 0.18, 0.26), ARMOR_BLUE, {
+  b.part(new THREE.BoxGeometry(0.1, 0.18, 0.26), ARMOR_BLUE, {
     bone: leftWrist,
     at: [1.01, 1.05, 0.38],
     rotation: [-20 * DEG, 0, 0],
@@ -811,13 +812,13 @@ export default function build() {
   // Long Chainblade chassis
   b.part(new THREE.BoxGeometry(0.07, 0.15, 0.65), ARMOR_BLUE, {
     bone: leftWrist,
-    at: [1.01, 1.20, 0.76],
+    at: [1.01, 1.2, 0.76],
     rotation: [-20 * DEG, 0, 0],
     group: "armL",
   });
   b.part(new THREE.BoxGeometry(0.068, 0.12, 0.14), GUN_METAL, {
     bone: leftWrist,
-    at: [1.01, 1.34, 1.10],
+    at: [1.01, 1.34, 1.1],
     rotation: [-50 * DEG, 0, 0],
     group: "armL",
   });
@@ -825,7 +826,7 @@ export default function build() {
   // Monomolecular Chain Teeth along bottom cutting edge
   for (let tooth = 0; tooth < 14; tooth++) {
     const frac = tooth / 14;
-    const tz = 0.48 + frac * 0.60;
+    const tz = 0.48 + frac * 0.6;
     const ty = 1.09 + frac * 0.22;
     b.part(new THREE.ConeGeometry(0.024, 0.048, 4), CHAIN_TEETH, {
       bone: leftWrist,

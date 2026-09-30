@@ -75,9 +75,9 @@ export function cards(
   const segments = bend ? Math.min(8, Math.max(2, Math.ceil((Math.abs(options.bend!) * detail) / SEGMENT_DEG))) : 1;
   const flowFor = (frame: Frame, i: number) =>
     typeof options.flow === "function"
-      ? toDirection(options.flow(frame, i))
+      ? toDirection(options.flow(frame, i), "cards()")
       : options.flow
-        ? toDirection(options.flow)
+        ? toDirection(options.flow, "cards()")
         : new Vector3(0, -0.3, -1);
   const [u0, u1] = options.mirror ? [1, 0] : [0, 1];
   const sink = options.sink ?? 0.1;

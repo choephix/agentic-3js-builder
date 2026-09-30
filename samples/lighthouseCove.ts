@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
-import { DEG, rng } from "../src/math";
+import { rng } from "../src/math";
 import { paint } from "../src/paint";
 import { catmull } from "../src/path";
 import { svg } from "../src/texture";
@@ -143,10 +143,10 @@ export default function build() {
   // 2. STYLIZED SEA & SHORE FOAM
   // =========================================================================
   const seaWaterOutline = plinthOutline.map(([x, z]) => [x * 0.955, z * 0.955] as [number, number]);
-  
+
   // Custom water paint: depth gradient + surf rim
   const seaPaint = paint((p) => {
-    const dx = p.x - (-0.1);
+    const dx = p.x - -0.1;
     const dz = p.z - 0.0;
     const dist = Math.sqrt(dx * dx + dz * dz);
     if (dist < 0.28) return FOAM_WHITE;
@@ -251,17 +251,17 @@ export default function build() {
   const rBoulder = rng(42);
 
   const boulderLocs: [number, number, number, number][] = [
-    [-0.38, 0.10, -0.28, 0.06],
-    [-0.46, 0.10, -0.05, 0.08],
-    [-0.42, 0.10, 0.22, 0.07],
-    [-0.22, 0.10, 0.38, 0.06],
-    [0.14, 0.10, 0.32, 0.07],
-    [0.26, 0.10, 0.08, 0.09],
-    [0.24, 0.10, -0.18, 0.07],
-    [0.05, 0.10, -0.36, 0.08],
-    [-0.18, 0.10, -0.42, 0.06],
-    [0.32, 0.095, -0.10, 0.045],
-    [-0.30, 0.095, 0.40, 0.04],
+    [-0.38, 0.1, -0.28, 0.06],
+    [-0.46, 0.1, -0.05, 0.08],
+    [-0.42, 0.1, 0.22, 0.07],
+    [-0.22, 0.1, 0.38, 0.06],
+    [0.14, 0.1, 0.32, 0.07],
+    [0.26, 0.1, 0.08, 0.09],
+    [0.24, 0.1, -0.18, 0.07],
+    [0.05, 0.1, -0.36, 0.08],
+    [-0.18, 0.1, -0.42, 0.06],
+    [0.32, 0.095, -0.1, 0.045],
+    [-0.3, 0.095, 0.4, 0.04],
     [-0.46, 0.095, 0.08, 0.05],
   ];
 
@@ -299,7 +299,7 @@ export default function build() {
   // =========================================================================
   const LX = -0.15;
   const LZ = -0.1;
-  const BASE_Y = 0.30;
+  const BASE_Y = 0.3;
 
   // Sturdy octagonal granite foundation plinth
   const lhPlinth = new THREE.CylinderGeometry(0.12, 0.135, 0.06, 8);
@@ -309,11 +309,11 @@ export default function build() {
   const stripeH = 0.07;
   const stripesData = [
     { color: TOWER_WHITE, rB: 0.102, rT: 0.096, y: BASE_Y + 0.06 + stripeH * 0.5 },
-    { color: TOWER_RED,   rB: 0.096, rT: 0.090, y: BASE_Y + 0.06 + stripeH * 1.5 },
-    { color: TOWER_WHITE, rB: 0.090, rT: 0.084, y: BASE_Y + 0.06 + stripeH * 2.5 },
-    { color: TOWER_RED,   rB: 0.084, rT: 0.078, y: BASE_Y + 0.06 + stripeH * 3.5 },
+    { color: TOWER_RED, rB: 0.096, rT: 0.09, y: BASE_Y + 0.06 + stripeH * 1.5 },
+    { color: TOWER_WHITE, rB: 0.09, rT: 0.084, y: BASE_Y + 0.06 + stripeH * 2.5 },
+    { color: TOWER_RED, rB: 0.084, rT: 0.078, y: BASE_Y + 0.06 + stripeH * 3.5 },
     { color: TOWER_WHITE, rB: 0.078, rT: 0.072, y: BASE_Y + 0.06 + stripeH * 4.5 },
-    { color: TOWER_RED,   rB: 0.072, rT: 0.066, y: BASE_Y + 0.06 + stripeH * 5.5 },
+    { color: TOWER_RED, rB: 0.072, rT: 0.066, y: BASE_Y + 0.06 + stripeH * 5.5 },
   ];
 
   for (const s of stripesData) {
@@ -377,10 +377,10 @@ export default function build() {
   // =========================================================================
   const CX = 0.06;
   const CZ = -0.04;
-  const COTTAGE_Y = 0.30;
+  const COTTAGE_Y = 0.3;
 
   // Whitewashed stone walls
-  const cottageWalls = new THREE.BoxGeometry(0.20, 0.12, 0.15);
+  const cottageWalls = new THREE.BoxGeometry(0.2, 0.12, 0.15);
   b.part(cottageWalls, COTTAGE_WALL, {
     bone: root,
     at: [CX, COTTAGE_Y + 0.06, CZ],
@@ -472,9 +472,9 @@ export default function build() {
     new THREE.Vector3(CX - 0.03, COTTAGE_Y + 0.005, CZ + 0.08),
     new THREE.Vector3(0.02, 0.29, 0.12),
     new THREE.Vector3(0.08, 0.25, 0.18),
-    new THREE.Vector3(0.16, 0.20, 0.22),
+    new THREE.Vector3(0.16, 0.2, 0.22),
     new THREE.Vector3(0.24, 0.15, 0.24),
-    new THREE.Vector3(0.30, 0.12, 0.26),
+    new THREE.Vector3(0.3, 0.12, 0.26),
   ];
   const trailCurve = catmull(trailPoints);
   b.sweep(trailCurve, 0.035, {
@@ -501,14 +501,18 @@ export default function build() {
   const jettyPlanks: THREE.BufferGeometry[] = [];
 
   const jettyPiles: [number, number][] = [
-    [0.30, 0.23], [0.30, 0.29],
-    [0.37, 0.25], [0.37, 0.31],
-    [0.44, 0.27], [0.44, 0.33],
-    [0.51, 0.29], [0.51, 0.35],
+    [0.3, 0.23],
+    [0.3, 0.29],
+    [0.37, 0.25],
+    [0.37, 0.31],
+    [0.44, 0.27],
+    [0.44, 0.33],
+    [0.51, 0.29],
+    [0.51, 0.35],
   ];
 
   for (const [jx, jz] of jettyPiles) {
-    const pile = new THREE.CylinderGeometry(0.010, 0.012, 0.11, 5);
+    const pile = new THREE.CylinderGeometry(0.01, 0.012, 0.11, 5);
     pile.translate(jx, 0.09, jz);
     jettyPosts.push(pile);
   }
@@ -534,8 +538,8 @@ export default function build() {
   }
 
   // Mooring bollard
-  const bollard = new THREE.CylinderGeometry(0.009, 0.010, 0.03, 5);
-  bollard.translate(0.50, 0.145, 0.30);
+  const bollard = new THREE.CylinderGeometry(0.009, 0.01, 0.03, 5);
+  bollard.translate(0.5, 0.145, 0.3);
   jettyPosts.push(bollard);
 
   // Wooden ladder leading down into water
@@ -594,7 +598,7 @@ export default function build() {
   const oar2 = new THREE.CylinderGeometry(0.003, 0.004, 0.13, 4);
   oar2.rotateZ(-1.1);
   oar2.rotateY(-0.3);
-  oar2.translate(0.01, 0.020, -0.01);
+  oar2.translate(0.01, 0.02, -0.01);
   seatGeoms.push(oar1, oar2);
 
   b.part(mergeGeometries(seatGeoms), BOAT_SEATS, {
@@ -604,14 +608,9 @@ export default function build() {
   });
 
   // Mooring rope from rowboat bow to jetty bollard
-  const ropePoints: THREE.Vector3[] = [
-    new THREE.Vector3(0.38 + 0.08, 0.115, 0.28 + 0.03),
-    new THREE.Vector3(0.44, 0.105, 0.30),
-    new THREE.Vector3(0.50, 0.145, 0.30),
-  ];
   const ropeGeo = new THREE.BoxGeometry(0.008, 0.008, 0.12);
   ropeGeo.rotateY(-0.38);
-  ropeGeo.translate(0.44, 0.115, 0.30);
+  ropeGeo.translate(0.44, 0.115, 0.3);
   b.part(ropeGeo, "#c2ab80", { bone: root, at: [0, 0, 0], group: "jetty" });
 
   // =========================================================================
@@ -627,7 +626,7 @@ export default function build() {
   buoyCollar.rotateX(Math.PI / 2);
   b.part(buoyCollar, BUOY_YELLOW, {
     bone: buoy,
-    at: [0.42, 0.10, -0.32],
+    at: [0.42, 0.1, -0.32],
     group: "buoy",
   });
   const buoyTower = new THREE.CylinderGeometry(0.005, 0.015, 0.06, 4);
@@ -690,13 +689,13 @@ export default function build() {
   // Coastal shrubbery
   const shrubGeoms: THREE.BufferGeometry[] = [];
   const shrubLocs: [number, number, number, number][] = [
-    [-0.26, 0.30, -0.18, 0.04],
-    [-0.22, 0.30, -0.22, 0.035],
-    [-0.30, 0.29, 0.04, 0.045],
-    [-0.24, 0.30, 0.16, 0.05],
-    [-0.10, 0.30, 0.22, 0.04],
+    [-0.26, 0.3, -0.18, 0.04],
+    [-0.22, 0.3, -0.22, 0.035],
+    [-0.3, 0.29, 0.04, 0.045],
+    [-0.24, 0.3, 0.16, 0.05],
+    [-0.1, 0.3, 0.22, 0.04],
     [0.02, 0.28, 0.24, 0.035],
-    [-0.04, 0.30, -0.20, 0.04],
+    [-0.04, 0.3, -0.2, 0.04],
     [0.12, 0.26, -0.16, 0.035],
   ];
 
@@ -724,7 +723,7 @@ export default function build() {
     new THREE.Vector3(-0.25, 0.305, -0.12),
     new THREE.Vector3(-0.28, 0.305, -0.04),
     new THREE.Vector3(-0.22, 0.305, 0.12),
-    new THREE.Vector3(-0.16, 0.305, 0.20),
+    new THREE.Vector3(-0.16, 0.305, 0.2),
     new THREE.Vector3(-0.02, 0.305, 0.21),
     new THREE.Vector3(0.04, 0.285, 0.18),
     new THREE.Vector3(0.12, 0.295, -0.12),
@@ -751,7 +750,7 @@ export default function build() {
   );
 
   const grassFrames: THREE.Vector3[] = [
-    new THREE.Vector3(-0.32, 0.21, 0.20),
+    new THREE.Vector3(-0.32, 0.21, 0.2),
     new THREE.Vector3(-0.35, 0.16, 0.12),
     new THREE.Vector3(-0.28, 0.18, -0.18),
     new THREE.Vector3(-0.15, 0.19, -0.28),
@@ -794,7 +793,7 @@ export default function build() {
     group: "gulls",
   });
 
-  const wingOutline: [number, number][] = [
+  const wingOutline = [
     [0, 0],
     [-0.02, 0.08],
     [0, 0.12, "sharp"],
@@ -829,7 +828,7 @@ export default function build() {
     group: "gulls",
   });
 
-  const wingOutline2: [number, number][] = [
+  const wingOutline2 = [
     [0, 0],
     [-0.018, 0.075],
     [0, 0.11, "sharp"],
@@ -857,7 +856,7 @@ export default function build() {
   // Gull 3: Perched on the pier bollard [0.50, 0.165, 0.30]
   const perchedGull = new THREE.ConeGeometry(0.012, 0.05, 4);
   perchedGull.rotateX(0.4);
-  perchedGull.translate(0.50, 0.175, 0.30);
+  perchedGull.translate(0.5, 0.175, 0.3);
   b.part(perchedGull, "#ffffff", { bone: root, at: [0, 0, 0], group: "gulls" });
 
   return b.root;

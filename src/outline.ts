@@ -8,8 +8,13 @@ import { aim, DEG, toDirection, toPoint } from "./math";
 import type { DirectionInput, PointInput } from "./math";
 import { Part } from "./parts";
 
-/** An outline corner `[x, y]` in meters; `[x, y, "sharp"]` keeps that corner pointed through smoothing. */
+/**
+ * An outline corner `[x, y]` in meters; `[x, y, "sharp"]` keeps that corner pointed through smoothing. Outlines
+ * written as plain arrays (a variable inferred as `(string | number)[][]`) are accepted too and checked when built.
+ */
 export type OutlinePoint = readonly [number, number] | readonly [number, number, "sharp"];
+/** What `extrude` and `lathe` take: OutlinePoints, typed or plain. */
+export type OutlineInput = readonly (OutlinePoint | readonly (number | string)[])[];
 
 type Vec2 = [number, number];
 
@@ -117,6 +122,20 @@ function area(points: readonly Vec2[]) {
 }
 
 type Outline = { points: Vec2[]; minY: number; maxY: number };
+
+/** The authored points, each checked to be `[x, y]` or `[x, y, "sharp"]`. */
+function checked(call: string, authored: OutlineInput): readonly OutlinePoint[] {
+  authored.forEach((p, i) => {
+    const ok =
+      (p.length === 2 || (p.length === 3 && p[2] === "sharp")) &&
+      typeof p[0] === "number" &&
+      typeof p[1] === "number" &&
+      Number.isFinite(p[0]) &&
+      Number.isFinite(p[1]);
+    if (!ok) throw new Error(`${call}: point ${i} is [x, y] or [x, y, "sharp"], got ${JSON.stringify(p)}`);
+  });
+  return authored as readonly OutlinePoint[];
+}
 
 /** Closed, checked, smoothed and counter-clockwise; throws with the authored point numbers when it can't be built. */
 function prepare(call: string, authored: readonly OutlinePoint[], smoothing = 0): Outline {
@@ -240,8 +259,8 @@ function toWorld(local: number[], at: Vector3, quat: Quaternion) {
  * `at` whose local x, y and z are the outline's x, y and the thickness axis, so `part.local([u, v, 0])` is a point
  * of the drawing and `part.local([u, v, t / 2])` sits on its front face.
  */
-export function extrude(ctx: Ctx, points: readonly OutlinePoint[], options: ExtrudeOptions) {
-  const outline = prepare("extrude()", points, options.smoothing);
+export function extrude(ctx: Ctx, points: OutlineInput, options: ExtrudeOptions) {
+  const outline = prepare("extrude()", checked("extrude()", points), options.smoothing);
   const [t0, t1] = typeof options.thickness === "number" ? [options.thickness, options.thickness] : options.thickness;
   if (!(t0 >= 0 && t1 >= 0 && Math.max(t0, t1) > 0))
     throw new Error("extrude(): thickness is positive, or [atLowest, atHighest] with at least one end above 0");
@@ -300,9 +319,9 @@ export function extrude(ctx: Ctx, points: readonly OutlinePoint[], options: Extr
     vertex(second, -cap.z);
   }
 
-  const at = toPoint(options.at);
-  const xDir = toDirection(options.x ?? [0, 0, 1]).normalize();
-  const yRaw = toDirection(options.y ?? [0, 1, 0]);
+  const at = toPoint(options.at, "extrude()");
+  const xDir = toDirection(options.x ?? [0, 0, 1], "extrude()").normalize();
+  const yRaw = toDirection(options.y ?? [0, 1, 0], "extrude()");
   const yDir = yRaw.addScaledVector(xDir, -yRaw.dot(xDir));
   if (yDir.length() < 1e-6) throw new Error("extrude(): x and y point the same way");
   yDir.normalize();
@@ -327,7 +346,8 @@ export function extrude(ctx: Ctx, points: readonly OutlinePoint[], options: Extr
  * Half a cross-section spun around `axis` through `at`: the outline's x is the distance from the axis (never
  * negative) and its y the height along it. Returns a Part at `at` facing `axis`.
  */
-export function lathe(ctx: Ctx, points: readonly OutlinePoint[], options: LatheOptions) {
+export function lathe(ctx: Ctx, authored: OutlineInput, options: LatheOptions) {
+  const points = checked("lathe()", authored);
   const negative = points.findIndex((p) => p[0] < 0);
   if (negative >= 0) throw new Error(`lathe(): point ${negative} has x < 0; x is the distance from the axis`);
   const outline = prepare("lathe()", points, options.smoothing);
@@ -377,8 +397,8 @@ export function lathe(ctx: Ctx, points: readonly OutlinePoint[], options: LatheO
     }
   }
 
-  const at = toPoint(options.at);
-  const quat = aim(toDirection(options.axis ?? [0, 1, 0]), undefined, "y");
+  const at = toPoint(options.at, "lathe()");
+  const quat = aim(toDirection(options.axis ?? [0, 1, 0], "lathe()"), undefined, "y");
   const weights = weightsFor(ctx, options.bone, [options.at], at);
   const mesh = meshFromWorld(
     ctx,

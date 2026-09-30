@@ -24,7 +24,7 @@ import {
 } from "../kits/pixel";
 ```
 
-Textured parts take the texture with a white tint: `b.part(geo, "#ffffff", { texture, bone, at })`. Every kit texture is pixelated, which makes the whole atlas (paint sheet included) magnify without smoothing.
+A textured part shows a pixel texture drawn in colour as drawn, whatever its `color`; a texture drawn only in greys is tinted by the part's `color`. Every kit texture is pixelated, which makes the whole atlas (paint sheet included) magnify without smoothing.
 
 Pick one texel size in meters for the model (`const TEXEL = 0.02`) and use it for boxes, skin boxes and paints, so all texels match. Use half or a third of it for small parts that need finer detail.
 
@@ -75,7 +75,7 @@ Makes a box `size` (`[w, h, d]` in meters). Each face shows a crop of `tile` at 
 
 ```ts
 const PLANKS = pixelTexture(32, 30, drawPlanks);
-b.part(tileBox([0.36, 0.17, 0.26], PLANKS, 0.0115, { rand, step: [1, 6] }), "#ffffff", {
+b.part(tileBox([0.36, 0.17, 0.26], PLANKS, 0.0115, { rand, step: [1, 6] }), WOOD, {
   texture: PLANKS,
   bone: body,
   at: [0, 0.125, -0.02],

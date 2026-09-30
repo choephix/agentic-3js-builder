@@ -4,8 +4,11 @@ import { Box3, Matrix4, Quaternion, Vector3 } from "three";
 import type { Mesh } from "three";
 import type { Frame } from "./frame";
 
-/** A literal model-space point or direction: a `[x, y, z]` tuple or a `THREE.Vector3`. */
-export type V3 = Vector3 | readonly [number, number, number];
+/**
+ * A literal model-space point or direction: `[x, y, z]` or a `THREE.Vector3`. Any number array passes the type check
+ * (plain `number[]` data from variables, object fields and `.map` needs no cast); it must hold exactly 3 numbers.
+ */
+export type V3 = Vector3 | readonly number[];
 export type Axis = "x" | "y" | "z";
 /** Something with a start frame: a Sweep (and so every rod, capsule, spike, horn...). */
 export type HasFrame = { readonly frame: Frame };
@@ -18,9 +21,19 @@ export type DirectionInput = V3 | FrameInput;
 
 export const DEG = Math.PI / 180;
 
-/** A fresh `Vector3` copy of `p` (never aliases the input). */
-export function vec(p: V3) {
-  return "isVector3" in p ? p.clone() : new Vector3(p[0], p[1], p[2]);
+/** A fresh `Vector3` copy of `p` (never aliases the input). `call` names the caller when a literal is malformed. */
+export function vec(p: V3, call = "vec()") {
+  if ("isVector3" in p) return p.clone();
+  if (p.length !== 3 || !p.every(Number.isFinite))
+    throw new Error(`${call}: a point or direction is [x, y, z] (3 numbers), got ${JSON.stringify(p)}`);
+  return new Vector3(p[0], p[1], p[2]);
+}
+
+/** A fresh unit vector for an axis letter or a direction. */
+export function axisVector(a: Axis | V3, call: string) {
+  if (typeof a !== "string") return vec(a, call).normalize();
+  if (a !== "x" && a !== "y" && a !== "z") throw new Error(`${call}: axis is "x", "y", "z" or [x, y, z], got "${a}"`);
+  return new Vector3(a === "x" ? 1 : 0, a === "y" ? 1 : 0, a === "z" ? 1 : 0);
 }
 
 /** The Frame of a Frame input. */
@@ -28,29 +41,29 @@ export function toFrame(x: FrameInput) {
   return "frame" in x ? x.frame : x;
 }
 
-/** A fresh model-space point from any point input. */
-export function toPoint(x: PointInput) {
-  if (Array.isArray(x) || "isVector3" in x) return vec(x as V3);
+/** A fresh model-space point from any point input. `call` names the caller when a literal is malformed. */
+export function toPoint(x: PointInput, call = "toPoint()") {
+  if (Array.isArray(x) || "isVector3" in x) return vec(x as V3, call);
   if ("isMesh" in x) return new Box3().setFromObject(x as Mesh).getCenter(new Vector3());
   return toFrame(x as FrameInput).at;
 }
 
 /** A fresh direction (not normalised) from any direction input: literal, or a Frame's facing axis. */
-export function toDirection(x: DirectionInput) {
-  return Array.isArray(x) || "isVector3" in x ? vec(x as V3) : toFrame(x as FrameInput).axis;
+export function toDirection(x: DirectionInput, call = "toDirection()") {
+  return Array.isArray(x) || "isVector3" in x ? vec(x as V3, call) : toFrame(x as FrameInput).axis;
 }
 
 export function lerp(a: PointInput, b: PointInput, t: number) {
-  return toPoint(a).lerp(toPoint(b), t);
+  return toPoint(a, "lerp()").lerp(toPoint(b, "lerp()"), t);
 }
 
 export function mid(a: PointInput, b: PointInput) {
-  return lerp(a, b, 0.5);
+  return toPoint(a, "mid()").lerp(toPoint(b, "mid()"), 0.5);
 }
 
 /** `p` moved `dist` along the direction `dir` (normalised). */
 export function offset(p: PointInput, dir: DirectionInput, dist: number) {
-  return toPoint(p).addScaledVector(toDirection(dir).normalize(), dist);
+  return toPoint(p, "offset()").addScaledVector(toDirection(dir, "offset()").normalize(), dist);
 }
 
 /** `v` with its component along the unit vector `n` removed. */
@@ -82,9 +95,9 @@ function perpendicular(hint: Vector3, d: Vector3) {
  * An explicit `up` parallel to `dir` falls back to the default rule. Deterministic for every input.
  */
 export function aim(dir: DirectionInput, up?: DirectionInput, axis: Axis = "y") {
-  const d = toDirection(dir).normalize();
+  const d = toDirection(dir, "aim()").normalize();
   if (d.lengthSq() === 0) throw new Error("aim(): zero-length direction");
-  let s = up ? perpendicular(toDirection(up).normalize(), d) : null;
+  let s = up ? perpendicular(toDirection(up, "aim()").normalize(), d) : null;
   if (!s) {
     if (axis === "y") s = perpendicular(d.clone().cross(X), d) ?? perpendicular(Y, d)!;
     else if (axis === "z") s = perpendicular(Y, d) ?? d.clone().cross(X).normalize();

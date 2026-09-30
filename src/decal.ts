@@ -40,17 +40,17 @@ export type DecalOptions = Tags & {
 
 export function decal(ctx: Ctx, target: Surface | SurfaceTarget, texture: Texture, options: DecalOptions) {
   const skin = target instanceof Surface ? target : new Surface(ctx, target);
-  const center = toPoint(options.at);
+  const center = toPoint(options.at, "decal()");
   const { at } = options;
   const dir = options.dir
-    ? toDirection(options.dir)
+    ? toDirection(options.dir, "decal()")
     : at instanceof Frame || (typeof at === "object" && "frame" in at)
       ? toFrame(at).axis.negate()
       : null;
   if (!dir || dir.lengthSq() < 1e-12) throw new Error("decal(): give `dir`, the viewing direction onto the surface");
   dir.normalize();
 
-  let up = options.up ? toDirection(options.up) : new Vector3(0, 1, 0);
+  let up = options.up ? toDirection(options.up, "decal()") : new Vector3(0, 1, 0);
   let right = dir.clone().cross(up);
   if (right.lengthSq() < 1e-10) {
     up = new Vector3(0, 0, 1);

@@ -2,7 +2,7 @@
 // Point input, so a rod can run from an eye to a joint; the tube belongs to the first endpoint's bone.
 import { boneFor } from "./context";
 import type { Ctx } from "./context";
-import { offset, toFrame, toPoint } from "./math";
+import { toDirection, toFrame, toPoint } from "./math";
 import type { DirectionInput, FrameInput, PointInput } from "./math";
 import { catmull, Path, polyline, toPath } from "./path";
 import type { PathInput } from "./path";
@@ -45,7 +45,10 @@ export function spike(
   r: number,
   options: SweepOptions = {},
 ) {
-  const tip = len === null ? toPoint(dirOrTip) : offset(base, dirOrTip as DirectionInput, len);
+  const tip =
+    len === null
+      ? toPoint(dirOrTip, "spike()")
+      : toPoint(base, "spike()").addScaledVector(toDirection(dirOrTip as DirectionInput, "spike()").normalize(), len);
   return sweep(ctx, [base, tip], [r, 0], { caps: { start: "flat", end: "point" }, ...options });
 }
 
@@ -108,7 +111,9 @@ export function sprout(
   const isPath =
     pathOrTip instanceof Path ||
     (Array.isArray(pathOrTip) ? typeof pathOrTip[0] !== "number" : "curve" in (pathOrTip as object));
-  const given = isPath ? toPath(pathOrTip as PathInput) : polyline([start, toPoint(pathOrTip as PointInput)]);
+  const given = isPath
+    ? toPath(pathOrTip as PathInput)
+    : polyline([start, toPoint(pathOrTip as PointInput, "sprout()")]);
   const path = given.at(0).distanceTo(start) > 1e-6 ? polyline([start, given.at(0)]).concat(given) : given;
   const chain =
     count === 0

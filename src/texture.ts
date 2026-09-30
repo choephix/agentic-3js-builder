@@ -2,6 +2,7 @@
 // showcase and the creature-lab harness both run in one); under Node the texture keeps its size and markup and stays
 // blank. Transparent pixels cut the surface away, so a drawn leaf on a card is a leaf.
 import {
+  Color,
   DataTexture,
   LinearFilter,
   LinearMipmapLinearFilter,
@@ -55,6 +56,7 @@ export function svg(markup: string, options: { size?: number; pixelated?: boolea
   texture.generateMipmaps = true;
   texture.anisotropy = 8;
   texture.userData.svg = markup;
+  texture.userData.coloured = inColour(markup);
   if (typeof document === "undefined") return texture;
 
   const parsed = new DOMParser().parseFromString(source, "image/svg+xml");
@@ -83,4 +85,31 @@ export function svg(markup: string, options: { size?: number; pixelated?: boolea
       texture.needsUpdate = true;
     });
   return texture;
+}
+
+/**
+ * Whether a drawing uses any colour beyond greys (white to black), read from its fill, stroke and stop colours.
+ * A textured part tints a grey drawing by its `color` and shows a coloured drawing as drawn.
+ */
+function inColour(markup: string) {
+  const color = new Color();
+  for (const [, , value] of markup.matchAll(
+    /(fill|stroke|stop-color|flood-color|color)\s*(?:=\s*["']|:)\s*([^"';>]+)/gi,
+  )) {
+    const token = value.trim().toLowerCase();
+    const hex = /^#([0-9a-f]{3,8})$/.exec(token)?.[1];
+    const [a = "0", b = "0", c] = token.match(/-?[\d.]+%?/g) ?? [];
+    const unit = (v: string, full: number) => (v.endsWith("%") ? parseFloat(v) / 100 : parseFloat(v) / full);
+    if (hex) {
+      const six = hex.length < 6 ? [...hex.slice(0, 3)].map((ch) => ch + ch).join("") : hex.slice(0, 6);
+      color.setHex(parseInt(six, 16), SRGBColorSpace);
+    } else if (token in Color.NAMES) color.setHex(Color.NAMES[token as keyof typeof Color.NAMES], SRGBColorSpace);
+    else if (/^rgba?\(/.test(token) && c) color.setRGB(unit(a, 255), unit(b, 255), unit(c, 255), SRGBColorSpace);
+    else if (/^hsla?\(/.test(token) && c)
+      color.setHSL((parseFloat(a) / 360) % 1, unit(b, 100), unit(c, 100), SRGBColorSpace);
+    else continue;
+    const rgb = color.getRGB({ r: 0, g: 0, b: 0 }, SRGBColorSpace);
+    if (Math.max(rgb.r, rgb.g, rgb.b) - Math.min(rgb.r, rgb.g, rgb.b) > 0.03) return true;
+  }
+  return false;
 }

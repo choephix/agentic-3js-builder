@@ -18,47 +18,46 @@ export const meta = {
 // =============================================================================
 const PENGUIN_BLACK = "#15181e"; // Tuxedo feathers / back
 const PENGUIN_WHITE = "#f0f2f5"; // Belly white plumage
-const CREST_YELLOW = "#fbc02d";  // Vibrant rockhopper spiky crests
-const CREST_DARK = "#f57f17";    // Base gradient for crests
-const BEAK_ORANGE = "#d84315";   // Heavy bill keratin
-const BEAK_PALE = "#ff7043";     // Beak highlight / plate edge
-const EYE_SCAR = "#b71c1c";      // Battle scar around right eye
-const EYE_CYBORG = "#00e676";    // Glowing cybernetic right lens
-const EYE_REAL = "#1a120b";      // Normal brown eye
+const CREST_YELLOW = "#fbc02d"; // Vibrant rockhopper spiky crests
+const BEAK_ORANGE = "#d84315"; // Heavy bill keratin
+const BEAK_PALE = "#ff7043"; // Beak highlight / plate edge
+const EYE_SCAR = "#b71c1c"; // Battle scar around right eye
+const EYE_CYBORG = "#00e676"; // Glowing cybernetic right lens
+const EYE_REAL = "#1a120b"; // Normal brown eye
 const EYE_HIGHLIGHT = "#ffffff";
 
 // Gear & Tactical vest
-const VEST_OLIVE = "#333d29";    // Military canvas / cordura
-const VEST_DARK = "#252e1c";     // Straps and webbing
-const VEST_TRIM = "#414833";     // Collar and harness lining
-const POUCH_CAMO = "#435032";    // Ammo pouches
-const POUCH_BUCKLE = "#c2a649";  // Brass buckles
+const VEST_OLIVE = "#333d29"; // Military canvas / cordura
+const VEST_DARK = "#252e1c"; // Straps and webbing
+const VEST_TRIM = "#414833"; // Collar and harness lining
+const POUCH_CAMO = "#435032"; // Ammo pouches
+const POUCH_BUCKLE = "#c2a649"; // Brass buckles
 const HOLSTER_LEATHER = "#4a3525";
 
 // Aviator Goggles
 const GOGGLE_LEATHER = "#2d2015"; // Headband strap
-const GOGGLE_BRASS = "#d4af37";   // Chunky brass rims
-const GOGGLE_GLASS = "#80deea";   // Tinted glass
+const GOGGLE_BRASS = "#d4af37"; // Chunky brass rims
+const GOGGLE_GLASS = "#80deea"; // Tinted glass
 
 // Jetpack
-const JET_STEEL = "#2b2f38";     // Industrial gunmetal tank & mount
-const JET_PLATE = "#3e4451";     // Armored outer shell
-const JET_COPPER = "#b87333";    // Manifold pipes & turbine rings
-const JET_HAZARD = "#f9a825";    // Hazard stripes
-const JET_NOZZLE = "#1c1f24";    // Heat-treated exhaust cones
-const JET_GLOW = "#ff3d00";      // Thruster interior heat glow
+const JET_STEEL = "#2b2f38"; // Industrial gunmetal tank & mount
+const JET_PLATE = "#3e4451"; // Armored outer shell
+const JET_COPPER = "#b87333"; // Manifold pipes & turbine rings
+const JET_HAZARD = "#f9a825"; // Hazard stripes
+const JET_NOZZLE = "#1c1f24"; // Heat-treated exhaust cones
+const JET_GLOW = "#ff3d00"; // Thruster interior heat glow
 
 // Weapon
-const GUN_HOUSING = "#1a1c23";   // Heavy matte composite frame
-const GUN_METAL = "#4b5366";     // Machined barrel & receiver
-const GUN_COIL = "#00e5ff";      // Glowing plasma accelerator coils
-const GUN_BRASS = "#c59b27";     // Warning plates & heat vents
-const GUN_GRIP = "#2c2621";      // Stippled grip panels
+const GUN_HOUSING = "#1a1c23"; // Heavy matte composite frame
+const GUN_METAL = "#4b5366"; // Machined barrel & receiver
+const GUN_COIL = "#00e5ff"; // Glowing plasma accelerator coils
+const GUN_BRASS = "#c59b27"; // Warning plates & heat vents
+const GUN_GRIP = "#2c2621"; // Stippled grip panels
 
 // Feet & Skin
-const FOOT_ORANGE = "#e65100";   // Thick scaled penguin feet
-const FOOT_PALE = "#f57c00";     // Webbing skin
-const CLAW_BLACK = "#101012";    // Heavy talons
+const FOOT_ORANGE = "#e65100"; // Thick scaled penguin feet
+const FOOT_PALE = "#f57c00"; // Webbing skin
+const CLAW_BLACK = "#101012"; // Heavy talons
 
 export default function build() {
   const b = createBuilder({ name: "jetpackPenguinMerc", detail: 0.95 });
@@ -90,7 +89,7 @@ export default function build() {
 
   const neckStations = [
     [0, 0.88, -0.01],
-    [0, 0.98, 0.00],
+    [0, 0.98, 0.0],
     [0, 1.06, 0.02],
   ] as const;
 
@@ -122,7 +121,7 @@ export default function build() {
   const tailChain = b.chain(
     "tail",
     catmull([
-      [0, 0.30, -0.16],
+      [0, 0.3, -0.16],
       [0, 0.22, -0.27],
       [0, 0.12, -0.38],
     ]),
@@ -142,22 +141,21 @@ export default function build() {
   type ArmJoints = { shoulder: any; elbow: any; wrist: any };
   const arms: Record<"L" | "R", ArmJoints> = {} as any;
 
-  for (const [s, side] of [[1, "L"], [-1, "R"]] as const) {
+  for (const [s, side] of [
+    [1, "L"],
+    [-1, "R"],
+  ] as const) {
     const shoulderPt: [number, number, number] = [s * 0.22, 0.84, -0.01];
-    const elbowPt: [number, number, number] = [s * 0.40, 0.74, 0.04];
-    const wristPt: [number, number, number] = [s * 0.54, 0.60, 0.10];
+    const elbowPt: [number, number, number] = [s * 0.4, 0.74, 0.04];
+    const wristPt: [number, number, number] = [s * 0.54, 0.6, 0.1];
     const tipPt: [number, number, number] = [s * 0.66, 0.44, 0.16];
 
-    const armChain = b.chain(
-      `arm${side}`,
-      [shoulderPt, elbowPt, wristPt, tipPt],
-      {
-        parent: shouldersJoint,
-        role: "arm",
-        names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`],
-        group: `flipper${side}`,
-      },
-    );
+    const armChain = b.chain(`arm${side}`, [shoulderPt, elbowPt, wristPt, tipPt], {
+      parent: shouldersJoint,
+      role: "arm",
+      names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`],
+      group: `flipper${side}`,
+    });
 
     arms[side] = {
       shoulder: armChain.joints[0],
@@ -190,8 +188,11 @@ export default function build() {
   const footBaseY = 0.024;
   const toeR = 0.024;
 
-  for (const [s, side] of [[1, "L"], [-1, "R"]] as const) {
-    const hipPt: [number, number, number] = [s * 0.16, 0.30, -0.03];
+  for (const [s, side] of [
+    [1, "L"],
+    [-1, "R"],
+  ] as const) {
+    const hipPt: [number, number, number] = [s * 0.16, 0.3, -0.03];
     const kneePt: [number, number, number] = [s * 0.16, 0.18, 0.03];
     const footTarget: [number, number, number] = [s * 0.16, footBaseY, 0.08];
 
@@ -204,10 +205,16 @@ export default function build() {
 
     const legChain = b.chain(
       `leg${side}`,
-      limb(kneePt, footTarget, [0.09, 0.08], [
-        [0, 0, 1],  // knee forward
-        [0, 0, -1], // ankle back
-      ], { sole: [0, 1, 0] }),
+      limb(
+        kneePt,
+        footTarget,
+        [0.09, 0.08],
+        [
+          [0, 0, 1], // knee forward
+          [0, 0, -1], // ankle back
+        ],
+        { sole: [0, 1, 0] },
+      ),
       {
         parent: hips,
         role: "leg",
@@ -240,17 +247,13 @@ export default function build() {
         0.08 + Math.cos(angleRad) * toeLen,
       ];
 
-      const toe = b.chain(
-        `toe${side}${i + 1}`,
-        [footBasePt, toeEndPt],
-        {
-          parent: ankleJoint,
-          role: "digit",
-          names: [`toe${side}${i + 1}`],
-          contact: [toeEndPt[0], 0.0, toeEndPt[2]],
-          group: `leg${side}`,
-        },
-      );
+      const toe = b.chain(`toe${side}${i + 1}`, [footBasePt, toeEndPt], {
+        parent: ankleJoint,
+        role: "digit",
+        names: [`toe${side}${i + 1}`],
+        contact: [toeEndPt[0], 0.0, toeEndPt[2]],
+        group: `leg${side}`,
+      });
       toeChains.push(toe);
 
       // Toe pad tube
@@ -261,17 +264,11 @@ export default function build() {
       });
 
       // Sharp heavy black mercenary talon
-      b.spike(
-        toe.at(1),
-        [s * Math.sin(angleRad) * 0.35, -0.05, 0.95],
-        0.036,
-        0.010,
-        {
-          bone: toe.joints[0],
-          color: CLAW_BLACK,
-          group: `leg${side}`,
-        },
-      );
+      b.spike(toe.at(1), [s * Math.sin(angleRad) * 0.35, -0.05, 0.95], 0.036, 0.01, {
+        bone: toe.joints[0],
+        color: CLAW_BLACK,
+        group: `leg${side}`,
+      });
     }
 
     // Heavy leather webbings between toes
@@ -286,17 +283,11 @@ export default function build() {
     }
 
     // Hind spur / rear digit
-    b.spike(
-      footBasePt,
-      [0, 0.05, -0.9],
-      0.026,
-      0.009,
-      {
-        bone: ankleJoint,
-        color: CLAW_BLACK,
-        group: `leg${side}`,
-      },
-    );
+    b.spike(footBasePt, [0, 0.05, -0.9], 0.026, 0.009, {
+      bone: ankleJoint,
+      color: CLAW_BLACK,
+      group: `leg${side}`,
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -305,26 +296,26 @@ export default function build() {
   // Stocky, barrel-chested rockhopper mercenary silhouette
   const bodyStations = [
     { at: [0, 0.24, -0.05] as const, w: 0.44, h: 0.42 }, // Lower abdomen
-    { at: [0, 0.38, -0.02] as const, w: 0.52, h: 0.50 }, // Maximum belly girth
-    { at: [0, 0.56, 0.02] as const,  w: 0.50, h: 0.49 }, // Mid chest
-    { at: [0, 0.74, 0.03] as const,  w: 0.46, h: 0.46 }, // Upper pectoral chest
+    { at: [0, 0.38, -0.02] as const, w: 0.52, h: 0.5 }, // Maximum belly girth
+    { at: [0, 0.56, 0.02] as const, w: 0.5, h: 0.49 }, // Mid chest
+    { at: [0, 0.74, 0.03] as const, w: 0.46, h: 0.46 }, // Upper pectoral chest
     { at: [0, 0.88, -0.01] as const, w: 0.38, h: 0.38 }, // Broad mercenary shoulders
-    { at: [0, 0.98, 0.00] as const,  w: 0.28, h: 0.28 }, // Muscular neck
-    { at: [0, 1.06, 0.02] as const,  w: 0.20, h: 0.20 }, // Base of skull
+    { at: [0, 0.98, 0.0] as const, w: 0.28, h: 0.28 }, // Muscular neck
+    { at: [0, 1.06, 0.02] as const, w: 0.2, h: 0.2 }, // Base of skull
   ];
 
   // Classic tuxedo countershading: pure white front abdomen, jet black back & sides
   const bodyPlumage = paint((p, n) => {
     const isFront = n.z > 0.15;
     const isBelly = p.y >= 0.24 && p.y <= 0.86;
-    const midX = Math.abs(p.x) < 0.20;
+    const midX = Math.abs(p.x) < 0.2;
     if (isFront && isBelly && midX) {
       return PENGUIN_WHITE;
     }
     return PENGUIN_BLACK;
   });
 
-  const bodyLoft = b.loft(bodyStations, {
+  b.loft(bodyStations, {
     bone: [tailChain, hips, spine, neck],
     color: bodyPlumage,
     group: "body",
@@ -339,10 +330,13 @@ export default function build() {
   // ---------------------------------------------------------------------------
   // FLIPPERS (Rigid hydrofoil combat wings)
   // ---------------------------------------------------------------------------
-  for (const [s, side] of [[1, "L"], [-1, "R"]] as const) {
+  for (const [s, side] of [
+    [1, "L"],
+    [-1, "R"],
+  ] as const) {
     const shoulderPt: [number, number, number] = [s * 0.22, 0.84, -0.01];
-    const elbowPt: [number, number, number] = [s * 0.40, 0.74, 0.04];
-    const wristPt: [number, number, number] = [s * 0.54, 0.60, 0.10];
+    const elbowPt: [number, number, number] = [s * 0.4, 0.74, 0.04];
+    const wristPt: [number, number, number] = [s * 0.54, 0.6, 0.1];
     const tipPt: [number, number, number] = [s * 0.66, 0.44, 0.16];
 
     const flipperPath = catmull([shoulderPt, elbowPt, wristPt, tipPt]);
@@ -357,7 +351,7 @@ export default function build() {
     });
 
     // White ventral under-flipper lining
-    b.sweep(flipperPath, (t) => [0.075 * (1 - 0.5 * t), 0.010], {
+    b.sweep(flipperPath, (t) => [0.075 * (1 - 0.5 * t), 0.01], {
       bone: flipperJoints,
       color: PENGUIN_WHITE,
       shift: [0, -0.01],
@@ -384,7 +378,7 @@ export default function build() {
     [0, 0.99, 0.31], // Hooked down at tip
   ]);
 
-  b.sweep(upperBeakPath, (t) => [0.046 * (1 - 0.6 * t), 0.040 * (1 - 0.5 * t)], {
+  b.sweep(upperBeakPath, (t) => [0.046 * (1 - 0.6 * t), 0.04 * (1 - 0.5 * t)], {
     bone: headJoint,
     color: BEAK_ORANGE,
     caps: { start: "flat", end: "point" },
@@ -395,7 +389,7 @@ export default function build() {
   for (const s of [1, -1]) {
     b.part(new THREE.BoxGeometry(0.008, 0.024, 0.11), BEAK_PALE, {
       bone: headJoint,
-      at: [s * 0.038, 1.035, 0.20],
+      at: [s * 0.038, 1.035, 0.2],
       rotation: [0, s * 8 * DEG, 0],
       group: "head",
     });
@@ -417,14 +411,14 @@ export default function build() {
 
   // Yellow Rockhopper Brow Crests (Spiky, fierce plumes flowing backward from brow)
   for (const s of [1, -1]) {
-    const crestBase: [number, number, number] = [s * 0.062, 1.10, 0.12];
-    
+    const crestBase: [number, number, number] = [s * 0.062, 1.1, 0.12];
+
     // Fan of 5 spiky golden quills per side spreading dynamically
     const crestSpikes = [
       { dir: [s * 0.35, 0.28, -0.88], len: 0.26, r: 0.015 },
       { dir: [s * 0.52, 0.16, -0.85], len: 0.28, r: 0.016 },
       { dir: [s * 0.62, 0.02, -0.78], len: 0.27, r: 0.015 },
-      { dir: [s * 0.46, -0.10, -0.88], len: 0.23, r: 0.014 },
+      { dir: [s * 0.46, -0.1, -0.88], len: 0.23, r: 0.014 },
       { dir: [s * 0.26, 0.38, -0.88], len: 0.22, r: 0.013 },
     ];
 
@@ -437,23 +431,17 @@ export default function build() {
     }
 
     // Black crest base feathers underneath
-    b.spike(
-      [s * 0.055, 1.11, 0.08],
-      [s * 0.2, 0.35, -0.9],
-      0.14,
-      0.018,
-      {
-        bone: headJoint,
-        color: PENGUIN_BLACK,
-        group: "head",
-      },
-    );
+    b.spike([s * 0.055, 1.11, 0.08], [s * 0.2, 0.35, -0.9], 0.14, 0.018, {
+      bone: headJoint,
+      color: PENGUIN_BLACK,
+      group: "head",
+    });
   }
 
   // Left Eye: Normal gritty battle-hardened eye visible clearly on face
   b.part(new THREE.SphereGeometry(0.026, 10, 8), EYE_REAL, {
     bone: headJoint,
-    at: [0.068, 1.075, 0.130],
+    at: [0.068, 1.075, 0.13],
     group: "head",
   });
   b.part(new THREE.SphereGeometry(0.008, 6, 6), EYE_HIGHLIGHT, {
@@ -464,7 +452,7 @@ export default function build() {
 
   // Right Eye: Scarred battle eye with glowing cyborg lens under goggle
   // Crimson jagged battle scar cutting across right face and eye socket
-  b.part(new THREE.BoxGeometry(0.016, 0.105, 0.040), EYE_SCAR, {
+  b.part(new THREE.BoxGeometry(0.016, 0.105, 0.04), EYE_SCAR, {
     bone: headJoint,
     at: [-0.068, 1.075, 0.132],
     rotation: [12 * DEG, 0, 24 * DEG],
@@ -478,7 +466,7 @@ export default function build() {
   });
   b.part(new THREE.SphereGeometry(0.025, 10, 8), EYE_CYBORG, {
     bone: headJoint,
-    at: [-0.068, 1.075, 0.130],
+    at: [-0.068, 1.075, 0.13],
     group: "head",
   });
   // Glowing reticle ring on cyborg eye
@@ -494,11 +482,11 @@ export default function build() {
   // ---------------------------------------------------------------------------
   // Thick leather headband wrapping around the crown
   const goggleStrapPath = catmull([
-    [0.110, 1.11, 0.06],
-    [0.090, 1.11, -0.07],
-    [0.000, 1.11, -0.10],
-    [-0.090, 1.11, -0.07],
-    [-0.110, 1.11, 0.06],
+    [0.11, 1.11, 0.06],
+    [0.09, 1.11, -0.07],
+    [0.0, 1.11, -0.1],
+    [-0.09, 1.11, -0.07],
+    [-0.11, 1.11, 0.06],
   ]);
   b.sweep(goggleStrapPath, [0.022, 0.012], {
     bone: headJoint,
@@ -512,7 +500,7 @@ export default function build() {
     const cupCenter: [number, number, number] = [s * 0.052, 1.135, 0.105];
 
     // Outer brass frame bevel
-    b.part(new THREE.CylinderGeometry(0.040, 0.044, 0.032, 14), GOGGLE_BRASS, {
+    b.part(new THREE.CylinderGeometry(0.04, 0.044, 0.032, 14), GOGGLE_BRASS, {
       bone: headJoint,
       at: cupCenter,
       dir: [s * 0.15, 0.45, 0.88],
@@ -520,7 +508,7 @@ export default function build() {
     });
 
     // Tinted aviator glass lens
-    b.part(new THREE.CylinderGeometry(0.034, 0.034, 0.010, 14), GOGGLE_GLASS, {
+    b.part(new THREE.CylinderGeometry(0.034, 0.034, 0.01, 14), GOGGLE_GLASS, {
       bone: headJoint,
       at: [cupCenter[0] + s * 0.004, cupCenter[1] + 0.012, cupCenter[2] + 0.022],
       dir: [s * 0.15, 0.45, 0.88],
@@ -537,7 +525,7 @@ export default function build() {
   }
 
   // Heavy brass bridge connecting the aviator lenses
-  b.capsule([0.024, 1.140, 0.125], [-0.024, 1.140, 0.125], 0.008, {
+  b.capsule([0.024, 1.14, 0.125], [-0.024, 1.14, 0.125], 0.008, {
     bone: headJoint,
     color: GOGGLE_BRASS,
     group: "gear",
@@ -548,9 +536,9 @@ export default function build() {
   // Armored military canvas vest hugging the stocky torso
   // Scaled cleanly to leave belly white visible below and penguin collar visible above
   const vestStations = [
-    { at: [0, 0.58, 0.01] as const, w: 0.51, h: 0.50 }, // Lower vest hem
+    { at: [0, 0.58, 0.01] as const, w: 0.51, h: 0.5 }, // Lower vest hem
     { at: [0, 0.72, 0.02] as const, w: 0.49, h: 0.48 }, // Mid torso
-    { at: [0, 0.85, 0.00] as const, w: 0.42, h: 0.42 }, // Yoke & shoulder harness
+    { at: [0, 0.85, 0.0] as const, w: 0.42, h: 0.42 }, // Yoke & shoulder harness
   ];
 
   b.loft(vestStations, {
@@ -562,7 +550,7 @@ export default function build() {
   // Heavy padded collar
   b.part(new THREE.TorusGeometry(0.18, 0.022, 8, 16), VEST_TRIM, {
     bone: chestJoint,
-    at: [0, 0.86, 0.00],
+    at: [0, 0.86, 0.0],
     rotation: [85 * DEG, 0, 0],
     group: "gear",
   });
@@ -570,7 +558,7 @@ export default function build() {
   // Webbing harness straps across chest & waist
   b.part(new THREE.BoxGeometry(0.48, 0.035, 0.48), VEST_DARK, {
     bone: chestJoint,
-    at: [0, 0.60, 0.02],
+    at: [0, 0.6, 0.02],
     group: "gear",
   });
   b.part(new THREE.BoxGeometry(0.46, 0.035, 0.46), VEST_DARK, {
@@ -687,7 +675,7 @@ export default function build() {
     // Exhaust nozzle cone (flared out at bottom)
     b.part(new THREE.CylinderGeometry(0.055, 0.085, 0.12, 14), JET_NOZZLE, {
       bone: jetpackBone,
-      at: [thrusterX, 0.50, -0.19],
+      at: [thrusterX, 0.5, -0.19],
       rotation: [12 * DEG, 0, 0],
       group: "gear",
     });
@@ -695,7 +683,7 @@ export default function build() {
     // Interior fiery glow element
     b.part(new THREE.ConeGeometry(0.045, 0.08, 12), JET_GLOW, {
       bone: jetpackBone,
-      at: [thrusterX, 0.50, -0.19],
+      at: [thrusterX, 0.5, -0.19],
       rotation: [192 * DEG, 0, 0],
       group: "gear",
     });
@@ -731,14 +719,14 @@ export default function build() {
   // Top carry handle & tactical reflex optic rail
   b.part(new THREE.BoxGeometry(0.045, 0.05, 0.28), GUN_METAL, {
     bone: weaponBone,
-    at: [gunCenter.x, gunCenter.y + 0.095, gunCenter.z + 0.10],
+    at: [gunCenter.x, gunCenter.y + 0.095, gunCenter.z + 0.1],
     rotation: [0, 0, 0],
     group: "weapon",
   });
   // Reflex optic lens (facing forward along Z)
   b.part(new THREE.CylinderGeometry(0.018, 0.018, 0.06, 8), EYE_CYBORG, {
     bone: weaponBone,
-    at: [gunCenter.x, gunCenter.y + 0.125, gunCenter.z + 0.10],
+    at: [gunCenter.x, gunCenter.y + 0.125, gunCenter.z + 0.1],
     dir: [0, 0, 1],
     group: "weapon",
   });
@@ -766,7 +754,7 @@ export default function build() {
   // Oversized heavy industrial muzzle brake / barrel shroud
   b.part(new THREE.BoxGeometry(0.11, 0.12, 0.14), GUN_METAL, {
     bone: weaponBone,
-    at: [gunCenter.x, gunCenter.y, gunCenter.z + 0.40],
+    at: [gunCenter.x, gunCenter.y, gunCenter.z + 0.4],
     dir: [0, 0, 1],
     group: "weapon",
   });
@@ -794,7 +782,7 @@ export default function build() {
   });
 
   // Ergonomic flipper clamp / tactical foregrip
-  b.part(new THREE.BoxGeometry(0.055, 0.10, 0.06), GUN_GRIP, {
+  b.part(new THREE.BoxGeometry(0.055, 0.1, 0.06), GUN_GRIP, {
     bone: weaponBone,
     at: [gunCenter.x, gunCenter.y - 0.08, gunCenter.z - 0.04],
     rotation: [-18 * DEG, 0, 0],

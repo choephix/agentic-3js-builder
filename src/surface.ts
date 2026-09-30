@@ -171,7 +171,7 @@ export class Surface {
   /** Closest surface point to `p`. */
   nearest(p: PointInput): Hit {
     this.sync();
-    const q = toPoint(p);
+    const q = toPoint(p, "nearest()");
     let best = -1;
     let bestD = Infinity;
     const closest = new Vector3();
@@ -191,8 +191,8 @@ export class Surface {
   /** First surface hit along the ray, or null. */
   ray(origin: PointInput, dir: DirectionInput): Hit | null {
     this.sync();
-    const o = toPoint(origin);
-    const d = toDirection(dir).normalize();
+    const o = toPoint(origin, "ray()");
+    const d = toDirection(dir, "ray()").normalize();
     const found = this.intersections(o, d);
     if (!found.length) return null;
     const first = found.reduce((x, y) => (y.dist < x.dist ? y : x));
@@ -206,7 +206,7 @@ export class Surface {
    */
   around(center?: PointInput) {
     this.sync();
-    const c = center ? toPoint(center) : this.box.getCenter(new Vector3());
+    const c = center ? toPoint(center, "around()") : this.box.getCenter(new Vector3());
     const far = this.box.getSize(new Vector3()).length() * 2 + this.box.distanceToPoint(c);
     return {
       at: (azimuthDeg: number, elevationDeg: number) => {
@@ -295,7 +295,7 @@ export type StickOptions = Tags & {
   /** Rigid on this bone. Default: the frame's weights (a hit on a bend bends with it), else the nearest joint. */
   bone?: JointRef;
   scale?: number | V3;
-  /** An image mapped by the geometry's UVs, tinted by `color`; see `part`. */
+  /** An image mapped by the geometry's UVs: a colour drawing as drawn, a grey one tinted by `color`; see `part`. */
   texture?: Texture;
   /** Faceted shading; see `part`. */
   flat?: boolean;
@@ -308,11 +308,15 @@ export type StickOptions = Tags & {
 export function stick(ctx: Ctx, geometry: BufferGeometry, color: Fill, on: FrameInput, options: StickOptions = {}) {
   const base = toFrame(on);
   const n = base.axis;
-  const flow = options.flow ? flatten(toDirection(options.flow), n) : null;
+  const flow = options.flow ? flatten(toDirection(options.flow, "stick()"), n) : null;
   const quat = aim(n, flow && flow.lengthSq() > 1e-10 ? flow : undefined);
   if (options.spin) quat.premultiply(new Quaternion().setFromAxisAngle(n, options.spin * DEG));
   const scale =
-    options.scale === undefined ? 1 : typeof options.scale === "number" ? options.scale : vec(options.scale).y;
+    options.scale === undefined
+      ? 1
+      : typeof options.scale === "number"
+        ? options.scale
+        : vec(options.scale, "stick()").y;
   if (!geometry.boundingBox) geometry.computeBoundingBox();
   const { min, max } = geometry.boundingBox!;
   const height = (max.y - min.y) * scale;

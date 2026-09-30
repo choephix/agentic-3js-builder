@@ -214,7 +214,7 @@ export type SlabOptions = Tags & { color: Fill; thickness: number; bone?: JointR
  * the polygon's centre, facing its normal (counter-clockwise points seen from the front face you).
  */
 export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptions) {
-  const pts = points.map(toPoint);
+  const pts = points.map((p, i) => toPoint(p, `slab() point ${i}`));
   if (pts.length < 3) throw new Error("slab() needs at least 3 points");
   // Newell normal.
   const n = new Vector3();

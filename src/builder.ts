@@ -14,7 +14,7 @@ import { membrane, slab } from "./membrane";
 import type { MembraneEdge, MembraneOptions, SlabOptions } from "./membrane";
 import type { FrameInput, PointInput } from "./math";
 import { extrude, lathe } from "./outline";
-import type { ExtrudeOptions, LatheOptions, OutlinePoint } from "./outline";
+import type { ExtrudeOptions, LatheOptions, OutlineInput } from "./outline";
 import { part } from "./parts";
 import type { PartOptions } from "./parts";
 import type { PathInput } from "./path";
@@ -29,6 +29,8 @@ import { stick, Surface } from "./surface";
 import type { StickOptions, SurfaceTarget } from "./surface";
 import { sweep } from "./sweep";
 import type { Radius, SweepOptions } from "./sweep";
+
+export type { OutlinePoint } from "./outline";
 
 export class Builder {
   /** The shared context, for layers built on the SDK (src/experimental/sculpt.ts); samples don't use it. */
@@ -147,11 +149,11 @@ export class Builder {
     return slab(this.ctx, points, options);
   }
 
-  extrude(points: readonly OutlinePoint[], options: ExtrudeOptions) {
+  extrude(points: OutlineInput, options: ExtrudeOptions) {
     return extrude(this.ctx, points, options);
   }
 
-  lathe(points: readonly OutlinePoint[], options: LatheOptions) {
+  lathe(points: OutlineInput, options: LatheOptions) {
     return lathe(this.ctx, points, options);
   }
 

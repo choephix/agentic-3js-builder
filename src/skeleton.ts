@@ -61,9 +61,13 @@ export type JointOptions = {
 export function createJoint(ctx: Ctx, name: string, options: JointOptions) {
   if (!JOINT_NAME.test(name)) throw new Error(`Joint name "${name}" must match ${JOINT_NAME}`);
   if (ctx.joints.has(name)) throw new Error(`Joint "${name}" already exists`);
-  const at = toPoint(options.at);
+  const at = toPoint(options.at, "joint()");
   const parent = options.parent === undefined && !ctx.rootJoint ? null : boneFor(ctx, options.parent, [options.at], at);
-  const direction = options.aim ? toPoint(options.aim).sub(at) : options.dir ? toDirection(options.dir) : null;
+  const direction = options.aim
+    ? toPoint(options.aim, "joint()").sub(at)
+    : options.dir
+      ? toDirection(options.dir, "joint()")
+      : null;
   const quat = direction ? aim(direction, options.up) : (parent?.quat ?? new Quaternion());
   const object = new Group();
   object.name = name;
@@ -113,9 +117,9 @@ export function pose(ctx: Ctx, ref: JointRef, rotation: PoseRotation) {
     pivot = hinge.at;
     delta = new Quaternion().setFromAxisAngle(hinge.axis, rotation.deg * DEG);
   } else if ("axis" in rotation)
-    delta = new Quaternion().setFromAxisAngle(toDirection(rotation.axis).normalize(), rotation.deg * DEG);
+    delta = new Quaternion().setFromAxisAngle(toDirection(rotation.axis, "pose()").normalize(), rotation.deg * DEG);
   else {
-    const to = "dir" in rotation ? toDirection(rotation.dir) : toPoint(rotation.aim).sub(pivot);
+    const to = "dir" in rotation ? toDirection(rotation.dir, "pose()") : toPoint(rotation.aim, "pose()").sub(pivot);
     delta = new Quaternion().setFromUnitVectors(joint.axis, to.normalize());
   }
   const at = joint.at.sub(pivot).applyQuaternion(delta).add(pivot);
@@ -243,7 +247,7 @@ export class Chain {
 
   /** The joint whose current bone segment passes closest to `p`. */
   nearestJoint(p: PointInput) {
-    const q = toPoint(p);
+    const q = toPoint(p, "nearestJoint()");
     const ends = [...this.spanJoints.map((joint) => joint.at), this.at(1).at];
     let best = 0;
     let bestD = Infinity;
@@ -310,7 +314,7 @@ export function createChain(ctx: Ctx, name: string, source: PathInput, options: 
   const chain = new Chain(name, path, frames, ts, joints, tip);
   const { role } = options;
   if (role) {
-    const contact = options.contact ? toPoint(options.contact) : role === "leg" ? path.at(1) : null;
+    const contact = options.contact ? toPoint(options.contact, "chain()") : role === "leg" ? path.at(1) : null;
     const last = joints[joints.length - 1];
     ctx.rig.push(() => ({
       chain: {
