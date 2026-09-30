@@ -2,7 +2,7 @@
 
 Four builders get the same two subjects at the same time. Each works with a different toolkit, described in its own arm file. This round judges the shapes of the body parts: every part reads as the anatomy it is (chest, shoulders, arms, hands, abdomen, hips, legs, feet, head and face), from every angle and in both flex shots.
 
-`GUIDE.md` is the sample contract, the model conventions and the snapshot loop; `README.md` is the API. Read both in full. Where this brief and `GUIDE.md` differ, this brief wins.
+`GUIDE.md` is the sample contract, the model conventions and the snapshot loop; `docs/api.md` is the API. Read both in full. Where this brief and `GUIDE.md` differ, this brief wins.
 
 ## Subjects
 
@@ -31,7 +31,7 @@ Four builders get the same two subjects at the same time. Each works with a diff
 - Git stays untouched: no staging, committing, stashing, checking out or resetting.
 - `npm run typecheck` checks everyone's files. Errors in files that aren't yours are another builder's work in progress; yours must be clean.
 - The browser on port 9333 is shared and already running; `snap` connects to it. It stays running: never start, stop or restart it.
-- `README.md` and `GUIDE.md` stay as they are.
+- `docs/api.md` and `GUIDE.md` stay as they are.
 
 ## Notes
 

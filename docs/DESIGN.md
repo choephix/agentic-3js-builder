@@ -249,3 +249,14 @@ The cost analysis of 37 builds from the style rounds ($148.61, 1,961 model calls
 - **`docs/conventions.md`** answers the questions builders read `src/` for (section orientation, paint coordinates per shape, caps and seams, cards, bounds, `b.part` without `at`). Loading the whole SDK source instead would add about 55-60k tokens to every call, roughly the same cost as the digging it replaces, and it answers behaviour questions less directly than a page written for them.
 - **`npm run preview`**: textures, a parts table with world bounds, floor offenders and optional quick shots in about a second, without a render. `snap` and `preview` take a file path, so smoke files live in `scratch/`.
 - **Docs split**: `docs/api.md` (the API, formerly README) and `docs/conventions.md` are for agents; `README.md` is for people.
+
+## Batch 14: what the Gemini and Astra rounds tripped on
+
+Evidence from the logs of the 35 builders of 2026-09-29: none wrote its own snapshot, collage or report code, and all eleven retro builds used `kits/pixel` without rewriting it. The friction was elsewhere.
+
+- **`npm run typecheck -- <slug>`**: the project-wide check failed on any one broken sample, and a sample that didn't parse hid every other file's errors. Builders filtered it (72 workarounds) or ran `tsc` on the file alone, which drops the project's settings, so three shipped with unused names while reporting a pass. The scoped check builds a throwaway config that extends `tsconfig.json` with only the named files.
+- **`npm run sheet`**: the round owner joined shots with `montage` by hand twice; `slug@tag` also compares versions.
+- **Chain tip joint**: about ten builders gave one name per point (hip, knee, ankle) and hit the count error. One extra name now adds a joint at the path's end, which is what they wanted for feet and hands. It sits in `joints` and `tip`; tubes and membranes still bend with the span joints only, so no existing chain changes.
+- **Region pass-through**: `region.p()` returned a plain `Vector3`, which region methods took as region units and transformed again (three misplaced jaws). Its results are now marked as model space. No sample in the library relied on the double transform (all 106 reports unchanged).
+- **Glow as a kit, not a core option**: builders kept faking lanterns, fire and neon in paint. glTF has a standard emissive factor and texture, so a glowing surface stays portable; threading a `glow` option through every shape helper did not fit a core meant to move between projects, so `kits/glow` sets the standard three.js `emissive` on the parts you pass and the creature-lab harness exports it (glowing parts grouped last, one glowing copy of the atlas material per strength, no second atlas).
+- **Docs**: joint and region axes in the conventions table (the joint's `local` reads [right, along the bone, +Z], a region's the model's axes), roles for pelvis, feet and toes, and `Cell.pick`'s two arguments.

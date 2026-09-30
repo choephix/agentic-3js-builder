@@ -1,6 +1,6 @@
 # Arm B: sculpt
 
-Your toolkit is the SDK in `README.md` plus a sculpting layer you build first, then use for both subjects: block the body out with sweeps and parts, then reshape the built meshes with brushes, the way an artist sculpts from a blockout.
+Your toolkit is the SDK in `docs/api.md` plus a sculpting layer you build first, then use for both subjects: block the body out with sweeps and parts, then reshape the built meshes with brushes, the way an artist sculpts from a blockout.
 
 ## The sculpting layer
 
@@ -9,7 +9,7 @@ Your toolkit is the SDK in `README.md` plus a sculpting layer you build first, t
 - Brush positions, directions, planes and paths are ordinary SDK inputs: Points, Directions, Frames and Paths, so joints, hits, `sweep.at(t)`, `chain.at(t)` and made-up points all work. Sizes are in meters and falloff is smooth.
 - Vertices keep their skin weights, so sculpted skin bends with the skeleton. Where a brush needs more vertices than the mesh has, the layer adds them locally, with weights interpolated from their neighbours.
 - Brushes apply in code order and the result is deterministic. Surface queries made after a brush see the sculpted shape.
-- The API reads like the rest of `README.md`: few names, few options. A doc comment at the top of the module documents it in README style; your samples use only what it documents.
+- The API reads like the rest of `docs/api.md`: few names, few options. A doc comment at the top of the module documents it in `docs/api.md` style; your samples use only what it documents.
 - Changes to existing `src/` files only where the layer needs them, strictly additive (every existing sample builds exactly as before). Another builder may be editing the same file: re-read before each edit.
 
 ## Order of work

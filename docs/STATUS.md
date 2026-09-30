@@ -59,6 +59,7 @@ All commits are local; nothing is pushed.
 | 09c8d79                                         | samples | Art-style round: ten Sonnet builds (see "Art-style round").                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | 721711d 571441d                                 | samples | Round 3: 22 Sonnet builds (see "Round 3"). Provenance: `scratch/` files don't make a session shared; a sample assembled by a shell command gets the session of its first render as builder.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | 6ef1a26 998f83d 3a9f0ec ce5e2d0 0f2882a 0096c24 | 13      | From the cost analysis of 37 round-2/3 builds (61% of spend before the first render, median context 171k tokens; see DESIGN "Batch 13"): `snap` takes a file path; `npm run preview` (textures, parts with bounds, floor check, quick shots, ~1 s, no render); `kits/pixel`, `kits/toon`, `kits/clockwork` on top of `src/`; `b.decal`; `flat` on part/stick; `docs/conventions.md`. Docs split (README → `docs/api.md` for agents, new human README, GUIDE → conventions, kits, preview) is on branch `agent-docs` (see to-do).                                                                                                                                                      |
+| 55de49e 66161a2                                 | 14      | Docs split merged (`agent-docs`). From the Gemini and Astra rounds (see DESIGN "Batch 14"): `npm run typecheck -- <slug>` checks one file and its imports; `npm run sheet` collages rendered shots; a chain's extra name makes a tip joint; `region.p()`/`d()` results pass through region methods; joint and region axes, roles and `Cell.pick` documented; `kits/glow` (standard emissive; creature lab 06ff867 exports it); provenance reads every checkout's logs.                                                                                                                                                                                                                |
 
 ## Guide test run
 
@@ -188,7 +189,7 @@ Friction: `b.chain` names are one per span (most builders); `Region.joint()` tak
 Friction the builders reported:
 
 - [x] Triangle limit: README now gives both numbers (120k hard, 60k soft budget); GUIDE keeps 60k, its done-criterion.
-- [ ] `chain.at(t)`: builders read `.p`/`.joint`; the fields are `.at`/`.bone`. The wrong names crash at run time.
+- [x] `chain.at(t)`: builders read `.p`/`.joint`; the fields are `.at`/`.bone`. `docs/api.md` now names the `ChainPoint` fields.
 - [ ] barnOwl rests 14 mm above the floor and tentacleSerpent 6 mm below it; the 5 mm floor check now flags both.
 - [ ] `Hit` has no `tangent`; two builders reached for one.
 - [ ] `radius: [r0, r1]` reads as an ellipse but is a linear taper; an ellipse needs `(t) => [rx, ry]`.
@@ -197,17 +198,17 @@ Friction the builders reported:
 - [ ] `surface(joint)` finds no meshes on a smooth-skinned chain; the mesh sits under its heaviest bone.
 - [x] Sweep `sectors` on narrow colour-split pieces triggered the harness's inside-out false alarm; the check now needs a closed part (6979c92).
 - [ ] README has lines over 1,000 characters (the `b.chain` and membrane paragraphs), which read tools truncate.
-- [ ] One broken sample fails `npm run typecheck` for everyone.
+- [x] One broken sample fails `npm run typecheck` for everyone: `npm run typecheck -- <slug>` checks one file and its imports.
 - [x] Pixel density: `kits/pixel` `tileBox` crops whole texels per face at a fixed texel size; `skinBox` maps a sheet per face.
 - [x] Flat shading: `flat: true` on `part`/`stick`.
 - [x] `b.ring`'s callback was already optional; `docs/api.md` says so.
 - [ ] Paints can't tell a sweep's round cap or an extrude's side wall from the face (`s` collapses there); the alebrije's leg caps rendered black in v01.
 - [ ] `b.stick` seats by each part's own bounding box, so multi-colour sprigs sharing one frame sink by different amounts.
 - [x] No visual preview between renders: `npm run preview -- <slug> --shot`.
-- [ ] Materials are fixed (MeshStandardMaterial, roughness 0.72): art styles want emissive, gloss, unlit/toon and a back-face outline.
+- [ ] Materials are fixed (MeshStandardMaterial, roughness 0.72): art styles want gloss, unlit/toon and a back-face outline. Emissive: `kits/glow`.
 - [x] Decal helper: `b.decal(target, texture, { at, dir, size, ... })`.
 - [x] `b.part` with `bone` and no `at`: behaviour kept, documented in `docs/conventions.md` and `docs/api.md` (pass `at: [0, 0, 0]` for model-space geometry).
-- [ ] Merge branch `agent-docs` into main once the humanoid round (`experiments/humanoids`, started 17:21 UTC) is over: its brief pins `README.md` and `GUIDE.md` as they are, so the docs split waits. `git merge --ff-only agent-docs` (rebase it on main first if main moved); then `experiments/humanoids/*` references to `README.md` point at `docs/api.md`.
+- [ ] Merge branch `sdk-polish` into main: it carries the `agent-docs` split (README → `docs/api.md`), with `experiments/humanoids` briefs pointing at `docs/api.md`.
 - [ ] Measure the kits: rerun a few round-3 subjects (a pixel, a toon, a clockwork one) with the new docs and compare cost, calls and context against their first builds.
 - [ ] The lean-mesh GUIDE line (batch 11) is untested on a fresh builder: rerun one texture-round subject and compare triangles against its batch 10 build.
 
