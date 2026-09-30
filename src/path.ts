@@ -102,7 +102,7 @@ export class Path {
 
   /** t of the point on the path closest to `p`. */
   closestT(p: PointInput) {
-    const q = toPoint(p);
+    const q = toPoint(p, "closestT()");
     let best = 0;
     let bestD = Infinity;
     const seg = new Vector3();
@@ -308,8 +308,8 @@ function sampleCurve(curve: Curve<Vector3>, count: number) {
 /** Straight segments through `points`; knots at the points. `closed` adds the segment back to the first point. */
 export function polyline(points: readonly PointInput[], options: { closed?: boolean } = {}) {
   const pts: Vector3[] = [];
-  for (const p of points) {
-    const v = toPoint(p);
+  for (const [i, p] of points.entries()) {
+    const v = toPoint(p, `polyline() point ${i}`);
     if (!pts.length || v.distanceTo(pts[pts.length - 1]) > EPS) pts.push(v);
   }
   const closed = options.closed ?? false;
@@ -326,9 +326,8 @@ export function polyline(points: readonly PointInput[], options: { closed?: bool
 
 /** Quadratic (3 points) or cubic (4 points) bezier. Knots: 4 equal arc-length spans. */
 export function bezier(p0: PointInput, p1: PointInput, p2: PointInput, p3?: PointInput) {
-  const curve = p3
-    ? new CubicBezierCurve3(toPoint(p0), toPoint(p1), toPoint(p2), toPoint(p3))
-    : new QuadraticBezierCurve3(toPoint(p0), toPoint(p1), toPoint(p2));
+  const [a, b, c] = [p0, p1, p2].map((p) => toPoint(p, "bezier()"));
+  const curve = p3 ? new CubicBezierCurve3(a, b, c, toPoint(p3, "bezier()")) : new QuadraticBezierCurve3(a, b, c);
   const { pts, tangents } = sampleCurve(curve, 48);
   return smoothPath(pts, tangents, { spans: 4 }, false, firstOwner([p0, p1, p2, p3]));
 }
@@ -338,7 +337,7 @@ export function bezier(p0: PointInput, p1: PointInput, p2: PointInput, p3?: Poin
  * `closed` continues smoothly from the last point back to the first (rims, collars, straps).
  */
 export function catmull(points: readonly PointInput[], options: { tension?: number; closed?: boolean } = {}) {
-  const vs = points.map(toPoint);
+  const vs = points.map((p, i) => toPoint(p, `catmull() point ${i}`));
   const closed = options.closed ?? false;
   if (vs.length === 2 && !closed) return polyline(points);
   const type = options.tension === undefined ? "centripetal" : "catmullrom";
@@ -352,9 +351,9 @@ export function catmull(points: readonly PointInput[], options: { tension?: numb
 
 /** Circular arc around `axis` through `center`, starting at `from`, sweeping `angleDeg` (right-hand rule). */
 export function arc(center: PointInput, from: PointInput, axis: DirectionInput, angleDeg: number) {
-  const c = toPoint(center);
-  const r0 = toPoint(from).sub(c);
-  const ax = toDirection(axis).normalize();
+  const c = toPoint(center, "arc()");
+  const r0 = toPoint(from, "arc()").sub(c);
+  const ax = toDirection(axis, "arc()").normalize();
   const count = Math.max(8, Math.ceil(Math.abs(angleDeg) / 4));
   const pts: Vector3[] = [];
   const tangents: Vector3[] = [];
@@ -378,9 +377,9 @@ export function spiral(
   axis: DirectionInput,
   options: { turns: number; r1?: number; pitch?: number },
 ) {
-  const c = toPoint(center);
-  const ax = toDirection(axis).normalize();
-  const rel = toPoint(from).sub(c);
+  const c = toPoint(center, "spiral()");
+  const ax = toDirection(axis, "spiral()").normalize();
+  const rel = toPoint(from, "spiral()").sub(c);
   const h0 = rel.dot(ax);
   const u = flatten(rel, ax);
   const r0 = u.length();

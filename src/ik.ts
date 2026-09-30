@@ -75,17 +75,22 @@ export function limb(
   const n = lengths.length;
   const hints =
     Array.isArray(bends) && typeof bends[0] !== "number"
-      ? (bends as readonly DirectionInput[]).map(toDirection)
-      : lengths.slice(1).map(() => toDirection(bends as DirectionInput));
+      ? (bends as readonly DirectionInput[]).map((d) => toDirection(d, "limb()"))
+      : lengths.slice(1).map(() => toDirection(bends as DirectionInput, "limb()"));
   if (hints.length < n - 1) throw new Error(`limb(): ${n - 1} inner joints but ${hints.length} bend hints`);
   if (options.sole) {
-    const sole = toDirection(options.sole).normalize();
+    const sole = toDirection(options.sole, "limb()").normalize();
     const last = lengths[n - 1];
-    const upper = limb(root, toPoint(target).addScaledVector(sole, -last), lengths.slice(0, -1), hints.slice(0, n - 2));
+    const upper = limb(
+      root,
+      toPoint(target, "limb()").addScaledVector(sole, -last),
+      lengths.slice(0, -1),
+      hints.slice(0, n - 2),
+    );
     return [...upper, upper[upper.length - 1].clone().addScaledVector(sole, last)];
   }
-  const a = toPoint(root);
-  const toTarget = toPoint(target).sub(a);
+  const a = toPoint(root, "limb()");
+  const toTarget = toPoint(target, "limb()").sub(a);
   const d = toTarget.length();
   const dir = d > 1e-9 ? toTarget.normalize() : new Vector3(0, -1, 0);
   let across = flatten(hints[0] ?? new Vector3(0, 0, 1), dir);

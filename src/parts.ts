@@ -46,8 +46,9 @@ export type PartOptions = Tags & {
   rotation?: V3;
   scale?: number | V3;
   /**
-   * An image mapped by the geometry's own UVs (three.js geometries have them), e.g. from `svg()`. `color` tints it
-   * (a colour string; "#ffffff" keeps it as drawn), and transparent pixels cut the part away.
+   * An image mapped by the geometry's own UVs (three.js geometries have them), e.g. from `svg()`. A drawing in
+   * colour shows its own colours; a drawing in greys (white to black) is tinted by `color`. Transparent pixels cut
+   * the part away.
    */
   texture?: Texture;
   /** Faceted shading: every triangle shades as one flat face (the geometry's vertices are split, normals redone). */
@@ -84,7 +85,8 @@ export function part(ctx: Ctx, geometry: BufferGeometry, color: Fill, options: P
       ? geometry.clone()
       : geometry;
   if (options.flat) shaped.computeVertexNormals();
-  const mesh = makeMesh(ctx, shaped, color, new Matrix4().compose(at, quat, scale), options.texture);
+  const tint = options.texture?.userData.coloured && typeof color === "string" ? "#ffffff" : color;
+  const mesh = makeMesh(ctx, shaped, tint, new Matrix4().compose(at, quat, scale), options.texture);
   setWorld(mesh, joint.object, at, quat, scale);
   addMesh(ctx, mesh, joint, options);
   if (blended)

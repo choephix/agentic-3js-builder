@@ -3,8 +3,8 @@
 // pattern runs on across body, legs and tail at one size in meters. The ready-made paints below take colours or
 // other paints for every colour, so they nest.
 import { Color, SRGBColorSpace, Vector3 } from "three";
-import { toPoint, vec } from "./math";
-import type { PointInput, V3 } from "./math";
+import { axisVector, toPoint } from "./math";
+import type { Axis, PointInput, V3 } from "./math";
 
 /** An sRGB colour, each channel 0..1. */
 export type Rgb = readonly [number, number, number];
@@ -292,17 +292,17 @@ export function spots(
 }
 
 /**
- * Bands across `axis` (default [0, 0, 1], so they ring a body that runs along z), about `size` apart, with wavy,
+ * Bands across `axis` ("x", "y", "z" or a direction; default "z", so they ring a body that runs along z), about `size` apart, with wavy,
  * forking, tapering edges: tiger, zebra, okapi legs, wasp, bands on a tail. `width` (0..1, default 0.35) is the
  * stripe share of each repeat, `wobble` (default 0.5) how far they wander.
  */
 export function stripes(
   base: ColorInput,
   stripe: Colors,
-  options: { size: number; axis?: V3; width?: number; wobble?: number; seed?: number },
+  options: { size: number; axis?: Axis | V3; width?: number; wobble?: number; seed?: number },
 ) {
   const { size, width = 0.35, wobble = 0.5, seed = 0 } = options;
-  const axis = vec(options.axis ?? [0, 0, 1]).normalize();
+  const axis = axisVector(options.axis ?? "z", "stripes()");
   return paint((p, n) => {
     const s = p.dot(axis) / size + wobble * 2 * (noise(p, size * 1.6, seed) - 0.5);
     const k = Math.floor(s);
@@ -353,20 +353,20 @@ export function countershade(back: ColorInput, belly: ColorInput, options: { lev
 
 /** `a` at `from`, `b` at `to`, blended between along the line joining them: socks, tail tips, sun-faded tops. */
 export function gradient(a: ColorInput, b: ColorInput, from: PointInput, to: PointInput) {
-  const start = toPoint(from);
-  const d = toPoint(to).sub(start);
+  const start = toPoint(from, "gradient()");
+  const d = toPoint(to, "gradient()").sub(start);
   const len2 = Math.max(d.lengthSq(), 1e-12);
   const q = new Vector3();
   return paint((p, n) => blend(a, b, q.copy(p).sub(start).dot(d) / len2, p, n));
 }
 
 /**
- * Fine streaks running along `axis` (default [0, 1, 0]), about `size` apart: wood grain, bark, reeds, hair,
+ * Fine streaks running along `axis` ("x", "y", "z" or a direction; default "y"), about `size` apart: wood grain, bark, reeds, hair,
  * brushed metal, sedimentary stone.
  */
-export function grain(a: ColorInput, b: ColorInput, options: { size: number; axis?: V3; seed?: number }) {
+export function grain(a: ColorInput, b: ColorInput, options: { size: number; axis?: Axis | V3; seed?: number }) {
   const { size, seed = 0 } = options;
-  const axis = vec(options.axis ?? [0, 1, 0]).normalize();
+  const axis = axisVector(options.axis ?? "y", "grain()");
   const u = new Vector3(1, 0, 0);
   if (Math.abs(axis.dot(u)) > 0.9) u.set(0, 0, 1);
   const side = u.sub(axis.clone().multiplyScalar(u.dot(axis))).normalize();

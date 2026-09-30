@@ -4,7 +4,7 @@
 import { Quaternion, Vector3 } from "three";
 import { Capture, weightsOf } from "./context";
 import type { Weights } from "./context";
-import { aim, toPoint, vec } from "./math";
+import { aim, toDirection, toPoint, vec } from "./math";
 import type { DirectionInput, PointInput, V3 } from "./math";
 
 const Y = new Vector3(0, 1, 0);
@@ -29,12 +29,12 @@ export abstract class Frame {
 
   /** A point given in this frame (meters) → model space. */
   local(p: V3) {
-    return vec(p).applyQuaternion(this.quat).add(this.at);
+    return vec(p, "local()").applyQuaternion(this.quat).add(this.at);
   }
 
   /** A vector given in this frame → model space (length kept). */
   dir(v: V3) {
-    return vec(v).applyQuaternion(this.quat);
+    return vec(v, "dir()").applyQuaternion(this.quat);
   }
 
   /**
@@ -88,7 +88,8 @@ export class Spot extends Frame {
  * from something built.
  */
 export function frame(at: PointInput, dir: DirectionInput, up?: DirectionInput) {
-  return new Spot(toPoint(at), aim(dir, up), weightsOf(at) ?? []);
+  const quat = aim(toDirection(dir, "frame()"), up && toDirection(up, "frame()"));
+  return new Spot(toPoint(at, "frame()"), quat, weightsOf(at) ?? []);
 }
 
 /** A line from `a` to `b`: a frame at `a` facing `b`, with `length` and `end`. Takes `a`'s weights, else `b`'s. */
@@ -109,5 +110,5 @@ export class Segment extends Spot {
 }
 
 export function line(a: PointInput, b: PointInput) {
-  return new Segment(toPoint(a), toPoint(b), weightsOf(a) ?? weightsOf(b) ?? []);
+  return new Segment(toPoint(a, "line()"), toPoint(b, "line()"), weightsOf(a) ?? weightsOf(b) ?? []);
 }
