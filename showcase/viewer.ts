@@ -158,6 +158,8 @@ export class Viewer {
   private framed = true;
   private pointer: { x: number; y: number } | null = null;
   private pointerMoved = false;
+  /** OrbitControls owns the pointer gesture; hover raycasts add no useful work while the camera is moving. */
+  private orbiting = false;
   private hoveredJoint: string | null = null;
 
   private readonly palette = new Map<string, MeshStandardMaterial>();
@@ -219,7 +221,17 @@ export class Viewer {
       this.dirty = true;
       if (!this.settingView) this.onView(this.view);
     });
-    this.controls.addEventListener("start", () => (this.framed = false));
+    this.controls.addEventListener("start", () => {
+      this.framed = false;
+      this.orbiting = true;
+      this.pointerMoved = false;
+      this.setHoveredJoint(null);
+      this.onHover(null, 0, 0);
+    });
+    this.controls.addEventListener("end", () => {
+      this.orbiting = false;
+      this.pointerMoved = this.pointer !== null;
+    });
     new ResizeObserver(() => this.resize()).observe(host);
     this.canvas.addEventListener("pointermove", (event) => {
       this.pointer = { x: event.clientX, y: event.clientY };
@@ -278,7 +290,7 @@ export class Viewer {
       this.onBend(this.bend);
     }
     if (this.controls.update()) this.dirty = true;
-    if (this.pointerMoved && this.pointer) {
+    if (!this.orbiting && this.pointerMoved && this.pointer) {
       this.pointerMoved = false;
       const hit = this.hit(this.pointer.x, this.pointer.y);
       this.setHoveredJoint(hit?.kind === "joint" ? hit.joint.name : null);

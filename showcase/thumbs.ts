@@ -21,11 +21,19 @@ export class Thumbs {
   private readonly queue: string[] = [];
   private running = false;
   private viewer: Viewer | null = null;
+  /** Do not start a synchronous thumbnail build until the page has been quiet for a short interval. */
+  private lastInput = performance.now();
+  private readonly noteInput = () => {
+    this.lastInput = performance.now();
+  };
 
   constructor(
     private readonly load: (slug: string) => Promise<SampleModule>,
     private readonly onDrawn: (slug: string) => void,
-  ) {}
+  ) {
+    for (const type of ["pointerdown", "pointermove", "wheel", "keydown"])
+      addEventListener(type, this.noteInput, { passive: true });
+  }
 
   /** The newest image of a sample, stale or not; null until one exists. */
   url(slug: string) {
@@ -40,7 +48,7 @@ export class Thumbs {
       .catch(() => ({}));
   }
 
-  /** Draw every missing or stale thumbnail among these samples, in this order, in the background. */
+  /** Draw every missing or stale thumbnail among these samples in idle time, one at a time. */
   update(slugs: readonly string[]) {
     for (const slug of slugs) if (this.stale(slug) && !this.queue.includes(slug)) this.queue.push(slug);
     void this.drain();
@@ -51,15 +59,23 @@ export class Thumbs {
     return kept !== undefined && !kept.fresh && !this.drawn.has(`${slug}/${kept.key}`);
   }
 
+  private async waitForIdle() {
+    for (;;) {
+      const wait = 750 - (performance.now() - this.lastInput);
+      if (wait <= 0) return;
+      await new Promise<void>((resolve) => setTimeout(resolve, Math.min(wait, 250)));
+    }
+  }
+
   private async drain() {
     if (this.running) return;
     this.running = true;
     for (let slug = this.queue.shift(); slug !== undefined; slug = this.queue.shift()) {
       if (!this.stale(slug)) continue;
+      await this.waitForIdle();
       // A sample that fails to build keeps its old image, or none; the list marks it once it is opened.
       if (await this.draw(slug, this.index[slug].key).catch(() => false)) this.onDrawn(slug);
-      // Builds block the page; give input and the main viewer a turn between them.
-      await new Promise((resolve) => setTimeout(resolve));
+      // Builds block the page; wait for another quiet interval before starting the next one.
     }
     this.viewer?.show(null, null);
     this.running = false;

@@ -137,6 +137,39 @@ On 2026-09-29 22 Sonnet 5.5 (high) builders, same 3-render limit and a `scratch/
 
 Friction repeated across builders: `b.part` on model-space merged geometry needs `at: [0, 0, 0]` (six builders); `ngon` sections put a vertex on top, so flat-faced tubes need `sides` with `smooth: false`; pixel styles need a UV-box / per-face crop helper; no outline, emissive or unlit material; `Box3.setFromObject` misreads bone-local meshes.
 
+## Gemini round
+
+On 2026-09-29 ten Gemini 3.8 Flash builders (Antigravity; the task tool's `med` effort logged as `low` thinking) each got `GUIDE.md`, one subject, the 3-render limit and `scratch/`, in worktree branch `worktree/green-meadow-a32b`. No redos. All ten finished on v03 with a clean report; two fail typecheck (lighthouseCove: `"sharp"` outline points typed as `[number, number][]` plus two unused names; spaceMarine: one unused const), left as built. Total $14.08, 4-10 min each. Contact sheet: `~/tmp/public/nilo/agentic-3js-builder/showcase/gemini-round.jpg`.
+
+| Sample           | Cost  | Active | Parts | Triangles | Joints | Note                                                                     |
+| ---------------- | ----- | ------ | ----- | --------- | ------ | ------------------------------------------------------------------------ |
+| lizardfolkHunter | $1.46 | 8 min  | 137   | 9.3k      | 54     | frill, harness, spear; readable                                          |
+| lighthouseCove   | $0.54 | 4 min  | 59    | 7.4k      | 8      | diorama, the best of the round; typecheck fails                          |
+| tyrannosaurus    | $2.03 | 10 min | 80    | 3.7k      | 44     | stripes and teeth; arms barely visible                                   |
+| spaceMarine      | $1.86 | 8 min  | 181   | 9.1k      | 23     | blocky; used the Ultramarines crest despite the brief; chainsword floats |
+| chestMimic       | $1.97 | 10 min | 234   | 7.1k      | 22     | teeth, coins, gems, tongue, six legs                                     |
+| emperorPenguin   | $1.06 | 6 min  | 40    | 2.2k      | 26     | body weighted to the hips alone; feet stand apart from the body          |
+| owlbear          | $1.46 | 8 min  | 85    | 7.2k      | 26     | facial disc and beak read; feather mantle sparse                         |
+| giraffe          | $1.09 | 6 min  | 31    | 1.9k      | 30     | reticulated paint carries it                                             |
+| flyingFox        | $1.02 | 5 min  | 91    | 6.6k      | 36     | crude: box head, flat black membranes                                    |
+| mantisShrimp     | $1.59 | 9 min  | 94    | 7.0k      | 67     | vivid; eyes and antennae read                                            |
+
+Friction they reported: `b.chain` with names wants one name per span (points − 1) (two builders); `catmull`/station points need tuple casts; joint roll on +Z-aimed bones puts local +Z dorsal (two builders); `role` has no `pelvis`/`foot`; a scenery rig with only a root joint throws in the harness. `npm run provenance` run from a worktree only finds that worktree's sessions and rewrites every other record without its builder; the other records were restored.
+
+## Astra round and Gemini game assets
+
+On 2026-09-29, same worktree and rules as the Gemini round (GUIDE.md, one subject, 3 renders, `scratch/<slug>/`, no redos): twenty GPT-6 Astra builders (task `med` effort, logged as `high`), eleven of them in named retro pixel styles and two dioramas; then five Gemini 3.8 Flash builders (logged `low`) briefed for game assets (a game role, silhouette at gameplay distance, lean rig, held items on their own bones). All 25 end on v03 with a clean report. Astra ≈ $95.6 ($2.86-$8.12, 6-17 min); Gemini game assets $9.07 ($0.76-$2.97, 4-8 min). Contact sheet: `~/tmp/public/nilo/agentic-3js-builder/showcase/astra-round.jpg`.
+
+- Retro (Astra): nesGoblinShaman, gbcSlimeKing, snesRedDragon, voxelWolf (288 tris), ps1Mech, amigaSeaTurtle, vgaSkeletonWarrior, arcadeTentacleAlien, pixelHarvestVillage (pixel diorama), nesYeti, pico8Rooster.
+- Other (Astra): witchCottageDiorama (plain objects, no joints), samuraiWarrior, hydra, bengalTiger, pangolin, moose, centaurArcher, leafySeadragon, silverbackGorilla.
+- Game assets (Gemini): mushroomGolemBoss (16.8k tris), jetpackPenguinMerc, cactusGunslinger, teapotDragon, siegeSnail.
+- Known failures, reported by the builders themselves and kept as built: nesYeti has four legs instead of two and a jaw above the head; gbcSlimeKing's crown floats and it rendered v03 twice (four renders); centaurArcher's hooves are detached from the legs, and its jaw and beard sit behind the face. Two builders asked for a fourth render and were refused.
+- snesRedDragon stands on long bare legs with the body high; cactusGunslinger aims forward instead of the rest pose.
+- jetpackPenguinMerc fails typecheck (3 errors, left as built). pico8Rooster's final file differs from v03 by type-only edits (a dropped third `c.pick` argument, two unused constants).
+- Six Astra records (gbcSlimeKing, voxelWolf, samuraiWarrior, bengalTiger, pangolin, centaurArcher) hold only whole-session totals: provenance counts their `scratch/<slug>/` files as other files.
+
+Friction: `b.chain` names are one per span (most builders); `Region.joint()` takes region-local coordinates while `region.p()` returns model space (tiger, gorilla, yeti jaws); `Cell.pick` takes `(ramp, value)` though docs suggest a threshold; `stripes()` wants a vector axis, not `"z"`; textured `tileBox` parts need a `#ffffff` tint; emissive material flags are ignored on plain-object samples.
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
@@ -144,6 +177,11 @@ Friction repeated across builders: `b.part` on model-space merged geometry needs
 - The five SDK-author samples (wyvern, ramFawn, tentacleSerpent, peacock, lantern) came from SdkBuilder's one session, which also wrote the SDK and showcase. Only its whole-session totals are known ($62.48, 343 calls); cost, time, tokens and typechecks can't be split per sample, and it rendered through the harness directly, so they have no snapshot tags.
 - The Astra builders (giantAnteater, barnOwl) ran on auto thinking; the level it chose isn't logged.
 - The Gemini builders (redFox, hammerheadShark) ran through cursor-agent, which logs one message per prompt, so model calls are unknown. The dropped run logged no input tokens or cost, so their cost and tokens are lower bounds.
+
+## Showcase performance
+
+- Thumbnail regeneration waits for 750 ms without pointer, wheel or keyboard input between synchronous builds, so stale sidebar images no longer block camera interaction.
+- Orbit hover raycasts are suspended during an `OrbitControls` gesture and run once after it ends; camera rotation does not compete with per-mesh picking.
 
 ## To-do
 
