@@ -4,6 +4,24 @@ The API of agentic-3js-builder: helpers for writing primitive-built, skeleton-ri
 
 Read with it: [`conventions.md`](conventions.md) (coordinates, sections, paint coordinates, cards, bounds: the behaviours to know before building) and the style kit that matches your brief, if any: [`kits/pixel.md`](../kits/pixel.md) (pixel art and retro), [`kits/toon.md`](../kits/toon.md) (cel-shaded cartoon), [`kits/clockwork.md`](../kits/clockwork.md) (gears and metals); [`kits/glow.md`](../kits/glow.md) makes parts self-lit in any style. Kits are optional helpers built on this API.
 
+## Which helper for which job
+
+- A body, neck, tail, limb or tentacle that bends: `b.chain` for the joints, then `b.sweep` along it (`b.loft` when the cross-section changes shape along the body).
+- Leg or arm joints that land a foot or hand exactly on a point: `limb(root, target, lengths, bends)` from `src/ik`.
+- A limb, horn, tentacle or neck growing out of a built body: `b.sprout(name, hit, tip, radius)`.
+- A point on a built body to put something on: `b.surface(body)` and its `.nearest(p)`, `.around(center).at(azimuth, elevation)` or `.ray(origin, dir)`; each returns a `Hit` facing out of the surface.
+- A part seated on a body (a scale, stud, spine, hoof, eye): `b.stick(geometry, color, hit)`.
+- Many things spread over a body (spots, spines, fur cards): `surface.scatter(count)`, then `b.stick` or `b.cards` on the hits.
+- Things around a limb, eye, horn, neck or waist (toes, a ruff, lashes, petals, a spine ring): `b.ring(line, { count, radius })`, where the line is that joint, eye or hit.
+- Things in a row along a curve or tube (dorsal spines, vertebrae, buttons): `b.along(path, count, (at) => {})`.
+- A band round a body (belt, collar, cuff, bandolier) and rows of studs or plates on it: `surface.loop(joint or point)`, then `b.sweep` or `b.along`.
+- A strap on any other route over a body: `surface.drape(roughPath)`.
+- A drawing on a curved surface (an eye, an emblem): `b.decal`.
+- A flat shape with thickness (fin, blade, plate): `b.extrude`; a turned shape (dome, vase, helmet bowl): `b.lathe`; a web or wing skin between two edges: `b.membrane`.
+- A head or other cluster whose size is one number: `b.region`.
+
+Hits, joints and tube points carry their bones, so what you build from them stays on the body and moves with it. The sections below give every option.
+
 ## Cheat sheet
 
 Bones work, and so does any other point, line or frame: an eye, a horn, a surface hit, a point on a tube, or something you make up. Every helper takes one of five geometric kinds and converts whatever you pass.
