@@ -23,10 +23,10 @@ TypeScript SDK that lets fast, cheap language models write primitive-built, skel
 ## Commands
 
 ```
-npm run typecheck                          # src, kits, samples and showcase; one broken sample fails it
+npm run typecheck                          # src, kits, samples, showcase, harness and scripts; one broken sample fails it
 npm run typecheck -- <slug | path.ts> ...  # only those files and their imports, with the project's settings
 npm run showcase                           # dev server, hot reload
 npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]... [--box <A>]...   # about a second: textures, parts, bounds, floor, quick shots
-npm run snap -- <slug | path.ts> <tag> [--report-only]   # render through the creature-lab harness
+npm run snap -- <slug | path.ts> <tag> [--report-only]   # render through harness/ (shots, report, GLBs)
 npm run sheet -- <slug | slug@tag> ... [--view three-quarter] [--cols N] [--out f.jpg]   # collage of rendered shots
 ```

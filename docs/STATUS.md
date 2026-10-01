@@ -260,12 +260,11 @@ Known geometry issues:
 
 ## Sibling repos
 
-- `~/workspace/nilo-creature-lab`: the harness `npm run snap` drives (`harness/snap.ts`). It has to be checked out. SDK-related commits there, also local:
-  - db5ed31: the rig answer key goes into the report and the rigged GLB extras.
-  - 3964259: keep per-vertex bone weights a part already carries.
-  - 1c352fb: `CREATURE_LAB_DIR` sets the snap output folder.
-  - 73be71a: the sprite-sheet atlas (colours, textures, paint sheet), cut-outs, vertex colours, double-sided parts, and a hand-written atlas PNG in the GLBs.
-  - The creature-lab site hasn't been redeployed since.
+This repo needs no other checkout. Its render harness (`harness/`: assemble, atlas, kit, measure, page, snap, weights) and the session-stats reader behind `npm run provenance` (`scripts/session-stats.ts`) were copied from `~/workspace/nilo-creature-lab` at 12f5eb6 on 2026-10-01; reports and GLBs from both match (6 textured samples gave identical reports, GLB mesh, skin and atlas data are byte-identical, and every build record but one new later edit came out the same). The two copies now evolve separately; a fix in one is ported by hand. Shared with the lab at run time, not as code:
+
+- The GPU slot lock files in `~/tmp/public/nilo/creature-lab/.gpu-slots`: both projects render on the one GPU.
+- The shared NVIDIA Chromium on port 9333.
+- The GLB extras key stays `creatureLab` (`creatureLab.rig`, the rig answer key), so earlier GLBs and their readers keep working.
 - `~/tmp/public/nilo/creature-lab/GUIDE.md`: the lab's creature contract, which SDK output meets.
 
 ## Output locations

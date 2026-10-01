@@ -1,11 +1,11 @@
 // Runs inside the shared headless Chromium, driven by scripts/preview.ts. Builds a bundled sample, bakes it with the
-// creature-lab harness's assemble() (so bounds, triangles and textures match what `npm run snap` reports) and returns
-// its textures, per-part table and, on request, two lit shots. `creature-lab/*` resolves to the lab's harness modules.
+// render harness's assemble() (so bounds, triangles and textures match what `npm run snap` reports) and returns
+// its textures, per-part table and, on request, two lit shots.
 import * as THREE from "three";
-import { assemble, createStaticMesh } from "creature-lab/assemble";
-import { gap, measureIndex } from "creature-lab/measure";
-import { bonesOf } from "creature-lab/weights";
-import { createKit } from "creature-lab/kit";
+import { assemble, createStaticMesh } from "../harness/assemble";
+import { gap, measureIndex } from "../harness/measure";
+import { bonesOf } from "../harness/weights";
+import { createKit } from "../harness/kit";
 
 const SHOT_SIZE = 900;
 const BACKGROUND = 0xd5dadf;
@@ -306,7 +306,7 @@ async function run({
     };
   });
 
-  const ownerBones = assembly.parts.map((part) => part.bone);
+  const ownerBones = assembly.parts.map((part) => part.bone ?? undefined);
   // What selectorMatch accepts, for suggestions: part names, groups and bones that own a part.
   const selectable = [
     ...new Set([

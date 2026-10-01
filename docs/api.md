@@ -618,7 +618,7 @@ The look is low-poly: facets are part of it, and a part needs only enough segmen
 
 ## Rig answer key
 
-Reading `b.root` writes `root.userData.rig`, evaluated in the current pose. The creature-lab harness copies it into the report JSON and the rigged GLB's extras (`creatureLab.rig`), so auto-riggers can be scored against it.
+Reading `b.root` writes `root.userData.rig`, evaluated in the current pose. The render harness (`harness/`) copies it into the report JSON and the rigged GLB's extras (`creatureLab.rig`), so auto-riggers can be scored against it.
 
 ```ts
 {

@@ -15,6 +15,7 @@ import { homedir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Build, Builder, Render, SessionTotals, Spend, Tokens, Version } from "../showcase/builds";
+import { collectSession, MODEL_NAMES } from "./session-stats";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 /** The nilo profile's logs, where earlier builders ran; logs from other profiles are named by their path from home. */
@@ -23,7 +24,6 @@ const OTHER_SESSIONS = [join(homedir(), ".omp/agent/sessions")];
 const sessionName = (file: string) =>
   file.startsWith(SESSIONS + sep) ? relative(SESSIONS, file) : relative(homedir(), file);
 const SNAPS = join(homedir(), "tmp/public/nilo/agentic-3js-builder/snaps");
-const STATS = join(homedir(), "workspace/nilo-creature-lab/site/scripts/stats.ts");
 const WORKTREES = (() => {
   try {
     return execFileSync("git", ["worktree", "list", "--porcelain"], { cwd: ROOT, encoding: "utf8" })
@@ -58,12 +58,10 @@ type Stats = {
   cost: number;
   finished: boolean;
 };
-// The lab repo is found from the home directory, like snap.ts's LAB_REPO; a static relative specifier would tie
-// this checkout's location to the lab's.
 const lab: {
   collectSession: (path: string) => Promise<{ stats: Stats } | null>;
   MODEL_NAMES: Record<string, string>;
-} = await import(STATS);
+} = { collectSession, MODEL_NAMES };
 
 type Part = { type: string; id?: string; name?: string; text?: string; arguments?: Record<string, unknown> };
 type Message = {

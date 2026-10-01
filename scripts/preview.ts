@@ -2,7 +2,7 @@
 //
 //   npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]... [--box <A>]...
 //
-// Builds the sample in the shared headless Chromium on :9333 and bakes it with the creature-lab harness's assemble(),
+// Builds the sample in the shared headless Chromium on :9333 and bakes it with the render harness's assemble(),
 // so its numbers match `npm run snap`. Writes to ~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/ (textures/ and
 // parts.json are replaced on every run, the shots only by a run with --shot): textures/*.png (each svg() drawing and the
 // baked paint sheet, v up), parts.json (the parts table and summary printed here) and with --shot three-quarter.png and
@@ -11,13 +11,13 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { setTimeout } from "node:timers/promises";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 import type { Plugin } from "esbuild";
+import { chromium } from "playwright-core";
 import type { PreviewResult } from "./preview-page";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const LAB_REPO = join(homedir(), "workspace/nilo-creature-lab");
 const OUT = join(homedir(), "tmp/public/nilo/agentic-3js-builder/preview");
 const CDP_URL = "http://127.0.0.1:9333";
 const USAGE =
@@ -59,10 +59,10 @@ for (let i = 0; i < args.length; i++) {
     usageError(`Unexpected argument ${arg}.`);
   }
 }
-if (target === undefined) usageError("A sample is required.");
-const isPath = target?.endsWith(".ts") ?? false;
-const sample = isPath ? resolve(process.cwd(), target) : join(ROOT, "samples", `${target}.ts`);
-const slug = isPath ? basename(target, ".ts") : target;
+const name: string = target ?? usageError("A sample is required.");
+const isPath = name.endsWith(".ts");
+const sample = isPath ? resolve(process.cwd(), name) : join(ROOT, "samples", `${name}.ts`);
+const slug = isPath ? basename(name, ".ts") : name;
 try {
   readFileSync(sample);
 } catch {
@@ -78,9 +78,6 @@ const threeHere: Plugin = {
     builder.onResolve({ filter: /^three(\/.*)?$/ }, (args) =>
       args.resolveDir === ROOT ? undefined : builder.resolve(args.path, { resolveDir: ROOT, kind: args.kind }),
     );
-    builder.onResolve({ filter: /^creature-lab\// }, (args) => ({
-      path: join(LAB_REPO, "harness", `${args.path.slice("creature-lab/".length)}.ts`),
-    }));
   },
 };
 const threeGlobal: Plugin = {
@@ -153,9 +150,6 @@ if (shot) {
   }
 }
 
-// playwright-core lives in the lab checkout, found from the home directory like snap.ts's LAB_REPO, so its path is
-// only known at run time.
-const { chromium } = await import(pathToFileURL(join(LAB_REPO, "node_modules/playwright-core/index.mjs")).href);
 const browser = await chromium.connectOverCDP(CDP_URL).catch((reason: Error) => {
   console.error(`Cannot reach the shared Chromium at ${CDP_URL}: ${reason.message}. Do not launch your own browser.`);
   process.exit(3);

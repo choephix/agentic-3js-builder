@@ -1,4 +1,4 @@
-// Renders a sample through the creature-lab harness (shared NVIDIA Chromium on :9333):
+// Renders a sample through this repo's render harness, harness/snap.ts (shared NVIDIA Chromium on :9333):
 //
 //   npm run snap -- <slug | path/to/file.ts> <tag>
 //   npm run snap -- <slug | path/to/file.ts> [<tag>] --report-only   (checks only, no render, tag optional)
@@ -15,7 +15,6 @@ import { fileURLToPath } from "node:url";
 import type { Object3D } from "three";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
-const LAB_REPO = join(homedir(), "workspace/nilo-creature-lab");
 const OUT = join(homedir(), "tmp/public/nilo/agentic-3js-builder/snaps");
 
 const USAGE =
@@ -48,10 +47,10 @@ const from = JSON.stringify(sample);
 writeFileSync(join(arm, "creature.ts"), `export * from ${from};\nexport { default } from ${from};\n`);
 
 const harnessArgs = ["harness/snap.ts", slug, lane, tag, ...args.filter((arg) => arg.startsWith("--"))];
-const result = spawnSync(join(LAB_REPO, "node_modules/.bin/tsx"), harnessArgs, {
-  cwd: LAB_REPO,
+const result = spawnSync(join(ROOT, "node_modules/.bin/tsx"), harnessArgs, {
+  cwd: ROOT,
   stdio: "inherit",
-  env: { ...process.env, CREATURE_LAB_DIR: OUT },
+  env: { ...process.env, SNAPS_DIR: OUT },
 });
 const copy = join(arm, "snaps", `${tag}-creature.ts`);
 if (!reportOnly && result.status === 0 && existsSync(copy)) copyFileSync(sample, copy);

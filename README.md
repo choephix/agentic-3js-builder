@@ -10,7 +10,8 @@ A TypeScript SDK for writing primitive-built, skeleton-rigged three.js models in
 | `kits/`     | Opinionated style kits built on top of `src/` (`pixel`, `toon`, `clockwork`). `src/` never imports a kit; a model imports the one it wants. |
 | `samples/`  | The sample library: one script per model, each with a build record (`<slug>.build.json`).                                                   |
 | `showcase/` | The local and published viewer for the samples.                                                                                             |
-| `scripts/`  | `snap` (harness render), `preview` (quick inspection), `provenance` (build records).                                                        |
+| `harness/`  | The render harness: bakes a model into one mesh and atlas, checks it, renders the review shots and exports the GLBs.                        |
+| `scripts/`  | `snap` (harness render), `preview` (quick inspection), `provenance` (build records), `typecheck`, `sheet`.                                  |
 | `docs/`     | Agent guidance (`api.md`, `conventions.md`), design notes (`DESIGN.md`) and project status (`STATUS.md`).                                   |
 
 ## Documentation
@@ -34,7 +35,7 @@ npm run typecheck        # src, kits, samples and showcase
 npm run typecheck -- <slug | path.ts> ...   # only those files and their imports
 npm run showcase         # dev server with hot reload
 npm run showcase:build   # static build in showcase/dist
-npm run snap -- <slug | path.ts> v01   # render through the creature-lab harness: contact sheet, report, GLBs
+npm run snap -- <slug | path.ts> v01   # render through harness/: contact sheet, report, GLBs
 npm run preview -- <slug | path.ts> [--shot]   # about a second: textures, parts with bounds, floor check, quick shots
 npm run preview -- <slug | path.ts> [--gap <A> <B>]...   # surface distance between two parts, groups or bones
 npm run preview -- <slug | path.ts> [--bones <A>]...      # which bones move a part, group or bone, by share
