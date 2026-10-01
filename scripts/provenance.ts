@@ -39,6 +39,9 @@ const CHECKOUTS = [...new Set([ROOT, ...WORKTREES])];
 function repoRelativePath(path: string, cwd: string) {
   const checkout = CHECKOUTS.find((root) => path === root || path.startsWith(root + sep));
   if (checkout) return relative(checkout, path);
+  // A sandbox: a standalone copy of the SDK for one builder, `<dir>/<slug>/samples/<slug>.ts` and its build record.
+  const sandbox = /\/([^/]+)\/samples\/(\1\.(?:ts|build\.json))$/.exec(path);
+  if (sandbox) return `samples/${sandbox[2]}`;
   const parts = cwd.split(sep);
   const marker = parts.lastIndexOf("agentic-3js-builder");
   if (marker < 1) return null;
@@ -303,10 +306,11 @@ function rounds(log: Log, slug: string) {
   let typechecks = 0;
   for (const item of log.calls) {
     if (item.name !== "bash" || typeof item.args.command !== "string") continue;
-    for (const [, name, tag] of item.args.command.matchAll(
-      /(?:npm run snap --|scripts\/snap\.ts)\s+(\S+)\s+([^\s;&|]+)/g,
-    ))
-      if (name === slug) runs.push(tag);
+    for (const part of item.args.command.split(/&&|\|\||[;\n]/)) {
+      if (part.includes("--report-only")) continue;
+      const run = /(?:npm run (?:-s |--silent )?snap --|scripts\/snap\.ts)\s+(\S+)\s+(v\d{2}[a-z0-9-]*)/.exec(part);
+      if (run && run[1] === slug) runs.push(run[2]);
+    }
     if (/npm run typecheck|\btsc\b/.test(item.args.command)) typechecks++;
   }
   return { runs, typechecks };

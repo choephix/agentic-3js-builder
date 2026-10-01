@@ -203,6 +203,12 @@ Same setup as the kawaii round without the cute brief: ten Sonnet 5.5 builders a
 
 New friction beyond the kawaii round: a grey test for drawings that only accepts exact R=G=B, so a warm-grey drawing silently skips the tint (golem); `decal` rays that miss snap to the nearest surface and leave stretched slivers or float past the target's edge (komodo, beetle, locomotive); `surface.drape` jumps to a belly edge on a tucked body (camel); round start caps sink a wide trunk below the floor (treehouse); `svg()` inside a helper makes a new atlas tile per call (camel); a sweep path that runs past its chain's start splits into a rigid piece (fisherman).
 
+## Muse round
+
+Twenty Muse Spark 1.3 Contributor builders (OpenRouter), up to seven renders each, each in its own sandbox (`~/tmp-archive/muse-round/<slug>/`: `src/`, `docs/`, `kits/`, `scripts/`, `GUIDE.md`, no other samples and no git history). The logs show none read another sample, folder or history: the first SDK-only round. Batch 1 at logged `low` ($2.05, about 11 min each): artDecoRobotButler, biomechSwarmQueen, chibiMechPilot, claymationBadgerChef, curiosityJackalope, marginaliaSnailKnight, origamiDragon, picturebookReef, synthwaveHoverbike, ukiyoeKappa. Batch 2 at logged `high` (asked for xhigh; Muse's `models.yml` entry had no thinking levels when the session started) ($3.59, about 26 min each): artNouveauDragonfly, brutalistWalkerFortress, codexJaguarWarrior, cyberpunkNoodleStall, delftWindmillDiorama, dieselpunkWarElephant, feltPlushSloth, gingerbreadGolem, graffitiSkateRat, inkwashCrane. All 0 report errors; hoverbike and dragonfly warn that they float, as briefed. Contact sheet: `~/tmp/public/nilo/agentic-3js-builder/showcase/muse-round.jpg`.
+
+They were built on the SDK before `9afd99d`. On main, the explicit decal `dir` of six (robot butler, badger chef, windmill, war elephant, skate rat, hoverbike) is negated to the facing convention; the chibi pilot's decals sit on hits and needed nothing. For all seven decal users every part's triangles, bones and bounds match the sandbox build, and the `-sdk` render after each builder's last tag shows the same model. Friction: a forward-aimed joint's local axes (5 builders), decal `dir` read as facing (4), part names for `--gap`/`--box` (4), the loose notes treated as a to-do list; the first three led to `9afd99d`.
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
@@ -210,6 +216,8 @@ New friction beyond the kawaii round: a grey test for drawings that only accepts
 - The five SDK-author samples (wyvern, ramFawn, tentacleSerpent, peacock, lantern) came from SdkBuilder's one session, which also wrote the SDK and showcase. Only its whole-session totals are known ($62.48, 343 calls); cost, time, tokens and typechecks can't be split per sample, and it rendered through the harness directly, so they have no snapshot tags.
 - The Astra builders (giantAnteater, barnOwl) ran on auto thinking; the level it chose isn't logged.
 - The Gemini builders (redFox, hammerheadShark) ran through cursor-agent, which logs one message per prompt, so model calls are unknown. The dropped run logged no input tokens or cost, so their cost and tokens are lower bounds.
+
+A sample file in a sandbox, `<dir>/<slug>/samples/<slug>.ts`, counts as that sample in this repo, so sandboxed builds keep their edits and creation time after the sandbox is gone. Snapshot tags and `snaps` count renders only: a `--report-only` run, or a snap argument that isn't a `vNN…` tag, is not a render.
 
 ## Showcase performance
 
