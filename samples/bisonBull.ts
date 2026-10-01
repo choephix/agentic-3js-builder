@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
 import { limb } from "../src/ik";
-import { rng } from "../src/math";
+import { rng, toDirection } from "../src/math";
 import { bezier, catmull } from "../src/path";
 import { svg } from "../src/texture";
 
@@ -286,7 +286,12 @@ export default function build() {
     });
     headPart(ico(0), DARK, [s * 0.13, 0.11, 0.1], [0.08, 0.05, 0.09]);
     // horns: out from the side of the skull, up and in, pale base to black tip
-    const horn = bezier(hp(s * 0.16, 0.1, 0.02), hp(s * 0.36, 0.12, -0.02), hp(s * 0.5, 0.26, 0.06), hp(s * 0.4, 0.46, 0.16));
+    const horn = bezier(
+      hp(s * 0.16, 0.1, 0.02),
+      hp(s * 0.36, 0.12, -0.02),
+      hp(s * 0.5, 0.26, 0.06),
+      hp(s * 0.4, 0.46, 0.16),
+    );
     b.sweep(horn, [0.072, 0.008], {
       bone: head,
       sides: 6,
@@ -320,14 +325,20 @@ export default function build() {
     flat: true,
   });
   // nostrils on the nose pad
-  b.decal(pad, NOSTRILS, { at: hp(0, -0.09, 0.85), dir: D.clone().negate(), up: U, size: [0.17, 0.085], bone: head });
+  b.decal(pad, NOSTRILS, {
+    at: hp(0, -0.09, 0.85),
+    dir: toDirection(D.clone().negate()).negate(),
+    up: U,
+    size: [0.17, 0.085],
+    bone: head,
+  });
 
   // eyes on the skull sides
   const skullSkin = b.surface([cranium, ...cheeks]);
   for (const s of [1, -1])
     b.decal(skullSkin, EYE, {
       at: hp(s * 0.3, 0.0, 0.1),
-      dir: [-s, 0, 0],
+      dir: [s, 0, 0],
       size: [0.11, 0.078],
       segments: 6,
       mirror: s > 0,
@@ -337,7 +348,7 @@ export default function build() {
   for (const s of [1, -1])
     b.decal(snout, MOUTH_LINE, {
       at: hp(s * 0.25, -0.17, 0.4),
-      dir: [-s, 0, 0],
+      dir: [s, 0, 0],
       size: [0.3, 0.05],
       segments: [8, 2],
       mirror: s > 0,
@@ -368,7 +379,9 @@ export default function build() {
   const tuftFrames = [];
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2;
-    tuftFrames.push(frame([tailTip.x + Math.cos(a) * 0.035, tailTip.y + 0.04, tailTip.z + Math.sin(a) * 0.035], [0, 1, 0]));
+    tuftFrames.push(
+      frame([tailTip.x + Math.cos(a) * 0.035, tailTip.y + 0.04, tailTip.z + Math.sin(a) * 0.035], [0, 1, 0]),
+    );
   }
   b.cards(tuftFrames, LOCK, {
     size: [0.1, 0.34],
@@ -459,7 +472,7 @@ export default function build() {
       // mud splashes on the lower legs
       b.decal(legSweep, MUD, {
         at: [foot.x + s * 0.2, 0.36, foot.z],
-        dir: [-s, 0, 0],
+        dir: [s, 0, 0],
         size: [0.13, 0.22],
         segments: [4, 6],
         mirror: s < 0,
@@ -494,26 +507,56 @@ export default function build() {
     lean: 70,
   });
   // brisket skirt
-  tuft(skin.scatter(70, { rng: rng(43), minDist: 0.1, filter: (h) => h.at.z > -0.1 && h.at.z < 1.1 && h.n.y < -0.3 }), BELLY, [0.14, 0.28], 53, {
-    lean: 20,
-    flow: [0, 0, -1],
-  });
+  tuft(
+    skin.scatter(70, { rng: rng(43), minDist: 0.1, filter: (h) => h.at.z > -0.1 && h.at.z < 1.1 && h.n.y < -0.3 }),
+    BELLY,
+    [0.14, 0.28],
+    53,
+    {
+      lean: 20,
+      flow: [0, 0, -1],
+    },
+  );
   // lean, short hair on the hindquarter
-  tuft(skin.scatter(130, { rng: rng(44), minDist: 0.1, filter: (h) => h.at.z < 0.05 && h.n.y > -0.2 }), TAN, [0.07, 0.13], 54, {
-    lean: 72,
-  });
-  tuft(skin.scatter(40, { rng: rng(45), minDist: 0.12, filter: (h) => h.at.z < 0.05 && h.n.y > 0.1 }), MID, [0.06, 0.11], 55, {
-    lean: 72,
-  });
+  tuft(
+    skin.scatter(130, { rng: rng(44), minDist: 0.1, filter: (h) => h.at.z < 0.05 && h.n.y > -0.2 }),
+    TAN,
+    [0.07, 0.13],
+    54,
+    {
+      lean: 72,
+    },
+  );
+  tuft(
+    skin.scatter(40, { rng: rng(45), minDist: 0.12, filter: (h) => h.at.z < 0.05 && h.n.y > 0.1 }),
+    MID,
+    [0.06, 0.11],
+    55,
+    {
+      lean: 72,
+    },
+  );
   // forelegs: shaggy chaps
   for (const [i, leg] of foreSweeps.entries()) {
     const s = i === 0 ? 1 : -1;
-    tuft(b.surface(leg).scatter(50, { rng: rng(60 + s), minDist: 0.06, filter: (h) => h.at.y > 0.5 }), DARK, [0.1, 0.2], 62 + s, {
-      lean: 48,
-    });
-    tuft(b.surface(leg).scatter(16, { rng: rng(70 + s), minDist: 0.05, filter: (h) => h.at.y > 0.3 && h.at.y < 0.5 }), MID, [0.07, 0.12], 72 + s, {
-      lean: 52,
-    });
+    tuft(
+      b.surface(leg).scatter(50, { rng: rng(60 + s), minDist: 0.06, filter: (h) => h.at.y > 0.5 }),
+      DARK,
+      [0.1, 0.2],
+      62 + s,
+      {
+        lean: 48,
+      },
+    );
+    tuft(
+      b.surface(leg).scatter(16, { rng: rng(70 + s), minDist: 0.05, filter: (h) => h.at.y > 0.3 && h.at.y < 0.5 }),
+      MID,
+      [0.07, 0.12],
+      72 + s,
+      {
+        lean: 52,
+      },
+    );
   }
   // head: bonnet on the crown and a little hair on the cheeks
   tuft(
@@ -524,7 +567,13 @@ export default function build() {
     { flow: [0, -0.3, -1], lean: 70 },
   );
   tuft(
-    b.surface([cranium]).scatter(14, { rng: rng(83), minDist: 0.06, filter: (h) => h.n.y < 0.3 && Math.abs(h.n.x) > 0.6 && h.n.y > -0.3 }),
+    b
+      .surface([cranium])
+      .scatter(14, {
+        rng: rng(83),
+        minDist: 0.06,
+        filter: (h) => h.n.y < 0.3 && Math.abs(h.n.x) > 0.6 && h.n.y > -0.3,
+      }),
     DARK,
     [0.07, 0.12],
     84,
@@ -552,14 +601,14 @@ export default function build() {
   for (const s of [1, -1]) {
     b.decal(torso, CAPE, {
       at: [s * 0.6, 1.2, 0.2],
-      dir: [-s, 0, 0],
+      dir: [s, 0, 0],
       size: [1.0, 1.02],
       segments: [14, 14],
       mirror: s < 0,
     });
     b.decal(torso, FLANK_HAIR, {
       at: [s * 0.6, 1.15, -0.5],
-      dir: [-s, 0, 0],
+      dir: [s, 0, 0],
       size: [0.75, 0.55],
       segments: [10, 8],
       mirror: s < 0,

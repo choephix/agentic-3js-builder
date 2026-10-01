@@ -587,7 +587,10 @@ function ringsSvg() {
     s += poly(
       [
         [100 + Math.cos(a) * 12 - Math.sin(a) * w, 100 + Math.sin(a) * 12 + Math.cos(a) * w],
-        [100 + Math.cos(a) * (12 + len) - Math.sin(a) * w * 0.3, 100 + Math.sin(a) * (12 + len) + Math.cos(a) * w * 0.3],
+        [
+          100 + Math.cos(a) * (12 + len) - Math.sin(a) * w * 0.3,
+          100 + Math.sin(a) * (12 + len) + Math.cos(a) * w * 0.3,
+        ],
         [100 + Math.cos(a) * 12 + Math.sin(a) * w, 100 + Math.sin(a) * 12 - Math.cos(a) * w],
       ],
       "#5a3a1e",
@@ -649,10 +652,10 @@ export default function build() {
     flat: true,
     name: "log",
   });
-  const logOutline: OutlinePoint[] = Array.from({ length: 10 }, (_, k): Pt => [
-    LOG_R * Math.cos((k * Math.PI) / 5),
-    LOG_R * Math.sin((k * Math.PI) / 5),
-  ]);
+  const logOutline: OutlinePoint[] = Array.from(
+    { length: 10 },
+    (_, k): Pt => [LOG_R * Math.cos((k * Math.PI) / 5), LOG_R * Math.sin((k * Math.PI) / 5)],
+  );
   const cutEnd = b.extrude(logOutline, {
     at: [0, LOG_FACE, LOG_HALF - 0.01],
     x: [1, 0, 0],
@@ -664,7 +667,7 @@ export default function build() {
   });
   b.decal(cutEnd, ringsSvg(), {
     at: [0, LOG_FACE, LOG_HALF],
-    dir: [0, 0, -1],
+    dir: [0, 0, 1],
     up: [0, 1, 0],
     size: [0.27, 0.27],
     segments: 2,
@@ -707,7 +710,7 @@ export default function build() {
   });
   b.decal(stub, ringsSvg(), {
     at: [-0.25, LOG_FACE + 0.1, -0.3],
-    dir: [0.88, -0.45, 0],
+    dir: [-0.88, 0.45, 0],
     up: [0, 1, 0],
     size: [0.07, 0.07],
     segments: 2,
@@ -742,7 +745,7 @@ export default function build() {
     );
     b.decal(shelf, fungusSvg(), {
       at: shelf.at,
-      dir: [0, -1, 0],
+      dir: [0, 1, 0],
       up: [0, 0, 1],
       size: [fs * 1.0, fs * 0.55],
       segments: [4, 3],
@@ -776,7 +779,7 @@ export default function build() {
   );
   b.decal(pronotum, pronotumSvg(), {
     at: [0, BY + 0.07, 0.036],
-    dir: [0, -1, 0],
+    dir: [0, 1, 0],
     up: [0, 0, 1],
     size: [0.178, 0.132],
     segments: [9, 8],
@@ -807,7 +810,7 @@ export default function build() {
   );
   b.decal(skull, headSvg(), {
     at: [0, BY + 0.05, 0.1675],
-    dir: [0, -1, 0],
+    dir: [0, 1, 0],
     up: [0, 0, 1],
     size: [0.18, 0.135],
     segments: [8, 7],
@@ -926,7 +929,7 @@ export default function build() {
     });
     b.decal(ely, elytronSvg(), {
       at: [s * 0.048, BY + 0.07, -0.14],
-      dir: [0, -1, 0],
+      dir: [0, 1, 0],
       up: [0, 0, 1],
       size: [0.1, 0.24],
       segments: [8, 20],
@@ -961,7 +964,7 @@ export default function build() {
     );
     b.decal(w, wingSvg(), {
       at: [s * 0.012 + s * 0.03, BY + 0.056, -0.11],
-      dir: [0, -1, 0],
+      dir: [0, 1, 0],
       up: [0, 0, 1],
       size: [0.07, 0.24],
       segments: [3, 10],
@@ -1075,7 +1078,11 @@ export default function build() {
       const nrm = hit.n.clone();
       const out = new THREE.Vector3(s, 0, 0);
       const fwd = new THREE.Vector3(0, 0, Math.sign(tz - hipZ) * 0.3);
-      const ankle = toe.clone().addScaledVector(nrm, 0.05).addScaledVector(out, 0.03).add(fwd.clone().multiplyScalar(0.08));
+      const ankle = toe
+        .clone()
+        .addScaledVector(nrm, 0.05)
+        .addScaledVector(out, 0.03)
+        .add(fwd.clone().multiplyScalar(0.08));
       toes.push(toe);
       const chain = b.chain(`leg${n}${S}`, polyline([hipP, kneeP, ankle, toe]), {
         parent: thorax,
@@ -1108,7 +1115,13 @@ export default function build() {
         });
       }
       // tarsus: a short jointed rod ending in two hooked claws
-      b.rod(aj, fj, [0.0092, 0.0072], { sides: 5, smooth: false, color: "#22130c", caps: "flat", name: `tarsus${n}${S}` });
+      b.rod(aj, fj, [0.0092, 0.0072], {
+        sides: 5,
+        smooth: false,
+        color: "#22130c",
+        caps: "flat",
+        name: `tarsus${n}${S}`,
+      });
       for (const t of [0.4, 0.75]) {
         b.part(new THREE.SphereGeometry(0.009, 5, 4), "#3a2016", { bone: fj, at: lerp(ankle, toe, t), flat: true });
       }
@@ -1132,13 +1145,31 @@ export default function build() {
   // ---- hair tufts on the underside and cheeks
   const under = b.surface(thoraxUnder);
   const hairHits = under.scatter(22, { rng: rand, minDist: 0.025, filter: (h) => h.n.y < 0.4 });
-  b.cards(hairHits, hairSvg(), { size: [0.012, 0.018], lean: 50, flow: [0, -0.3, -1], vary: 0.3, rng: rand, cross: true });
+  b.cards(hairHits, hairSvg(), {
+    size: [0.012, 0.018],
+    lean: 50,
+    flow: [0, -0.3, -1],
+    vary: 0.3,
+    rng: rand,
+    cross: true,
+  });
   // a golden fringe along the pronotum's sides and the cheeks
   const fringeHits = [
-    ...b.surface(pronotum).scatter(40, { rng: rand, minDist: 0.02, filter: (h) => Math.abs(h.at.x) > 0.06 && h.n.y < 0.75 }),
-    ...b.surface(skull).scatter(16, { rng: rand, minDist: 0.025, filter: (h) => Math.abs(h.at.x) > 0.06 && h.n.y < 0.6 }),
+    ...b
+      .surface(pronotum)
+      .scatter(40, { rng: rand, minDist: 0.02, filter: (h) => Math.abs(h.at.x) > 0.06 && h.n.y < 0.75 }),
+    ...b
+      .surface(skull)
+      .scatter(16, { rng: rand, minDist: 0.025, filter: (h) => Math.abs(h.at.x) > 0.06 && h.n.y < 0.6 }),
   ];
-  b.cards(fringeHits, hairSvg(), { size: [0.02, 0.026], lean: 60, flow: [0, -0.2, -1], vary: 0.3, rng: rand, cross: true });
+  b.cards(fringeHits, hairSvg(), {
+    size: [0.02, 0.026],
+    lean: 60,
+    flow: [0, -0.2, -1],
+    vary: 0.3,
+    rng: rand,
+    cross: true,
+  });
 
   // ---- moss and ground cover
   const mossHits = logSurf.scatter(140, {
@@ -1164,7 +1195,13 @@ export default function build() {
     minDist: 0.05,
     filter: (h) => h.n.y < 0.3 && h.n.y > -0.35 && Math.abs(h.at.z) > 0.35,
   });
-  b.cards(mossLow, mossTuftSvg(51, false), { size: [0.075, 0.05], lean: 25, flow: [0, -1, 0], vary: 0.3, rng: rng(15) });
+  b.cards(mossLow, mossTuftSvg(51, false), {
+    size: [0.075, 0.05],
+    lean: 25,
+    flow: [0, -1, 0],
+    vary: 0.3,
+    rng: rng(15),
+  });
 
   // grass tufts and leaf litter on the floor
   const floorRng = rng(31);

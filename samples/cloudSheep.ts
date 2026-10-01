@@ -155,7 +155,10 @@ export default function build() {
   const jaw = b.joint("jaw", { parent: head, at: [0, HY - 0.05, 0.3], aim: [0, HY - 0.052, 0.42], role: "jaw" });
 
   // ---- fleece core
-  const bodyR = (t: number): [number, number] => [0.17 + 0.07 * Math.sin(Math.PI * t), 0.15 + 0.05 * Math.sin(Math.PI * t)];
+  const bodyR = (t: number): [number, number] => [
+    0.17 + 0.07 * Math.sin(Math.PI * t),
+    0.15 + 0.05 * Math.sin(Math.PI * t),
+  ];
   const core = b.sweep(spine, bodyR, { sides: 8, smooth: false, color: CORE, bone: spine });
 
   // ---- neck, head
@@ -195,7 +198,7 @@ export default function build() {
   }
   const brow = skin.around(HC).at(0, 52);
   if (brow) b.decal(skin, FOREHEAD, { at: brow, size: [0.03, 0.03], lift: 0.003 });
-  b.decal(b.surface(muzzle), SMILE, { at: [0, HY - 0.04, 0.447], dir: [0, 0, -1], size: [0.05, 0.025], lift: 0.002 });
+  b.decal(b.surface(muzzle), SMILE, { at: [0, HY - 0.04, 0.447], dir: [0, 0, 1], size: [0.05, 0.025], lift: 0.002 });
 
   // ---- floppy ears
   for (const s of [1, -1]) {
@@ -206,7 +209,11 @@ export default function build() {
       [s * 0.2, HY - 0.015, 0.29],
       [s * 0.215, HY - 0.075, 0.285],
     ]);
-    const ear = b.chain(`ear${side}`, path, { parent: head, names: [`ear${side}1`, `ear${side}2`, `ear${side}3`], role: "hinge" });
+    const ear = b.chain(`ear${side}`, path, {
+      parent: head,
+      names: [`ear${side}1`, `ear${side}2`, `ear${side}3`],
+      role: "hinge",
+    });
     const w = (t: number): [number, number] => [0.011, 0.038 * Math.sin(Math.PI * (0.25 + 0.65 * t)) + 0.012];
     b.sweep(ear, w, { section: "box", color: FACE, caps: "flat" });
     b.sweep(
@@ -231,7 +238,11 @@ export default function build() {
     });
   }
   for (const s of [1, -1]) {
-    b.part(new THREE.IcosahedronGeometry(0.046, 1), WOOL[1], { bone: head, at: [s * 0.122, HY - 0.085, 0.29], flat: true });
+    b.part(new THREE.IcosahedronGeometry(0.046, 1), WOOL[1], {
+      bone: head,
+      at: [s * 0.122, HY - 0.085, 0.29],
+      flat: true,
+    });
   }
   b.part(new THREE.IcosahedronGeometry(0.05, 1), WOOL[0], { bone: head, at: [0.03, HY + 0.115, 0.37], flat: true });
   b.part(new THREE.IcosahedronGeometry(0.042, 1), WOOL[3], { bone: head, at: [-0.035, HY + 0.12, 0.385], flat: true });
@@ -244,7 +255,11 @@ export default function build() {
     const set = y < 0.2 ? HEM : y < 0.29 ? MID : WOOL;
     return set[Math.floor(R() * set.length)];
   };
-  const big = [new THREE.IcosahedronGeometry(0.085, 1), new THREE.IcosahedronGeometry(0.1, 1), new THREE.IcosahedronGeometry(0.072, 1)];
+  const big = [
+    new THREE.IcosahedronGeometry(0.085, 1),
+    new THREE.IcosahedronGeometry(0.1, 1),
+    new THREE.IcosahedronGeometry(0.072, 1),
+  ];
   for (const hit of fleece.scatter(34, { rng: R, minDist: 0.11, filter: (h) => awayFromHead(h.at) && h.n.y > -0.75 })) {
     b.stick(big[Math.floor(R() * big.length)], wool(hit.at.y), hit, {
       embed: 0.5,
@@ -285,7 +300,11 @@ export default function build() {
         { parent: sz > 0 ? chest : hips, names: [`hip${n}`, `knee${n}`, `hoof${n}`], role: "leg" },
       );
       b.sweep(leg, [0.052, 0.042], { sides: 6, smooth: false, color: FACE });
-      b.part(new THREE.CylinderGeometry(0.046, 0.05, 0.05, 6), HOOF, { bone: leg.tip ?? leg.joints[leg.joints.length - 1], at: [sx * 0.125, 0.025, z], flat: true });
+      b.part(new THREE.CylinderGeometry(0.046, 0.05, 0.05, 6), HOOF, {
+        bone: leg.tip ?? leg.joints[leg.joints.length - 1],
+        at: [sx * 0.125, 0.025, z],
+        flat: true,
+      });
       b.part(new THREE.IcosahedronGeometry(0.068, 1), WOOL[0], {
         bone: leg.joints[0],
         at: [sx * 0.122, 0.17, z],
@@ -327,7 +346,11 @@ export default function build() {
       flat: true,
     });
   }
-  b.part(new THREE.IcosahedronGeometry(0.014, 0), RIBBON_DK, { bone: neck.joints[0], at: [0, F.y + 0.004, F.z + 0.014], flat: true });
+  b.part(new THREE.IcosahedronGeometry(0.014, 0), RIBBON_DK, {
+    bone: neck.joints[0],
+    at: [0, F.y + 0.004, F.z + 0.014],
+    flat: true,
+  });
   b.cards([frame([0, F.y - 0.01, F.z + 0.012], [0, 1, 0])], CHARM, {
     size: [0.105, 0.118],
     lean: 180,

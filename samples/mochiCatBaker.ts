@@ -100,7 +100,9 @@ const TOES = svg(
 );
 
 // Apron drawing: 100 × 106 units = 0.2 × 0.212 m on the body front, top edge at y = 0.324: world y = 0.324 − 0.002 · svgY.
-const SCALLOPS = [10, 24, 38, 52, 66, 80, 94].map((x) => `<circle cx="${x}" cy="97" r="7.5" fill="${WHITE}"/>`).join("");
+const SCALLOPS = [10, 24, 38, 52, 66, 80, 94]
+  .map((x) => `<circle cx="${x}" cy="97" r="7.5" fill="${WHITE}"/>`)
+  .join("");
 const DOTS = [
   [26, 82],
   [22, 92],
@@ -159,9 +161,15 @@ const DOILY = (() => {
   const holes = [...ring(14, 33, 3), ...ring(8, 22, 3.6, 0.2), [50, 50, 4.2] as [number, number, number]];
   const disc = `M${50 - 36} 50a36 36 0 1 0 72 0a36 36 0 1 0 -72 0`;
   const lace = circlesPath(ring(18, 40, 8));
-  return svg(S(`<path fill-rule="evenodd" fill="${WHITE}" d="${disc}${circlesPath(holes)}"/><path fill="${WHITE}" d="${lace}"/>`, "0 0 100 100"), {
-    size: 320,
-  });
+  return svg(
+    S(
+      `<path fill-rule="evenodd" fill="${WHITE}" d="${disc}${circlesPath(holes)}"/><path fill="${WHITE}" d="${lace}"/>`,
+      "0 0 100 100",
+    ),
+    {
+      size: 320,
+    },
+  );
 })();
 
 const FACE_SVG = svg(
@@ -195,7 +203,9 @@ const STEAM = svg(
   { size: 160 },
 );
 const TUFT = svg(S(`<path d="M3 40L5 8L15 24L22 0L29 24L39 8L41 40Z" fill="${FUR}"/>`, "0 0 44 40"), { size: 132 });
-const TUFT_CREAM = svg(S(`<path d="M3 40L5 8L15 24L22 0L29 24L39 8L41 40Z" fill="${CREAM}"/>`, "0 0 44 40"), { size: 132 });
+const TUFT_CREAM = svg(S(`<path d="M3 40L5 8L15 24L22 0L29 24L39 8L41 40Z" fill="${CREAM}"/>`, "0 0 44 40"), {
+  size: 132,
+});
 const SPRINKLE = svg(
   S(`<rect x="8" y="26" width="48" height="12" rx="6" fill="#ffffff" transform="rotate(-25 32 32)"/>`, "0 0 64 64"),
   { size: 64 },
@@ -233,7 +243,13 @@ export default function build() {
     color: FUR,
   });
   const bodySkin = b.surface(body);
-  b.decal(bodySkin, APRON_SVG, { at: [0, 0.218, 0.2], dir: [0, 0, -1], size: [0.2, 0.212], segments: [20, 22], lift: 0.003 });
+  b.decal(bodySkin, APRON_SVG, {
+    at: [0, 0.218, 0.2],
+    dir: [0, 0, 1],
+    size: [0.2, 0.212],
+    segments: [20, 22],
+    lift: 0.003,
+  });
 
   // a thin waist band all round the body, straps over the shoulders, and a bow at the back
   const waist = bodySkin.loop([0, 0.184, 0], { lift: 0.003 });
@@ -293,7 +309,16 @@ export default function build() {
       [-0.01, -0.017],
       [-0.027, -0.011],
     ],
-    { at: [0, 0.148, pz + 0.004], x: [1, 0, 0], y: [0, 1, 0], thickness: 0.014, bevel: 0.003, detail: 0.34, color: APRON_D, bone: chest },
+    {
+      at: [0, 0.148, pz + 0.004],
+      x: [1, 0, 0],
+      y: [0, 1, 0],
+      thickness: 0.014,
+      bevel: 0.003,
+      detail: 0.34,
+      color: APRON_D,
+      bone: chest,
+    },
   );
   b.part(new THREE.PlaneGeometry(0.05, 0.033), "#ffffff", {
     bone: chest,
@@ -311,7 +336,15 @@ export default function build() {
       [-0.008, 0.016],
       [-0.014, 0.004],
     ],
-    { at: [0.01, 0.164, pz + 0.002], x: [1, 0, 0], y: [0, 1, 0], thickness: 0.006, smoothing: 1, color: COOKIE, bone: chest },
+    {
+      at: [0.01, 0.164, pz + 0.002],
+      x: [1, 0, 0],
+      y: [0, 1, 0],
+      thickness: 0.006,
+      smoothing: 1,
+      color: COOKIE,
+      bone: chest,
+    },
   );
 
   // ── tail: curled up in a question mark, ringed in stripes with a cream tip ──────────────────────────────────────
@@ -362,7 +395,7 @@ export default function build() {
       scale: [0.95, 0.6, 1.25],
       flat: true,
     });
-    b.decal(b.surface(foot), TOES, { at: [s * 0.072, 0.03, 0.2], dir: [0, -0.35, -1], size: [0.04, 0.016] });
+    b.decal(b.surface(foot), TOES, { at: [s * 0.072, 0.03, 0.2], dir: [0, 0.35, 1], size: [0.04, 0.016] });
   }
 
   // ── head: a wide faceted ball with ears, hat, muzzle and face ──────────────────────────────────────────────────
@@ -377,7 +410,12 @@ export default function build() {
   // ears, each with its own joint
   for (const s of [1, -1]) {
     const side = s > 0 ? "L" : "R";
-    const ear = b.joint(`ear${side}`, { parent: head, at: [s * 0.112, 0.455, 0.0], dir: [s * 0.3, 1, 0], role: "hinge" });
+    const ear = b.joint(`ear${side}`, {
+      parent: head,
+      at: [s * 0.112, 0.455, 0.0],
+      dir: [s * 0.3, 1, 0],
+      role: "hinge",
+    });
     const outer: OutlinePoint[] = [
       [-0.05, 0],
       [0.05, 0],
@@ -419,7 +457,12 @@ export default function build() {
     ],
     { at: [0, HAT_Y, 0.004], bone: head, segments: 8, color: WHITE },
   );
-  b.decal(b.surface(band), HAT_BAND, { at: [0, HAT_Y + 0.024, 0.2], dir: [0, 0, -1], size: [0.15, 0.048], segments: [14, 4] });
+  b.decal(b.surface(band), HAT_BAND, {
+    at: [0, HAT_Y + 0.024, 0.2],
+    dir: [0, 0, 1],
+    size: [0.15, 0.048],
+    segments: [14, 4],
+  });
   b.lathe(
     [
       [0.1, 0],
@@ -441,16 +484,31 @@ export default function build() {
 
   // muzzle, nose, forehead stripes and face drawings
   const muzzle = [1, -1].map((s) =>
-    b.part(ball(0.042, 7, 5), CREAM, { bone: head, at: [s * 0.03, 0.343, 0.118], scale: [1.1, 0.85, 0.95], flat: true }),
+    b.part(ball(0.042, 7, 5), CREAM, {
+      bone: head,
+      at: [s * 0.03, 0.343, 0.118],
+      scale: [1.1, 0.85, 0.95],
+      flat: true,
+    }),
   );
   b.part(ball(0.0125, 5, 3), NOSE, { bone: head, at: [0, 0.362, 0.153], scale: [1.25, 0.85, 0.8], flat: true });
-  b.decal(b.surface(muzzle), MOUTH_SVG, { at: [0, 0.336, 0.2], dir: [0, 0, -1], size: [0.07, 0.035], segments: [12, 6] });
-  b.decal(skin, BROW, { at: [0, 0.445, 0.2], dir: [0, -0.15, -1], size: [0.05, 0.022], segments: [8, 4] });
+  b.decal(b.surface(muzzle), MOUTH_SVG, {
+    at: [0, 0.336, 0.2],
+    dir: [0, 0, 1],
+    size: [0.07, 0.035],
+    segments: [12, 6],
+  });
+  b.decal(skin, BROW, { at: [0, 0.445, 0.2], dir: [0, 0.15, 1], size: [0.05, 0.022], segments: [8, 4] });
   for (const s of [1, -1]) {
-    b.decal(skin, EYE, { at: [s * 0.074, 0.39, 0.2], dir: [0, 0, -1], size: [0.052, 0.069], segments: [8, 10] });
-    b.decal(skin, BLUSH, { at: [s * 0.105, 0.352, 0.2], dir: [-s * 0.45, 0, -1], size: [0.05, 0.027], segments: [10, 5] });
+    b.decal(skin, EYE, { at: [s * 0.074, 0.39, 0.2], dir: [0, 0, 1], size: [0.052, 0.069], segments: [8, 10] });
+    b.decal(skin, BLUSH, {
+      at: [s * 0.105, 0.352, 0.2],
+      dir: [-(-s * 0.45), 0, 1],
+      size: [0.05, 0.027],
+      segments: [10, 5],
+    });
   }
-  b.decal(skin, FLOUR, { at: [-0.115, 0.36, 0.2], dir: [0.45, 0, -1], size: [0.03, 0.017], segments: [6, 4] });
+  b.decal(skin, FLOUR, { at: [-0.115, 0.36, 0.2], dir: [-0.45, 0, 1], size: [0.03, 0.017], segments: [6, 4] });
 
   // cheek fluff: fur and cream tufts sticking out sideways at each cheek, facing front
   for (const [tex, az, el] of [
@@ -492,7 +550,11 @@ export default function build() {
         [s * 0.2, 0.213, 0.072],
         [s * 0.228, 0.214, 0.09],
       ]),
-      { parent: spine.joints[1], names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`, `hand${side}`], role: "arm" },
+      {
+        parent: spine.joints[1],
+        names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`, `hand${side}`],
+        role: "arm",
+      },
     );
     arms[side] = arm;
     b.sweep(arm, [0.034, 0.027], { sides: 6, smooth: false, color: FUR });
@@ -626,11 +688,12 @@ export default function build() {
       { at: [x, CY + 0.019, z], bone: handR, segments: 8, color: iceD },
     );
     b.part(ball(0.008, 6, 4), CHERRY, { bone: handR, at: [x, CY + 0.0565, z], flat: true });
-    b.cards(
-      b.surface(frost).scatter(6, { rng: rnd, minDist: 0.012 }),
-      SPRINKLE,
-      { size: 0.011, lean: 75, bone: handR, color: i % 2 ? "#ffffff" : BUTTER },
-    );
+    b.cards(b.surface(frost).scatter(6, { rng: rnd, minDist: 0.012 }), SPRINKLE, {
+      size: 0.011,
+      lean: 75,
+      bone: handR,
+      color: i % 2 ? "#ffffff" : BUTTER,
+    });
   };
   cupcake(0, WHITE, "#ffd0e2", "#ffb3d1", "#ff93bd");
   cupcake(1, "#ffd0e2", WHITE, LILAC, LILAC_D);
@@ -639,8 +702,18 @@ export default function build() {
   // a face-cube petit four and a macaron
   {
     const [x, z] = slot(2);
-    b.part(new THREE.BoxGeometry(0.038, 0.034, 0.038), "#ffe0ef", { bone: handR, at: [x, CY + 0.017, z], rotation: [0, 14, 0], flat: true });
-    b.part(new THREE.BoxGeometry(0.04, 0.008, 0.04), WHITE, { bone: handR, at: [x, CY + 0.038, z], rotation: [0, 14, 0], flat: true });
+    b.part(new THREE.BoxGeometry(0.038, 0.034, 0.038), "#ffe0ef", {
+      bone: handR,
+      at: [x, CY + 0.017, z],
+      rotation: [0, 14, 0],
+      flat: true,
+    });
+    b.part(new THREE.BoxGeometry(0.04, 0.008, 0.04), WHITE, {
+      bone: handR,
+      at: [x, CY + 0.038, z],
+      rotation: [0, 14, 0],
+      flat: true,
+    });
     b.part(ball(0.0085, 5, 3), CHERRY, { bone: handR, at: [x, CY + 0.047, z], flat: true });
     b.part(new THREE.PlaneGeometry(0.03, 0.024), "#ffffff", {
       bone: handR,

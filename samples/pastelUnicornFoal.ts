@@ -184,7 +184,7 @@ export default function build() {
     name: "lowerJaw",
   });
   // nostrils and a little smile
-  b.decal(muzzle, NOSE, { at: [0, 0.625, 0.64], dir: [0, 0, -1], size: [0.095, 0.07], segments: 8, lift: 0.002 });
+  b.decal(muzzle, NOSE, { at: [0, 0.625, 0.64], dir: [0, 0, 1], size: [0.095, 0.07], segments: 8, lift: 0.002 });
 
   const skin = b.surface(skull);
   for (const s of [1, -1]) {
@@ -206,10 +206,30 @@ export default function build() {
     const x: [number, number, number] = [s, 0, 0];
     const y: [number, number, number] = [s * 0.7, 1, -0.25];
     const at = [s * 0.11, 0.785, 0.37] as [number, number, number];
-    b.extrude(earOutline, { at, x, y, thickness: 0.026, bevel: 0.006, smoothing: 1, color: BODY, bone: head, name: "ear" });
+    b.extrude(earOutline, {
+      at,
+      x,
+      y,
+      thickness: 0.026,
+      bevel: 0.006,
+      smoothing: 1,
+      color: BODY,
+      bone: head,
+      name: "ear",
+    });
     b.extrude(
       earOutline.map(([u, v]) => [u * 0.62, v * 0.68 + 0.01] as [number, number]),
-      { at: [at[0], at[1], at[2] + 0.007], x, y, thickness: 0.026, bevel: 0.004, smoothing: 1, color: EAR_IN, bone: head, name: "earInner" },
+      {
+        at: [at[0], at[1], at[2] + 0.007],
+        x,
+        y,
+        thickness: 0.026,
+        bevel: 0.004,
+        smoothing: 1,
+        color: EAR_IN,
+        bone: head,
+        name: "earInner",
+      },
     );
   }
 
@@ -218,7 +238,14 @@ export default function build() {
   if (!hornHit) throw new Error("no horn seat");
   const hornBase = hornHit.at.clone().add(new THREE.Vector3(0, -0.02, -0.02));
   const hornTip = hornHit.at.clone().add(new THREE.Vector3(0, 0.15, 0.085));
-  const hornPath = bezier(hornBase, hornBase.clone().lerp(hornTip, 0.5).add(new THREE.Vector3(0, 0.01, -0.005)), hornTip);
+  const hornPath = bezier(
+    hornBase,
+    hornBase
+      .clone()
+      .lerp(hornTip, 0.5)
+      .add(new THREE.Vector3(0, 0.01, -0.005)),
+    hornTip,
+  );
   b.sweep(hornPath, [0.042, 0.0], {
     bone: head,
     twist: 400,
@@ -232,14 +259,21 @@ export default function build() {
     ],
     name: "horn",
   });
-  b.sweep(catmull([hornBase.clone().add(new THREE.Vector3(0, 0.0, 0)), hornBase.clone().add(new THREE.Vector3(0, 0.008, 0.004))]), 0.05, {
-    bone: head,
-    color: "#ff9cc5",
-    sides: 6,
-    smooth: false,
-    caps: "round",
-    name: "hornCollar",
-  });
+  b.sweep(
+    catmull([
+      hornBase.clone().add(new THREE.Vector3(0, 0.0, 0)),
+      hornBase.clone().add(new THREE.Vector3(0, 0.008, 0.004)),
+    ]),
+    0.05,
+    {
+      bone: head,
+      color: "#ff9cc5",
+      sides: 6,
+      smooth: false,
+      caps: "round",
+      name: "hornCollar",
+    },
+  );
 
   // --- rainbow mane -------------------------------------------------------------------------------------------
   const tipFrames: { at: THREE.Vector3; dir: THREE.Vector3; bone: typeof head }[] = [];
@@ -258,7 +292,14 @@ export default function build() {
       name: "mane",
     });
     const end = pts[pts.length - 1];
-    tipFrames.push({ at: end, dir: end.clone().sub(pts[pts.length - 2]).normalize(), bone });
+    tipFrames.push({
+      at: end,
+      dir: end
+        .clone()
+        .sub(pts[pts.length - 2])
+        .normalize(),
+      bone,
+    });
   };
   // locks down the neck, tumbling off the left side
   const manePoints = [0.92, 0.75, 0.58, 0.42, 0.26, 0.1];
@@ -266,15 +307,48 @@ export default function build() {
     const top = neckTube.at(t, 0).at;
     const joint = t > 0.5 ? neck.joints[1] : neck.joints[0];
     const sway = i % 2 === 0 ? 0 : 0.012;
-    lock(top, [[0, 0, 0], [0.045 + sway, 0.055, -0.03], [0.1 + sway, 0.03, -0.065], [0.125 + sway, -0.07, -0.085]], 0.042, i, joint);
+    lock(
+      top,
+      [
+        [0, 0, 0],
+        [0.045 + sway, 0.055, -0.03],
+        [0.1 + sway, 0.03, -0.065],
+        [0.125 + sway, -0.07, -0.085],
+      ],
+      0.042,
+      i,
+      joint,
+    );
   });
   // a crest behind the horn, between the ears
-  lock(new THREE.Vector3(0, 0.805, 0.335), [[0, 0, 0], [0.01, 0.06, -0.03], [0.07, 0.065, -0.07], [0.1, 0.0, -0.095]], 0.04, 0, head);
+  lock(
+    new THREE.Vector3(0, 0.805, 0.335),
+    [
+      [0, 0, 0],
+      [0.01, 0.06, -0.03],
+      [0.07, 0.065, -0.07],
+      [0.1, 0.0, -0.095],
+    ],
+    0.04,
+    0,
+    head,
+  );
   // forelock curling either side of the horn
   for (const s of [1, -1]) {
     const seat = skin.around(SKULL_C).at(s * 28, 58);
     if (!seat) continue;
-    lock(seat.at, [[0, -0.01, 0], [s * 0.035, 0.03, 0.04], [s * 0.075, 0.025, 0.065], [s * 0.095, -0.03, 0.05]], 0.03, s > 0 ? 2 : 4, head);
+    lock(
+      seat.at,
+      [
+        [0, -0.01, 0],
+        [s * 0.035, 0.03, 0.04],
+        [s * 0.075, 0.025, 0.065],
+        [s * 0.095, -0.03, 0.05],
+      ],
+      0.03,
+      s > 0 ? 2 : 4,
+      head,
+    );
   }
 
   // --- tail: a fan of chunky rainbow locks riding the tail chain ---------------------------------------------
@@ -297,7 +371,12 @@ export default function build() {
     }
     // the locks run past the chain's end so the tail ends in a fluffy tassel
     const lastDir = pts[6].clone().sub(pts[5]).normalize();
-    pts.push(pts[6].clone().addScaledVector(lastDir, 0.06).add(new THREE.Vector3(0, -0.03, 0)));
+    pts.push(
+      pts[6]
+        .clone()
+        .addScaledVector(lastDir, 0.06)
+        .add(new THREE.Vector3(0, -0.03, 0)),
+    );
     const ci = k % 6;
     b.sweep(catmull(pts), [0.036, 0.04, 0.03, 0.012], {
       bone: tail,
@@ -313,7 +392,7 @@ export default function build() {
   }
 
   // --- legs ---------------------------------------------------------------------------------------------------
-  const hooves: { joint: (typeof head) | null; at: THREE.Vector3 }[] = [];
+  const hooves: { joint: typeof head | null; at: THREE.Vector3 }[] = [];
   const legRadius = [0.046, 0.036, 0.03, 0.028, 0.027];
   for (const s of [1, -1]) {
     const side = s > 0 ? "L" : "R";
@@ -391,7 +470,8 @@ export default function build() {
   // cutie marks on both hips
   for (const s of [1, -1]) {
     const hit = bodySkin.around([0, 0.47, -0.05]).at(s * 90, 0);
-    if (hit) b.decal(body, CUTIE, { at: hit, dir: [-s, 0, 0], size: [0.14, 0.14], segments: 10, lift: 0.002, mirror: s < 0 });
+    if (hit)
+      b.decal(body, CUTIE, { at: hit, dir: [s, 0, 0], size: [0.14, 0.14], segments: 10, lift: 0.002, mirror: s < 0 });
   }
   // a few sticker hearts scattered on the barrel and shoulders
   for (const [az, el, sz] of [
@@ -401,7 +481,8 @@ export default function build() {
     [-80, -6, 0.04],
   ] as const) {
     const hit = bodySkin.around([0, 0.49, 0.1]).at(az, el);
-    if (hit) b.decal(body, HEART, { at: hit, dir: [-Math.sign(az), 0, 0], size: [sz, sz], segments: 5, lift: 0.002 });
+    if (hit)
+      b.decal(body, HEART, { at: hit, dir: [-(-Math.sign(az)), 0, 0], size: [sz, sz], segments: 5, lift: 0.002 });
   }
   // sparkles above the mane tips, facing up so they light like the top of the mane
   for (const t of tipFrames) {

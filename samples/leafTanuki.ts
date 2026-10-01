@@ -180,7 +180,7 @@ export default function build() {
     shift: [0, -0.008],
   });
   const bodySkin = b.surface(body);
-  b.decal(body, BELLY, { at: [0, 0.185, 0.2], dir: [0, 0, -1], size: [0.15, 0.135], segments: [9, 8], lift: 0.003 });
+  b.decal(body, BELLY, { at: [0, 0.185, 0.2], dir: [0, 0, 1], size: [0.15, 0.135], segments: [9, 8], lift: 0.003 });
 
   // ---- head -------------------------------------------------------------------------------------------
   const HEAD_C: [number, number, number] = [0, 0.34, 0.01];
@@ -190,11 +190,11 @@ export default function build() {
     scale: [0.135, 0.09, 0.11],
     flat: true,
   });
-  b.decal(skull, FACE, { at: [0, 0.335, 0.2], dir: [0, 0, -1], size: [0.2, 0.128], segments: [14, 9], lift: 0.0025 });
+  b.decal(skull, FACE, { at: [0, 0.335, 0.2], dir: [0, 0, 1], size: [0.2, 0.128], segments: [14, 9], lift: 0.0025 });
   for (const s of [1, -1]) {
     b.decal(skull, EYE_PATCH, {
       at: [s * 0.062, 0.352, 0.2],
-      dir: [0, 0, -1],
+      dir: [0, 0, 1],
       size: [0.09, 0.105],
       segments: [8, 10],
       lift: 0.0045,
@@ -229,7 +229,7 @@ export default function build() {
   });
   b.decal([muzzle, jawPart], MOUTH, {
     at: [0, 0.305, 0.3],
-    dir: [0, -0.15, -1],
+    dir: [0, 0.15, 1],
     size: [0.042, 0.027],
     segments: [8, 5],
     lift: 0.002,
@@ -294,7 +294,9 @@ export default function build() {
   // ---- the leaf ---------------------------------------------------------------------------------------
   const LEAF_AT = new THREE.Vector3(0.0, 0.434, -0.012);
   const leafJoint = b.joint("leaf", { parent: head, at: LEAF_AT, dir: [0, 1, 0], role: "hinge" });
-  const tilt = new THREE.Quaternion().setFromEuler(new THREE.Euler((14 * Math.PI) / 180, (-30 * Math.PI) / 180, (6 * Math.PI) / 180, "YXZ"));
+  const tilt = new THREE.Quaternion().setFromEuler(
+    new THREE.Euler((14 * Math.PI) / 180, (-30 * Math.PI) / 180, (6 * Math.PI) / 180, "YXZ"),
+  );
   const lxDir = new THREE.Vector3(1, 0, 0).applyQuaternion(tilt);
   const lyDir = new THREE.Vector3(0, 0, -1).applyQuaternion(tilt);
   const lzDir = lxDir.clone().cross(lyDir);
@@ -487,7 +489,7 @@ export default function build() {
     dir: [0, 1, 0],
     scale: [1, 1, 1],
   });
-  b.decal(jug, LABEL, { at: [0, 0.192, 0.35], dir: [0, 0, -1], size: [0.034, 0.034], segments: 6, lift: 0.0015 });
+  b.decal(jug, LABEL, { at: [0, 0.192, 0.35], dir: [0, 0, 1], size: [0.034, 0.034], segments: 6, lift: 0.0015 });
 
   // ---- straw hat hanging on the back ---------------------------------------------------------------------
   const hatJoint = b.joint("hat", { parent: chest, at: [0, 0.29, -0.07], dir: [0, -1, -0.3], role: "hinge" });

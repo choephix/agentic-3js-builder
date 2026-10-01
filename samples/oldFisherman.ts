@@ -55,7 +55,8 @@ const lerpTable = (table: ReadonlyArray<readonly number[]>, y: number) => {
   }
   return table[table.length - 1].slice(1);
 };
-const basisQuat = (x: P, y: P, z: P) => new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
+const basisQuat = (x: P, y: P, z: P) =>
+  new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
 
 // ---------------------------------------------------------------- drawings
 function drawings() {
@@ -92,10 +93,19 @@ function drawings() {
     `<svg viewBox="0 0 64 128" xmlns="http://www.w3.org/2000/svg">
       <rect width="64" height="128" fill="${WOOL}"/>
       ${[8, 56]
-        .map((x) => `<rect x="${x - 4}" width="8" height="128" fill="#c2b797"/><g stroke="#a89c7c" stroke-width="1.2">${Array.from({ length: 16 }, (_, r) => `<line x1="${x - 4}" y1="${r * 8 + 2}" x2="${x + 4}" y2="${r * 8 + 6}"/>`).join("")}</g>`)
+        .map(
+          (x) =>
+            `<rect x="${x - 4}" width="8" height="128" fill="#c2b797"/><g stroke="#a89c7c" stroke-width="1.2">${Array.from({ length: 16 }, (_, r) => `<line x1="${x - 4}" y1="${r * 8 + 2}" x2="${x + 4}" y2="${r * 8 + 6}"/>`).join("")}</g>`,
+        )
         .join("")}
       ${[20, 44]
-        .map((x) => Array.from({ length: 8 }, (_, r) => `<path d="M${x} ${r * 16} q-9 8 0 16 q9 8 0 16" fill="none" stroke="#a89c7c" stroke-width="3.4"/><path d="M${x} ${r * 16} q-9 8 0 16" fill="none" stroke="#efe8d2" stroke-width="1.4" transform="translate(-0.4 0)"/>`).join(""))
+        .map((x) =>
+          Array.from(
+            { length: 8 },
+            (_, r) =>
+              `<path d="M${x} ${r * 16} q-9 8 0 16 q9 8 0 16" fill="none" stroke="#a89c7c" stroke-width="3.4"/><path d="M${x} ${r * 16} q-9 8 0 16" fill="none" stroke="#efe8d2" stroke-width="1.4" transform="translate(-0.4 0)"/>`,
+          ).join(""),
+        )
         .join("")}
       <g>${Array.from({ length: 8 }, (_, r) => `<path d="M32 ${r * 16 + 8} l5 -4 l-5 -4 l-5 4 z" fill="#c2b797" stroke="#a89c7c" stroke-width="1.6" transform="translate(0 ${r * 16 - r * 16})"/>`).join("")}</g>
     </svg>`,
@@ -281,7 +291,30 @@ function drawings() {
     </svg>`,
     { size: 192 },
   );
-  return { cap, cuff, wool, cable, face, strands, smoke, rope, fringe, planks, stencil, glass, stains, boatNo, pocket, patch, grime, mackerel, elbow, kelp, salt, tide };
+  return {
+    cap,
+    cuff,
+    wool,
+    cable,
+    face,
+    strands,
+    smoke,
+    rope,
+    fringe,
+    planks,
+    stencil,
+    glass,
+    stains,
+    boatNo,
+    pocket,
+    patch,
+    grime,
+    mackerel,
+    elbow,
+    kelp,
+    salt,
+    tide,
+  };
 }
 
 // ---------------------------------------------------------------- build
@@ -325,7 +358,11 @@ export default function build() {
   for (const s of [1, -1]) {
     const side = s > 0 ? "L" : "R";
     const sh = V(s * 0.225, 1.37, 0);
-    const el = sh.clone().add(V(s * 0.86, -0.5, 0.06).normalize().multiplyScalar(0.29));
+    const el = sh.clone().add(
+      V(s * 0.86, -0.5, 0.06)
+        .normalize()
+        .multiplyScalar(0.29),
+    );
     const f = V(s * 0.84, -0.42, 0.34).normalize();
     const wr = el.clone().addScaledVector(f, 0.26);
     const chain = b.chain(`arm${side}`, polyline([sh, el, wr]), {
@@ -372,7 +409,7 @@ export default function build() {
     flat: true,
   });
   b.part(new THREE.BoxGeometry(0.13, 0.07, 0.12), SKIN, { bone: jaw, at: [0, 1.51, 0.045], flat: true });
-  b.decal(skull, T.face, { at: [0, 1.6, 0.1], dir: [0, 0, -1], size: [0.16, 0.1], segments: [16, 10], bone: head });
+  b.decal(skull, T.face, { at: [0, 1.6, 0.1], dir: [0, 0, 1], size: [0.16, 0.1], segments: [16, 10], bone: head });
   for (const s of [1, -1]) {
     b.part(new THREE.SphereGeometry(1, 5, 4), SKIN, {
       bone: head,
@@ -421,7 +458,14 @@ export default function build() {
   const hairHits = b
     .surface(skull)
     .scatter(18, { rng: rand, minDist: 0.03, filter: (h) => h.at.y < 1.64 && h.at.y > 1.52 && h.n.z < 0.35 });
-  b.cards(hairHits, T.strands, { size: [0.028, 0.05], lean: 60, flow: [0, -1, -0.2], vary: 0.25, rng: rand, bone: head });
+  b.cards(hairHits, T.strands, {
+    size: [0.028, 0.05],
+    lean: 60,
+    flow: [0, -1, -0.2],
+    vary: 0.25,
+    rng: rand,
+    bone: head,
+  });
   const hair = b.part(new THREE.SphereGeometry(1, 8, 5), GREY, {
     bone: head,
     at: [0, 1.585, -0.022],
@@ -431,7 +475,15 @@ export default function build() {
   const locks = b
     .surface(hair)
     .scatter(24, { rng: rand, minDist: 0.03, filter: (h) => h.n.z < 0.1 && h.at.y < 1.6 && h.at.y > 1.53 });
-  b.cards(locks, T.strands, { size: [0.045, 0.085], lean: 20, bend: 10, flow: [0, -1, -0.1], vary: 0.25, rng: rand, bone: head });
+  b.cards(locks, T.strands, {
+    size: [0.045, 0.085],
+    lean: 20,
+    bend: 10,
+    flow: [0, -1, -0.1],
+    vary: 0.25,
+    rng: rand,
+    bone: head,
+  });
 
   // beard: a bib on the jaw, whiskers on the cheeks, a drooping moustache
   const bib = b.loft(
@@ -444,23 +496,39 @@ export default function build() {
     { bone: jaw, color: GREY, sides: 6, smooth: false, caps: { start: "flat", end: "point" } },
   );
   for (const s of [1, -1]) {
-    b.sweep(catmull([V(s * 0.085, 1.572, 0.01), V(s * 0.08, 1.545, 0.04), V(s * 0.065, 1.515, 0.075)]), [0.019, 0.017], {
-      bone: head,
-      color: GREY,
-      sides: 6,
-      smooth: false,
-    });
-    b.sweep(catmull([V(s * 0.004, 1.543, 0.108), V(s * 0.036, 1.538, 0.112), V(s * 0.066, 1.512, 0.098)]), [0.018, 0.01], {
-      bone: head,
-      color: GREY_L,
-      sides: 5,
-      smooth: false,
-    });
+    b.sweep(
+      catmull([V(s * 0.085, 1.572, 0.01), V(s * 0.08, 1.545, 0.04), V(s * 0.065, 1.515, 0.075)]),
+      [0.019, 0.017],
+      {
+        bone: head,
+        color: GREY,
+        sides: 6,
+        smooth: false,
+      },
+    );
+    b.sweep(
+      catmull([V(s * 0.004, 1.543, 0.108), V(s * 0.036, 1.538, 0.112), V(s * 0.066, 1.512, 0.098)]),
+      [0.018, 0.01],
+      {
+        bone: head,
+        color: GREY_L,
+        sides: 5,
+        smooth: false,
+      },
+    );
   }
   const beardHits = b
     .surface(bib)
     .scatter(26, { rng: rand, minDist: 0.035, filter: (h) => h.n.z > -0.2 && h.at.y < 1.5 });
-  b.cards(beardHits, T.strands, { size: [0.04, 0.05], lean: 60, bend: 10, flow: [0, -1, 0.3], vary: 0.3, rng: rand, bone: jaw });
+  b.cards(beardHits, T.strands, {
+    size: [0.04, 0.05],
+    lean: 60,
+    bend: 10,
+    flow: [0, -1, 0.3],
+    vary: 0.3,
+    rng: rand,
+    bone: jaw,
+  });
 
   // pipe
   const pipeStem = [V(0.032, 1.536, 0.112), V(0.05, 1.528, 0.16), V(0.058, 1.52, 0.2)];
@@ -478,7 +546,11 @@ export default function build() {
     { at: [0.06, 1.51, 0.212], segments: 6, bone: jaw, color: BRIAR },
   );
   glow(
-    b.part(new THREE.CylinderGeometry(0.013, 0.013, 0.004, 8), "#ff8a3c", { bone: jaw, at: [0.06, 1.549, 0.212], flat: true }),
+    b.part(new THREE.CylinderGeometry(0.013, 0.013, 0.004, 8), "#ff8a3c", {
+      bone: jaw,
+      at: [0.06, 1.549, 0.212],
+      flat: true,
+    }),
     1.4,
   );
   const smokeFrames = [0, 1].map((i) => frame([0.06 + i * 0.012, 1.56 + i * 0.075, 0.212 + i * 0.012], [0, 1, 0]));
@@ -488,7 +560,14 @@ export default function build() {
   for (const s of [1, -1]) {
     const side = s > 0 ? "L" : "R";
     const { chain, pts, knee, ankle } = legs[side];
-    const pants = b.sweep(chain, [0.098, 0.092, 0.09], { color: NAVY, sides: 6, smooth: false, from: 0.15, to: 0.6, caps: { start: "flat", end: "none" } });
+    const pants = b.sweep(chain, [0.098, 0.092, 0.09], {
+      color: NAVY,
+      sides: 6,
+      smooth: false,
+      from: 0.15,
+      to: 0.6,
+      caps: { start: "flat", end: "none" },
+    });
     const shinAt = (y: number) => pts[1].clone().lerp(pts[2], (pts[1].y - y) / (pts[1].y - pts[2].y));
     const shaft = b.sweep(polyline([shinAt(0.4), shinAt(0.1)]), [0.088, 0.072], {
       bone: knee,
@@ -523,14 +602,14 @@ export default function build() {
     );
     b.decal(foot, T.grime, {
       at: [x0 + s * 0.2, 0.07, 0.11],
-      dir: [-s, 0, 0],
+      dir: [s, 0, 0],
       size: [0.3, 0.12],
       segments: [12, 5],
       bone: ankle,
     });
     b.decal(shaft, T.grime, {
       at: [shinAt(0.2).x + s * 0.2, 0.2, shinAt(0.2).z],
-      dir: [-s, 0, 0],
+      dir: [s, 0, 0],
       size: [0.18, 0.12],
       segments: [8, 5],
       bone: knee,
@@ -538,14 +617,14 @@ export default function build() {
     for (const dz of [0.2, -0.2]) {
       b.decal(pants, T.salt, {
         at: [pts[0].x, 0.62, dz],
-        dir: [0, 0, -Math.sign(dz)],
+        dir: [0, 0, -(-Math.sign(dz))],
         size: [0.16, 0.16],
         segments: 6,
         mirror: dz < 0,
       });
       b.decal(shaft, T.tide, {
         at: [shinAt(0.3).x, 0.3, dz],
-        dir: [0, 0, -Math.sign(dz)],
+        dir: [0, 0, -(-Math.sign(dz))],
         size: [0.17, 0.07],
         segments: [8, 3],
         mirror: dz < 0,
@@ -554,7 +633,7 @@ export default function build() {
     }
     b.decal(pants, T.patch, {
       at: [pts[1].x, pts[1].y + 0.02, pts[1].z + 0.12],
-      dir: [0, 0, -1],
+      dir: [0, 0, 1],
       size: [0.1, 0.1],
       segments: 6,
     });
@@ -569,8 +648,16 @@ export default function build() {
     const a = new THREE.Vector3().crossVectors(n, f).normalize();
     const palmT = 0.04;
     const c = hand.at.addScaledVector(f, 0.108).addScaledVector(n, -(bar + palmT / 2));
-    const palmAt = c.clone().addScaledVector(n, bar + palmT / 2).addScaledVector(f, -0.054);
-    b.part(new THREE.BoxGeometry(0.104, palmT, 0.108), SKIN, { bone: hand, at: palmAt, quat: basisQuat(a, n, f), flat: true });
+    const palmAt = c
+      .clone()
+      .addScaledVector(n, bar + palmT / 2)
+      .addScaledVector(f, -0.054);
+    b.part(new THREE.BoxGeometry(0.104, palmT, 0.108), SKIN, {
+      bone: hand,
+      at: palmAt,
+      quat: basisQuat(a, n, f),
+      flat: true,
+    });
     const wrap = (off: number, radius: number, from: number, to: number) =>
       Array.from({ length: 5 }, (_, k) => {
         const phi = ((from + ((to - from) * k) / 4) * Math.PI) / 180;
@@ -617,10 +704,13 @@ export default function build() {
       texture: T.wool,
       flat: true,
     });
-    b.decal(sleeve, T.elbow, { at: el.clone().add(V(0, 0, -0.1)), dir: [0, 0, 1], size: [0.1, 0.1], segments: 6 });
+    b.decal(sleeve, T.elbow, { at: el.clone().add(V(0, 0, -0.1)), dir: [0, 0, -1], size: [0.1, 0.1], segments: 6 });
     b.decal(sleeve, T.stains, {
-      at: sh.clone().lerp(el, 0.55).add(V(0, 0.12, 0)),
-      dir: [0, -1, 0],
+      at: sh
+        .clone()
+        .lerp(el, 0.55)
+        .add(V(0, 0.12, 0)),
+      dir: [0, 1, 0],
       up: [0, 0, 1],
       size: [0.12, 0.16],
       segments: [6, 8],
@@ -634,20 +724,47 @@ export default function build() {
     const { c, g, n, a } = fR;
     const hand = arms.R.hand;
     const butt = c.clone().addScaledVector(g, -0.2);
-    const tip = c.clone().addScaledVector(g, 1.35).add(V(0, -0.08, 0));
-    const rodPath = catmull([butt, c.clone().addScaledVector(g, 0.3), c.clone().addScaledVector(g, 0.85).add(V(0, -0.02, 0)), tip]);
-    b.sweep(rodPath, [0.0125, 0.0035], { bone: hand, color: ROD, sides: 5, smooth: false, caps: { start: "flat", end: "round" } });
-    b.sweep(polyline([butt, c.clone().addScaledVector(g, 0.17)]), 0.0205, { bone: hand, color: CORK, sides: 6, smooth: false });
+    const tip = c
+      .clone()
+      .addScaledVector(g, 1.35)
+      .add(V(0, -0.08, 0));
+    const rodPath = catmull([
+      butt,
+      c.clone().addScaledVector(g, 0.3),
+      c
+        .clone()
+        .addScaledVector(g, 0.85)
+        .add(V(0, -0.02, 0)),
+      tip,
+    ]);
+    b.sweep(rodPath, [0.0125, 0.0035], {
+      bone: hand,
+      color: ROD,
+      sides: 5,
+      smooth: false,
+      caps: { start: "flat", end: "round" },
+    });
+    b.sweep(polyline([butt, c.clone().addScaledVector(g, 0.17)]), 0.0205, {
+      bone: hand,
+      color: CORK,
+      sides: 6,
+      smooth: false,
+    });
     b.part(new THREE.SphereGeometry(0.023, 6, 4), IRON, { bone: hand, at: butt, flat: true });
     const reelAt = c.clone().addScaledVector(g, 0.2).addScaledVector(n, 0.05);
     b.part(new THREE.CylinderGeometry(0.028, 0.028, 0.028, 8), STEEL, { bone: hand, at: reelAt, dir: a, flat: true });
     b.rod(reelAt, c.clone().addScaledVector(g, 0.2), 0.008, { bone: hand, color: IRON, sides: 4, smooth: false });
-    b.rod(reelAt.clone().addScaledVector(a, 0.015), reelAt.clone().addScaledVector(a, 0.045).addScaledVector(n, 0.03), 0.004, {
-      bone: hand,
-      color: IRON,
-      sides: 4,
-      smooth: false,
-    });
+    b.rod(
+      reelAt.clone().addScaledVector(a, 0.015),
+      reelAt.clone().addScaledVector(a, 0.045).addScaledVector(n, 0.03),
+      0.004,
+      {
+        bone: hand,
+        color: IRON,
+        sides: 4,
+        smooth: false,
+      },
+    );
     for (const t of [0.24, 0.42, 0.6, 0.78, 0.94]) {
       b.part(new THREE.TorusGeometry(0.011, 0.0018, 3, 5), IRON, {
         bone: hand,
@@ -658,19 +775,48 @@ export default function build() {
       });
     }
     // line, bobber and hook
-    const linePath = catmull([tip, tip.clone().add(V(0, -0.22, 0.05)), tip.clone().add(V(0.01, -0.5, 0.09)), tip.clone().add(V(0, -0.8, 0.1))]);
-    b.sweep(linePath, 0.0028, { bone: hand, color: CREAM, sides: 4, smooth: false, detail: 0.35, caps: { start: "none", end: "round" } });
-    const bob = linePath.at(0.55);
-    b.part(new THREE.SphereGeometry(0.02, 6, 3, 0, Math.PI * 2, 0, Math.PI / 2), RED, { bone: hand, at: bob, flat: true });
-    b.part(new THREE.SphereGeometry(0.02, 6, 3, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), CREAM, { bone: hand, at: bob, flat: true });
-    const end = linePath.at(1);
-    b.sweep(catmull([end, end.clone().add(V(0, -0.03, 0.0)), end.clone().add(V(0, -0.05, 0.02)), end.clone().add(V(0, -0.03, 0.035))]), 0.0025, {
+    const linePath = catmull([
+      tip,
+      tip.clone().add(V(0, -0.22, 0.05)),
+      tip.clone().add(V(0.01, -0.5, 0.09)),
+      tip.clone().add(V(0, -0.8, 0.1)),
+    ]);
+    b.sweep(linePath, 0.0028, {
       bone: hand,
-      color: STEEL,
+      color: CREAM,
       sides: 4,
       smooth: false,
       detail: 0.35,
+      caps: { start: "none", end: "round" },
     });
+    const bob = linePath.at(0.55);
+    b.part(new THREE.SphereGeometry(0.02, 6, 3, 0, Math.PI * 2, 0, Math.PI / 2), RED, {
+      bone: hand,
+      at: bob,
+      flat: true,
+    });
+    b.part(new THREE.SphereGeometry(0.02, 6, 3, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), CREAM, {
+      bone: hand,
+      at: bob,
+      flat: true,
+    });
+    const end = linePath.at(1);
+    b.sweep(
+      catmull([
+        end,
+        end.clone().add(V(0, -0.03, 0.0)),
+        end.clone().add(V(0, -0.05, 0.02)),
+        end.clone().add(V(0, -0.03, 0.035)),
+      ]),
+      0.0025,
+      {
+        bone: hand,
+        color: STEEL,
+        sides: 4,
+        smooth: false,
+        detail: 0.35,
+      },
+    );
   }
 
   // ---- hurricane lantern
@@ -688,7 +834,11 @@ export default function build() {
     ];
     b.sweep(polyline(wire), 0.0045, { bone: hand, color: IRON, sides: 4, smooth: false });
     b.part(new THREE.ConeGeometry(0.052, 0.045, 6), IRON, { bone: hand, at: [x, top - 0.0225, z], flat: true });
-    b.part(new THREE.CylinderGeometry(0.012, 0.016, 0.022, 6), IRON, { bone: hand, at: [x, top + 0.008, z], flat: true });
+    b.part(new THREE.CylinderGeometry(0.012, 0.016, 0.022, 6), IRON, {
+      bone: hand,
+      at: [x, top + 0.008, z],
+      flat: true,
+    });
     glow(
       b.part(new THREE.CylinderGeometry(0.046, 0.046, 0.13, 6), "#ffffff", {
         bone: hand,
@@ -725,19 +875,23 @@ export default function build() {
     ],
     { at: [0, 1.425, 0.012], segments: 8, bone: neck.joints[0], color: YEL },
   );
-  b.decal(coat, T.cable, { at: [0, 1.18, 0.17], dir: [0, 0, -1], size: [0.125, 0.46], segments: [5, 14] });
+  b.decal(coat, T.cable, { at: [0, 1.18, 0.17], dir: [0, 0, 1], size: [0.125, 0.46], segments: [5, 14] });
   for (const angle of [158, 202]) {
     b.sweep(coat.line(angle, 0.004).slice(0.3, 0.98), 0.006, { bone: spine, color: YEL_D, sides: 4, smooth: false });
   }
   for (const t of [0.5, 0.63, 0.76]) {
-    b.stick(new THREE.BoxGeometry(0.014, 0.014, 0.055), BRIAR, coat.at(t, 158), { spin: 90, bone: spine.joints[1], flat: true });
+    b.stick(new THREE.BoxGeometry(0.014, 0.014, 0.055), BRIAR, coat.at(t, 158), {
+      spin: 90,
+      bone: spine.joints[1],
+      flat: true,
+    });
   }
   for (const s of [1, -1]) {
-    b.decal(coat, T.pocket, { at: [s * 0.115, 0.86, 0.17], dir: [0, 0, -1], size: [0.11, 0.11], segments: 6 });
+    b.decal(coat, T.pocket, { at: [s * 0.115, 0.86, 0.17], dir: [0, 0, 1], size: [0.11, 0.11], segments: 6 });
   }
-  b.decal(coat, T.stains, { at: [0.13, 0.85, 0.17], dir: [0, 0, -1], size: [0.15, 0.15], segments: 7 });
-  b.decal(coat, T.stains, { at: [-0.12, 1.1, -0.16], dir: [0, 0, 1], size: [0.16, 0.16], segments: 7, mirror: true });
-  b.decal(coat, T.boatNo, { at: [0, 1.2, -0.16], dir: [0, 0, 1], size: [0.2, 0.1], segments: [10, 5] });
+  b.decal(coat, T.stains, { at: [0.13, 0.85, 0.17], dir: [0, 0, 1], size: [0.15, 0.15], segments: 7 });
+  b.decal(coat, T.stains, { at: [-0.12, 1.1, -0.16], dir: [0, 0, -1], size: [0.16, 0.16], segments: 7, mirror: true });
+  b.decal(coat, T.boatNo, { at: [0, 1.2, -0.16], dir: [0, 0, -1], size: [0.2, 0.1], segments: [10, 5] });
   b.sweep(b.surface(coat).loop(V(0, 0.76, 0), { lift: 0.004 }), 0.007, { color: YEL_D, sides: 4, smooth: false });
   b.sweep(b.surface(coat).loop(V(0, 1.3, 0), { lift: 0.003 }), 0.006, { color: YEL_D, sides: 4, smooth: false });
   b.sweep(coat.line(0, 0.003).slice(0.08, 0.9), 0.006, { bone: spine, color: YEL_D, sides: 4, smooth: false });
@@ -756,11 +910,18 @@ export default function build() {
         flat: true,
       });
     }
-    const tailPath = b.surface(coat).drape(
-      catmull([V(-0.15, 1.47, 0.09), V(-0.16, 1.38, 0.15), V(-0.17, 1.25, 0.17), V(-0.16, 1.12, 0.17)]),
-      { lift: 0.012 },
-    );
-    b.sweep(tailPath, 0.016, { bone: chest, color: ROPE, sides: 5, smooth: false, caps: { start: "round", end: "flat" } });
+    const tailPath = b
+      .surface(coat)
+      .drape(catmull([V(-0.15, 1.47, 0.09), V(-0.16, 1.38, 0.15), V(-0.17, 1.25, 0.17), V(-0.16, 1.12, 0.17)]), {
+        lift: 0.012,
+      });
+    b.sweep(tailPath, 0.016, {
+      bone: chest,
+      color: ROPE,
+      sides: 5,
+      smooth: false,
+      caps: { start: "round", end: "flat" },
+    });
     const endAt = tailPath.at(1);
     b.cards(
       [0, 1, 2].map((i) => frame([endAt.x + (i - 1) * 0.012, endAt.y, endAt.z + 0.004], [0, 1, 0])),
@@ -773,9 +934,27 @@ export default function build() {
   {
     const yaw = 14;
     const C = V(0.43, 0, 0.17);
-    const toW = (lx: number, ly: number, lz: number) => V(lx, ly, lz).applyAxisAngle(V(0, 1, 0), (yaw * Math.PI) / 180).add(C);
-    const box = (sx: number, sy: number, sz: number, lx: number, ly: number, lz: number, color: string, texture?: THREE.Texture) =>
-      b.part(new THREE.BoxGeometry(sx, sy, sz), color, { bone: hips, at: toW(lx, ly, lz), rotation: [0, yaw, 0], texture, flat: true });
+    const toW = (lx: number, ly: number, lz: number) =>
+      V(lx, ly, lz)
+        .applyAxisAngle(V(0, 1, 0), (yaw * Math.PI) / 180)
+        .add(C);
+    const box = (
+      sx: number,
+      sy: number,
+      sz: number,
+      lx: number,
+      ly: number,
+      lz: number,
+      color: string,
+      texture?: THREE.Texture,
+    ) =>
+      b.part(new THREE.BoxGeometry(sx, sy, sz), color, {
+        bone: hips,
+        at: toW(lx, ly, lz),
+        rotation: [0, yaw, 0],
+        texture,
+        flat: true,
+      });
     box(0.4, 0.02, 0.28, 0, 0.01, 0, WOOD_D);
     for (const z of [-1, 1]) {
       box(0.42, 0.17, 0.018, 0, 0.105, z * 0.141, WOOD, T.planks);
@@ -790,7 +969,9 @@ export default function build() {
     }
     box(0.385, 0.03, 0.265, 0, 0.165, 0, ICE);
     b.cards(
-      [toW(0.205, 0.2, 0.07), toW(0.205, 0.2, -0.06), toW(-0.17, 0.2, 0.152), toW(0.12, 0.2, 0.152)].map((p) => frame(p, [0, 1, 0])),
+      [toW(0.205, 0.2, 0.07), toW(0.205, 0.2, -0.06), toW(-0.17, 0.2, 0.152), toW(0.12, 0.2, 0.152)].map((p) =>
+        frame(p, [0, 1, 0]),
+      ),
       T.kelp,
       { size: [0.06, 0.13], lean: 180, flow: [0.4, 0, 1], cross: true, vary: 0.2, rng: rand, bone: hips },
     );
@@ -862,12 +1043,16 @@ export default function build() {
       );
       b.part(new THREE.SphereGeometry(0.0075, 5, 4), IRON, {
         bone: hips,
-        at: head.clone().addScaledVector(d, -0.04).addScaledVector(lat, 0.01).add(V(0, 0.013, 0)),
+        at: head
+          .clone()
+          .addScaledVector(d, -0.04)
+          .addScaledVector(lat, 0.01)
+          .add(V(0, 0.013, 0)),
         flat: true,
       });
       b.decal(body, T.mackerel, {
         at: centre.clone().add(V(0, 0.04, 0)),
-        dir: [0, -1, 0],
+        dir: [0, 1, 0],
         up: lat,
         size: [0.25, 0.07],
         segments: [14, 5],

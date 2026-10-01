@@ -182,7 +182,13 @@ function shellGeometries(o: {
   }
   const geo = (tris: Tri[]) => {
     const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.Float32BufferAttribute(tris.flatMap((t) => t.flatMap((v) => v.toArray())), 3));
+    g.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(
+        tris.flatMap((t) => t.flatMap((v) => v.toArray())),
+        3,
+      ),
+    );
     return g;
   };
   return { skin: geo(skin), lining: geo(lining), rim: geo(rim) };
@@ -292,7 +298,7 @@ export default function build() {
     smooth: false,
   });
   const belly = ball(spine.joints[0], [0, 0.175, 0.06], [0.082, 0.08, 0.055], BELLY);
-  b.decal(belly, BARS, { at: [0, 0.18, 0.12], dir: [0, 0, -1], size: [0.085, 0.092] });
+  b.decal(belly, BARS, { at: [0, 0.18, 0.12], dir: [0, 0, 1], size: [0.085, 0.092] });
   for (const i of [0.42, 0.6, 0.78])
     b.spike(body.at(i), body.at(i), 0.04, 0.017, { color: PINK, sides: 5, smooth: false, caps: "flat" });
 
@@ -358,7 +364,12 @@ export default function build() {
       [0.03, 0.026],
       [0.004, 0.022],
     ];
-    const ear = { at: [s * 0.108, 0.35, -0.005] as [number, number, number], x: [s, 0.05, -0.3] as [number, number, number], y: [0, 1, 0] as [number, number, number], bone: head };
+    const ear = {
+      at: [s * 0.108, 0.35, -0.005] as [number, number, number],
+      x: [s, 0.05, -0.3] as [number, number, number],
+      y: [0, 1, 0] as [number, number, number],
+      bone: head,
+    };
     b.extrude(outline, { ...ear, thickness: 0.008, bevel: 0.002, color: MINT_D });
     b.extrude(inn, { ...ear, thickness: 0.012, color: PINK });
   }
@@ -407,13 +418,13 @@ export default function build() {
     const wrist = arm.joints[2];
     ball(wrist, hand, [0.03, 0.022, 0.028], MINT, { w: 6, h: 4 });
     for (const dx of [-1, 0, 1])
-      b.spike(
-        [hand[0] + dx * 0.014 * s, hand[1] - 0.004, hand[2] + 0.02],
-        [dx * 0.4 * s, -0.1, 1],
-        0.02,
-        0.007,
-        { bone: wrist, color: SHELL, sides: 5, smooth: false, caps: "flat" },
-      );
+      b.spike([hand[0] + dx * 0.014 * s, hand[1] - 0.004, hand[2] + 0.02], [dx * 0.4 * s, -0.1, 1], 0.02, 0.007, {
+        bone: wrist,
+        color: SHELL,
+        sides: 5,
+        smooth: false,
+        caps: "flat",
+      });
   }
 
   // ---- legs: knees up, feet hooked over the front of the rim -------------------------------------------------------
@@ -477,15 +488,12 @@ export default function build() {
     });
     b.membrane(fingers[0], fingers[1], { color: LILAC, thickness: 0.006, rows: 3, scallop: 0.2 });
     b.membrane(fingers[1], fingers[2], { color: LILAC_D, thickness: 0.006, rows: 3, scallop: 0.2 });
-    b.membrane(
-      fingers[2],
-      [
-        wrist.at.toArray(),
-        [s * 0.12, 0.225, -0.085],
-        [s * 0.065, 0.205, -0.06],
-      ],
-      { color: LILAC, thickness: 0.006, rows: 3, bone: spine.joints[1] },
-    );
+    b.membrane(fingers[2], [wrist.at.toArray(), [s * 0.12, 0.225, -0.085], [s * 0.065, 0.205, -0.06]], {
+      color: LILAC,
+      thickness: 0.006,
+      rows: 3,
+      bone: spine.joints[1],
+    });
   }
 
   // ---- the chubby tail curling out over the rim -------------------------------------------------------------------
@@ -555,7 +563,13 @@ export default function build() {
       ],
       { at: [x, 0.006, z], x: dx, y: dz, thickness: 0.012, color: SHELL, bone: root },
     );
-    b.decal(shard, SPOT_LILAC, { at: [x, 0.012, z], dir: [0, -1, 0], up: [0, 0, -1], size: [sz * 0.9, sz * 0.9], roll: deg });
+    b.decal(shard, SPOT_LILAC, {
+      at: [x, 0.012, z],
+      dir: [0, 1, 0],
+      up: [0, 0, -1],
+      size: [sz * 0.9, sz * 0.9],
+      roll: deg,
+    });
   }
   const sparkleAt: [number, number, number][] = [
     [0.33, 0.24, 0.08],

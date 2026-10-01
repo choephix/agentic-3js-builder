@@ -4,7 +4,7 @@ import type { OutlinePoint } from "../src/builder";
 import { frame } from "../src/frame";
 import { limb } from "../src/ik";
 import { glow } from "../kits/glow";
-import { rng } from "../src/math";
+import { rng, toDirection } from "../src/math";
 import { catmull } from "../src/path";
 import { svg } from "../src/texture";
 
@@ -81,10 +81,15 @@ function combWall() {
     for (let r = -1; r < 3; r++) {
       const cy = r * Math.sqrt(3) * R + (c % 2 ? (Math.sqrt(3) * R) / 2 : 0) + 2;
       const pts = [0, 1, 2, 3, 4, 5]
-        .map((k) => `${(cx + (R - 0.9) * Math.cos((k * Math.PI) / 3)).toFixed(2)},${(cy + (R - 0.9) * Math.sin((k * Math.PI) / 3)).toFixed(2)}`)
+        .map(
+          (k) =>
+            `${(cx + (R - 0.9) * Math.cos((k * Math.PI) / 3)).toFixed(2)},${(cy + (R - 0.9) * Math.sin((k * Math.PI) / 3)).toFixed(2)}`,
+        )
         .join(" ");
       const fill = (c * 7 + r * 3 + 11) % 5 === 0 ? "#ffd05a" : "#c97d1e";
-      cells.push(`<polygon points="${pts}" fill="${fill}" stroke="#ffe7a6" stroke-width="1.3" stroke-linejoin="round"/>`);
+      cells.push(
+        `<polygon points="${pts}" fill="${fill}" stroke="#ffe7a6" stroke-width="1.3" stroke-linejoin="round"/>`,
+      );
     }
   }
   return svg(`<svg viewBox="0 0 360 20"><rect width="360" height="20" fill="#ffe7a6"/>${cells.join("")}</svg>`, {
@@ -100,12 +105,18 @@ function combTop() {
       const cx = 100 + (c - 3) * 1.5 * R;
       const cy = 100 + (r - 3) * Math.sqrt(3) * R + (c % 2 ? (Math.sqrt(3) * R) / 2 : 0);
       const pts = [0, 1, 2, 3, 4, 5]
-        .map((k) => `${(cx + (R - 1.6) * Math.cos((k * Math.PI) / 3)).toFixed(2)},${(cy + (R - 1.6) * Math.sin((k * Math.PI) / 3)).toFixed(2)}`)
+        .map(
+          (k) =>
+            `${(cx + (R - 1.6) * Math.cos((k * Math.PI) / 3)).toFixed(2)},${(cy + (R - 1.6) * Math.sin((k * Math.PI) / 3)).toFixed(2)}`,
+        )
         .join(" ");
       const k = (c * 5 + r * 3 + 40) % 7;
       const fill = k < 3 ? "#ffc12e" : k < 5 ? "#ffe39a" : "#b86f17";
       cells.push(`<polygon points="${pts}" fill="${fill}" stroke="#fff0c2" stroke-width="3" stroke-linejoin="round"/>`);
-      if (k < 3) cells.push(`<ellipse cx="${(cx - 5).toFixed(1)}" cy="${(cy - 6).toFixed(1)}" rx="4.5" ry="2.6" fill="#fff3c4"/>`);
+      if (k < 3)
+        cells.push(
+          `<ellipse cx="${(cx - 5).toFixed(1)}" cy="${(cy - 6).toFixed(1)}" rx="4.5" ry="2.6" fill="#fff3c4"/>`,
+        );
     }
   }
   return svg(`<svg viewBox="0 0 200 200"><rect width="200" height="200" fill="#fff0c2"/>${cells.join("")}</svg>`, {
@@ -231,7 +242,12 @@ export default function build() {
   });
 
   // stinger
-  b.spike([0, 0.219, -0.2], [0, -0.02, -1], 0.04, 0.014, { color: PLUM, sides: 5, smooth: false, bone: abdomen.joints[3] });
+  b.spike([0, 0.219, -0.2], [0, -0.02, -1], 0.04, 0.014, {
+    color: PLUM,
+    sides: 5,
+    smooth: false,
+    bone: abdomen.joints[3],
+  });
 
   // fuzz tufts, tinted to the stripe under them
   const skin = b.surface(torso);
@@ -243,7 +259,16 @@ export default function build() {
     tuftsBy.set(color, [...(tuftsBy.get(color) ?? []), h]);
   }
   for (const [color, hits] of tuftsBy)
-    b.cards(hits, TUFT, { size: [0.046, 0.046], lean: 40, flow: [0, -0.25, -1], vary: 0.2, spin: 20, rng: rand, color, sink: 0.25 });
+    b.cards(hits, TUFT, {
+      size: [0.046, 0.046],
+      lean: 40,
+      flow: [0, -0.25, -1],
+      vary: 0.2,
+      spin: 20,
+      rng: rand,
+      color,
+      sink: 0.25,
+    });
 
   // ================================================================ head
   const headPart = b.part(new THREE.SphereGeometry(1, 10, 8), HONEY, {
@@ -270,7 +295,15 @@ export default function build() {
     sink: 0.25,
   });
   const ruff = b.ring(frame([0, 0.26, 0.05], [0, 0, 1]), { count: 11, radius: 0.088 });
-  b.cards(ruff.items, TUFT, { size: [0.038, 0.042], lean: 55, flow: [0, 0, -1], color: CREAM, vary: 0.2, rng: rand, bone: neck });
+  b.cards(ruff.items, TUFT, {
+    size: [0.038, 0.042],
+    lean: 55,
+    flow: [0, 0, -1],
+    color: CREAM,
+    vary: 0.2,
+    rng: rand,
+    bone: neck,
+  });
 
   // jaw: a separate smiling D that hangs from the lip line
   const lip = face.around(HEAD_C).at(0, -19)!;
@@ -356,11 +389,20 @@ export default function build() {
   const dripTop = dipTop.clone().addScaledVector(DIP_DIR, 0.028).addScaledVector(down, 0.026);
   const dripEnd = dripTop.clone().add(v3(0, -0.03, 0));
   b.capsule(dripTop, dripEnd, [0.011, 0.007], { color: AMBER, sides: 5, smooth: false, bone: body });
-  b.part(new THREE.SphereGeometry(0.0115, 6, 4), AMBER, { bone: body, at: dripEnd.clone().add(v3(0, -0.012, 0)), scale: [1, 1.35, 1], flat: true });
+  b.part(new THREE.SphereGeometry(0.0115, 6, 4), AMBER, {
+    bone: body,
+    at: dripEnd.clone().add(v3(0, -0.012, 0)),
+    scale: [1, 1.35, 1],
+    flat: true,
+  });
 
   // ================================================================ legs (stubby)
   const grips: Record<number, THREE.Vector3> = {};
-  for (const s of SIDES) grips[s] = dipBot.clone().addScaledVector(DIP_DIR, s > 0 ? 0.1 : 0.165).add(v3(s * 0.021, 0, 0));
+  for (const s of SIDES)
+    grips[s] = dipBot
+      .clone()
+      .addScaledVector(DIP_DIR, s > 0 ? 0.1 : 0.165)
+      .add(v3(s * 0.021, 0, 0));
 
   const LEG_COLOR = PLUM;
   const FOOT_Y = 0.1 + 0.013 - 0.001;
@@ -375,7 +417,12 @@ export default function build() {
       role: "arm",
     });
     b.sweep(arm, [0.022, 0.016], { color: LEG_COLOR, sides: 6, smooth: false });
-    b.part(new THREE.SphereGeometry(0.024, 6, 4), BOOT, { bone: arm.tip!, at: arm.at(1), scale: [1, 0.95, 1.1], flat: true });
+    b.part(new THREE.SphereGeometry(0.024, 6, 4), BOOT, {
+      bone: arm.tip!,
+      at: arm.at(1),
+      scale: [1, 0.95, 1.1],
+      flat: true,
+    });
 
     // middle and hind legs stand on the block
     const pairs: [string, number, number, number, number][] = [
@@ -417,7 +464,10 @@ export default function build() {
         names: [`wing${w.key}${tag(s)}1`, `wing${w.key}${tag(s)}2`],
         role: "wing",
       });
-      const normal = a.clone().cross(v3(0, w.chord[1], w.chord[2])).normalize();
+      const normal = a
+        .clone()
+        .cross(v3(0, w.chord[1], w.chord[2]))
+        .normalize();
       // self-lit so the thin wing reads pale and glassy from every side
       glow(
         b.cards([frame(rootP, a)], WING, {
@@ -446,8 +496,18 @@ export default function build() {
     texture: combTop(),
   });
   // wax trim and foot
-  b.part(new THREE.CylinderGeometry(R + 0.014, R + 0.014, 0.016, 6), WAX, { bone: root, at: [0, H - 0.008, 0], rotation: [0, 30, 0], flat: true });
-  b.part(new THREE.CylinderGeometry(R + 0.014, R + 0.014, 0.018, 6), WAX, { bone: root, at: [0, 0.009, 0], rotation: [0, 30, 0], flat: true });
+  b.part(new THREE.CylinderGeometry(R + 0.014, R + 0.014, 0.016, 6), WAX, {
+    bone: root,
+    at: [0, H - 0.008, 0],
+    rotation: [0, 30, 0],
+    flat: true,
+  });
+  b.part(new THREE.CylinderGeometry(R + 0.014, R + 0.014, 0.018, 6), WAX, {
+    bone: root,
+    at: [0, 0.009, 0],
+    rotation: [0, 30, 0],
+    flat: true,
+  });
   // honey drips over the front trim
   const apothem = R * Math.cos(Math.PI / 6) + 0.014;
   const DRIP: OutlinePoint[] = [
@@ -526,18 +586,22 @@ export default function build() {
     ],
     { at: jarAt, segments: 8, color: LID, bone: root },
   );
-  b.part(new THREE.SphereGeometry(0.014, 6, 4), HONEY, { bone: root, at: jarAt.clone().add(v3(0, 0.162, 0)), flat: true });
+  b.part(new THREE.SphereGeometry(0.014, 6, 4), HONEY, {
+    bone: root,
+    at: jarAt.clone().add(v3(0, 0.162, 0)),
+    flat: true,
+  });
   // label and glass shine conformed onto the jar
   const jarFront = v3(-0.26, 0, 0.97);
   b.decal(jarHoney, LABEL, {
     at: jarAt.clone().add(v3(jarFront.x * 0.06, 0.052, jarFront.z * 0.06)),
-    dir: jarFront.clone().negate().toArray(),
+    dir: toDirection(jarFront.clone().negate().toArray()).negate(),
     size: [0.094, 0.067],
     segments: [14, 8],
   });
   b.decal(jarHoney, SHINE, {
     at: jarAt.clone().add(v3(0.042, 0.052, 0.042)),
-    dir: [-0.6, 0, -0.8],
+    dir: [0.6, 0, 0.8],
     size: [0.014, 0.05],
     segments: [3, 8],
   });
@@ -553,7 +617,15 @@ export default function build() {
   ];
   for (const [i, tex] of [DAISY, TULIP].entries()) {
     const fr = flowerSpots.filter((f) => f[2] === i).map((f) => frame([f[0], H, f[1]], [0, 1, 0]));
-    b.cards(fr, tex, { size: [0.075, 0.15], cross: true, vary: 0.15, rng: rand, flow: [0, 0, 1], sink: 0.05, bone: root });
+    b.cards(fr, tex, {
+      size: [0.075, 0.15],
+      cross: true,
+      vary: 0.15,
+      rng: rand,
+      flow: [0, 0, 1],
+      sink: 0.05,
+      bone: root,
+    });
   }
 
   return b.root;

@@ -124,7 +124,11 @@ const petals = (n: number, cx: number, cy: number, off: number, rx: number, ry: 
 const FLOWERS = [
   // daisy
   svg(
-    S(32, 64, flowerStem() + petals(9, 16, 14, 7, 2.8, 5.6, "#fbfaf0") + `<circle cx="16" cy="14" r="3.8" fill="#f0b823"/>`),
+    S(
+      32,
+      64,
+      flowerStem() + petals(9, 16, 14, 7, 2.8, 5.6, "#fbfaf0") + `<circle cx="16" cy="14" r="3.8" fill="#f0b823"/>`,
+    ),
     { size: 192 },
   ),
   // poppy
@@ -147,7 +151,11 @@ const FLOWERS = [
   ),
   // buttercup
   svg(
-    S(32, 64, flowerStem() + petals(5, 16, 14, 5.2, 4.6, 4.6, "#f4cf27") + `<circle cx="16" cy="14" r="3.2" fill="#dc9f16"/>`),
+    S(
+      32,
+      64,
+      flowerStem() + petals(5, 16, 14, 5.2, 4.6, 4.6, "#f4cf27") + `<circle cx="16" cy="14" r="3.2" fill="#dc9f16"/>`,
+    ),
     { size: 192 },
   ),
   // bluebell
@@ -228,7 +236,13 @@ const FRINGE = svg(
 
 const STREAMER = (a: string, b2: string) =>
   svg(
-    S(8, 32, [0, 1, 2, 3, 4, 5].map((i) => `<rect x="0" y="${i * 5.4}" width="8" height="5.4" fill="${i % 2 ? b2 : a}"/>`).join("")),
+    S(
+      8,
+      32,
+      [0, 1, 2, 3, 4, 5]
+        .map((i) => `<rect x="0" y="${i * 5.4}" width="8" height="5.4" fill="${i % 2 ? b2 : a}"/>`)
+        .join(""),
+    ),
     { size: 128 },
   );
 
@@ -276,7 +290,13 @@ const meadowTexture = () => {
   for (let i = 0; i < 26; i++) {
     const a = sr() * Math.PI * 2;
     const r = 30 + sr() * 150;
-    body += blob(200 + Math.cos(a) * r, 200 + Math.sin(a) * r, 18 + sr() * 26, 14 + sr() * 20, pick(["#82b352", "#5f9440", "#8fbf58", "#74a84a"]));
+    body += blob(
+      200 + Math.cos(a) * r,
+      200 + Math.sin(a) * r,
+      18 + sr() * 26,
+      14 + sr() * 20,
+      pick(["#82b352", "#5f9440", "#8fbf58", "#74a84a"]),
+    );
   }
   // bare earth: under the tree, the swing, the ladder foot and a path from the front
   body += blob(200, 198, 50, 46, "#8c6b47", 10);
@@ -329,14 +349,19 @@ const HEART = svg(
   { size: 200 },
 );
 const KNOT = svg(
-  S(30, 40, `<ellipse cx="15" cy="20" rx="12" ry="17" fill="#7a5a3c"/><ellipse cx="15" cy="21" rx="8" ry="12.5" fill="#2a1a12"/><ellipse cx="12" cy="15" rx="2.4" ry="3.6" fill="#5b4330"/>`),
+  S(
+    30,
+    40,
+    `<ellipse cx="15" cy="20" rx="12" ry="17" fill="#7a5a3c"/><ellipse cx="15" cy="21" rx="8" ry="12.5" fill="#2a1a12"/><ellipse cx="12" cy="15" rx="2.4" ry="3.6" fill="#5b4330"/>`,
+  ),
   { size: 150 },
 );
 
 // Corrugated tin, 1 unit = 1 mm: u runs down the slope, v along the ridge. Rust, a bolted teal patch, nails.
 const TIN = (() => {
   let body = `<rect width="190" height="280" fill="#aeb6b8"/>`;
-  for (let y = 0; y < 280; y += 8) body += `<rect x="0" y="${y}" width="190" height="4" fill="#c4cbcd"/><rect x="0" y="${y + 4}" width="190" height="2" fill="#97a0a3"/>`;
+  for (let y = 0; y < 280; y += 8)
+    body += `<rect x="0" y="${y}" width="190" height="4" fill="#c4cbcd"/><rect x="0" y="${y + 4}" width="190" height="2" fill="#97a0a3"/>`;
   body += blob(9, 60, 13, 34, "#a3633f", 9) + blob(13, 70, 6, 14, "#7d4a30", 7);
   body += blob(182, 214, 12, 40, "#a3633f", 9) + blob(178, 226, 6, 14, "#7d4a30", 7);
   body += blob(120, 14, 26, 9, "#a3633f", 8) + blob(60, 268, 30, 8, "#a3633f", 8);
@@ -348,7 +373,8 @@ const TIN = (() => {
     [126, 200],
   ])
     body += `<circle cx="${x}" cy="${y}" r="2.2" fill="#2f3a3e"/>`;
-  for (let i = 0; i < 6; i++) body += `<path d="M${150 + i * 6} 0 l1.6 ${16 + (i % 3) * 14}" stroke="#8a5a3c" stroke-width="1.8" fill="none"/>`;
+  for (let i = 0; i < 6; i++)
+    body += `<path d="M${150 + i * 6} 0 l1.6 ${16 + (i % 3) * 14}" stroke="#8a5a3c" stroke-width="1.8" fill="none"/>`;
   for (let i = 0; i < 7; i++) body += `<circle cx="${8 + (i % 2) * 4}" cy="${20 + i * 40}" r="2" fill="#3a4448"/>`;
   return svg(S(190, 280, body), { size: 570 });
 })();
@@ -359,7 +385,8 @@ const frontWall = (() => {
   for (let i = 0; i < 10; i++) {
     const cx = 12 + i * 24;
     for (const y of [10, 100, 190]) body += `<circle cx="${cx}" cy="${y}" r="1.5" fill="#2d3b3a"/>`;
-    if (i % 3 === 1) body += `<path d="M${cx + 1} 12 l1.4 ${18 + (i % 4) * 8}" stroke="#8c5a3a" stroke-width="1.6" fill="none"/>`;
+    if (i % 3 === 1)
+      body += `<path d="M${cx + 1} 12 l1.4 ${18 + (i % 4) * 8}" stroke="#8c5a3a" stroke-width="1.6" fill="none"/>`;
   }
   body += `<rect x="0" y="188" width="240" height="12" fill="#d9a441"/>`;
   for (let x = 4; x < 240; x += 18) body += `<path d="M${x} 188 l4 -4 l4 4" fill="#d9a441"/>`;
@@ -386,7 +413,8 @@ const frontWall = (() => {
   body += `<text x="55" y="53" font-family="DejaVu Sans, sans-serif" font-weight="bold" font-size="14" text-anchor="middle" fill="#b9553f" rotate="-2 1 -1 2">CLUB</text>`;
   // growth chart between door and window
   body += `<path d="M112 70 V180" stroke="#5a2a1e" stroke-width="1.2"/>`;
-  for (let i = 0; i < 9; i++) body += `<path d="M112 ${180 - i * 12} h${i % 2 ? 6 : 10}" stroke="#5a2a1e" stroke-width="1.4"/>`;
+  for (let i = 0; i < 9; i++)
+    body += `<path d="M112 ${180 - i * 12} h${i % 2 ? 6 : 10}" stroke="#5a2a1e" stroke-width="1.4"/>`;
   body += `<path d="M112 120 h14" stroke="#b9553f" stroke-width="2"/><path d="M112 96 h14" stroke="#2f6d8a" stroke-width="2"/>`;
   return svg(S(240, 200, body), { size: 960 });
 })();
@@ -408,7 +436,11 @@ const GABLE = svg(
     240,
     100,
     `<polygon points="0,100 240,100 120,0" fill="#d8c7a0"/>` +
-      Array.from({ length: 9 }, (_, i) => `<path d="M${(i + 1) * 24} 100 L${120 + (Math.min((i + 1) * 24, 240 - (i + 1) * 24) - 120) * 0 + 0} 100" stroke="none"/>`).join("") +
+      Array.from(
+        { length: 9 },
+        (_, i) =>
+          `<path d="M${(i + 1) * 24} 100 L${120 + (Math.min((i + 1) * 24, 240 - (i + 1) * 24) - 120) * 0 + 0} 100" stroke="none"/>`,
+      ).join("") +
       Array.from({ length: 9 }, (_, i) => {
         const x = (i + 1) * 24;
         const top = 100 - Math.min(x, 240 - x) * (100 / 120);
@@ -429,7 +461,14 @@ const GABLE_GLASS = svg(
   { size: 160 },
 );
 
-const DOORMAT = svg(S(40, 24, `<rect width="40" height="24" fill="#7a5a30"/><path d="M0 6 H40 M0 12 H40 M0 18 H40" stroke="#5d4322" stroke-width="2"/><text x="20" y="16" font-family="DejaVu Sans, sans-serif" font-weight="bold" font-size="8" text-anchor="middle" fill="#f1e3bb">HI</text>`), { size: 200 });
+const DOORMAT = svg(
+  S(
+    40,
+    24,
+    `<rect width="40" height="24" fill="#7a5a30"/><path d="M0 6 H40 M0 12 H40 M0 18 H40" stroke="#5d4322" stroke-width="2"/><text x="20" y="16" font-family="DejaVu Sans, sans-serif" font-weight="bold" font-size="8" text-anchor="middle" fill="#f1e3bb">HI</text>`,
+  ),
+  { size: 200 },
+);
 
 const ivyLeaf = (fill: string, vein: string) =>
   svg(
@@ -501,7 +540,10 @@ const TYRE = svg(
     210,
     100,
     `<rect width="210" height="100" fill="#26262a"/>` +
-      Array.from({ length: 14 }, (_, i) => `<rect x="${i * 15 + 2}" y="30" width="10" height="40" fill="#3c3c44"/>`).join("") +
+      Array.from(
+        { length: 14 },
+        (_, i) => `<rect x="${i * 15 + 2}" y="30" width="10" height="40" fill="#3c3c44"/>`,
+      ).join("") +
       `<rect x="0" y="8" width="210" height="6" fill="#d8d8cf"/>` +
       `<polygon points="30,74 60,74 50,92 20,92" fill="#4a4a52"/>`,
   ),
@@ -524,16 +566,28 @@ const WEAVE = svg(
     32,
     `<rect width="48" height="32" fill="#c9a25e"/>` +
       [0, 1, 2, 3].map((i) => `<rect x="0" y="${i * 8 + 5}" width="48" height="2.6" fill="#9f7a3a"/>`).join("") +
-      Array.from({ length: 12 }, (_, i) => `<rect x="${i * 4 + 1}" y="0" width="1.8" height="32" fill="#a9803f"/>`).join(""),
+      Array.from(
+        { length: 12 },
+        (_, i) => `<rect x="${i * 4 + 1}" y="0" width="1.8" height="32" fill="#a9803f"/>`,
+      ).join(""),
   ),
   { size: 192 },
 );
 const bunting = (fill: string, accent: string) =>
   svg(
-    S(32, 24, `<polygon points="0,0 32,0 16,24" fill="${fill}" stroke="${fill}" stroke-width="1"/><path d="M16 6 l-5 8 h10 z" fill="${accent}"/>`),
+    S(
+      32,
+      24,
+      `<polygon points="0,0 32,0 16,24" fill="${fill}" stroke="${fill}" stroke-width="1"/><path d="M16 6 l-5 8 h10 z" fill="${accent}"/>`,
+    ),
     { size: 128 },
   );
-const BUNTING = [bunting("#e0b640", "#b9553f"), bunting("#5d9d9b", "#e7dcc0"), bunting("#b9553f", "#e0b640"), bunting("#e7dcc0", "#5d9d9b")];
+const BUNTING = [
+  bunting("#e0b640", "#b9553f"),
+  bunting("#5d9d9b", "#e7dcc0"),
+  bunting("#b9553f", "#e0b640"),
+  bunting("#e7dcc0", "#5d9d9b"),
+];
 
 // ---------------------------------------------------------------------------------------------------------------
 // Build
@@ -563,7 +617,12 @@ export default function build() {
     flat: true,
   });
   b.part(new THREE.CircleGeometry(0.6, 12), PLINTH_BOT, { bone: base, at: [0, 0.001, 0], rotation: [90, 0, 0] });
-  b.part(new THREE.PlaneGeometry(0.14, 0.036), "#ffffff", { bone: base, at: [0.1505, 0.045, 0.5618], rotation: [0, 15, 0], texture: PLAQUE });
+  b.part(new THREE.PlaneGeometry(0.14, 0.036), "#ffffff", {
+    bone: base,
+    at: [0.1505, 0.045, 0.5618],
+    rotation: [0, 15, 0],
+    texture: PLAQUE,
+  });
 
   const profile = [
     [0.6, PLINTH_H],
@@ -592,7 +651,15 @@ export default function build() {
   const mound = b.part(moundGeo, GRASS, { bone: base, at: [0, 0, 0], flat: true, name: "mound" });
   const moundSurf = b.surface(mound);
   const gy = (x: number, z: number) => moundSurf.ray([x, 1, z], [0, -1, 0])?.at.y ?? PLINTH_H;
-  b.decal(moundSurf, meadowTexture(), { at: [0, 0.3, 0], dir: [0, -1, 0], up: [0, 0, -1], size: [1.2, 1.2], segments: 34, lift: 0.0015, bone: base });
+  b.decal(moundSurf, meadowTexture(), {
+    at: [0, 0.3, 0],
+    dir: [0, 1, 0],
+    up: [0, 0, -1],
+    size: [1.2, 1.2],
+    segments: 34,
+    lift: 0.0015,
+    bone: base,
+  });
 
   // --- the oak: trunk on a chain, roots, branches ---------------------------------------------------------------
   const trunkPath = catmull([
@@ -631,12 +698,86 @@ export default function build() {
   // branches: [name, y on trunk, azimuth, path after the start, radius, leaf blobs (centre, radius)]
   type BlobSpec = [V, number];
   const branches: Array<[string, number, number, V[], [number, number], BlobSpec[]]> = [
-    ["brLeft", 0.72, -72, [[-0.14, 0.76, 0.03], [-0.27, 0.86, 0.04], [-0.38, 0.94, 0.02]], [0.038, 0.011], [[[-0.38, 0.97, 0.02], 0.145], [[-0.24, 0.99, -0.07], 0.12]]],
-    ["brRight", 0.78, 96, [[0.13, 0.88, -0.02], [0.27, 0.97, -0.06], [0.37, 1.02, -0.06]], [0.036, 0.011], [[[0.36, 1.05, -0.07], 0.145], [[0.2, 1.11, -0.12], 0.12]]],
-    ["brBack", 0.74, 185, [[-0.04, 0.86, -0.15], [-0.05, 0.97, -0.27], [-0.02, 1.05, -0.37]], [0.036, 0.011], [[[-0.02, 1.08, -0.37], 0.155], [[-0.06, 1.04, -0.22], 0.13]]],
-    ["brBackL", 0.84, -132, [[-0.13, 0.96, -0.1], [-0.23, 1.04, -0.2], [-0.3, 1.1, -0.27]], [0.03, 0.009], [[[-0.3, 1.13, -0.27], 0.135]]],
-    ["brBackR", 0.86, 142, [[0.13, 0.98, -0.12], [0.23, 1.06, -0.2], [0.3, 1.12, -0.27]], [0.03, 0.009], [[[0.3, 1.14, -0.27], 0.13]]],
-    ["brFront", 0.9, 22, [[0.04, 0.98, 0.13], [0.07, 1.04, 0.22]], [0.026, 0.009], [[[0.07, 1.07, 0.23], 0.11]]],
+    [
+      "brLeft",
+      0.72,
+      -72,
+      [
+        [-0.14, 0.76, 0.03],
+        [-0.27, 0.86, 0.04],
+        [-0.38, 0.94, 0.02],
+      ],
+      [0.038, 0.011],
+      [
+        [[-0.38, 0.97, 0.02], 0.145],
+        [[-0.24, 0.99, -0.07], 0.12],
+      ],
+    ],
+    [
+      "brRight",
+      0.78,
+      96,
+      [
+        [0.13, 0.88, -0.02],
+        [0.27, 0.97, -0.06],
+        [0.37, 1.02, -0.06],
+      ],
+      [0.036, 0.011],
+      [
+        [[0.36, 1.05, -0.07], 0.145],
+        [[0.2, 1.11, -0.12], 0.12],
+      ],
+    ],
+    [
+      "brBack",
+      0.74,
+      185,
+      [
+        [-0.04, 0.86, -0.15],
+        [-0.05, 0.97, -0.27],
+        [-0.02, 1.05, -0.37],
+      ],
+      [0.036, 0.011],
+      [
+        [[-0.02, 1.08, -0.37], 0.155],
+        [[-0.06, 1.04, -0.22], 0.13],
+      ],
+    ],
+    [
+      "brBackL",
+      0.84,
+      -132,
+      [
+        [-0.13, 0.96, -0.1],
+        [-0.23, 1.04, -0.2],
+        [-0.3, 1.1, -0.27],
+      ],
+      [0.03, 0.009],
+      [[[-0.3, 1.13, -0.27], 0.135]],
+    ],
+    [
+      "brBackR",
+      0.86,
+      142,
+      [
+        [0.13, 0.98, -0.12],
+        [0.23, 1.06, -0.2],
+        [0.3, 1.12, -0.27],
+      ],
+      [0.03, 0.009],
+      [[[0.3, 1.14, -0.27], 0.13]],
+    ],
+    [
+      "brFront",
+      0.9,
+      22,
+      [
+        [0.04, 0.98, 0.13],
+        [0.07, 1.04, 0.22],
+      ],
+      [0.026, 0.009],
+      [[[0.07, 1.07, 0.23], 0.11]],
+    ],
   ];
   const foliage: THREE.Mesh[] = [];
   const jitterBlob = (r: number) => {
@@ -715,21 +856,41 @@ export default function build() {
     const vine = trunkSurf.drape(rough, { lift: 0.004 });
     b.sweep(vine, 0.0035, { color: "#3f5d2f", sides: 4, smooth: false, bone: base, caps: "flat" });
     const leaves = Array.from({ length: 34 }, (_, i) => trunkSurf.nearest(vine.at((i + 0.5) / 34)));
-    b.cards(leaves, IVY, { size: [0.036, 0.036], lean: 70, flow: [0, -1, 0], spin: 150, vary: 0.3, rng: rng(61), bone: base, sink: 0.05 });
+    b.cards(leaves, IVY, {
+      size: [0.036, 0.036],
+      lean: 70,
+      flow: [0, -1, 0],
+      spin: 150,
+      vary: 0.3,
+      rng: rng(61),
+      bone: base,
+      sink: 0.05,
+    });
   }
 
   // --- mushrooms, rocks ------------------------------------------------------------------------------------------
   const mushroom = (x: number, z: number, s: number) => {
     const y = gy(x, z);
-    b.part(new THREE.CylinderGeometry(0.006 * s, 0.008 * s, 0.03 * s, 6), "#efe6cf", { bone: base, at: [x, y + 0.012 * s, z] });
-    b.part(new THREE.SphereGeometry(0.02 * s, 7, 4, 0, Math.PI * 2, 0, Math.PI / 2), RED, { bone: base, at: [x, y + 0.026 * s, z], flat: true });
+    b.part(new THREE.CylinderGeometry(0.006 * s, 0.008 * s, 0.03 * s, 6), "#efe6cf", {
+      bone: base,
+      at: [x, y + 0.012 * s, z],
+    });
+    b.part(new THREE.SphereGeometry(0.02 * s, 7, 4, 0, Math.PI * 2, 0, Math.PI / 2), RED, {
+      bone: base,
+      at: [x, y + 0.026 * s, z],
+      flat: true,
+    });
     for (const [dx, dz, dy] of [
       [0.008, 0.004, 0.018],
       [-0.006, 0.009, 0.016],
       [-0.01, -0.005, 0.014],
       [0.004, -0.011, 0.014],
     ] as const)
-      b.part(new THREE.SphereGeometry(0.0035 * s, 4, 3), "#f7f1df", { bone: base, at: [x + dx * s, y + (0.026 + dy) * s, z + dz * s], flat: true });
+      b.part(new THREE.SphereGeometry(0.0035 * s, 4, 3), "#f7f1df", {
+        bone: base,
+        at: [x + dx * s, y + (0.026 + dy) * s, z + dz * s],
+        flat: true,
+      });
   };
   for (const [x, z, s] of [
     [0.15, 0.12, 1],
@@ -766,7 +927,11 @@ export default function build() {
   const nPlanks = 10;
   const pd = (DZ1 - DZ0) / nPlanks;
   for (let i = 0; i < nPlanks; i++)
-    box(DX1 - DX0 - (i % 3) * 0.01, 0.014, pd - 0.003, DECK[i % DECK.length]!, [(DX0 + DX1) / 2 + (i % 3) * 0.005, DECK_Y - 0.007 + (R() - 0.5) * 0.002, DZ0 + pd * (i + 0.5)]);
+    box(DX1 - DX0 - (i % 3) * 0.01, 0.014, pd - 0.003, DECK[i % DECK.length]!, [
+      (DX0 + DX1) / 2 + (i % 3) * 0.005,
+      DECK_Y - 0.007 + (R() - 0.5) * 0.002,
+      DZ0 + pd * (i + 0.5),
+    ]);
   // joists and bearers
   for (const z of [-0.1, 0.055, 0.21]) box(DX1 - DX0 + 0.04, 0.03, 0.03, TIMBER, [(DX0 + DX1) / 2, DECK_Y - 0.029, z]);
   for (const x of [0.0, 0.3]) box(0.03, 0.028, DZ1 - DZ0 + 0.03, TIMBER_L, [x, DECK_Y - 0.059, (DZ0 + DZ1) / 2]);
@@ -774,9 +939,23 @@ export default function build() {
   rod([0.03, 0.36, 0.06], [0.3, 0.52, 0.21], 0.011, TIMBER, 4);
   rod([0.03, 0.36, -0.05], [0.3, 0.52, -0.1], 0.011, TIMBER, 4);
   rod([-0.05, 0.38, 0.05], [-0.1, 0.52, 0.21], 0.009, TIMBER, 4);
-  for (const p of [[0.3, 0.52, 0.21], [0.3, 0.52, -0.1], [-0.1, 0.52, 0.21]] as V[]) b.part(new THREE.CylinderGeometry(0.008, 0.008, 0.006, 6), STEEL_D, { bone: base, at: [p[0], p[1], p[2] + 0.017], rotation: [90, 0, 0] });
+  for (const p of [
+    [0.3, 0.52, 0.21],
+    [0.3, 0.52, -0.1],
+    [-0.1, 0.52, 0.21],
+  ] as V[])
+    b.part(new THREE.CylinderGeometry(0.008, 0.008, 0.006, 6), STEEL_D, {
+      bone: base,
+      at: [p[0], p[1], p[2] + 0.017],
+      rotation: [90, 0, 0],
+    });
   // door mat at the porch
-  b.part(new THREE.PlaneGeometry(0.05, 0.03), "#ffffff", { bone: base, at: [0.115, DECK_Y + 0.001, 0.14], rotation: [-90, 0, 0], texture: DOORMAT });
+  b.part(new THREE.PlaneGeometry(0.05, 0.03), "#ffffff", {
+    bone: base,
+    at: [0.115, DECK_Y + 0.001, 0.14],
+    rotation: [-90, 0, 0],
+    texture: DOORMAT,
+  });
 
   // house box
   const HX0 = 0.06;
@@ -788,27 +967,52 @@ export default function build() {
     box(w, WH + hJit, d, color, [cx, DECK_Y + (WH + hJit) / 2, cz]);
   const frontN = 10;
   const fw = (HX1 - HX0) / frontN;
-  const frontCols = ["#5d9d9b", "#6fb0a8", "#4d8c90", "#6fb0a8", "#5d9d9b", "#d9a441", "#4d8c90", "#6fb0a8", "#b9553f", "#5d9d9b"];
-  for (let i = 0; i < frontN; i++) board(HX0 + fw * (i + 0.5), HZ1 - 0.004, fw - 0.0015, 0.008, frontCols[i]!, (R() - 0.5) * 0.004);
+  const frontCols = [
+    "#5d9d9b",
+    "#6fb0a8",
+    "#4d8c90",
+    "#6fb0a8",
+    "#5d9d9b",
+    "#d9a441",
+    "#4d8c90",
+    "#6fb0a8",
+    "#b9553f",
+    "#5d9d9b",
+  ];
+  for (let i = 0; i < frontN; i++)
+    board(HX0 + fw * (i + 0.5), HZ1 - 0.004, fw - 0.0015, 0.008, frontCols[i]!, (R() - 0.5) * 0.004);
   const backN = 10;
-  for (let i = 0; i < backN; i++) board(HX0 + fw * (i + 0.5), HZ0 + 0.004, fw - 0.0015, 0.008, WALL_RAW[i % WALL_RAW.length]!, (R() - 0.5) * 0.006);
+  for (let i = 0; i < backN; i++)
+    board(HX0 + fw * (i + 0.5), HZ0 + 0.004, fw - 0.0015, 0.008, WALL_RAW[i % WALL_RAW.length]!, (R() - 0.5) * 0.006);
   const sideN = 9;
   const sw = (HZ1 - HZ0 - 0.016) / sideN;
   for (let i = 0; i < sideN; i++) {
     const z = HZ0 + 0.008 + sw * (i + 0.5);
-    board(HX1 - 0.004, z, 0.008, sw - 0.0015, i === 3 ? "#e6d8b2" : WALL_RAW[(i * 2) % WALL_RAW.length]!, (R() - 0.5) * 0.006);
+    board(
+      HX1 - 0.004,
+      z,
+      0.008,
+      sw - 0.0015,
+      i === 3 ? "#e6d8b2" : WALL_RAW[(i * 2) % WALL_RAW.length]!,
+      (R() - 0.5) * 0.006,
+    );
     board(HX0 + 0.004, z, 0.008, sw - 0.0015, WALL_RAW[(i * 3 + 1) % WALL_RAW.length]!, (R() - 0.5) * 0.006);
   }
   // interior floor shadow so the walls read as a room seen through gaps
   box(HX1 - HX0 - 0.016, 0.004, HZ1 - HZ0 - 0.016, "#3a2a1f", [(HX0 + HX1) / 2, DECK_Y + 0.003, (HZ0 + HZ1) / 2]);
   // corner posts
-  for (const x of [HX0, HX1]) for (const z of [HZ0, HZ1]) box(0.014, WH + 0.012, 0.014, TIMBER, [x, DECK_Y + (WH + 0.012) / 2, z]);
+  for (const x of [HX0, HX1])
+    for (const z of [HZ0, HZ1]) box(0.014, WH + 0.012, 0.014, TIMBER, [x, DECK_Y + (WH + 0.012) / 2, z]);
   // top plate
   box(HX1 - HX0 + 0.016, 0.01, 0.012, TIMBER, [(HX0 + HX1) / 2, DECK_Y + WH + 0.002, HZ1 + 0.001]);
   box(HX1 - HX0 + 0.016, 0.01, 0.012, TIMBER, [(HX0 + HX1) / 2, DECK_Y + WH + 0.002, HZ0 - 0.001]);
 
   // front overlay (door, nails, chart) and glowing window
-  b.part(new THREE.PlaneGeometry(HX1 - HX0, WH), "#ffffff", { bone: base, at: [(HX0 + HX1) / 2, DECK_Y + WH / 2, HZ1 + 0.0012], texture: frontWall });
+  b.part(new THREE.PlaneGeometry(HX1 - HX0, WH), "#ffffff", {
+    bone: base,
+    at: [(HX0 + HX1) / 2, DECK_Y + WH / 2, HZ1 + 0.0012],
+    texture: frontWall,
+  });
   const WIN_C: V = [0.235, 0.685, HZ1 + 0.0028];
   glow(b.part(new THREE.PlaneGeometry(0.07, 0.08), "#ffffff", { bone: base, at: WIN_C, texture: WINDOW }), 1.1);
   for (const [dx, dy, w, h] of [
@@ -822,7 +1026,9 @@ export default function build() {
   box(0.092, 0.03, 0.026, "#8a4f34", [WIN_C[0], 0.632, HZ1 + 0.016]);
   box(0.092, 0.006, 0.028, "#6d3c28", [WIN_C[0], 0.648, HZ1 + 0.016]);
   b.cards(
-    Array.from({ length: 9 }, (_, i) => frame([WIN_C[0] - 0.038 + i * 0.0095, 0.65, HZ1 + 0.012 + (i % 2) * 0.008], [0, 1, 0])),
+    Array.from({ length: 9 }, (_, i) =>
+      frame([WIN_C[0] - 0.038 + i * 0.0095, 0.65, HZ1 + 0.012 + (i % 2) * 0.008], [0, 1, 0]),
+    ),
     FLOWERS,
     { size: [0.028, 0.05], vary: 0.25, rng: rng(5), bone: base, cross: true, flow: [0, 0, 1], lean: 10 },
   );
@@ -839,9 +1045,27 @@ export default function build() {
     [0, 0.1],
   ];
   for (const z of [HZ1 - 0.004, HZ0 + 0.004])
-    b.extrude(gableTri, { at: [(HX0 + HX1) / 2, DECK_Y + WH, z], x: [1, 0, 0], y: [0, 1, 0], thickness: 0.008, color: z > 0 ? "#d8c7a0" : WALL_RAW[1]!, bone: base });
-  b.part(new THREE.PlaneGeometry(0.24, 0.1), "#ffffff", { bone: base, at: [(HX0 + HX1) / 2, DECK_Y + WH + 0.05, HZ1 + 0.0012], texture: GABLE });
-  glow(b.part(new THREE.CircleGeometry(0.0185, 10), "#ffffff", { bone: base, at: [(HX0 + HX1) / 2, DECK_Y + WH + 0.0385, HZ1 + 0.0026], texture: GABLE_GLASS }), 1.1);
+    b.extrude(gableTri, {
+      at: [(HX0 + HX1) / 2, DECK_Y + WH, z],
+      x: [1, 0, 0],
+      y: [0, 1, 0],
+      thickness: 0.008,
+      color: z > 0 ? "#d8c7a0" : WALL_RAW[1]!,
+      bone: base,
+    });
+  b.part(new THREE.PlaneGeometry(0.24, 0.1), "#ffffff", {
+    bone: base,
+    at: [(HX0 + HX1) / 2, DECK_Y + WH + 0.05, HZ1 + 0.0012],
+    texture: GABLE,
+  });
+  glow(
+    b.part(new THREE.CircleGeometry(0.0185, 10), "#ffffff", {
+      bone: base,
+      at: [(HX0 + HX1) / 2, DECK_Y + WH + 0.0385, HZ1 + 0.0026],
+      texture: GABLE_GLASS,
+    }),
+    1.1,
+  );
 
   // roof: two tin panels, ridge cap, barge boards, chimney
   const RIDGE: V = [0.18, DECK_Y + WH + 0.1, 0];
@@ -863,14 +1087,33 @@ export default function build() {
     });
     // barge boards along both gable edges
     for (const z of [roofZ / 2 - 0.004, -roofZ / 2 + 0.004])
-      rod([RIDGE[0] + dx * (panelLen - 0.012), RIDGE[1] + dy * (panelLen - 0.012) + 0.0, z], [RIDGE[0], RIDGE[1] + 0.002, z], 0.0065, CREAM, 4);
+      rod(
+        [RIDGE[0] + dx * (panelLen - 0.012), RIDGE[1] + dy * (panelLen - 0.012) + 0.0, z],
+        [RIDGE[0], RIDGE[1] + 0.002, z],
+        0.0065,
+        CREAM,
+        4,
+      );
   }
-  b.rod([RIDGE[0], RIDGE[1] + 0.006, -roofZ / 2 - 0.004], [RIDGE[0], RIDGE[1] + 0.006, roofZ / 2 + 0.004], 0.008, { color: TIMBER, sides: 4, smooth: false, bone: base });
+  b.rod([RIDGE[0], RIDGE[1] + 0.006, -roofZ / 2 - 0.004], [RIDGE[0], RIDGE[1] + 0.006, roofZ / 2 + 0.004], 0.008, {
+    color: TIMBER,
+    sides: 4,
+    smooth: false,
+    bone: base,
+  });
   // chimney with smoke
   const CH: V = [0.26, 0.808, -0.07];
-  b.part(new THREE.CylinderGeometry(0.0115, 0.0115, 0.1, 7), "#7b5a4a", { bone: base, at: [CH[0], CH[1] + 0.035, CH[2]], flat: true });
+  b.part(new THREE.CylinderGeometry(0.0115, 0.0115, 0.1, 7), "#7b5a4a", {
+    bone: base,
+    at: [CH[0], CH[1] + 0.035, CH[2]],
+    flat: true,
+  });
   b.part(new THREE.ConeGeometry(0.02, 0.014, 7), STEEL, { bone: base, at: [CH[0], CH[1] + 0.092, CH[2]], flat: true });
-  b.part(new THREE.CylinderGeometry(0.014, 0.014, 0.008, 7), STEEL, { bone: base, at: [CH[0], CH[1] - 0.004, CH[2]], flat: true });
+  b.part(new THREE.CylinderGeometry(0.014, 0.014, 0.008, 7), STEEL, {
+    bone: base,
+    at: [CH[0], CH[1] - 0.004, CH[2]],
+    flat: true,
+  });
   b.cards(
     [0, 1, 2, 3].map((i) => frame([CH[0] + 0.012 * i, CH[1] + 0.108 + 0.05 * i, CH[2] + 0.03 * i], [0, 1, 0])),
     SMOKE,
@@ -918,16 +1161,51 @@ export default function build() {
   rod([0.3, 0.77, 0.105], [0.335, 0.77, 0.13], 0.004, TIMBER, 4);
   rod([0.335, 0.77, 0.13], [0.335, 0.755, 0.13], 0.0016, STEEL_D, 4);
   b.part(new THREE.ConeGeometry(0.012, 0.01, 6), STEEL_D, { bone: base, at: [0.335, 0.752, 0.13], flat: true });
-  glow(b.part(new THREE.CylinderGeometry(0.0085, 0.0085, 0.022, 6), "#ffcf66", { bone: base, at: [0.335, 0.736, 0.13], flat: true }), 1.3);
-  b.part(new THREE.CylinderGeometry(0.0105, 0.0085, 0.005, 6), STEEL_D, { bone: base, at: [0.335, 0.7225, 0.13], flat: true });
+  glow(
+    b.part(new THREE.CylinderGeometry(0.0085, 0.0085, 0.022, 6), "#ffcf66", {
+      bone: base,
+      at: [0.335, 0.736, 0.13],
+      flat: true,
+    }),
+    1.3,
+  );
+  b.part(new THREE.CylinderGeometry(0.0105, 0.0085, 0.005, 6), STEEL_D, {
+    bone: base,
+    at: [0.335, 0.7225, 0.13],
+    flat: true,
+  });
   // a drift of leaves and a cat-sized pumpkin on the deck
   b.cards(
-    [[-0.05, 0.2], [-0.09, 0.15], [0.01, 0.23], [0.33, 0.22], [0.32, 0.04], [-0.1, -0.1], [0.2, 0.2]].map(([x, z]) => frame([x!, DECK_Y + 0.001, z!], [0, 1, 0])),
+    [
+      [-0.05, 0.2],
+      [-0.09, 0.15],
+      [0.01, 0.23],
+      [0.33, 0.22],
+      [0.32, 0.04],
+      [-0.1, -0.1],
+      [0.2, 0.2],
+    ].map(([x, z]) => frame([x!, DECK_Y + 0.001, z!], [0, 1, 0])),
     FALLEN,
-    { size: [0.028, 0.036], lean: 90, flow: (_f, i) => [Math.cos(i * 2.1), 0, Math.sin(i * 2.1)], mirror: true, rng: rng(13), bone: base, vary: 0.2 },
+    {
+      size: [0.028, 0.036],
+      lean: 90,
+      flow: (_f, i) => [Math.cos(i * 2.1), 0, Math.sin(i * 2.1)],
+      mirror: true,
+      rng: rng(13),
+      bone: base,
+      vary: 0.2,
+    },
   );
-  b.part(new THREE.IcosahedronGeometry(0.02, 0), "#d9782c", { bone: base, at: [-0.075, DECK_Y + 0.016, -0.06], scale: [1.2, 0.85, 1.2], flat: true });
-  b.part(new THREE.CylinderGeometry(0.003, 0.004, 0.01, 4), "#4f7d36", { bone: base, at: [-0.075, DECK_Y + 0.034, -0.06] });
+  b.part(new THREE.IcosahedronGeometry(0.02, 0), "#d9782c", {
+    bone: base,
+    at: [-0.075, DECK_Y + 0.016, -0.06],
+    scale: [1.2, 0.85, 1.2],
+    flat: true,
+  });
+  b.part(new THREE.CylinderGeometry(0.003, 0.004, 0.01, 4), "#4f7d36", {
+    bone: base,
+    at: [-0.075, DECK_Y + 0.034, -0.06],
+  });
 
   // --- outrigger with pulley and bucket ------------------------------------------------------------------------
   const BEAM_Y = 0.725;
@@ -936,8 +1214,18 @@ export default function build() {
   const WHEEL: V = [0.48, 0.69, 0];
   for (const z of [-0.0075, 0.0075]) box(0.006, 0.04, 0.003, STEEL_D, [WHEEL[0], 0.705, z]);
   const pulley = b.joint("pulley", { parent: base, at: WHEEL, dir: [0, 0, 1], role: "hinge" });
-  b.part(new THREE.CylinderGeometry(0.0145, 0.0145, 0.008, 8), STEEL, { bone: pulley, at: WHEEL, rotation: [90, 0, 0], flat: true });
-  b.part(new THREE.CylinderGeometry(0.005, 0.005, 0.02, 6), STEEL_D, { bone: pulley, at: WHEEL, rotation: [90, 0, 0], flat: true });
+  b.part(new THREE.CylinderGeometry(0.0145, 0.0145, 0.008, 8), STEEL, {
+    bone: pulley,
+    at: WHEEL,
+    rotation: [90, 0, 0],
+    flat: true,
+  });
+  b.part(new THREE.CylinderGeometry(0.005, 0.005, 0.02, 6), STEEL_D, {
+    bone: pulley,
+    at: WHEEL,
+    rotation: [90, 0, 0],
+    flat: true,
+  });
   // rope over the wheel and down to the bucket (chain), slack end to a cleat
   const overWheel = arc(WHEEL, [WHEEL[0] + 0.0175, WHEEL[1], 0], [0, 0, 1], 180);
   b.sweep(overWheel, 0.003, { color: ROPE, sides: 5, smooth: false, bone: pulley, caps: "flat" });
@@ -952,7 +1240,14 @@ export default function build() {
   b.sweep(haul, 0.003, { color: ROPE, sides: 5, smooth: false, bone: base, caps: "flat" });
   box(0.012, 0.008, 0.034, TIMBER_L, [0.306, 0.641, 0]);
   b.part(new THREE.SphereGeometry(0.006, 5, 4), ROPE_D, { bone: base, at: [0.318, 0.641, 0], flat: true });
-  b.cards([frame([0.3155, 0.636, 0.0], [0, 1, 0])], FRINGE, { size: [0.011, 0.016], lean: 180, flow: [0, 0, 1], bone: base, cross: true, sink: 0 });
+  b.cards([frame([0.3155, 0.636, 0.0], [0, 1, 0])], FRINGE, {
+    size: [0.011, 0.016],
+    lean: 180,
+    flow: [0, 0, 1],
+    bone: base,
+    cross: true,
+    sink: 0,
+  });
 
   const BX = WHEEL[0] + 0.0175;
   const bucketRope = b.chain(
@@ -996,7 +1291,11 @@ export default function build() {
     ],
     { at: [BX, BRIM - 0.05, 0], bone: bucket, segments: 8, color: STEEL_D },
   );
-  b.part(new THREE.CylinderGeometry(0.0262, 0.0205, 0.03, 8), "#d8c9a0", { bone: bucket, at: [BX, BRIM - 0.027, 0], flat: true });
+  b.part(new THREE.CylinderGeometry(0.0262, 0.0205, 0.03, 8), "#d8c9a0", {
+    bone: bucket,
+    at: [BX, BRIM - 0.027, 0],
+    flat: true,
+  });
   for (const [dx, dz, dy] of [
     [0.011, 0.005, 0.0],
     [-0.011, 0.007, 0.002],
@@ -1004,8 +1303,18 @@ export default function build() {
     [0.0, 0.0, 0.012],
     [-0.004, 0.014, 0.0],
   ] as const)
-    b.part(new THREE.IcosahedronGeometry(0.0125, 0), RED, { bone: bucket, at: [BX + dx, BRIM + dy - 0.004, dz], flat: true });
-  b.sweep(arc([BX, BRIM, 0], [BX, BRIM, 0.031], [1, 0, 0], -180), 0.0018, { color: STEEL_D, sides: 4, smooth: false, bone: bucket, caps: "flat" });
+    b.part(new THREE.IcosahedronGeometry(0.0125, 0), RED, {
+      bone: bucket,
+      at: [BX + dx, BRIM + dy - 0.004, dz],
+      flat: true,
+    });
+  b.sweep(arc([BX, BRIM, 0], [BX, BRIM, 0.031], [1, 0, 0], -180), 0.0018, {
+    color: STEEL_D,
+    sides: 4,
+    smooth: false,
+    bone: bucket,
+    caps: "flat",
+  });
   b.part(new THREE.SphereGeometry(0.005, 5, 4), ROPE_D, { bone: bucket, at: [BX, BRIM + 0.032, 0], flat: true });
 
   // --- rope ladder ----------------------------------------------------------------------------------------------
@@ -1019,18 +1328,38 @@ export default function build() {
     [LX, footY, 0.325],
   ]);
   const ladder = b.chain("ladder", ladderPath, { parent: base, count: 4, role: "tentacle" });
-  const offsetPath = (dx: number) => catmull([0, 0.25, 0.5, 0.75, 1].map((t) => ladderPath.at(t).clone().add(new THREE.Vector3(dx, 0, 0))));
-  for (const dx of [-0.026, 0.026]) b.sweep(offsetPath(dx), 0.0035, { color: ROPE, sides: 5, smooth: false, bone: ladder, caps: "flat" });
+  const offsetPath = (dx: number) =>
+    catmull(
+      [0, 0.25, 0.5, 0.75, 1].map((t) =>
+        ladderPath
+          .at(t)
+          .clone()
+          .add(new THREE.Vector3(dx, 0, 0)),
+      ),
+    );
+  for (const dx of [-0.026, 0.026])
+    b.sweep(offsetPath(dx), 0.0035, { color: ROPE, sides: 5, smooth: false, bone: ladder, caps: "flat" });
   const nRungs = 10;
   for (let i = 1; i <= nRungs; i++) {
     const t = i / (nRungs + 1);
     const p = ladderPath.at(t);
     const j = ladder.joints[Math.min(ladder.joints.length - 1, Math.floor(t * ladder.joints.length))]!;
-    b.part(new THREE.CylinderGeometry(0.0048, 0.0048, 0.062, 5), "#9a7448", { bone: j, at: [p.x, p.y, p.z], rotation: [0, 0, 90], flat: true });
-    for (const dx of [-0.026, 0.026]) b.part(new THREE.SphereGeometry(0.0055, 4, 3), ROPE_D, { bone: j, at: [p.x + dx, p.y, p.z], flat: true });
+    b.part(new THREE.CylinderGeometry(0.0048, 0.0048, 0.062, 5), "#9a7448", {
+      bone: j,
+      at: [p.x, p.y, p.z],
+      rotation: [0, 0, 90],
+      flat: true,
+    });
+    for (const dx of [-0.026, 0.026])
+      b.part(new THREE.SphereGeometry(0.0055, 4, 3), ROPE_D, { bone: j, at: [p.x + dx, p.y, p.z], flat: true });
   }
   // top bar
-  b.part(new THREE.CylinderGeometry(0.0065, 0.0065, 0.078, 6), TIMBER_L, { bone: base, at: [LX, DECK_Y + 0.0035, zF + 0.012], rotation: [0, 0, 90], flat: true });
+  b.part(new THREE.CylinderGeometry(0.0065, 0.0065, 0.078, 6), TIMBER_L, {
+    bone: base,
+    at: [LX, DECK_Y + 0.0035, zF + 0.012],
+    rotation: [0, 0, 90],
+    flat: true,
+  });
   b.cards(
     [-0.026, 0.026].map((dx) => frame([LX + dx, footY + 0.014, 0.325], [0, 1, 0], [0, 0, 1])),
     FRINGE,
@@ -1042,9 +1371,20 @@ export default function build() {
     const hit = trunkSurf.around([axisAt(0.5).x, 0.5, axisAt(0.5).z]).at(-84, 0);
     if (!hit) throw new Error("no swing branch hit");
     const swingPath = catmull([hit, [-0.19, 0.53, 0.04], [-0.34, 0.565, 0.06], [-0.46, 0.63, 0.05]]);
-    const sb = b.sprout("swingBranch", hit, swingPath, [0.046, 0.014], { count: 3, color: BARK, sides: 6, smooth: false, role: "arm", caps: "round" });
+    const sb = b.sprout("swingBranch", hit, swingPath, [0.046, 0.014], {
+      count: 3,
+      color: BARK,
+      sides: 6,
+      smooth: false,
+      role: "arm",
+      caps: "round",
+    });
     const sj = sb.chain!.joints;
-    for (const [c, r] of [[[-0.43, 0.7, 0.04], 0.1], [[-0.29, 0.67, -0.03], 0.08]] as Array<[V, number]>) addBlob(c, r, sj[2]!);
+    for (const [c, r] of [
+      [[-0.43, 0.7, 0.04], 0.1],
+      [[-0.29, 0.67, -0.03], 0.08],
+    ] as Array<[V, number]>)
+      addBlob(c, r, sj[2]!);
     const tHang = swingPath.closestT([-0.35, 0.56, 0.06]);
     const H = swingPath.at(tHang);
     const swing = b.joint("swing", { parent: sj[1]!, at: [H.x, H.y - 0.008, H.z], dir: [0, -1, 0], role: "hinge" });
@@ -1052,9 +1392,21 @@ export default function build() {
     const Kp: V = [H.x, hy - 0.115, H.z];
     const Cp: V = [H.x, Kp[1] - 0.075, H.z];
     const tilt: V = [7, 0, -6];
-    b.part(new THREE.TorusGeometry(0.038, 0.0175, 6, 12), "#ffffff", { bone: swing, at: Cp, rotation: [90 + tilt[0], 0, tilt[2]], texture: TYRE, flat: true, name: "tyre" });
+    b.part(new THREE.TorusGeometry(0.038, 0.0175, 6, 12), "#ffffff", {
+      bone: swing,
+      at: Cp,
+      rotation: [90 + tilt[0], 0, tilt[2]],
+      texture: TYRE,
+      flat: true,
+      name: "tyre",
+    });
     // rope: branch loop, hanging line, knot, three legs to the tyre
-    b.part(new THREE.TorusGeometry(0.0115, 0.0035, 4, 7), ROPE, { bone: swing, at: [H.x, hy + 0.001, H.z], rotation: [0, 90, 0], flat: true });
+    b.part(new THREE.TorusGeometry(0.0115, 0.0035, 4, 7), ROPE, {
+      bone: swing,
+      at: [H.x, hy + 0.001, H.z],
+      rotation: [0, 90, 0],
+      flat: true,
+    });
     ropeSweep([[H.x, hy + 0.005, H.z], [H.x, hy - 0.05, H.z], Kp], 0.0038, ROPE, swing);
     b.part(new THREE.SphereGeometry(0.0075, 5, 4), ROPE_D, { bone: swing, at: Kp, flat: true });
     const eul = new THREE.Euler(tilt[0] * (Math.PI / 180), 0, tilt[2] * (Math.PI / 180));
@@ -1063,13 +1415,26 @@ export default function build() {
       const v = new THREE.Vector3(Math.cos(a) * 0.038, 0.012, Math.sin(a) * 0.038).applyEuler(eul);
       ropeSweep([Kp, [Cp[0] + v.x, Cp[1] + v.y, Cp[2] + v.z]], 0.0028, ROPE, swing);
     }
-    b.cards([frame([Kp[0], Kp[1] + 0.004, Kp[2]], [0, 1, 0])], FRINGE, { size: [0.01, 0.014], lean: 180, flow: [0, 0, 1], bone: swing, cross: true, sink: 0 });
+    b.cards([frame([Kp[0], Kp[1] + 0.004, Kp[2]], [0, 1, 0])], FRINGE, {
+      size: [0.01, 0.014],
+      lean: 180,
+      flow: [0, 0, 1],
+      bone: swing,
+      cross: true,
+      sink: 0,
+    });
     // a robin perched on the branch
     const tPerch = swingPath.closestT([-0.25, 0.55, 0.05]);
     const perch = swingPath.at(tPerch);
     const rb: V = [perch.x, perch.y + (0.046 - 0.032 * tPerch) * 0.9 + 0.012, perch.z];
     const bird = (geo: THREE.BufferGeometry, color: string, d: V, rot?: V, scale?: V) =>
-      b.part(geo, color, { bone: sj[1]!, at: [rb[0] + d[0], rb[1] + d[1], rb[2] + d[2]], rotation: rot, scale, flat: true });
+      b.part(geo, color, {
+        bone: sj[1]!,
+        at: [rb[0] + d[0], rb[1] + d[1], rb[2] + d[2]],
+        rotation: rot,
+        scale,
+        flat: true,
+      });
     bird(new THREE.IcosahedronGeometry(0.013, 1), "#8a6a4a", [0, 0, 0], [-12, 0, 0], [1, 0.95, 1.4]);
     bird(new THREE.IcosahedronGeometry(0.0105, 1), "#df6a2c", [0, -0.002, 0.008]);
     bird(new THREE.IcosahedronGeometry(0.0088, 1), "#8a6a4a", [0, 0.012, 0.014]);
@@ -1077,7 +1442,8 @@ export default function build() {
     bird(new THREE.ConeGeometry(0.0025, 0.008, 4), "#e8b23a", [0, 0.0115, 0.0262], [90, 0, 0]);
     for (const s of [-1, 1]) bird(new THREE.IcosahedronGeometry(0.0017, 0), BLACK, [s * 0.0052, 0.0135, 0.0195]);
     bird(new THREE.BoxGeometry(0.008, 0.002, 0.022), "#6a4f38", [0, 0.001, -0.026], [-18, 0, 0]);
-    for (const s of [-1, 1]) bird(new THREE.CylinderGeometry(0.0009, 0.0009, 0.011, 3), "#6a4f38", [s * 0.004, -0.0125, 0.002]);
+    for (const s of [-1, 1])
+      bird(new THREE.CylinderGeometry(0.0009, 0.0009, 0.011, 3), "#6a4f38", [s * 0.004, -0.0125, 0.002]);
   }
 
   // --- the bike, leaning on the trunk ---------------------------------------------------------------------------
@@ -1105,7 +1471,12 @@ export default function build() {
     };
     const mk = (geo: THREE.BufferGeometry, color: string, p: V, rot?: V, texture?: THREE.Texture) => {
       const q = qBike.clone();
-      if (rot) q.multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(rot[0] * (Math.PI / 180), rot[1] * (Math.PI / 180), rot[2] * (Math.PI / 180))));
+      if (rot)
+        q.multiply(
+          new THREE.Quaternion().setFromEuler(
+            new THREE.Euler(rot[0] * (Math.PI / 180), rot[1] * (Math.PI / 180), rot[2] * (Math.PI / 180)),
+          ),
+        );
       return b.part(geo, color, { bone: base, at: Wv(p), quat: q, texture, flat: true, scale: SC });
     };
     const FRAME = "#c84a3c";
@@ -1118,8 +1489,20 @@ export default function build() {
     const headBot: V = [0.053, 0.066, 0];
     for (const ctr of [rear, front]) {
       mk(new THREE.TorusGeometry(RW - 0.0065, 0.0065, 5, 14), BLACK, ctr);
-      mk(new THREE.PlaneGeometry(2 * (RW - 0.009), 2 * (RW - 0.009)), "#ffffff", [ctr[0], ctr[1], ctr[2] + 0.001], undefined, SPOKES);
-      mk(new THREE.PlaneGeometry(2 * (RW - 0.009), 2 * (RW - 0.009)), "#ffffff", [ctr[0], ctr[1], ctr[2] - 0.001], [0, 180, 0], SPOKES);
+      mk(
+        new THREE.PlaneGeometry(2 * (RW - 0.009), 2 * (RW - 0.009)),
+        "#ffffff",
+        [ctr[0], ctr[1], ctr[2] + 0.001],
+        undefined,
+        SPOKES,
+      );
+      mk(
+        new THREE.PlaneGeometry(2 * (RW - 0.009), 2 * (RW - 0.009)),
+        "#ffffff",
+        [ctr[0], ctr[1], ctr[2] - 0.001],
+        [0, 180, 0],
+        SPOKES,
+      );
       mk(new THREE.CylinderGeometry(0.0035, 0.0035, 0.03, 5), STEEL_D, ctr, [90, 0, 0]);
     }
     tube(seatTop, headTop);
@@ -1135,8 +1518,19 @@ export default function build() {
     tube(headBot, [headBot[0], headBot[1], -0.0085], 0.0024, STEEL_D);
     // bars, grips, saddle, post
     tube([headTop[0], headTop[1], 0], [headTop[0] - 0.004, headTop[1] + 0.012, 0], 0.0028, STEEL_D);
-    tube([headTop[0] - 0.004, headTop[1] + 0.012, -0.032], [headTop[0] - 0.004, headTop[1] + 0.012, 0.032], 0.0024, STEEL_D);
-    for (const z of [-0.032, 0.032]) mk(new THREE.CylinderGeometry(0.0038, 0.0038, 0.012, 5), "#e8e0c8", [headTop[0] - 0.004, headTop[1] + 0.012, z + Math.sign(z) * 0.002], [90, 0, 0]);
+    tube(
+      [headTop[0] - 0.004, headTop[1] + 0.012, -0.032],
+      [headTop[0] - 0.004, headTop[1] + 0.012, 0.032],
+      0.0024,
+      STEEL_D,
+    );
+    for (const z of [-0.032, 0.032])
+      mk(
+        new THREE.CylinderGeometry(0.0038, 0.0038, 0.012, 5),
+        "#e8e0c8",
+        [headTop[0] - 0.004, headTop[1] + 0.012, z + Math.sign(z) * 0.002],
+        [90, 0, 0],
+      );
     tube(seatTop, [seatTop[0] - 0.003, seatTop[1] + 0.014, 0], 0.0028, STEEL_D);
     mk(new THREE.BoxGeometry(0.034, 0.007, 0.018), "#5b3a29", [seatTop[0] - 0.002, seatTop[1] + 0.017, 0]);
     mk(new THREE.BoxGeometry(0.014, 0.006, 0.014), "#5b3a29", [seatTop[0] + 0.014, seatTop[1] + 0.0155, 0]);
@@ -1147,14 +1541,28 @@ export default function build() {
     mk(new THREE.BoxGeometry(0.014, 0.003, 0.008), BLACK, [bb[0] + 0.012, bb[1] - 0.012, 0.016]);
     mk(new THREE.BoxGeometry(0.014, 0.003, 0.008), BLACK, [bb[0] - 0.012, bb[1] + 0.012, -0.016]);
     // basket, bell, streamers
-    mk(new THREE.BoxGeometry(0.03, 0.022, 0.05), "#ffffff", [headTop[0] + 0.022, headTop[1] + 0.0, 0], undefined, WEAVE);
+    mk(
+      new THREE.BoxGeometry(0.03, 0.022, 0.05),
+      "#ffffff",
+      [headTop[0] + 0.022, headTop[1] + 0.0, 0],
+      undefined,
+      WEAVE,
+    );
     mk(new THREE.BoxGeometry(0.032, 0.003, 0.052), "#8f6a30", [headTop[0] + 0.022, headTop[1] + 0.012, 0]);
     mk(new THREE.SphereGeometry(0.0045, 5, 4), "#e8c24a", [headTop[0] - 0.004, headTop[1] + 0.017, 0.012]);
     const streamTex = [STREAMER("#e8c24a", "#ffffff"), STREAMER("#3a86c8", "#ffffff")];
     b.cards(
       [-1, 1].map((s) => frame(Wv([headTop[0] - 0.004, headTop[1] + 0.012, s * 0.036]), [0, 1, 0], [0, 0, 1])),
       streamTex,
-      { size: [0.007, 0.038], lean: 180, flow: [out.x * 0.6, 0, out.z * 0.6], bone: base, sink: 0, rng: rng(3), cross: true },
+      {
+        size: [0.007, 0.038],
+        lean: 180,
+        flow: [out.x * 0.6, 0, out.z * 0.6],
+        bone: base,
+        sink: 0,
+        rng: rng(3),
+        cross: true,
+      },
     );
     // mudguard flecks: a rear rack and reflector
     mk(new THREE.BoxGeometry(0.004, 0.006, 0.008), RED, [rear[0] - 0.012, 0.072, 0]);
@@ -1171,11 +1579,28 @@ export default function build() {
     const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
     const up = new THREE.Vector3(0, 1, 0);
     rod([sx, y0 - 0.012, sz], [sx, y0 + 0.235, sz], 0.0075, TIMBER_L, 4);
-    b.part(new THREE.ConeGeometry(0.0106, 0.012, 4), TIMBER_L, { bone: base, at: [sx, y0 + 0.241, sz], rotation: [0, 45, 0] });
-    const sign = (tex: THREE.Texture, poly: Array<[number, number]>, w: number, h: number, yOff: number, xOff: number, tiltDeg: number, wood: string) => {
-      const q = new THREE.Quaternion().setFromAxisAngle(up, yaw).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), (tiltDeg * Math.PI) / 180));
+    b.part(new THREE.ConeGeometry(0.0106, 0.012, 4), TIMBER_L, {
+      bone: base,
+      at: [sx, y0 + 0.241, sz],
+      rotation: [0, 45, 0],
+    });
+    const sign = (
+      tex: THREE.Texture,
+      poly: Array<[number, number]>,
+      w: number,
+      h: number,
+      yOff: number,
+      xOff: number,
+      tiltDeg: number,
+      wood: string,
+    ) => {
+      const q = new THREE.Quaternion()
+        .setFromAxisAngle(up, yaw)
+        .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), (tiltDeg * Math.PI) / 180));
       const c = new THREE.Vector3(sx, y0 + yOff, sz).addScaledVector(right, xOff).addScaledVector(face, 0.0105);
-      const rx = right.clone().applyQuaternion(new THREE.Quaternion().setFromAxisAngle(face, (tiltDeg * Math.PI) / 180));
+      const rx = right
+        .clone()
+        .applyQuaternion(new THREE.Quaternion().setFromAxisAngle(face, (tiltDeg * Math.PI) / 180));
       const ry = up.clone().applyQuaternion(new THREE.Quaternion().setFromAxisAngle(face, (tiltDeg * Math.PI) / 180));
       b.extrude(
         poly.map(([x, y]): [number, number] => [(x - w / 2) * 0.001, (h / 2 - y) * 0.001]),
@@ -1189,7 +1614,21 @@ export default function build() {
       });
     };
     sign(SIGN1, SIGN1_POLY, SIGN_W, SIGN_H, 0.19, 0.012, -4, "#3c5e45");
-    sign(SIGN2, [[0, 0], [SIGN2_W, 0], [SIGN2_W, SIGN2_H], [0, SIGN2_H]], SIGN2_W, SIGN2_H, 0.128, -0.004, 3, "#8a6a44");
+    sign(
+      SIGN2,
+      [
+        [0, 0],
+        [SIGN2_W, 0],
+        [SIGN2_W, SIGN2_H],
+        [0, SIGN2_H],
+      ],
+      SIGN2_W,
+      SIGN2_H,
+      0.128,
+      -0.004,
+      3,
+      "#8a6a44",
+    );
   }
 
   // --- meadow: grass, wildflowers, fallen leaves -----------------------------------------------------------------
@@ -1201,20 +1640,71 @@ export default function build() {
     [0.29, 0.41, 0.045],
     [0.49, 0.0, 0.03],
   ];
-  const free = (x: number, z: number, pad = 0) => keepOut.every(([kx, kz, kr]) => Math.hypot(x - kx, z - kz) > kr + pad);
-  const grassHits = moundSurf.scatter(520, { rng: rng(21), minDist: 0.028, filter: (h) => h.n.y > 0.5 && free(h.at.x, h.at.z) });
-  b.cards(grassHits, GRASS_CARDS, { size: [0.058, 0.062], vary: 0.3, rng: rng(22), cross: true, bone: base, lean: 8, flow: [0, 0, 1], sink: 0.15 });
-  const flowerHits = moundSurf.scatter(80, { rng: rng(31), minDist: 0.075, filter: (h) => h.n.y > 0.5 && free(h.at.x, h.at.z, 0.03) && Math.hypot(h.at.x, h.at.z) > 0.15 });
-  b.cards(flowerHits, FLOWERS, { size: [0.042, 0.085], vary: 0.3, rng: rng(32), cross: true, bone: base, flow: [0, 0, 1], sink: 0.12, spin: 40 });
-  const leafHits = moundSurf.scatter(120, { rng: rng(41), minDist: 0.05, filter: (h) => h.n.y > 0.5 && free(h.at.x, h.at.z, 0.01) });
-  b.cards(leafHits, FALLEN, { size: [0.034, 0.045], lean: 90, flow: (_f, i) => [Math.cos(i * 1.7), 0, Math.sin(i * 1.7)], mirror: true, rng: rng(42), bone: base, vary: 0.25, sink: 0 });
+  const free = (x: number, z: number, pad = 0) =>
+    keepOut.every(([kx, kz, kr]) => Math.hypot(x - kx, z - kz) > kr + pad);
+  const grassHits = moundSurf.scatter(520, {
+    rng: rng(21),
+    minDist: 0.028,
+    filter: (h) => h.n.y > 0.5 && free(h.at.x, h.at.z),
+  });
+  b.cards(grassHits, GRASS_CARDS, {
+    size: [0.058, 0.062],
+    vary: 0.3,
+    rng: rng(22),
+    cross: true,
+    bone: base,
+    lean: 8,
+    flow: [0, 0, 1],
+    sink: 0.15,
+  });
+  const flowerHits = moundSurf.scatter(80, {
+    rng: rng(31),
+    minDist: 0.075,
+    filter: (h) => h.n.y > 0.5 && free(h.at.x, h.at.z, 0.03) && Math.hypot(h.at.x, h.at.z) > 0.15,
+  });
+  b.cards(flowerHits, FLOWERS, {
+    size: [0.042, 0.085],
+    vary: 0.3,
+    rng: rng(32),
+    cross: true,
+    bone: base,
+    flow: [0, 0, 1],
+    sink: 0.12,
+    spin: 40,
+  });
+  const leafHits = moundSurf.scatter(120, {
+    rng: rng(41),
+    minDist: 0.05,
+    filter: (h) => h.n.y > 0.5 && free(h.at.x, h.at.z, 0.01),
+  });
+  b.cards(leafHits, FALLEN, {
+    size: [0.034, 0.045],
+    lean: 90,
+    flow: (_f, i) => [Math.cos(i * 1.7), 0, Math.sin(i * 1.7)],
+    mirror: true,
+    rng: rng(42),
+    bone: base,
+    vary: 0.25,
+    sink: 0,
+  });
 
   // --- canopy cards ----------------------------------------------------------------------------------------------
   const leafHitsCanopy = b.surface(foliage).scatter(460, { rng: rng(51), minDist: 0.05, filter: (h) => h.n.y > -0.45 });
-  b.cards(leafHitsCanopy, LEAF_CARDS, { size: [0.1, 0.1], vary: 0.3, rng: rng(52), lean: 62, bend: 25, sink: 0.2, flow: [0, -1, 0.15], spin: 180 });
+  b.cards(leafHitsCanopy, LEAF_CARDS, {
+    size: [0.1, 0.1],
+    vary: 0.3,
+    rng: rng(52),
+    lean: 62,
+    bend: 25,
+    sink: 0.2,
+    flow: [0, -1, 0.15],
+    spin: 180,
+  });
   // bunting strung along the porch front
   {
-    const pts: V[] = [0, 0.25, 0.5, 0.75, 1].map((t): V => [-0.114 + t * 0.364, DECK_Y + RAIL_H + 0.006 - Math.sin(t * Math.PI) * 0.028, zF + 0.006]);
+    const pts: V[] = [0, 0.25, 0.5, 0.75, 1].map(
+      (t): V => [-0.114 + t * 0.364, DECK_Y + RAIL_H + 0.006 - Math.sin(t * Math.PI) * 0.028, zF + 0.006],
+    );
     const string = catmull(pts);
     b.sweep(string, 0.0016, { color: ROPE_D, sides: 4, smooth: false, bone: base, caps: "flat" });
     b.cards(

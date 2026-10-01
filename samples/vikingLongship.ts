@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
-import { aim, rng } from "../src/math";
+import { aim, rng, toDirection } from "../src/math";
 import { bezier, catmull, polyline, spiral } from "../src/path";
 import { svg } from "../src/texture";
 
@@ -84,7 +84,8 @@ const BH = 0.092;
 const beachH = (x: number, z: number) => {
   const e = Math.pow(Math.pow(Math.abs(x) / BX, 3) + Math.pow(Math.abs(z) / BZ, 3), 1 / 3);
   const fall = 1 - smooth01(0.6, 1, e);
-  const rough = 0.007 * Math.sin(x * 9.1 + z * 4.3) + 0.006 * Math.sin(x * 3.7 - z * 8.3 + 1.2) + 0.005 * Math.sin(z * 13 + x * 2);
+  const rough =
+    0.007 * Math.sin(x * 9.1 + z * 4.3) + 0.006 * Math.sin(x * 3.7 - z * 8.3 + 1.2) + 0.005 * Math.sin(z * 13 + x * 2);
   return Math.max(0, fall * (BH + rough));
 };
 
@@ -105,7 +106,10 @@ function ribbon(rings: RingVertex[][]) {
   };
   const m = rings[0].length;
   for (let i = 0; i < rings.length - 1; i++) {
-    const mid = centres[i].clone().add(centres[i + 1]).multiplyScalar(0.5);
+    const mid = centres[i]
+      .clone()
+      .add(centres[i + 1])
+      .multiplyScalar(0.5);
     for (let j = 0; j < m; j++) {
       const a = rings[i][j];
       const b = rings[i][(j + 1) % m];
@@ -342,8 +346,12 @@ function shingleDrawing() {
     const c = tones[Math.floor(r() * tones.length)];
     const tf = `transform="rotate(${rot} ${x.toFixed(1)} ${y.toFixed(1)})"`;
     if (i % 3 === 0)
-      out.push(`<ellipse cx="${(x + 0.6).toFixed(1)}" cy="${(y + 0.8).toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" ${tf} fill="#3f3d39"/>`);
-    out.push(`<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" ${tf} fill="${c}"/>`);
+      out.push(
+        `<ellipse cx="${(x + 0.6).toFixed(1)}" cy="${(y + 0.8).toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" ${tf} fill="#3f3d39"/>`,
+      );
+    out.push(
+      `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" ${tf} fill="${c}"/>`,
+    );
   }
   const weed: string[] = [];
   const kelp = ["#4c5a2e", "#3b4526", "#62552f"];
@@ -433,7 +441,8 @@ export default function build() {
       groups[i % tones.length].push(g2);
     }
     groups.forEach((list, i) => {
-      if (list.length) b.part(mergeGeometries(list)!, tones[i], { bone: hull, at: [0, 0, 0], flat: true, name: "pebbles" });
+      if (list.length)
+        b.part(mergeGeometries(list)!, tones[i], { bone: hull, at: [0, 0, 0], flat: true, name: "pebbles" });
     });
 
     // beach grass and foam
@@ -446,15 +455,19 @@ export default function build() {
       if (e < 0.62 || e > 0.86 || x < -0.5) continue;
       tufts.push(V(x, beachH(x, z), z));
     }
-    b.cards(tufts.map((p) => frame(p, [0, 1, 0])), grassDrawing(), {
-      size: [0.09, 0.15],
-      lean: 12,
-      vary: 0.35,
-      spin: 180,
-      cross: true,
-      rng: rng(34),
-      bone: hull,
-    });
+    b.cards(
+      tufts.map((p) => frame(p, [0, 1, 0])),
+      grassDrawing(),
+      {
+        size: [0.09, 0.15],
+        lean: 12,
+        vary: 0.35,
+        spin: 180,
+        cross: true,
+        rng: rng(34),
+        bone: hull,
+      },
+    );
     const foam: THREE.Vector3[] = [];
     const fr = rng(41);
     for (let i = 0; i < 12; i++) {
@@ -462,15 +475,19 @@ export default function build() {
       const x = -BX * 0.96 + fr() * 0.14;
       foam.push(V(x, 0.004 + fr() * 0.003, z));
     }
-    b.cards(foam.map((p) => frame(p, [0, 1, 0])), foamDrawing(), {
-      size: [0.3, 0.15],
-      lean: 90,
-      flow: [1, 0, 0],
-      mirror: true,
-      vary: 0.3,
-      rng: rng(42),
-      bone: hull,
-    });
+    b.cards(
+      foam.map((p) => frame(p, [0, 1, 0])),
+      foamDrawing(),
+      {
+        size: [0.3, 0.15],
+        lean: 90,
+        flow: [1, 0, 0],
+        mirror: true,
+        vary: 0.3,
+        rng: rng(42),
+        bone: hull,
+      },
+    );
   }
 
   // ---- Clinker strakes ---------------------------------------------------------------------
@@ -571,7 +588,11 @@ export default function build() {
       [1, RED],
     ],
   });
-  b.part(new THREE.SphereGeometry(0.03 * HS, 6, 4), RED, { bone: head, at: snoutPath.at(1).add(head.dir([0, 0.012 * HS, 0.004 * HS])), flat: true });
+  b.part(new THREE.SphereGeometry(0.03 * HS, 6, 4), RED, {
+    bone: head,
+    at: snoutPath.at(1).add(head.dir([0, 0.012 * HS, 0.004 * HS])),
+    flat: true,
+  });
   for (const s of [1, -1])
     b.part(new THREE.SphereGeometry(0.0075 * HS, 5, 3), "#4e1411", {
       bone: head,
@@ -585,12 +606,16 @@ export default function build() {
     caps: "flat",
     color: OAK,
   });
-  b.sweep(bezier(hl(0, 0, -0.03), hl(0, 0.1, -0.038), hl(0, 0.19, -0.027)), (t) => [(0.016 - 0.008 * t) * HS, 0.004 * HS], {
-    section: "box",
-    bone: jaw,
-    caps: "flat",
-    color: RED,
-  });
+  b.sweep(
+    bezier(hl(0, 0, -0.03), hl(0, 0.1, -0.038), hl(0, 0.19, -0.027)),
+    (t) => [(0.016 - 0.008 * t) * HS, 0.004 * HS],
+    {
+      section: "box",
+      bone: jaw,
+      caps: "flat",
+      color: RED,
+    },
+  );
   // teeth
   const down = head.dir([0, 0, -1]);
   const upDir = head.dir([0, 0, 1]);
@@ -603,13 +628,29 @@ export default function build() {
       const w = (0.04 - 0.018 * t - 0.007) * HS;
       const ry = (0.034 - 0.014 * t) * HS;
       upperTeeth.push(
-        tooth(c.clone().addScaledVector(head.dir([s, 0, 0]), w).addScaledVector(down, ry * 0.9), down, (0.032 - 0.008 * t) * HS, 0.007 * HS),
+        tooth(
+          c
+            .clone()
+            .addScaledVector(head.dir([s, 0, 0]), w)
+            .addScaledVector(down, ry * 0.9),
+          down,
+          (0.032 - 0.008 * t) * HS,
+          0.007 * HS,
+        ),
       );
       const c2 = lowerPath.at(t * 0.95 + 0.03);
       const w2 = (0.032 - 0.013 * t - 0.006) * HS;
       const ry2 = (0.018 - 0.006 * t) * HS;
       lowerTeeth.push(
-        tooth(c2.clone().addScaledVector(head.dir([s, 0, 0]), w2).addScaledVector(upDir, ry2 * 0.9), upDir, 0.024 * HS, 0.0065 * HS),
+        tooth(
+          c2
+            .clone()
+            .addScaledVector(head.dir([s, 0, 0]), w2)
+            .addScaledVector(upDir, ry2 * 0.9),
+          upDir,
+          0.024 * HS,
+          0.0065 * HS,
+        ),
       );
     }
   b.part(mergeGeometries(upperTeeth)!, BONE, { bone: head, at: [0, 0, 0], flat: true });
@@ -624,22 +665,30 @@ export default function build() {
       dir: gaze,
       axis: "z",
     });
-    b.sweep(bezier(hl(s * 0.03, 0.07, 0.045), hl(s * 0.055, 0.03, 0.064), hl(s * 0.066, -0.03, 0.056)), [0.012 * HS, 0.006 * HS], {
-      section: "box",
-      bone: head,
-      caps: "flat",
-      color: RED,
-    });
-    b.sweep(bezier(hl(s * 0.035, -0.03, 0.05), hl(s * 0.058, -0.12, 0.115), hl(s * 0.04, -0.21, 0.09)), [0.02 * HS, 0.004 * HS], {
-      bone: head,
-      sides: 5,
-      smooth: false,
-      caps: "point",
-      color: GOLD,
-    });
+    b.sweep(
+      bezier(hl(s * 0.03, 0.07, 0.045), hl(s * 0.055, 0.03, 0.064), hl(s * 0.066, -0.03, 0.056)),
+      [0.012 * HS, 0.006 * HS],
+      {
+        section: "box",
+        bone: head,
+        caps: "flat",
+        color: RED,
+      },
+    );
+    b.sweep(
+      bezier(hl(s * 0.035, -0.03, 0.05), hl(s * 0.058, -0.12, 0.115), hl(s * 0.04, -0.21, 0.09)),
+      [0.02 * HS, 0.004 * HS],
+      {
+        bone: head,
+        sides: 5,
+        smooth: false,
+        caps: "point",
+        color: GOLD,
+      },
+    );
     b.decal(cranium, spiralDrawing(), {
       at: hl(s * 0.06, 0, 0),
-      dir: head.dir([-s, 0, 0]),
+      dir: toDirection(head.dir([-s, 0, 0])).negate(),
       size: [0.085 * HS, 0.085 * HS],
       segments: 5,
       mirror: s < 0,
@@ -649,16 +698,23 @@ export default function build() {
   b.extrude(
     (
       [
-      [0.04, 0],
-      [0.0, 0.07],
-      [-0.04, 0.04],
-      [-0.08, 0.11],
-      [-0.11, 0.05],
-      [-0.17, 0.1],
-      [-0.2, 0],
+        [0.04, 0],
+        [0.0, 0.07],
+        [-0.04, 0.04],
+        [-0.08, 0.11],
+        [-0.11, 0.05],
+        [-0.17, 0.1],
+        [-0.2, 0],
       ] as Array<[number, number]>
     ).map(([x, y]) => [x * HS, y * HS] as [number, number]),
-    { at: hl(0, 0.0, 0.04), x: head.dir([0, 1, 0]), y: head.dir([0, 0, 1]), thickness: 0.014 * HS, color: RED, bone: head },
+    {
+      at: hl(0, 0.0, 0.04),
+      x: head.dir([0, 1, 0]),
+      y: head.dir([0, 0, 1]),
+      thickness: 0.014 * HS,
+      color: RED,
+      bone: head,
+    },
   );
   // mane cards down the back of the neck
   b.cards(
@@ -706,7 +762,12 @@ export default function build() {
       right.push(hp(f, u, -1).addScaledVector(outN(f, u, -1), -0.018));
     }
     const mid = V(0, YS + keelY(u) + 0.055, z);
-    b.sweep(catmull([...left, mid, ...right.reverse()]), 0.011, { section: "box", caps: "flat", bone: hull, color: OAK_LIGHT });
+    b.sweep(catmull([...left, mid, ...right.reverse()]), 0.011, {
+      section: "box",
+      caps: "flat",
+      bone: hull,
+      color: OAK_LIGHT,
+    });
   }
   // floor boards
   const wood = woodDrawing();
@@ -751,7 +812,11 @@ export default function build() {
     bone: hull,
     color: PALE_WOOD,
   });
-  b.part(new THREE.SphereGeometry(0.03, 6, 4), GOLD, { bone: hull, at: mastTop.clone().add(V(0, 0.01, 0)), flat: true });
+  b.part(new THREE.SphereGeometry(0.03, 6, 4), GOLD, {
+    bone: hull,
+    at: mastTop.clone().add(V(0, 0.01, 0)),
+    flat: true,
+  });
   b.extrude(
     [
       [0, 0],
@@ -762,7 +827,14 @@ export default function build() {
       [0.11, 0.03],
       [0.16, 0],
     ],
-    { at: mastTop.clone().add(V(0, 0.035, -0.01)), x: [0, 0, 1], y: [0, 1, 0], thickness: 0.008, color: GOLD, bone: hull },
+    {
+      at: mastTop.clone().add(V(0, 0.035, -0.01)),
+      x: [0, 0, 1],
+      y: [0, 1, 0],
+      thickness: 0.008,
+      color: GOLD,
+      bone: hull,
+    },
   );
 
   const YARD_Y = 1.74;
@@ -827,7 +899,13 @@ export default function build() {
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
     g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
-    b.part(g, "#ffffff", { bone: yard, at: [0, 0, 0], texture: sailTex, flat: true, name: front ? "sailFront" : "sailBack" });
+    b.part(g, "#ffffff", {
+      bone: yard,
+      at: [0, 0, 0],
+      texture: sailTex,
+      flat: true,
+      name: front ? "sailFront" : "sailBack",
+    });
   }
   // bolt ropes round the sail
   const edge = (f: (t: number) => THREE.Vector3, n: number) => Array.from({ length: n + 1 }, (_, i) => f(i / n));
@@ -915,13 +993,17 @@ export default function build() {
       b.part(port, DARK, { bone: hull, at: P.clone().addScaledVector(n, 0.004), dir: n, axis: "z" });
       const d = V(s, -0.18, -0.1).normalize();
       const oar = b.joint(`oar${s > 0 ? "L" : "R"}${i + 1}`, { parent: hull, at: P, dir: d, role: "hinge" });
-      b.sweep(polyline([P.clone().addScaledVector(d, -0.3), P.clone().addScaledVector(d, 0.6)]), (t) => 0.017 - 0.006 * t, {
-        sides: 6,
-        smooth: false,
-        caps: "flat",
-        bone: oar,
-        color: OAK_LIGHT,
-      });
+      b.sweep(
+        polyline([P.clone().addScaledVector(d, -0.3), P.clone().addScaledVector(d, 0.6)]),
+        (t) => 0.017 - 0.006 * t,
+        {
+          sides: 6,
+          smooth: false,
+          caps: "flat",
+          bone: oar,
+          color: OAK_LIGHT,
+        },
+      );
       b.extrude(bladeOutline, {
         at: P.clone().addScaledVector(d, 0.58),
         x: d,
@@ -941,7 +1023,12 @@ export default function build() {
     const P = hp(fo, u, -1).addScaledVector(n, 0.012);
     const d = V(-0.22, -0.95, -0.14).normalize();
     const steer = b.joint("steeringOar", { parent: hull, at: P, dir: d, role: "hinge" });
-    b.part(new THREE.BoxGeometry(0.05, 0.07, 0.06), OAK, { bone: hull, at: P.clone().addScaledVector(n, -0.004), dir: n, axis: "x" });
+    b.part(new THREE.BoxGeometry(0.05, 0.07, 0.06), OAK, {
+      bone: hull,
+      at: P.clone().addScaledVector(n, -0.004),
+      dir: n,
+      axis: "x",
+    });
     b.sweep(polyline([P.clone().addScaledVector(d, -0.36), P.clone().addScaledVector(d, 0.27)]), [0.02, 0.016], {
       sides: 6,
       smooth: false,
@@ -1033,13 +1120,21 @@ export default function build() {
       bone: hull,
       color: HEMP,
     });
-    b.sweep(spiral(c.clone().add(V(0, 0.026, 0)), c.clone().add(V(0.09, 0.026, 0)), [0, 1, 0], { turns: 1.6, r1: 0.05, pitch: 0.01 }), 0.0135, {
-      sides: 5,
-      smooth: false,
-      detail: 0.5,
-      bone: hull,
-      color: HEMP_DARK,
-    });
+    b.sweep(
+      spiral(c.clone().add(V(0, 0.026, 0)), c.clone().add(V(0.09, 0.026, 0)), [0, 1, 0], {
+        turns: 1.6,
+        r1: 0.05,
+        pitch: 0.01,
+      }),
+      0.0135,
+      {
+        sides: 5,
+        smooth: false,
+        detail: 0.5,
+        bone: hull,
+        color: HEMP_DARK,
+      },
+    );
   }
 
   // ---- Beach props: shoring timbers, mooring post and line ---------------------------------

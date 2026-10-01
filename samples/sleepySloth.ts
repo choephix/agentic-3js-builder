@@ -172,13 +172,17 @@ export default function build() {
   // ---- props: posts, branch, rope ---------------------------------------------------------------------------------
   // The branch bends away from the body at both ends (an S-shaped twig) so the posts stand clear of the face.
   const bx = (z: number) => (z < -0.28 ? -0.28 - z : z > 0.26 ? -(z - 0.26) : 0);
-  const branch = b.sweep([V(0.27, BY, -0.55), V(0, BY, -0.28), V(0, BY, 0.26), V(-0.27, BY, 0.53)], [0.04, 0.043, 0.04, 0.042, 0.04, 0.043, 0.04], {
-    bone: root,
-    color: BARK,
-    sides: 7,
-    smooth: false,
-    up: [0, 1, 0],
-  });
+  const branch = b.sweep(
+    [V(0.27, BY, -0.55), V(0, BY, -0.28), V(0, BY, 0.26), V(-0.27, BY, 0.53)],
+    [0.04, 0.043, 0.04, 0.042, 0.04, 0.043, 0.04],
+    {
+      bone: root,
+      color: BARK,
+      sides: 7,
+      smooth: false,
+      up: [0, 1, 0],
+    },
+  );
   for (const [z, dx, dy] of [
     [-0.22, 1, 0.2],
     [0.21, -1, 0.2],
@@ -186,7 +190,14 @@ export default function build() {
     [0.0, 1, -0.3],
     [0.12, 1, 0.3],
   ] as const)
-    b.decal(branch, BARK_MARKS, { at: [0, BY, z], dir: [-dx, -dy, 0], up: [0, 0, 1], roll: -90, size: [0.09, 0.045], bone: root });
+    b.decal(branch, BARK_MARKS, {
+      at: [0, BY, z],
+      dir: [dx, dy, 0],
+      up: [0, 0, 1],
+      roll: -90,
+      size: [0.09, 0.045],
+      bone: root,
+    });
   for (const z of POSTS) {
     const px = bx(z);
     const phi = -Math.PI / 4; // branch yaw at both posts
@@ -256,11 +267,15 @@ export default function build() {
   });
 
   // tail nub
-  const tail = b.chain("tail", catmull([V(0, BODY_Y + 0.005, -0.2), V(0, BODY_Y, -0.235), V(0, BODY_Y - 0.01, -0.26)]), {
-    parent: hips,
-    names: ["tail1", "tail2"],
-    role: "tail",
-  });
+  const tail = b.chain(
+    "tail",
+    catmull([V(0, BODY_Y + 0.005, -0.2), V(0, BODY_Y, -0.235), V(0, BODY_Y - 0.01, -0.26)]),
+    {
+      parent: hips,
+      names: ["tail1", "tail2"],
+      role: "tail",
+    },
+  );
   b.sweep(tail, [0.045, 0.02], { sides: 6, smooth: false, color: FUR, caps: "round" });
 
   // neck
@@ -306,7 +321,7 @@ export default function build() {
     });
   b.decal([skull, faceplate, muzzle, chin], FACE, {
     at: [0, SK.y - 0.004, 0.42],
-    dir: [0, 0, -1],
+    dir: [0, 0, 1],
     size: [0.22 * H, 0.124 * H],
     segments: [22, 12],
     lift: 0.002,
@@ -315,7 +330,11 @@ export default function build() {
   // cheek fur
   const skullSkin = b.surface([skull]);
   b.cards(
-    skullSkin.scatter(34, { rng: rand, minDist: 0.03, filter: (h) => h.n.z < 0.3 && h.n.y < 0.75 && h.at.y < SK.y + 0.06 }),
+    skullSkin.scatter(34, {
+      rng: rand,
+      minDist: 0.03,
+      filter: (h) => h.n.z < 0.3 && h.n.y < 0.75 && h.at.y < SK.y + 0.06,
+    }),
     TUFT,
     { size: [0.03, 0.045], lean: 65, bend: 20, flow: [0, -1, -0.2], vary: 0.25, rng: rand, color: FUR },
   );
@@ -377,14 +396,27 @@ export default function build() {
 
   // ---- limbs: long arms and legs with claws hooked over the branch ----------------------------------------------------
   const RC = 0.058; // claw arc radius round the branch axis
-  const limbFor = (s: 1 | -1, name: string, parent: Joint, root3: THREE.Vector3, zp: number, lens: [number, number], hint: [number, number, number], fur: string) => {
+  const limbFor = (
+    s: 1 | -1,
+    name: string,
+    parent: Joint,
+    root3: THREE.Vector3,
+    zp: number,
+    lens: [number, number],
+    hint: [number, number, number],
+    fur: string,
+  ) => {
     const S = s > 0 ? "L" : "R";
     const zOff = s > 0 ? 0 : 0.014;
     const paw = V(s * 0.0557, BY - 0.039, zp + zOff);
     const pts = limb(root3, paw, lens, hint);
     const chain = b.chain(`${name}${S}`, pts, {
       parent,
-      names: [`${name === "arm" ? "shoulder" : "hip"}${S}`, `${name === "arm" ? "elbow" : "knee"}${S}`, `${name === "arm" ? "wrist" : "ankle"}${S}`],
+      names: [
+        `${name === "arm" ? "shoulder" : "hip"}${S}`,
+        `${name === "arm" ? "elbow" : "knee"}${S}`,
+        `${name === "arm" ? "wrist" : "ankle"}${S}`,
+      ],
       role: name === "arm" ? "arm" : "leg",
     });
     const limbSweep = b.sweep(chain, (t) => 0.052 - 0.014 * t, { sides: 6, smooth: false, color: fur, caps: "round" });
@@ -422,15 +454,23 @@ export default function build() {
 
   const limbSweeps: Sweep[] = [];
   for (const s of [1, -1] as const) {
-    limbSweeps.push(limbFor(s, "arm", chest, V(s * 0.095, BODY_Y + 0.03, 0.085), 0.085, [0.125, 0.115], [s, -0.5, -0.2], FUR_DARK));
-    limbSweeps.push(limbFor(s, "leg", hips, V(s * 0.09, BODY_Y + 0.02, -0.105), -0.205, [0.135, 0.125], [s, -0.3, 0.15], FUR_DARK));
+    limbSweeps.push(
+      limbFor(s, "arm", chest, V(s * 0.095, BODY_Y + 0.03, 0.085), 0.085, [0.125, 0.115], [s, -0.5, -0.2], FUR_DARK),
+    );
+    limbSweeps.push(
+      limbFor(s, "leg", hips, V(s * 0.09, BODY_Y + 0.02, -0.105), -0.205, [0.135, 0.125], [s, -0.3, 0.15], FUR_DARK),
+    );
   }
   for (const sweep of limbSweeps)
-    b.cards(
-      b.surface(sweep).scatter(9, { rng: rand, minDist: 0.045, filter: (h) => h.n.y < 0.6 }),
-      TUFT,
-      { size: [0.028, 0.045], lean: 65, bend: 20, flow: [0, -1, 0], vary: 0.25, rng: rand, color: FUR },
-    );
+    b.cards(b.surface(sweep).scatter(9, { rng: rand, minDist: 0.045, filter: (h) => h.n.y < 0.6 }), TUFT, {
+      size: [0.028, 0.045],
+      lean: 65,
+      bend: 20,
+      flow: [0, -1, 0],
+      vary: 0.25,
+      rng: rand,
+      color: FUR,
+    });
 
   // fur over the body
   b.cards(
@@ -463,7 +503,13 @@ export default function build() {
         ],
         { at: tipAt, x: [s, 0.3, 0], y: [0, 0.3, 1], thickness: 0.006, smoothing: 1, color: MOSS, bone: moss },
       );
-    b.cards([frame(tipAt, [0, 1, 0.4])], FLOWER, { size: [0.045, 0.06], flow: [0, 0, 1], bone: moss, sink: 0.1, lean: 0 });
+    b.cards([frame(tipAt, [0, 1, 0.4])], FLOWER, {
+      size: [0.045, 0.06],
+      flow: [0, 0, 1],
+      bone: moss,
+      sink: 0.1,
+      lean: 0,
+    });
     b.cards(
       [0, 1, 2, 3, 4].map((i) => {
         const a = (i / 5) * Math.PI * 2;
@@ -490,12 +536,39 @@ export default function build() {
       [0.012, 0.006],
       { bone: root, sides: 5, smooth: false, color: BARK, caps: "round" },
     );
-  const cluster = (at: [number, number, number], dirs: Array<[number, number, number]>) => dirs.map((d) => frame(at, d));
+  const cluster = (at: [number, number, number], dirs: Array<[number, number, number]>) =>
+    dirs.map((d) => frame(at, d));
   const bigLeaves = [
-    ...cluster(twigs[0][1], [[0.7, 1, 0.1], [-0.7, 1, -0.2], [0, 1, -0.7], [0.3, 1.3, 0.6]]),
-    ...cluster(twigs[1][1], [[0.7, 1, 0.3], [-0.7, 1, -0.1], [0, 1, 0.7], [0.1, 1.3, -0.6]]),
-    ...cluster([0.27, BY + 0.03, -0.55], [[0.6, 0.8, -1], [-0.5, 1, -0.6], [1, 0.7, -0.2], [0, 1.2, 0.3]]),
-    ...cluster([-0.27, BY + 0.03, 0.53], [[-0.6, 0.8, 1], [0.5, 1, 0.6], [-1, 0.7, 0.2], [0, 1.2, -0.3]]),
+    ...cluster(twigs[0][1], [
+      [0.7, 1, 0.1],
+      [-0.7, 1, -0.2],
+      [0, 1, -0.7],
+      [0.3, 1.3, 0.6],
+    ]),
+    ...cluster(twigs[1][1], [
+      [0.7, 1, 0.3],
+      [-0.7, 1, -0.1],
+      [0, 1, 0.7],
+      [0.1, 1.3, -0.6],
+    ]),
+    ...cluster(
+      [0.27, BY + 0.03, -0.55],
+      [
+        [0.6, 0.8, -1],
+        [-0.5, 1, -0.6],
+        [1, 0.7, -0.2],
+        [0, 1.2, 0.3],
+      ],
+    ),
+    ...cluster(
+      [-0.27, BY + 0.03, 0.53],
+      [
+        [-0.6, 0.8, 1],
+        [0.5, 1, 0.6],
+        [-1, 0.7, 0.2],
+        [0, 1.2, -0.3],
+      ],
+    ),
   ];
   b.cards(bigLeaves, LEAF, {
     size: [0.06, 0.1],
@@ -508,14 +581,41 @@ export default function build() {
     sink: 0.25,
   });
   const smallLeaves = [
-    ...cluster(topOf(-0.46), [[0.8, 1, 0], [-0.8, 1, 0]]),
-    ...cluster(topOf(0.46), [[0.8, 1, 0], [-0.8, 1, 0]]),
+    ...cluster(topOf(-0.46), [
+      [0.8, 1, 0],
+      [-0.8, 1, 0],
+    ]),
+    ...cluster(topOf(0.46), [
+      [0.8, 1, 0],
+      [-0.8, 1, 0],
+    ]),
     ...cluster(topOf(0.25), [[-0.8, 1, 0.3]]),
     ...cluster(topOf(-0.27), [[0.8, 1, -0.3]]),
-    ...cluster([(twigs[0][0][0] + twigs[0][1][0]) / 2, BY + 0.09, -0.385], [[-0.8, 0.6, 0.2], [0.8, 0.6, -0.1]]),
-    ...cluster([(twigs[1][0][0] + twigs[1][1][0]) / 2, BY + 0.095, 0.375], [[-0.8, 0.6, 0.1], [0.8, 0.6, 0.3]]),
+    ...cluster(
+      [(twigs[0][0][0] + twigs[0][1][0]) / 2, BY + 0.09, -0.385],
+      [
+        [-0.8, 0.6, 0.2],
+        [0.8, 0.6, -0.1],
+      ],
+    ),
+    ...cluster(
+      [(twigs[1][0][0] + twigs[1][1][0]) / 2, BY + 0.095, 0.375],
+      [
+        [-0.8, 0.6, 0.1],
+        [0.8, 0.6, 0.3],
+      ],
+    ),
   ];
-  b.cards(smallLeaves, LEAF, { size: [0.045, 0.075], lean: 50, flow: [0, 0, 1], vary: 0.2, rng: rand, cross: true, bone: root, sink: 0.25 });
+  b.cards(smallLeaves, LEAF, {
+    size: [0.045, 0.075],
+    lean: 50,
+    flow: [0, 0, 1],
+    vary: 0.2,
+    rng: rand,
+    cross: true,
+    bone: root,
+    sink: 0.25,
+  });
   b.cards(
     [frame(twigs[0][1], [0.1, 1, 0.3]), frame(twigs[1][1], [-0.1, 1, -0.3]), frame(topOf(0.5), [0, 1, 0.3])],
     FLOWER,
@@ -535,11 +635,7 @@ export default function build() {
 
   // sleepy Zs and sparkles
   b.cards(
-    [
-      frame([0.25, 0.6, 0.36], [0, 1, 0]),
-      frame([0.3, 0.68, 0.37], [0, 1, 0]),
-      frame([0.35, 0.78, 0.37], [0, 1, 0]),
-    ],
+    [frame([0.25, 0.6, 0.36], [0, 1, 0]), frame([0.3, 0.68, 0.37], [0, 1, 0]), frame([0.35, 0.78, 0.37], [0, 1, 0])],
     Z_GLYPH,
     { size: [0.05, 0.055], flow: [0, 0, 1], bone: root, sink: 0, lean: 0 },
   );

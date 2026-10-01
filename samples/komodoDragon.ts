@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { createBuilder } from "../src/builder";
-import { rng } from "../src/math";
+import { rng, toDirection } from "../src/math";
 import { bezier, catmull } from "../src/path";
 import { limb } from "../src/ik";
 import { svg } from "../src/texture";
@@ -97,9 +97,12 @@ export default function build() {
   const b = createBuilder({ name: "komodoDragon" });
   const R = rng(11);
 
-  const beads = svg(beadTile(3, 26, 13, ["#8b7a5d", "#9a8966", "#77684f", "#6a5c47", "#a39370", "#857557"], "#b9ab83"), {
-    size: 780,
-  });
+  const beads = svg(
+    beadTile(3, 26, 13, ["#8b7a5d", "#9a8966", "#77684f", "#6a5c47", "#a39370", "#857557"], "#b9ab83"),
+    {
+      size: 780,
+    },
+  );
   const beadsDark = svg(beadTile(8, 26, 13, ["#6f604b", "#7a6a52", "#5f5140", "#857459"], "#9a8b69"), { size: 780 });
   const saddles = svg(saddleTile(5), { size: 600 });
   const scars = svg(SCARS, { size: 256 });
@@ -217,7 +220,16 @@ export default function build() {
     size: [number, number],
     lift: number,
     opts: { color?: string; mirror?: boolean; segments?: number | [number, number] } = {},
-  ) => b.decal(skin, tex, { at, dir, up, size, lift, segments: opts.segments ?? [14, 7], ...opts });
+  ) =>
+    b.decal(skin, tex, {
+      at,
+      dir: toDirection(dir).negate(),
+      up,
+      size,
+      lift,
+      segments: opts.segments ?? [14, 7],
+      ...opts,
+    });
 
   [-0.52, -0.38, -0.24, -0.1, 0.04, 0.18, 0.32, 0.46].forEach((z, i) =>
     dec(i % 2 ? beads : beadsDark, [0, 0.5, z], [0, -1, 0], [0.0, 0, 1], [0.34, 0.17], 0.0015, { mirror: i % 3 === 0 }),
@@ -281,7 +293,12 @@ export default function build() {
   // ---------------------------------------------------------------- head
   const K = 1.16;
   const upW = (u: number) =>
-    K * (u < 0.03 ? 0.052 + 0.008 * ((u + 0.035) / 0.065) : u < 0.1 ? 0.06 - 0.008 * ((u - 0.03) / 0.07) : 0.052 - 0.095 * (u - 0.1));
+    K *
+    (u < 0.03
+      ? 0.052 + 0.008 * ((u + 0.035) / 0.065)
+      : u < 0.1
+        ? 0.06 - 0.008 * ((u - 0.03) / 0.07)
+        : 0.052 - 0.095 * (u - 0.1));
   const upH = (u: number) => K * (u < 0.03 ? 0.038 + 0.004 * ((u + 0.035) / 0.065) : 0.042 - 0.085 * (u - 0.03));
   const U0 = -0.035;
   const U1 = 0.3;
@@ -317,7 +334,7 @@ export default function build() {
   const chinSkin = b.surface(chin);
   b.decal(headSkin, beads, {
     at: hl(1, 0, 0.14, 0.08),
-    dir: hd(1, 0, 0, -1),
+    dir: toDirection(hd(1, 0, 0, -1)).negate(),
     up: hd(1, 1, 0, 0),
     size: [0.27, 0.12],
     lift: 0.0015,
@@ -326,7 +343,7 @@ export default function build() {
   });
   b.decal(headSkin, beadsDark, {
     at: hl(1, 0, 0.12, 0.08),
-    dir: hd(1, 0, 0, -1),
+    dir: toDirection(hd(1, 0, 0, -1)).negate(),
     up: hd(1, 1, 0, 0),
     size: [0.16, 0.075],
     lift: 0.0028,
@@ -336,7 +353,7 @@ export default function build() {
   for (const s of [1, -1]) {
     b.decal(headSkin, s > 0 ? beads : beadsDark, {
       at: hl(s, 0.07, 0.12, 0.04),
-      dir: hd(s, -1, 0, 0),
+      dir: toDirection(hd(s, -1, 0, 0)).negate(),
       up: hd(s, 0, 0, 1),
       size: [0.24, 0.12],
       lift: 0.0015,
@@ -345,7 +362,7 @@ export default function build() {
     });
     b.decal(chinSkin, s > 0 ? beadsDark : beads, {
       at: jaw.local([-s * 0.05, 0.13, -0.014]),
-      dir: hd(s, -1, 0, 0),
+      dir: toDirection(hd(s, -1, 0, 0)).negate(),
       up: hd(s, 0, 0, 1),
       size: [0.22, 0.05],
       lift: 0.0015,
@@ -484,7 +501,7 @@ export default function build() {
       const limbSkin = b.surface([tube, mass]);
       b.decal(limbSkin, beads, {
         at: [massAt[0] + s * 0.06, massAt[1] + 0.02, massAt[2]],
-        dir: [-s, -0.25, 0],
+        dir: [s, 0.25, 0],
         up: [0, 1, 0],
         size: [0.15, 0.075],
         lift: 0.0015,
@@ -493,7 +510,7 @@ export default function build() {
       });
       b.decal(limbSkin, beadsDark, {
         at: [massAt[0], massAt[1] + 0.07, massAt[2]],
-        dir: [0, -1, 0],
+        dir: [0, 1, 0],
         up: [0, 0, 1],
         size: [0.13, 0.065],
         lift: 0.0028,
@@ -501,7 +518,7 @@ export default function build() {
       });
       b.decal(limbSkin, beadsDark, {
         at: pts[0].clone().lerp(pts[1], 0.75),
-        dir: [0, -1, 0],
+        dir: [0, 1, 0],
         up: [0, 0, 1],
         size: [0.14, 0.07],
         lift: 0.0015,
@@ -509,7 +526,7 @@ export default function build() {
       });
       b.decal(limbSkin, beads, {
         at: pts[1].clone().lerp(pts[2], 0.4),
-        dir: [-s, 0, 0],
+        dir: [s, 0, 0],
         up: [0, 1, 0],
         size: [0.12, 0.06],
         lift: 0.0015,

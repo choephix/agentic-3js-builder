@@ -226,7 +226,10 @@ type Hit = { at: THREE.Vector3; n: THREE.Vector3 };
 function quillGeometry(hits: Hit[], random: () => number, len: number, radius: number, sweepBack: number) {
   const pieces: THREE.BufferGeometry[] = [];
   for (const hit of hits) {
-    const dir = hit.n.clone().add(new THREE.Vector3(0, 0.22, -sweepBack)).normalize();
+    const dir = hit.n
+      .clone()
+      .add(new THREE.Vector3(0, 0.22, -sweepBack))
+      .normalize();
     const l = len * (0.8 + 0.4 * random());
     const r = radius * (0.85 + 0.3 * random());
     const cone = new THREE.ConeGeometry(1, 1, 5, 1).translate(0, 0.5, 0);
@@ -313,7 +316,7 @@ export default function build() {
   });
   b.decal(skull, maskTex, {
     at: [0, 0.32, 0.25],
-    dir: [0, 0, -1],
+    dir: [0, 0, 1],
     size: [0.15, 0.105],
     segments: 26,
     lift: 0.0025,
@@ -323,7 +326,7 @@ export default function build() {
   for (const s of [1, -1]) {
     b.decal(skull, eyeTex, {
       at: [s * 0.056, 0.338, 0.25],
-      dir: [0, 0, -1],
+      dir: [0, 0, 1],
       size: [0.04, 0.05],
       segments: 14,
       lift: 0.0055,
@@ -333,7 +336,7 @@ export default function build() {
     if (cheek) {
       b.decal(skull, blushTex, {
         at: cheek,
-        dir: [-s * 0.3, 0, -1],
+        dir: [-(-s * 0.3), 0, 1],
         size: [0.042, 0.026],
         lift: 0.0045,
         bone: head,
@@ -381,7 +384,7 @@ export default function build() {
     if (hit) {
       b.decal(skull, smileTex, {
         at: hit,
-        dir: [-s * 0.25, 0, -1],
+        dir: [-(-s * 0.25), 0, 1],
         size: [0.03, 0.02],
         lift: 0.005,
         mirror: s < 0,
@@ -463,7 +466,7 @@ export default function build() {
       bone: head,
     },
   );
-  b.decal(crown, badgeTex, { at: [0, 0.402, 0.3], dir: [0, 0.14, -1], size: [0.046, 0.046], lift: 0.0025, bone: head });
+  b.decal(crown, badgeTex, { at: [0, 0.402, 0.3], dir: [0, -0.14, 1], size: [0.046, 0.046], lift: 0.0025, bone: head });
 
   // ---- back quills -----------------------------------------------------------------------------------------
   const dome = b.part(new THREE.SphereGeometry(1, 9, 6), QUILL_BASE, {
@@ -551,12 +554,7 @@ export default function build() {
   // ---- legs ------------------------------------------------------------------------------------------------
   for (const s of [1, -1]) {
     const S = s > 0 ? "L" : "R";
-    const pts = limb(
-      [s * 0.056, 0.13, 0.004],
-      [s * 0.062, 0.03, 0.012],
-      [0.058, 0.062],
-      [0, 0, 1],
-    );
+    const pts = limb([s * 0.056, 0.13, 0.004], [s * 0.062, 0.03, 0.012], [0.058, 0.062], [0, 0, 1]);
     const leg = b.chain(`leg${S}`, catmull(pts), {
       parent: hips,
       names: [`hip${S}`, `knee${S}`, `ankle${S}`],
@@ -579,13 +577,12 @@ export default function build() {
       bone: toe,
     });
     for (const k of [-1, 0, 1]) {
-      b.spike(
-        [s * 0.062 + k * 0.016, 0.028, 0.098 - Math.abs(k) * 0.008],
-        [k * 0.25, -0.1, 1],
-        0.02,
-        0.008,
-        { sides: 5, smooth: false, color: CLAW, bone: toe },
-      );
+      b.spike([s * 0.062 + k * 0.016, 0.028, 0.098 - Math.abs(k) * 0.008], [k * 0.25, -0.1, 1], 0.02, 0.008, {
+        sides: 5,
+        smooth: false,
+        color: CLAW,
+        bone: toe,
+      });
     }
   }
 
@@ -649,7 +646,7 @@ export default function build() {
   });
   b.decal(torsoSkin, scarfTex, {
     at: [0, 0.225, 0.25],
-    dir: [0, 0.2, -1],
+    dir: [0, -0.2, 1],
     size: [0.1, 0.1],
     lift: 0.012,
     bone: chestJoint,
@@ -702,8 +699,20 @@ export default function build() {
     { at: PB, segments: 8, color: GOLD, bone: hips },
   );
   b.part(new THREE.SphereGeometry(0.01, 6, 4), GOLD, { bone: hips, at: [PB[0], 0.204, PB[2]], flat: true });
-  b.decal(box, slotTex, { at: [PB[0] - 0.02, 0.165, 0.3], dir: [0.1, 0, -1], size: [0.048, 0.024], lift: 0.003, bone: hips });
-  b.decal(box, plateTex, { at: [PB[0] - 0.012, 0.085, 0.3], dir: [0.1, 0, -1], size: [0.04, 0.04], lift: 0.003, bone: hips });
+  b.decal(box, slotTex, {
+    at: [PB[0] - 0.02, 0.165, 0.3],
+    dir: [-0.1, 0, 1],
+    size: [0.048, 0.024],
+    lift: 0.003,
+    bone: hips,
+  });
+  b.decal(box, plateTex, {
+    at: [PB[0] - 0.012, 0.085, 0.3],
+    dir: [-0.1, 0, 1],
+    size: [0.04, 0.04],
+    lift: 0.003,
+    bone: hips,
+  });
 
   // ---- envelope cards, flowers, grass, sparkles ------------------------------------------------------------
   b.cards([frame([-0.14, 0.001, 0.14], [0, 1, 0])], ENV_PINK, {
@@ -748,11 +757,7 @@ export default function build() {
     { size: [0.04, 0.052], cross: true, bone: hips },
   );
   b.cards(
-    [
-      frame([0.27, 0.36, 0.08], [0, 1, 0]),
-      frame([-0.2, 0.34, 0.07], [0, 1, 0]),
-      frame([0.33, 0.23, 0.1], [0, 1, 0]),
-    ],
+    [frame([0.27, 0.36, 0.08], [0, 1, 0]), frame([-0.2, 0.34, 0.07], [0, 1, 0]), frame([0.33, 0.23, 0.1], [0, 1, 0])],
     sparkleTex,
     { size: 0.028, flow: [0, 0, 1], cross: true, lean: 0, bone: chestJoint },
   );

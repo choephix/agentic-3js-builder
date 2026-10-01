@@ -399,14 +399,14 @@ export default function build() {
   for (const leg of legs) {
     const R = leg.hind ? hindR : frontR;
     legSweeps[leg.name] = b.sweep(leg.chain, (t) => R(t), {
-        sides: 6,
-        smooth: false,
-        bands: [
-          [0.6, TAN],
-          [1, TAN_L],
-        ],
-        caps: { start: "round", end: "round" },
-        extend: [0, 0.1],
+      sides: 6,
+      smooth: false,
+      bands: [
+        [0.6, TAN],
+        [1, TAN_L],
+      ],
+      caps: { start: "round", end: "round" },
+      extend: [0, 0.1],
     });
     const joints = leg.chain.joints;
     const kneeJ = joints[2];
@@ -453,7 +453,7 @@ export default function build() {
     const foot = leg.chain.joints[3];
     for (const dirX of [1, -1]) {
       const at = [foot.at.x, 0.36, foot.at.z + (leg.hind ? 0.02 : 0)];
-      b.decal(sw, dust, { at, dir: [dirX, 0, 0], size: [0.12, 0.17], up: [0, 1, 0], mirror: dirX < 0 });
+      b.decal(sw, dust, { at, dir: [-dirX, 0, 0], size: [0.12, 0.17], up: [0, 1, 0], mirror: dirX < 0 });
     }
   }
 
@@ -502,7 +502,7 @@ export default function build() {
   for (const w of [1, -1]) {
     b.decal(muzzle, nostrilDecal, {
       at: head.local([-w * 0.05, 0.47, 0.02]),
-      dir: [0, -1, 0],
+      dir: [0, 1, 0],
       up: [0, 0, 1],
       size: [0.05, 0.05],
       mirror: w > 0,
@@ -553,7 +553,7 @@ export default function build() {
     });
     b.decal(skull, eyeDecal, {
       at: head.local([-w * 0.11, 0.12, 0.03]),
-      dir: [-w, 0, 0],
+      dir: [w, 0, 0],
       size: [0.1, 0.064],
       segments: 6,
       mirror: w > 0,
@@ -580,14 +580,19 @@ export default function build() {
   }
 
   // ---- tail ------------------------------------------------------------------------------------------------------
-  const tailSweep = b.sweep(tail, [0.045, 0.022], { sides: 5, smooth: false, color: TAN, caps: { start: "round", end: "round" } });
+  const tailSweep = b.sweep(tail, [0.045, 0.022], {
+    sides: 5,
+    smooth: false,
+    color: TAN,
+    caps: { start: "round", end: "round" },
+  });
 
   // =================================================================================================================
   // Saddle blanket, frame and cargo: all rigid on the spine
   // =================================================================================================================
   const skin = b.surface(body);
   // the owner's brand, burned into the left shoulder
-  b.decal(body, brand, { at: [0.36, 1.52, 0.38], dir: [-1, 0, 0], size: [0.17, 0.17], segments: 6 });
+  b.decal(body, brand, { at: [0.36, 1.52, 0.38], dir: [1, 0, 0], size: [0.17, 0.17], segments: 6 });
   const cargo = spine2;
   // a path round the barrel at z, from +phi over the back to -phi degrees, found with rays fired outward from the
   // spine, then lifted off the skin
@@ -617,13 +622,13 @@ export default function build() {
   for (const w of [1, -1]) {
     b.decal(blanket, sidePanel, {
       at: [w * 0.45, 1.36, blanketZ],
-      dir: [-w, 0, 0],
+      dir: [w, 0, 0],
       size: [blanketHalf * 2, 0.56],
       segments: [8, 10],
     });
     b.decal(blanket, wear, {
       at: [w * 0.42, 1.2, blanketZ + 0.06],
-      dir: [-w, 0, 0],
+      dir: [w, 0, 0],
       size: [0.3, 0.2],
       segments: 6,
       mirror: w > 0,
@@ -631,7 +636,7 @@ export default function build() {
   }
   b.decal(blanket, topPanel, {
     at: [0, 1.9, blanketZ],
-    dir: [0, -1, 0],
+    dir: [0, 1, 0],
     up: [0, 0, 1],
     size: [0.3, blanketHalf * 2],
     segments: [6, 8],
@@ -656,7 +661,9 @@ export default function build() {
   ] as const) {
     const p = blanketPath.at(end);
     b.cards(
-      Array.from({ length: 11 }, (_, i) => frame([p.x, p.y - 0.012, blanketZ - blanketHalf + 0.055 + i * 0.049], [0, 1, 0])),
+      Array.from({ length: 11 }, (_, i) =>
+        frame([p.x, p.y - 0.012, blanketZ - blanketHalf + 0.055 + i * 0.049], [0, 1, 0]),
+      ),
       tassel,
       { size: [0.06, 0.16], lean: 180, flow: [w, 0, 0], bone: cargo, sink: 0 },
     );
@@ -698,9 +705,27 @@ export default function build() {
   const railY = topY + 0.075 + 0.022;
 
   // ---- rolled carpets on top --------------------------------------------------------------------------------------
-  const carpet = (x: number, y: number, z: number, r: number, len: number, wall: THREE.Texture, end: THREE.Texture, tilt: number) => {
-    const q = { bone: cargo, at: [x, y, z] as [number, number, number], rotation: [0, 0, 90] as [number, number, number] };
-    b.part(new THREE.CylinderGeometry(r, r, len, 8, 1, true), WHITE, { ...q, rotation: [0, tilt, 90], texture: wall, flat: true });
+  const carpet = (
+    x: number,
+    y: number,
+    z: number,
+    r: number,
+    len: number,
+    wall: THREE.Texture,
+    end: THREE.Texture,
+    tilt: number,
+  ) => {
+    const q = {
+      bone: cargo,
+      at: [x, y, z] as [number, number, number],
+      rotation: [0, 0, 90] as [number, number, number],
+    };
+    b.part(new THREE.CylinderGeometry(r, r, len, 8, 1, true), WHITE, {
+      ...q,
+      rotation: [0, tilt, 90],
+      texture: wall,
+      flat: true,
+    });
     for (const e of [-1, 1]) {
       const a = new THREE.Vector3(Math.cos((tilt * Math.PI) / 180), 0, -Math.sin((tilt * Math.PI) / 180));
       b.part(new THREE.CircleGeometry(r * 0.99, 8), WHITE, {
@@ -732,13 +757,24 @@ export default function build() {
   const barR = (u: number) => archF.at(0.93).clone().lerp(archR.at(0.93), u);
 
   const hang = (from: THREE.Vector3, to: THREE.Vector3) => {
-    b.sweep(catmull([from, from.clone().lerp(to, 0.5).add(new THREE.Vector3(Math.sign(from.x) * 0.03, 0, 0)), to]), 0.011, {
-      bone: cargo,
-      sides: 4,
-      smooth: false,
-      color: ROPE,
-      caps: "round",
-    });
+    b.sweep(
+      catmull([
+        from,
+        from
+          .clone()
+          .lerp(to, 0.5)
+          .add(new THREE.Vector3(Math.sign(from.x) * 0.03, 0, 0)),
+        to,
+      ]),
+      0.011,
+      {
+        bone: cargo,
+        sides: 4,
+        smooth: false,
+        color: ROPE,
+        caps: "round",
+      },
+    );
   };
 
   const waterSkin = (x: number, y: number, z: number, size: number, w: number, yaw: number) => {
@@ -771,12 +807,18 @@ export default function build() {
       [1, -1, -1],
       [-1, -1, -1],
     ] as const) {
-      b.spike([x + dx * 0.09 * sc, y + dy * 0.14 * sc, z + dz * 0.07 * sc], [dx * 0.5, dy, dz * 0.4], 0.055 * sc, 0.034 * sc, {
-        bone: cargo,
-        sides: 5,
-        smooth: false,
-        color: LEATHER_D,
-      });
+      b.spike(
+        [x + dx * 0.09 * sc, y + dy * 0.14 * sc, z + dz * 0.07 * sc],
+        [dx * 0.5, dy, dz * 0.4],
+        0.055 * sc,
+        0.034 * sc,
+        {
+          bone: cargo,
+          sides: 5,
+          smooth: false,
+          color: LEATHER_D,
+        },
+      );
     }
   };
 
@@ -868,7 +910,13 @@ export default function build() {
   // chin strap down to the lead ring
   const ringAt = head.local([0, 0.36, -0.2]);
   b.sweep(
-    catmull([head.local([-0.088, 0.33, -0.05]), head.local([-0.06, 0.35, -0.14]), ringAt, head.local([0.06, 0.35, -0.14]), head.local([0.088, 0.33, -0.05])]),
+    catmull([
+      head.local([-0.088, 0.33, -0.05]),
+      head.local([-0.06, 0.35, -0.14]),
+      ringAt,
+      head.local([0.06, 0.35, -0.14]),
+      head.local([0.088, 0.33, -0.05]),
+    ]),
     0.012,
     { bone: head, sides: 5, smooth: false, color: TEAL },
   );
@@ -892,7 +940,9 @@ export default function build() {
     const r = 0.2 - 0.07 * u;
     const c0x = landing.x - 0.2 * Math.sin(a0);
     const c0z = landing.z - 0.2 * Math.cos(a0);
-    coil.push(new THREE.Vector3(c0x + 0.05 * u + r * Math.sin(a), floorY + 0.012 * Math.floor(u * 3), c0z + r * Math.cos(a)));
+    coil.push(
+      new THREE.Vector3(c0x + 0.05 * u + r * Math.sin(a), floorY + 0.012 * Math.floor(u * 3), c0z + r * Math.cos(a)),
+    );
   }
   const lead = b.chain(
     "lead",
@@ -920,7 +970,12 @@ export default function build() {
       color: RED,
     });
     const top = bellHit.at.clone().add(new THREE.Vector3(0, -0.03, 0.05));
-    b.rod(top, top.clone().add(new THREE.Vector3(0, -0.05, 0.01)), 0.012, { bone: neckBone, sides: 4, smooth: false, color: LEATHER_D });
+    b.rod(top, top.clone().add(new THREE.Vector3(0, -0.05, 0.01)), 0.012, {
+      bone: neckBone,
+      sides: 4,
+      smooth: false,
+      color: LEATHER_D,
+    });
     b.lathe(
       [
         [0, 0],
@@ -932,28 +987,41 @@ export default function build() {
       ],
       { at: top.clone().add(new THREE.Vector3(0, -0.05, 0.01)), bone: neckBone, segments: 8, color: BRASS },
     );
-    b.part(ball(0.02, 5, 4), LEATHER_D, { bone: neckBone, at: top.clone().add(new THREE.Vector3(0, -0.17, 0.01)), flat: true });
+    b.part(ball(0.02, 5, 4), LEATHER_D, {
+      bone: neckBone,
+      at: top.clone().add(new THREE.Vector3(0, -0.17, 0.01)),
+      flat: true,
+    });
   }
 
   // =================================================================================================================
   // Hair: tufts as cards
   // =================================================================================================================
   const tuftDark = tuft(FUR, FUR_L);
-  b.cards(
-    b.surface(hump).scatter(26, { rng: rng(3), minDist: 0.08, filter: (h) => h.n.y > 0.35 }),
-    tuftDark,
-    { size: [0.1, 0.1], lean: 50, bend: 30, flow: [0, 0, -1], cross: true, vary: 0.25, rng: rng(4), bone: spine2 },
-  );
+  b.cards(b.surface(hump).scatter(26, { rng: rng(3), minDist: 0.08, filter: (h) => h.n.y > 0.35 }), tuftDark, {
+    size: [0.1, 0.1],
+    lean: 50,
+    bend: 30,
+    flow: [0, 0, -1],
+    cross: true,
+    vary: 0.25,
+    rng: rng(4),
+    bone: spine2,
+  });
   b.cards(
     b.surface(neckSweep).scatter(70, { rng: rng(6), minDist: 0.06, filter: (h) => h.n.y < -0.1 && h.n.z > -0.2 }),
     tuftDark,
     { size: [0.07, 0.15], lean: 30, bend: 25, flow: [0, -1, 0.1], cross: true, vary: 0.3, rng: rng(7) },
   );
-  b.cards(
-    b.surface(neckSweep).scatter(40, { rng: rng(8), minDist: 0.07, filter: (h) => h.n.y > 0.4 }),
-    tuftDark,
-    { size: [0.05, 0.1], lean: 40, bend: 20, flow: [0, 0.1, -1], cross: true, vary: 0.3, rng: rng(9) },
-  );
+  b.cards(b.surface(neckSweep).scatter(40, { rng: rng(8), minDist: 0.07, filter: (h) => h.n.y > 0.4 }), tuftDark, {
+    size: [0.05, 0.1],
+    lean: 40,
+    bend: 20,
+    flow: [0, 0.1, -1],
+    cross: true,
+    vary: 0.3,
+    rng: rng(9),
+  });
 
   // tail tuft: a dark plume of hair on the tail's end
   b.spike([0, 0.84, -1.07], [0, -1, 0.05], 0.22, 0.055, { bone: tail.joints[2], sides: 5, smooth: false, color: FUR });

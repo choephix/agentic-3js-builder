@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
-import { aim, rng } from "../src/math";
+import { aim, rng, toDirection } from "../src/math";
 import { bezier, catmull } from "../src/path";
 import { svg } from "../src/texture";
 import { glow } from "../kits/glow";
@@ -112,7 +112,11 @@ const SPARKLE_Y = vb(
   `<path d="M20 1 C22 13 27 18 39 20 C27 22 22 27 20 39 C18 27 13 22 1 20 C13 18 18 13 20 1Z" fill="#fff2a8"/>`,
   96,
 );
-const DROP = vb("0 0 24 36", `<path d="M12 2 C20 14 23 20 23 25 A11 11 0 0 1 1 25 C1 20 4 14 12 2Z" fill="#dff8ff"/><ellipse cx="8" cy="25" rx="2.6" ry="4" fill="#ffffff"/>`, 96);
+const DROP = vb(
+  "0 0 24 36",
+  `<path d="M12 2 C20 14 23 20 23 25 A11 11 0 0 1 1 25 C1 20 4 14 12 2Z" fill="#dff8ff"/><ellipse cx="8" cy="25" rx="2.6" ry="4" fill="#ffffff"/>`,
+  96,
+);
 const RING = vb(
   "0 0 100 100",
   `<ellipse cx="50" cy="50" rx="46" ry="46" fill="none" stroke="#e4fbff" stroke-width="4"/>
@@ -639,7 +643,10 @@ export default function build() {
 
   // teacup sign by the terrace
   put(new THREE.BoxGeometry(0.01, 0.11, 0.01), WOOD_D, { at: [0.225, GR + 0.055, -0.31] });
-  put(new THREE.CylinderGeometry(0.036, 0.036, 0.008, 10), WOOD, { at: [0.225, GR + 0.112, -0.31], rotation: [90, 0, 0] });
+  put(new THREE.CylinderGeometry(0.036, 0.036, 0.008, 10), WOOD, {
+    at: [0.225, GR + 0.112, -0.31],
+    rotation: [90, 0, 0],
+  });
   put(new THREE.CircleGeometry(0.032, 10), "#ffffff", { at: [0.225, GR + 0.112, -0.3055], texture: SIGN });
 
   // ---------------------------------------------------------------- cherry tree
@@ -686,7 +693,7 @@ export default function build() {
   ]);
   const tipOf = (br: typeof brL) => br.chain!.joints[br.chain!.joints.length - 1];
   const trunkTop = trunk.joints[trunk.joints.length - 1];
-  const blobSpec: Array<[number, number, number, number, string, (typeof trunkTop)]> = [
+  const blobSpec: Array<[number, number, number, number, string, typeof trunkTop]> = [
     [TX - 0.06, 0.4, TZ - 0.02, 0.105, PINK, trunkTop],
     [TX - 0.04, 0.485, TZ - 0.02, 0.068, PINK_L, trunkTop],
     [TX - 0.175, 0.38, TZ + 0.0, 0.078, PINK_D, tipOf(brL)],
@@ -735,15 +742,12 @@ export default function build() {
 
   const lotus = (x: number, z: number, h: number, petals: number) => {
     const top: [number, number, number] = [x, WY + h, z];
-    b.sweep(
-      catmull([
-        [x + 0.012, WY - 0.005, z - 0.008],
-        [x + 0.004, WY + h * 0.5, z - 0.002],
-        top,
-      ]),
-      0.0042,
-      { sides: 5, smooth: false, color: "#56bd6b", bone: root },
-    );
+    b.sweep(catmull([[x + 0.012, WY - 0.005, z - 0.008], [x + 0.004, WY + h * 0.5, z - 0.002], top]), 0.0042, {
+      sides: 5,
+      smooth: false,
+      color: "#56bd6b",
+      bone: root,
+    });
     if (petals === 0) {
       // bud
       const bud = b.ring(frame(top, [0, 1, 0]), { count: 6, radius: 0.004, tilt: 72 });
@@ -756,7 +760,13 @@ export default function build() {
       [5, 68, 0.042, LOTUS_PETAL_W, 0.003],
     ];
     for (const [count, tilt, len, tex, r] of tiers) {
-      const items = b.ring(frame(top, [0, 1, 0]), { count, radius: r, tilt, fromDeg: tilt, toDeg: tilt + 360 - 360 / count }).items;
+      const items = b.ring(frame(top, [0, 1, 0]), {
+        count,
+        radius: r,
+        tilt,
+        fromDeg: tilt,
+        toDeg: tilt + 360 - 360 / count,
+      }).items;
       b.cards(items, tex, { size: [len * 0.62, len], flow: [0, 1, 0], bend: 18, bone: root, sink: 0.05 });
     }
     put(new THREE.CylinderGeometry(0.011, 0.008, 0.012, 6), GOLD, { at: [x, WY + h + 0.006, z] });
@@ -804,7 +814,8 @@ export default function build() {
     `<ellipse cx="30" cy="22" rx="24" ry="17" fill="#c2415f"/><ellipse cx="30" cy="29" rx="14" ry="8" fill="#ff8fa3"/>`,
     128,
   );
-  const fanPath = "M50 100 C28 88 6 72 4 42 C2 22 12 8 26 10 C38 12 44 24 50 30 C56 24 62 12 74 10 C88 8 98 22 96 42 C94 72 72 88 50 100Z";
+  const fanPath =
+    "M50 100 C28 88 6 72 4 42 C2 22 12 8 26 10 C38 12 44 24 50 30 C56 24 62 12 74 10 C88 8 98 22 96 42 C94 72 72 88 50 100Z";
   const leafPath = "M50 100 C26 84 6 56 14 30 C22 6 48 2 70 18 C92 36 78 76 50 100Z";
   const sailPath = "M6 100 C10 70 28 30 72 4 C66 38 74 70 94 100Z";
   const finSvg = (path: string, main: string, tip: string, ray: string) => {
@@ -878,7 +889,7 @@ export default function build() {
     const topHit = body.at(0.56, 0);
     b.decal(body, o.patch, {
       at: topHit,
-      dir: D(0, -1, 0),
+      dir: toDirection(D(0, -1, 0)).negate(),
       up: D(0, 0, 1),
       size: [0.1 * o.sc, 0.17 * o.sc],
       segments: [16, 28],
@@ -888,7 +899,7 @@ export default function build() {
       const sp = body.at(0.86, -s * 62);
       b.decal(body, EYE, {
         at: sp,
-        dir: sp.n.clone().negate(),
+        dir: toDirection(sp.n.clone().negate()).negate(),
         up: D(0, 1, 0),
         size: [0.04 * o.sc, 0.04 * o.sc],
         segments: 6,
@@ -897,11 +908,14 @@ export default function build() {
       });
     }
     const headJoint = front.joints[front.joints.length - 1];
-    const snout = b.surface(body).around(P(0, 0, 0.05)).at(o.yaw, -8 + (o.pitchUp ?? 0));
+    const snout = b
+      .surface(body)
+      .around(P(0, 0, 0.05))
+      .at(o.yaw, -8 + (o.pitchUp ?? 0));
     if (snout)
       b.decal(body, MOUTH, {
         at: snout,
-        dir: D(0, 0, -1),
+        dir: toDirection(D(0, 0, -1)).negate(),
         up: D(0, 1, 0),
         size: [0.034 * o.sc, 0.024 * o.sc],
         segments: 4,
@@ -921,12 +935,16 @@ export default function build() {
       flat: true,
     });
     for (const s of [1, -1])
-      b.sweep(bezier(P(s * 0.02, -0.02, 0.1), P(s * 0.042, -0.022, 0.104), P(s * 0.056, -0.03, 0.084)), [0.003 * o.sc, 0.001], {
-        sides: 4,
-        smooth: false,
-        color: CREAM,
-        bone: headJoint,
-      });
+      b.sweep(
+        bezier(P(s * 0.02, -0.02, 0.1), P(s * 0.042, -0.022, 0.104), P(s * 0.056, -0.03, 0.084)),
+        [0.003 * o.sc, 0.001],
+        {
+          sides: 4,
+          smooth: false,
+          color: CREAM,
+          bone: headJoint,
+        },
+      );
     // fins: each a pair of back-to-back planes so both faces are lit like the fin they are
     const [fMain, fTip, fRay] = o.fins;
     const tailTex = finSvg(fanPath, fMain, fTip, fRay);
@@ -1032,7 +1050,10 @@ export default function build() {
   const drops = Array.from({ length: 9 }, (_, i) => {
     const a = (i / 9) * Math.PI * 2 + 0.3;
     const r = 0.03 + R() * 0.05;
-    return frame([splashAt.x + Math.cos(a) * r, WY + 0.01 + R() * 0.07, splashAt.z + Math.sin(a) * r], [Math.cos(a) * 0.4, 1, Math.sin(a) * 0.4]);
+    return frame(
+      [splashAt.x + Math.cos(a) * r, WY + 0.01 + R() * 0.07, splashAt.z + Math.sin(a) * r],
+      [Math.cos(a) * 0.4, 1, Math.sin(a) * 0.4],
+    );
   });
   b.cards(drops, DROP, { size: [0.014, 0.022], flow: [0, 0, 1], cross: true, bone: root, vary: 0.25, rng: rng(9) });
 
@@ -1044,7 +1065,10 @@ export default function build() {
     [-0.47, 0.02, 0.05],
   ];
   const bushes = bushSpots.map(([x, z, r], i) =>
-    put(new THREE.IcosahedronGeometry(r, 1), i % 2 ? BUSH : BUSH_D, { at: [x, GR + r * 0.3, z], scale: [1.2, 0.8, 1.1] }),
+    put(new THREE.IcosahedronGeometry(r, 1), i % 2 ? BUSH : BUSH_D, {
+      at: [x, GR + r * 0.3, z],
+      scale: [1.2, 0.8, 1.1],
+    }),
   );
   b.cards(
     b.surface(bushes).scatter(44, { rng: rng(14), minDist: 0.022, filter: (h) => h.n.y > 0.15 }),
@@ -1057,7 +1081,14 @@ export default function build() {
     frame([-0.02, 0.14, 0.24], [0, 1, 0]),
     frame([0.12, 0.17, 0.05], [0, 1, 0]),
   ];
-  b.cards(sparkles, [SPARKLE, SPARKLE_Y], { size: 0.03, flow: [0, 0, 1], cross: true, bone: root, rng: rng(6), vary: 0.3 });
+  b.cards(sparkles, [SPARKLE, SPARKLE_Y], {
+    size: 0.03,
+    flow: [0, 0, 1],
+    cross: true,
+    bone: root,
+    rng: rng(6),
+    vary: 0.3,
+  });
 
   const air = Array.from({ length: 70 }, () => {
     const x = 0.12 + R() * 0.42;
@@ -1066,7 +1097,15 @@ export default function build() {
     const d: [number, number, number] = [R() - 0.5, R() * 0.6 + 0.4, R() - 0.5];
     return frame([x, y, z], d);
   });
-  b.cards(air, [PETAL_A, PETAL_B, PETAL_C], { size: 0.022, flow: [0, 0, 1], bend: 25, vary: 0.3, spin: 180, rng: rng(8), bone: root });
+  b.cards(air, [PETAL_A, PETAL_B, PETAL_C], {
+    size: 0.022,
+    flow: [0, 0, 1],
+    bend: 25,
+    vary: 0.3,
+    spin: 180,
+    rng: rng(8),
+    bone: root,
+  });
 
   const keep: Array<[number, number, number]> = [
     [0, PZ, 0.4],
@@ -1102,7 +1141,16 @@ export default function build() {
     { size: [0.04, 0.042], cross: true, flow: [0, 0, 1], vary: 0.3, spin: 180, rng: rng(22), bone: root },
   );
   const flowers = scatterGrass(22, 31).map(([x, z]) => frame([x, GR + 0.0015, z], [0, 1, 0]));
-  b.cards(flowers, [DAISY_W, DAISY_P, DAISY_Y], { size: 0.03, lean: 90, flow: [1, 0, 0], mirror: true, rng: rng(32), bone: root, sink: 0, spin: 180 });
+  b.cards(flowers, [DAISY_W, DAISY_P, DAISY_Y], {
+    size: 0.03,
+    lean: 90,
+    flow: [1, 0, 0],
+    mirror: true,
+    rng: rng(32),
+    bone: root,
+    sink: 0,
+    spin: 180,
+  });
   const ground = Array.from({ length: 34 }, () => {
     const a = R() * Math.PI * 2;
     const r = R() * 0.17;
@@ -1111,7 +1159,15 @@ export default function build() {
     const inPond = Math.hypot(x, z - PZ) < POND - 0.02;
     return frame([x, inPond ? WY + 0.005 : GR + 0.002, z], [0, 1, 0]);
   });
-  b.cards(ground, [PETAL_A, PETAL_B, PETAL_C], { size: 0.022, lean: 90, flow: (_f, i) => [Math.cos(i * 2.1), 0, Math.sin(i * 2.1)], mirror: true, rng: rng(33), bone: root, sink: 0 });
+  b.cards(ground, [PETAL_A, PETAL_B, PETAL_C], {
+    size: 0.022,
+    lean: 90,
+    flow: (_f, i) => [Math.cos(i * 2.1), 0, Math.sin(i * 2.1)],
+    mirror: true,
+    rng: rng(33),
+    bone: root,
+    sink: 0,
+  });
 
   return b.root;
 }

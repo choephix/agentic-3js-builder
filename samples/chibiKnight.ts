@@ -219,7 +219,14 @@ export default function build() {
   // ---- helmet
   const helmet = b.part(sphere(0.17, 12, 8), STEEL, { bone: head, at: [0, 0.455, 0], flat: true, name: "helmet" });
   const hs = b.surface(helmet);
-  b.decal(helmet, FACE, { at: [0, 0.457, 0.17], dir: [0, 0, -1], size: [0.24, 0.15], segments: [14, 9], lift: 0.004, bone: head });
+  b.decal(helmet, FACE, {
+    at: [0, 0.457, 0.17],
+    dir: [0, 0, 1],
+    size: [0.24, 0.15],
+    segments: [14, 9],
+    lift: 0.004,
+    bone: head,
+  });
   const shineHit = hs.around([0, 0.455, 0]).at(-38, 52);
   if (shineHit) b.decal(helmet, SHINE, { at: shineHit, size: [0.07, 0.052], lift: 0.002, bone: head });
   // gold neck rim and top ridge
@@ -267,7 +274,7 @@ export default function build() {
     flat: true,
     name: "chin",
   });
-  b.decal(chin, MOUTH, { at: [0, 0.352, 0.17], dir: [0, 0, -1], size: [0.052, 0.029], lift: 0.002, bone: jaw });
+  b.decal(chin, MOUTH, { at: [0, 0.352, 0.17], dir: [0, 0, 1], size: [0.052, 0.029], lift: 0.002, bone: jaw });
 
   // ---- plume
   const plume = b.chain(
@@ -281,19 +288,23 @@ export default function build() {
     ]),
     { parent: head, names: ["plume1", "plume2", "plume3", "plume4"], role: "tail" },
   );
-  const plumeTube = b.sweep(plume, (t) => {
-    const k = Math.sin(Math.PI * Math.pow(t, 0.85));
-    return [0.012 + 0.036 * k, 0.012 + 0.02 * k];
-  }, {
-    sides: 6,
-    smooth: false,
-    bands: [
-      [0.55, MINT],
-      [0.85, "#9af0da"],
-      [1, CORAL],
-    ],
-    caps: "round",
-  });
+  const plumeTube = b.sweep(
+    plume,
+    (t) => {
+      const k = Math.sin(Math.PI * Math.pow(t, 0.85));
+      return [0.012 + 0.036 * k, 0.012 + 0.02 * k];
+    },
+    {
+      sides: 6,
+      smooth: false,
+      bands: [
+        [0.55, MINT],
+        [0.85, "#9af0da"],
+        [1, CORAL],
+      ],
+      caps: "round",
+    },
+  );
   for (const s of [1, -1])
     b.cards(
       [0.36, 0.46, 0.56, 0.66, 0.75, 0.84, 0.93].map((t) => plumeTube.at(t, 0)),
@@ -320,7 +331,12 @@ export default function build() {
     const [shoulder, elbow, wrist, hand] = arm.joints;
     handPos[side] = hand.at.clone();
     // pauldron with a gold stud
-    b.part(sphere(0.052, 8, 6), STEEL, { bone: shoulder, at: [s * 0.108, 0.322, 0], scale: [1.05, 0.85, 1], flat: true });
+    b.part(sphere(0.052, 8, 6), STEEL, {
+      bone: shoulder,
+      at: [s * 0.108, 0.322, 0],
+      scale: [1.05, 0.85, 1],
+      flat: true,
+    });
     b.part(sphere(0.014, 5, 3), GOLD, { bone: shoulder, at: [s * 0.112, 0.356, 0], flat: true });
     // elbow pad
     b.part(sphere(0.03, 6, 4), STEEL_L, { bone: elbow, at: [s * 0.178, 0.288, 0.012], flat: true });
@@ -357,7 +373,11 @@ export default function build() {
   const hr = handPos.R;
   const swordY = hr.y;
   const sword = (y: number) => [hr.x, y, hr.z] as number[];
-  b.part(new THREE.CylinderGeometry(0.013, 0.013, 0.09, 6), PINK, { bone: "handR", at: sword(swordY + 0.005), flat: true });
+  b.part(new THREE.CylinderGeometry(0.013, 0.013, 0.09, 6), PINK, {
+    bone: "handR",
+    at: sword(swordY + 0.005),
+    flat: true,
+  });
   b.part(sphere(0.02, 6, 4), GOLD, { bone: "handR", at: sword(swordY - 0.05), flat: true });
   b.part(new THREE.BoxGeometry(0.12, 0.02, 0.024), WOOD_D, { bone: "handR", at: sword(swordY + 0.06), flat: true });
   b.part(new THREE.BoxGeometry(0.05, 0.22, 0.016), "#ffffff", {
@@ -397,7 +417,12 @@ export default function build() {
     axis: "z",
     texture: LID_FACE,
   });
-  b.part(new THREE.CylinderGeometry(0.011, 0.014, 0.024, 6), KNOB, { bone: "handL", at: lidPt(0.046), dir: lidAxis, flat: true });
+  b.part(new THREE.CylinderGeometry(0.011, 0.014, 0.024, 6), KNOB, {
+    bone: "handL",
+    at: lidPt(0.046),
+    dir: lidAxis,
+    flat: true,
+  });
   b.part(sphere(0.026, 7, 5), KNOB, { bone: "handL", at: lidPt(0.066), flat: true });
   b.capsule(hl, lidPt(0), 0.011, { color: BOOT, bone: "handL" });
 
@@ -429,8 +454,17 @@ export default function build() {
       scale: [0.88, 0.8, 1.25],
       flat: true,
     });
-    b.part(sphere(0.034, 7, 5), BOOT_L, { bone: foot, at: [s * 0.055, 0.03, 0.068], scale: [1.05, 0.9, 1.05], flat: true });
-    b.part(new THREE.CylinderGeometry(0.04, 0.043, 0.022, 8), BOOT_L, { bone: ankle, at: [s * 0.055, 0.078, 0], flat: true });
+    b.part(sphere(0.034, 7, 5), BOOT_L, {
+      bone: foot,
+      at: [s * 0.055, 0.03, 0.068],
+      scale: [1.05, 0.9, 1.05],
+      flat: true,
+    });
+    b.part(new THREE.CylinderGeometry(0.04, 0.043, 0.022, 8), BOOT_L, {
+      bone: ankle,
+      at: [s * 0.055, 0.078, 0],
+      flat: true,
+    });
   }
 
   return b.root;

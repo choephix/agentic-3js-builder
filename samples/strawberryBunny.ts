@@ -185,11 +185,22 @@ export default function build() {
     { bone: [hips, spine], color: BERRY, sides: 8, smooth: false },
   );
   const bodySkin = b.surface(body);
-  b.decal(body, BIB, { at: [0, 0.145, 0.1], dir: [0, 0, -1], size: [0.115, 0.127], segments: 8, lift: 0.002, bone: spine.joints[0] });
+  b.decal(body, BIB, {
+    at: [0, 0.145, 0.1],
+    dir: [0, 0, 1],
+    size: [0.115, 0.127],
+    segments: 8,
+    lift: 0.002,
+    bone: spine.joints[0],
+  });
 
   // seeds on the onesie (not on the bib)
   b.cards(
-    bodySkin.scatter(90, { rng: rng(11), minDist: 0.027, filter: (h) => !(h.n.z > 0.25) && h.at.y < 0.2 && h.at.y > 0.04 }),
+    bodySkin.scatter(90, {
+      rng: rng(11),
+      minDist: 0.027,
+      filter: (h) => !(h.n.z > 0.25) && h.at.y < 0.2 && h.at.y > 0.04,
+    }),
     SEED,
     { size: [0.016, 0.024], lean: 88, bend: 16, flow: [0, -1, 0], mirror: true, sink: 0.05 },
   );
@@ -204,7 +215,12 @@ export default function build() {
         [s * 0.056, 0.062, 0.008],
         [s * 0.057, 0.04, 0.012],
       ]),
-      { parent: hips, names: [`hip${side}`, `knee${side}`, `ankle${side}`], role: "leg", contact: [s * 0.057, 0, 0.03] },
+      {
+        parent: hips,
+        names: [`hip${side}`, `knee${side}`, `ankle${side}`],
+        role: "leg",
+        contact: [s * 0.057, 0, 0.03],
+      },
     );
     const ankle = leg.tip ?? leg.joints[leg.joints.length - 1];
     b.sweep(leg, [0.045, 0.04], { color: BERRY, sides: 6, smooth: false });
@@ -240,12 +256,20 @@ export default function build() {
     ],
     { parent: hips, names: ["tail1", "tail2"], role: "tail" },
   );
-  const pom = b.part(new THREE.IcosahedronGeometry(0.052, 1), FUR, { bone: tail.joints[1], at: [0, 0.108, -0.122], flat: true });
-  b.cards(
-    b.surface(pom).scatter(16, { rng: rng(5), minDist: 0.034 }),
-    TUFT,
-    { size: [0.036, 0.042], lean: 35, flow: [0, -0.2, -1], vary: 0.2, rng: rng(6), cross: true, sink: 0.25 },
-  );
+  const pom = b.part(new THREE.IcosahedronGeometry(0.052, 1), FUR, {
+    bone: tail.joints[1],
+    at: [0, 0.108, -0.122],
+    flat: true,
+  });
+  b.cards(b.surface(pom).scatter(16, { rng: rng(5), minDist: 0.034 }), TUFT, {
+    size: [0.036, 0.042],
+    lean: 35,
+    flow: [0, -0.2, -1],
+    vary: 0.2,
+    rng: rng(6),
+    cross: true,
+    sink: 0.25,
+  });
 
   // ---------------- head ----------------
   const HOOD_C: V = [0, 0.303, -0.026];
@@ -287,7 +311,9 @@ export default function build() {
       const ang = ((k * 360) / ring + offsetDeg) * (Math.PI / 180);
       const tangentU = new THREE.Vector3(1, 0, 0);
       const tangentV = new THREE.Vector3(0, 0, 1).cross(tangentU).cross(tangentU).multiplyScalar(-1);
-      const pt = new THREE.Vector3(...crown.at).addScaledVector(tangentU, Math.cos(ang) * radius).addScaledVector(tangentV, Math.sin(ang) * radius);
+      const pt = new THREE.Vector3(...crown.at)
+        .addScaledVector(tangentU, Math.cos(ang) * radius)
+        .addScaledVector(tangentV, Math.sin(ang) * radius);
       crownHits.push(hoodSkin.nearest(pt));
     }
   }
@@ -304,7 +330,12 @@ export default function build() {
       sink: 0.06,
     });
   }
-  b.part(new THREE.CylinderGeometry(0.022, 0.03, 0.016, 8), LEAF_DEEP, { bone: head, at: [crownAt.x, crownAt.y + 0.005, crownAt.z], dir: crown.axis, flat: true });
+  b.part(new THREE.CylinderGeometry(0.022, 0.03, 0.016, 8), LEAF_DEEP, {
+    bone: head,
+    at: [crownAt.x, crownAt.y + 0.005, crownAt.z],
+    dir: crown.axis,
+    flat: true,
+  });
   b.sweep(
     catmull([
       crownAt,
@@ -335,8 +366,18 @@ export default function build() {
 
   // jaw, nose-muzzle, teeth
   b.part(sph(7, 5), FUR, { bone: jaw, at: [0, 0.212, 0.074], scale: [0.046, 0.024, 0.036], flat: true });
-  for (const s of [1, -1]) b.part(new THREE.BoxGeometry(0.011, 0.016, 0.006), TOOTH, { bone: head, at: [s * 0.0065, 0.22, 0.119], flat: true });
-  b.decal(faceSkin, MUZZLE, { at: faceSkin.around(FACE_C).at(0, -22)!, size: [0.066, 0.043], segments: [9, 6], bone: head });
+  for (const s of [1, -1])
+    b.part(new THREE.BoxGeometry(0.011, 0.016, 0.006), TOOTH, {
+      bone: head,
+      at: [s * 0.0065, 0.22, 0.119],
+      flat: true,
+    });
+  b.decal(faceSkin, MUZZLE, {
+    at: faceSkin.around(FACE_C).at(0, -22)!,
+    size: [0.066, 0.043],
+    segments: [9, 6],
+    bone: head,
+  });
 
   // eyes and blush
   for (const s of [1, -1]) {
@@ -355,20 +396,29 @@ export default function build() {
       [s * 0.072, 0.518, -0.014],
     ]);
     const chain = b.chain(`ear${side}`, path, { parent: head, names: [`ear${side}1`, `ear${side}2`], role: "hinge" });
-    const ear = b.sweep(chain, (t) => {
-      const k = Math.sin(Math.PI * Math.min(1, 0.25 + 0.75 * t));
-      const tip = t > 0.75 ? 1 - ((t - 0.75) / 0.25) * 0.55 : 1;
-      return [0.032 * k * tip + 0.004, 0.014 * k * tip + 0.003];
-    }, { color: FUR, sides: 6, smooth: false, caps: "round" });
+    const ear = b.sweep(
+      chain,
+      (t) => {
+        const k = Math.sin(Math.PI * Math.min(1, 0.25 + 0.75 * t));
+        const tip = t > 0.75 ? 1 - ((t - 0.75) / 0.25) * 0.55 : 1;
+        return [0.032 * k * tip + 0.004, 0.014 * k * tip + 0.003];
+      },
+      { color: FUR, sides: 6, smooth: false, caps: "round" },
+    );
     b.decal(ear, EAR_INNER, {
       at: [s * 0.055, 0.45, 0.0],
-      dir: [0, 0, -1],
+      dir: [0, 0, 1],
       size: [0.04, 0.125],
       segments: [4, 10],
       roll: -s * 12,
       bone: chain.joints[1],
     });
-    b.part(new THREE.CylinderGeometry(0.036, 0.042, 0.016, 7), BERRY_DEEP, { bone: head, at: [s * 0.041, 0.372, -0.018], dir: [s * 0.15, 1, -0.1], flat: true });
+    b.part(new THREE.CylinderGeometry(0.036, 0.042, 0.016, 7), BERRY_DEEP, {
+      bone: head,
+      at: [s * 0.041, 0.372, -0.018],
+      dir: [s * 0.15, 1, -0.1],
+      flat: true,
+    });
   }
 
   // ---------------- arms, paws, basket ----------------
@@ -385,22 +435,37 @@ export default function build() {
     const hand = arm.tip ?? arm.joints[arm.joints.length - 1];
     const sleeve = b.sweep(arm, [0.038, 0.033, 0.029], { color: BERRY, sides: 6, smooth: false, caps: "round" });
     b.cards(
-      b.surface(sleeve).scatter(6, { rng: rng(31 + s), minDist: 0.034, filter: (h) => h.n.y > -0.3 && h.at.x * s > 0.1 }),
+      b
+        .surface(sleeve)
+        .scatter(6, { rng: rng(31 + s), minDist: 0.034, filter: (h) => h.n.y > -0.3 && h.at.x * s > 0.1 }),
       SEED,
       { size: [0.014, 0.021], lean: 88, bend: 36, flow: [0, -1, 0.2], mirror: true, sink: 0.05 },
     );
     const dir = new THREE.Vector3(...wrist).sub(new THREE.Vector3(...elbow)).normalize();
     // cream mitten cuff and paw
-    b.part(new THREE.CylinderGeometry(0.033, 0.036, 0.018, 8), CREAM, { bone: hand, at: wrist, dir: dir.toArray() as V, flat: true });
+    b.part(new THREE.CylinderGeometry(0.033, 0.036, 0.018, 8), CREAM, {
+      bone: hand,
+      at: wrist,
+      dir: dir.toArray() as V,
+      flat: true,
+    });
     const pawAt = new THREE.Vector3(...wrist).addScaledVector(dir, 0.026);
     b.part(sph(6, 5), FUR, { bone: hand, at: pawAt.toArray() as V, scale: [0.031, 0.027, 0.03], flat: true });
     // three stub fingers as digit joints, fanned sideways
     const across = new THREE.Vector3(-dir.z, 0, dir.x).normalize();
     [-0.55, 0, 0.55].forEach((spread, i) => {
       const fdir = dir.clone().addScaledVector(across, spread).normalize();
-      const base = pawAt.clone().addScaledVector(dir, 0.02).addScaledVector(across, spread * 0.03);
+      const base = pawAt
+        .clone()
+        .addScaledVector(dir, 0.02)
+        .addScaledVector(across, spread * 0.03);
       const tip = base.clone().addScaledVector(fdir, 0.022);
-      const finger = b.joint(`finger${i + 1}${side}`, { parent: hand, at: base.toArray() as V, aim: tip.toArray() as V, role: "digit" });
+      const finger = b.joint(`finger${i + 1}${side}`, {
+        parent: hand,
+        at: base.toArray() as V,
+        aim: tip.toArray() as V,
+        role: "digit",
+      });
       b.capsule(base.toArray() as V, tip.toArray() as V, 0.0105, { bone: finger, color: FUR, sides: 5, smooth: false });
     });
 
@@ -480,11 +545,13 @@ export default function build() {
 
   // a few sparkles, sticker-style, on the hood cheek
   for (const s of [1, -1]) {
-    b.cards(
-      [hoodSkin.around(HOOD_C).at(s * 105, 28)!],
-      SPARKLE,
-      { size: 0.028, lean: 80, flow: [0, -1, 0], mirror: true, sink: 0.05 },
-    );
+    b.cards([hoodSkin.around(HOOD_C).at(s * 105, 28)!], SPARKLE, {
+      size: 0.028,
+      lean: 80,
+      flow: [0, -1, 0],
+      mirror: true,
+      sink: 0.05,
+    });
   }
 
   return b.root;

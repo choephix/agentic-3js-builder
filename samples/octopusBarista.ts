@@ -40,7 +40,7 @@ const LEAF = "#6fd88c";
 const SOIL = "#6b4636";
 
 // ---------------------------------------------------------------- drawings
-const ST = "stroke-linecap=\"round\" stroke-linejoin=\"round\"";
+const ST = 'stroke-linecap="round" stroke-linejoin="round"';
 
 const EYE = svg(
   `<svg viewBox="0 0 100 120">
@@ -127,7 +127,10 @@ const FLOWER = svg(
     <path d="M25 62 Q8 58 6 44 Q22 46 25 62Z" fill="${LEAF}"/>
     <path d="M25 52 Q42 50 44 36 Q28 38 25 52Z" fill="${LEAF}"/>
     ${[0, 60, 120, 180, 240, 300]
-      .map((a) => `<ellipse cx="25" cy="11" rx="7" ry="11" transform="rotate(${a} 25 22)" fill="${a % 120 ? "#ffc6d9" : "#ff8fb5"}"/>`)
+      .map(
+        (a) =>
+          `<ellipse cx="25" cy="11" rx="7" ry="11" transform="rotate(${a} 25 22)" fill="${a % 120 ? "#ffc6d9" : "#ff8fb5"}"/>`,
+      )
       .join("")}
     <circle cx="25" cy="22" r="7" fill="${BUTTER}"/>
   </svg>`,
@@ -165,7 +168,14 @@ const PANEL_SIDE = svg(
     <rect width="190" height="80" fill="${MINT}"/>
     <rect x="0" y="0" width="190" height="8" fill="${PINK}"/>
     <rect x="0" y="72" width="190" height="8" fill="${PINK}"/>
-    ${[[24, 28], [70, 52], [150, 26], [120, 58], [172, 60], [30, 58]]
+    ${[
+      [24, 28],
+      [70, 52],
+      [150, 26],
+      [120, 58],
+      [172, 60],
+      [30, 58],
+    ]
       .map(([x, y], i) =>
         i % 2
           ? `<path d="M${x} ${y + 9} C${x - 14} ${y - 2} ${x - 10} ${y - 14} ${x} ${y - 8} C${x + 10} ${y - 14} ${x + 14} ${y - 2} ${x} ${y + 9}Z" fill="${PINK}"/>`
@@ -233,8 +243,7 @@ const UP = V(0, 1, 0);
 
 export default function build() {
   const b = createBuilder({ name: "octopusBarista" });
-  const put = (g: THREE.BufferGeometry, color: string, o: PartOptions = {}) =>
-    b.part(g, color, { flat: true, ...o });
+  const put = (g: THREE.BufferGeometry, color: string, o: PartOptions = {}) => b.part(g, color, { flat: true, ...o });
 
   // ------------------------------------------------------------ skeleton
   const tilt = V(0, 1, -0.22).normalize();
@@ -265,17 +274,40 @@ export default function build() {
   const skin = b.surface(bulb);
 
   for (const s of [1, -1]) {
-    b.decal(skin, EYE, { at: [s * 0.062, 0.33, 0.2], dir: [0, 0, -1], size: [0.078, 0.094], segments: [8, 9] });
-    b.decal(skin, BLUSH, { at: [s * 0.108, 0.272, 0.2], dir: [0, 0, -1], size: [0.05, 0.028], segments: [6, 4], roll: s * -8 });
-    b.decal(skin, BROW, { at: [s * 0.066, 0.388, 0.2], dir: [0, 0, -1], size: [0.046, 0.018], segments: [6, 3], mirror: s > 0, roll: s * 6 });
+    b.decal(skin, EYE, { at: [s * 0.062, 0.33, 0.2], dir: [0, 0, 1], size: [0.078, 0.094], segments: [8, 9] });
+    b.decal(skin, BLUSH, {
+      at: [s * 0.108, 0.272, 0.2],
+      dir: [0, 0, 1],
+      size: [0.05, 0.028],
+      segments: [6, 4],
+      roll: s * -8,
+    });
+    b.decal(skin, BROW, {
+      at: [s * 0.066, 0.388, 0.2],
+      dir: [0, 0, 1],
+      size: [0.046, 0.018],
+      segments: [6, 3],
+      mirror: s > 0,
+      roll: s * 6,
+    });
   }
-  b.decal(skin, SPOTS_A, { at: [0, 0.3, -0.3], dir: [0, -0.1, 1], size: [0.2, 0.2], segments: [10, 10] });
-  b.decal(skin, SPOTS_B, { at: [0.16, 0.3, -0.2], dir: [-1, 0, 0.1], size: [0.15, 0.17], segments: [8, 9] });
-  b.decal(skin, SPOTS_B, { at: [-0.16, 0.3, -0.2], dir: [1, 0, 0.1], size: [0.15, 0.17], segments: [8, 9], mirror: true });
+  b.decal(skin, SPOTS_A, { at: [0, 0.3, -0.3], dir: [0, 0.1, -1], size: [0.2, 0.2], segments: [10, 10] });
+  b.decal(skin, SPOTS_B, { at: [0.16, 0.3, -0.2], dir: [1, 0, -0.1], size: [0.15, 0.17], segments: [8, 9] });
+  b.decal(skin, SPOTS_B, {
+    at: [-0.16, 0.3, -0.2],
+    dir: [-1, 0, -0.1],
+    size: [0.15, 0.17],
+    segments: [8, 9],
+    mirror: true,
+  });
 
   // mouth: dark cavity and a small hooked upper beak on the head, a round chin-jaw on the jaw bone
   const mp = skin.ray([0, mouthY, 0.5], [0, 0, -1])!.at.clone();
-  put(new THREE.SphereGeometry(0.03, 8, 5), MOUTH, { bone: head, at: [0, mouthY - 0.004, mp.z + 0.004], scale: [1.25, 0.85, 0.45] });
+  put(new THREE.SphereGeometry(0.03, 8, 5), MOUTH, {
+    bone: head,
+    at: [0, mouthY - 0.004, mp.z + 0.004],
+    scale: [1.25, 0.85, 0.45],
+  });
   const hookDir = V(0, -1, 0.45).normalize();
   put(new THREE.ConeGeometry(0.02, 0.04, 4), BEAK, {
     bone: head,
@@ -285,7 +317,11 @@ export default function build() {
   });
   const chinAt = V(0, mouthY - 0.02, mp.z + 0.006);
   put(new THREE.SphereGeometry(0.03, 8, 4), BEAK, { bone: jaw, at: chinAt, scale: [1.05, 0.45, 0.85] });
-  put(new THREE.SphereGeometry(0.016, 6, 4), TONGUE, { bone: jaw, at: chinAt.clone().add(V(0, 0.008, 0.004)), scale: [1.3, 0.5, 1] });
+  put(new THREE.SphereGeometry(0.016, 6, 4), TONGUE, {
+    bone: jaw,
+    at: chinAt.clone().add(V(0, 0.008, 0.004)),
+    scale: [1.3, 0.5, 1],
+  });
 
   // beret, visor, pompom
   const seat = A0.clone().addScaledVector(tilt, 0.26);
@@ -319,10 +355,18 @@ export default function build() {
       [0.06, 0.02],
       [0.05, 0],
     ],
-    { at: [0, 0.396, -0.092], x: [1, 0, 0], y: [0, -0.287, 0.958], thickness: 0.007, smoothing: 1, color: TEAL_D, bone: head },
+    {
+      at: [0, 0.396, -0.092],
+      x: [1, 0, 0],
+      y: [0, -0.287, 0.958],
+      thickness: 0.007,
+      smoothing: 1,
+      color: TEAL_D,
+      bone: head,
+    },
   );
   put(new THREE.SphereGeometry(0.015, 6, 4), BUTTER, { bone: head, at: seat.clone().addScaledVector(tilt, 0.09) });
-  b.decal(cap, BEAN, { at: [0, 0.452, -0.05], dir: [0, -0.4, -1], size: [0.036, 0.036], segments: [5, 5] });
+  b.decal(cap, BEAN, { at: [0, 0.452, -0.05], dir: [0, 0.4, 1], size: [0.036, 0.036], segments: [5, 5] });
 
   // ------------------------------------------------------------ tentacles
   const tentRadii = [0.05, 0.042, 0.034, 0.026, 0.019, 0.014, 0.01, 0.007];
@@ -347,16 +391,26 @@ export default function build() {
       const phi = (deg * Math.PI) / 180;
       const d = V(s * Math.sin(phi), 0, Math.cos(phi));
       const p = V(s * Math.cos(phi), 0, -Math.sin(phi)); // sideways, mirrored with the side
-      const at = (r: number, y: number, sideways = 0) => C.clone().addScaledVector(d, r).addScaledVector(p, sideways).setY(y);
+      const at = (r: number, y: number, sideways = 0) =>
+        C.clone().addScaledVector(d, r).addScaledVector(p, sideways).setY(y);
       const end = at(reach, 0.022, sway * 0.3);
       const R = 0.04;
       const curlCentre = end.clone().setY(0.022 + R);
       const axis = d.clone().cross(UP);
-      const route = catmull([at(0.055, 0.205), at(0.105, 0.15), at(0.17, 0.07, sway * 0.4), at(reach * 0.62, 0.032, sway), end]).concat(
-        spiral(curlCentre, end, axis, { turns: 1.15, r1: 0.013, pitch: 0.012 }),
-      );
+      const route = catmull([
+        at(0.055, 0.205),
+        at(0.105, 0.15),
+        at(0.17, 0.07, sway * 0.4),
+        at(reach * 0.62, 0.032, sway),
+        end,
+      ]).concat(spiral(curlCentre, end, axis, { turns: 1.15, r1: 0.013, pitch: 0.012 }));
       const names = (i: number) => `tentacle${s > 0 ? "L" : "R"}${(k + 1) >> 1}_${i + 1}`;
-      const chain = b.chain(`tentacle${s > 0 ? "L" : "R"}${(k + 1) >> 1}`, route, { parent: body, count: 10, names, role: "tentacle" });
+      const chain = b.chain(`tentacle${s > 0 ? "L" : "R"}${(k + 1) >> 1}`, route, {
+        parent: body,
+        count: 10,
+        names,
+        role: "tentacle",
+      });
       const sw = b.sweep(chain, tentRadii, { color: PINK, sides: 6, smooth: false, sectors: [[135, 225, PINK_L]] });
       suckers(sw, 0.45, 0.96, 6);
     }
@@ -411,7 +465,12 @@ export default function build() {
       axis: "z",
       texture: LATTE,
     });
-    b.decal(cup, HEART, { at: [cx, cupBase + 0.035, cz + 0.1], dir: [0, 0, -1], size: [0.024, 0.022], segments: [5, 5] });
+    b.decal(cup, HEART, {
+      at: [cx, cupBase + 0.035, cz + 0.1],
+      dir: [0, 0, 1],
+      size: [0.024, 0.022],
+      segments: [5, 5],
+    });
     const frames = [
       frame([cx - 0.014, cupBase + 0.066, cz], [0, 1, 0]),
       frame([cx + 0.014, cupBase + 0.066, cz - 0.002], [0, 1, 0]),
@@ -438,7 +497,12 @@ export default function build() {
       ],
       { at: [jx, cupBase, jz], segments: 10, color: STEEL, bone: hand },
     );
-    put(new THREE.CircleGeometry(0.031, 10), CREAM, { bone: hand, at: [jx, cupBase + 0.086, jz], dir: [0, 1, 0], axis: "z" });
+    put(new THREE.CircleGeometry(0.031, 10), CREAM, {
+      bone: hand,
+      at: [jx, cupBase + 0.086, jz],
+      dir: [0, 1, 0],
+      axis: "z",
+    });
     put(new THREE.ConeGeometry(0.017, 0.036, 4), STEEL, {
       bone: hand,
       at: [jx - 0.04, cupBase + 0.092, jz],
@@ -453,7 +517,7 @@ export default function build() {
       [jx, cupBase + 0.036, jz - 0.038],
     ]);
     b.sweep(handle, 0.007, { color: STEEL_D, sides: 5, smooth: false, bone: hand });
-    b.decal(jug, DROP, { at: [jx, cupBase + 0.05, jz + 0.1], dir: [0, 0, -1], size: [0.028, 0.034], segments: [5, 5] });
+    b.decal(jug, DROP, { at: [jx, cupBase + 0.05, jz + 0.1], dir: [0, 0, 1], size: [0.028, 0.034], segments: [5, 5] });
   }
 
   // ------------------------------------------------------------ the cart
@@ -469,7 +533,8 @@ export default function build() {
     dir: [number, number, number],
     o: PartOptions = {},
   ) => b.part(new THREE.PlaneGeometry(w, h), "#ffffff", { bone: cart, at, dir, axis: "z", texture: tex, ...o });
-  const shrink = (pts: Array<[number, number]>, k: number): Array<[number, number]> => pts.map(([x, y]) => [x * k, y * k]);
+  const shrink = (pts: Array<[number, number]>, k: number): Array<[number, number]> =>
+    pts.map(([x, y]) => [x * k, y * k]);
 
   const cz0 = 0.29; // cart centre z
   box(0.64, 0.128, 0.34, MINT, [0, 0.109, cz0]);
@@ -490,7 +555,12 @@ export default function build() {
       [0.44, 0.465],
       [0.14, 0.445],
     ] as const) {
-      b.rod([s * 0.33, counterTop, z], [s * 0.33, top, z], 0.0065, { color: CHOC, sides: 5, smooth: false, bone: cart });
+      b.rod([s * 0.33, counterTop, z], [s * 0.33, top, z], 0.0065, {
+        color: CHOC,
+        sides: 5,
+        smooth: false,
+        bone: cart,
+      });
       onCart(new THREE.SphereGeometry(0.012, 6, 4), BUTTER, [s * 0.33, top + 0.006, z]);
     }
     const string = catmull([
@@ -502,7 +572,14 @@ export default function build() {
     ]);
     b.sweep(string, 0.0026, { color: CHOC, sides: 4, smooth: false, bone: cart });
     const flagFrames = Array.from({ length: 6 }, (_, i) => frame(string.at(0.08 + (i * 0.84) / 5), [0, 1, 0]));
-    b.cards(flagFrames, FLAGS, { size: [0.042, 0.055], lean: 180, flow: [s, 0, 0.6], sink: 0, bone: cart, rng: rng(4 + s) });
+    b.cards(flagFrames, FLAGS, {
+      size: [0.042, 0.055],
+      lean: 180,
+      flow: [s, 0, 0.6],
+      sink: 0,
+      bone: cart,
+      rng: rng(4 + s),
+    });
   }
 
   // espresso machine (octopus's left end of the counter)
@@ -514,19 +591,34 @@ export default function build() {
     box(0.09, 0.007, 0.046, STEEL_D, [mx, counterTop + 0.0035, mz + 0.054]);
     onCart(new THREE.CylinderGeometry(0.018, 0.016, 0.02, 8), STEEL, [mx, counterTop + 0.068, mz + 0.045]);
     sticker(GAUGE, 0.028, 0.028, [mx, counterTop + 0.078, mz + 0.0405], [0, 0, 1]);
-    [-0.035, 0.035].forEach((x, i) => onCart(new THREE.SphereGeometry(0.007, 6, 4), i ? RED : BUTTER, [mx + x, counterTop + 0.044, mz + 0.041]));
+    [-0.035, 0.035].forEach((x, i) =>
+      onCart(new THREE.SphereGeometry(0.007, 6, 4), i ? RED : BUTTER, [mx + x, counterTop + 0.044, mz + 0.041]),
+    );
     b.rod([mx + 0.053, counterTop + 0.066, mz + 0.02], [mx + 0.07, counterTop + 0.026, mz + 0.035], 0.0045, {
       color: STEEL_D,
       sides: 5,
       smooth: false,
       bone: cart,
     });
-    b.lathe(shrink([[0, 0], [0.014, 0], [0.02, 0.028], [0.017, 0.028], [0.011, 0.005], [0, 0.005]], 0.9), {
-      at: [mx, counterTop + 0.007, mz + 0.054],
-      segments: 8,
-      color: CREAM,
-      bone: cart,
-    });
+    b.lathe(
+      shrink(
+        [
+          [0, 0],
+          [0.014, 0],
+          [0.02, 0.028],
+          [0.017, 0.028],
+          [0.011, 0.005],
+          [0, 0.005],
+        ],
+        0.9,
+      ),
+      {
+        at: [mx, counterTop + 0.007, mz + 0.054],
+        segments: 8,
+        color: CREAM,
+        bone: cart,
+      },
+    );
   }
 
   // menu board on the counter (octopus's right, front)
@@ -539,7 +631,12 @@ export default function build() {
     const qb = new THREE.Quaternion().setFromEuler(new THREE.Euler(th, 0, 0));
     const fc = hinge.clone().add(front);
     onCart(new THREE.BoxGeometry(0.115, 0.15, 0.012), WOOD_D, fc.toArray() as [number, number, number], { quat: qf });
-    onCart(new THREE.BoxGeometry(0.115, 0.15, 0.012), WOOD_D, hinge.clone().add(back).toArray() as [number, number, number], { quat: qb });
+    onCart(
+      new THREE.BoxGeometry(0.115, 0.15, 0.012),
+      WOOD_D,
+      hinge.clone().add(back).toArray() as [number, number, number],
+      { quat: qb },
+    );
     const face = fc.clone().add(V(0, 0, 0.0066).applyQuaternion(qf));
     b.part(new THREE.PlaneGeometry(0.099, 0.134), "#ffffff", { bone: cart, at: face, quat: qf, texture: MENU });
   }
@@ -549,35 +646,86 @@ export default function build() {
     const z = 0.4;
     const tone = [PINK, BUTTER, TEAL][i];
     const at: [number, number, number] = [x, counterTop, z];
-    b.lathe(shrink([[0, 0], [0.021, 0], [0.029, 0.058], [0.027, 0.058], [0.0195, 0.006], [0, 0.006]], 0.88), {
-      at,
-      segments: 10,
-      color: CREAM,
-      bone: cart,
-    });
-    b.lathe(shrink([[0.0235, 0.018], [0.0255, 0.018], [0.0275, 0.044], [0.0255, 0.044]], 0.88), { at, segments: 10, color: tone, bone: cart });
-    b.lathe(shrink([[0, 0.056], [0.03, 0.056], [0.03, 0.062], [0.019, 0.068], [0, 0.07]], 0.88), {
-      at,
-      segments: 10,
-      color: tone,
-      bone: cart,
-    });
+    b.lathe(
+      shrink(
+        [
+          [0, 0],
+          [0.021, 0],
+          [0.029, 0.058],
+          [0.027, 0.058],
+          [0.0195, 0.006],
+          [0, 0.006],
+        ],
+        0.88,
+      ),
+      {
+        at,
+        segments: 10,
+        color: CREAM,
+        bone: cart,
+      },
+    );
+    b.lathe(
+      shrink(
+        [
+          [0.0235, 0.018],
+          [0.0255, 0.018],
+          [0.0275, 0.044],
+          [0.0255, 0.044],
+        ],
+        0.88,
+      ),
+      { at, segments: 10, color: tone, bone: cart },
+    );
+    b.lathe(
+      shrink(
+        [
+          [0, 0.056],
+          [0.03, 0.056],
+          [0.03, 0.062],
+          [0.019, 0.068],
+          [0, 0.07],
+        ],
+        0.88,
+      ),
+      {
+        at,
+        segments: 10,
+        color: tone,
+        bone: cart,
+      },
+    );
   });
   {
     const jx = -0.05;
     const jz = 0.41;
-    b.lathe(shrink([[0, 0], [0.03, 0], [0.033, 0.01], [0.033, 0.06], [0.03, 0.065], [0, 0.065]], 0.92), {
-      at: [jx, counterTop, jz],
-      segments: 10,
-      color: "#d8f3fb",
-      bone: cart,
-    });
+    b.lathe(
+      shrink(
+        [
+          [0, 0],
+          [0.03, 0],
+          [0.033, 0.01],
+          [0.033, 0.06],
+          [0.03, 0.065],
+          [0, 0.065],
+        ],
+        0.92,
+      ),
+      {
+        at: [jx, counterTop, jz],
+        segments: 10,
+        color: "#d8f3fb",
+        bone: cart,
+      },
+    );
     for (const [dx, dy, dz] of [
       [-0.008, 0.012, 0.004],
       [0.01, 0.014, -0.006],
       [0.0, 0.026, 0.006],
     ])
-      onCart(new THREE.CylinderGeometry(0.008, 0.008, 0.003, 6), BUTTER, [jx + dx, counterTop + dy, jz + dz], { dir: [0.2, 1, 0.4] });
+      onCart(new THREE.CylinderGeometry(0.008, 0.008, 0.003, 6), BUTTER, [jx + dx, counterTop + dy, jz + dz], {
+        dir: [0.2, 1, 0.4],
+      });
     sticker(PLATE, 0.04, 0.02, [jx, counterTop + 0.036, jz + 0.0315], [0, 0, 1]);
   }
 
@@ -585,12 +733,25 @@ export default function build() {
   {
     const px = -0.27;
     const pz = 0.19;
-    b.lathe(shrink([[0, 0], [0.022, 0], [0.03, 0.04], [0.034, 0.046], [0.03, 0.046], [0, 0.04]], 0.95), {
-      at: [px, counterTop, pz],
-      segments: 8,
-      color: PINK_D,
-      bone: cart,
-    });
+    b.lathe(
+      shrink(
+        [
+          [0, 0],
+          [0.022, 0],
+          [0.03, 0.04],
+          [0.034, 0.046],
+          [0.03, 0.046],
+          [0, 0.04],
+        ],
+        0.95,
+      ),
+      {
+        at: [px, counterTop, pz],
+        segments: 8,
+        color: PINK_D,
+        bone: cart,
+      },
+    );
     onCart(new THREE.CylinderGeometry(0.028, 0.028, 0.006, 8), SOIL, [px, counterTop + 0.041, pz]);
     const plants = [
       [0, 0],

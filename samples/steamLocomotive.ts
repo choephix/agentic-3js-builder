@@ -140,9 +140,12 @@ const pebbleGrid = (seed: number, w: number, h: number, step: number, colors: st
   return out;
 };
 
-const ballastTex = svg(svgDoc(170, 100, pebbleGrid(5, 170, 100, 10, ["#a9a397", "#7c766b", "#95907f", "#bdb7a8", "#6b665c"])), {
-  size: 512,
-});
+const ballastTex = svg(
+  svgDoc(170, 100, pebbleGrid(5, 170, 100, 10, ["#a9a397", "#7c766b", "#95907f", "#bdb7a8", "#6b665c"])),
+  {
+    size: 512,
+  },
+);
 
 const verdureTex = svg(
   svgDoc(
@@ -257,7 +260,11 @@ const roofTex = svg(
   svgDoc(
     146,
     156,
-    Array.from({ length: 6 }, (_, i) => `<polygon points="${10 + i * 25},0 ${13.5 + i * 25},0 ${13.5 + i * 25},156 ${10 + i * 25},156" fill="#b9ae8e"/>`).join("") +
+    Array.from(
+      { length: 6 },
+      (_, i) =>
+        `<polygon points="${10 + i * 25},0 ${13.5 + i * 25},0 ${13.5 + i * 25},156 ${10 + i * 25},156" fill="#b9ae8e"/>`,
+    ).join("") +
       `<polygon points="${lumpy(61, 44, 26, 26, 9, 0.3)}" fill="#a79f86"/><polygon points="${lumpy(62, 112, 40, 18, 8, 0.3)}" fill="#a79f86"/>` +
       `<polygon points="30,96 70,92 74,122 34,126" fill="#c6bd9f"/>` +
       `<polygon points="100,110 130,108 132,150 102,152" fill="#a39b82"/>`,
@@ -325,9 +332,20 @@ export default function build(): THREE.Object3D {
     batches.clear();
   };
   // a box of w,h,d centred at x,y,z, optionally turned (degrees, XYZ)
-  const bx = (w: number, h: number, d: number, x: number, y: number, z: number, rot: [number, number, number] = [0, 0, 0]) => {
+  const bx = (
+    w: number,
+    h: number,
+    d: number,
+    x: number,
+    y: number,
+    z: number,
+    rot: [number, number, number] = [0, 0, 0],
+  ) => {
     const g = new THREE.BoxGeometry(w, h, d);
-    if (rot[0] || rot[1] || rot[2]) g.applyMatrix4(new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(rot[0] * DEG, rot[1] * DEG, rot[2] * DEG)));
+    if (rot[0] || rot[1] || rot[2])
+      g.applyMatrix4(
+        new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(rot[0] * DEG, rot[1] * DEG, rot[2] * DEG)),
+      );
     return g.translate(x, y, z);
   };
   // a faceted rod from a to c
@@ -347,8 +365,15 @@ export default function build(): THREE.Object3D {
   const cylZ = (r: number, h: number, x: number, y: number, z: number, sides = 8) =>
     new THREE.CylinderGeometry(r, r, h, sides).rotateX(Math.PI / 2).translate(x, y, z);
   // a decal plane facing `dir`, floating on a flat surface
-  const plane = (tex: THREE.Texture, w: number, h: number, at: [number, number, number], dir: [number, number, number], bone: J, name: string) =>
-    b.part(new THREE.PlaneGeometry(w, h), "#ffffff", { bone, at, dir, axis: "z", texture: tex, name });
+  const plane = (
+    tex: THREE.Texture,
+    w: number,
+    h: number,
+    at: [number, number, number],
+    dir: [number, number, number],
+    bone: J,
+    name: string,
+  ) => b.part(new THREE.PlaneGeometry(w, h), "#ffffff", { bone, at, dir, axis: "z", texture: tex, name });
 
   // ===================================================================== TRACK
   const LEN = 7.2;
@@ -363,11 +388,16 @@ export default function build(): THREE.Object3D {
   );
   for (let i = 0; i < 7; i++) {
     const z = -3.15 + i * 1.05;
-    b.decal(
-      ballastSurface,
-      ballastTex,
-      { at: [0, 0.11, z], dir: [0, -1, 0], up: [0, 0, -1], size: [1.7, 1.05], segments: [1, 1], bone: track, lift: 0.002, name: "pebbles" },
-    );
+    b.decal(ballastSurface, ballastTex, {
+      at: [0, 0.11, z],
+      dir: [0, 1, 0],
+      up: [0, 0, -1],
+      size: [1.7, 1.05],
+      segments: [1, 1],
+      bone: track,
+      lift: 0.002,
+      name: "pebbles",
+    });
   }
   // grass verges with ragged outer edges
   for (const s of [1, -1]) {
@@ -380,7 +410,15 @@ export default function build(): THREE.Object3D {
       { at: [0, 0.04, 0], x: [1, 0, 0], y: [0, 0, -1], thickness: 0.08, color: GRASS, bone: track, name: `verge${s}` },
     );
     for (let i = 0; i < 6; i++)
-      b.decal(verge, verdureTex, { at: [s * 1.3, 0.08, -3.0 + i * 1.2], dir: [0, -1, 0], up: [0, 0, -1], size: [0.52, 1.2], segments: [1, 3], bone: track, name: "meadow" });
+      b.decal(verge, verdureTex, {
+        at: [s * 1.3, 0.08, -3.0 + i * 1.2],
+        dir: [0, 1, 0],
+        up: [0, 0, -1],
+        size: [0.52, 1.2],
+        segments: [1, 3],
+        bone: track,
+        name: "meadow",
+      });
   }
 
   // sleepers, tie plates, rails ------------------------------------------------
@@ -424,7 +462,15 @@ export default function build(): THREE.Object3D {
     const z = -3.5 + R() * 7.0;
     tufts.push(frame([x, near ? 0.105 : 0.078, z], [0, 1, 0]));
   }
-  b.cards(tufts, [grassA, grassB], { size: [0.15, 0.2], vary: 0.4, spin: 180, rng: R, cross: true, bone: track, sink: 0.15 });
+  b.cards(tufts, [grassA, grassB], {
+    size: [0.15, 0.2],
+    vary: 0.4,
+    spin: 180,
+    rng: R,
+    cross: true,
+    bone: track,
+    sink: 0.15,
+  });
   const fringe = [];
   for (let i = 0; i < 30; i++) {
     const s = i % 2 ? 1 : -1;
@@ -554,7 +600,12 @@ export default function build(): THREE.Object3D {
     ],
     { at: [0.16, fbTop - 0.07, 0.56], color: BRASS, segments: 6, bone: chassis, name: "whistle" },
   );
-  b.part(new THREE.BoxGeometry(0.05, 0.04, 0.2), BRASS, { bone: chassis, at: [0.16, fbTop + 0.13, 0.52], flat: true, name: "whistleLever" });
+  b.part(new THREE.BoxGeometry(0.05, 0.04, 0.2), BRASS, {
+    bone: chassis,
+    at: [0.16, fbTop + 0.13, 0.52],
+    flat: true,
+    name: "whistleLever",
+  });
 
   // headlamp on the smokebox top
   const lampY = YB + 0.42;
@@ -562,7 +613,13 @@ export default function build(): THREE.Object3D {
   add(chassis, BLACK, bx(0.22, 0.26, 0.2, 0, lampY + 0.15, 2.03), bx(0.25, 0.03, 0.23, 0, lampY + 0.295, 2.03));
   add(chassis, BRASS, cyl(0.045, 0.05, 0, lampY + 0.34, 2.03, 6, 0.02));
   glow(
-    b.part(new THREE.PlaneGeometry(0.15, 0.17), WARM, { bone: chassis, at: [0, lampY + 0.15, 2.135], dir: [0, 0, 1], axis: "z", name: "headlampGlass" }),
+    b.part(new THREE.PlaneGeometry(0.15, 0.17), WARM, {
+      bone: chassis,
+      at: [0, lampY + 0.15, 2.135],
+      dir: [0, 0, 1],
+      axis: "z",
+      name: "headlampGlass",
+    }),
     1.4,
   );
   add(chassis, BRASS, bx(0.17, 0.19, 0.012, 0, lampY + 0.15, 2.128));
@@ -573,9 +630,15 @@ export default function build(): THREE.Object3D {
     const hy = YB + 0.22;
     add(chassis, BRASS, rd([hx, hy, 2.0], [hx, hy, 0.4], 0.013, 4));
     add(chassis, BRASS, cylZ(0.03, 0.03, hx, hy, 2.0, 6), cylZ(0.03, 0.03, hx, hy, 0.4, 6));
-    for (const z of [1.65, 1.2, 0.75]) add(chassis, BRASS, rd([s * (rB(z) + 0.02), hy - 0.07, z], [hx, hy, z], 0.011, 4));
+    for (const z of [1.65, 1.2, 0.75])
+      add(chassis, BRASS, rd([s * (rB(z) + 0.02), hy - 0.07, z], [hx, hy, z], 0.011, 4));
     // steam pipe from the smokebox down to the cylinder
-    add(chassis, STEEL_D, rd([s * 0.34, YB - 0.1, 1.98], [s * 0.545, H(0.75), 1.8], 0.032, 6), cyl(0.05, 0.05, s * 0.545, H(0.72), 1.8, 6));
+    add(
+      chassis,
+      STEEL_D,
+      rd([s * 0.34, YB - 0.1, 1.98], [s * 0.545, H(0.75), 1.8], 0.032, 6),
+      cyl(0.05, 0.05, s * 0.545, H(0.72), 1.8, 6),
+    );
   }
 
   // running boards, cab floor, frame --------------------------------------------------
@@ -585,7 +648,13 @@ export default function build(): THREE.Object3D {
     add(chassis, IRON, rd([s * 0.33, H(0.58), 2.36], [s * 0.33, H(0.58), -1.15], 0.035, 4));
     add(chassis, IRON, bx(0.045, 0.3, 3.5, s * 0.31, H(0.56), 0.62));
   }
-  add(chassis, IRON, bx(0.66, 0.1, 1.98, 0, H(0.85), 1.25), bx(0.7, 0.1, 0.45, 0, H(0.46), 2.0), bx(0.7, 0.1, 0.3, 0, H(0.46), -0.5));
+  add(
+    chassis,
+    IRON,
+    bx(0.66, 0.1, 1.98, 0, H(0.85), 1.25),
+    bx(0.7, 0.1, 0.45, 0, H(0.46), 2.0),
+    bx(0.7, 0.1, 0.3, 0, H(0.46), -0.5),
+  );
   add(chassis, FLOOR, bx(1.36, 0.05, 1.5, 0, H(0.895), -0.4));
   add(chassis, IRON, bx(1.36, 0.08, 1.5, 0, H(0.83), -0.4));
   add(chassis, IRON, bx(0.6, 0.12, 0.1, 0, H(0.61), 0.2));
@@ -607,7 +676,12 @@ export default function build(): THREE.Object3D {
       [CZ1 + 0.1, CZ1],
     ])
       add(chassis, GREEN, bx(0.04, 0.42, za - zb, wx, FL + 0.79, (za + zb) / 2));
-    add(chassis, WOOD_IN, bx(0.012, 0.56, cabLen - 0.02, s * 0.612, FL + 0.29, cabMidZ), bx(0.012, 0.36, cabLen - 0.02, s * 0.612, FL + 1.19, cabMidZ));
+    add(
+      chassis,
+      WOOD_IN,
+      bx(0.012, 0.56, cabLen - 0.02, s * 0.612, FL + 0.29, cabMidZ),
+      bx(0.012, 0.36, cabLen - 0.02, s * 0.612, FL + 1.19, cabMidZ),
+    );
     // cream window frames
     for (const [za, zb] of [
       [0.22, -0.36],
@@ -647,17 +721,39 @@ export default function build(): THREE.Object3D {
     ],
     { at: [0, H(2.3), -0.4], x: [1, 0, 0], y: [0, 1, 0], thickness: 1.6, color: ROOF, bone: chassis, name: "cabRoof" },
   );
-  b.decal(roof, roofTex, { at: [0, H(2.46), -0.4], dir: [0, -1, 0], up: [0, 0, 1], size: [1.46, 1.56], segments: [8, 4], bone: chassis, lift: 0.003, name: "roofSeams" });
+  b.decal(roof, roofTex, {
+    at: [0, H(2.46), -0.4],
+    dir: [0, 1, 0],
+    up: [0, 0, 1],
+    size: [1.46, 1.56],
+    segments: [8, 4],
+    bone: chassis,
+    lift: 0.003,
+    name: "roofSeams",
+  });
   add(chassis, GREEN_D, bx(0.3, 0.06, 0.4, 0, H(2.49), -0.4), bx(0.24, 0.04, 0.32, 0, H(2.54), -0.4));
   add(chassis, GREEN_D, bx(1.52, 0.05, 0.04, 0, H(2.3), 0.39), bx(1.52, 0.05, 0.04, 0, H(2.3), -1.19));
   // canvas weather-sheet hanging from the roof behind the crew, tied back in the middle
   for (const s of [1, -1]) {
-    add(chassis, CANVAS, bx(0.4, 1.0, 0.02, s * 0.43, FL + 0.86, CZ1 + 0.02, [0, 0, s * 4]), bx(0.05, 1.0, 0.05, s * 0.64, FL + 0.86, CZ1 + 0.02));
+    add(
+      chassis,
+      CANVAS,
+      bx(0.4, 1.0, 0.02, s * 0.43, FL + 0.86, CZ1 + 0.02, [0, 0, s * 4]),
+      bx(0.05, 1.0, 0.05, s * 0.64, FL + 0.86, CZ1 + 0.02),
+    );
     add(chassis, CANVAS_D, bx(0.1, 0.95, 0.03, s * 0.2, FL + 0.86, CZ1 + 0.03, [0, 0, -s * 6]));
   }
   add(chassis, IRON, rd([-0.66, FL + 1.34, CZ1 + 0.02], [0.66, FL + 1.34, CZ1 + 0.02], 0.012, 4));
   // interior lamp
-  glow(b.part(new THREE.IcosahedronGeometry(0.045, 0), WARM, { bone: chassis, at: [0.35, FL + 1.15, -0.2], flat: true, name: "cabLamp" }), 1.2);
+  glow(
+    b.part(new THREE.IcosahedronGeometry(0.045, 0), WARM, {
+      bone: chassis,
+      at: [0.35, FL + 1.15, -0.2],
+      flat: true,
+      name: "cabLamp",
+    }),
+    1.2,
+  );
   add(chassis, IRON, rd([0.35, FL + 1.35, -0.2], [0.35, FL + 1.2, -0.2], 0.01, 4));
   // reversing lever and brake stand
   add(chassis, STEEL_D, rd([-0.3, FL, 0.0], [-0.3, FL + 0.75, 0.05], 0.018, 6));
@@ -665,17 +761,38 @@ export default function build(): THREE.Object3D {
 
   // steps below the cab doors
   for (const s of [1, -1]) {
-    add(chassis, IRON, bx(0.18, 0.02, 0.36, s * 0.75, H(0.55), -0.2), rd([s * 0.66, H(0.88), -0.05], [s * 0.66, H(0.55), -0.05], 0.014, 4), rd([s * 0.66, H(0.88), -0.35], [s * 0.66, H(0.55), -0.35], 0.014, 4));
+    add(
+      chassis,
+      IRON,
+      bx(0.18, 0.02, 0.36, s * 0.75, H(0.55), -0.2),
+      rd([s * 0.66, H(0.88), -0.05], [s * 0.66, H(0.55), -0.05], 0.014, 4),
+      rd([s * 0.66, H(0.88), -0.35], [s * 0.66, H(0.55), -0.35], 0.014, 4),
+    );
     add(chassis, STEEL_D, bx(0.18, 0.012, 0.36, s * 0.75, H(0.563), -0.2));
   }
 
   // buffer beams, buffers, couplings ---------------------------------------------------
-  b.part(new THREE.BoxGeometry(1.3, 0.3, 0.1), RED, { bone: chassis, at: [0, H(0.58), 2.41], flat: true, name: "frontBeam" });
+  b.part(new THREE.BoxGeometry(1.3, 0.3, 0.1), RED, {
+    bone: chassis,
+    at: [0, H(0.58), 2.41],
+    flat: true,
+    name: "frontBeam",
+  });
   plane(beamTex, 1.3, 0.3, [0, H(0.58), 2.462], [0, 0, 1], chassis, "frontBeamDecal");
-  b.part(new THREE.BoxGeometry(1.3, 0.3, 0.1), RED, { bone: chassis, at: [0, H(0.58), -1.2], flat: true, name: "rearBeam" });
+  b.part(new THREE.BoxGeometry(1.3, 0.3, 0.1), RED, {
+    bone: chassis,
+    at: [0, H(0.58), -1.2],
+    flat: true,
+    name: "rearBeam",
+  });
   for (const s of [1, -1]) {
     add(chassis, STEEL_D, cylZ(0.045, 0.14, s * 0.48, H(0.58), 2.52, 8), cylZ(0.095, 0.035, s * 0.48, H(0.58), 2.6, 8));
-    add(chassis, STEEL_D, cylZ(0.045, 0.14, s * 0.48, H(0.58), -1.32, 8), cylZ(0.095, 0.035, s * 0.48, H(0.58), -1.4, 8));
+    add(
+      chassis,
+      STEEL_D,
+      cylZ(0.045, 0.14, s * 0.48, H(0.58), -1.32, 8),
+      cylZ(0.095, 0.035, s * 0.48, H(0.58), -1.4, 8),
+    );
   }
   add(chassis, IRON, bx(0.06, 0.06, 0.2, 0, H(0.58), 2.56), bx(0.09, 0.12, 0.05, 0, H(0.52), 2.63));
   add(chassis, STEEL_D, bx(0.03, 0.12, 0.03, 0, H(0.58), 2.66));
@@ -715,26 +832,35 @@ export default function build(): THREE.Object3D {
   const driverZ = [0.95, 0.1, -0.75];
   const driverY = H(flatAxle(DRIVER_R));
   const PIN_R = 0.13;
-  const wheelGeo = (
-    s: number,
-    cz: number,
-    cy: number,
-    Rw: number,
-    spokes: number,
-    psi0: number,
-    weight: boolean,
-  ) => {
+  const wheelGeo = (s: number, cz: number, cy: number, Rw: number, spokes: number, psi0: number, weight: boolean) => {
     const cx = s * GX;
     const rot = (g: THREE.BufferGeometry) => g.rotateZ(s > 0 ? -Math.PI / 2 : Math.PI / 2);
     const V = THREE.Vector2;
     const tyre = rot(
       new THREE.LatheGeometry(
-        [new V(Rw - 0.055, -0.045), new V(Rw + 0.03, -0.045), new V(Rw + 0.03, -0.03), new V(Rw, -0.02), new V(Rw, 0.03), new V(Rw - 0.055, 0.03), new V(Rw - 0.055, -0.045)],
+        [
+          new V(Rw - 0.055, -0.045),
+          new V(Rw + 0.03, -0.045),
+          new V(Rw + 0.03, -0.03),
+          new V(Rw, -0.02),
+          new V(Rw, 0.03),
+          new V(Rw - 0.055, 0.03),
+          new V(Rw - 0.055, -0.045),
+        ],
         SEG,
       ),
     ).translate(cx, cy, cz);
     const rim = rot(
-      new THREE.LatheGeometry([new V(Rw - 0.09, -0.02), new V(Rw - 0.05, -0.02), new V(Rw - 0.05, 0.022), new V(Rw - 0.09, 0.022), new V(Rw - 0.09, -0.02)], SEG),
+      new THREE.LatheGeometry(
+        [
+          new V(Rw - 0.09, -0.02),
+          new V(Rw - 0.05, -0.02),
+          new V(Rw - 0.05, 0.022),
+          new V(Rw - 0.09, 0.022),
+          new V(Rw - 0.09, -0.02),
+        ],
+        SEG,
+      ),
     ).translate(cx, cy, cz);
     const web: THREE.BufferGeometry[] = [rim];
     const hub = rot(new THREE.CylinderGeometry(0.075, 0.075, 0.1, 6)).translate(cx + s * 0.005, cy, cz);
@@ -767,7 +893,12 @@ export default function build(): THREE.Object3D {
     const phi = s > 0 ? 35 : 125; // crank angle from +Z toward +Y
     sideInfo[side] = { s, phi, pins: [] };
     driverZ.forEach((z, i) => {
-      const j = b.joint(`driver${side}${driverNames[i]}`, { parent: chassis, at: [s * GX, driverY, z], dir: [s, 0, 0], role: "hinge" });
+      const j = b.joint(`driver${side}${driverNames[i]}`, {
+        parent: chassis,
+        at: [s * GX, driverY, z],
+        dir: [s, 0, 0],
+        role: "hinge",
+      });
       wheelJoints[`driver${side}${i}`] = j;
       const { tyre, web } = wheelGeo(s, z, driverY, DRIVER_R, 8, phi + 22.5, true);
       add(j, STEEL_D, tyre);
@@ -777,7 +908,12 @@ export default function build(): THREE.Object3D {
       const pz = z + Math.cos(phi * DEG) * PIN_R;
       const py = driverY + Math.sin(phi * DEG) * PIN_R;
       sideInfo[side].pins.push(new THREE.Vector3(s * 0.49, py, pz));
-      add(j, STEEL, rd([s * (GX - 0.005), py, pz], [s * (GX + pinLen), py, pz], 0.022, 6), rd([s * (GX - 0.3), driverY, z], [s * GX, driverY, z], 0.035, 6));
+      add(
+        j,
+        STEEL,
+        rd([s * (GX - 0.005), py, pz], [s * (GX + pinLen), py, pz], 0.022, 6),
+        rd([s * (GX - 0.3), driverY, z], [s * GX, driverY, z], 0.035, 6),
+      );
       add(j, RED_D, rd([s * (GX + 0.0), py, pz], [s * (GX + 0.05), py, pz], 0.05, 6));
     });
   }
@@ -791,12 +927,25 @@ export default function build(): THREE.Object3D {
     // crosshead position from a 1.2 m connecting rod
     const dy = yP - P2.y;
     const zc = P2.z + Math.sqrt(1.2 * 1.2 - dy * dy);
-    const couple = b.joint(`couplingRod${side}`, { parent: chassis, at: [s * 0.49, P1.y, P1.z], aim: [s * 0.49, P3.y, P3.z], role: "hinge" });
+    const couple = b.joint(`couplingRod${side}`, {
+      parent: chassis,
+      at: [s * 0.49, P1.y, P1.z],
+      aim: [s * 0.49, P3.y, P3.z],
+      role: "hinge",
+    });
     const cross = b.joint(`crosshead${side}`, { parent: chassis, at: [x, yP, zc], dir: [0, 0, -1], role: "hinge" });
     const main = b.joint(`mainRod${side}`, { parent: cross, at: [x, yP, zc], aim: [x, P2.y, P2.z], role: "hinge" });
-    b.frustumBox([s * 0.49, P1.y, P1.z], [s * 0.49, P3.y, P3.z], [0.028, 0.065], [0.028, 0.065], { color: STEEL, bone: couple, name: "couplingRod" });
+    b.frustumBox([s * 0.49, P1.y, P1.z], [s * 0.49, P3.y, P3.z], [0.028, 0.065], [0.028, 0.065], {
+      color: STEEL,
+      bone: couple,
+      name: "couplingRod",
+    });
     for (const P of [P1, P2, P3]) add(couple, STEEL_D, cylX(0.055, 0.032, s * 0.49, P.y, P.z, 6));
-    b.frustumBox([x, yP, zc], [x, P2.y, P2.z], [0.03, 0.07], [0.03, 0.09], { color: STEEL, bone: main, name: "mainRod" });
+    b.frustumBox([x, yP, zc], [x, P2.y, P2.z], [0.03, 0.07], [0.03, 0.09], {
+      color: STEEL,
+      bone: main,
+      name: "mainRod",
+    });
     add(main, STEEL_D, cylX(0.06, 0.035, x, P2.y, P2.z, 6));
     add(cross, STEEL_D, bx(0.05, 0.09, 0.13, x, yP, zc), bx(0.028, 0.03, 0.09, x, yP, zc - 0.02));
     b.rod([x, yP, zc], [x, yP, 1.6], 0.018, { section: { ngon: 6 }, color: STEEL, bone: cross, name: "pistonRod" });
@@ -806,12 +955,36 @@ export default function build(): THREE.Object3D {
     const linkX = s * 0.56;
     add(chassis, STEEL_D, bx(0.03, 0.17, 0.05, linkX, linkY, linkZ, [15 * s, 0, 0]));
     add(chassis, IRON, rd([linkX, linkY - 0.1, linkZ], [linkX, H(0.92), linkZ + 0.02], 0.014, 4));
-    const crank = new THREE.Vector3(s * 0.6, driverY + Math.sin((phi + 95) * DEG) * 0.07, driverZ[1] + Math.cos((phi + 95) * DEG) * 0.07);
-    const ecc = b.joint(`eccentricRod${side}`, { parent: chassis, at: [linkX, linkY - 0.08, linkZ], aim: [crank.x, crank.y, crank.z], role: "hinge" });
-    b.rod([linkX, linkY - 0.08, linkZ], crank, 0.014, { section: { ngon: 4 }, color: STEEL, bone: ecc, name: "eccentricRod" });
+    const crank = new THREE.Vector3(
+      s * 0.6,
+      driverY + Math.sin((phi + 95) * DEG) * 0.07,
+      driverZ[1] + Math.cos((phi + 95) * DEG) * 0.07,
+    );
+    const ecc = b.joint(`eccentricRod${side}`, {
+      parent: chassis,
+      at: [linkX, linkY - 0.08, linkZ],
+      aim: [crank.x, crank.y, crank.z],
+      role: "hinge",
+    });
+    b.rod([linkX, linkY - 0.08, linkZ], crank, 0.014, {
+      section: { ngon: 4 },
+      color: STEEL,
+      bone: ecc,
+      name: "eccentricRod",
+    });
     add(wheelJoints[`driver${side}1`], STEEL_D, cylX(0.045, 0.02, crank.x, crank.y, crank.z, 6));
-    const valve = b.joint(`valveRod${side}`, { parent: chassis, at: [linkX, linkY + 0.02, linkZ], aim: [linkX, yP + 0.17, 1.6], role: "hinge" });
-    b.rod([linkX, linkY + 0.02, linkZ], [linkX, yP + 0.17, 1.6], 0.014, { section: { ngon: 4 }, color: STEEL, bone: valve, name: "radiusRod" });
+    const valve = b.joint(`valveRod${side}`, {
+      parent: chassis,
+      at: [linkX, linkY + 0.02, linkZ],
+      aim: [linkX, yP + 0.17, 1.6],
+      role: "hinge",
+    });
+    b.rod([linkX, linkY + 0.02, linkZ], [linkX, yP + 0.17, 1.6], 0.014, {
+      section: { ngon: 4 },
+      color: STEEL,
+      bone: valve,
+      name: "radiusRod",
+    });
   }
 
   // pony truck ----------------------------------------------------------------------------
@@ -824,7 +997,13 @@ export default function build(): THREE.Object3D {
     add(j, RED, ...web);
     add(j, IRON, rd([s * (GX - 0.3), ponyY, 2.0], [s * GX, ponyY, 2.0], 0.03, 6));
   }
-  add(chassis, IRON, bx(0.6, 0.05, 0.12, 0, H(0.36), 2.0), bx(0.04, 0.14, 0.1, 0.33, H(0.43), 2.0), bx(0.04, 0.14, 0.1, -0.33, H(0.43), 2.0));
+  add(
+    chassis,
+    IRON,
+    bx(0.6, 0.05, 0.12, 0, H(0.36), 2.0),
+    bx(0.04, 0.14, 0.1, 0.33, H(0.43), 2.0),
+    bx(0.04, 0.14, 0.1, -0.33, H(0.43), 2.0),
+  );
 
   // ===================================================================== TENDER
   const tz0 = -1.36;
@@ -832,9 +1011,20 @@ export default function build(): THREE.Object3D {
   const tzMid = (tz0 + tz1) / 2;
   const tlen = tz0 - tz1;
   // drawbar and safety chains
-  add(chassis, IRON, rd([0, H(0.55), -1.25], [0, H(0.55), -1.4], 0.035, 6), cyl(0.06, 0.05, 0, H(0.55), -1.25, 6), cyl(0.06, 0.05, 0, H(0.55), -1.4, 6));
+  add(
+    chassis,
+    IRON,
+    rd([0, H(0.55), -1.25], [0, H(0.55), -1.4], 0.035, 6),
+    cyl(0.06, 0.05, 0, H(0.55), -1.25, 6),
+    cyl(0.06, 0.05, 0, H(0.55), -1.4, 6),
+  );
   for (const s of [1, -1]) {
-    add(chassis, STEEL_D, rd([s * 0.3, H(0.62), -1.25], [s * 0.25, H(0.5), -1.32], 0.01, 4), rd([s * 0.25, H(0.5), -1.32], [s * 0.3, H(0.62), -1.4], 0.01, 4));
+    add(
+      chassis,
+      STEEL_D,
+      rd([s * 0.3, H(0.62), -1.25], [s * 0.25, H(0.5), -1.32], 0.01, 4),
+      rd([s * 0.25, H(0.5), -1.32], [s * 0.3, H(0.62), -1.4], 0.01, 4),
+    );
   }
   // frame and tank
   for (const s of [1, -1]) {
@@ -850,7 +1040,15 @@ export default function build(): THREE.Object3D {
       [-0.58, 0.5],
       [-0.65, 0.42],
     ],
-    { at: [0, H(0.6), tzMid], x: [1, 0, 0], y: [0, 1, 0], thickness: tlen, color: GREEN, bone: tender, name: "tenderTank" },
+    {
+      at: [0, H(0.6), tzMid],
+      x: [1, 0, 0],
+      y: [0, 1, 0],
+      thickness: tlen,
+      color: GREEN,
+      bone: tender,
+      name: "tenderTank",
+    },
   );
   // tank lining and lettering
   add(tender, CREAM, bx(1.32, 0.02, tlen + 0.01, 0, H(0.605), tzMid));
@@ -893,7 +1091,12 @@ export default function build(): THREE.Object3D {
   add(tender, COAL, ...coalA);
   add(tender, COAL2, ...coalB);
   // shovel leaning on the front wall
-  add(tender, STEEL_D, rd([0.35, H(1.5), -1.75], [0.35, H(1.05), -1.98], 0.014, 4), bx(0.14, 0.02, 0.17, 0.35, H(1.05), -2.03, [-20, 0, 0]));
+  add(
+    tender,
+    STEEL_D,
+    rd([0.35, H(1.5), -1.75], [0.35, H(1.05), -1.98], 0.014, 4),
+    bx(0.14, 0.02, 0.17, 0.35, H(1.05), -2.03, [-20, 0, 0]),
+  );
   // water filler on the tank top forward of the bunker
   add(tender, BRASS, cyl(0.1, 0.05, 0.3, H(1.13), -1.52, 8), cyl(0.05, 0.05, 0.3, H(1.16), -1.52, 6, 0.03));
   add(tender, IRON, bx(0.56, 0.05, 0.22, -0.25, H(1.13), -1.52));
@@ -902,17 +1105,48 @@ export default function build(): THREE.Object3D {
   add(tender, BRASS, new THREE.TorusGeometry(0.1, 0.014, 4, 8).rotateY(Math.PI / 2).translate(-0.5, H(1.56), -1.44));
   add(tender, RED_D, rd([-0.5, H(1.56), -1.44], [-0.5, H(1.56), -1.44], 0.001, 4));
   // tender beam, buffers, lamp
-  b.part(new THREE.BoxGeometry(1.3, 0.26, 0.09), RED, { bone: tender, at: [0, H(0.58), tz1 - 0.045], flat: true, name: "tenderBeam" });
-  for (const s of [1, -1]) add(tender, STEEL_D, cylZ(0.045, 0.12, s * 0.48, H(0.58), tz1 - 0.15, 8), cylZ(0.095, 0.035, s * 0.48, H(0.58), tz1 - 0.225, 8));
+  b.part(new THREE.BoxGeometry(1.3, 0.26, 0.09), RED, {
+    bone: tender,
+    at: [0, H(0.58), tz1 - 0.045],
+    flat: true,
+    name: "tenderBeam",
+  });
+  for (const s of [1, -1])
+    add(
+      tender,
+      STEEL_D,
+      cylZ(0.045, 0.12, s * 0.48, H(0.58), tz1 - 0.15, 8),
+      cylZ(0.095, 0.035, s * 0.48, H(0.58), tz1 - 0.225, 8),
+    );
   add(tender, IRON, bx(0.06, 0.06, 0.2, 0, H(0.58), tz1 - 0.15), bx(0.09, 0.12, 0.05, 0, H(0.52), tz1 - 0.24));
-  add(tender, BLACK, bx(0.14, 0.18, 0.12, 0, H(0.86), tz1 - 0.1), bx(0.16, 0.02, 0.14, 0, H(0.96), tz1 - 0.1), bx(0.05, 0.05, 0.1, 0, H(0.86), tz1 - 0.03));
-  glow(b.part(new THREE.PlaneGeometry(0.1, 0.12), LAMP_RED, { bone: tender, at: [0, H(0.86), tz1 - 0.172], dir: [0, 0, -1], axis: "z", name: "tailLamp" }), 1.3);
+  add(
+    tender,
+    BLACK,
+    bx(0.14, 0.18, 0.12, 0, H(0.86), tz1 - 0.1),
+    bx(0.16, 0.02, 0.14, 0, H(0.96), tz1 - 0.1),
+    bx(0.05, 0.05, 0.1, 0, H(0.86), tz1 - 0.03),
+  );
+  glow(
+    b.part(new THREE.PlaneGeometry(0.1, 0.12), LAMP_RED, {
+      bone: tender,
+      at: [0, H(0.86), tz1 - 0.172],
+      dir: [0, 0, -1],
+      axis: "z",
+      name: "tailLamp",
+    }),
+    1.3,
+  );
   // tender wheels
   const tendY = H(flatAxle(TENDER_R));
   for (const s of [1, -1]) {
     const side = s > 0 ? "L" : "R";
     [-1.65, -2.23].forEach((z, i) => {
-      const j = b.joint(`tenderWheel${side}${i + 1}`, { parent: tender, at: [s * GX, tendY, z], dir: [s, 0, 0], role: "hinge" });
+      const j = b.joint(`tenderWheel${side}${i + 1}`, {
+        parent: tender,
+        at: [s * GX, tendY, z],
+        dir: [s, 0, 0],
+        role: "hinge",
+      });
       const { tyre, web } = wheelGeo(s, z, tendY, TENDER_R, 6, 15 * i, false);
       add(j, STEEL_D, tyre);
       add(j, RED, ...web);
@@ -921,15 +1155,37 @@ export default function build(): THREE.Object3D {
   }
 
   // soot on the boiler top behind the chimney and on the smokebox
-  b.decal(boiler, sootTex, { at: [0, YB + 0.42, 1.62], dir: [0, -1, 0], up: [0, 0, -1], size: [0.42, 0.62], segments: [3, 4], bone: chassis, lift: 0.003, name: "soot" });
+  b.decal(boiler, sootTex, {
+    at: [0, YB + 0.42, 1.62],
+    dir: [0, 1, 0],
+    up: [0, 0, -1],
+    size: [0.42, 0.62],
+    segments: [3, 4],
+    bone: chassis,
+    lift: 0.003,
+    name: "soot",
+  });
   for (const s of [1, -1]) {
-    b.decal(boiler, namePlate, { at: [s * 0.44, YB + 0.02, 1.36], dir: [-s, 0, 0], size: [0.42, 0.135], segments: [6, 2], bone: chassis, lift: 0.003, name: "nameplate" });
+    b.decal(boiler, namePlate, {
+      at: [s * 0.44, YB + 0.02, 1.36],
+      dir: [s, 0, 0],
+      size: [0.42, 0.135],
+      segments: [6, 2],
+      bone: chassis,
+      lift: 0.003,
+      name: "nameplate",
+    });
   }
   flush();
 
   // ===================================================================== SMOKE AND STEAM
   const chimneyAt: [number, number, number] = [0, chimneyTop + 0.1, 1.78];
-  const path = bezier(chimneyAt, [0, chimneyTop + 0.45, 1.6], [0, chimneyTop + 0.75, 0.7], [0, chimneyTop + 0.85, -1.0]);
+  const path = bezier(
+    chimneyAt,
+    [0, chimneyTop + 0.45, 1.6],
+    [0, chimneyTop + 0.75, 0.7],
+    [0, chimneyTop + 0.85, -1.0],
+  );
   const smokeDark = [puffSvg(11, "#4a4846", "#35332f", "#66635e"), puffSvg(12, "#4e4b48", "#37342f", "#6a6661")];
   const smokeMid = [puffSvg(21, "#8b8883", "#6f6c67", "#a7a49e"), puffSvg(22, "#8e8b85", "#72706a", "#aaa7a0")];
   const smokeLight = [puffSvg(31, "#c5c3bd", "#a8a6a0", "#e2e0da"), puffSvg(32, "#cbc9c3", "#adaba5", "#e6e4de")];
@@ -960,7 +1216,14 @@ export default function build(): THREE.Object3D {
       sink: 0,
     });
   }
-  b.cards([frame([0, fbTop + 0.16, 0.48], [0, 1, 0])], spraySvg, { size: [0.22, 0.4], cross: true, bone: chassis, sink: 0, flow: [0, 0, -1], lean: 10 });
+  b.cards([frame([0, fbTop + 0.16, 0.48], [0, 1, 0])], spraySvg, {
+    size: [0.22, 0.4],
+    cross: true,
+    bone: chassis,
+    sink: 0,
+    flow: [0, 0, -1],
+    lean: 10,
+  });
 
   return b.root;
 }

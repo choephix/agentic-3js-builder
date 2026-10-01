@@ -226,19 +226,23 @@ export default function build(): THREE.Object3D {
   });
 
   // ---- Cat body
-  const body = b.sweep(spine, (t) => {
-    const k = Math.sin(Math.PI * Math.min(1, 0.15 + t * 0.95));
-    return [0.086 + 0.02 * k, 0.07 + 0.01 * k];
-  }, {
-    sides: 8,
-    smooth: false,
-    color: ORANGE,
-    sectors: [[112, 248, CREAM]],
-  });
+  const body = b.sweep(
+    spine,
+    (t) => {
+      const k = Math.sin(Math.PI * Math.min(1, 0.15 + t * 0.95));
+      return [0.086 + 0.02 * k, 0.07 + 0.01 * k];
+    },
+    {
+      sides: 8,
+      smooth: false,
+      color: ORANGE,
+      sectors: [[112, 248, CREAM]],
+    },
+  );
 
   b.decal(body, SALMON, {
     at: [0, BODY_Y + 0.08, 0.0],
-    dir: [0, -1, 0],
+    dir: [0, 1, 0],
     up: [0, 0, 1],
     size: [0.21, 0.23],
     segments: [10, 10],
@@ -262,7 +266,13 @@ export default function build(): THREE.Object3D {
   ];
   rightSide[0][0] = 0;
   rightSide[rightSide.length - 1][0] = 0;
-  const loop = [...rightSide, ...rightSide.slice(1, -1).reverse().map(([x, y]): [number, number] => [-x, y])];
+  const loop = [
+    ...rightSide,
+    ...rightSide
+      .slice(1, -1)
+      .reverse()
+      .map(([x, y]): [number, number] => [-x, y]),
+  ];
   const noriPos: number[] = [];
   // Each quad is wound so its face looks along `want`.
   const quad = (a: THREE.Vector3, bb: THREE.Vector3, c: THREE.Vector3, d: THREE.Vector3, want: THREE.Vector3) => {
@@ -276,17 +286,39 @@ export default function build(): THREE.Object3D {
   };
   loop.forEach(([x, y], i) => {
     const [x2, y2] = loop[(i + 1) % loop.length];
-    const n0 = edgeNormal((i + loop.length - 1) % loop.length).add(edgeNormal(i)).normalize();
-    const n1 = edgeNormal(i).add(edgeNormal((i + 1) % loop.length)).normalize();
+    const n0 = edgeNormal((i + loop.length - 1) % loop.length)
+      .add(edgeNormal(i))
+      .normalize();
+    const n1 = edgeNormal(i)
+      .add(edgeNormal((i + 1) % loop.length))
+      .normalize();
     const at = (px: number, py: number, n: THREE.Vector3, k: number, z: number) =>
       new THREE.Vector3(px + n.x * NORI_HALF_T * k, py + n.y * NORI_HALF_T * k, z);
     const z0 = Z_BAND - NORI_HALF_W;
     const z1 = Z_BAND + NORI_HALF_W;
     const face = edgeNormal(i);
     quad(at(x, y, n0, 1, z0), at(x2, y2, n1, 1, z0), at(x2, y2, n1, 1, z1), at(x, y, n0, 1, z1), face);
-    quad(at(x, y, n0, -1, z0), at(x2, y2, n1, -1, z0), at(x2, y2, n1, -1, z1), at(x, y, n0, -1, z1), face.clone().negate());
-    quad(at(x, y, n0, 1, z1), at(x2, y2, n1, 1, z1), at(x2, y2, n1, -1, z1), at(x, y, n0, -1, z1), new THREE.Vector3(0, 0, 1));
-    quad(at(x, y, n0, 1, z0), at(x2, y2, n1, 1, z0), at(x2, y2, n1, -1, z0), at(x, y, n0, -1, z0), new THREE.Vector3(0, 0, -1));
+    quad(
+      at(x, y, n0, -1, z0),
+      at(x2, y2, n1, -1, z0),
+      at(x2, y2, n1, -1, z1),
+      at(x, y, n0, -1, z1),
+      face.clone().negate(),
+    );
+    quad(
+      at(x, y, n0, 1, z1),
+      at(x2, y2, n1, 1, z1),
+      at(x2, y2, n1, -1, z1),
+      at(x, y, n0, -1, z1),
+      new THREE.Vector3(0, 0, 1),
+    );
+    quad(
+      at(x, y, n0, 1, z0),
+      at(x2, y2, n1, 1, z0),
+      at(x2, y2, n1, -1, z0),
+      at(x, y, n0, -1, z0),
+      new THREE.Vector3(0, 0, -1),
+    );
   });
   const noriGeo = new THREE.BufferGeometry();
   noriGeo.setAttribute("position", new THREE.Float32BufferAttribute(noriPos, 3));
@@ -351,7 +383,11 @@ export default function build(): THREE.Object3D {
         [s * 0.058, RICE_TOP + 0.016, 0.19],
         [s * 0.05, RICE_TOP + 0.014, 0.225],
       ]),
-      { parent: spine.joints[spine.joints.length - 1], role: "arm", names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`, `paw${side}`] },
+      {
+        parent: spine.joints[spine.joints.length - 1],
+        role: "arm",
+        names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`, `paw${side}`],
+      },
     );
     const arm = b.sweep(fore, [0.036, 0.031, 0.029, 0.027], {
       sides: 6,
@@ -363,7 +399,7 @@ export default function build(): THREE.Object3D {
     });
     b.decal(arm, TOES, {
       at: [s * 0.05, RICE_TOP + 0.022, 0.26],
-      dir: [0, -0.15, -1],
+      dir: [0, 0.15, 1],
       up: [0, 1, 0],
       size: [0.04, 0.028],
       lift: 0.0015,
@@ -405,14 +441,14 @@ export default function build(): THREE.Object3D {
   });
   b.decal([skull, ...pads], FACE, {
     at: [0, HEAD[1] + 0.0, HEAD[2] + 0.07],
-    dir: [0, 0, -1],
+    dir: [0, 0, 1],
     size: [0.17, 0.09],
     segments: [16, 9],
     lift: 0.002,
   });
   b.decal([...pads, chin], MOUTH, {
     at: [0, HEAD[1] - 0.036, HEAD[2] + 0.09],
-    dir: [0, 0, -1],
+    dir: [0, 0, 1],
     size: [0.05, 0.03],
     segments: [8, 5],
     lift: 0.002,
@@ -433,9 +469,17 @@ export default function build(): THREE.Object3D {
   for (const s of [1, -1]) {
     const baseP = new THREE.Vector3(s * 0.052, HEAD[1] + 0.054, HEAD[2] - 0.012);
     const tipP = new THREE.Vector3(s * 0.09, HEAD[1] + 0.126, HEAD[2] - 0.03);
-    const ear = b.joint(`ear${s > 0 ? "L" : "R"}`, { parent: head, at: baseP.toArray(), aim: tipP.toArray(), role: "hinge" });
+    const ear = b.joint(`ear${s > 0 ? "L" : "R"}`, {
+      parent: head,
+      at: baseP.toArray(),
+      aim: tipP.toArray(),
+      role: "hinge",
+    });
     const y = tipP.clone().sub(baseP).normalize();
-    const x = y.clone().cross(new THREE.Vector3(0, 0, 1)).normalize();
+    const x = y
+      .clone()
+      .cross(new THREE.Vector3(0, 0, 1))
+      .normalize();
     const front = x.clone().cross(y);
     if (front.z < 0) front.negate();
     b.extrude(
@@ -446,7 +490,17 @@ export default function build(): THREE.Object3D {
         [0, 0.09],
         [-0.016, 0.06],
       ],
-      { at: baseP.toArray(), x: x.toArray(), y: y.toArray(), thickness: 0.012, bevel: 0.003, smoothing: 1, detail: 0.5, color: ORANGE, bone: ear },
+      {
+        at: baseP.toArray(),
+        x: x.toArray(),
+        y: y.toArray(),
+        thickness: 0.012,
+        bevel: 0.003,
+        smoothing: 1,
+        detail: 0.5,
+        color: ORANGE,
+        bone: ear,
+      },
     );
     b.extrude(
       [
@@ -456,7 +510,16 @@ export default function build(): THREE.Object3D {
         [0, 0.066],
         [-0.009, 0.048],
       ],
-      { at: baseP.clone().addScaledVector(front, 0.0055).toArray(), x: x.toArray(), y: y.toArray(), thickness: 0.004, smoothing: 1, detail: 0.5, color: PINK, bone: ear },
+      {
+        at: baseP.clone().addScaledVector(front, 0.0055).toArray(),
+        x: x.toArray(),
+        y: y.toArray(),
+        thickness: 0.004,
+        smoothing: 1,
+        detail: 0.5,
+        color: PINK,
+        bone: ear,
+      },
     );
   }
 
@@ -495,7 +558,11 @@ export default function build(): THREE.Object3D {
   b.cards(grainHits, GRAIN, { size: [0.034, 0.025], lean: 90, spin: 180, rng: rand, sink: 0.3, bone: base });
   const topHits = b
     .surface(rice)
-    .scatter(40, { rng: rand, minDist: 0.03, filter: (h) => h.n.y > 0.6 && h.at.z > 0.1 && h.at.z < 0.21 && Math.abs(h.at.x) < 0.07 });
+    .scatter(40, {
+      rng: rand,
+      minDist: 0.03,
+      filter: (h) => h.n.y > 0.6 && h.at.z > 0.1 && h.at.z < 0.21 && Math.abs(h.at.x) < 0.07,
+    });
   b.cards(topHits, GRAIN, { size: [0.03, 0.022], lean: 90, spin: 180, rng: rand, sink: 0.3, bone: base });
 
   // ---- Wasabi dab
@@ -518,7 +585,12 @@ export default function build(): THREE.Object3D {
     flow: [0, 0, 1],
     bone: base,
   });
-  b.cards([frame([W.x + 0.002, W.y + 0.05, W.z], [0, 1, 0])], SPARKLE, { size: 0.028, flow: [0, 0, 1], bone: base, sink: 0 });
+  b.cards([frame([W.x + 0.002, W.y + 0.05, W.z], [0, 1, 0])], SPARKLE, {
+    size: 0.028,
+    flow: [0, 0, 1],
+    bone: base,
+    sink: 0,
+  });
 
   // ---- Pickled-ginger rose
   const G = new THREE.Vector3(0.13, BOARD_TOP, 0.29);
@@ -529,23 +601,47 @@ export default function build(): THREE.Object3D {
     { n: 5, r: 0.017, dy: 0.009, lean: 14, w: 0.013, h: 0.014, c: 1 },
     { n: 4, r: 0.009, dy: 0.015, lean: -14, w: 0.01, h: 0.012, c: 2 },
   ];
-  b.part(new THREE.CylinderGeometry(0.03, 0.034, 0.012, 7), GINGER[0], { bone: base, at: [G.x, G.y + 0.004, G.z], flat: true });
+  b.part(new THREE.CylinderGeometry(0.03, 0.034, 0.012, 7), GINGER[0], {
+    bone: base,
+    at: [G.x, G.y + 0.004, G.z],
+    flat: true,
+  });
   layers.forEach((L, li) => {
     const from = li * 25;
     const ringOptions = { count: L.n, radius: L.r, fromDeg: from, toDeg: from + (360 * (L.n - 1)) / L.n };
     b.ring(frame([G.x, G.y + L.dy, G.z], [0, 1, 0]), ringOptions, (item) => {
       const out = item.outward.clone();
-      const d = new THREE.Vector3(0, Math.cos((L.lean * Math.PI) / 180), 0).addScaledVector(out, Math.sin((L.lean * Math.PI) / 180));
-      b.part(petal, GINGER[L.c], { bone: base, at: item.at, dir: d.toArray(), up: out.toArray(), scale: [L.w, L.h, 0.0045], flat: true });
+      const d = new THREE.Vector3(0, Math.cos((L.lean * Math.PI) / 180), 0).addScaledVector(
+        out,
+        Math.sin((L.lean * Math.PI) / 180),
+      );
+      b.part(petal, GINGER[L.c], {
+        bone: base,
+        at: item.at,
+        dir: d.toArray(),
+        up: out.toArray(),
+        scale: [L.w, L.h, 0.0045],
+        flat: true,
+      });
     });
   });
-  b.part(new THREE.SphereGeometry(1, 5, 4), GINGER[2], { bone: base, at: [G.x, G.y + 0.028, G.z], scale: [0.007, 0.007, 0.009], flat: true });
-  b.cards([frame([G.x + 0.03, G.y + 0.03, G.z + 0.02], [0, 1, 0])], SPARKLE, { size: 0.026, flow: [0, 0, 1], bone: base, sink: 0 });
+  b.part(new THREE.SphereGeometry(1, 5, 4), GINGER[2], {
+    bone: base,
+    at: [G.x, G.y + 0.028, G.z],
+    scale: [0.007, 0.007, 0.009],
+    flat: true,
+  });
+  b.cards([frame([G.x + 0.03, G.y + 0.03, G.z + 0.02], [0, 1, 0])], SPARKLE, {
+    size: 0.026,
+    flow: [0, 0, 1],
+    bone: base,
+    sink: 0,
+  });
 
   // Wood grain printed on the board top
   b.decal(board, WOOD_GRAIN, {
     at: [0, BOARD_TOP, 0.065],
-    dir: [0, -1, 0],
+    dir: [0, 1, 0],
     up: [0, 0, 1],
     size: [0.52, 0.61],
     segments: [10, 10],

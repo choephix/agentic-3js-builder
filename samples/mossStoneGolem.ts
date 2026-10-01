@@ -95,7 +95,9 @@ function runeStrip(ids: number[]) {
 
 /** The big chest sigil: rings, a hex, spokes and six small glyphs. */
 function sigilSvg() {
-  const hex = [0, 1, 2, 3, 4, 5].map((i) => pt(50 + Math.cos((i * Math.PI) / 3 + 0.5) * 26, 50 + Math.sin((i * Math.PI) / 3 + 0.5) * 26));
+  const hex = [0, 1, 2, 3, 4, 5].map((i) =>
+    pt(50 + Math.cos((i * Math.PI) / 3 + 0.5) * 26, 50 + Math.sin((i * Math.PI) / 3 + 0.5) * 26),
+  );
   const parts: string[] = [
     `<circle cx="50" cy="50" r="44" fill="none"`,
     `<circle cx="50" cy="50" r="10" fill="none"`,
@@ -185,7 +187,7 @@ function fernSvg() {
   let s = `<path d="M20,79 Q22,40 18,6" stroke="#2e5522" stroke-width="2.8" fill="none" stroke-linecap="round"/>`;
   for (let i = 0; i < 10; i++) {
     const y = 74 - i * 6.8;
-    const x = 20 + ((i / 10) * -2);
+    const x = 20 + (i / 10) * -2;
     const len = 17 * (1 - i * 0.075) + 2;
     const col = i % 2 ? "#4f8a30" : "#62a13a";
     s += `<polygon points="${pt(x, y)} ${pt(x - len, y - 8)} ${pt(x - len * 0.55, y + 1)}" fill="${col}"/>`;
@@ -244,7 +246,8 @@ function flowerSvg() {
     [20, 16, "#f6d65a"],
     [14, 6, "#f4efe0"],
   ];
-  for (const [x, y] of heads) s += `<path d="M${x},40 Q${x + 1},22 ${x},${y}" stroke="#3f7126" stroke-width="2.4" fill="none"/>`;
+  for (const [x, y] of heads)
+    s += `<path d="M${x},40 Q${x + 1},22 ${x},${y}" stroke="#3f7126" stroke-width="2.4" fill="none"/>`;
   for (const [x, y, c] of heads) {
     s += `<polygon points="${blob(x, y, 5.2, 6, 0.05, () => 0.5)}" fill="${c}"/>`;
     s += `<polygon points="${blob(x, y, 2, 5, 0.05, () => 0.5)}" fill="${c === "#f4efe0" ? "#e0a930" : "#c97d1e"}"/>`;
@@ -462,8 +465,14 @@ export default function build() {
   /** A toadstool seated on a surface hit, `h` scales it. */
   function toadstool(on: Hit, h: number) {
     b.stick(new THREE.CylinderGeometry(0.014 * h, 0.02 * h, 0.08 * h, 5), "#e6dcc4", on, { flat: true, embed: 0.25 });
-    b.stick(new THREE.ConeGeometry(0.06 * h, 0.05 * h, 6), "#c4532e", on.moved([0, 0.075 * h, 0]), { flat: true, embed: 0 });
-    b.stick(new THREE.CylinderGeometry(0.02 * h, 0.02 * h, 0.012 * h, 5), "#f1ead2", on.moved([0, 0.1 * h, 0]), { flat: true, embed: 0 });
+    b.stick(new THREE.ConeGeometry(0.06 * h, 0.05 * h, 6), "#c4532e", on.moved([0, 0.075 * h, 0]), {
+      flat: true,
+      embed: 0,
+    });
+    b.stick(new THREE.CylinderGeometry(0.02 * h, 0.02 * h, 0.012 * h, 5), "#f1ead2", on.moved([0, 0.1 * h, 0]), {
+      flat: true,
+      embed: 0,
+    });
   }
 
   /** Cards standing on the upward faces of the host parts. */
@@ -528,7 +537,7 @@ export default function build() {
     glow(
       b.decal(skull, eyeTex, {
         at: hit,
-        dir: [0, 0, -1],
+        dir: [0, 0, 1],
         size: [0.2, 0.08],
         mirror: s < 0,
         roll: -s * 12,
@@ -540,7 +549,10 @@ export default function build() {
   }
   const foreHit = b.surface(skull).ray([0, 2.37, 1.0], [0, 0, -1]);
   if (foreHit)
-    glow(b.decal(skull, runeStrip([3]), { at: foreHit, dir: [0, 0, -1], size: [0.11, 0.11], lift: 0.004, segments: 5 }), 0.8);
+    glow(
+      b.decal(skull, runeStrip([3]), { at: foreHit, dir: [0, 0, 1], size: [0.11, 0.11], lift: 0.004, segments: 5 }),
+      0.8,
+    );
 
   // ------------------------------------------------------------ legs
   for (const { s, pts, joints } of legs) {
@@ -576,8 +588,24 @@ export default function build() {
     const palm = rock(handJ, [s * 1.92, 1.49, 0.2], [0.26, 0.34, 0.4], { seed: 260 + s, color: STONES[2] });
     for (const f of fingers) {
       const big = f.k === 4;
-      stackAlong(f.joints[0], f.pts[0], f.pts[1], 1, big ? 0.125 : 0.11, big ? 0.115 : 0.1, 270 + f.k * 2 + (s > 0 ? 0 : 20));
-      stackAlong(f.joints[1], f.pts[1], f.pts[2], 1, big ? 0.115 : 0.1, big ? 0.1 : 0.09, 271 + f.k * 2 + (s > 0 ? 0 : 20));
+      stackAlong(
+        f.joints[0],
+        f.pts[0],
+        f.pts[1],
+        1,
+        big ? 0.125 : 0.11,
+        big ? 0.115 : 0.1,
+        270 + f.k * 2 + (s > 0 ? 0 : 20),
+      );
+      stackAlong(
+        f.joints[1],
+        f.pts[1],
+        f.pts[2],
+        1,
+        big ? 0.115 : 0.1,
+        big ? 0.1 : 0.09,
+        271 + f.k * 2 + (s > 0 ? 0 : 20),
+      );
     }
 
     // vegetation on the upward faces
@@ -606,11 +634,22 @@ export default function build() {
     }
 
     // hanging moss strands under the forearm and shoulder
-    const under = b.surface([...upper, ...fore]).scatter(16, { rng: rng(550 + s), minDist: 0.1, filter: (h) => h.n.y < -0.45 });
+    const under = b
+      .surface([...upper, ...fore])
+      .scatter(16, { rng: rng(550 + s), minDist: 0.1, filter: (h) => h.n.y < -0.45 });
     b.cards(
       under.map((h) => frame(h.at, [0, 1, 0])),
       vine,
-      { size: [0.08, 0.22], lean: 180, flow: [0, 0, 1], vary: 0.35, spin: 20, rng: rng(560 + s), cross: true, bone: elJ },
+      {
+        size: [0.08, 0.22],
+        lean: 180,
+        flow: [0, 0, 1],
+        vary: 0.35,
+        spin: 20,
+        rng: rng(560 + s),
+        cross: true,
+        bone: elJ,
+      },
     );
 
     // carved runes, cracks, lichen and moss patches
@@ -639,7 +678,10 @@ export default function build() {
   mark([skull], lichen[1], -80, 30, [0.22, 0.22]);
 
   // moss crown and hair of grass on the head
-  const crown = [moss(head, [0.04, 2.41, 0.16], [0.22, 0.07, 0.2], 420), moss(head, [-0.14, 2.36, 0.3], [0.11, 0.05, 0.1], 422)];
+  const crown = [
+    moss(head, [0.04, 2.41, 0.16], [0.22, 0.07, 0.2], 420),
+    moss(head, [-0.14, 2.36, 0.3], [0.11, 0.05, 0.1], 422),
+  ];
   growOn(crown, grass, 8, 600, [0.06, 0.11], { minDist: 0.05 });
   growOn(crown, fern, 1, 604, [0.1, 0.19], { lean: 40 });
 
@@ -652,10 +694,34 @@ export default function build() {
 
   // ------------------------------------------------------------ sapling on the back
   const mound = [
-    rock(spine2, [0, 2.0, -0.5], [0.32, 0.1, 0.24], { color: MOSS[0], plain: true, jit: 0.28, seed: 430, rot: [-50, 0, 0] }),
-    rock(spine2, [0.24, 1.92, -0.52], [0.17, 0.07, 0.14], { color: MOSS[1], plain: true, jit: 0.28, seed: 432, rot: [-55, 0, 0] }),
-    rock(spine2, [-0.26, 1.9, -0.52], [0.18, 0.07, 0.14], { color: MOSS[2], plain: true, jit: 0.28, seed: 434, rot: [-55, 0, 0] }),
-    rock(spine2, [0, 2.14, -0.36], [0.22, 0.07, 0.16], { color: MOSS[1], plain: true, jit: 0.28, seed: 436, rot: [-20, 0, 0] }),
+    rock(spine2, [0, 2.0, -0.5], [0.32, 0.1, 0.24], {
+      color: MOSS[0],
+      plain: true,
+      jit: 0.28,
+      seed: 430,
+      rot: [-50, 0, 0],
+    }),
+    rock(spine2, [0.24, 1.92, -0.52], [0.17, 0.07, 0.14], {
+      color: MOSS[1],
+      plain: true,
+      jit: 0.28,
+      seed: 432,
+      rot: [-55, 0, 0],
+    }),
+    rock(spine2, [-0.26, 1.9, -0.52], [0.18, 0.07, 0.14], {
+      color: MOSS[2],
+      plain: true,
+      jit: 0.28,
+      seed: 434,
+      rot: [-55, 0, 0],
+    }),
+    rock(spine2, [0, 2.14, -0.36], [0.22, 0.07, 0.16], {
+      color: MOSS[1],
+      plain: true,
+      jit: 0.28,
+      seed: 436,
+      rot: [-20, 0, 0],
+    }),
   ];
   growOn(mound, grass, 14, 620, [0.07, 0.12], { minDist: 0.05 });
   growOn(mound, fern, 4, 630, [0.13, 0.24], { lean: 35, minDist: 0.14 });
@@ -691,7 +757,13 @@ export default function build() {
   ];
   const tips: Frame[] = [frame(trunkPts[3], [0, 1, -0.1])];
   for (const [from, to] of twigs) {
-    b.sweep(polyline([from, to]), [0.025, 0.007], { bone: spine2, color: BARK_DARK, sides: 5, smooth: false, caps: { end: "point" } });
+    b.sweep(polyline([from, to]), [0.025, 0.007], {
+      bone: spine2,
+      color: BARK_DARK,
+      sides: 5,
+      smooth: false,
+      caps: { end: "point" },
+    });
     tips.push(frame(to, [to[0] - from[0], to[1] - from[1], to[2] - from[2]]));
     rock(spine2, [to[0], to[1] + 0.02, to[2]], [0.12, 0.08, 0.12], {
       color: LEAF[tips.length % 2],

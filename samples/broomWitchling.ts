@@ -287,29 +287,43 @@ export default function build() {
   for (const s of [1, -1]) {
     b.decal(cranium, eyeTex, {
       at: [s * 0.058, 0.44, 0.1],
-      dir: [-s * 0.12, 0, -1],
+      dir: [-(-s * 0.12), 0, 1],
       size: [0.056, 0.056],
       mirror: s > 0,
       lift: 0.002,
     });
     b.decal([cranium, jawPart], blushTex, {
       at: [s * 0.088, 0.405, 0.075],
-      dir: [-s * 0.55, 0, -1],
+      dir: [-(-s * 0.55), 0, 1],
       size: [0.042, 0.023],
       lift: 0.002,
       segments: [8, 4],
     });
   }
-  b.decal(jawPart, mouthTex, { at: [0, 0.382, 0.09], dir: [0, 0.1, -1], size: [0.046, 0.029], lift: 0.002 });
-  b.part(ball(6, 4), SKIN_DEEP, { bone: head, at: [0, 0.421, 0.119], scale: [0.0085, 0.007, 0.007], flat: true, name: "nose" });
+  b.decal(jawPart, mouthTex, { at: [0, 0.382, 0.09], dir: [0, -0.1, 1], size: [0.046, 0.029], lift: 0.002 });
+  b.part(ball(6, 4), SKIN_DEEP, {
+    bone: head,
+    at: [0, 0.421, 0.119],
+    scale: [0.0085, 0.007, 0.007],
+    flat: true,
+    name: "nose",
+  });
 
   // Fringe of hair on the forehead, and the bob: back and sides only.
-  b.decal(cranium, fringeTex, { at: [0, 0.522, 0.1], dir: [0, -0.15, -1], size: [0.2, 0.09], lift: 0.0035, segments: [14, 5] });
-  b.part(
-    new THREE.SphereGeometry(1, 10, 5, 0.72 * Math.PI, 1.56 * Math.PI, 0, 122 * DEG),
-    HAIR,
-    { bone: head, at: HC.clone().add(V(0, 0.002, -0.004)), scale: [0.138, 0.12, 0.13], flat: true, name: "hairBob" },
-  );
+  b.decal(cranium, fringeTex, {
+    at: [0, 0.522, 0.1],
+    dir: [0, 0.15, 1],
+    size: [0.2, 0.09],
+    lift: 0.0035,
+    segments: [14, 5],
+  });
+  b.part(new THREE.SphereGeometry(1, 10, 5, 0.72 * Math.PI, 1.56 * Math.PI, 0, 122 * DEG), HAIR, {
+    bone: head,
+    at: HC.clone().add(V(0, 0.002, -0.004)),
+    scale: [0.138, 0.12, 0.13],
+    flat: true,
+    name: "hairBob",
+  });
 
   // Glasses.
   for (const s of [1, -1]) {
@@ -328,7 +342,12 @@ export default function build() {
       texture: glintTex,
       name: "glint",
     });
-    b.rod([s * 0.094, 0.446, 0.092], [s * 0.126, 0.446, 0.034], 0.0036, { bone: head, color: GOLD, sides: 4, smooth: false });
+    b.rod([s * 0.094, 0.446, 0.092], [s * 0.126, 0.446, 0.034], 0.0036, {
+      bone: head,
+      color: GOLD,
+      sides: 4,
+      smooth: false,
+    });
   }
   b.rod([0.026, 0.446, 0.132], [-0.026, 0.446, 0.132], 0.0042, { bone: head, color: GOLD, sides: 4, smooth: false });
 
@@ -438,9 +457,23 @@ export default function build() {
   });
 
   // Moon and stars on the hat.
-  b.decal(crown, moonTex, { at: [0.0, 0.6, 0.06], dir: [0, -0.1, -1], size: [0.15, 0.15], lift: 0.002, segments: 14 });
-  b.decal(crown, crownStarsTex, { at: [0.11, 0.6, -0.04], dir: [-1, -0.05, 0], size: [0.12, 0.12], lift: 0.002, segments: 12, up: [0, 1, 0] });
-  b.decal(crown, crownStarsTex, { at: [-0.11, 0.6, -0.04], dir: [1, -0.05, 0], size: [0.12, 0.12], lift: 0.002, segments: 12, mirror: true });
+  b.decal(crown, moonTex, { at: [0.0, 0.6, 0.06], dir: [0, 0.1, 1], size: [0.15, 0.15], lift: 0.002, segments: 14 });
+  b.decal(crown, crownStarsTex, {
+    at: [0.11, 0.6, -0.04],
+    dir: [1, 0.05, 0],
+    size: [0.12, 0.12],
+    lift: 0.002,
+    segments: 12,
+    up: [0, 1, 0],
+  });
+  b.decal(crown, crownStarsTex, {
+    at: [-0.11, 0.6, -0.04],
+    dir: [-1, 0.05, 0],
+    size: [0.12, 0.12],
+    lift: 0.002,
+    segments: 12,
+    mirror: true,
+  });
   for (const [bx, bz, roll] of [
     [-0.13, 0.1, 20],
     [0.0, -0.165, 140],
@@ -448,7 +481,7 @@ export default function build() {
   ] as const)
     b.decal(brim, brimTex, {
       at: [bx, 0.5, bz],
-      dir: [0, -1, 0],
+      dir: [0, 1, 0],
       up: [0, 0, 1],
       size: [0.12, 0.12],
       lift: 0.002,
@@ -457,14 +490,22 @@ export default function build() {
     });
 
   // ------------------------------------------------------------------ torso, dress, cape
-  b.sweep(catmull([[0, 0.195, 0], [0, 0.265, 0], [0, 0.338, 0]]), [0.07, 0.056, 0.056], {
-    bone: [hips, spine],
-    color: DRESS,
-    sides: 8,
-    smooth: false,
-    caps: "flat",
-    name: "torso",
-  });
+  b.sweep(
+    catmull([
+      [0, 0.195, 0],
+      [0, 0.265, 0],
+      [0, 0.338, 0],
+    ]),
+    [0.07, 0.056, 0.056],
+    {
+      bone: [hips, spine],
+      color: DRESS,
+      sides: 8,
+      smooth: false,
+      caps: "flat",
+      name: "torso",
+    },
+  );
   const skirt = b.lathe(
     [
       [0, 0.28],
@@ -490,7 +531,7 @@ export default function build() {
     const r = 0.11;
     b.decal(skirt, skirtTex, {
       at: [Math.sin(a * DEG) * r, 0.212, Math.cos(a * DEG) * r],
-      dir: [-Math.sin(a * DEG), 0, -Math.cos(a * DEG)],
+      dir: [-(-Math.sin(a * DEG)), 0, -(-Math.cos(a * DEG))],
       size: [0.11, 0.088],
       lift: 0.002,
       segments: [10, 8],
@@ -525,7 +566,7 @@ export default function build() {
   ] as const) {
     b.decal(capeParts, capeTex, {
       at: [ax, dy, az],
-      dir: [0, 0.05, 1],
+      dir: [0, -0.05, -1],
       size: [0.1, 0.1],
       lift: 0.002,
       segments: 10,
@@ -553,7 +594,13 @@ export default function build() {
   }
   b.part(ball(6, 4), BAND, { bone: chest, at: [0, 0.3, 0.06], scale: 0.013, flat: true, name: "bowKnot" });
   const belt = b.ring(frame([0, 0.262, 0], [0, 1, 0]), { count: 12, radius: 0.0745 });
-  b.sweep(catmull(belt.items, { closed: true }), 0.0075, { bone: hips, color: PINK, sides: 5, smooth: false, name: "belt" });
+  b.sweep(catmull(belt.items, { closed: true }), 0.0075, {
+    bone: hips,
+    color: PINK,
+    sides: 5,
+    smooth: false,
+    name: "belt",
+  });
   b.extrude(starOutline(0.02, 0.009), {
     at: [0, 0.262, 0.081],
     x: [1, 0, 0],
@@ -580,14 +627,22 @@ export default function build() {
       { parent: hips, names: [`hip${k}`, `knee${k}`, `ankle${k}`, `ball${k}`], role: "leg", contact: [x, 0, 0.03] },
     );
     const STOCK_LEN = 0.12;
-    b.sweep(polyline([[x, 0.195, 0], [x, 0.13, 0.004], [x, 0.075, 0]]), 0.031, {
-      bone: leg,
-      color: (t) => (Math.floor((t * STOCK_LEN) / 0.0115) % 2 ? CREAM : PINK),
-      sides: 8,
-      smooth: false,
-      caps: "flat",
-      name: "stocking",
-    });
+    b.sweep(
+      polyline([
+        [x, 0.195, 0],
+        [x, 0.13, 0.004],
+        [x, 0.075, 0],
+      ]),
+      0.031,
+      {
+        bone: leg,
+        color: (t) => (Math.floor((t * STOCK_LEN) / 0.0115) % 2 ? CREAM : PINK),
+        sides: 8,
+        smooth: false,
+        caps: "flat",
+        name: "stocking",
+      },
+    );
     const ankle = leg.joints[2];
     const toe = leg.joints[3];
     const shaft = b.part(new THREE.CylinderGeometry(0.04, 0.045, 0.062, 8), BOOT, {
@@ -596,14 +651,31 @@ export default function build() {
       flat: true,
       name: `bootShaft${k}`,
     });
-    b.part(new THREE.CylinderGeometry(0.046, 0.046, 0.014, 8), CREAM, { bone: ankle, at: [x, 0.104, 0], flat: true, name: "bootCuff" });
+    b.part(new THREE.CylinderGeometry(0.046, 0.046, 0.014, 8), CREAM, {
+      bone: ankle,
+      at: [x, 0.104, 0],
+      flat: true,
+      name: "bootCuff",
+    });
     b.part(ball(), BOOT, { bone: ankle, at: [x, 0.04, -0.004], scale: [0.046, 0.04, 0.05], flat: true, name: "heel" });
     b.part(ball(), BOOT, { bone: toe, at: [x, 0.036, 0.046], scale: [0.045, 0.036, 0.048], flat: true, name: "toe" });
-    b.part(ball(), SOLE, { bone: ankle, at: [x, 0.012, -0.004], scale: [0.048, 0.016, 0.052], flat: true, name: "soleHeel" });
-    b.part(ball(), SOLE, { bone: toe, at: [x, 0.012, 0.046], scale: [0.047, 0.016, 0.05], flat: true, name: "soleToe" });
+    b.part(ball(), SOLE, {
+      bone: ankle,
+      at: [x, 0.012, -0.004],
+      scale: [0.048, 0.016, 0.052],
+      flat: true,
+      name: "soleHeel",
+    });
+    b.part(ball(), SOLE, {
+      bone: toe,
+      at: [x, 0.012, 0.046],
+      scale: [0.047, 0.016, 0.05],
+      flat: true,
+      name: "soleToe",
+    });
     b.decal(shaft, buckleTex, {
       at: [x, 0.072, 0.06],
-      dir: [0, 0, -1],
+      dir: [0, 0, 1],
       size: [0.034, 0.034],
       lift: 0.002,
       segments: 4,
@@ -642,7 +714,12 @@ export default function build() {
       },
     );
     const cuff = b.ring(arm.at(0.56), { count: 7, radius: 0.026 });
-    b.sweep(catmull(cuff.items, { closed: true }), 0.0065, { color: CREAM, sides: 4, smooth: false, name: "sleeveCuff" });
+    b.sweep(catmull(cuff.items, { closed: true }), 0.0065, {
+      color: CREAM,
+      sides: 4,
+      smooth: false,
+      name: "sleeveCuff",
+    });
   }
 
   const wristR = armChains.R.joints[2];
@@ -652,14 +729,21 @@ export default function build() {
   {
     const s = -1;
     const W = V(s * 0.222, 0.295, BZ);
-    b.part(ball(7, 5), SKIN, { bone: wristR, at: W.clone().add(V(s * 0.02, 0, 0)), scale: [0.024, 0.029, 0.019], flat: true, name: "palmR" });
+    b.part(ball(7, 5), SKIN, {
+      bone: wristR,
+      at: W.clone().add(V(s * 0.02, 0, 0)),
+      scale: [0.024, 0.029, 0.019],
+      flat: true,
+      name: "palmR",
+    });
     const fingerNames = ["index", "middle", "ring", "pinky"];
     fingerNames.forEach((nm, i) => {
       const a = (1.5 - i) * 11 * DEG;
       const d = V(s * Math.cos(a), Math.sin(a), 0.06).normalize();
       const y0 = W.y + (1.5 - i) * 0.0135;
       const p0 = V(W.x + s * 0.036, y0, BZ);
-      const lens = nm === "middle" ? [0.022, 0.02, 0.016] : nm === "pinky" ? [0.017, 0.015, 0.012] : [0.02, 0.018, 0.014];
+      const lens =
+        nm === "middle" ? [0.022, 0.02, 0.016] : nm === "pinky" ? [0.017, 0.015, 0.012] : [0.02, 0.018, 0.014];
       const pts = [p0];
       lens.forEach((l) => pts.push(pts[pts.length - 1].clone().addScaledVector(d, l)));
       const fc = b.chain(`${nm}R`, polyline(pts), {
@@ -671,11 +755,15 @@ export default function build() {
     });
     const td = V(s * 0.5, -0.3, 0.8).normalize();
     const t0 = V(W.x + s * 0.012, W.y - 0.022, 0.012);
-    const tc = b.chain("thumbR", polyline([t0, t0.clone().addScaledVector(td, 0.018), t0.clone().addScaledVector(td, 0.034)]), {
-      parent: wristR,
-      names: ["thumbR1", "thumbR2", "thumbRTip"],
-      role: "digit",
-    });
+    const tc = b.chain(
+      "thumbR",
+      polyline([t0, t0.clone().addScaledVector(td, 0.018), t0.clone().addScaledVector(td, 0.034)]),
+      {
+        parent: wristR,
+        names: ["thumbR1", "thumbR2", "thumbRTip"],
+        role: "digit",
+      },
+    );
     b.sweep(tc, 0.0088, { color: SKIN, sides: 5, smooth: false, caps: "round", name: "thumb" });
   }
 
@@ -683,7 +771,13 @@ export default function build() {
   const broomJoint = b.joint("broom", { parent: wristL, at: [BX, 0.23, BZ], dir: [0, 1, 0], group: "broom" });
   {
     const W = V(0.222, 0.295, BZ);
-    b.part(ball(7, 5), SKIN, { bone: wristL, at: W.clone().add(V(0.02, 0, 0)), scale: [0.022, 0.03, 0.02], flat: true, name: "palmL" });
+    b.part(ball(7, 5), SKIN, {
+      bone: wristL,
+      at: W.clone().add(V(0.02, 0, 0)),
+      scale: [0.022, 0.03, 0.02],
+      flat: true,
+      name: "palmL",
+    });
     const rc = 0.0105 + 0.0075;
     const around = (y: number, phi: number) => V(BX - rc * Math.cos(phi * DEG), y, BZ + rc * Math.sin(phi * DEG));
     ["index", "middle", "ring", "pinky"].forEach((nm, i) => {
@@ -696,31 +790,48 @@ export default function build() {
       b.sweep(fc, 0.0075, { color: SKIN, sides: 5, smooth: false, caps: "round", name: "finger" });
     });
     const t0 = V(W.x + 0.026, W.y + 0.022, 0.018);
-    const tc = b.chain(
-      "thumbL",
-      polyline([t0, V(0.258, W.y + 0.034, 0.032), V(0.272, W.y + 0.04, 0.034)]),
-      { parent: wristL, names: ["thumbL1", "thumbL2", "thumbLTip"], role: "digit" },
-    );
+    const tc = b.chain("thumbL", polyline([t0, V(0.258, W.y + 0.034, 0.032), V(0.272, W.y + 0.04, 0.034)]), {
+      parent: wristL,
+      names: ["thumbL1", "thumbL2", "thumbLTip"],
+      role: "digit",
+    });
     b.sweep(tc, 0.0088, { color: SKIN, sides: 5, smooth: false, caps: "round", name: "thumb" });
   }
 
   // ------------------------------------------------------------------ broom
-  const handle = b.sweep(polyline([[BX, 0.23, BZ], [BX, 0.86, BZ]]), 0.0105, {
+  const handle = b.sweep(
+    polyline([
+      [BX, 0.23, BZ],
+      [BX, 0.86, BZ],
+    ]),
+    0.0105,
+    {
+      bone: broomJoint,
+      color: (t) => (t > 0.86 && t < 0.91 ? BAND : t > 0.93 && t < 0.96 ? BAND : WOOD),
+      sides: 6,
+      smooth: false,
+      caps: "flat",
+      name: "handle",
+    },
+  );
+  b.part(ball(7, 5), WOOD_DEEP, {
     bone: broomJoint,
-    color: (t) => (t > 0.86 && t < 0.91 ? BAND : t > 0.93 && t < 0.96 ? BAND : WOOD),
-    sides: 6,
-    smooth: false,
-    caps: "flat",
-    name: "handle",
+    at: [BX, 0.872, BZ],
+    scale: [0.017, 0.017, 0.017],
+    flat: true,
+    name: "knob",
   });
-  b.part(ball(7, 5), WOOD_DEEP, { bone: broomJoint, at: [BX, 0.872, BZ], scale: [0.017, 0.017, 0.017], flat: true, name: "knob" });
   const strands: Sweep[] = [];
   for (let i = 0; i < 9; i++) {
     const a = i * 40 * DEG;
     const center = i === 8;
     const top = V(BX + (center ? 0 : 0.011 * Math.cos(a)), 0.245, BZ + (center ? 0 : 0.011 * Math.sin(a)));
     const bot = V(BX + (center ? 0.004 : 0.052 * Math.cos(a)), 0.02, BZ + (center ? 0 : 0.052 * Math.sin(a)));
-    const mid = V((top.x + bot.x) / 2 + (center ? 0 : 0.008 * Math.cos(a)), 0.14, (top.z + bot.z) / 2 + (center ? 0 : 0.008 * Math.sin(a)));
+    const mid = V(
+      (top.x + bot.x) / 2 + (center ? 0 : 0.008 * Math.cos(a)),
+      0.14,
+      (top.z + bot.z) / 2 + (center ? 0 : 0.008 * Math.sin(a)),
+    );
     strands.push(
       b.sweep(catmull([top, mid, bot]), center ? [0.016, 0.02, 0.022] : [0.011, 0.016, 0.02], {
         bone: broomJoint,
@@ -748,9 +859,23 @@ export default function build() {
         [s * 0.038, 0.02],
         [s * 0.044, -0.014],
       ],
-      { at: [BX, 0.232, BZ + 0.031], x: [1, 0, 0], y: [0, 1, 0], thickness: 0.01, bone: broomJoint, color: GOLD, name: "broomBow" },
+      {
+        at: [BX, 0.232, BZ + 0.031],
+        x: [1, 0, 0],
+        y: [0, 1, 0],
+        thickness: 0.01,
+        bone: broomJoint,
+        color: GOLD,
+        name: "broomBow",
+      },
     );
-  b.part(ball(6, 4), GOLD, { bone: broomJoint, at: [BX, 0.232, BZ + 0.034], scale: 0.012, flat: true, name: "broomKnot" });
+  b.part(ball(6, 4), GOLD, {
+    bone: broomJoint,
+    at: [BX, 0.232, BZ + 0.034],
+    scale: 0.012,
+    flat: true,
+    name: "broomKnot",
+  });
   for (const s of [1, -1])
     b.extrude(
       [
@@ -759,27 +884,65 @@ export default function build() {
         [s * 0.026, -0.042],
         [s * 0.006, 0],
       ],
-      { at: [BX, 0.226, BZ + 0.034], x: [1, 0, 0], y: [0, 1, 0], thickness: 0.008, bone: broomJoint, color: GOLD, name: "broomRibbon" },
+      {
+        at: [BX, 0.226, BZ + 0.034],
+        x: [1, 0, 0],
+        y: [0, 1, 0],
+        thickness: 0.008,
+        bone: broomJoint,
+        color: GOLD,
+        name: "broomRibbon",
+      },
     );
-  b.decal(handle, stickerStarTex, { at: [BX, 0.5, BZ + 0.01], dir: [0, 0, -1], size: [0.028, 0.028], lift: 0.0015, segments: 6 });
-  b.decal(handle, stickerMoonTex, { at: [BX, 0.68, BZ + 0.01], dir: [0, 0, -1], size: [0.028, 0.028], lift: 0.0015, segments: 6 });
+  b.decal(handle, stickerStarTex, {
+    at: [BX, 0.5, BZ + 0.01],
+    dir: [0, 0, 1],
+    size: [0.028, 0.028],
+    lift: 0.0015,
+    segments: 6,
+  });
+  b.decal(handle, stickerMoonTex, {
+    at: [BX, 0.68, BZ + 0.01],
+    dir: [0, 0, 1],
+    size: [0.028, 0.028],
+    lift: 0.0015,
+    segments: 6,
+  });
   // Straw tufts bristling out of the bundle.
-  const tufts = b.surface(strands).scatter(26, { rng: rng(11), minDist: 0.03, filter: (h) => h.at.y < 0.17 && h.at.y > 0.07 && h.n.y < 0.5 });
-  b.cards(tufts, strawTex, { size: [0.03, 0.045], lean: 55, flow: [0, -1, 0], vary: 0.3, rng: rng(12), cross: true, bone: broomJoint });
-
-  // Sparkles drifting off her right hand and up the broom.
-  b.cards(
-    [frame([-0.285, 0.345, 0.04], [0, 1, 0]), frame([-0.318, 0.315, 0.02], [0, 1, 0]), frame([-0.262, 0.385, 0.03], [0, 1, 0])],
-    sparkleTex,
-    { size: [0.04, 0.04], lean: 0, flow: [0, 0, 1], cross: true, bone: wristR },
-  );
-  b.cards([frame([BX + 0.03, 0.72, BZ + 0.012], [0, 1, 0]), frame([BX - 0.03, 0.6, BZ + 0.015], [0, 1, 0])], sparkleTex, {
-    size: [0.035, 0.035],
-    lean: 0,
-    flow: [0, 0, 1],
+  const tufts = b
+    .surface(strands)
+    .scatter(26, { rng: rng(11), minDist: 0.03, filter: (h) => h.at.y < 0.17 && h.at.y > 0.07 && h.n.y < 0.5 });
+  b.cards(tufts, strawTex, {
+    size: [0.03, 0.045],
+    lean: 55,
+    flow: [0, -1, 0],
+    vary: 0.3,
+    rng: rng(12),
     cross: true,
     bone: broomJoint,
   });
+
+  // Sparkles drifting off her right hand and up the broom.
+  b.cards(
+    [
+      frame([-0.285, 0.345, 0.04], [0, 1, 0]),
+      frame([-0.318, 0.315, 0.02], [0, 1, 0]),
+      frame([-0.262, 0.385, 0.03], [0, 1, 0]),
+    ],
+    sparkleTex,
+    { size: [0.04, 0.04], lean: 0, flow: [0, 0, 1], cross: true, bone: wristR },
+  );
+  b.cards(
+    [frame([BX + 0.03, 0.72, BZ + 0.012], [0, 1, 0]), frame([BX - 0.03, 0.6, BZ + 0.015], [0, 1, 0])],
+    sparkleTex,
+    {
+      size: [0.035, 0.035],
+      lean: 0,
+      flow: [0, 0, 1],
+      cross: true,
+      bone: broomJoint,
+    },
+  );
 
   // ------------------------------------------------------------------ kitten on the brim
   const brimSkin = b.surface(brim);
@@ -800,24 +963,58 @@ export default function build() {
   });
   const kHips = kSpine.joints[0];
   const kChest = kSpine.joints[1];
-  const kHead = b.joint("kHead", { parent: kChest, at: K(0, 0.095, 0.008), dir: [0, 1, 0], role: "head", group: "kitten" });
-  const kJaw = b.joint("kJaw", { parent: kHead, at: K(0, 0.108, -0.025), aim: K(0, 0.098, 0.04), role: "jaw", group: "kitten" });
+  const kHead = b.joint("kHead", {
+    parent: kChest,
+    at: K(0, 0.095, 0.008),
+    dir: [0, 1, 0],
+    role: "head",
+    group: "kitten",
+  });
+  const kJaw = b.joint("kJaw", {
+    parent: kHead,
+    at: K(0, 0.108, -0.025),
+    aim: K(0, 0.098, 0.04),
+    role: "jaw",
+    group: "kitten",
+  });
 
   b.part(ball(), CAT, { bone: kHips, at: K(0, 0.042, -0.005), scale: [0.04, 0.042, 0.038], flat: true, name: "kBody" });
-  b.part(ball(), CAT, { bone: kChest, at: K(0, 0.078, 0.008), scale: [0.031, 0.032, 0.029], flat: true, name: "kChestPart" });
+  b.part(ball(), CAT, {
+    bone: kChest,
+    at: K(0, 0.078, 0.008),
+    scale: [0.031, 0.032, 0.029],
+    flat: true,
+    name: "kChestPart",
+  });
   // head: cranium + jaw
   const KH = Kv(0, 0.127, 0.012);
   const KR: [number, number, number] = [0.053, 0.046, 0.048];
   const kSeam = 112 * DEG;
-  const kCran = b.part(new THREE.SphereGeometry(1, 9, 5, 0, Math.PI * 2, 0, kSeam), CAT, { bone: kHead, at: KH, scale: KR, flat: true, name: "kCranium" });
-  const kChin = b.part(new THREE.SphereGeometry(1, 9, 3, 0, Math.PI * 2, kSeam, Math.PI - kSeam), CAT, { bone: kJaw, at: KH, scale: KR, flat: true, name: "kChin" });
-  b.part(new THREE.CircleGeometry(Math.sin(kSeam), 9).rotateX(-Math.PI / 2).translate(0, Math.cos(kSeam), 0), MOUTH_IN, {
+  const kCran = b.part(new THREE.SphereGeometry(1, 9, 5, 0, Math.PI * 2, 0, kSeam), CAT, {
+    bone: kHead,
+    at: KH,
+    scale: KR,
+    flat: true,
+    name: "kCranium",
+  });
+  const kChin = b.part(new THREE.SphereGeometry(1, 9, 3, 0, Math.PI * 2, kSeam, Math.PI - kSeam), CAT, {
     bone: kJaw,
     at: KH,
     scale: KR,
     flat: true,
-    name: "kMouthBed",
+    name: "kChin",
   });
+  b.part(
+    new THREE.CircleGeometry(Math.sin(kSeam), 9).rotateX(-Math.PI / 2).translate(0, Math.cos(kSeam), 0),
+    MOUTH_IN,
+    {
+      bone: kJaw,
+      at: KH,
+      scale: KR,
+      flat: true,
+      name: "kMouthBed",
+    },
+  );
   b.part(new THREE.CircleGeometry(Math.sin(kSeam), 9).rotateX(Math.PI / 2).translate(0, Math.cos(kSeam), 0), MOUTH_IN, {
     bone: kHead,
     at: KH,
@@ -826,9 +1023,22 @@ export default function build() {
     name: "kPalate",
   });
   for (const s of [1, -1]) {
-    b.decal(kCran, catEyeTex, { at: K(s * 0.022, 0.133, 0.05), dir: [-s * 0.15, 0, -1], size: [0.028, 0.028], mirror: s > 0, lift: 0.0015, segments: 6 });
+    b.decal(kCran, catEyeTex, {
+      at: K(s * 0.022, 0.133, 0.05),
+      dir: [-(-s * 0.15), 0, 1],
+      size: [0.028, 0.028],
+      mirror: s > 0,
+      lift: 0.0015,
+      segments: 6,
+    });
     const ear = Kv(s * 0.034, 0.165, 0.004);
-    b.part(new THREE.ConeGeometry(0.022, 0.05, 4), CAT, { bone: kHead, at: ear, dir: [s * 0.4, 1, 0.05], flat: true, name: "kEar" });
+    b.part(new THREE.ConeGeometry(0.022, 0.05, 4), CAT, {
+      bone: kHead,
+      at: ear,
+      dir: [s * 0.4, 1, 0.05],
+      flat: true,
+      name: "kEar",
+    });
     b.part(new THREE.ConeGeometry(0.014, 0.034, 4), CAT_INNER, {
       bone: kHead,
       at: ear.clone().add(V(-s * 0.001, -0.004, 0.008)),
@@ -847,18 +1057,30 @@ export default function build() {
         name: "whisker",
       });
     // cheek fur
-    const hit = b.surface(kCran).around(KH).at(s * 82, -8);
-    if (hit)
-      b.cards([hit], furTex, { size: [0.022, 0.03], lean: 75, flow: [0, -1, 0.3], cross: true, bone: kHead });
+    const hit = b
+      .surface(kCran)
+      .around(KH)
+      .at(s * 82, -8);
+    if (hit) b.cards([hit], furTex, { size: [0.022, 0.03], lean: 75, flow: [0, -1, 0.3], cross: true, bone: kHead });
     // front legs and paws
     const pawY = ground(kx + s * 0.022, kz + 0.034) - ky;
-    const front = b.chain(`kFront${armSide(s)}`, polyline([K(s * 0.022, 0.07, 0.02), K(s * 0.022, pawY + 0.012, 0.03)]), {
-      parent: kChest,
-      names: [`kFront${armSide(s)}1`, `kPaw${armSide(s)}`],
-      role: "leg",
-      group: "kitten",
+    const front = b.chain(
+      `kFront${armSide(s)}`,
+      polyline([K(s * 0.022, 0.07, 0.02), K(s * 0.022, pawY + 0.012, 0.03)]),
+      {
+        parent: kChest,
+        names: [`kFront${armSide(s)}1`, `kPaw${armSide(s)}`],
+        role: "leg",
+        group: "kitten",
+      },
+    );
+    b.sweep(front, 0.011, {
+      color: CAT,
+      sides: 5,
+      smooth: false,
+      caps: { start: "round", end: "none" },
+      name: "kForeleg",
     });
-    b.sweep(front, 0.011, { color: CAT, sides: 5, smooth: false, caps: { start: "round", end: "none" }, name: "kForeleg" });
     b.part(ball(6, 4), CAT, {
       bone: front.joints[1],
       at: K(s * 0.022, pawY + 0.008, 0.036),
@@ -868,13 +1090,23 @@ export default function build() {
     });
     // haunches and hind feet
     const hindY = ground(kx + s * 0.03, kz + 0.018) - ky;
-    const hind = b.chain(`kHind${armSide(s)}`, polyline([K(s * 0.03, 0.04, -0.012), K(s * 0.03, hindY + 0.012, 0.014)]), {
-      parent: kHips,
-      names: [`kHip${armSide(s)}`, `kFoot${armSide(s)}`],
-      role: "leg",
-      group: "kitten",
+    const hind = b.chain(
+      `kHind${armSide(s)}`,
+      polyline([K(s * 0.03, 0.04, -0.012), K(s * 0.03, hindY + 0.012, 0.014)]),
+      {
+        parent: kHips,
+        names: [`kHip${armSide(s)}`, `kFoot${armSide(s)}`],
+        role: "leg",
+        group: "kitten",
+      },
+    );
+    b.part(ball(), CAT, {
+      bone: hind.joints[0],
+      at: K(s * 0.032, 0.03, -0.012),
+      scale: [0.022, 0.028, 0.032],
+      flat: true,
+      name: "kHaunch",
     });
-    b.part(ball(), CAT, { bone: hind.joints[0], at: K(s * 0.032, 0.03, -0.012), scale: [0.022, 0.028, 0.032], flat: true, name: "kHaunch" });
     b.part(ball(6, 4), CAT, {
       bone: hind.joints[1],
       at: K(s * 0.03, hindY + 0.008, 0.024),
@@ -883,19 +1115,49 @@ export default function build() {
       name: "kFoot",
     });
   }
-  b.part(ball(6, 4), CAT_INNER, { bone: kHead, at: K(0, 0.12, 0.0615), scale: [0.008, 0.006, 0.006], flat: true, name: "kNose" });
-  b.decal(kChin, catMouthTex, { at: K(0, 0.105, 0.055), dir: [0, 0, -1], size: [0.028, 0.018], lift: 0.001, segments: 4 });
+  b.part(ball(6, 4), CAT_INNER, {
+    bone: kHead,
+    at: K(0, 0.12, 0.0615),
+    scale: [0.008, 0.006, 0.006],
+    flat: true,
+    name: "kNose",
+  });
+  b.decal(kChin, catMouthTex, {
+    at: K(0, 0.105, 0.055),
+    dir: [0, 0, 1],
+    size: [0.028, 0.018],
+    lift: 0.001,
+    segments: 4,
+  });
   // collar and bell
   const kCollar = b.ring(frame(K(0, 0.078, 0.008), [0, 1, 0]), { count: 8, radius: 0.034 });
-  b.sweep(catmull(kCollar.items, { closed: true }), 0.0055, { bone: kChest, color: BAND, sides: 4, smooth: false, name: "kCollar" });
+  b.sweep(catmull(kCollar.items, { closed: true }), 0.0055, {
+    bone: kChest,
+    color: BAND,
+    sides: 4,
+    smooth: false,
+    name: "kCollar",
+  });
   b.part(ball(6, 4), GOLD, { bone: kChest, at: K(0, 0.074, 0.042), scale: 0.0095, flat: true, name: "kBell" });
   // tail
   const kTail = b.chain(
     "kTail",
-    catmull([Kv(0, 0.03, -0.035), Kv(0, 0.018, -0.082), Kv(0, 0.042, -0.115), Kv(0.012, 0.09, -0.11), Kv(0.03, 0.122, -0.092)]),
+    catmull([
+      Kv(0, 0.03, -0.035),
+      Kv(0, 0.018, -0.082),
+      Kv(0, 0.042, -0.115),
+      Kv(0.012, 0.09, -0.11),
+      Kv(0.03, 0.122, -0.092),
+    ]),
     { parent: kHips, role: "tail", group: "kitten", names: ["kTail1", "kTail2", "kTail3", "kTail4"] },
   );
-  b.sweep(kTail, [0.014, 0.012, 0.0105, 0.009, 0.007], { color: CAT, sides: 5, smooth: false, caps: "round", name: "kTailTube" });
+  b.sweep(kTail, [0.014, 0.012, 0.0105, 0.009, 0.007], {
+    color: CAT,
+    sides: 5,
+    smooth: false,
+    caps: "round",
+    name: "kTailTube",
+  });
 
   return b.root;
 }

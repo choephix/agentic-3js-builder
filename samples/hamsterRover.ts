@@ -322,7 +322,12 @@ export default function build() {
     { at: [0, 0, 0], thickness: 0.64, bevel: 0.03, detail: 0.34, color: MINT_D, bone: chassis, name: "cowl" },
   );
   // seat cushion and the cockpit rim
-  b.part(new THREE.BoxGeometry(0.5, 0.06, 0.5), CORAL, { at: [0, 0.36, -0.1], bone: chassis, flat: true, name: "seat" });
+  b.part(new THREE.BoxGeometry(0.5, 0.06, 0.5), CORAL, {
+    at: [0, 0.36, -0.1],
+    bone: chassis,
+    flat: true,
+    name: "seat",
+  });
   b.sweep(
     polyline(
       [
@@ -341,18 +346,57 @@ export default function build() {
     { color: CORAL, sides: 8, smooth: false, bone: chassis, name: "rim" },
   );
   // bumper, headlights
-  b.capsule([-0.3, 0.26, 0.675], [0.3, 0.26, 0.675], 0.035, { color: CORAL, sides: 8, smooth: false, bone: chassis, name: "bumper" });
+  b.capsule([-0.3, 0.26, 0.675], [0.3, 0.26, 0.675], 0.035, {
+    color: CORAL,
+    sides: 8,
+    smooth: false,
+    bone: chassis,
+    name: "bumper",
+  });
   for (const s of SIDES) {
-    b.part(ball(6, 4), MINT_D, { at: [s * 0.22, 0.395, 0.69], scale: [0.058, 0.052, 0.036], bone: chassis, flat: true, name: "lampHousing" });
-    b.part(ball(6, 4), WHITE, { at: [s * 0.22, 0.395, 0.71], scale: [0.04, 0.036, 0.022], bone: chassis, flat: true, name: "lamp" });
+    b.part(ball(6, 4), MINT_D, {
+      at: [s * 0.22, 0.395, 0.69],
+      scale: [0.058, 0.052, 0.036],
+      bone: chassis,
+      flat: true,
+      name: "lampHousing",
+    });
+    b.part(ball(6, 4), WHITE, {
+      at: [s * 0.22, 0.395, 0.71],
+      scale: [0.04, 0.036, 0.022],
+      bone: chassis,
+      flat: true,
+      name: "lamp",
+    });
   }
 
   // livery stickers on the hull, roundels on the hood, patches on the cowl
   for (const s of SIDES) {
     const out: V = [s, 0, 0];
-    b.part(plane(0.64, 0.07), WHITE, { at: [s * 0.3335, 0.275, 0], dir: out, axis: "z", texture: LIVERY, bone: chassis, name: "livery" });
-    b.part(plane(0.085, 0.085), WHITE, { at: [s * 0.3225, 0.4, 0.42], dir: out, axis: "z", texture: ROUNDEL, bone: chassis, name: "roundel" });
-    b.part(plane(0.17, 0.17), WHITE, { at: [s * 0.3225, 0.485, -0.5], dir: out, axis: "z", texture: PATCH, bone: chassis, name: "patch" });
+    b.part(plane(0.64, 0.07), WHITE, {
+      at: [s * 0.3335, 0.275, 0],
+      dir: out,
+      axis: "z",
+      texture: LIVERY,
+      bone: chassis,
+      name: "livery",
+    });
+    b.part(plane(0.085, 0.085), WHITE, {
+      at: [s * 0.3225, 0.4, 0.42],
+      dir: out,
+      axis: "z",
+      texture: ROUNDEL,
+      bone: chassis,
+      name: "roundel",
+    });
+    b.part(plane(0.17, 0.17), WHITE, {
+      at: [s * 0.3225, 0.485, -0.5],
+      dir: out,
+      axis: "z",
+      texture: PATCH,
+      bone: chassis,
+      name: "patch",
+    });
   }
   b.part(plane(0.36, 0.14), WHITE, {
     at: [0, 0.4035, 0.54],
@@ -363,8 +407,22 @@ export default function build() {
     bone: chassis,
     name: "hoodStickers",
   });
-  b.part(plane(0.18, 0.09), WHITE, { at: [0, 0.51, -0.6635], dir: [0, 0, -1], axis: "z", texture: GRILLE, bone: chassis, name: "grille" });
-  b.part(plane(0.24, 0.096), WHITE, { at: [0, 0.486, 0.2396], dir: [0, -0.15, -1], axis: "z", texture: GAUGES, bone: chassis, name: "gauges" });
+  b.part(plane(0.18, 0.09), WHITE, {
+    at: [0, 0.51, -0.6635],
+    dir: [0, 0, -1],
+    axis: "z",
+    texture: GRILLE,
+    bone: chassis,
+    name: "grille",
+  });
+  b.part(plane(0.24, 0.096), WHITE, {
+    at: [0, 0.486, 0.2396],
+    dir: [0, -0.15, -1],
+    axis: "z",
+    texture: GAUGES,
+    bone: chassis,
+    name: "gauges",
+  });
 
   // ------------------------------------------------------------------------------------------ rover: six wheels
   const AXLE_Y = 0.165;
@@ -450,7 +508,11 @@ export default function build() {
     const n: V = [-s * Math.sin(tilt), Math.cos(tilt), 0];
     const hinge: V = [s * 0.34, 0.6, -0.5];
     const panel = b.joint(`panel${side}`, { parent: chassis, at: hinge, dir: d, role: "hinge" });
-    const at = (t: number, lift = 0): V => [hinge[0] + d[0] * t + n[0] * lift, hinge[1] + d[1] * t + n[1] * lift, hinge[2]];
+    const at = (t: number, lift = 0): V => [
+      hinge[0] + d[0] * t + n[0] * lift,
+      hinge[1] + d[1] * t + n[1] * lift,
+      hinge[2],
+    ];
     const frameBox = b.part(new THREE.BoxGeometry(0.5, 0.03, 0.38), BUTTER, {
       at: at(0.27),
       dir: d,
@@ -477,7 +539,13 @@ export default function build() {
     });
     for (const z of [-0.36, -0.62]) {
       const top = at(0.3, -0.02);
-      b.rod([s * 0.33, 0.56, z], [top[0], top[1], z], 0.014, { color: LILAC_D, sides: 8, smooth: false, bone: chassis, name: "strut" });
+      b.rod([s * 0.33, 0.56, z], [top[0], top[1], z], 0.014, {
+        color: LILAC_D,
+        sides: 8,
+        smooth: false,
+        bone: chassis,
+        name: "strut",
+      });
     }
     void frameBox;
   }
@@ -505,9 +573,20 @@ export default function build() {
     caps: "flat",
     name: "mast",
   });
-  b.part(ball(6, 4), BUTTER, { at: [0.213, 1.14, -0.5], scale: 0.03, bone: mast.joints[2], flat: true, name: "tipBall" });
+  b.part(ball(6, 4), BUTTER, {
+    at: [0.213, 1.14, -0.5],
+    scale: 0.03,
+    bone: mast.joints[2],
+    flat: true,
+    name: "tipBall",
+  });
   b.part(ball(6, 4), LILAC_D, { at: [0.22, 0.64, -0.52], scale: 0.04, bone: chassis, flat: true, name: "mastBase" });
-  const flagHinge = b.joint("flagHinge", { parent: mast.joints[2], at: [0.216, 1.1, -0.505], dir: [1, 0, 0], role: "hinge" });
+  const flagHinge = b.joint("flagHinge", {
+    parent: mast.joints[2],
+    at: [0.216, 1.1, -0.505],
+    dir: [1, 0, 0],
+    role: "hinge",
+  });
   const flag = b.extrude(
     [
       [0, 0],
@@ -530,7 +609,13 @@ export default function build() {
   }
 
   // ------------------------------------------------------------------------------------------ exhaust and steam
-  b.rod([0, 0.41, -0.64], [0, 0.43, -0.75], [0.055, 0.04], { color: LILAC_D, sides: 8, smooth: false, bone: chassis, name: "exhaust" });
+  b.rod([0, 0.41, -0.64], [0, 0.43, -0.75], [0.055, 0.04], {
+    color: LILAC_D,
+    sides: 8,
+    smooth: false,
+    bone: chassis,
+    name: "exhaust",
+  });
   b.cards([frame([0, 0.45, -0.77], [0, 1, 0]), frame([0.03, 0.53, -0.9], [0, 1, 0])], CLOUD, {
     size: [0.2, 0.15],
     flow: [0, 0, 1],
@@ -559,8 +644,18 @@ export default function build() {
     flat: true,
     name: "jarGlass",
   });
-  b.part(new THREE.CylinderGeometry(0.098, 0.098, 0.03, 8), CORAL, { at: [JAR_C[0], 0.655, JAR_C[2]], bone: chassis, flat: true, name: "jarBase" });
-  b.part(new THREE.CylinderGeometry(0.098, 0.098, 0.035, 8), CORAL, { at: [JAR_C[0], 0.885, JAR_C[2]], bone: chassis, flat: true, name: "jarLid" });
+  b.part(new THREE.CylinderGeometry(0.098, 0.098, 0.03, 8), CORAL, {
+    at: [JAR_C[0], 0.655, JAR_C[2]],
+    bone: chassis,
+    flat: true,
+    name: "jarBase",
+  });
+  b.part(new THREE.CylinderGeometry(0.098, 0.098, 0.035, 8), CORAL, {
+    at: [JAR_C[0], 0.885, JAR_C[2]],
+    bone: chassis,
+    flat: true,
+    name: "jarLid",
+  });
   b.part(ball(6, 4), BUTTER, { at: [JAR_C[0], 0.915, JAR_C[2]], scale: 0.028, bone: chassis, flat: true });
   const seedRng = rng(11);
   const jarSeeds: THREE.BufferGeometry[][] = [[], []];
@@ -569,7 +664,9 @@ export default function build() {
     const a = seedRng() * Math.PI * 2;
     const y = 0.675 + seedRng() * 0.17;
     const q = new THREE.Quaternion().setFromEuler(new THREE.Euler(seedRng() * 3, seedRng() * 3, seedRng() * 3));
-    jarSeeds[i % 2].push(placed(ball(5, 3), [JAR_C[0] + r * Math.cos(a), y, JAR_C[2] + r * Math.sin(a)], q, [0.02, 0.034, 0.013]));
+    jarSeeds[i % 2].push(
+      placed(ball(5, 3), [JAR_C[0] + r * Math.cos(a), y, JAR_C[2] + r * Math.sin(a)], q, [0.02, 0.034, 0.013]),
+    );
   }
   b.part(mergeGeometries(jarSeeds[0]), SEED, { at: [0, 0, 0], bone: chassis, flat: true, name: "jarSeeds" });
   b.part(mergeGeometries(jarSeeds[1]), SEED_D, { at: [0, 0, 0], bone: chassis, flat: true, name: "jarSeedsDark" });
@@ -578,7 +675,8 @@ export default function build() {
   const torso = b.sweep(spine, [0.15, 0.17, 0.16], { color: LILAC, sides: 8, smooth: false, name: "torso" });
   const torsoSkin = b.surface(torso);
   const chestHit = torsoSkin.around([0, 0.5, -0.03]).at(0, -8);
-  if (chestHit) b.decal(torsoSkin, CHEST, { at: chestHit, dir: [0, 0, -1], size: [0.13, 0.104], lift: 0.004, segments: 12 });
+  if (chestHit)
+    b.decal(torsoSkin, CHEST, { at: chestHit, dir: [0, 0, 1], size: [0.13, 0.104], lift: 0.004, segments: 12 });
   const beltPath = torsoSkin.loop([0, 0.455, -0.04], { dir: [0, 1, 0], lift: 0.006 });
   b.sweep(beltPath, 0.014, { color: BUTTER, sides: 8, smooth: false, name: "belt" });
   // tail nub
@@ -592,13 +690,23 @@ export default function build() {
     { parent: hips, names: ["tail1", "tail2", "tail3"], role: "tail" },
   );
   b.sweep(tail, [0.05, 0.035], { color: FUR, sides: 8, smooth: false, caps: "flat", name: "tailNub" });
-  b.part(ball(6, 4), CREAM, { at: [0, 0.43, -0.3], scale: 0.05, bone: tail.tip ?? tail.joints[2], flat: true, name: "tailPom" });
+  b.part(ball(6, 4), CREAM, {
+    at: [0, 0.43, -0.3],
+    scale: 0.05,
+    bone: tail.tip ?? tail.joints[2],
+    flat: true,
+    name: "tailPom",
+  });
 
   // legs with round boots
   for (const s of SIDES) {
     const side = s > 0 ? "L" : "R";
     const pts = limb([s * 0.11, 0.43, -0.03], [s * 0.125, 0.43, 0.2], [0.13, 0.12], [0, 1, 0]);
-    const leg = b.chain(`leg${side}`, pts, { parent: hips, names: [`hip${side}`, `knee${side}`, `ankle${side}`], role: "leg" });
+    const leg = b.chain(`leg${side}`, pts, {
+      parent: hips,
+      names: [`hip${side}`, `knee${side}`, `ankle${side}`],
+      role: "leg",
+    });
     b.sweep(leg, [0.055, 0.048, 0.046], { color: LILAC, sides: 8, smooth: false, name: "leg" });
     b.part(ball(8, 6), BUTTER, {
       at: [s * 0.125, 0.425, 0.225],
@@ -620,8 +728,15 @@ export default function build() {
   };
   const ringPts: V[] = [];
   for (let k = 0; k < 8; k++) ringPts.push(wheelPoint(k * 45));
-  b.sweep(polyline(ringPts, { closed: true }), 0.013, { color: CORAL, sides: 8, smooth: false, bone: steering, name: "steeringRing" });
-  for (const deg of [90, 210, 330]) b.rod(WC, wheelPoint(deg, 0.08), 0.01, { color: CORAL, sides: 8, smooth: false, bone: steering });
+  b.sweep(polyline(ringPts, { closed: true }), 0.013, {
+    color: CORAL,
+    sides: 8,
+    smooth: false,
+    bone: steering,
+    name: "steeringRing",
+  });
+  for (const deg of [90, 210, 330])
+    b.rod(WC, wheelPoint(deg, 0.08), 0.01, { color: CORAL, sides: 8, smooth: false, bone: steering });
   b.part(ball(6, 4), BUTTER, { at: WC, scale: 0.03, bone: steering, flat: true, name: "steeringHub" });
   b.rod([0, 0.42, 0.32], WC, 0.014, { color: LILAC_D, sides: 8, smooth: false, bone: chassis, name: "column" });
 
@@ -630,7 +745,11 @@ export default function build() {
     const side = s > 0 ? "L" : "R";
     const grip = wheelPoint(s > 0 ? 25 : 155);
     const pts = limb([s * 0.15, 0.53, -0.01], grip, [0.17, 0.16], [s * 0.6, -0.8, -0.2]);
-    const arm = b.chain(`arm${side}`, pts, { parent: chest, names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`], role: "arm" });
+    const arm = b.chain(`arm${side}`, pts, {
+      parent: chest,
+      names: [`shoulder${side}`, `elbow${side}`, `wrist${side}`],
+      role: "arm",
+    });
     b.sweep(arm, [0.056, 0.047, 0.042], {
       bands: [
         [0.86, LILAC],
@@ -644,22 +763,75 @@ export default function build() {
     const wrist = arm.tip ?? arm.joints[2];
     b.part(ball(7, 5), CREAM, { at: grip, scale: [0.05, 0.048, 0.05], bone: wrist, flat: true, name: "paw" });
     for (const dx of [-0.024, 0, 0.024])
-      b.part(ball(5, 4), CREAM, { at: [grip[0] + dx, grip[1] - 0.004, grip[2] + 0.04], scale: 0.02, bone: wrist, flat: true, name: "toe" });
+      b.part(ball(5, 4), CREAM, {
+        at: [grip[0] + dx, grip[1] - 0.004, grip[2] + 0.04],
+        scale: 0.02,
+        bone: wrist,
+        flat: true,
+        name: "toe",
+      });
   }
 
   // ------------------------------------------------------------------------------------------ hamster head
-  const skull = b.part(ball(10, 8), FUR, { at: HEAD_C, scale: [0.17, 0.16, 0.165], bone: head, flat: true, name: "skull" });
+  const skull = b.part(ball(10, 8), FUR, {
+    at: HEAD_C,
+    scale: [0.17, 0.16, 0.165],
+    bone: head,
+    flat: true,
+    name: "skull",
+  });
   const skin = b.surface(skull);
   const cheeks = SIDES.map((s) =>
-    b.part(ball(8, 6), CREAM, { at: hl(s * 0.14, -0.065, 0.06), scale: [0.1, 0.095, 0.1], bone: head, flat: true, name: "cheek" }),
+    b.part(ball(8, 6), CREAM, {
+      at: hl(s * 0.14, -0.065, 0.06),
+      scale: [0.1, 0.095, 0.1],
+      bone: head,
+      flat: true,
+      name: "cheek",
+    }),
   );
-  const muzzle = b.part(ball(8, 6), CREAM, { at: hl(0, -0.045, 0.135), scale: [0.075, 0.05, 0.065], bone: head, flat: true, name: "muzzle" });
-  b.part(ball(6, 4), PINK, { at: hl(0, -0.022, 0.197), scale: [0.024, 0.018, 0.018], bone: head, flat: true, name: "nose" });
-  b.part(ball(7, 4), PLUM, { at: hl(0, -0.09, 0.135), scale: [0.055, 0.02, 0.05], bone: head, flat: true, name: "mouthInside" });
+  const muzzle = b.part(ball(8, 6), CREAM, {
+    at: hl(0, -0.045, 0.135),
+    scale: [0.075, 0.05, 0.065],
+    bone: head,
+    flat: true,
+    name: "muzzle",
+  });
+  b.part(ball(6, 4), PINK, {
+    at: hl(0, -0.022, 0.197),
+    scale: [0.024, 0.018, 0.018],
+    bone: head,
+    flat: true,
+    name: "nose",
+  });
+  b.part(ball(7, 4), PLUM, {
+    at: hl(0, -0.09, 0.135),
+    scale: [0.055, 0.02, 0.05],
+    bone: head,
+    flat: true,
+    name: "mouthInside",
+  });
   for (const s of SIDES)
-    b.part(new THREE.BoxGeometry(0.024, 0.036, 0.013), WHITE, { at: hl(s * 0.014, -0.092, 0.178), bone: head, flat: true, name: "tooth" });
-  b.part(ball(8, 6), CREAM, { at: hl(0, -0.118, 0.135), scale: [0.06, 0.03, 0.058], bone: jaw, flat: true, name: "lowerJaw" });
-  b.part(ball(6, 4), PINK, { at: hl(0, -0.103, 0.14), scale: [0.03, 0.012, 0.03], bone: jaw, flat: true, name: "tongue" });
+    b.part(new THREE.BoxGeometry(0.024, 0.036, 0.013), WHITE, {
+      at: hl(s * 0.014, -0.092, 0.178),
+      bone: head,
+      flat: true,
+      name: "tooth",
+    });
+  b.part(ball(8, 6), CREAM, {
+    at: hl(0, -0.118, 0.135),
+    scale: [0.06, 0.03, 0.058],
+    bone: jaw,
+    flat: true,
+    name: "lowerJaw",
+  });
+  b.part(ball(6, 4), PINK, {
+    at: hl(0, -0.103, 0.14),
+    scale: [0.03, 0.012, 0.03],
+    bone: jaw,
+    flat: true,
+    name: "tongue",
+  });
 
   for (const s of SIDES) {
     const side = s > 0 ? "L" : "R";
@@ -669,7 +841,14 @@ export default function build() {
     if (browHit) b.decal(skin, BROW, { at: browHit, size: [0.04, 0.022], lift: 0.003, roll: s * -12 });
     const cheekSkin = b.surface(cheeks[s > 0 ? 0 : 1]);
     const blushHit = cheekSkin.around(cheeks[s > 0 ? 0 : 1].at).at(s * 40, 28);
-    if (blushHit) b.decal(cheekSkin, BLUSH, { at: blushHit, dir: [-s * 0.35, -0.1, -1], size: [0.06, 0.034], lift: 0.003, roll: s * 8 });
+    if (blushHit)
+      b.decal(cheekSkin, BLUSH, {
+        at: blushHit,
+        dir: [-(-s * 0.35), 0.1, 1],
+        size: [0.06, 0.034],
+        lift: 0.003,
+        roll: s * 8,
+      });
     // seeds bulging in the cheek
     const seedSpots: Array<[number, number, number, number]> = [
       [s * 12, -34, 20 * s, 0.072],
@@ -681,14 +860,39 @@ export default function build() {
       if (hit) b.decal(cheekSkin, SEED_DECAL, { at: hit, size: [h * 0.62, h], lift: 0.003, roll, segments: 8 });
     }
     // ears
-    const ear = b.joint(`ear${side}`, { parent: head, at: hl(s * 0.105, 0.115, -0.01), dir: [s * 0.4, 1, 0], role: "hinge" });
+    const ear = b.joint(`ear${side}`, {
+      parent: head,
+      at: hl(s * 0.105, 0.115, -0.01),
+      dir: [s * 0.4, 1, 0],
+      role: "hinge",
+    });
     const earAt = hl(s * 0.12, 0.135, -0.012);
     const octagon = (r: number): Array<[number, number]> =>
       Array.from({ length: 8 }, (_, k) => [r * Math.cos(k * 45 * DEG), r * Math.sin(k * 45 * DEG)]);
-    b.extrude(octagon(0.058), { at: earAt, x: [1, 0, 0], y: [s * 0.25, 1, 0], thickness: 0.022, color: FUR, bone: ear, name: "ear" });
-    b.extrude(octagon(0.036), { at: earAt, x: [1, 0, 0], y: [s * 0.25, 1, 0], thickness: 0.028, color: PINK, bone: ear, name: "earInner" });
+    b.extrude(octagon(0.058), {
+      at: earAt,
+      x: [1, 0, 0],
+      y: [s * 0.25, 1, 0],
+      thickness: 0.022,
+      color: FUR,
+      bone: ear,
+      name: "ear",
+    });
+    b.extrude(octagon(0.036), {
+      at: earAt,
+      x: [1, 0, 0],
+      y: [s * 0.25, 1, 0],
+      thickness: 0.028,
+      color: PINK,
+      bone: ear,
+      name: "earInner",
+    });
     // whiskers
-    b.cards([frame(hl(s * 0.07, -0.05, 0.17), [s, -0.1, 0.4])], WHISKER, { size: [0.11, 0.1], flow: [0, 0, 1], bone: head });
+    b.cards([frame(hl(s * 0.07, -0.05, 0.17), [s, -0.1, 0.4])], WHISKER, {
+      size: [0.11, 0.1],
+      flow: [0, 0, 1],
+      bone: head,
+    });
     // fur tufts flaring from the lower cheek
     const tuftFrames = [-10, -32, -54].map((el) => cheekSkin.around(cheeks[s > 0 ? 0 : 1].at).at(s * 78, el)!);
     b.cards(tuftFrames, TUFT_CREAM, { size: [0.04, 0.05], lean: 55, flow: [0, -1, 0.3], bone: head });
@@ -721,7 +925,15 @@ export default function build() {
     [hl(0.02, 0.2, 0.12), [0.5, 1, -0.2]],
   ];
   for (const [p, d] of floaters)
-    b.part(ball(6, 4), WHITE, { at: p, dir: d, scale: [0.014, 0.027, 0.011], texture: SEED_STRIPES, bone: head, flat: true, name: "floatSeed" });
+    b.part(ball(6, 4), WHITE, {
+      at: p,
+      dir: d,
+      scale: [0.014, 0.027, 0.011],
+      texture: SEED_STRIPES,
+      bone: head,
+      flat: true,
+      name: "floatSeed",
+    });
 
   // ------------------------------------------------------------------------------------------ helmet
   const HELMET_C: V = [0, 0.715, 0];

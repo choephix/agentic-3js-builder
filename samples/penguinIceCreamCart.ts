@@ -191,7 +191,10 @@ const sparkle = svg(
   { size: 128 },
 );
 const pennant = (colour: string) =>
-  svg(`<svg viewBox="0 0 48 64"><path d="M0 0 H48 L24 62 Z" fill="${colour}"/><circle cx="24" cy="18" r="6" fill="#fff6ec"/></svg>`, { size: 128 });
+  svg(
+    `<svg viewBox="0 0 48 64"><path d="M0 0 H48 L24 62 Z" fill="${colour}"/><circle cx="24" cy="18" r="6" fill="#fff6ec"/></svg>`,
+    { size: 128 },
+  );
 
 // ---------------------------------------------------------------- geometry helpers
 const sphere = (w = 8, h = 6) => new THREE.SphereGeometry(1, w, h);
@@ -249,14 +252,23 @@ export default function build() {
         [PX + s * 0.058, 0.03, 0.022],
         [PX + s * 0.058, 0.012, 0.06],
       ],
-      { parent: hips, names: s > 0 ? ["hipL", "kneeL", "ankleL", "toeL"] : ["hipR", "kneeR", "ankleR", "toeR"], role: "leg" },
+      {
+        parent: hips,
+        names: s > 0 ? ["hipL", "kneeL", "ankleL", "toeL"] : ["hipR", "kneeR", "ankleR", "toeR"],
+        role: "leg",
+      },
     ),
   );
 
   // ================================================================ skeleton: cart
   const cart = b.joint("cart", { parent: hips, at: c(0, 0.2, 0), dir: [0, 1, 0] });
   const parasolBase = b.joint("parasolBase", { parent: cart, at: c(0, 0.375, -0.12), dir: [0, 1, 0], role: "hinge" });
-  const parasolTop = b.joint("parasolTop", { parent: parasolBase, at: c(0, 0.7, -0.12), dir: [0, 1, 0], role: "hinge" });
+  const parasolTop = b.joint("parasolTop", {
+    parent: parasolBase,
+    at: c(0, 0.7, -0.12),
+    dir: [0, 1, 0],
+    role: "hinge",
+  });
   const wheels: Record<string, Joint> = {};
   const wheelSpots: Array<[string, number, number]> = [
     ["wheelFL", 0.27, 0.225],
@@ -279,7 +291,13 @@ export default function build() {
     [PX, 0.31, 0.008],
   ]);
   const plump = egg(1, 0.158, 0.152);
-  b.sweep(bodyPath, (t) => [0.128 * plump(t), 0.118 * plump(t)], { bone: [hips, spine, chest, neck], color: FEATHER, sides: 10, smooth: false, caps: "round" });
+  b.sweep(bodyPath, (t) => [0.128 * plump(t), 0.118 * plump(t)], {
+    bone: [hips, spine, chest, neck],
+    color: FEATHER,
+    sides: 10,
+    smooth: false,
+    caps: "round",
+  });
   const bellyFn = egg(1, 0.138, 0.127);
   const belly = b.sweep(bodyPath, (t) => [0.098 * bellyFn(t), 0.092 * bellyFn(t)], {
     bone: [hips, spine, chest, neck],
@@ -289,7 +307,7 @@ export default function build() {
     caps: "round",
     shift: [0, -0.036],
   });
-  b.decal(belly, tummy, { at: [PX, 0.125, 0.13], dir: [0, 0, -1], size: [0.05, 0.05], segments: 6 });
+  b.decal(belly, tummy, { at: [PX, 0.125, 0.13], dir: [0, 0, 1], size: [0.05, 0.05], segments: 6 });
   // tail wedge
   b.part(new THREE.ConeGeometry(0.04, 0.12, 5), FEATHER_DK, {
     ...flat,
@@ -300,11 +318,21 @@ export default function build() {
   });
 
   // head
-  const skull = b.part(sphere(11, 8), FEATHER, { ...flat, bone: head, at: [PX, 0.3, 0.008], scale: [0.114, 0.1, 0.102] });
-  b.decal(skull, face, { at: [PX, 0.296, 0.1], dir: [0, 0, -1], size: [0.17, 0.12], segments: [12, 9], bone: head });
+  const skull = b.part(sphere(11, 8), FEATHER, {
+    ...flat,
+    bone: head,
+    at: [PX, 0.3, 0.008],
+    scale: [0.114, 0.1, 0.102],
+  });
+  b.decal(skull, face, { at: [PX, 0.296, 0.1], dir: [0, 0, 1], size: [0.17, 0.12], segments: [12, 9], bone: head });
   // bow tie
   for (const s of [1, -1]) {
-    b.part(new THREE.ConeGeometry(0.022, 0.04, 4), HOT, { ...flat, bone: neck, at: [PX + s * 0.02, 0.222, 0.101], dir: [s, 0, 0] });
+    b.part(new THREE.ConeGeometry(0.022, 0.04, 4), HOT, {
+      ...flat,
+      bone: neck,
+      at: [PX + s * 0.02, 0.222, 0.101],
+      dir: [s, 0, 0],
+    });
   }
   b.part(sphere(6, 4), PINK, { ...flat, bone: neck, at: [PX, 0.222, 0.103], scale: 0.012 });
 
@@ -348,7 +376,17 @@ export default function build() {
         [len, w1],
         [0, w0],
       ],
-      { at: a, x: d.toArray(), y: y.toArray(), thickness: 0.02, bevel: 0.005, smoothing: 1, detail: 0.5, color: FEATHER_DK, bone },
+      {
+        at: a,
+        x: d.toArray(),
+        y: y.toArray(),
+        thickness: 0.02,
+        bevel: 0.005,
+        smoothing: 1,
+        detail: 0.5,
+        color: FEATHER_DK,
+        bone,
+      },
     );
   };
   paddle(LEFT_FLIPPER, 0, [0, 0.7, 0.7], 0.03, 0.027, armL.joints[0]);
@@ -408,8 +446,20 @@ export default function build() {
     bone: held,
     at: [cone[0], cone[1] + 0.094, cone[2]],
   });
-  b.part(sphere(8, 6), "#ffffff", { ...flat, texture: S_PINK, bone: held, at: [cone[0], cone[1] + 0.112, cone[2]], scale: 0.038 });
-  b.part(sphere(8, 6), "#ffffff", { ...flat, texture: S_LEMON, bone: held, at: [cone[0], cone[1] + 0.152, cone[2]], scale: 0.033 });
+  b.part(sphere(8, 6), "#ffffff", {
+    ...flat,
+    texture: S_PINK,
+    bone: held,
+    at: [cone[0], cone[1] + 0.112, cone[2]],
+    scale: 0.038,
+  });
+  b.part(sphere(8, 6), "#ffffff", {
+    ...flat,
+    texture: S_LEMON,
+    bone: held,
+    at: [cone[0], cone[1] + 0.152, cone[2]],
+    scale: 0.033,
+  });
   b.part(sphere(6, 4), CHERRY, { ...flat, bone: held, at: [cone[0], cone[1] + 0.19, cone[2]], scale: 0.0135 });
   b.part(new THREE.CylinderGeometry(0.0015, 0.0015, 0.025, 4), "#6a5680", {
     ...flat,
@@ -425,20 +475,56 @@ export default function build() {
   b.part(box(0.83, 0.028, 0.39), CREAM, { ...flat, bone: cart, at: c(0, 0.369, 0) });
   b.part(box(0.83, 0.014, 0.39), PINK, { ...flat, bone: cart, at: c(0, 0.349, 0) });
   // panels
-  b.part(new THREE.PlaneGeometry(0.76, 0.19), "#ffffff", { texture: cartFront, bone: cart, at: c(0, 0.25, 0.1815), dir: [0, 0, 1], axis: "z" });
-  b.part(new THREE.PlaneGeometry(0.76, 0.19), "#ffffff", { texture: cartFront, bone: cart, at: c(0, 0.25, -0.1815), dir: [0, 0, -1], axis: "z" });
-  b.part(new THREE.PlaneGeometry(0.34, 0.19), "#ffffff", { texture: cartEnd, bone: cart, at: c(0.4015, 0.25, 0), dir: [1, 0, 0], axis: "z" });
-  b.part(new THREE.PlaneGeometry(0.34, 0.19), "#ffffff", { texture: cartEnd, bone: cart, at: c(-0.4015, 0.25, 0), dir: [-1, 0, 0], axis: "z" });
+  b.part(new THREE.PlaneGeometry(0.76, 0.19), "#ffffff", {
+    texture: cartFront,
+    bone: cart,
+    at: c(0, 0.25, 0.1815),
+    dir: [0, 0, 1],
+    axis: "z",
+  });
+  b.part(new THREE.PlaneGeometry(0.76, 0.19), "#ffffff", {
+    texture: cartFront,
+    bone: cart,
+    at: c(0, 0.25, -0.1815),
+    dir: [0, 0, -1],
+    axis: "z",
+  });
+  b.part(new THREE.PlaneGeometry(0.34, 0.19), "#ffffff", {
+    texture: cartEnd,
+    bone: cart,
+    at: c(0.4015, 0.25, 0),
+    dir: [1, 0, 0],
+    axis: "z",
+  });
+  b.part(new THREE.PlaneGeometry(0.34, 0.19), "#ffffff", {
+    texture: cartEnd,
+    bone: cart,
+    at: c(-0.4015, 0.25, 0),
+    dir: [-1, 0, 0],
+    axis: "z",
+  });
 
   // axles
-  for (const x of [0.27, -0.27]) b.part(new THREE.CylinderGeometry(0.011, 0.011, 0.46, 6), STEEL, { ...flat, bone: cart, at: c(x, 0.085, 0), dir: [0, 0, 1] });
+  for (const x of [0.27, -0.27])
+    b.part(new THREE.CylinderGeometry(0.011, 0.011, 0.46, 6), STEEL, {
+      ...flat,
+      bone: cart,
+      at: c(x, 0.085, 0),
+      dir: [0, 0, 1],
+    });
 
   // wheels
   for (const [name, x, z] of wheelSpots) {
     const joint = wheels[name];
     const out = z > 0 ? 1 : -1;
     b.part(box(0.034, 0.05, 0.09), STEEL, { ...flat, bone: cart, at: c(x, 0.105, out * 0.165) });
-    b.part(new THREE.CylinderGeometry(0.088, 0.088, 0.032, 10), PLUM, { ...flat, bone: joint, at: c(x, 0.088, z), dir: [0, 0, 1], up: [0, 1, 0] });
+    b.part(new THREE.CylinderGeometry(0.088, 0.088, 0.032, 10), PLUM, {
+      ...flat,
+      bone: joint,
+      at: c(x, 0.088, z),
+      dir: [0, 0, 1],
+      up: [0, 1, 0],
+    });
     b.part(new THREE.CircleGeometry(0.066, 10), "#ffffff", {
       texture: hubcap,
       bone: joint,
@@ -449,8 +535,19 @@ export default function build() {
   }
 
   // handle at the -x end
-  for (const s of [1, -1]) b.part(new THREE.CylinderGeometry(0.009, 0.009, 0.1, 6), STEEL, { ...flat, bone: cart, at: c(-0.45, 0.3, s * 0.14), dir: [1, 0, 0] });
-  b.part(new THREE.CylinderGeometry(0.014, 0.014, 0.36, 6), HOT, { ...flat, bone: cart, at: c(-0.5, 0.3, 0), dir: [0, 0, 1] });
+  for (const s of [1, -1])
+    b.part(new THREE.CylinderGeometry(0.009, 0.009, 0.1, 6), STEEL, {
+      ...flat,
+      bone: cart,
+      at: c(-0.45, 0.3, s * 0.14),
+      dir: [1, 0, 0],
+    });
+  b.part(new THREE.CylinderGeometry(0.014, 0.014, 0.36, 6), HOT, {
+    ...flat,
+    bone: cart,
+    at: c(-0.5, 0.3, 0),
+    dir: [0, 0, 1],
+  });
   for (const s of [1, -1]) b.part(sphere(6, 4), HOT, { ...flat, bone: cart, at: c(-0.5, 0.3, s * 0.18), scale: 0.022 });
 
   // ================================================================ tubs of ice cream
@@ -472,7 +569,12 @@ export default function build() {
     });
   }
   // scoop stuck in the middle tub
-  b.part(new THREE.CylinderGeometry(0.005, 0.005, 0.14, 5), HOT, { ...flat, bone: cart, at: c(0.04, 0.53, 0.04), rotation: [14, 0, -12] });
+  b.part(new THREE.CylinderGeometry(0.005, 0.005, 0.14, 5), HOT, {
+    ...flat,
+    bone: cart,
+    at: c(0.04, 0.53, 0.04),
+    rotation: [14, 0, -12],
+  });
   b.part(sphere(6, 4), STEEL, { ...flat, bone: cart, at: c(0.058, 0.585, 0.07), scale: [0.026, 0.016, 0.026] });
 
   // ================================================================ cone stack in a holder
@@ -493,7 +595,13 @@ export default function build() {
 
   // ================================================================ price sign
   const signAt = c(-0.32, 0.475, 0.115);
-  for (const s of [1, -1]) b.part(new THREE.CylinderGeometry(0.006, 0.006, 0.09, 5), WOOD_DK, { ...flat, bone: cart, at: [signAt[0] + s * 0.05, 0.42, 0.124], rotation: [-10, 0, 0] });
+  for (const s of [1, -1])
+    b.part(new THREE.CylinderGeometry(0.006, 0.006, 0.09, 5), WOOD_DK, {
+      ...flat,
+      bone: cart,
+      at: [signAt[0] + s * 0.05, 0.42, 0.124],
+      rotation: [-10, 0, 0],
+    });
   b.part(box(0.17, 0.125, 0.02), WOOD, { ...flat, bone: cart, at: signAt, rotation: [-10, 0, 0] });
   b.part(new THREE.PlaneGeometry(0.15, 0.11), "#ffffff", {
     texture: priceSign,
@@ -506,7 +614,12 @@ export default function build() {
   // ================================================================ parasol
   b.part(new THREE.CylinderGeometry(0.01, 0.01, 0.52, 6), WOOD, { ...flat, bone: parasolBase, at: c(0, 0.635, -0.12) });
   b.part(new THREE.CylinderGeometry(0.03, 0.04, 0.03, 8), HOT, { ...flat, bone: parasolBase, at: c(0, 0.39, -0.12) });
-  b.part(new THREE.ConeGeometry(0.46, 0.17, 8, 1, true), "#ffffff", { ...flat, texture: canopyTex, bone: parasolTop, at: c(0, 0.785, -0.12) });
+  b.part(new THREE.ConeGeometry(0.46, 0.17, 8, 1, true), "#ffffff", {
+    ...flat,
+    texture: canopyTex,
+    bone: parasolTop,
+    at: c(0, 0.785, -0.12),
+  });
   b.part(flipTriangles(new THREE.ConeGeometry(0.46, 0.17, 8, 1, true)), "#ffffff", {
     ...flat,
     texture: canopyTex,
@@ -535,7 +648,11 @@ export default function build() {
     [PX + 0.17, 0.43, 0.1, 0.045],
     [PX + 0.3, 0.4, 0.14, 0.04],
   ];
-  b.cards(sparkles.map(([x, y, z]) => frame([x, y, z], [0, 1, 0])), sparkle, { size: 0.05, cross: true, bone: held });
+  b.cards(
+    sparkles.map(([x, y, z]) => frame([x, y, z], [0, 1, 0])),
+    sparkle,
+    { size: 0.05, cross: true, bone: held },
+  );
 
   b.pose(jaw, { axis: [1, 0, 0], deg: 9 });
 

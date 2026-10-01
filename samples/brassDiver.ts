@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { createBuilder } from "../src/builder";
 import { frame } from "../src/frame";
-import { rng } from "../src/math";
+import { rng, toDirection } from "../src/math";
 import { catmull, polyline } from "../src/path";
 import { svg } from "../src/texture";
 import { glow } from "../kits/glow";
@@ -225,7 +225,12 @@ export default function build() {
   const neck = b.joint("neck", { parent: chest, at: [0, 1.58, 0], dir: [0, 1, 0], role: "neck" });
   const head = b.joint("head", { parent: neck, at: [0, 1.66, 0], dir: [0, 1, 0], role: "head" });
   // The front port is hinged on its left edge; closed at rest.
-  const portHinge = b.joint("portHinge", { parent: head, at: hp([0.105, 1.745, 0.185]), dir: [0, 1, 0], role: "hinge" });
+  const portHinge = b.joint("portHinge", {
+    parent: head,
+    at: hp([0.105, 1.745, 0.185]),
+    dir: [0, 1, 0],
+    role: "hinge",
+  });
 
   // --- the torso under everything ----------------------------------------------------------------------------------
   const torsoR = [keyed([0.18, 0.175, 0.185, 0.15]), keyed([0.125, 0.135, 0.15, 0.13])];
@@ -436,26 +441,28 @@ export default function build() {
   ] as const)
     b.decal(domeSkin, T.verdigris, {
       at: hp(pt(H0.clone().add(V(Math.sin(az * DEG) * 0.17, 0, Math.cos(az * DEG) * 0.17)))),
-      dir: pt(V(-Math.sin(az * DEG), 0, -Math.cos(az * DEG))),
+      dir: toDirection(pt(V(-Math.sin(az * DEG), 0, -Math.cos(az * DEG)))).negate(),
       size: [size * HK, size * HK],
       lift: 0.002,
     });
   b.decal(domeSkin, T.barnacles, {
     at: hp([0.06, 1.66, -0.17]),
-    dir: [-0.2, 0.0, 1],
+    dir: [0.2, -0.0, -1],
     size: [0.12 * HK, 0.12 * HK],
     lift: 0.002,
   });
   b.decal(domeSkin, T.plate, {
     at: hp([0, 1.76, -0.172]),
-    dir: [0, 0, 1],
+    dir: [0, 0, -1],
     size: [0.1 * HK, 0.05 * HK],
     lift: 0.002,
   });
 
   // Air inlet valve at the back right of the bonnet, exhaust valve on the front left.
   const vdir = V(-0.62, 0.0, -0.78).normalize();
-  const vBase = HC.clone().add(vdir.clone().multiplyScalar(0.15 * HK)).add(V(0, -0.035 * HK, 0));
+  const vBase = HC.clone()
+    .add(vdir.clone().multiplyScalar(0.15 * HK))
+    .add(V(0, -0.035 * HK, 0));
   const along = (base: THREE.Vector3, dir: THREE.Vector3, d: number) =>
     pt(base.clone().add(dir.clone().multiplyScalar(d * HK)));
   const vTip = vBase.clone().add(vdir.clone().multiplyScalar(0.085 * HK));
@@ -481,7 +488,9 @@ export default function build() {
     name: "inletNut",
   });
   const exDir = V(0.8, 0.05, -0.6).normalize();
-  const exBase = HC.clone().add(exDir.clone().multiplyScalar(0.165 * HK)).add(V(0, -0.03 * HK, 0));
+  const exBase = HC.clone()
+    .add(exDir.clone().multiplyScalar(0.165 * HK))
+    .add(V(0, -0.03 * HK, 0));
   b.part(grow(new THREE.CylinderGeometry(0.02, 0.026, 0.05, 6)), BRASS_D, {
     bone: head,
     at: along(exBase, exDir, 0.012),
@@ -538,34 +547,34 @@ export default function build() {
     // Crease lines over the knee, a patch on the left thigh, tide stains above the boot.
     b.decal(legSkin, T.creases, {
       at: [s * 0.118, 0.55, 0.11],
-      dir: [0, 0, -1],
+      dir: [0, 0, 1],
       size: [0.17, 0.13],
       lift: 0.002,
     });
     b.decal(legSkin, T.creases, {
       at: [s * 0.118, 0.56, -0.11],
-      dir: [0, 0, 1],
+      dir: [0, 0, -1],
       size: [0.17, 0.12],
       lift: 0.002,
       mirror: true,
     });
     b.decal(legSkin, T.tide, {
       at: [s * 0.124, 0.3, 0.1],
-      dir: [0, 0, -1],
+      dir: [0, 0, 1],
       size: [0.2, 0.24],
       lift: 0.002,
     });
     b.decal(legSkin, T.tide, {
       at: [s * 0.124, 0.3, -0.1],
-      dir: [0, 0, 1],
+      dir: [0, 0, -1],
       size: [0.2, 0.24],
       lift: 0.002,
       mirror: true,
     });
     if (s > 0)
-      b.decal(legSkin, T.patch, { at: [0.12, 0.8, 0.1], dir: [0, 0, -1], size: [0.11, 0.11], lift: 0.002, roll: 8 });
+      b.decal(legSkin, T.patch, { at: [0.12, 0.8, 0.1], dir: [0, 0, 1], size: [0.11, 0.11], lift: 0.002, roll: 8 });
     // Stitched outer seam, and a cord tying the trouser hem above the boot.
-    b.decal(legSkin, T.seam, { at: [s * 0.2, 0.6, 0.0], dir: [-s, 0, 0], size: [0.045, 0.75], lift: 0.002 });
+    b.decal(legSkin, T.seam, { at: [s * 0.2, 0.6, 0.0], dir: [s, 0, 0], size: [0.045, 0.75], lift: 0.002 });
     const hem = legSkin.loop([s * 0.125, 0.235, 0], { lift: 0.008 });
     b.sweep(hem, 0.009, { color: ROPE, sides: 5, smooth: false });
     b.part(new THREE.SphereGeometry(0.017, 5, 4), ROPE_D, { bone: ankle, at: pt(hem.at(0)), flat: true });
@@ -627,13 +636,13 @@ export default function build() {
     // Lacing up the shaft front, barnacles on the outer heel.
     b.decal(heel, T.lace, {
       at: [bx, 0.17, 0.06],
-      dir: [0, -0.3, -1],
+      dir: [0, 0.3, 1],
       size: [0.085, 0.125],
       lift: 0.002,
     });
     b.decal(heel, T.barnacles, {
       at: [bx + s * 0.075, 0.1, -0.03],
-      dir: [-s, 0, 0],
+      dir: [s, 0, 0],
       size: [0.1, 0.1],
       lift: 0.002,
       mirror: s < 0,
@@ -714,20 +723,20 @@ export default function build() {
   });
   b.decal(front, T.leadFront, {
     at: [0, wMid, 0.235],
-    dir: [0, 0, -1],
+    dir: [0, 0, 1],
     size: [0.23 * WS, 0.29 * WS],
     lift: 0.002,
   });
   b.decal(back, T.leadBack, {
     at: [0, wMid, -0.235],
-    dir: [0, 0, 1],
+    dir: [0, 0, -1],
     size: [0.23 * WS, 0.29 * WS],
     lift: 0.002,
     mirror: true,
   });
   b.decal(back, T.barnacles, {
     at: [0.06, wTop - 0.25, -0.232],
-    dir: [0, 0, 1],
+    dir: [0, 0, -1],
     size: [0.11, 0.11],
     lift: 0.004,
   });
@@ -777,46 +786,63 @@ export default function build() {
     const armSkin = b.surface(sleeve);
     b.decal(armSkin, T.creases, {
       at: [s * 0.51, 1.335, 0.07],
-      dir: [0, -0.2, -1],
+      dir: [0, 0.2, 1],
       size: [0.13, 0.1],
       lift: 0.002,
     });
     if (s < 0)
-      b.decal(armSkin, T.patch, { at: [-0.44, 1.36, 0.08], dir: [0, -0.1, -1], size: [0.1, 0.1], lift: 0.002, roll: -10 });
+      b.decal(armSkin, T.patch, {
+        at: [-0.44, 1.36, 0.08],
+        dir: [0, 0.1, 1],
+        size: [0.1, 0.1],
+        lift: 0.002,
+        roll: -10,
+      });
     b.decal(armSkin, T.seam, {
       at: [s * 0.5, 1.33, 0],
-      dir: [0, -1, 0],
+      dir: [0, 1, 0],
       up: [s * 0.8, -0.6, 0],
       size: [0.045, 0.5],
       lift: 0.002,
     });
-    b.decal(b.surface(torso), T.creases, { at: [s * 0.2, 1.14, 0.0], dir: [-s, 0, 0], size: [0.18, 0.14], lift: 0.002 });
+    b.decal(b.surface(torso), T.creases, { at: [s * 0.2, 1.14, 0.0], dir: [s, 0, 0], size: [0.18, 0.14], lift: 0.002 });
     const d = wrist.clone().sub(elbow).normalize();
     // Brass cuff ring at the wrist.
     b.part(
-      lathe([
-        [0.05, -0.022],
-        [0.066, -0.022],
-        [0.07, 0.0],
-        [0.066, 0.022],
-        [0.05, 0.022],
-      ], 8),
+      lathe(
+        [
+          [0.05, -0.022],
+          [0.066, -0.022],
+          [0.07, 0.0],
+          [0.066, 0.022],
+          [0.05, 0.022],
+        ],
+        8,
+      ),
       BRASS,
-      { bone: wristJ, at: pt(wrist.clone().add(d.clone().multiplyScalar(-0.02))), dir: pt(d), flat: true, name: `cuff${S}` },
+      {
+        bone: wristJ,
+        at: pt(wrist.clone().add(d.clone().multiplyScalar(-0.02))),
+        dir: pt(d),
+        flat: true,
+        name: `cuff${S}`,
+      },
     );
 
     // Hand frame: d along the fingers, fw toward the thumb (forward), palmN out of the palm (down).
     const fw = V(0, 0, 1).sub(d.clone().multiplyScalar(d.z)).normalize();
     const down = V(0, -1, 0);
-    const palmN = down.sub(d.clone().multiplyScalar(d.dot(down))).sub(fw.clone().multiplyScalar(fw.dot(down))).normalize();
+    const palmN = down
+      .sub(d.clone().multiplyScalar(d.dot(down)))
+      .sub(fw.clone().multiplyScalar(fw.dot(down)))
+      .normalize();
     const knuckle = wrist.clone().add(d.clone().multiplyScalar(0.085));
-    b.frustumBox(
-      wrist.clone().add(d.clone().multiplyScalar(0.012)),
-      knuckle,
-      [0.06, 0.032],
-      [0.085, 0.026],
-      { bone: wristJ, color: SKIN, up: [0, 1, 0], name: `palm${S}` },
-    );
+    b.frustumBox(wrist.clone().add(d.clone().multiplyScalar(0.012)), knuckle, [0.06, 0.032], [0.085, 0.026], {
+      bone: wristJ,
+      color: SKIN,
+      up: [0, 1, 0],
+      name: `palm${S}`,
+    });
 
     const gripper = s > 0; // the left hand holds the lantern bail
     const fingers: [string, number, number, number][] = [
@@ -826,7 +852,11 @@ export default function build() {
       ["pinky", -0.031, 0.06, -0.12],
     ];
     const bend = (dir: THREE.Vector3, a: number) =>
-      dir.clone().multiplyScalar(Math.cos(a)).add(palmN.clone().multiplyScalar(Math.sin(a))).normalize();
+      dir
+        .clone()
+        .multiplyScalar(Math.cos(a))
+        .add(palmN.clone().multiplyScalar(Math.sin(a)))
+        .normalize();
     for (const [name, off, len, spread] of fingers) {
       const k0 = knuckle.clone().add(fw.clone().multiplyScalar(off));
       const dir0 = d.clone().add(fw.clone().multiplyScalar(spread)).normalize();
@@ -879,14 +909,17 @@ export default function build() {
     void gripDown;
     // Roof, rim, glass, posts and foot, all centred under the bail.
     b.part(
-      lathe([
-        [0.0, 0.0],
-        [0.07, 0.0],
-        [0.07, 0.012],
-        [0.042, 0.03],
-        [0.02, 0.048],
-        [0.0, 0.052],
-      ], 8),
+      lathe(
+        [
+          [0.0, 0.0],
+          [0.07, 0.0],
+          [0.07, 0.012],
+          [0.042, 0.03],
+          [0.02, 0.048],
+          [0.0, 0.052],
+        ],
+        8,
+      ),
       BRASS,
       { bone: hand, at: pt(cap.clone().add(V(0, -0.012, 0))), flat: true, name: "lanternRoof" },
     );
@@ -908,7 +941,12 @@ export default function build() {
       1.4,
     );
     glow(
-      b.part(new THREE.SphereGeometry(0.03, 6, 4), LIGHT, { bone: hand, at: pt(glassC), flat: true, name: "lanternFlame" }),
+      b.part(new THREE.SphereGeometry(0.03, 6, 4), LIGHT, {
+        bone: hand,
+        at: pt(glassC),
+        flat: true,
+        name: "lanternFlame",
+      }),
       2,
     );
     b.part(new THREE.CylinderGeometry(0.008, 0.008, glassH * 0.45, 5), BRASS_D, {
@@ -926,13 +964,16 @@ export default function build() {
       });
     }
     b.part(
-      lathe([
-        [0.0, 0.0],
-        [0.062, 0.0],
-        [0.07, 0.014],
-        [0.058, 0.03],
-        [0.0, 0.03],
-      ], 8),
+      lathe(
+        [
+          [0.0, 0.0],
+          [0.062, 0.0],
+          [0.07, 0.014],
+          [0.058, 0.03],
+          [0.0, 0.03],
+        ],
+        8,
+      ),
       BRASS,
       { bone: hand, at: pt(cap.clone().add(V(0, -0.012 - glassH - 0.004, 0))), flat: true, name: "lanternFoot" },
     );
@@ -984,7 +1025,12 @@ export default function build() {
       [0.66, 0.022, -1.1],
       [0.84, 0.022, -1.06],
     ]);
-    const line = b.chain("lifeline", ropePath, { parent: hips, count: 6, names: (i) => `line${i + 1}`, role: "tentacle" });
+    const line = b.chain("lifeline", ropePath, {
+      parent: hips,
+      count: 6,
+      names: (i) => `line${i + 1}`,
+      role: "tentacle",
+    });
     b.sweep(line, 0.012, {
       color: (t) => (Math.floor(t * 70) % 2 ? ROPE : ROPE_D),
       sides: 5,
