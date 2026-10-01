@@ -5,7 +5,6 @@ import * as THREE from "three";
 import { assemble, createStaticMesh } from "../harness/assemble";
 import { gap, measureIndex } from "../harness/measure";
 import { bonesOf } from "../harness/weights";
-import { createKit } from "../harness/kit";
 
 const SHOT_SIZE = 900;
 const BACKGROUND = 0xd5dadf;
@@ -240,14 +239,14 @@ async function run({
   // The creature bundle maps `three` to this global (so both share one copy) and assigns its exports to __creature.
   const page = globalThis as {
     THREE?: typeof THREE;
-    __creature?: { default?: unknown; build?: unknown; meta?: unknown };
+    __creature?: { default?: unknown; meta?: unknown };
   };
   page.THREE = THREE;
   (0, eval)(code);
   const module = page.__creature;
-  const build = (module?.default ?? module?.build) as ((kit: unknown) => unknown) | undefined;
+  const build = module?.default;
   if (typeof build !== "function") throw new Error("The module must `export default function build()`");
-  const built = await build(createKit());
+  const built: unknown = await build();
   if (!(built instanceof THREE.Object3D)) throw new Error("build() must return a THREE.Object3D");
 
   let rigged = false;

@@ -6,14 +6,24 @@ import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 import { assemble, createSkinnedMesh, createStaticMesh, surfaceOf } from "./assemble";
 import type { Assembly } from "./assemble";
 import { looseClusters, measureIndex } from "./measure";
-import { createKit } from "./kit";
 import { stiffParts } from "./weights";
-import type { Kit } from "./kit";
 
 type Arm = "A" | "B" | "C";
 type Mode = "shaded" | "groups" | "bones" | "xray";
 type Pose = "rest" | "flexA" | "flexB";
 type Shot = { name: string; caption: string; view: keyof typeof VIEWS; mode: Mode; pose: Pose; focus?: "head" };
+
+/** Deterministic PRNG in [0, 1) (mulberry32), so the flex poses are the same on every run. */
+function rng(seed: number) {
+  let state = seed >>> 0 || 1;
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 const SHOT_SIZE = 900;
 const TILE = 600;
@@ -283,11 +293,13 @@ async function run({ code, arm, slug, tag, reportOnly }: RunOptions) {
   const rigged = arm !== "A";
   (globalThis as { THREE?: typeof THREE }).THREE = THREE;
   (0, eval)(code);
-  const module = (globalThis as { __creature?: { default?: unknown; build?: unknown; meta?: unknown } }).__creature;
-  const build = (module?.default ?? module?.build) as ((kit: Kit) => unknown) | undefined;
-  if (typeof build !== "function") throw new Error("creature.ts must `export default function build(kit)`");
-  const built = await build(createKit());
-  if (!(built instanceof THREE.Object3D)) throw new Error("build(kit) must return a THREE.Object3D");
+  // The bundle (snap.ts, globalName "__creature") assigns the sample module's exports to this global.
+  const page = globalThis as { __creature?: { default?: unknown; meta?: unknown } };
+  const module = page.__creature;
+  const build = module?.default;
+  if (typeof build !== "function") throw new Error("The module must `export default function build()`");
+  const built: unknown = await build();
+  if (!(built instanceof THREE.Object3D)) throw new Error("build() must return a THREE.Object3D");
 
   const started = performance.now();
   const assembly = await assemble(built, rigged);
@@ -505,7 +517,7 @@ async function run({ code, arm, slug, tag, reportOnly }: RunOptions) {
   const restRotations = skinned?.bones.map((bone) => bone.quaternion.clone()) ?? [];
   const setPose = (pose: Pose) => {
     if (!skinned) return;
-    const random = createKit().rng(pose === "flexA" ? 11 : pose === "flexB" ? 29 : 1);
+    const random = rng(pose === "flexA" ? 11 : pose === "flexB" ? 29 : 1);
     const euler = new THREE.Euler();
     skinned.bones.forEach((bone, index) => {
       bone.quaternion.copy(restRotations[index]);

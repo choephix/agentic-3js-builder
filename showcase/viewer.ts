@@ -89,7 +89,7 @@ export type Display = { mode: ColorMode; skeleton: boolean; wire: boolean; focus
 /** Where the orbit camera sits and looks, for keeping several viewers in step. */
 export type CameraView = { position: [number, number, number]; target: [number, number, number] };
 
-/** harness/kit.ts rng: deterministic PRNG in [0, 1). */
+/** Deterministic PRNG in [0, 1) (mulberry32), the same as harness/page.ts uses for its flex poses. */
 function rng(seed: number) {
   let state = seed >>> 0 || 1;
   return () => {
