@@ -159,7 +159,7 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
         normals[a][b].add(n);
     }
   for (const col of normals) for (const n of col) (n.lengthSq() > 1e-16 ? n : n.copy(total)).normalize();
-  const tags = { name: options.name ?? "membrane", group: options.group };
+  const tags = { name: options.name, kind: "membrane", group: options.group };
   const cells: Array<[number, number]> = [];
   for (let i = 0; i < columns.length - 1; i++) for (let j = 0; j < rows; j++) cells.push([i, j]);
 
@@ -270,7 +270,7 @@ export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptio
     options.color,
     () => weights,
     false,
-    { name: options.name ?? "slab", group: options.group },
+    { name: options.name, kind: "slab", group: options.group },
     { surface },
   );
   return new Part(mesh, center, frame, weights, [0, 0, 1]);

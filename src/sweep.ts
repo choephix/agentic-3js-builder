@@ -866,7 +866,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const bounds = [0, ...cuts.map((c) => c.t), 1];
   const kinds: string[] = ["start", ...cuts.map((c) => c.kind), "end"];
   const weld = seamSmooth && bounds.length === 2;
-  const tags = { name: options.name ?? "sweep", group: options.group };
+  const tags = { name: options.name, kind: "sweep", group: options.group };
   const span = (to - from) * L;
   // Smooth skin: rings at the edges and centre of every joint's blend window, so the bend has a middle. Where the
   // window is narrower than the ring gap (a thick body on short spans), the middle ring alone.

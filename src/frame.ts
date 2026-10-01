@@ -27,9 +27,15 @@ export abstract class Frame {
     return this.dir(Y);
   }
 
-  /** A point given in this frame (meters) → model space. */
-  local(p: V3) {
-    return vec(p, "local()").applyQuaternion(this.quat).add(this.at);
+  /**
+   * A point near this frame → model space. Numbers `[x, y, z]` are in the frame's own axes (meters). Words are model
+   * directions from the frame's point, whichever way the frame is aimed: `head.local({ forward: 0.3, up: 0.05 })` is
+   * 0.3 m toward the model's front and 0.05 m up from the head joint. `right` is the model's right (world −X).
+   */
+  local(p: V3 | Toward) {
+    if (!isToward(p)) return vec(p, "local()").applyQuaternion(this.quat).add(this.at);
+    const { right = 0, left = 0, up = 0, down = 0, forward = 0, back = 0 } = p;
+    return this.at.clone().add(new Vector3(left - right, up - down, forward - back));
   }
 
   /** A vector given in this frame → model space (length kept). */
@@ -38,13 +44,28 @@ export abstract class Frame {
   }
 
   /**
-   * This frame moved to a point given in its own coordinates, keeping orientation, facing and weights: a point
-   * derived from a frame that still carries the frame's bones (`item.moved([0, 0.12, 0])` = 12 cm out along +Y).
+   * This frame moved to a point given as in `local()` (numbers in its own axes or model-direction words), keeping
+   * orientation, facing and weights: a point derived from a frame that still carries the frame's bones
+   * (`item.moved([0, 0.12, 0])` = 12 cm out along +Y, `head.moved({ forward: 0.2 })` = 20 cm ahead of the head).
    */
-  moved(p: V3) {
+  moved(p: V3 | Toward) {
     const quat = this.quat;
     return new Spot(this.local(p), quat, this.weights, this.axis.applyQuaternion(quat.invert()));
   }
+}
+
+/** Model directions in meters, for `local()` and `moved()`: right is the model's right (world −X), forward is +Z. */
+export type Toward = {
+  right?: number;
+  left?: number;
+  up?: number;
+  down?: number;
+  forward?: number;
+  back?: number;
+};
+
+function isToward(p: V3 | Toward): p is Toward {
+  return !Array.isArray(p) && !(p instanceof Vector3);
 }
 
 /**

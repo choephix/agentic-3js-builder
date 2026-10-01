@@ -336,7 +336,7 @@ export function extrude(ctx: Ctx, points: OutlineInput, options: ExtrudeOptions)
     options.color,
     () => weights,
     false,
-    { name: options.name ?? "extrude", group: options.group },
+    { name: options.name, kind: "extrude", group: options.group },
     { surface: local.flatMap((value, i) => (i % 3 === 2 ? [] : [value])) },
   );
   return new Part(mesh, at, quat, weights, [0, 0, 1]);
@@ -407,7 +407,7 @@ export function lathe(ctx: Ctx, authored: OutlineInput, options: LatheOptions) {
     options.color,
     () => weights,
     smooth,
-    { name: options.name ?? "lathe", group: options.group },
+    { name: options.name, kind: "lathe", group: options.group },
     { surface, wrap: true },
   );
   return new Part(mesh, at, quat, weights, [0, 1, 0]);

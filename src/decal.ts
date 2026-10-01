@@ -1,4 +1,4 @@
-// `decal()`: a texture conformed onto a curved built surface. A grid of rays shot along the viewing direction lands a
+// `decal()`: a texture conformed onto a curved built surface. A grid of rays shot against the facing direction lands a
 // sheet of quads on the surface's real triangles, lifted slightly off it; every vertex takes the skin weights of the
 // point it landed on, so the decal bends with the bones under it.
 import { Box3, Vector3 } from "three";
@@ -16,11 +16,11 @@ export type DecalOptions = Tags & {
   /** A point on or near the surface where the decal's centre lands (a surface hit works). */
   at: PointInput;
   /**
-   * The viewing direction onto the surface: rays travel along it. Default: into the surface along `at`'s facing
-   * axis when `at` is a frame (a hit's normal, reversed).
+   * The way the drawing faces, out of the surface toward its viewer (a decal on a face looking forward: `[0, 0, 1]`).
+   * Rays travel the opposite way, onto the surface. Default: `at`'s facing axis when `at` is a frame (a hit's normal).
    */
   dir?: DirectionInput;
-  /** Which way is up in the drawing, as seen along `dir` (default world +Y, else world +Z when `dir` is vertical). */
+  /** Which way is up in the drawing, seen from the front (default world +Y, else world +Z when `dir` is vertical). */
   up?: DirectionInput;
   /** Width and height of the drawing in meters, measured on the plane facing `dir`. */
   size: readonly [number, number];
@@ -28,7 +28,7 @@ export type DecalOptions = Tags & {
   segments?: number | readonly [number, number];
   /** Distance the sheet floats off the surface (default 0.0015 m); cells spanning a fold float higher to clear it. */
   lift?: number;
-  /** Degrees the drawing turns counter-clockwise as seen along `dir`. */
+  /** Degrees the drawing turns counter-clockwise, seen from the front. */
   roll?: number;
   /** Flip the drawing left-right (the other eye of a pair). */
   mirror?: boolean;
@@ -42,13 +42,15 @@ export function decal(ctx: Ctx, target: Surface | SurfaceTarget, texture: Textur
   const skin = target instanceof Surface ? target : new Surface(ctx, target);
   const center = toPoint(options.at, "decal()");
   const { at } = options;
-  const dir = options.dir
+  const facing = options.dir
     ? toDirection(options.dir, "decal()")
     : at instanceof Frame || (typeof at === "object" && "frame" in at)
-      ? toFrame(at).axis.negate()
+      ? toFrame(at).axis
       : null;
-  if (!dir || dir.lengthSq() < 1e-12) throw new Error("decal(): give `dir`, the viewing direction onto the surface");
-  dir.normalize();
+  if (!facing || facing.lengthSq() < 1e-12)
+    throw new Error("decal(): give `dir`, the way the drawing faces (out of the surface)");
+  // The rays travel against the facing direction, onto the surface; `dir` below is their direction.
+  const dir = facing.negate().normalize();
 
   let up = options.up ? toDirection(options.up, "decal()") : new Vector3(0, 1, 0);
   let right = dir.clone().cross(up);
@@ -118,10 +120,19 @@ export function decal(ctx: Ctx, target: Surface | SurfaceTarget, texture: Textur
 
   const fixed = options.bone === undefined ? null : rigid(resolveJoint(ctx, options.bone));
   const weightAt = (vertex: number): Weights => fixed ?? hits[vertex].weights;
-  const mesh = meshFromWorld(ctx, positions, index, options.color ?? "#ffffff", weightAt, true, options, {
-    uvs,
-    texture,
-  });
+  const mesh = meshFromWorld(
+    ctx,
+    positions,
+    index,
+    options.color ?? "#ffffff",
+    weightAt,
+    true,
+    { ...options, kind: "decal" },
+    {
+      uvs,
+      texture,
+    },
+  );
   const middle = hits[Math.floor(rows / 2) * (cols + 1) + Math.floor(cols / 2)];
   return new Part(mesh, middle.at.clone(), aim(dir.clone().negate(), up), fixed ?? middle.weights, [0, 1, 0]);
 }

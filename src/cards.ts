@@ -82,7 +82,7 @@ export function cards(
   const [u0, u1] = options.mirror ? [1, 0] : [0, 1];
   const sink = options.sink ?? 0.1;
   const tint = options.color instanceof Paint ? null : (options.color ?? "#ffffff");
-  const tags = { name: options.name ?? "cards", group: options.group };
+  const tags = { name: options.name, kind: "cards", group: options.group };
 
   type Batch = {
     positions: number[];

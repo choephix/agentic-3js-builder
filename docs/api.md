@@ -105,9 +105,14 @@ Every helper copies its inputs and returns fresh vectors. `V3` is a literal `[x,
 
 ## Frames
 
-Every Frame has `at`, `quat`, `axis` (facing, unit), `weights` (the bones it moves with, heaviest first: one for a rigid point, two on a smooth bend, none for frames made from nothing), `bone` (the heaviest, or null), `local(p)` (a point in the frame, meters, to model space), `dir(v)` and `moved(p)` (the frame shifted to a local point, same orientation and bone).
+Every Frame has `at`, `quat`, `axis` (facing, unit), `weights` (the bones it moves with, heaviest first: one for a rigid point, two on a smooth bend, none for frames made from nothing), `bone` (the heaviest, or null), `local(p)` (a point near the frame, to model space), `dir(v)` and `moved(p)` (the frame shifted to a point, same orientation and bone).
 
-`moved(p)` takes `p` in the frame's own coordinates, like `local(p)`, and returns a Frame there: `hit.moved([0, 0.01, 0])` is 1 cm out along the hit's normal. Pass it the local point itself; `f.moved(f.local(q))` would apply the frame twice.
+`local` and `moved` take a point two ways:
+
+- Words: model directions from the frame's point, in meters, whichever way the frame is aimed. `head.local({ forward: 0.3, up: 0.05 })` is 0.3 m toward the model's front and 0.05 m above the head joint; the words are `right`, `left`, `up`, `down`, `forward`, `back`, and `right` is the model's right (world −X).
+- Numbers `[x, y, z]`: the frame's own axes, which turn with it (see the roll convention below). `hit.moved([0, 0.01, 0])` is 1 cm out along the hit's normal.
+
+`moved` returns a Frame there. Pass it the point itself; `f.moved(f.local(q))` would apply the frame twice.
 
 - `frame(at, dir, up?)` faces `dir` with roll from `up` (see `aim`); it takes `at`'s bones when `at` came from something built.
 - `line(a, b)` faces from `a` to `b` and adds `length` and `end`; it takes `a`'s bones, else `b`'s.
@@ -121,7 +126,7 @@ Every Frame has `at`, `quat`, `axis` (facing, unit), `weights` (the bones it mov
 - Axis "y" without `up` (the default for bones and tubes): local +X stays as close to the creature's right (world −X) as possible. In the mid-plane, a bone pointing forward has +Z up, down means +Z forward, up means +Z back, and backward means +Z down. Widths always run along world X. A bone pointing straight sideways falls back to +Z = world up.
 - Axis "z" or "x": local +Y leans toward `up` (default world +Y), like `lookAt`.
 
-So for a head joint aimed forward, `head.local([0, 0.3, 0.05])` is 0.3 ahead and 0.05 up.
+So for a head joint aimed forward, `head.local([0, 0.3, 0.05])` is 0.3 ahead and 0.05 up: local +Y runs along the bone and +Z is up, so a forward head's numbers read [right, forward, up]. The words form `head.local({ forward: 0.3, up: 0.05 })` gives the same point without the axis order.
 
 `lerp(a, b, t)`, `mid(a, b)`, `offset(p, dir, dist)` return `Vector3`. `DEG`, `vec(p)` and `rng(seed)` are also exported from `math`.
 
@@ -185,6 +190,7 @@ b.sweep(body, radii, { bone: [back, core, front], color: SKIN }); // or b.loft(s
 
 `b.part(geometry, color, { bone?, frame?, at?, quat? | aim? | dir? (+ up?, axis?) | rotation?, scale?, group?, name? })` places a mesh in model space under its bone and returns a `Part`: a Frame at the geometry's origin and orientation, with `mesh`.
 
+- Every builder that makes meshes takes `name` and `group`. A mesh without `name` is named after what made it and its group, else its bone: `box.head`, `sweep.legL`, then `sweep.legL.2` for the next one there. The report, the preview questions (`--gap`, `--box`, `--bones`) and the GLB use these names; they stay the same when you edit other groups.
 - It follows `bone` (rigid), else the bones of `at`/`frame` (on a smooth bend: both, blended), else the nearest joint to `at` (with no position at all: the root).
 - `frame` places the geometry on a frame (its position, and its orientation unless another orientation option is given); `at` sets the position alone.
 - Orientation priority is `quat`, then `aim`/`dir`, then `rotation` (XYZ degrees), then `frame`, then world axes.
@@ -488,15 +494,20 @@ The harness bakes the model into one mesh with one texture, the atlas: a block o
 `b.decal(target, texture, { at, dir?, up?, size: [w, h], segments?, lift?, roll?, mirror?, color?, bone?, name?, group? })` lays a drawing onto a curved built surface (a head, a flank) and returns the `Part`.
 
 - `target` is anything `b.surface` takes.
-- `at` is a point on or near the surface; a `Hit` also sets `dir` to face it.
-- `dir` is the viewing direction: a grid of `segments` quads (default 10 along the longer side) is projected along it onto the surface, `lift` (default 1.5 mm) off it, so the drawing reads undistorted from that direction.
-- `up` (default world +Y) sets the drawing's top, `roll` turns it by degrees, `mirror` flips it left to right (the other eye).
+- `at` is a point on or near the surface; a `Hit` also sets `dir` to its normal.
+- `dir` is the way the drawing faces, out of the surface toward its viewer: `[0, 0, 1]` for a face looking forward, `[1, 0, 0]` on the model's left flank. A grid of `segments` quads (default 10 along the longer side) is projected onto the surface against it, `lift` (default 1.5 mm) off it, so the drawing reads undistorted from the front.
+- `up` (default world +Y) sets the drawing's top, `roll` turns it by degrees counter-clockwise seen from the front, `mirror` flips it left to right (the other eye).
 - Every vertex takes the skin weights of the point it lands on, so a decal across a bend bends with it; `bone` makes it rigid.
 
 ```ts
 const eye = animeEye({ iris: "#27dccb" }); // kits/toon
 for (const s of [1, -1])
-  b.decal(head, eye, { at: head.local([s * 0.09, 0.05, 0.2]), dir: [0, 0, -1], size: [0.1, 0.14], mirror: s > 0 });
+  b.decal(head, eye, {
+    at: head.local({ left: s * 0.09, up: 0.05, forward: 0.2 }),
+    dir: [0, 0, 1],
+    size: [0.1, 0.14],
+    mirror: s > 0,
+  });
 ```
 
 ## Distribution, IK, regions
@@ -603,7 +614,7 @@ The look is low-poly: facets are part of it, and a part needs only enough segmen
 - **Per shape.** `sides` on a tube, `segments` on a lathe, `rows`/`cols` on a membrane, `smoothing` and `bevel` on an extrude, and the segment arguments of three.js geometries set the counts directly. Every shape also takes `detail`, a multiplier on the SDK's defaults for that shape alone: `sweep`, `loft`, the tube helpers, `sprout`, `membrane`, `extrude`, `lathe` and `cards`.
 - **Whole model.** `createBuilder({ detail })` scales every default: circle sides (8 × detail), lathe steps (12 × detail), membrane cells, bevel steps, card curl segments and the radius tolerance. `b.segments(n, detail?)` gives `max(3, round(n × detail))` for your own geometry.
 - **Rings along a tube** come from its shape: one ring per step round the section (360° / sides, 45° at most) of bend or roll, more where the radius or `shift` changes or where a thin tube would cut the corner of its path, up to three at each joint of a smooth-skinned tube (the edges and middle of the bend), and never closer together than about the edge length round the tube. Fewer sides therefore also means fewer rings.
-- **The snap report** lists "Fine meshes": the parts whose mean triangle edge is under 1/150 of the model's diagonal, most triangles first, named by `name` (or geometry class) with bone and group. Cards and other cut-out parts are left out.
+- **The snap report** lists "Fine meshes": the parts whose mean triangle edge is under 1/150 of the model's diagonal, most triangles first, named by `name` (or the default name, see `b.part`) with bone and group. Cards and other cut-out parts are left out.
 
 ## Rig answer key
 

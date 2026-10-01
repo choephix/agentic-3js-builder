@@ -122,7 +122,12 @@ export class Capture {
   }
 }
 
-export type Tags = { name?: string; group?: string };
+/**
+ * `name` and `group` tag a mesh for the report, the preview questions and the GLB. Without `name` it is called after
+ * `kind` (what made it: "sweep", "extrude", the geometry for a part, e.g. "box") and its group, else its bone, with a
+ * running number from the second on, joined by dots so a shell needs no quotes: "sweep.legL", "sweep.legL.2", "sphere.head".
+ */
+export type Tags = { name?: string; group?: string; kind?: string };
 
 export class Ctx {
   readonly root = new Group();
@@ -140,6 +145,8 @@ export class Ctx {
   /** Painted meshes, packed into one paint sheet when the root is read. */
   readonly paints: Painted[] = [];
   private baked = 0;
+  /** Meshes named so far per default name, for the running number. */
+  readonly names = new Map<string, number>();
   private sheet: MeshStandardMaterial | null = null;
 
   constructor(
@@ -293,6 +300,18 @@ export function setWorld(
 
 export function addMesh(ctx: Ctx, mesh: Mesh, joint: Joint, tags: Tags) {
   if (tags.name) mesh.name = tags.name;
+  else {
+    const kind =
+      tags.kind ??
+      mesh.geometry.type
+        .replace(/Geometry$/, "")
+        .replace(/^Buffer$/, "part")
+        .toLowerCase();
+    const base = `${kind}.${tags.group ?? joint.name}`;
+    const count = (ctx.names.get(base) ?? 0) + 1;
+    ctx.names.set(base, count);
+    mesh.name = count === 1 ? base : `${base}.${count}`;
+  }
   if (tags.group) mesh.userData.group = tags.group;
   ctx.owner.set(mesh, joint);
   const list = ctx.meshes.get(joint);
