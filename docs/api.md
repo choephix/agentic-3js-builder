@@ -83,13 +83,13 @@ A creature module that:
 
 ```ts
 import * as THREE from "three";
-import { createBuilder } from "/home/cx/noodlespace/agentic-3js-builder/src/builder";
-import { frame, line } from "/home/cx/noodlespace/agentic-3js-builder/src/frame";
-import { aim, lerp, mid, offset, rng } from "/home/cx/noodlespace/agentic-3js-builder/src/math";
-import { arc, bezier, catmull, polyline, spiral } from "/home/cx/noodlespace/agentic-3js-builder/src/path";
-import { limb } from "/home/cx/noodlespace/agentic-3js-builder/src/ik";
-import { countershade, paint, spots, stripes } from "/home/cx/noodlespace/agentic-3js-builder/src/paint";
-import { svg } from "/home/cx/noodlespace/agentic-3js-builder/src/texture";
+import { createBuilder } from "../src/builder";
+import { frame, line } from "../src/frame";
+import { aim, lerp, mid, offset, rng } from "../src/math";
+import { arc, bezier, catmull, polyline, spiral } from "../src/path";
+import { limb } from "../src/ik";
+import { countershade, paint, spots, stripes } from "../src/paint";
+import { svg } from "../src/texture";
 
 export default function build() {
   const b = createBuilder({ name: "wyvern" }); // { detail } scales tessellation, see "Detail and budget"
@@ -366,7 +366,7 @@ Both take an outline: at least 3 corners `[x, y]` in meters, drawn in order arou
 
 - The loop always closes; a last point repeating the first is dropped.
 - Mark a corner `[x, y, "sharp"]` to keep it pointed through smoothing.
-- An outline held in a variable is fine as written; its type is `OutlinePoint[]` (`import type { OutlinePoint } from "/home/cx/noodlespace/agentic-3js-builder/src/builder"`).
+- An outline held in a variable is fine as written; its type is `OutlinePoint[]` (`import type { OutlinePoint } from "../src/builder"`).
 - A corner that isn't `[x, y]` or `[x, y, "sharp"]` throws, naming its index.
 - An outline that crosses or touches itself throws, naming the two edges.
 - Both return a `Part` and follow `bone` (rigid), else `at`'s bones, else the nearest joint.
