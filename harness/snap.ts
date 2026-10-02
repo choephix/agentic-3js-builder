@@ -1,6 +1,7 @@
 // The render harness behind `npm run snap` (scripts/snap.ts picks the lane and calls this):
 //
 //   node_modules/.bin/tsx harness/snap.ts <slug> <A|B> <tag> [--report-only]
+//   node_modules/.bin/tsx harness/snap.ts --gallery    (only rewrite <snaps>/index.html)
 //
 // Bundles <snaps>/<slug>/<lane>/creature.ts with esbuild, runs it in the shared NVIDIA headless Chromium
 // (CDP :9333), bakes it into one mesh, renders the review shots and writes:
@@ -33,6 +34,10 @@ function usage(message: string): never {
 }
 
 const args = process.argv.slice(2);
+if (args.length === 1 && args[0] === "--gallery") {
+  await writeGallery();
+  process.exit(0);
+}
 const flags = new Set(args.filter((arg) => arg.startsWith("--")));
 const [slug, arm, tag] = args.filter((arg) => !arg.startsWith("--"));
 if (!slug || !/^[A-Za-z0-9]+$/.test(slug)) usage("Missing or invalid <slug>.");
@@ -295,38 +300,44 @@ console.log(`Done in ${((Date.now() - started) / 1000).toFixed(1)} s`);
 await writeGallery();
 process.exit(0);
 
+/** The gallery shows lane B only (lanes A and C are old rounds), samples with the newest render first. */
 async function writeGallery() {
-  const slugs = (await readdir(LAB, { withFileTypes: true }))
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
+  const lane = "B";
+  const dirs = (await readdir(LAB, { withFileTypes: true })).filter((entry) => entry.isDirectory());
+  const samples: Array<{ creature: string; tags: string[]; newest: number }> = [];
+  for (const { name: creature } of dirs) {
+    const snaps = join(LAB, creature, lane, "snaps");
+    const files = await readdir(snaps).catch(() => [] as string[]);
+    const sheets = files.filter((file) => file.endsWith("-sheet.jpg"));
+    if (sheets.length === 0) continue;
+    const times = await Promise.all(sheets.map(async (file) => (await stat(join(snaps, file))).mtimeMs));
+    const tags = sheets
+      .map((file) => file.slice(0, -"-sheet.jpg".length))
+      .sort()
+      .reverse();
+    samples.push({ creature, tags, newest: Math.max(...times) });
+  }
+  samples.sort((a, b) => b.newest - a.newest);
   const sections: string[] = [];
-  for (const creature of slugs) {
+  for (const { creature, tags, newest } of samples) {
     const title =
       (await readFile(join(LAB, creature, "BRIEF.md"), "utf8").catch(() => "")).match(/^#\s+(.+)$/m)?.[1] ?? creature;
-    const columns: string[] = [];
-    for (const lane of ARMS) {
-      const files = await readdir(join(LAB, creature, lane, "snaps")).catch(() => [] as string[]);
-      const tags = files
-        .filter((file) => file.endsWith("-sheet.jpg"))
-        .map((file) => file.slice(0, -"-sheet.jpg".length))
-        .sort()
-        .reverse();
-      columns.push(
-        `<div class="arm"><h3>Arm ${lane} <small>${tags.length} rounds</small></h3>${tags
-          .map(
-            (t) =>
-              `<a href="${creature}/${lane}/snaps/${t}-sheet.jpg"><img loading="lazy" src="${creature}/${lane}/snaps/${t}-sheet.jpg"><span>${t}</span></a>`,
-          )
-          .join("")}</div>`,
-      );
-    }
+    const when = new Date(newest).toLocaleString("en-GB", {
+      timeZone: "Europe/Sofia",
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
     sections.push(
-      `<section><h2>${title} <small>${creature}</small></h2><div class="arms">${columns.join("")}</div></section>`,
+      `<section><h2>${title} <small>${creature} · ${tags.length} rounds · ${when}</small></h2><div class="tags">${tags
+        .map(
+          (t) =>
+            `<a href="${creature}/${lane}/snaps/${t}-sheet.jpg"><img loading="lazy" src="${creature}/${lane}/snaps/${t}-sheet.jpg"><span>${t}</span></a>`,
+        )
+        .join("")}</div></section>`,
     );
   }
   await writeFile(
     join(LAB, "index.html"),
-    `<!doctype html><meta charset="utf-8"><title>Snapshots</title><style>body{font:15px system-ui;background:#15181b;color:#e8eaed;margin:24px}h2{margin:32px 0 8px}small{color:#8a939c;font-weight:400}.arms{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.arm a{display:block;position:relative;margin-bottom:8px}.arm img{width:100%;display:block;border-radius:4px}.arm span{position:absolute;left:6px;top:6px;background:#000a;padding:2px 6px;border-radius:3px}</style><h1>Snapshots</h1><p>Newest round first. A = plain object, B = rigged.</p>${sections.join("")}`,
+    `<!doctype html><meta charset="utf-8"><title>Snapshots</title><style>body{font:15px system-ui;background:#15181b;color:#e8eaed;margin:24px}h2{margin:32px 0 8px}small{color:#8a939c;font-weight:400}.tags{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.tags a{display:block;position:relative}.tags img{width:100%;display:block;border-radius:4px}.tags span{position:absolute;left:6px;top:6px;background:#000a;padding:2px 6px;border-radius:3px}</style><h1>Snapshots</h1><p>Most recent render first, newest round on the left.</p>${sections.join("")}`,
   );
 }
