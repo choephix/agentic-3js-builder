@@ -1,0 +1,1 @@
+- Exercised a textured decal attached to a pre-pose surface hit in `hunt-pose-decal.ts`; after posing, its 121 vertices remained finite and the returned Part followed the posed hit.

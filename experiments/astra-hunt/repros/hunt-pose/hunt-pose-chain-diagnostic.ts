@@ -1,0 +1,3 @@
+import { Vector3 } from 'three';
+import { createBuilder } from '../../../../src/builder';
+const b=createBuilder({name:'chain',detail:.5});const r=b.joint('r',{at:[0,0,0],dir:[0,1,0]});const ch=b.chain('ch',[[0,0,0],[0,1,0],[0,2,1]],{parent:r});const rest=ch.joints.map(j=>j.at.clone());const restRoot=r.object.matrixWorld.clone();b.pose(r,{axis:[1,0,0],deg:33});console.log('ts',ch.ts,'rest',rest.map(x=>x.toArray()),'now',ch.joints.map(j=>j.at.toArray()),'root',r.object.matrixWorld.elements);for(const t of [0,.2,.5,.8,1]) console.log('t',t,'path',ch.path.at(t).toArray(),'chain',ch.at(t).at.toArray(),'bone',ch.jointAt(t).name);

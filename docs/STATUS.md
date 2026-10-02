@@ -209,6 +209,15 @@ Twenty Muse Spark 1.3 Contributor builders (OpenRouter), up to seven renders eac
 
 They were built on the SDK before `9afd99d`. On main, the explicit decal `dir` of six (robot butler, badger chef, windmill, war elephant, skate rat, hoverbike) is negated to the facing convention; the chibi pilot's decals sit on hits and needed nothing. For all seven decal users every part's triangles, bones and bounds match the sandbox build, and the `-sdk` render after each builder's last tag shows the same model. Friction: a forward-aimed joint's local axes (5 builders), decal `dir` read as facing (4), part names for `--gap`/`--box` (4), the loose notes treated as a to-do list; the first three led to `9afd99d`.
 
+## Astra bug hunt and audit
+
+On 2026-10-02, spare GPT-6 Astra quota (task `med` effort) went to read-mostly work in one hour, everything under `experiments/astra-hunt/`. Nothing in `src/`, `docs/` or the existing samples changed.
+
+- `FINDINGS.md`: the SDK work list. 27 hunters (21 one module each, 6 writing realistic quadruped, winged, serpent, mechanical, biped and styled subjects) wrote reproduced findings; 8 triage agents reran every repro, judged intended vs bug and listed the samples each hits; one agent merged them. 3 P0, 37 P1, 23 P2 or docs. Worst: `Frame.moved()` corrupts orientation for any non-cardinal frame and for ±X (`src/frame.ts:51-54`, 17 samples place geometry with it); `spots()`/`scales()` bake an RGB tuple as black; axis-touching lathes emit half their triangles degenerate (dozens of samples). Its first item, the harness's per-part 1.003 growth, is a deliberate z-fighting workaround; what it breaks is `preview --gap`/`--box` numbers and exact model-space export. Solid: posing, surface hits, paint determinism, kits, cards, regions, ordinary sweeps and paths.
+- `SAMPLE-FIXES.md`: a per-sample fix list (no drops). Ten auditors, a redo of group f and nine second looks covered all 186 samples: 25 with a P0, 8 with a P1, 1 with only P2, 152 clean. First passes rubber-stamped: one marked nesYeti (four legs) clean from report counts alone, so every group got a second look against the images; those found nesGoblinShaman facing backwards, brassDiver without a jaw, centaurArcher's bow held by no hand, mantisShrimp's legs off the body, and more.
+- Five SDK-only sandbox builds (`~/tmp-archive/astra-round/<slug>/`, Muse-round layout plus `harness/`, at most two renders): moonJellyfish, redKangaroo, hummingbirdAtFlower, articulatedDeskLamp, rainyBusStopDiorama. $2.70-$4.56, 7-14 min each; 2.0k-7.0k triangles. Plain builds: the hummingbird is small beside its flower, the lamp's power switch floats 17 mm off the base. Contact sheet: `~/tmp/public/nilo/agentic-3js-builder/showcase/astra-sandbox-round.jpg`. Their build records come from provenance run in the sandbox and lack model and effort.
+- `reports/` holds every raw report, `briefs/` the hunter, auditor, triage, merge and build briefs, `repros/` the repro scripts with imports fixed for the new depth (`npx tsx experiments/astra-hunt/repros/<dir>/<file>.ts`).
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
@@ -237,7 +246,7 @@ Friction the builders reported:
 - [ ] Sloped feet: the round end cap dips below the floor. The snap report now warns from 5 mm off the floor (6979c92).
 - [ ] `surface(joint)` finds no meshes on a smooth-skinned chain; the mesh sits under its heaviest bone.
 - [x] Sweep `sectors` on narrow colour-split pieces triggered the harness's inside-out false alarm; the check now needs a closed part (6979c92).
-- [ ] `docs/api.md` has lines over 1,000 characters (the `b.chain` and membrane paragraphs), which read tools truncate.
+- [x] `docs/api.md` lines over 1,000 characters: none left in `docs/api.md`, `docs/conventions.md` or `GUIDE.md` (Astra docs hunt, 2026-10-02).
 - [x] One broken sample fails `npm run typecheck` for everyone: `npm run typecheck -- <slug>` checks one file and its imports.
 - [x] Pixel density: `kits/pixel` `tileBox` crops whole texels per face at a fixed texel size; `skinBox` maps a sheet per face.
 - [x] Flat shading: `flat: true` on `part`/`stick`.
@@ -256,6 +265,8 @@ Samples:
 
 - [x] Fix giantAnteater's type errors (abb86a1).
 - [x] Review and commit the untracked guide-test samples: all are committed.
+- [ ] Work through `experiments/astra-hunt/SAMPLE-FIXES.md` (25 samples with a P0).
+- [ ] Work through `experiments/astra-hunt/FINDINGS.md`, "Fix first" down; fixing `Frame.moved()` changes the 17 samples it lists, so re-render them.
 
 Known geometry issues:
 

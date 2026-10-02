@@ -1,0 +1,11 @@
+import { createBuilder } from "../../../../src/builder";
+const b=createBuilder({name:"region-joint"});
+const root=b.joint("root",{at:[0,0,0],dir:[0,1,0]});
+const head=b.joint("head",{parent:root,at:[0,1,0],dir:[0,0,1]});
+const region=b.region({at:head});
+const local=[0,0,0.3] as const;
+const expected=region.p(local);
+const j=region.joint("jaw",{at:local,dir:[0,0,1]});
+console.log({expected:expected.toArray(), actual:j.at.toArray(), parent:j.parent?.name, regionBone:region.bone?.name});
+b.pose(head,{axis:[1,0,0],deg:90});
+console.log({afterPose: j.at.toArray(), regionPoint:region.p(local).toArray()});

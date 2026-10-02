@@ -1,0 +1,2 @@
+import { Vector3 } from 'three'; import {frame} from '../../../../src/frame';
+for(const d of [[0,0,1],[0,1,0],[1,0,0]]) {const f=frame([0,0,0],d); const q=f.quat; const ax=f.axis; const local=ax.clone().applyQuaternion(q.clone().invert()); const inv=q.clone().invert(); const m=f.moved([0,0,0]); console.log(d,'q',q.toArray(),'ax',ax.toArray(),'facing',local.toArray(),'inv',inv.toArray(),'mquat',m.quat.toArray(),'max',m.axis.toArray());}

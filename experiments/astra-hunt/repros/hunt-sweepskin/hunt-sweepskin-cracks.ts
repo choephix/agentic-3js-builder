@@ -1,0 +1,4 @@
+import * as THREE from 'three'; import {createBuilder} from '../../../../src/builder';
+const b=createBuilder({name:'crack'}); const root=b.joint('root',{at:[0,0,0]}); const c=b.chain('arm',[[0,0,0],[0,1,0],[0,2,0]],{parent:root,names:['arm1','arm2']}); const s=b.sweep(c,.2,{bands:[[.5,'#f00']],color:'#0f0',sides:8}); b.pose('arm2',{axis:[0,0,1],deg:60});
+const vs=s.meshes.map(m=>{m.updateWorldMatrix(true,false);const p=m.geometry.getAttribute('position');const out=[] as THREE.Vector3[];for(let i=0;i<p.count;i++){const v=new THREE.Vector3().fromBufferAttribute(p,i).applyMatrix4(m.matrixWorld);if(v.distanceTo(new THREE.Vector3(0,1,0))<.205)out.push(v)}return out});
+let max=0;for(const a of vs[0]??[])for(const b of vs[1]??[])max=Math.max(max,Math.min(...vs[1].map(x=>a.distanceTo(x)))); console.log(JSON.stringify({meshes:s.meshes.length,seamCounts:vs.map(x=>x.length),maxNearestGap:max,bones:s.meshes.map(m=>m.userData.skinBones)}));

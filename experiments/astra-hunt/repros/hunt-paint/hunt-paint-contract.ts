@@ -1,0 +1,13 @@
+import { Vector3 } from "three";
+import { countershade, mottle, spots, stripes, mix, grain } from "../../../../src/paint";
+const p=new Vector3(.13,.27,.41), n=new Vector3(0,1,0);
+const same=(a:readonly number[],b:readonly number[])=>a.every((v,i)=>Math.abs(v-b[i])<1e-12);
+const a=stripes("#111111","#eeeeee",{size:.1,axis:"z",seed:7}).at(p,n);
+const b=stripes("#111111","#eeeeee",{size:.1,axis:[0,0,1],seed:7}).at(p,n);
+console.log("stripes z equals vector",same(a,b),a,b);
+const body=mottle("#223344","#aabbcc",{size:.2,seed:3});
+const coat=spots(body,"#ffffff",{size:.08,seed:5});
+const nested=countershade(coat,"#111111");
+console.log("nested paint deterministic",nested.at(p,n),nested.at(p,n),same(nested.at(p,n),nested.at(p,n)));
+console.log("mix clamps",mix("#000000","#ffffff",-1),mix("#000000","#ffffff",2));
+console.log("grain axis deterministic",grain("#000","#fff",{size:.02,axis:[1,0,0],seed:4}).at(p,n));

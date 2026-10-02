@@ -1,0 +1,2 @@
+import { createBuilder } from '../../../../src/builder';
+const b=createBuilder({name:'rig'});const root=b.joint('hips',{at:[0,1,0],role:'spine'});const leg=b.chain('leg',[[.5,1,0],[.5,.5,0],[.5,.1,0]],{parent:root,names:['hipL','kneeL'],role:'leg'});const jaw=b.joint('jaw',{parent:root,at:[0,1.5,.4],dir:[0,0,1],role:'jaw'});console.log('before',JSON.stringify(b.root.userData.rig));b.pose(root,{axis:[0,0,1],deg:20});b.pose(jaw,{axis:[1,0,0],deg:25});console.log('after',JSON.stringify(b.root.userData.rig));

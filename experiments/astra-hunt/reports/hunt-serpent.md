@@ -1,0 +1,17 @@
+# Serpent bug hunt
+
+### SERPENT-1: Twisted circular sweeps penetrate the floor
+- Severity: P1 (silent wrong geometry / floor violation on the documented coiled-tube + twist combination)
+- Repro: `scratch/hunt-serpent/hunt-serpent-twist.ts` — run `npx tsx scratch/hunt-serpent/hunt-serpent-twist.ts`; `scratch/hunt-serpent/hunt-serpent-floor.ts` isolates the mesh bounds.
+- Expected: `docs/api.md:221` says a circular tube of radius `r` whose axis is at height `r` touches the floor, and `docs/api.md:236` / `docs/conventions.md:25` say twist rolls the section while the world-up clock used by `sweep.at(t, deg)` stays continuous. For a horizontal spiral at y=0.1 swept with radius 0.1, `sweep.at(t, 0)` should be the top at y=0.2 and `sweep.at(t, 180)` the underside at y=0.
+- Actual: With a one-turn horizontal `spiral` centered at y=0.1 and `b.sweep(path, 0.1, { twist: 90, color })`, at t=0.25 `sweep.at(t, 0).at.y = 0.208239` and `sweep.at(t, 180).at.y = -0.008239`; the same values recur periodically along the coil. The built mesh has minY `-0.0082392186` (untwisted control: minY `-1.49e-9`, top `0.2`). Twists 180 and 360 similarly produce periodic top/bottom excursions; `twist: 540` on a 2.3-turn, 36-joint chain gives minY `-0.0081348658`, despite the centerline being exactly at y=0.1.
+- Cause: `src/sweep.ts:247-260` represents `"circle"` with a finite regular polygon whose vertices reach `r / cos(π/sides)`. `src/sweep.ts:352-353` rotates that polygon's section frame with the chain twist. As the twisted section turns, world up/down sometimes land on vertices rather than the flat faces; at 8 sides the support grows to `0.1 / cos(π/8) = 0.108239`, causing the floor penetration. This is a geometric violation for an ordinary low-poly circle, not a NaN or pose artefact.
+- Fix: keep floor-facing support at the requested radius when a twisted tube is grounded (for example, orient/correct each section's faceting against the world-up clock, or compensate the centerline/shift by the rotated section support); document the choice if twist is intentionally allowed to change contact.
+
+## Covered
+- `scratch/hunt-serpent/hunt-serpent-chain.ts` — a 36-joint, 2.3-turn coiled snake chain produced one finite smooth-skinned tube with 1,744 triangles; the untwisted control stayed on the floor to within `1.5e-9` m. A 32-joint sharply meandering chain also stayed finite.
+- `scratch/hunt-serpent/hunt-serpent-octopus.ts` — an 8-arm mantle build using surface hits, `sprout(count: 8, names: 9)`, and 56 suckers from `along(sweep, 7, ...)` produced 77 joints, 65 meshes, and 5,440 triangles. All 8 hits were found, all positions remained finite, and a late tentacle pose moved the last suckers (`[0.157439, 0, -0.081958]` for the seventh sucker) with the posed arm.
+- `scratch/hunt-serpent/hunt-serpent-jelly.ts` — a ring of 16 fine tentacles, each `sprout(count: 8, names: 9)`, produced 149 joints, 17 meshes, and 6,752 triangles with finite bounds (`y=0.05..1.7`); generated names were unique across all sprouts.
+- `scratch/hunt-serpent/hunt-serpent-limit.ts` — a realistic mantle plus eight tentacles built at 156 joints (`count: 19`) and 164 joints (`count: 20`) in `27.4` ms and `13.0` ms respectively; the SDK does not enforce the lab's 160-joint limit, consistent with `docs/api.md:80` assigning that limit to the author/harness.
+- Triangle and build-time probes remained far below the documented 120k hard / 60k soft budgets for these realistic subjects.
+
