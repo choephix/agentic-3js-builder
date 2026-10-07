@@ -339,7 +339,12 @@ async function check(round: string, args: string[]) {
     const typeErrors = [...`${types.stdout}\n${types.stderr}`.matchAll(/^.*error TS(?!6133)\d+:.*$/gm)].map(
       (m) => m[0],
     );
-    const render = await capture(tsx, ["scripts/snap.ts", file, "v01"]);
+    let render = await capture(tsx, ["scripts/snap.ts", file, "v01"]);
+    // A dropped connection to the shared browser is not the build's fault: try once more.
+    if (/do not launch your own browser/.test(render.stdout + render.stderr)) {
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      render = await capture(tsx, ["scripts/snap.ts", file, "v01"]);
+    }
     const found = findReport(slug);
     const output = `${render.stdout}\n${render.stderr}`;
     const report = found ? readJson<any>(found.path) : null;
