@@ -228,6 +228,35 @@ export function radiusFn(radius: Radius): (t: number) => [number, number] {
 
 const isContour = (radius: Radius): radius is Contour => typeof radius === "object" && "polygon" in radius;
 
+/** Options carrying the radius, for the form `b.sweep(path, { radius, color })`. */
+export type WithRadius<O, R = Radius> = O & { radius: R };
+
+/**
+ * A tube helper's radius and options, whether the radius came positionally (`b.sweep(path, 0.1, { color })`) or as
+ * `radius` in the options (`b.sweep(path, { radius: 0.1, color })`). `call` names the helper in errors.
+ */
+export function radiusArgs<R, O extends object>(call: string, radius: R | WithRadius<O, R>, options?: O): [R, O] {
+  if (radius === undefined || radius === null)
+    throw new Error(`${call}: radius is required, as an argument or as { radius }`);
+  if (typeof radius === "object" && !Array.isArray(radius) && !isContour(radius as Radius)) {
+    if (!("radius" in radius))
+      throw new Error(
+        `${call}: radius takes a number, [r0, r1], number[] or (t) => r, as an argument or as { radius }`,
+      );
+    const { radius: r, ...rest } = radius as WithRadius<O, R>;
+    return radiusArgs(call, r, { ...options, ...rest } as O);
+  }
+  return [radius as R, options ?? ({} as O)];
+}
+
+/** A tube needs a colour unless `bands` or `sectors` give it one; `call` names the helper in the error. */
+export function requireTubeColor(call: string, options: SweepOptions) {
+  if (options.color === undefined && !options.bands?.length && !options.sectors?.length)
+    throw new Error(
+      `${call}: color is required (a colour string, a paint or (t) => colour), or bands covering the tube`,
+    );
+}
+
 /** The shape of a contoured tube: only its vertex count and shading matter, every ring carries its own polygon. */
 function contourShape(contour: Contour, sides: number, t: number): Shape {
   return { pts: contour.polygon(t, sides), smooth: contour.smooth, contour };
@@ -564,7 +593,7 @@ function boneSpans(ctx: Ctx, path: Path, items: ReadonlyArray<JointRef | Chain>)
   const spans: Array<{ joint: Joint; t: number; past: boolean }> = [];
   for (const item of items) {
     if (!(item instanceof Chain)) {
-      const joint = resolveJoint(ctx, item);
+      const joint = resolveJoint(ctx, item, "sweep(): bone");
       const t = path.closestT(joint.at);
       spans.push({ joint, t, past: past(joint.at, t) });
       continue;
@@ -584,6 +613,7 @@ function boneSpans(ctx: Ctx, path: Path, items: ReadonlyArray<JointRef | Chain>)
 }
 
 export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, options: SweepOptions = {}) {
+  requireTubeColor("sweep()", options);
   const chain = source instanceof Chain ? source : null;
   const path = source instanceof Chain ? source.path : toPath(source);
   const from = options.from ?? 0;
@@ -623,7 +653,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const boneJoints = spans?.map((span) => span.joint) ?? null;
   const boneTs = spans ? spans.map((span) => span.t) : [0];
   const starts = boneTs.map((t) => t * L);
-  const uniform = spans ? null : weightsFor(ctx, owner as JointRef | undefined, [path], path.at(from));
+  const uniform = spans ? null : weightsFor(ctx, owner as JointRef | undefined, [path], path.at(from), "sweep(): bone");
   const jointAt = (t: number) => {
     let i = 0;
     while (i < boneTs.length - 1 && boneTs[i + 1] <= t) i++;

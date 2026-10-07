@@ -1,7 +1,7 @@
 // Surface queries on the REAL built triangles (no analytic stand-ins) and `stick()` to seat parts on any frame.
 import { Box3, Quaternion, Triangle, Vector3 } from "three";
 import type { BufferGeometry, Mesh, Object3D, Texture } from "three";
-import { mix, rigid, vertexWeights } from "./context";
+import { describe, mix, requireFill, rigid, vertexWeights } from "./context";
 import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, flatten, rng as makeRng, toDirection, toFrame, toPoint, vec } from "./math";
@@ -28,7 +28,8 @@ export class Hit extends Spot {
   }
 }
 
-export type SurfaceTarget = Mesh | Part | Sweep | Joint | readonly SurfaceTarget[];
+/** Meshes, Parts, a Sweep, a Joint (its meshes), any other three.js object (every mesh under it), or arrays of them. */
+export type SurfaceTarget = Mesh | Part | Sweep | Joint | Object3D | readonly SurfaceTarget[];
 
 export type ScatterOptions = {
   /** Random source in [0, 1) (e.g. `rng(7)` or `kit.rng(7)`); default `rng(1)`. */
@@ -72,12 +73,20 @@ export class Surface {
       if (target instanceof Sweep) target.meshes.forEach(add);
       else if (target instanceof Part) add(target.mesh);
       else if (target instanceof Joint) (ctx.meshes.get(target) ?? []).forEach(add);
-      else if ("isMesh" in target) {
-        if (!this.meshes.includes(target)) {
-          this.meshes.push(target);
-          this.joints.push(ctx.owner.get(target) ?? ownerJoint(ctx, target));
+      else if (Array.isArray(target)) target.forEach(add);
+      else if (target && typeof target === "object" && "isObject3D" in target) {
+        const object = target as Object3D;
+        if (!(object as Mesh).isMesh) {
+          object.updateWorldMatrix(true, true);
+          object.traverse((node) => node !== object && (node as Mesh).isMesh && add(node as Mesh));
+        } else if (!this.meshes.includes(object as Mesh)) {
+          this.meshes.push(object as Mesh);
+          this.joints.push(ctx.owner.get(object as Mesh) ?? ownerJoint(ctx, object));
         }
-      } else (target as readonly SurfaceTarget[]).forEach(add);
+      } else
+        throw new Error(
+          `surface(): takes meshes, Parts, a Sweep, a Joint, any three.js object (every mesh under it) or arrays of them; got ${describe(target)}`,
+        );
     };
     add(targets);
     if (!this.meshes.length) throw new Error("surface(): no meshes in targets");
@@ -497,6 +506,7 @@ export type StickOptions = Tags & {
  * facing axis (a hit's normal), sunk by `embed` × the part's own height. The part faces that axis.
  */
 export function stick(ctx: Ctx, geometry: BufferGeometry, color: Fill, on: FrameInput, options: StickOptions = {}) {
+  requireFill("stick()", color);
   const base = toFrame(on);
   const n = base.axis;
   const flow = options.flow ? flatten(toDirection(options.flow, "stick()"), n) : null;

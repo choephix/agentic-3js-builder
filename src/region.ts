@@ -8,8 +8,8 @@ import type { Ctx, Fill, JointRef } from "./context";
 import { Spot } from "./frame";
 import { DEG, toDirection, toPoint, vec } from "./math";
 import type { DirectionInput, PointInput, V3 } from "./math";
-import { part } from "./parts";
-import type { PartOptions } from "./parts";
+import { part, partArgs } from "./parts";
+import type { Part, PartOptions, PartSpec } from "./parts";
 import { createJoint } from "./skeleton";
 import type { JointOptions } from "./skeleton";
 
@@ -29,7 +29,10 @@ export class Region extends Spot {
     private readonly ctx: Ctx,
     options: RegionOptions,
   ) {
-    const weights = options.bone === undefined ? (weightsOf(options.at) ?? []) : rigid(resolveJoint(ctx, options.bone));
+    const weights =
+      options.bone === undefined
+        ? (weightsOf(options.at) ?? [])
+        : rigid(resolveJoint(ctx, options.bone, "region(): bone"));
     super(toPoint(options.at), options.quat?.clone() ?? new Quaternion(), weights);
     this.scale = options.scale ?? 1;
   }
@@ -55,7 +58,10 @@ export class Region extends Spot {
   }
 
   /** `b.part` with every option in region units; the region scale is baked into the mesh scale. */
-  part(geometry: BufferGeometry, color: Fill, options: PartOptions = {}) {
+  part(spec: PartSpec): Part;
+  part(geometry: BufferGeometry, color: Fill, options?: PartOptions): Part;
+  part(first: BufferGeometry | PartSpec, fill?: Fill, given?: PartOptions) {
+    const [geometry, color, options] = partArgs(first, fill, given);
     let quat: Quaternion | undefined;
     if (options.quat) quat = this.q(options.quat);
     else if (!options.aim && !options.dir && !options.frame) {

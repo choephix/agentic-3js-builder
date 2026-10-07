@@ -1,6 +1,6 @@
 // Thin closed skins: `membrane()` between two edges (blend-skinned, or split per bone) and `slab()` from one polygon.
 import { ShapeUtils, Vector2, Vector3 } from "three";
-import { meshFromWorld, mix, nearestJoint, resolveJoint, rigid, weightsFor } from "./context";
+import { meshFromWorld, mix, nearestJoint, requireFill, resolveJoint, rigid, weightsFor } from "./context";
 import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { aim, toPoint } from "./math";
 import type { PointInput } from "./math";
@@ -94,7 +94,15 @@ function prism(grid: Grid, normals: Grid, cells: Array<[number, number]>, half: 
   return { positions, index, sources };
 }
 
+/** `thickness` is a finite number of meters; `call` names the helper in the error. */
+function requireThickness(call: string, thickness: unknown) {
+  if (typeof thickness !== "number" || !Number.isFinite(thickness))
+    throw new Error(`${call}: thickness is required: the total thickness in meters, e.g. 0.01`);
+}
+
 export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions) {
+  requireFill("membrane()", options?.color);
+  requireThickness("membrane()", options.thickness);
   const chainA = edgeA instanceof Chain ? edgeA : null;
   const chainB = edgeB instanceof Chain ? edgeB : null;
   const pathA = chainA ? null : toPath(edgeA as PathInput);
@@ -116,7 +124,7 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     const along = (chain: Chain, u: number) => (smooth ? chain.weightsAt(u) : rigid(chain.jointAt(u)));
     if (own) return along(own, t);
     if (owner instanceof Chain) return along(owner, ownerCurve!.closestT(at));
-    if (owner !== undefined) return rigid(resolveJoint(ctx, owner));
+    if (owner !== undefined) return rigid(resolveJoint(ctx, owner, "membrane(): bone"));
     const weights = (side === "a" ? pathA : pathB)!.weights;
     return weights ? (smooth ? weights : rigid(weights[0][0])) : other ? along(other, t) : rigid(nearestJoint(ctx, at));
   };
@@ -214,6 +222,8 @@ export type SlabOptions = Tags & { color: Fill; thickness: number; bone?: JointR
  * the polygon's centre, facing its normal (counter-clockwise points seen from the front face you).
  */
 export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptions) {
+  requireFill("slab()", options?.color);
+  requireThickness("slab()", options.thickness);
   const pts = points.map((p, i) => toPoint(p, `slab() point ${i}`));
   if (pts.length < 3) throw new Error("slab() needs at least 3 points");
   // Newell normal.
@@ -256,7 +266,7 @@ export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptio
     tri(top[b], top[a], bottom[a]);
     tri(top[b], bottom[a], bottom[b]);
   }
-  const weights = weightsFor(ctx, options.bone, points, center);
+  const weights = weightsFor(ctx, options.bone, points, center, "slab(): bone");
   const q = new Vector3();
   const surface: number[] = [];
   for (let i = 0; i < positions.length; i += 3) {

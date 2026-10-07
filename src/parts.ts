@@ -4,7 +4,18 @@
 // with the skin under it.
 import { Euler, Matrix4, Quaternion, Vector3 } from "three";
 import type { BufferGeometry, Mesh, Texture } from "three";
-import { addMesh, makeMesh, resolveJoint, rigid, setWorld, skinMesh, weightsFor, writeWeights } from "./context";
+import {
+  addMesh,
+  describe,
+  makeMesh,
+  requireFill,
+  resolveJoint,
+  rigid,
+  setWorld,
+  skinMesh,
+  weightsFor,
+  writeWeights,
+} from "./context";
 import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, toDirection, toFrame, toPoint, vec } from "./math";
@@ -55,11 +66,35 @@ export type PartOptions = Tags & {
   flat?: boolean;
 };
 
+/** `part`'s one-object form: the geometry and colour inside the options. */
+export type PartSpec = PartOptions & { geometry: BufferGeometry; color: Fill };
+
+/**
+ * `part`'s arguments in either form, `(geometry, color, options)` or `({ geometry, color, ...options })`, as
+ * `[geometry, color, options]`.
+ */
+export function partArgs(
+  first: BufferGeometry | PartSpec,
+  color?: Fill,
+  options: PartOptions = {},
+): [BufferGeometry, Fill, PartOptions] {
+  if (first && !(first as BufferGeometry).isBufferGeometry && typeof first === "object" && "geometry" in first) {
+    const { geometry, color: fill, ...rest } = first;
+    return [geometry, fill, { ...options, ...rest }];
+  }
+  return [first as BufferGeometry, color as Fill, options];
+}
+
 export function part(ctx: Ctx, geometry: BufferGeometry, color: Fill, options: PartOptions = {}) {
+  if (!geometry?.isBufferGeometry)
+    throw new Error(
+      `part(): takes (geometry, color, options) or ({ geometry, color, ...options }); got ${describe(geometry)} as the geometry`,
+    );
+  requireFill("part()", color);
   const placed = options.at ?? options.frame;
   const weights = placed
-    ? weightsFor(ctx, options.bone, [options.at, options.frame], toPoint(placed))
-    : rigid(resolveJoint(ctx, options.bone));
+    ? weightsFor(ctx, options.bone, [options.at, options.frame], toPoint(placed), "part(): bone")
+    : rigid(resolveJoint(ctx, options.bone, "part(): bone"));
   const joint = weights[0][0];
   const at = placed ? toPoint(placed) : joint.at;
   let quat = new Quaternion();

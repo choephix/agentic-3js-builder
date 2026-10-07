@@ -15,8 +15,8 @@ import type { MembraneEdge, MembraneOptions, SlabOptions } from "./membrane";
 import type { FrameInput, PointInput } from "./math";
 import { extrude, lathe } from "./outline";
 import type { ExtrudeOptions, LatheOptions, OutlineInput } from "./outline";
-import { part } from "./parts";
-import type { PartOptions } from "./parts";
+import { part, partArgs } from "./parts";
+import type { Part, PartOptions, PartSpec } from "./parts";
 import type { PathInput } from "./path";
 import { Region } from "./region";
 import type { RegionOptions } from "./region";
@@ -27,10 +27,13 @@ import { capsule, frustumBox, loft, rod, spike, sprout } from "./sugar";
 import type { SproutOptions, Station } from "./sugar";
 import { stick, Surface } from "./surface";
 import type { StickOptions, SurfaceTarget } from "./surface";
-import { sweep } from "./sweep";
-import type { Radius, SweepOptions } from "./sweep";
+import { radiusArgs, sweep } from "./sweep";
+import type { Radius, Sweep, SweepOptions, WithRadius } from "./sweep";
 
 export type { OutlinePoint } from "./outline";
+
+/** A straight tube's radius: one number, or `[r0, r1]` for a taper. */
+type TubeRadius = number | readonly [number, number];
 
 export class Builder {
   /** The shared context, for layers built on the SDK (src/experimental/sculpt.ts); samples don't use it. */
@@ -87,24 +90,42 @@ export class Builder {
     return pose(this.ctx, joint, rotation);
   }
 
-  part(geometry: BufferGeometry, color: Fill, options?: PartOptions) {
-    return part(this.ctx, geometry, color, options);
+  /** `b.part(geometry, color, options)`, or the same in one object: `b.part({ geometry, color, ...options })`. */
+  part(spec: PartSpec): Part;
+  part(geometry: BufferGeometry, color: Fill, options?: PartOptions): Part;
+  part(geometry: BufferGeometry | PartSpec, color?: Fill, options?: PartOptions) {
+    return part(this.ctx, ...partArgs(geometry, color, options));
   }
 
-  sweep(source: PathInput | Chain, radius: Radius, options?: SweepOptions) {
-    return sweep(this.ctx, source, radius, options);
+  /** The radius goes second, or inside the options: `b.sweep(path, { radius, color })`. */
+  sweep(source: PathInput | Chain, options: WithRadius<SweepOptions>): Sweep;
+  sweep(source: PathInput | Chain, radius: Radius, options?: SweepOptions): Sweep;
+  sweep(source: PathInput | Chain, radius: Radius | WithRadius<SweepOptions>, options?: SweepOptions) {
+    return sweep(this.ctx, source, ...radiusArgs("sweep()", radius, options));
   }
 
-  rod(a: PointInput, b: PointInput, r: number | readonly [number, number], options?: SweepOptions) {
-    return rod(this.ctx, a, b, r, options);
+  rod(a: PointInput, b: PointInput, options: WithRadius<SweepOptions, TubeRadius>): Sweep;
+  rod(a: PointInput, b: PointInput, r: TubeRadius, options?: SweepOptions): Sweep;
+  rod(a: PointInput, b: PointInput, r: TubeRadius | WithRadius<SweepOptions, TubeRadius>, options?: SweepOptions) {
+    return rod(this.ctx, a, b, ...radiusArgs("rod()", r, options));
   }
 
-  capsule(a: PointInput, b: PointInput, r: number | readonly [number, number], options?: SweepOptions) {
-    return capsule(this.ctx, a, b, r, options);
+  capsule(a: PointInput, b: PointInput, options: WithRadius<SweepOptions, TubeRadius>): Sweep;
+  capsule(a: PointInput, b: PointInput, r: TubeRadius, options?: SweepOptions): Sweep;
+  capsule(a: PointInput, b: PointInput, r: TubeRadius | WithRadius<SweepOptions, TubeRadius>, options?: SweepOptions) {
+    return capsule(this.ctx, a, b, ...radiusArgs("capsule()", r, options));
   }
 
-  spike(base: PointInput, dirOrTip: PointInput, len: number | null, r: number, options?: SweepOptions) {
-    return spike(this.ctx, base, dirOrTip, len, r, options);
+  spike(base: PointInput, dirOrTip: PointInput, len: number | null, options: WithRadius<SweepOptions, number>): Sweep;
+  spike(base: PointInput, dirOrTip: PointInput, len: number | null, r: number, options?: SweepOptions): Sweep;
+  spike(
+    base: PointInput,
+    dirOrTip: PointInput,
+    len: number | null,
+    r: number | WithRadius<SweepOptions, number>,
+    options?: SweepOptions,
+  ) {
+    return spike(this.ctx, base, dirOrTip, len, ...radiusArgs("spike()", r, options));
   }
 
   frustumBox(
@@ -121,8 +142,27 @@ export class Builder {
     return loft(this.ctx, stations, options);
   }
 
-  sprout(name: string, on: FrameInput, pathOrTip: PathInput | PointInput, radius: Radius, options?: SproutOptions) {
-    return sprout(this.ctx, name, on, pathOrTip, radius, options);
+  sprout(
+    name: string,
+    on: FrameInput,
+    pathOrTip: PathInput | PointInput,
+    options: WithRadius<SproutOptions>,
+  ): ReturnType<typeof sprout>;
+  sprout(
+    name: string,
+    on: FrameInput,
+    pathOrTip: PathInput | PointInput,
+    radius: Radius,
+    options?: SproutOptions,
+  ): ReturnType<typeof sprout>;
+  sprout(
+    name: string,
+    on: FrameInput,
+    pathOrTip: PathInput | PointInput,
+    radius: Radius | WithRadius<SproutOptions>,
+    options?: SproutOptions,
+  ) {
+    return sprout(this.ctx, name, on, pathOrTip, ...radiusArgs("sprout()", radius, options));
   }
 
   surface(targets: SurfaceTarget) {

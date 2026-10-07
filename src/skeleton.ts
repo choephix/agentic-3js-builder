@@ -1,6 +1,7 @@
 // Joints and chains: the only helpers that create bones. Also `pose()`, which re-poses a joint after building and
 // re-deforms blend-skinned meshes.
 import { Group, Matrix4, Quaternion, Vector3 } from "three";
+import type { Mesh, Object3D } from "three";
 import { boneFor, Capture, resolveJoint, rigid, setWorld, spanWeights } from "./context";
 import type { Ctx, JointRef, Weights } from "./context";
 import { Frame, Spot } from "./frame";
@@ -19,8 +20,29 @@ export class Joint extends Frame {
     readonly name: string,
     readonly object: Group,
     readonly parent: Joint | null,
+    private readonly ctx?: Ctx,
   ) {
     super();
+  }
+
+  /**
+   * Add three.js objects under this joint's group (`joint.object`), in the joint's local space as in three.js, and
+   * return the joint. Every mesh among them (and under them) rides this bone.
+   */
+  add(...objects: Object3D[]) {
+    this.object.add(...objects);
+    for (const object of objects) {
+      object.updateMatrixWorld(true);
+      object.traverse((node) => {
+        const mesh = node as Mesh;
+        if (!mesh.isMesh || !this.ctx || this.ctx.owner.has(mesh)) return;
+        this.ctx.owner.set(mesh, this);
+        const list = this.ctx.meshes.get(this);
+        if (list) list.push(mesh);
+        else this.ctx.meshes.set(this, [mesh]);
+      });
+    }
+    return this;
   }
 
   get at() {
@@ -62,7 +84,10 @@ export function createJoint(ctx: Ctx, name: string, options: JointOptions) {
   if (!JOINT_NAME.test(name)) throw new Error(`Joint name "${name}" must match ${JOINT_NAME}`);
   if (ctx.joints.has(name)) throw new Error(`Joint "${name}" already exists`);
   const at = toPoint(options.at, "joint()");
-  const parent = options.parent === undefined && !ctx.rootJoint ? null : boneFor(ctx, options.parent, [options.at], at);
+  const parent =
+    options.parent === undefined && !ctx.rootJoint
+      ? null
+      : boneFor(ctx, options.parent, [options.at], at, "joint(): parent");
   const direction = options.aim
     ? toPoint(options.aim, "joint()").sub(at)
     : options.dir
@@ -74,9 +99,13 @@ export function createJoint(ctx: Ctx, name: string, options: JointOptions) {
   object.userData.joint = name;
   if (options.group) object.userData.group = options.group;
   setWorld(object, parent ? parent.object : ctx.root, at, quat);
-  const joint = new Joint(name, object, parent);
+  const joint = new Joint(name, object, parent, ctx);
   ctx.joints.set(name, joint);
-  if (!parent) ctx.rootJoint = joint;
+  if (!parent) {
+    ctx.rootJoint = joint;
+    // Meshes added straight to `b.root` (outside every joint) ride the root joint.
+    ctx.root.userData.bone = name;
+  }
   const { role } = options;
   if (role)
     ctx.rig.push(() => ({
@@ -108,7 +137,7 @@ export type PoseRotation =
  * their build-time data through each joint's motion, and blend-skinned meshes re-deform, so every handle stays valid.
  */
 export function pose(ctx: Ctx, ref: JointRef, rotation: PoseRotation) {
-  const joint = resolveJoint(ctx, ref);
+  const joint = resolveJoint(ctx, ref, "pose(): joint");
   let pivot = joint.at;
   let delta: Quaternion;
   if ("isQuaternion" in rotation) delta = rotation.clone();
@@ -275,7 +304,7 @@ export class Chain {
 
 export function createChain(ctx: Ctx, name: string, source: PathInput, options: ChainOptions) {
   const path = toPath(source);
-  const parent = boneFor(ctx, options.parent, [path], path.at(0));
+  const parent = boneFor(ctx, options.parent, [path], path.at(0), "chain(): parent");
   const frames = path.frames(options.up, options.twist);
   const { names } = options;
   const nameOf = (i: number) =>

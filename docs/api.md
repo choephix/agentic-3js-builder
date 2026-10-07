@@ -34,18 +34,18 @@ Bones work, and so does any other point, line or frame: an eye, a horn, a surfac
 | **Frame**     | a point with a full orientation, a facing `axis` and the bones it moves with | a `Joint` (bone +Y), a `Part` (the axis it was aimed or stuck along), a `Sweep` (its start, along the tube), a `Hit` (its normal), `chain.at(t)` (the tangent), `sweep.at(t)` (the surface normal), a `Region`, ring and along items, `frame(at, dir, up?)`, `line(a, b)`, `f.moved(p)` |
 | **Path**      | an arc-length curve                                                          | a point array (any Points), `polyline`, `bezier`, `catmull`, `arc`, `spiral`, a `Chain` or a `Sweep` (its current centreline), `sweep.line(deg)`, `surface.drape(path)`                                                                                                                 |
 
-| Helper                                                                                            | Takes                                                          |
-| ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `b.joint({ at, aim, dir, up })`                                                                   | Point, Point, Direction, Direction                             |
-| `b.chain(name, path)`, `b.sweep(path)`, `b.membrane(edgeA, edgeB)`, `b.along(path)`               | Path                                                           |
-| `b.rod/capsule/frustumBox(a, b)`, `b.slab(points)`, `b.loft(stations[].at)`, `limb(root, target)` | Points                                                         |
-| `b.spike(base, dirOrTip, len, r)`                                                                 | Point, then a Direction (`len` number) or a Point (`len` null) |
-| `b.part({ at, frame, aim, dir, up })`                                                             | Point, Frame, Point, Direction, Direction                      |
-| `b.extrude(outline, { at, x, y })`, `b.lathe(outline, { at, axis })`                              | 2D outline, then a Point and Directions                        |
-| `b.stick(geo, color, on)`, `b.sprout(name, on, ...)`                                              | Frame (seated along its facing axis)                           |
-| `b.cards(frames, texture, ...)`                                                                   | Frames (one card on each, standing along its facing axis)      |
-| `b.ring(line, ...)`, `b.pose(joint, { about })`                                                   | Line                                                           |
-| `surface.nearest/ray/around`, `aim`, `offset`, `lerp`, `mid`, `bezier/catmull/arc/spiral`         | Points and Directions                                          |
+| Helper                                                                                                 | Takes                                                          |
+| ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| `b.joint({ at, aim, dir, up })`                                                                        | Point, Point, Direction, Direction                             |
+| `b.chain(name, path)`, `b.sweep(path, radius, { color })`, `b.membrane(edgeA, edgeB)`, `b.along(path)` | Path                                                           |
+| `b.rod/capsule/frustumBox(a, b)`, `b.slab(points)`, `b.loft(stations[].at)`, `limb(root, target)`      | Points                                                         |
+| `b.spike(base, dirOrTip, len, r)`                                                                      | Point, then a Direction (`len` number) or a Point (`len` null) |
+| `b.part(geometry, color, { at, bone, frame, aim, dir, up })`                                           | Point, Joint, Frame, Point, Direction, Direction               |
+| `b.extrude(outline, { at, x, y })`, `b.lathe(outline, { at, axis })`                                   | 2D outline, then a Point and Directions                        |
+| `b.stick(geo, color, on)`, `b.sprout(name, on, ...)`                                                   | Frame (seated along its facing axis)                           |
+| `b.cards(frames, texture, ...)`                                                                        | Frames (one card on each, standing along its facing axis)      |
+| `b.ring(line, ...)`, `b.pose(joint, { about })`                                                        | Line                                                           |
+| `surface.nearest/ray/around`, `aim`, `offset`, `lerp`, `mid`, `bezier/catmull/arc/spiral`              | Points and Directions                                          |
 
 **Bone inheritance.** Geometry and joints built from an input that came from something built take that thing's bones:
 
@@ -75,6 +75,7 @@ A creature module that:
 - Exactly one root joint (the first `joint` without `parent`); a second one throws. Joint names match `/^[A-Za-z][A-Za-z0-9_]*$/` and are unique.
 - Joints and everything above them are unscaled. Scale lives on meshes (`part({ scale })`, `region`).
 - Every mesh sits under its heaviest bone. A mesh that follows several bones carries per-vertex weights (`skinIndex` / `skinWeight` attributes indexing `userData.skinBones`, at most 4 bones per vertex); the creature-lab harness exports them as they are. Everything else is rigid: every vertex on that one bone.
+- A three.js mesh you build yourself rides the joint you add it to: `joint.add(mesh)`. One added straight to `b.root` rides the root joint.
 - Materials: one shared `MeshStandardMaterial` per colour string (roughness 0.72, metalness 0.04). Painted parts share one material whose map is the paint sheet; textured parts and cards get one material per texture and tint, cut away where the texture is transparent (`alphaTest` 0.5).
 - Deterministic: randomness only through an `rng` you pass (`rng(seed)` here, or `kit.rng(seed)`).
 - You still own the lab's limits (1000 parts, 120k triangles with a 60k soft budget, 160 joints, 64 flat colours) and resting on y = 0. Textures and paints don't count as colours; they share one atlas (see "Paint, textures and cards"). Parts cost nothing below the limit: the lab merges every part into one mesh on export, so build each piece as its own part. Merging geometry by hand only matters near 1000 parts, and a merged piece is one part on one bone.
@@ -164,6 +165,9 @@ const jaw = b.joint("jaw", { parent: head, at: head.local([0, 0.02, -0.06]), aim
 
 `b.joint(name, { parent?, at, aim?, dir?, up?, group?, role? })` returns a `Joint`. `aim` is a target point and `dir` a direction; bone +Y points along it. With neither, the joint keeps its parent's orientation. Without `parent`, the first joint is the root; later joints take `at`'s bone when it came from something built, else the nearest joint. A `Joint` is a Frame (its `bone` is itself) with `name`, `object` and `parent`.
 
+- `joint.add(...objects)` adds three.js objects under `joint.object`, in the joint's local space as in three.js, and returns the joint; their meshes ride its bone.
+- Wherever a joint is taken (`parent`, `bone`, `pose`), pass the `Joint`, its name, a `Chain` (its last joint) or `joint.object`.
+
 `role` is one of `spine neck head jaw hinge tail leg arm wing digit tentacle fan`, and `joint`, `chain`, `ring` (default "fan") and `sprout` all take it. A role names a whole chain or joint: the hips or pelvis are the root or first `spine` joint; a hand, foot or hoof is the tip of its `arm` or `leg` chain (see `names` on `chain`); fingers and toes are `digit`; lids, wing cases and flaps are `hinge`. Roles feed the rig answer key (see "Rig answer key").
 
 `b.chain(name, path, { parent?, up?, twist?, group?, count?, names?, role?, contact? })` returns a `Chain` of joints `${name}1..N`, or the names you give (`(i) => string` or an array; auto-riggers key on them).
@@ -190,7 +194,7 @@ b.sweep(body, radii, { bone: [back, core, front], color: SKIN }); // or b.loft(s
 
 ## Parts
 
-`b.part(geometry, color, { bone?, frame?, at?, quat? | aim? | dir? (+ up?, axis?) | rotation?, scale?, group?, name? })` places a mesh in model space under its bone and returns a `Part`: a Frame at the geometry's origin and orientation, with `mesh`.
+`b.part(geometry, color, { bone?, frame?, at?, quat? | aim? | dir? (+ up?, axis?) | rotation?, scale?, group?, name? })` places a mesh in model space under its bone and returns a `Part`: a Frame at the geometry's origin and orientation, with `mesh`. The same call takes one object: `b.part({ geometry, color, at, bone })`.
 
 - Every builder that makes meshes takes `name` and `group`. A mesh without `name` is named after what made it and its group, else its bone: `box.head`, `sweep.legL`, then `sweep.legL.2` for the next one there. The report, the preview questions (`--gap`, `--box`, `--bones`) and the GLB use these names; they stay the same when you edit other groups.
 - It follows `bone` (rigid), else the bones of `at`/`frame` (on a smooth bend: both, blended), else the nearest joint to `at` (with no position at all: the root).
@@ -214,7 +218,7 @@ b.rod(eye, crest, 0.012, { color: BONE }); // from an eye to a joint, on the eye
 
 ## Sweep
 
-`b.sweep(source, radius, options?)` returns a `Sweep`. Use it for every tube: bodies, necks, tails, limbs, horns, tentacles, whiskers.
+`b.sweep(source, radius, options?)` returns a `Sweep`. Use it for every tube: bodies, necks, tails, limbs, horns, tentacles, whiskers. The radius can also go in the options, `b.sweep(path, { radius: 0.05, color })`, and the same holds for `rod`, `capsule`, `spike` and `sprout`.
 
 - `source` is a Path input (one mesh; its bones are `bone`, else the path's own bones when it was made from built inputs, else the joint nearest its start) or a `Chain`. For a path that runs through chains and joints (a loft body over a spine, or tail, hips, spine and neck on one curve), `bone: chain` or `bone: [tail, hips, spine, head]` skins it like a chain source: one mesh that bends at every listed joint. List them in any order; each chain may run either way along the path. `from`/`to` crop the source range and change nothing else.
 - A `bone` list suits a path that runs along those chains. Each joint owns the path from where it projects onto it; joints that project past the path's far end own none of it and are left out, so a feather or fin swept along part of a longer chain keeps its tip on the last bone it reaches. A path that crosses a chain (a ray standing up from a spine) rides one bone: `bone: joint`.
@@ -298,7 +302,7 @@ b.sprout("tail", rump, catmull([rump, mid, tip]), [0.07, 0.03], { count: 2, name
 
 ## Surface and stick
 
-`b.surface(targets)` takes meshes, `Part`s, a `Sweep`, a `Joint` (its meshes) or nested arrays, and returns a `Surface` that queries the built triangles.
+`b.surface(targets)` takes meshes, `Part`s, a `Sweep`, a `Joint` (its meshes), any other three.js object (every mesh under it, so `b.surface(b.root)` is the whole model) or nested arrays, and returns a `Surface` that queries the built triangles.
 
 - `.nearest(p)` returns a `Hit`: a Frame facing the outward face normal `n`, with `mesh`, with the skin's weights there (interpolated on a blend-skinned mesh, else the mesh's bone).
 - `.ray(origin, dir)` returns the first hit or null.

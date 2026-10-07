@@ -328,7 +328,7 @@ export function extrude(ctx: Ctx, points: OutlineInput, options: ExtrudeOptions)
   const quat = new Quaternion().setFromRotationMatrix(
     new Matrix4().makeBasis(xDir, yDir, new Vector3().crossVectors(xDir, yDir)),
   );
-  const weights = weightsFor(ctx, options.bone, [options.at], at);
+  const weights = weightsFor(ctx, options.bone, [options.at], at, "extrude(): bone");
   const mesh = meshFromWorld(
     ctx,
     toWorld(local, at, quat),
@@ -399,7 +399,7 @@ export function lathe(ctx: Ctx, authored: OutlineInput, options: LatheOptions) {
 
   const at = toPoint(options.at, "lathe()");
   const quat = aim(toDirection(options.axis ?? [0, 1, 0], "lathe()"), undefined, "y");
-  const weights = weightsFor(ctx, options.bone, [options.at], at);
+  const weights = weightsFor(ctx, options.bone, [options.at], at, "lathe(): bone");
   const mesh = meshFromWorld(
     ctx,
     toWorld(local, at, quat),
