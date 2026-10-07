@@ -1,0 +1,25 @@
+{
+  "slug": "r2ScorpionRichDocsPrim",
+  "arm": "docs-prim",
+  "subject": "scorpion",
+  "level": "rich",
+  "pitch": "A desert scorpion in a threatening pose, tail arched high over its back. Glossy amber armour with darker bands at every joint, big crab-like pincers held forward, eight thin legs, a segmented tail ending in a bulbous dark stinger, and a cluster of tiny black eyes on the head shield.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:08:09.513Z",
+  "wallMs": 77514,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32692,
+    "completion_tokens": 9983,
+    "total_tokens": 42675,
+    "prompt_tokens_details": {
+      "cached_tokens": 32586
+    }
+  },
+  "costUsd": 0.10655919999999999,
+  "hasCode": true,
+  "reasoning": "I'm planning the scorpion's proportions, aiming for a body around 0.14m with a tail arching up to about 0.2m high, then sketching out the module using basic joint, chain, sweep, and part primitives.\n\nNow I'm designing the skeleton: a root body joint, a carapace built from a flattened sphere shape, and a segmented abdomen tapering backward using a spine chain with an elliptical cross-section and darker banding stripes for the glossy segmented look. For the tail, I'm plotting a curved chain of points arcing up and over the back before hooking down into a stinger tip.\n\nNow I'm working out the tail segments with a tapering sweep radius and alternating dark/amber bands using a color function along the path, then capping it with a bulb sphere at the end and a pointed spike cone oriented along the tail's tangent direction to form the stinger.\n\nAlso a spine chain for rigging, with the abdomen swept over it using tapering width/height radii and banded coloring by segment.\n\nNow I'm adding the carapace as a scaled sphere flattened and positioned near the front of the body, parented to root, placing it ahead of the abdomen's spine start. Next I'm positioning the eyes symmetrically on the carapace.\n\nChecking the lateral eye placement against the ellipsoid surface, I find they sit slightly outside, so I nudge the y-coordinate down to pull them back within bounds given their small radius. Now I'm sketching the mouth/chelicerae as small dark boxes near the front, and starting the pedipalp arm chain with shoulder and elbow joint positions extending forward-outward.\n\nDefining arm joint chain...\n\nWorking out the exact coordinates for wrist, palm, and both pincer fingers so they curve inward and meet near the tip rather than overlapping.\n\nStill defining joints and bones...\n\nNaming the leg joint chain as hip/knee/ankle/foot per leg with side and index suffixes, then adding sweep geometry with rounded amber caps and dark spherical joint knobs positioned at each chain point.\n\nNow I'm positioning the eight legs relative to the body, splaying their hip and foot z-offsets so front legs angle forward and rear legs angle backward, keeping them clear of the pedipalps and within the carapace width.\n\nI'm checking that each leg's segment lengths can actually reach from hip to foot given the offsets, confirming the reach distances work with the chosen segment sizes. Then I'm figuring out the tail attachment point at the rear of the abdomen, tapering the tail segment radii from thicker near the body to thinner at the tip.\n\nI'm plotting out a curved spline path for the tail with a bulb-tipped stinger at the end, checking that the overall height stays within reasonable proportions and that the feet sit close enough to the floor without sinking too far below it.\n\nStill positioning the stinger geometry...\n\nNow I'm setting up the abdomen's segment coloring and spine chain -- using a tapered ellipse radius function along a catmull-rom path for the tail bones, parented to root.\n\nWorking out pedipalp joint positions and finger tip coordinates so the fixed and movable digits meet correctly...\n\nI'm adding chelicerae as small dark boxes near the root, then setting up a jaw joint for the lower mandible and a head joint to carry the carapace and eyes, with the jaw parented to the head.\n\nNow I'm defining the leg geometry using limb chains with a single bend direction swept upward, coloring the tips amber-to-dark gradient and adding small knob spheres at the joint points.\n\n"
+}

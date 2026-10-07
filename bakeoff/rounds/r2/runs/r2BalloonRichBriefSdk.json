@@ -1,0 +1,25 @@
+{
+  "slug": "r2BalloonRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "balloon",
+  "level": "rich",
+  "pitch": "A hot-air balloon about to take off. A big envelope in bold vertical stripes of sunflower yellow, tomato red and sky blue with a patterned band around the middle, a burner glowing orange at the mouth, ropes down to a woven wicker basket with sandbags hanging on its sides and a little flag on one corner.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:14:20.923Z",
+  "wallMs": 58793,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5397,
+    "completion_tokens": 8059,
+    "total_tokens": 13456,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.0818692,
+  "hasCode": true,
+  "reasoning": "I'm wary of not knowing the exact SDK signatures, so I'll lean on safer primitives like part with THREE geometries, position/rotation options, and a rod helper for connections, keeping assumptions minimal where I'm unsure of exact parameters.\n\nFor rods between two points, I'll build the cylinder geometry myself and apply a quaternion to orient it from a to b before translating, rather than relying on uncertain aim/dir parameters. For the balloon envelope, I'm planning to construct lathe geometry per gore segment using phiStart/phiLength so I can create 12 colored stripes cycling through three colors.\n\nI'm defining the balloon's profile function, where radius varies with height using a sine curve parameterized by a power exponent so the max radius sits around 3.5 near the equator, narrowing toward the mouth at the bottom, plus a separate banded ring of alternating colored segments near the equator for the decorative pattern.\n\nFor the decorative band near the balloon's widest point, I'm adding a slightly larger radius offset to create a checkered pattern ring with alternating colors and thin trim edges. Then I'm planning the burner and basket structure below the mouth, with a square basket frame and poles connecting up to the balloon.\n\nConnecting mouth ring points to basket rim points using projected square coordinates, then building the wicker basket as a box with alternating horizontal weave rods, vertical stakes per face, and a darker rim trim on top.\n\nFor details, I'm adding hanging burlap sandbags around the sides tied with rope, plus a corner flagpole with a triangular flag using custom geometry.\n\nI'll skip ground ropes and keep things simple, aiming for a total height around 11 to sell the \"about to take off\" feel. I'm setting up a helper function to build cylindrical rods oriented via quaternion rotation between two points, and planning to bake position/rotation transforms directly into each part's geometry so everything can be placed at the origin with a consistent `add(geo, color, pos)` helper.\n\nNow I'm defining the balloon's gore structure: 12 lathe segments cycling through yellow, red, and blue (4 each), with a small cap disc at the top and a root joint anchored at the basket floor. I'm also working out the band geometry with scaled profile points across rows to shape the balloon's curvature.\n\nFor the checkerboard band I'm alternating navy and cream colors across rows, adding thin dark-red trim rings above and below, and building a profile function mapping arc position to radius and height so the lathe generates a smooth bottom-to-top shape, including a mouth skirt that flares outward near the base.\n\nNow I'm adding hardware details: a thin dark torus ring at the mouth, four metal poles forming the burner stand, a cross frame plate at the top, a cylindrical burner body with a coil, and layered flame cones in orange and yellow to simulate the fire.\n\n"
+}

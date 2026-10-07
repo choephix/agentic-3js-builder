@@ -1,0 +1,25 @@
+{
+  "slug": "r2BalloonTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "balloon",
+  "level": "terse",
+  "pitch": "A hot-air balloon.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:14:11.181Z",
+  "wallMs": 29189,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5315,
+    "completion_tokens": 3901,
+    "total_tokens": 9216,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.0401,
+  "hasCode": true,
+  "reasoning": "I'm planning out a hot-air balloon model using the SDK, keeping it simple with a root joint and basic part geometries rather than a full creature rig, and considering using a lathe shape to form the balloon envelope.\n\nInstead of guessing at an unfamiliar outline parameter format, I decide to build the envelope from colored gore panels using repeated lathe geometries with offset phi angles, alternating stripe colors. I sketch out a height profile for the balloon's silhouette (mouth, widest point, taper to crown), plan 12 gores cycling through 4 colors, and add supporting details like a mouth skirt cylinder, top cap disc, and a basket box sized to realistic proportions with wicker-like stripe detailing.\n\nFor the suspension system, I plan four corner poles rising from the basket to the burner frame, with cables connecting pole tops to the envelope mouth. Since I'm unsure of the exact helper function signatures available, I decide to compute cylinder orientation and placement manually—building geometry, rotating it to match the direction between two points, translating to the midpoint, and applying it directly rather than relying on uncertain helper methods.\n\nFor remaining details, I'm planning a small burner cylinder with a cone flame, two horizontal propane tanks sitting in the basket, and wedge-shaped gores using a lathe geometry whose point ordering should naturally produce outward-facing normals. The basket itself will be a simple box sitting at ground level, with the envelope left open at the bottom where the gores meet.\n\nNow I'm positioning the corner poles and burner above the basket, running cables from the pole tops up to ring points near the mouth of the envelope, calculating their radius and angle so everything lines up at the 45-degree corners. I'm also adding a decorative banding effect by splitting each gore's lathe profile into lower, middle, and upper sections with alternating colors for a striped look.\n\n"
+}

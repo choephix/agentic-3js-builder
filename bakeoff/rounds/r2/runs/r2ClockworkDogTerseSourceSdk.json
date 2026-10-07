@@ -1,0 +1,25 @@
+{
+  "slug": "r2ClockworkDogTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "clockworkDog",
+  "level": "terse",
+  "pitch": "A clockwork dog.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:12:14.073Z",
+  "wallMs": 84747,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112464,
+    "completion_tokens": 11250,
+    "total_tokens": 123714,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.135018,
+  "hasCode": true,
+  "reasoning": "I'm planning out a clockwork toy dog model, sizing it around 0.35m long and 0.28m tall with a brass/tin body, and thinking through the skeleton structure using the SDK.\n\nNow I'm defining the joint hierarchy and body chain, setting floor and body coordinates, then working through how to sweep the spine chain into the box-shaped body with proper parenting.\n\nDefining neck chain...\n\nStill defining ear geometry and bone structure... Now I'm setting up the leg chains with hip-knee-ankle joint positions for a standing rest pose, mirroring front legs on both sides.\n\nPlacing the dark paw box at the ankle height so its bottom sits flush at y=0, then defining the hind leg joints with hip, bent knee, and ankle positions offset backward and slightly forward for a natural bend, before setting up the joint hierarchy connecting each chain to its nearest parent.\n\nI'm also assigning front legs to spine2 and hind legs to spine1 based on proximity along the body's spine spans, then adding decorative brass gear cylinders at the shoulder tops on each side of the body using rotated cylinder geometry to resemble cog wheels.\n\nNow I'm designing a wind-up key on the back, parented to spine2, with a shaft and a butterfly-shaped bow built from an extruded polygon outline for the wing shapes.\n\nConfirming it's a simple CCW polygon, then I'm extruding the key shape at the top of the body with the appropriate bone orientation so it can spin around the key joint's axis, placing it correctly relative to the shaft and head positions.\n\nNow for the tail, I'm planning a brass coil swept along a helix path curling up and back from the body, using the spiral path function with decreasing radius and a few turns, attached to a short chain for flexibility.\n\nTagging it as the tail role with a thin sweep, low-poly sides, and enough rings to keep triangle count reasonable, skipping an end cap sphere for simplicity. I'm also planning small spheres as manual rivet details along the body sides for texture.\n\nI'm tapering the body radius slightly with height, then adding a gear detail on the back using a flat cylinder with small box teeth around it to simulate cog shapes.\n\nActually, a cleaner approach: I'll build gears with ExtrudeGeometry from a tooth-polygon shape, centered and depth-translated, then rotate the geometry per orientation (Y-rotation for side-mounted gears, X-rotation for top-mounted ones) so I can reuse one `makeGear(radius, teeth, depth)` helper everywhere.\n\nStill writing gear geometry...\n\nLegs need adjusting too—moving them to x=±0.045 so the thigh bump sits just outside the body width rather than overlapping it. Now I'm thinking through where the head joint attaches above the body.\n\nWorking out head and jaw geometry... placing the neck capsule, head box, snout, and a hinged lower jaw with small teeth boxes positioned along the bite line.\n\nNow I'm placing the small features: a thin red tongue box, a black nose sphere at the snout tip, and white eye spheres with black pupils positioned on the head's front-top face, plus thin brass eyebrow boxes and starting the ear joints.\n\nWorking out the ear geometry next—small boxes rotated outward from the head so they hang naturally, with symmetric rotation angles for left and right sides, then adding a torus collar ring around the neck.\n\nChecking that nothing dips below the ground plane and that proportions stay sensible. For legs I'm sweeping tapered radii along each chain with rounded caps, adding brass knee-joint spheres anchored to the elbow bone, and naming each segment per side (shoulder, elbow, paw) for front and back limbs.\n\nI'm sketching out the paw boxes and considering adding toe details, then deciding to skip sector-based belly shading on the body sweep since the box-section caps would be risky, opting instead to just add a simple belly plate as a separate part.\n\nAdding a yellow belly plate box attached to the spine chain, then setting up a mirrored loop for left/right sides. Now I'm writing a helper function to build gear geometry using THREE.Shape with extrusion and an optional center hole, plus rotation logic for side gears.\n\nWriting gear geometry function...\n\n"
+}

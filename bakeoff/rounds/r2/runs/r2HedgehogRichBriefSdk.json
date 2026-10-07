@@ -1,0 +1,25 @@
+{
+  "slug": "r2HedgehogRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "hedgehog",
+  "level": "rich",
+  "pitch": "A plump hedgehog out on an autumn evening walk. A dome of spines in chestnut brown with cream tips, a soft fawn face with a pointed, twitchy snout, a shiny black button nose, tiny round ears and bright beady eyes. Little pink paws, and a single red maple leaf stuck on its spines like a trophy.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:14.006Z",
+  "wallMs": 38045,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5403,
+    "completion_tokens": 5510,
+    "total_tokens": 10913,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.065906,
+  "hasCode": true,
+  "reasoning": "I'm uncertain about the exact SDK signatures, so I should stick to safer, well-documented functions like joints and parts, guessing at parameter structures like name, position, and parent/bone options to minimize the risk of errors.\n\nPlanning the skeleton: a hip root joint with body, head, jaw, ear, leg, and tail joints hanging off it, likely passing joint objects as parents. For the hedgehog spines, I'm scattering hundreds of small cones over the upper dome using randomized placement, aiming each one outward along the surface normal with brown and cream coloring, keeping the part count reasonable for performance while building the ellipsoid body at its center with specific radii.\n\nFor spine placement, I'm excluding the face and belly regions so the quills stay on the back, computing positions and outward directions from the ellipsoid normal, and sinking the cone base slightly with the aim convention pointing along +Y. For the head, I'm adding a snout cone aimed forward, a black nose sphere, eyes with highlights, pink-fawn ears, and small paw and leg geometry for the feet resting at ground level.\n\nNow I'm figuring out how to build the maple leaf shape by constructing a custom star-lobed outline and extruding it, then rotating the geometry so its extrusion axis aligns with the part's outward direction, plus adding a small stem and a tiny tail nub, while double-checking how the scale option should be passed.\n\n"
+}

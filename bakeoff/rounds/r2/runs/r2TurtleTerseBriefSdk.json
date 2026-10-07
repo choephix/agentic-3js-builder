@@ -1,0 +1,25 @@
+{
+  "slug": "r2TurtleTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "turtle",
+  "level": "terse",
+  "pitch": "A sea turtle.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:08:38.824Z",
+  "wallMs": 36373,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5299,
+    "completion_tokens": 5080,
+    "total_tokens": 10379,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.0518832,
+  "hasCode": true,
+  "reasoning": "I'm sketching out a plan for the sea turtle rig with the SDK—setting up a body root joint and a spine chain through neck, head, and jaw, plus flippers and tail, while figuring out how to approximate the shell geometry using the available part primitives.\n\nTo keep risk low, I'll bake rotations and scale directly into the geometry rather than relying on uncertain SDK options, and build joints manually with explicit parent relationships instead of trusting unknown chain APIs. I'm roughing out proportions too, aiming for a turtle around 1.1m long with a shell width near 0.8m.\n\nI'm computing vertical placement so the plastron and carapace both sit flush with the floor, centering ellipsoids and adjusting their radii so their lowest points touch y=0. Now I'm positioning hexagonal scute plates across the carapace surface using the ellipsoid equation to find correct y-coordinates for each plate.\n\nWorking out the normal rotation...\n\nNow shaping the flippers: I'll build each as a scaled, rotated sphere geometry to form a flattened paddle shape, positioning the front pair angled back from the shoulder joints.\n\nFor the head and neck, I'm placing joints for neck, head, and jaw, then constructing the skull as a scaled sphere with small box shapes for the upper beak and lower jaw, adding black-and-white eye spheres, brow details, a neck cylinder, and small rear flippers near the tail base.\n\nNow I'm defining colors: olive-green skin, dark brown shell with tan scutes and a lighter rim, and a pale yellow plastron. I'm adding a ring of small dark spheres around the shell's equator to represent marginal scutes, positioning them along an elliptical path to match the carapace's curvature, then setting up the joint hierarchy with proper parent-child relationships before moving on to the skin spot details.\n\nPositioning small cream spots on the head and laying out the central and side scute hexagons across the shell surface using flattened six-sided cylinders, offset slightly outward along the surface normal to sit just above the shell.\n\n"
+}

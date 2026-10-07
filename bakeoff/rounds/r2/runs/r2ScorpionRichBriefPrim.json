@@ -1,0 +1,25 @@
+{
+  "slug": "r2ScorpionRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "scorpion",
+  "level": "rich",
+  "pitch": "A desert scorpion in a threatening pose, tail arched high over its back. Glossy amber armour with darker bands at every joint, big crab-like pincers held forward, eight thin legs, a segmented tail ending in a bulbous dark stinger, and a cluster of tiny black eyes on the head shield.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:08:14.023Z",
+  "wallMs": 67686,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5406,
+    "completion_tokens": 9037,
+    "total_tokens": 14443,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.091642,
+  "hasCode": true,
+  "reasoning": "I need to write this carefully since I can't verify the exact SDK API, so I'll stick to well-documented calls like joint, part, and rod with minimal risk, planning a helper function to build limb segments between two points with a given radius, color, and bone attachment.\n\nNow I'm sketching the scorpion's proportions: a small body around 10-12cm, with a tapering seven-segment abdomen running along the Z axis, and a five-segment tail arcing up and over the back toward the front, ending in a stinger, computed using polar coordinates around a center point in the YZ plane.\n\nI'm mapping out seven abdomen segments along the arc down to the tail start, then placing the stinger curving up and forward so it clears the head. For the tail chain, I'm setting up sequential joints with parent-child bone relationships, using seven points spaced across the curve to form five rod segments ending in the bulb.\n\nAdding segment joints and dark banding...\n\nPlacing scaled sphere geometry for the carapace, then adding median and lateral eye clusters as small black spheres. For the pincers, I'm working out the pedipalp arm segments — shoulder, elbow, wrist, and claw joints — positioning each from the carapace outward and forward to form the arm and hand with fixed and movable fingers.\n\nWorking out finger positioning...\n\nNow I'm defining the leg structure: four pairs extending from the carapace underside at different z positions, each with coxa, femur, tibia, and tarsus joints fanning outward and angled forward or backward depending on position.\n\nNow I'm figuring out the joint hierarchy for the abdomen chain, deciding to skip uncertain \"role\" parameters and just use parent-child joint relationships with known arguments. For the mouth, I'm planning small chelicerae jaw boxes positioned at the front.\n\nI'm picking a color palette of amber, light tan, dark brown, black, and a darker stinger tone, then sketching a helper function to build cylindrical body segments by computing length, midpoint, and direction between two points for each bone piece.\n\nNow I'm building the abdomen as a series of tapering sphere segments that shrink in width and height toward the tail, with dark thin box bands placed between segments for contrast and a subtle dorsal ridge detail.\n\nI'm computing the tail curvature using joint cylinders and tangent vectors for each segment, then placing the stinger as a cone curling downward from the last tail joint with a dark bulb sphere at its base, working through the trig to get the tangent direction right.\n\nNow I'm setting up the leg skeleton: coxa bones parented to the body, with knee and ankle joints as children down the chain.\n\n"
+}

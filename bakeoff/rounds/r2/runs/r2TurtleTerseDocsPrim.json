@@ -1,0 +1,25 @@
+{
+  "slug": "r2TurtleTerseDocsPrim",
+  "arm": "docs-prim",
+  "subject": "turtle",
+  "level": "terse",
+  "pitch": "A sea turtle.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:08:38.715Z",
+  "wallMs": 37533,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32599,
+    "completion_tokens": 4790,
+    "total_tokens": 37389,
+    "prompt_tokens_details": {
+      "cached_tokens": 32586
+    }
+  },
+  "costUsd": 0.0544432,
+  "hasCode": true,
+  "reasoning": "I'm planning a compact sea turtle model, roughly a meter-long carapace with flippers extended in a resting pose, positioned so the plastron sits just above the floor, and starting to lay out the skeleton hierarchy beginning with a root body joint and spine chain.\n\nNow I'm working through the joint chains: neck segments leading to the head and jaw, plus front and rear flipper chains branching from the shoulders and hips. I'm sketching the head geometry with a scaled sphere skull, beak cone, jaw box, and eye spheres, then moving to the carapace shell as a flattened, elongated sphere with painted shell patches.\n\nFor the underside, I'm fitting a flatter cream plastron sphere so its bottom sits at ground level while the carapace sits above it, adjusting the body joint height to match. I'm adding small ridge boxes along the back for a keel effect, then starting the front flipper chains running from the shoulder out to the tip with a few curved joints.\n\nWorking out flipper taper and orientation...\n\nRear flippers get a smaller radius as legs, and I'm adding a short two-joint tail chain. For coloring I'm thinking an olive-gray mottled skin tone for the flippers with mottling paint applied to the whole body.\n\nNow I'm setting up the neck as a tapering bone chain into the shell, placing symmetric eyes relative to the forward-facing head joint, and positioning the skull sphere slightly forward using local head coordinates.\n\nNext I'm shaping the beak using tapered frustum boxes for the upper mandible, with the lower jaw as a separate bone aimed from a joint point below and behind the upper beak.\n\nFor the shell rim, I'm skipping the torus approach since scaling after rotation gets unreliable, and instead switching to a closed catmull-rom sweep tracing an ellipse at the shell's base height.\n\nFor the carapace, I'll paint scute patches directly onto a low-poly flat-shaded sphere, using dark base lines between tan/brown patch colors to simulate the segmented pattern rather than modeling individual scute geometry. I'll skip extra keel ridges or vertebral boxes since the painted pattern should read well enough, then move on to writing the flipper chain paths.\n\nWriting limb chain code...\n\n"
+}

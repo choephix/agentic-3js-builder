@@ -1,0 +1,25 @@
+{
+  "slug": "r2TurtleRichDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "turtle",
+  "level": "rich",
+  "pitch": "A green sea turtle gliding through the water. A heart-shaped shell with olive and caramel plates traced in darker brown, a pale yellow belly plate, a blunt head with cream-edged scales, dark wise eyes and a gentle beak. Long front flippers spread wide, short rear flippers, and a little remora fish riding under its shell.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:08:47.220Z",
+  "wallMs": 73303,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32690,
+    "completion_tokens": 9796,
+    "total_tokens": 42486,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.1047104,
+  "hasCode": true,
+  "reasoning": "I'm designing a sea turtle model in a resting glide pose, with flippers spread and the body positioned so its lowest points sit near the ground plane.\n\nI'm structuring the skeleton as a hips root joint, then a spine chain running from hips to a neck chain, ending in a head joint, keeping the hierarchy simple to minimize API errors.\n\nStill defining joints...\n\nFor the shell, I'm lofting a heart-shaped carapace along the center line using catmull stations that vary width and height from back to front, narrowest near the rear point and widest around z=0.1, then I'll move on to painting scale patterns.\n\nNow I'm planning the coloring with olive and caramel patches over a brown base, a simple bone rig for the hips, and a separate flatter loft below for the pale yellow plastron with narrower, lower-profile stations than the carapace.\n\nI need to check that everything touches the ground: the carapace spans roughly 0.22-0.46 in height, the plastron 0.19-0.29, and the attached remora's body extends down to about 0.09 — so the lowest point isn't at zero yet. I'm figuring out whether to shift the whole model down by that offset or just set a base Y so the remora's underside rests exactly at the floor.\n\nI'm fine-tuning remora placement so its top clears the plastron bottom, then sketching out the remora's body sweep, striped coloring, flattened sucker head, and tail fin attached at the hips, all positioned forward-facing along the Z axis.\n\nNow working on the head: a scaled sphere for the skull placed above the neck joint, with a tapered beak formed from a flattened sphere plus a small hooked cone for the upper jaw.\n\nStill defining head geometry...\n\nFor the neck and flippers I'll sweep tube chains with tapered elliptical cross-sections, using olive coloring with patch painting for countershading, and working out the orientation math so the flippers come out wide and flat rather than round.\n\nStill writing radius functions...\n\nI'm also adding a small claw spike at the front flipper tip, shortening the rear flippers with their own taper, and planning a ring of marginal scutes along the carapace rim.\n\nI'll add a dark brown dorsal ridge sweep along the carapace line, plus some flattened scute bosses scattered on upward-facing points for texture. Then I'm setting up loft stations centered at the carapace midline to define the shell profile.\n\nWorking out the station widths and heights to form a heart-shaped silhouette — wide and flat near the front, narrowing to a point at the rear, widest just past center. I'm also positioning the flipper shoulders so they emerge naturally from beneath the shell's rim where the ellipse narrows toward the edge.\n\nMapping out the flipper's joint path now — shoulder, elbow, wrist, and tip — placing each in x/y/z space so the limb curves backward and down convincingly, then figuring out how many named points a three-point catmull spline needs.\n\nI'm also sketching the rear leg chain (hip, knee, ankle) and the neck chain (neck1-neck3), then starting on the spine's own point sequence to connect everything to the hips.\n\nStill defining joints and geometry...\n\nAdding the plastron with patch-based coloring across several body stations to shape the underside pattern, skipping finer brow details to keep things simple.\n\nNow I'm placing the remora path and radii, giving it a countershaded gray-to-white color scheme and a darker sucker disc box for the attachment point.\n\nFinishing the tail extrusion and eye, then assigning a hip bone to each remora for skeletal rigging before returning the root node and writing out the export.\n\n"
+}

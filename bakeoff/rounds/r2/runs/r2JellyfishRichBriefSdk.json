@@ -1,0 +1,25 @@
+{
+  "slug": "r2JellyfishRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "jellyfish",
+  "level": "rich",
+  "pitch": "A glowing moon jellyfish drifting upward. A translucent pale-blue bell with four pink horseshoe shapes inside, a frilly rim of fine tentacles, and four long, ruffled oral arms trailing below in pearly white and lilac. A soft glow lights it from within, like a lantern in the deep.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:10:50.748Z",
+  "wallMs": 30145,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5396,
+    "completion_tokens": 4011,
+    "total_tokens": 9407,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.0413872,
+  "hasCode": true,
+  "reasoning": "I'm uncertain about the exact SDK signatures, so I'll stick to minimal, commonly-named builder calls like joint, chain, sweep, part, and lathe, keeping usage conservative given my incomplete knowledge of their precise parameters.\n\nTo minimize risk, I'll build the creature with a root \"bell\" joint, child joints for arms/tentacles via parent references, and attach parts using thin cylinder/capsule geometries with baked-in transformations rather than relying on uncertain rotation options. For translucency and glow I'll just rely on bright, pale colors since opacity/emissive controls aren't confirmed available.\n\nScaling things to real jellyfish proportions: bell radius around 0.3, arms trailing down to about 0.6 so the lowest points rest at y≈0 while the bell top sits near 0.85. I'm shaping the bell as a flattened hemisphere with a smaller glowing core sphere inside, then adding four small torus-arc \"horseshoes\" (gonads) around the center, rotated flat and oriented so their gaps face outward.\n\nNow I'm adding a rim of 48 thin hanging tentacles around the bell edge plus a pink-lilac torus lip, and building the four ruffled oral arms as stacked, tapering flattened-box segments running from mid-bell down to the ground, chained together with joints.\n\nEach arm gets 8 segments that shrink and thin going down, with alternating rotation for a ruffled look, small spheres accenting the edges, pearly white and lilac coloring, and a slight sinusoidal sway so the arms don't hang perfectly straight.\n\nNow I'm working out the joint hierarchy -- a root \"bell\" joint with a child \"rim\" joint, then building out 40 tentacles hanging from the rim at slightly varying lengths and radii, colored in soft pinkish-white tones, with the bell itself rendered in pale blue and a pink core using a simplified sphere-based shape.\n\nI'll skip adding visible ribs and radial canal lines to keep things simple, but add 16 small lilac spheres around the rim as gonad dots for visual detail.\n\n"
+}

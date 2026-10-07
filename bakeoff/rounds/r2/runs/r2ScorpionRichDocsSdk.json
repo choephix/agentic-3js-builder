@@ -1,0 +1,25 @@
+{
+  "slug": "r2ScorpionRichDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "scorpion",
+  "level": "rich",
+  "pitch": "A desert scorpion in a threatening pose, tail arched high over its back. Glossy amber armour with darker bands at every joint, big crab-like pincers held forward, eight thin legs, a segmented tail ending in a bulbous dark stinger, and a cluster of tiny black eyes on the head shield.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:08:08.330Z",
+  "wallMs": 71324,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32678,
+    "completion_tokens": 9399,
+    "total_tokens": 42077,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.1007164,
+  "hasCode": true,
+  "reasoning": "I'm planning the scorpion's scale and proportions, using real-world dimensions around 10cm body length with a thin arched tail, and starting to sketch out the skeleton hierarchy for the model.\n\nI'm working out the spine chain for the body, with the tail arching up over the back toward a stinger near the head, using a sweep with alternating amber and dark color bands to suggest segmented plates, then separately lofting the carapace and abdomen shapes along a simpler spine chain.\n\nFor the abdomen I'm using a paint function based on z-position to create dark banding lines against the glossy amber body, and shaping a flattened ellipsoid carapace with a raised eye mound carrying two large median eyes plus smaller lateral ones. For the pedipalps I'm building arm chains from shoulder to wrist with curved sweep pincers -- a fixed tapering finger and a movable claw joint attached at the wrist.\n\nWorking out the actual joint coordinates now: shoulder, elbow, and wrist positions scaled outward and forward, with the palm and pincer fingers positioned ahead of the wrist curving inward toward the center. Setting up the arm as a three-point chain producing two spans plus a tip joint, then attaching a scaled sphere as the palm geometry at the wrist position.\n\nFiguring out the fixed and movable claw fingers as curved bezier sweeps, with the fixed finger on the outer side and the movable one on the inner side so the pincer opens horizontally like a crab claw, offsetting their tip positions slightly apart for visual separation.\n\nNow I'm planning the eight legs, four per side, placing hips along the body and splaying the feet outward with slight z-offsets to create a natural stance, using a simple limb sweep per segment.\n\nFor the foot, I want the sweep radius to taper so it touches the ground near y=0.0015, with darker color bands near the joints to suggest segmentation along the leg chain.\n\nNow I'm working out leg splay positions—foot x/z offsets per leg index, hip attachment points on the carapace sides, then starting to loft the body shape from front to rear with width/height stations for the carapace.\n\nSetting up the spine bone chain through those stations, then starting to paint banding colors along the body based on z-position.\n\nStill placing anatomy details...\n\nDefining tail taper and ridge geometry...\n\nFor the stinger, I'm placing a dark bulb at the tail tip using the path's end point and tangent direction, then adding a curved spike projecting downward from it, with dark ink colors for both the bulb and barb.\n\nNow I'm setting up the tail chain itself, building the path with catmull interpolation and chaining six joints off the spine with a tapering sweep radius. Next I want to add chelicerae—small mouthpart boxes near the front with their own joints, separate from the upper and lower jaw.\n\nFor the jaw, I'm adding a single joint under the first spine segment angled forward, with a fixed upper chelicera box and a lower jaw box attached to the jaw joint. I'm deciding to skip extra decorative details like dorsal ridge keels, tail bumps, pectines, and carapace stripes since the existing bands and paint already convey enough detail, and I'm now checking the leg attachment height.\n\nWriting arm joint hierarchy...\n\nStill placing joints...\n\nNow I'm setting the wrist, elbow, and shoulder positions for the arm, then defining the color palette (amber tones, dark brown, black, sting) to use for painting the creature.\n\nDefining the chelicerae and jaw geometry...\n\nNow I'm setting up the leg loop, assigning each leg's hip and foot points, and chaining them to the spine joints based on front/back position. I think this covers everything, so I'm ready to write the final structure.\n\n"
+}

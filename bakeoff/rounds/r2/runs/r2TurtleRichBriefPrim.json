@@ -1,0 +1,25 @@
+{
+  "slug": "r2TurtleRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "turtle",
+  "level": "rich",
+  "pitch": "A green sea turtle gliding through the water. A heart-shaped shell with olive and caramel plates traced in darker brown, a pale yellow belly plate, a blunt head with cream-edged scales, dark wise eyes and a gentle beak. Long front flippers spread wide, short rear flippers, and a little remora fish riding under its shell.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:08:54.064Z",
+  "wallMs": 67906,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5418,
+    "completion_tokens": 9633,
+    "total_tokens": 15051,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.097626,
+  "hasCode": true,
+  "reasoning": "I'm planning out a single TypeScript module using the SDK's joint, chain, part, and sweep APIs, trying to keep the structure simple since I can't test it directly and want to minimize risk of misusing unfamiliar method signatures.\n\nI'm sketching the turtle's proportions: a shell roughly 1.0m long and 0.85m wide centered around y=0.3, with flippers positioned so the lowest point touches the ground.\n\nNow I'm figuring out the shell details: a dome-shaped ellipsoid base with hexagonal scutes arranged across the surface, alternating olive and caramel coloring with a darker brown rim, all positioned to follow the heart-shaped curvature of the dome.\n\nStill laying out scute positions and colors...\n\nNow I'm designing the head geometry: a neck joint leading to a scaled head sphere, with upper and lower beak parts, dark eye spheres with tiny highlights, and small cream scale cylinders on top of the head.\n\nFor the body I'm working out a neck ellipsoid connecting to the shell, then sketching the flipper rig—shoulder, elbow, and wrist joints with flattened ellipsoid shapes angled to sweep back and droop naturally.\n\nEach flipper gets two segments, inner and outer, placed along a shoulder-to-tip path angled outward, back, and down, with a helper function computing each segment's midpoint, orientation, and scale from its endpoints using low-poly unit spheres.\n\nNow I'm adding rear flippers from hip to tip and a small tail cone, then building the plastron as a pale yellow ellipsoid tucked under the shell, and adjusting the shell dome's darker caramel-brown color so the plastron fits neatly against its lower edge.\n\nI'm adding the remora's cream stripe, tail fin, and sucker disc, attaching it to the root joint, and switching to baking scale directly into geometry via .scale() rather than relying on a scale parameter to avoid API mismatches.\n\nNow I'm defining a scute-placement function that positions textured scale plates across the body surface using normal vectors computed from the ellipsoid equation, offsetting each brown base cylinder and colored top disc outward along the surface normal.\n\nPlacing the marginal scutes around the shell rim at alternating colors, then working out head scale placement by projecting positions onto the head ellipsoid's surface, and generalizing that into a reusable stud function I can share with the shell scutes too.\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2CrabTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "crab",
+  "level": "terse",
+  "pitch": "A crab.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:31.487Z",
+  "wallMs": 37337,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5296,
+    "completion_tokens": 5469,
+    "total_tokens": 10765,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.055767199999999996,
+  "hasCode": true,
+  "reasoning": "I'm planning out a crab model using the SDK's documented builder functions, sticking to known calls like joint, part, sweep, and extrude since I can't verify undocumented options, and working out a conservative approach for defining joints with position and parent attributes.\n\nGiven uncertainty about chain and rod signatures, I'm deciding to build joints manually with explicit parent relationships and attach parts via geometry and bone references, pre-transforming geometries myself to avoid relying on uncertain orientation parameters like aim or direction vectors.\n\nNow I'm sketching the actual crab anatomy: a flattened wide carapace facing forward, four jointed legs per side reaching the ground, pincer claws on arms, eye stalks, and mouth parts, all in an orange-red color scheme, with the body joint rooted slightly above the ground.\n\nStill shaping claws... now planning the eye stalks with little spheres and highlights, plus small mouth plates before moving to the rear body section.\n\nFor the body I'm sketching a tiny flap underneath the abdomen, carapace spikes along the front edge using cone shapes, and dark flattened spots scattered on the shell positioned around the body ellipsoid, then setting proportions for the ellipsoid and leg heights so the lowest feet sit near the ground. Now I'm writing a reusable ellipsoid helper function and defining the color palette for shell, dark spots, belly, and claw tip.\n\nFor the claws I'm enlarging the palm radii, then writing the segment-building logic using cylinders oriented between two points via quaternion rotation from a default axis to the desired direction. I'm also setting up joint parenting so each part attaches correctly in model space, and adding front shell spikes with cones plus randomly placed spots computed from the ellipsoid surface equation.\n\n"
+}

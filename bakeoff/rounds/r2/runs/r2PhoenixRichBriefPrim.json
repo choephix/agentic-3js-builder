@@ -1,0 +1,25 @@
+{
+  "slug": "r2PhoenixRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "phoenix",
+  "level": "rich",
+  "pitch": "A phoenix rising with its wings flung open. Feathers blaze from deep crimson at the body through orange to golden yellow at the tips, a crest of flame-shaped plumes on its head, long trailing tail feathers like ribbons of fire, glowing amber eyes and a golden hooked beak. Embers and sparks drift off its wings.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:12:04.640Z",
+  "wallMs": 101078,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5418,
+    "completion_tokens": 13041,
+    "total_tokens": 18459,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.131706,
+  "hasCode": true,
+  "reasoning": "I'm working out the pose of a rising phoenix without exact SDK signatures to reference, planning to keep the tail feathers as the lowest point near ground level while the body sits higher up in the air.\n\nI'll lean on joint, chain, and part functions with conservative use of options like at, parent, bone, and aim, since I'm unsure of their exact behavior. For feathers I'm considering spike shapes for flame-like plumes and extrude for leaf-shaped outlines, using safe default parameters where the API is uncertain.\n\nNow I'm planning the body as a scaled sphere capsule shape, and designing wing feathers as leaf-shaped extrusions fanned out in the wing plane, with gradient coloring computed along each feather's length.\n\nWorking out the wing skeleton next, with shoulder, elbow, and wrist joints positioned so the wings fling up and outward, and feathers arranged in rows of primaries and secondaries angled along the arm within the wing plane.\n\nNow I'm planning the feather layout: each wing gets layered feathers fanning outward with length-based color gradients from crimson to orange to gold, using covert and flight-feather layers, and shaping each feather's outline with a tapered point and a gold-tinted tip overlay for visual depth.\n\nDefining feather angles along the wing, then moving to the joint skeleton: hips, spine, neck, head, jaw with separate beak parts, and tail joints for ribbon-like feathers built from swept paths.\n\nFor the tail ribbons I'm deciding to build them as chains of overlapping tapered leaf segments along a curve rather than a true sweep, giving each segment a pointed rhombus cross-section with a perpendicular width direction and color gradient for a flowing ribbon look.\n\nNow I'm plotting the five tail paths trailing from the base near the back down to the ground with sinusoidal wiggle in x, keeping the body pitched slightly upward for a rising-phoenix pose and making sure the center ribbon's endpoint just grazes floor height.\n\nI'm also sketching out the bone structure: manually creating joint chains per tail ribbon rather than relying on an unverified chain helper, assigning each segment to its nearest joint, and setting up legs tucked under with feet resting around y~0.9.\n\nFor the wings I'm placing shoulder/elbow/wrist joints and roughly assigning feathers by parameter range, deciding to skip the uncertain \"role\" option since I can't confirm the API. For the head and torso, I'm positioning the head sphere and neck joints, then laying out hips, chest, neck, and head positions to pitch the body forward, with the torso built as an elongated, rotated ellipsoid.\n\nNow I'm building the body with chest and belly spheres, coloring the body crimson with an orange breast and a crimson-orange head. I'm shaping the beak as golden hooked spikes with an upper and lower piece, adding amber eyes with black pupils since there's no emissive control, and planning a five-spike flame-colored crest swept back and upward.\n\nI'm designing a reusable ribbon helper that chains tapered cones along a curved path, planning to reuse it for both the tail and the crest plumes. I'm scattering 40 small ember shapes in gold, orange, and yellow around the wings using randomized positions, keeping them all above y=0.3 so none hang below the body, and I'm now starting on the tucked-back legs with hip, knee, ankle, and foot joints.\n\nWriting leg spike code...\n\nStill defining wing joints and feather layers...\n\nStill building feather geometry...\n\nStill refining the ribbon orientation math...\n\nAdding tail ribbon wiggle, taper, and gradient coloring...\n\nStill placing head geometry...\n\nNow I'm shaping the neck, chest, and hip spheres as the body base, then adding ember particles near the wings using octahedron shapes colored by a fire gradient quantized into a limited color palette. I'm working out how to call the spike and part helper functions with bone and color options, making some assumptions about their signatures since I'm not fully certain of the API.\n\n"
+}

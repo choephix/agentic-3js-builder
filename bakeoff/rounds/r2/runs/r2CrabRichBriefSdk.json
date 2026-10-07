@@ -1,0 +1,25 @@
+{
+  "slug": "r2CrabRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "crab",
+  "level": "rich",
+  "pitch": "A feisty red rock crab with one oversized claw raised in challenge. A wide, knobbly shell in brick red speckled with orange and cream, eyes on stalks, eight jointed walking legs with pointed tips, and claws with dark tips and little teeth on the pinchers. A tiny barnacle and a strand of seaweed cling to the back of its shell.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:45.266Z",
+  "wallMs": 74367,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5410,
+    "completion_tokens": 10385,
+    "total_tokens": 15795,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.10515519999999999,
+  "hasCode": true,
+  "reasoning": "I should be careful with the SDK since I'm not fully certain of exact signatures, so I'll stick to conservative, documented usage like createBuilder, joints, chains, and parts, favoring robustness over clever shortcuts.\n\nFor rods I'll build the geometry myself rather than rely on an uncertain `rod` method—baking cylinder geometry oriented between two points in model space, then assigning it to a bone explicitly via `part`'s bone option to sidestep ambiguity about local vs. model space.\n\nNow I'm sketching the crab's proportions: a stylized shell around 0.24m wide by 0.17m deep, centered at y=0.05, with legs reaching down to the ground and a body joint as root. I'm planning the joint hierarchy—hip, knee, and ankle joints for each of four legs per side, plus shoulder, elbow, wrist, and pincer joints for the claws—using indexed naming conventions and parent references to build out the skeleton.\n\nThen I move to the shell geometry itself, flattening a sphere and scattering small bump and speckle details across the upper hemisphere using unit-direction placement on the ellipsoid surface, varying colors between orange, cream, and brick tones, with a darker plastron underneath. I'm positioning the leg hip joints symmetrically along the body's sides, staggered front-to-back along the z-axis.\n\nWorking out leg joint positions...\n\nNow for the big raised claw on the left side, I'm placing shoulder, elbow, and wrist joints progressively higher and outward, with the palm raised and facing upward as a larger ellipsoid shape.\n\nI'm orienting the palm ellipsoid along a direction vector that points up and slightly forward, using a helper function to scale and rotate sphere geometry to align with that direction.\n\nFor the fingers, I'm tapering them into curved cone shapes with darker tips and small teeth cones along the inner edges, offsetting the fixed and moving fingers to either side of the palm using a perpendicular vector, then adding a smaller, lower-scaled claw variant held forward. Now I'm sketching out a generalized claw builder function that takes joint positions and an open angle as parameters so I can reuse it across different claws.\n\nNext I'm placing the eye stalks and eyeballs, positioning sockets on the shell's curved surface by computing where the ellipsoid intersects at given x/z coordinates, then working out where to attach a barnacle on the back using similar surface-point math.\n\nThen I'm planning the barnacle shape as a frustum with small plates and a dark tip, plus seaweed strands as waving segmented rods, and locking in the color palette for shell, body, belly, and seaweed.\n\nI'm working out a surface helper that maps a point on the ellipsoid body to its position and normal, then scattering around 30 small knobs and 70 tiny speckles across the shell using randomized placement, size, and color choices from the brick/orange/cream palette while avoiding the eye zone.\n\nFor the implementation I'll skip relying on an unknown `rng` signature and just write my own simple PRNG to be safe, keeping SDK usage limited to the builder itself. I'm also sketching out the part/joint API calls—body as root joint, limbs parented to it—and noting that role assignment isn't clearly supported so I'll leave it out for now while setting up the geometry transforms for the rim ellipsoid.\n\nNow I'm working through the claw construction logic: building shoulder, elbow, wrist, and jaw joints each parented to the previous one, with segments connecting them, and a moving finger pivoting off the jaw joint positioned slightly forward of the wrist.\n\nContinuing finger geometry...\n\nStill placing claw joints and sizing...\n\n"
+}

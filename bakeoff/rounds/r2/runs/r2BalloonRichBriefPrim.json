@@ -1,0 +1,25 @@
+{
+  "slug": "r2BalloonRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "balloon",
+  "level": "rich",
+  "pitch": "A hot-air balloon about to take off. A big envelope in bold vertical stripes of sunflower yellow, tomato red and sky blue with a patterned band around the middle, a burner glowing orange at the mouth, ropes down to a woven wicker basket with sandbags hanging on its sides and a little flag on one corner.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:14:22.279Z",
+  "wallMs": 61867,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5411,
+    "completion_tokens": 8584,
+    "total_tokens": 13995,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.087122,
+  "hasCode": true,
+  "reasoning": "Since I can't test the module, I should keep it robust and stick to SDK APIs I'm confident about, like createBuilder, joints, parts, and lathe operations, while avoiding uncertain paint details. I'm thinking of constructing the envelope from gore segments, building each colored stripe as a custom lathe geometry covering a partial angle.\n\nI found that LatheGeometry supports phiStart and phiLength, so I can generate each stripe segment and pass it to b.part with a color. For the overall balloon, I'm scaling realistic proportions—basket around 1.2m, ropes about 4m, envelope roughly 10m diameter and 12m tall—and defining a profile curve of radius/height points to sweep into the envelope shape with 12 colored stripes cycling yellow, red, and blue, plus a distinct mid-body band.\n\nFor that band, I'm setting up a checkerboard pattern of navy and white across two rows and 24 columns using linear interpolation of the profile points to get radius at any height, alternating colors by row and column index to create the checker effect.\n\nI'm also confirming that building the lathe geometry bottom-to-top keeps the normals facing outward correctly, so I don't need to worry about flipping materials, and now I'm thinking about adding a fabric skirt cylinder near the mouth.\n\nFor the mouth opening I'll skip the problematic inverted cone and instead use a thin dark torus ring to mark the rim cleanly. The burner assembly needs four support poles rising from the basket corners to a dark metal cylinder frame, topped by an orange cone flame with a smaller yellow inner cone, positioned right at the balloon's mouth around y≈3.9.\n\nFor the basket, I'm building a woven wicker look by stacking roughly ten thin horizontal boxes in alternating brown shades with tiny offsets, adding vertical corner posts as cylinders that double as the burner support poles, plus thin vertical stave boxes on each face every 0.16 units to simulate the weave pattern, topped with a simple rim frame.\n\nNow I need the ropes connecting the basket's four corner poles up to the balloon envelope surface, matching angles so they meet the envelope radius correctly at a given height. I'm considering using a rod-building helper that constructs a cylinder geometry and rotates it with a quaternion to align between two arbitrary points, since the aim-based part helper's orientation behavior is unclear.\n\nRather than ropes crossing poles, I'll put corner poles up to y~2.9 with ropes running from the pole tops to the envelope at matching angles, then add four more ropes from the rim midpoints to the envelope for extra visual support.\n\nNow I'm working out the lathe math, converting angle φ into x/z coordinates for each stripe so the basket's circular cross-section stays consistent. For the sandbags, I'm placing squashed tan sack shapes at four positions around the basket's sides, each attached with a small rope tied to the rim.\n\nI'm figuring out where to add a flag — deciding to put it on a separate pole rising from the basket's rear corner rather than conflicting with the existing corner support poles, with a small triangular flag shape built via extrusion at the top.\n\nShaping the pennant triangle and extruding it with a thin depth for a flag effect, colored red with a small yellow stripe. I'm deciding to skip adding ground details or tie-down ropes, and considering adding a couple of small silver propane tank cylinders tucked into the basket corners for extra detail.\n\nNow I'm working on the burner assembly: a ring frame tube, a small cylinder burner body, and a glowing orange-to-yellow flame cone, plus a hose rod connecting tank to burner. I'm setting up the joint hierarchy with root, envelope, and basket joints, making sure each part is explicitly assigned to the correct bone.\n\nI'm placing the basket, envelope, and burner joints at their heights, then baking world positions directly into the geometry rather than relying on per-part offsets. Now I'm writing the envelope's lathe profile with radius sampling along the band rows and adding a trim torus near the mouth.\n\nAdding stripe geometry...\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2ClockworkDogRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "clockworkDog",
+  "level": "rich",
+  "pitch": "A wind-up clockwork terrier made of polished brass and copper. Riveted body plates, visible gears turning in its chest, a big winding key on its back, springy jointed legs, floppy leather ears, glass-lens eyes with a green tint, a tail made of a coiled spring, and a little red collar with a brass tag.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:12:52.270Z",
+  "wallMs": 54635,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5411,
+    "completion_tokens": 8337,
+    "total_tokens": 13748,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.084652,
+  "hasCode": true,
+  "reasoning": "I'm trying to recall the exact SDK API for building joints and parts, since I can't verify the signatures directly. I'll stick to the safest usage pattern I'm fairly confident about—createBuilder with joint and part calls—while being cautious about how parent relationships get passed into joint definitions.\n\nFor geometry orientation I'm leaning toward manually rotating shapes myself rather than relying on an uncertain `dir` parameter, since that avoids ambiguity about default axis alignment. Now I'm sketching out the terrier's proportions and skeleton structure—placing hips, spine, neck, head, jaw, ears, legs, and tail joints with approximate coordinates, then working out the front and rear leg joint chains with shoulder/elbow/wrist and hip/knee/ankle positions.\n\nI'm also planning a helper function to build rod-shaped segments between two points by baking orientation and position into the geometry itself, plus settling on a limited color palette (brass, copper, dark brass, steel, red, leather, green glass) to keep things under budget. Now I'm thinking through the torso construction—a brass box body with copper plating, rivet details, and visible gear mechanisms on the chest sides.\n\nI'm working out the gear discs as cylinders with tooth boxes arranged radially, mounted as children of the chest bone, plus the back key mechanism with a shaft and flattened wing shapes. For the head I'm laying out box-shaped skull and snout pieces, jaw bone, sphere eyes with glass and brass rings, leather ear flaps with tilted geometry, a collar torus, and a tag disc—then moving on to a spiral tail built from a helical series of small tori.\n\nNow I'm figuring out the tail's helix orientation, looping through segments with positions along a tilted spiral axis, rotating each torus to align with the curve direction using a helper that reorients geometry from its default axis. I'm also planning the legs: capsule/cylinder thighs, copper joint spheres at the knees, spring-coil lower legs made of stacked tori, and brass paw boxes, with coordinates worked out for the front leg's shoulder, elbow, wrist, and paw positions.\n\nStill placing joints...\n\nI'm adding a small steel hub and giving the gears a recessed look with a dark cutaway panel behind them on the torso sides, then setting up a helper function to translate geometry and place parts with position, color, bone, and rotation.\n\nI'm also writing a segment helper that builds a cylinder between two points, orienting it along the direction vector and centering it at the midpoint.\n\n"
+}

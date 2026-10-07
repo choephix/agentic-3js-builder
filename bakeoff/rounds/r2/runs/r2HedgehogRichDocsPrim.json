@@ -1,0 +1,25 @@
+{
+  "slug": "r2HedgehogRichDocsPrim",
+  "arm": "docs-prim",
+  "subject": "hedgehog",
+  "level": "rich",
+  "pitch": "A plump hedgehog out on an autumn evening walk. A dome of spines in chestnut brown with cream tips, a soft fawn face with a pointed, twitchy snout, a shiny black button nose, tiny round ears and bright beady eyes. Little pink paws, and a single red maple leaf stuck on its spines like a trophy.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:14.006Z",
+  "wallMs": 71340,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32703,
+    "completion_tokens": 9466,
+    "total_tokens": 42169,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.160066,
+  "hasCode": true,
+  "reasoning": "I'm planning out the hedgehog model's proportions and structure, sketching the body as a scaled sphere with a skeleton chain running from hips through the spine to the head and jaw joints.\n\nI'm mapping out the leg chains as hip-knee-foot joints parented to the hips, then thinking through how to construct the quills—likely by generating many small oriented cones across the dome and merging them into a single spiky mesh.\n\nStill writing spine cone logic...\n\nI'm sampling spine placements using jittered fibonacci sphere points, tilting each spine's direction slightly backward from the surface normal and embedding its base into the body. I'm excluding spines over the face and lower belly region while keeping a forward-pointing fringe over the forehead and downward-angled spines along the skirt area.\n\nFor body coloring I'm applying a countershaded paint from dark chestnut to a lighter tan across the torso sphere, then building the head as a scaled sphere with a forward-aimed cone for the snout, positioning the cone so its tip extends out to form the jaw.\n\nNow I'm placing the nose, lower jaw cone, eyes with glint highlights, and small flattened ear spheres with pink inner details, all parented to the head bone for proper hinge movement.\n\nFor the legs, I'm defining the left side as positive X and sketching a hip-knee-foot polyline per leg, then sweeping a tube along it; I need to fix the foot radius so it doesn't dip below the ground plane.\n\nChecking end-cap geometry so the dome bottom sits just above zero, then placing a pink paw pad sphere squashed to fit at the foot, followed by three tiny toe spheres up front.\n\nNow I'm sizing the body ellipsoid so its lowest point rests near the floor while legs stay tucked underneath and the fawn-colored legs peek out slightly. I'm also tallying up the overall height, body plus spines, aiming for a proportion that reads as hedgehog-like.\n\nFor the maple leaf, I'm planning to construct it as a simple star-shaped polygon using a polar radius function with multiple lobes, ensuring the outline stays non-self-intersecting so it can be extruded cleanly and placed tilted on the creature's back.\n\nWorking out the orientation vectors...\n\nWorking out the stem rod placement and vein geometry for the leaf, running from the center outward to the lobe tips, offset slightly above the leaf surface by half its thickness.\n\nFor the outline shape, I'm figuring out a 5-lobed star pattern using a cosine function with frequency 2.5, checking that the peaks land symmetrically every 72 degrees around the circle so the lobes come out evenly spaced like a maple leaf.\n\nI'll add a small sphere tail near the back rigged to a tailBase joint, and consider simple fur details for the fawn's face like cheeks and brow, though I'll skip extras like eyebrows for now.\n\nFor the body, I'm making sure the underside stays cream via countershading and the spines don't interfere with that region, while adding forward-facing spines along the forehead fringe. I'm setting up the joint hierarchy: hips as root, a neck joint branching to the head, and the head parent to the jaw, positioning each appropriately for the rest pose.\n\nFor the legs, I'm naming each chain (hip, knee, ankle per limb) and using the ankle joint as the tip for paw placement, then sweeping fawn-colored geometry along each leg bone with smooth skinning. I'm also adding spine geometry merged onto the hips bone and a small white glint sphere for the eye, then starting to write the actual construction code using a random number generator for variation.\n\nWriting fur/spike geometry code...\n\nNow I'll finalize the metadata export and write everything out.\n\n"
+}
