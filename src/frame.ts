@@ -50,7 +50,7 @@ export abstract class Frame {
    */
   moved(p: V3 | Toward) {
     const quat = this.quat;
-    return new Spot(this.local(p), quat, this.weights, this.axis.applyQuaternion(quat.invert()));
+    return new Spot(this.local(p), quat, this.weights, this.axis.applyQuaternion(quat.clone().invert()));
   }
 }
 

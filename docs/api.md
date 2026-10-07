@@ -101,6 +101,8 @@ export default function build() {
 
 `snap.ts` bundles the SDK with your module and maps every `three` import to the page's single copy.
 
+`src/index.ts` re-exports the whole SDK as one module, for apps that map a single import name to it.
+
 Every helper copies its inputs and returns fresh vectors. `V3` is a literal `[x, y, z]` or `THREE.Vector3`; `PointInput`, `DirectionInput`, `FrameInput` and `PathInput` are the kinds above. Plain number arrays are Points and Directions wherever they come from: literals, variables, object fields (`spike.dir`) and `.map` results all type-check as they are, and a point list is a `number[][]`. A literal that isn't exactly 3 numbers throws, naming the call and the value.
 
 ## Frames

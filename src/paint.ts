@@ -243,8 +243,9 @@ function warp(p: Vector3, size: number, amount: number, seed: number) {
   );
 }
 
+/** One colour from a list by `t`; an `[r, g, b]` tuple is one colour, not a list. */
 const pick = (colors: Colors, t: number): ColorInput =>
-  Array.isArray(colors)
+  Array.isArray(colors) && typeof colors[0] !== "number"
     ? (colors as readonly ColorInput[])[Math.min(Math.floor(t * colors.length), colors.length - 1)]
     : (colors as ColorInput);
 
