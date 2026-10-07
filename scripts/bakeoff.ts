@@ -10,6 +10,7 @@
 // run options: --model <provider/id> (anthropic/claude-sonnet-5-5) --effort <low|medium|high> (medium)
 //   --arms a,b --subjects x,y --levels terse,rich --concurrency 8 --max-tokens 64000
 //   --arm-set <file in bakeoff/> (arms.json) --pitches <file in bakeoff/> (pitches.json); `prompt` takes --arm-set too
+//   --prompts-from <round>: reuse that round's system prompts verbatim
 //
 // Everything lands in bakeoff/rounds/<round>/: round.json (model, effort, arms, pitches as run), prompts/<arm>.md
 // (the exact system prompts), runs/<slug>.json (request, reply, usage, cost, timing), runs/<slug>.md (the reply),
@@ -211,6 +212,7 @@ async function run(round: string, args: string[]) {
     model,
     effort,
     sdkCommit,
+    promptsFrom: option(args, "prompts-from", "") || null,
     maxTokens,
     pricing: cost ?? null,
     arms: arms(),
@@ -219,7 +221,12 @@ async function run(round: string, args: string[]) {
   for (const arm of new Set(todo.map((job) => job.arm))) {
     const path = join(dir, "prompts", `${arm.id}.md`);
     mkdirSync(dirname(path), { recursive: true });
-    writeFileSync(path, systemPrompt(arm));
+    // `--prompts-from <round>` reuses that round's exact system prompts, to compare models on identical input.
+    const from = option(args, "prompts-from", "");
+    writeFileSync(
+      path,
+      from ? readFileSync(join(BAKEOFF, "rounds", from, "prompts", `${arm.id}.md`), "utf8") : systemPrompt(arm),
+    );
   }
   console.log(`${todo.length} builds to ask ${model} (${effort}) for, ${concurrency} at a time.`);
 
