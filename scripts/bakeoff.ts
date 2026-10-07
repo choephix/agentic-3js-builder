@@ -140,7 +140,8 @@ async function pricing(model: string) {
   const out = await capture(OMP, ["models", "--json"]);
   const list = JSON.parse(out.stdout);
   const found = (Array.isArray(list) ? list : list.models).find((entry: any) => entry.selector === model);
-  return found?.cost as { input: number; output: number; cacheRead: number; cacheWrite: number } | undefined;
+  type Rates = { input: number; output: number; cacheRead: number; cacheWrite: number };
+  return found?.cost as (Rates & { longContext?: Rates & { inputThreshold: number } }) | undefined;
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -263,11 +264,13 @@ async function run(round: string, args: string[]) {
       writeFileSync(buildFile, wireImports(code, buildFile));
     }
     const cached = usage?.prompt_tokens_details?.cached_tokens ?? 0;
+    // Some models bill the whole call at higher rates past an input threshold (`longContext`).
+    const rates = cost?.longContext && usage?.prompt_tokens > cost.longContext.inputThreshold ? cost.longContext : cost;
     const costUsd =
-      usage && cost
-        ? ((usage.prompt_tokens - cached) * cost.input +
-            cached * cost.cacheRead +
-            usage.completion_tokens * cost.output) /
+      usage && rates
+        ? ((usage.prompt_tokens - cached) * rates.input +
+            cached * rates.cacheRead +
+            usage.completion_tokens * rates.output) /
           1e6
         : null;
     writeJson(join(dir, "runs", `${job.slug}.json`), {
