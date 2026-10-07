@@ -1,0 +1,25 @@
+{
+  "slug": "r3DragonflyTerseDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "dragonfly",
+  "level": "terse",
+  "pitch": "A dragonfly.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:08:00.848Z",
+  "wallMs": 64709,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32585,
+    "completion_tokens": 8493,
+    "total_tokens": 41078,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.0914704,
+  "hasCode": true,
+  "reasoning": "I'm planning a dragonfly model using the SDK, aiming for realistic proportions—body around 7cm, wingspan near 9cm—while deciding whether it should be perched or flying and ensuring its lowest points rest on the ground.\n\nLaying out the skeleton: a root thorax joint with chains for the abdomen, head, four wings, and six legs, all positioned using small-scale meter coordinates. I'm defining joint positions and sweeps for the head, jaw, and abdomen segments, tapering the radii along the tail for a natural shape...\n\nDefining wing chains now...\n\nI'm thinking through vein coloring with a cell-based paint function, adding a darker pterostigma patch near the wingtip, and giving the membrane a pale glassy translucent color. Then I'm sketching the wing outline coordinates for the forewing, shaping the leading and trailing edges outward from the root, and planning the hindwing shape next.\n\nWriting wing joint hierarchy...\n\nI'm defining the paint function to color veins darker where cell boundaries are close together, keeping texel density reasonable given the small painted area, and adding a leading-edge rod along the wing for structural detail.\n\nFor the head, I'm placing large compound eyes as spheres on either side, using countershading so the eye top reads blue and bottom green based on surface normal, with a faceted low-poly look. I'm also sketching in small facial features like the frons and clypeus.\n\nNow I'm adding the jaw structure with upper and lower mandibles, tiny antenna rods projecting forward from the head, and a scaled thorax sphere painted with diagonal green-brown stripes to mimic dragonfly coloring, tilted to match the natural thorax slant. For the abdomen, I'm planning a sweep along the bone chain using a skinning approach.\n\nAdding blue-dark abdomen stripes...\n\nI'm also placing cerci spikes at the tail tip, attached to the last tail joint bone, and working out positions for six tucked legs along the thorax underside with hips and feet coordinates.\n\nCalculating leg reach: foot targets near ground level with distances between hip and foot staying under the total limb length of about 0.042, adjusting bend angles so knees point up and outward for front, mid, and rear leg pairs.\n\nI'm settling joint naming conventions using position and side, deciding world x>0 means left side, and sizing the foot sweep thin enough to sit near the floor without clipping. I'm also checking overall model height stays around 0.06 including wings, then moving to set up the wing joint base position at the shoulder.\n\nNow I'm writing the builder code, starting the thorax root joint with spine role, then adding the head joint parented to the thorax with forward-facing direction, checking its local z-offset places the head center correctly, and beginning the jaw joint definition.\n\nContinuing with part placement, using a flat shading scale option for parts attached to bones, then adding paired sphere eyes on the head with a countershaded blue-green paint and slight scale flattening for shape.\n\nAdding small pale ocelli spheres on top of the head, then building the face detail: a frons sphere shaped with uneven radii for a rounded bump, a lower jaw box in a tan tone, an upper lip box in olive, and dark mandible spikes on the jaw sides. Now moving on to thorax construction.\n\nStill writing geometry...\n\nStill writing wing extrusion and paint logic...\n\nI'm deciding to skip the leading edge rod for simplicity and instead focus on building the leg chains using the limb function with root, knee, and ankle/foot points, assembling them into a named chain parented to the thorax with tapered sweep radii.\n\n"
+}

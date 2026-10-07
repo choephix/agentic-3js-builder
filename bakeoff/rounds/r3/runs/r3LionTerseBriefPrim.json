@@ -1,0 +1,25 @@
+{
+  "slug": "r3LionTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "lion",
+  "level": "terse",
+  "pitch": "A lion.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:06:27.888Z",
+  "wallMs": 44233,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5310,
+    "completion_tokens": 6512,
+    "total_tokens": 11822,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.07574,
+  "hasCode": true,
+  "reasoning": "I need to build a lion model using the SDK, being careful since I can't test the API directly. I'll stick to the functions I'm confident about—joints, chains, parts, and sweeps—keeping assumptions about joint placement and parenting as conservative as possible given the uncertainty around exact signatures.\n\nI'm planning the overall structure: a lion facing +Z, roughly 1.2m at the shoulder and 1.9m long, with a spine chain running hips to chest to neck to head to jaw, a segmented tail, and four legs each with shoulder, knee, ankle, and paw joints. I'm also sketching a helper function to place cylindrical limb segments between two points with a given radius, color, and bone, deriving orientation from the direction between the endpoints.\n\nFor construction I'll decide to bake rotations directly into the geometry using a quaternion derived from the segment direction rather than relying on a part-level rotation option, then position parts simply with the `at` field. I'm also laying out the color palette (tan body, lighter belly, dark brown and mid-brown mane tones, pink nose, amber eyes) and starting to build the torso from scaled low-poly spheres for the chest and rump plus a lighter belly shape underneath.\n\nNow I'm placing the head, muzzle, jaw, ears, and eyes with specific coordinates, and surrounding the head and neck with a cluster of roughly forty randomized flattened spheres and cones to form the mane. I'm also working out the joint positions for the front and hind legs—shoulder, elbow, wrist, paw, hip, knee, hock—using cylinders for limbs and boxes for paws, plus a curved multi-segment tail ending in a dark tuft sphere.\n\nWriting bone/joint helper functions...\n\nScattering mane tufts radially around the neck with alternating brown spheres, jittering position slightly, and adding a chest fringe for extra texture.\n\nFor ears, I'll place small tan spheres with pink inner coloring symmetrically on the head. That covers the mane and ear details, so I'm ready to write this out.\n\n"
+}

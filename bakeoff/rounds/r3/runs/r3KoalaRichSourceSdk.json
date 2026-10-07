@@ -1,0 +1,25 @@
+{
+  "slug": "r3KoalaRichSourceSdk",
+  "arm": "source-sdk",
+  "subject": "koala",
+  "level": "rich",
+  "pitch": "A sleepy koala hugging a eucalyptus branch. Soft ash-grey fur with a cream chest and cream-lined fluffy ears, a big black leathery nose, half-closed drowsy brown eyes, strong grey paws with dark claws, and a sprig of blue-green eucalyptus leaves in one hand, mid-munch.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:08:41.541Z",
+  "wallMs": 63933,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112570,
+    "completion_tokens": 8600,
+    "total_tokens": 121170,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.10873,
+  "hasCode": true,
+  "reasoning": "I'm planning a koala sitting upright, slightly tilted, hugging a eucalyptus branch that runs diagonally across the front of its body, aiming for moderate modeling effort but reliable, workable code.\n\nI'm sketching the joint hierarchy: hips rooted at ground level, a spine chain swept with bulging radii from hips to chest to head, with the head, jaw, arms, legs, and ears branching off from there, so the body reads as a seated, rounded figure holding onto the branch.\n\nNow I'm detailing the head: a wide head sphere, big round ears with grey outer and cream inner discs, a black oval nose, half-closed eyes made from brown spheres with grey lid overlays, and a separate jaw sphere positioned for a slight open-mouth munching look, before moving on to shape the thighs sweeping down from the hips.\n\nFor the legs, I'm chaining three points per leg (hip, knee, foot) and sweeping a tapering radius from thick thigh to narrower ankle to form each limb. For the arms, I'm setting shoulder-elbow-hand points so the left arm wraps over a branch while the right arm reaches to hold something.\n\nNow I'm working out the branch's diagonal line equation to figure out exactly where each hand should grip it, adjusting the hand coordinates so they sit right on the branch's surface with a small radius for the gripping fingers.\n\nThen I'm designing the sprig itself—a short twig running from the right hand toward the mouth, with small leaf shapes built from an extruded outline I'm defining as a simple pointed leaf silhouette, tinted blue-green, placed at a few rotated positions along the twig.\n\nI need bone weighting tied to the nearest joint, passing the bone explicitly like \"handR\" for the sprig and root for the branch, using chain tip names such as shoulderR, elbowR, wristR. For the branch leaves, I'm clustering them along the upper end toward the target position.\n\nNow I'm working out the branch's path from the ground up to its tip, computing intermediate points along the line so the left hand and elbow positions align properly with where the branch actually sits, using a blue-green palette for the leaves.\n\nThen I'm adjusting the torso to tilt forward onto the branch and adding a cream-colored belly patch on the chest, keeping the established fur palette and applying a mottled paint texture across the torso surfaces.\n\nI'm using paint selectively on the torso and legs to balance visual detail against cost, then defining helper functions for building scaled sphere parts for the head and limbs, including small capsule-shaped fingers with claws for the hands.\n\nFor the hands, I'm working out finger placement so they wrap around the branch naturally, calculating offsets from the hand position along the branch direction so fingers curl forward-down over the branch with claw spikes extending from the tips.\n\nNow I'm placing feet with small sphere pads at the ankles, adding three forward-pointing claws per foot, and sketching out the rump as a scaled sphere positioned behind the torso.\n\nThen I'm plotting the spine as a sweeping curve from the hips upward and forward, with a tapering radius function and named segments (spine1, spine2, spine3) to chain the body sections together.\n\nI set up the hips as the root joint, attaching the spine chain to it, then continue upward with a neck joint angled slightly forward, a head joint, and finally a jaw joint for later articulation.\n\nNow I'm placing the head sphere above the torso, positioning eyes slightly forward on the face, adding a nose that protrudes outward, and a cream-grey muzzle sphere beneath it to shape the snout area.\n\nStill building jaw and face details...\n\nAdding a cream chest sphere positioned to stick out from the torso, then setting up bone chains for the arms with shoulder-elbow-wrist joints and tapering sweep radii, mirroring left and right sides separately since the hug poses differ between them, plus similar chains for the legs.\n\nFor the leaves, I'm scattering them along each branch using a seeded random generator, mixing branch direction with outward offsets for natural variation, and adding bark coloring for texture.\n\n"
+}

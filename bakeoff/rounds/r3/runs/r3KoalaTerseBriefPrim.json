@@ -1,0 +1,25 @@
+{
+  "slug": "r3KoalaTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "koala",
+  "level": "terse",
+  "pitch": "A koala.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:08:38.762Z",
+  "wallMs": 24770,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5310,
+    "completion_tokens": 3606,
+    "total_tokens": 8916,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.03714,
+  "hasCode": true,
+  "reasoning": "I need to build a koala model using the SDK's joint and part APIs, being careful about correct usage since my knowledge of the exact signatures is limited—particularly how parent relationships work for joints and avoiding issues like creating a second root.\n\nI'm planning the rest pose as a koala standing on all fours, roughly 0.7m long with a standing height around 0.5m, and sketching out the joint hierarchy: hips as root, then spine, neck, head, jaw, ears, shoulders, and down through the limbs, using scaled ellipsoid parts aimed with direction vectors rather than explicit rotation since that API seems uncertain.\n\nI'm now sketching the body parts: a scaled sphere for the torso with a lighter belly patch, a smaller scaled sphere for the head, large flattened round ears with pink/white inner detail, a black oval nose, tiny black eyes with glints, a softer jawline, and limbs built from scaled spheres for thighs and capsule-like shins ending in feet with cone claws, positioning the arms and legs so hands and feet reach the ground.\n\nI'm switching the claws to simple blocky boxes instead of cones to avoid rotation issues, adding white fur tufts to the ears and a cream chest patch, and skipping a tail. I'm defining a sphere geometry helper and double-checking that the foot's bottom edge sits right at ground level, then writing a placement helper function that takes geometry, color, position, scale, and an optional bone/joint reference.\n\n"
+}

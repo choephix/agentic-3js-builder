@@ -1,0 +1,25 @@
+{
+  "slug": "r3PenguinTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "penguin",
+  "level": "terse",
+  "pitch": "A penguin.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:06:27.890Z",
+  "wallMs": 33599,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5297,
+    "completion_tokens": 4525,
+    "total_tokens": 9822,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.055844,
+  "hasCode": true,
+  "reasoning": "I need to build a penguin model using the SDK, but since I can't test, I should stick to well-known calls like createBuilder, joints, chains, sweeps, and parts, using THREE geometries with uncertain signatures for joint and part placement to minimize risk.\n\nI'm sketching out a skeleton for an emperor-penguin-like figure around 1 meter tall, with hips as root, spine segments up to the neck and head, plus flippers, legs, and a tail, planning to connect joints with parent relationships and skip risky chain APIs in favor of simple joints. For the body shapes, I'll manually scale sphere geometries myself rather than relying on an uncertain scale option in the part function, writing a helper to build ellipsoid-like shapes.\n\nNow I'm placing the body details: black back and white belly ellipsoids, a black head with yellow ear patches and a pale yellow chest gradient, a beak made from a rotated cone so it points forward, a separate lower jaw with an orange stripe, small eyes with pupils, and flattened flipper ellipsoids angled outward on the shoulder joints.\n\nThen I work out the feet as flattened orange ellipsoid shapes near the base of the legs, roughing out their position and size.\n\nNow I'm setting up the tail as a flattened black cone angled downward and backward, then building the joint hierarchy for hips, spine, neck, head, and jaw to position the beak.\n\nStill working out shoulder and elbow joints...\n\nFor hips and legs I'm placing the knee skip so the leg cylinder goes straight from hip to ankle, with the foot as an ellipsoid plus small toe boxes angled outward. I'm also setting the color palette (black, white, yellow, pale yellow, orange, beak tones) and structuring part positions as model-space coordinates tied to their parent joints.\n\nChecking the eye placement against the head sphere radius to make sure the eyes poke out naturally with their dark pupils and white highlights, then blending a neck ellipsoid where head meets body, and adjusting foot height so they sit just above the ground before finalizing the code.\n\n"
+}

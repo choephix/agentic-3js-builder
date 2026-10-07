@@ -1,0 +1,25 @@
+{
+  "slug": "r3ArmadilloRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "armadillo",
+  "level": "rich",
+  "pitch": "A nine-banded armadillo trotting along. A shell of overlapping banded plates in dusty pinkish-tan, a pointy snout, tall leathery ears, small beady eyes, sturdy clawed feet and a long armoured tail tapering to a point. A sprinkle of coarse pale hairs pokes out between the bands.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:07:44.655Z",
+  "wallMs": 66559,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5401,
+    "completion_tokens": 9410,
+    "total_tokens": 14811,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.09538719999999999,
+  "hasCode": true,
+  "reasoning": "I'm planning to build the module using the SDK's builder pattern, sticking to documented calls like joint, chain, sweep, part, stick, spike, and rod, since I can't verify unlisted signatures beyond the reference material. I'll stay conservative with parameters like name, position, parent, and aim for the joint function.\n\nI'm sketching out the armadillo's skeleton: a hips root joint, spine chain to the chest, neck and head joints facing forward, a jaw, ears, a four-segment tail chain, and four legs each with hip, knee, and foot joints, keeping proportions around 0.75m long and 0.25m tall. For the body shell I'm planning to use a scaled sphere geometry to form a dome shape, banding it into segments along the torso.\n\nStill shaping dome plates...\n\nNow I'm placing shoulder and rear shields with studs scattered across their ellipsoid surfaces, then figuring out banding and hair spikes between the armor plates, deciding whether to bind them to bones or let auto-bone handle placement.\n\nSince \"at\" is model space, I'll pass it explicitly as a parameter rather than baking it into geometry, keeping only rotation/scale baked in. For the legs, I'll build hip-knee-ankle joints with rods connecting them and claws at the feet.\n\nFor limb segments, I'm writing a helper that orients a cylinder from one joint to another using quaternion alignment between unit vectors, positioned at the midpoint. The rest pose stays neutral/standing for the trot cycle.\n\nFor the head, I'm shaping a scaled skull sphere with a forward-pointing snout cone for the upper jaw, a smaller box for the lower jaw at a hinge joint, plus black sphere eyes, a nose, and tall flat ear extrusions.\n\nThe ears get flattened spheres tilted at the top of the head, darker pink-tan inside, mounted on earL/earR joints. The tail is five tapering cone segments with armor-ring plates along tail1 through tail4 joints, curving back and down.\n\nWriting cylinder-frustum helper...\n\nNow I'm laying out joint positions: hips as root, chest/neck/head/jaw chained upward, ears off the head, and a five-point tail chain extending back about 0.35m. Front legs sit at hip/knee/foot positions with x offsets widening slightly down the chain.\n\nContinuing the leg setup, I'm placing hind legs further back with hip/knee/ankle/foot joints, then adding small forward-pointing claws and a foot pad near the ground. For the torso I'm shaping a pale pink belly ellipsoid centered mid-body, with the shell domes sitting above it.\n\nTotal body height comes out around 0.27, head positioned near y≈0.17. Now I'm scattering tufts of cream-colored hair along the shell's arch edges using angular positions and outward-forward cone directions with slight random jitter, and defining the band width profile as a function of z-position along the shell.\n\nWorking through shield placement front and rear, nine overlapping plate bands spanning the shell length, and setting the color palette: tan plates, slightly darker alternates, a muted shield tone, dark studs, pale belly cream, and a warm brown skin tone.\n\nStill writing geometry code...\n\nStill positioning head features...\n\nWriting helper function for ringed tube segments...\n\n"
+}

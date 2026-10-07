@@ -1,0 +1,25 @@
+{
+  "slug": "r3PenguinRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "penguin",
+  "level": "rich",
+  "pitch": "An emperor penguin chick's proud parent. Glossy blue-black back and head, a crisp white belly blending into a warm golden-yellow patch at the neck and ear, a long slender beak with an orange-pink stripe, stubby flippers held slightly out, and big black feet. A fluffy grey chick peeks out from between its feet.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:06:27.890Z",
+  "wallMs": 49194,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5402,
+    "completion_tokens": 6255,
+    "total_tokens": 11657,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.073354,
+  "hasCode": true,
+  "reasoning": "I need to produce a single TypeScript module using the SDK, being careful about API usage since I can't test it directly. I'll stick to well-known builder calls like joint, chain, sweep, and part, using reasonable guesses for signatures like passing \"at\" and \"parent\" options to joint.\n\nNow I'm designing the penguin skeleton, planning joint positions for hips, spine, neck, head, jaw, flippers, and feet, baking rotation into geometry rather than relying on uncertain rotation options, and keeping extra parameters minimal to avoid unexpected errors.\n\nI'm also working out proportions so the body, neck, and head stack to roughly 1.15m total height, and figuring out the beak shape using rotated cone geometry so the tip points forward along the Z axis for upper and lower jaws.\n\nNow I'm adding color details: a golden chest/neck patch, flattened gold-yellow ear spheres on either side of the head, a dark blue-black head tone, and a white belly ellipsoid offset toward the front of the darker body sphere, working out the scale and offset values to keep the belly patch contained within the body.\n\nStill placing geometry...\n\nPlacing the chick peeking from between the adult's feet, with its own body, head, white face mask, tiny beak and eyes, fluff tufts in two grey tones, positioned so its head slightly overlaps the adult's belly underneath. I'm also working out the adult's eye placement on the head sphere, checking the geometry so the beads with glint sit correctly inset on the surface.\n\nNow I'm sculpting the beak itself: an upper cone tilted slightly downward with pink-orange stripe accents along the sides, and a flatter, shorter lower jaw cone in orange matching color, joined at a jaw pivot point just beneath the eyes.\n\nThinking through the overall coloring scheme next: a dark blue-black base with a subtle lighter blue sheen on the shoulders, maybe a small cape-like patch on the back. Then I'll move to writing the actual construction code, using a helper function for ellipsoid parts and a joint system that builds a hierarchy from hips to spine to child parts.\n\nFor the beak cone, I need to work out the right rotation and translation so it points forward and down correctly -- orienting the cone's tip along the forward direction with a slight downward tilt, then shifting it so the base sits at the origin before applying that tilt.\n\n"
+}

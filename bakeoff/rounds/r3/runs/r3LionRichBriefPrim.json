@@ -1,0 +1,25 @@
+{
+  "slug": "r3LionRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "lion",
+  "level": "rich",
+  "pitch": "A proud old lion resting with his head held high. A huge shaggy mane fading from golden blond at the face to dark chocolate at the edges, a tawny body with a pale cream belly and muzzle, amber eyes, a broad black nose, a scar across one eyebrow, big padded paws and a long tail ending in a dark tuft.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:06:27.889Z",
+  "wallMs": 35527,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5414,
+    "completion_tokens": 4858,
+    "total_tokens": 10272,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.059408,
+  "hasCode": true,
+  "reasoning": "I want to produce a solid module without overengineering, so I'll stick to well-documented SDK calls like builder joints, chains, sweeps, and parts, being cautious about riskier options like parent references and chain roles since I'm not fully certain of their exact signatures.\n\nI'll use sweep with point arrays for legs and tail, passing coordinates directly rather than fancier curve types. For the pose, I'm designing a sphinx-like resting lion with the torso lying from back to chest, head held up, and joints placed for hips, spine, neck, head, jaw, tail, and legs with explicit parent relationships. I'm scaling spheres via the part scale option to form an ellipsoid torso at the chest position.\n\nNow I'm building the mane out of layered clumps of small spheres/icospheres around the head, going from gold near the face to darker brown toward the edges, jittered with randomness and positioned on a hemisphere behind the face extending down toward the chest. For the head itself I'm shaping a tawny sphere with a cream muzzle, black nose, separate jaw pieces, amber eyes with pupils, brows, and a scar detail.\n\nAdding ears and teeth...\n\nI'm positioning the front legs stretched forward from shoulder to paw, shaping the rear haunches and tucked hind paws as spheres, and sweeping the tail out to the side along the ground with a tufted end, considering whether to build it as a jointed chain with a sweep operation.\n\nFor the tail tuft and other parts I'll mostly rely on proximity to the nearest joint rather than specifying bones explicitly, except for head parts where I'll pass the head joint directly to avoid misassignment. I'm also setting the ground contact so paw radii rest at y near zero and the belly sinks slightly above that.\n\n"
+}
