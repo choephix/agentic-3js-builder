@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuClockworkDogTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "clockworkDog",
+  "level": "terse",
+  "pitch": "A clockwork dog.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:28:20.605Z",
+  "wallMs": 45130,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5300,
+    "completion_tokens": 9208,
+    "total_tokens": 14508,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00465826,
+  "hasCode": true,
+  "reasoning": "I need to build a clockwork dog model using only the documented SDK helpers—things like joint, chain, sweep, part, stick, surface, ring, region, paint, extrude, lathe, and other geometry and limb utilities—so I should plan out a correct, well-sized module using these functions.\n\nI'm being careful about exact signatures since I can't be sure of the undocumented parts: joint likely takes a name and options object with `at`, `aim`, `dir`, `up`, and possibly `parent` for building a skeleton hierarchy, while part takes geometry, color, and options including `at` and `bone` where bone is a joint reference. I'm less certain about chain's behavior—whether it auto-generates named joints along a path—so I'll lean toward using joint directly for skeleton construction to stay safe.\n\nGiven the uncertainty, I'll build a moderately sized clockwork dog using b.part for the body, legs, and head geometry, with visible gears on the flank, a key on the back, a glass chest window showing internal gearwork, rivets, and a jointed tail and legs for articulation, using brass and copper tones throughout.\n\nWorking out the joint and chain API — I'll use a spine chain swept into a body tube, with separate joints for legs and head parented to that structure, passing joint objects as parents where needed.\n\nFor the gears, I'm building each as a disc plus a ring of tooth boxes, constructed in the XY plane then rotated so the gear axis points outward through the body side, applying matrix transforms to orient disc and teeth consistently.\n\nI'm laying out the whole mechanical dog: a boxy brass body, jointed legs with cylinder-swept paths ending in flat feet, a coiled tail chain, a faceted head with cone ears and a snout, glass chest window, key-and-torus wind-up piece on the back, and small rivet spheres along the flanks, all mirrored across left/right sides with brass, copper, iron, dark, and glass color constants, using explicit bone assignments to keep most parts rigid to the hip joint while legs and head get their own joints.\n\n"
+}

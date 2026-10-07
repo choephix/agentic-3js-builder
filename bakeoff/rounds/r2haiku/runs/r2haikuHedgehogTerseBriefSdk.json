@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuHedgehogTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "hedgehog",
+  "level": "terse",
+  "pitch": "A hedgehog.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:16.977Z",
+  "wallMs": 45834,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5299,
+    "completion_tokens": 9304,
+    "total_tokens": 14603,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00470616,
+  "hasCode": true,
+  "reasoning": "I'm planning out a TypeScript module that builds a hedgehog using the SDK, sticking strictly to documented helpers like createBuilder, joint, chain, sweep, part, stick, surface scatter, paint patterns, and SVG rendering utilities, while keeping the design simple but visually appealing.\n\nFor the actual hedgehog shape, I'm thinking of a rounded ellipsoid body with a snout, dark face, small ears, short legs, and spines scattered across the back using cone geometries positioned via surface.scatter and oriented along the body's outward-facing normals.\n\nNow I'm sketching out the joint hierarchy — a root hips joint anchoring the body, with a spine chain running forward toward the head, laying out the hedgehog facing +Z with a body length around 0.25m sitting low on short legs.\n\nStill working through the builder structure...\n\nFor the snout, I'll just use another scaled sphere rather than fiddling with cone orientation—simpler and still reads as a muzzle shape.\n\nNow I'm placing the nose, eyes, and ears as small spheres positioned relative to the head center, flattening the ear spheres slightly for shape. Then I'm working out the leg structure, planning stubby cylinders with hip joints for the limb rig since the rod helper's radius API is unclear.\n\nI'm naming the joints frontL/frontR/backL/backR for the legs with a \"leg\" role, and sketching small foot spheres at the base of each. For the spines, I'm figuring out how to use the surface helper on the body part to scatter points across the top and sides, avoiding the belly, though the exact scatter signature needs some guessing.\n\nSince the scatter output's orientation data is ambiguous, I'm switching to a deterministic grid approach using `around(center)` with azimuth/elevation angles to control exactly where spines land, keeping them off the face and front while covering the back and flanks.\n\nExcluding the belly and front face, I'll compute nearest surface points along an ellipsoid parametrization and spawn spike parts at each, oriented by the hit's normal, with roughly 126 spines total arranged in rows across φ and θ, colored cream, kept well under the part budget.\n\nNow I'm thinking through the joint hierarchy—placing ears at the head's back-top, setting up a root \"hips\" joint, and figuring out how the head joint should connect to its parent since only one root joint is allowed.\n\nPlanning the legs' joints parented to hips at symmetric offsets, and the head joint parented similarly with no neck in between. I'm also considering coloring details like a darker face mask, feet, and a pink nose to make the design pop.\n\nNow I'm picking a realistic hedgehog palette: cream underside, mid-brown spines and face, near-black eyes with a tiny white highlight, dark nose, dark feet, and pinkish ears, and working out the snout and head sphere placement and scale relative to the head joint.\n\nI'm positioning facial features—head color, eyes, nose—relative to the head bone, then working out leg placement using the body's ellipsoid shape to figure where the legs attach at the body's underside and sizing the leg cylinders accordingly.\n\nFeet get small flattened spheres at ground level, and I'm skipping a tail for simplicity. For spines, I'm randomizing lengths within a small range, and now I'm deriving the surface points of the scaled ellipsoid body to find the nearest point for placing spines correctly across its curvature.\n\nEach spine rides the body's surface, using the hit's normal for orientation and bone attachment through the hips. I'm looping through latitude and longitude angles to scatter roughly 90-100 spikes, excluding the front face region to keep that area clear, with some jitter added for natural variation. I'm keeping imports minimal, using just the builder, random seed utility, and THREE.js to avoid unresolved references.\n\nBuilding the skeleton now: hips joint, head joint offset forward and up, legs attached to hips, and a scaled sphere for the body mesh positioned at the hips. For spikes I'm using the skin's nearest-point lookup against sampled positions to place each one correctly on the surface.\n\nStill writing joint and part definitions...\n\nFinishing up the facial features (ears, snout, nose, eyes, eye highlights) with their positions, scales, and colors, then wrapping up with spine coloring and a short closing explanation alongside the final code block.\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuSnailRichSourceSdk",
+  "arm": "source-sdk",
+  "subject": "snail",
+  "level": "rich",
+  "pitch": "A garden snail on an adventure. A glossy spiral shell striped in caramel, chocolate and cream, a soft grey-green body with a pebbly texture and a slimy shine, two long eye stalks with little black eyes and two short feelers below. A tiny ladybird hitches a ride on top of the shell.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:25:07.180Z",
+  "wallMs": 108903,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112557,
+    "completion_tokens": 21863,
+    "total_tokens": 134420,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.0603335,
+  "hasCode": true,
+  "reasoning": "I'm planning out a TypeScript module for a garden snail using the SDK, working through realistic-ish proportions like shell diameter and body length to keep the model readable yet true to scale.\n\nFor the skeleton, I'm sketching joints for the body, head, and eye stalks/feelers using a tentacle-like chain role. For the shell itself, I'm weighing options between a tube swept along a spiral path versus a lathe-based whorl shape to get a convincing coiled form, and thinking about how to add banded stripe coloring across the shell's surface.\n\nFor stripes, I'm deciding between a custom paint function keyed off the sweep coordinate versus simpler discrete color bands along the spiral—leaning toward bands for reliability while keeping a planar coil (zero pitch) with decreasing radius to shape the classic snail spiral.\n\nI'm wrestling with the shell's tilt: a real snail coil axis isn't purely vertical or horizontal but angled, so I'm testing slanted axis vectors to get that side-view spiral look rather than a flat ammonite disk.\n\nThinking about construction options now—maybe the shell shouldn't be a pure swept tube at all, but a domed lathe shape for the big final whorl combined with a spiral band for the smaller turns, which would read more convincingly as a snail shell than a strict mathematical coil.\n\nThe lathe closure at the axis gives a degenerate but workable disk at the base, which is fine for grounding the shape. For the ladybird, I'm thinking of it as a separate sphere part with black spots placed via surface hits, and planning the overall layout in meters—snail facing +Z, body as a tapered sweep along a curved path from tail to head.\n\nNow I'm working out the rig: a chain for the spine driving the body sweep, then attaching the shell as a lathe at an angle on the back, tilted along a custom axis so it leans backward naturally. I need to check the shell's base placement against the body's height so it doesn't sink below the ground or float disconnected from the body surface.\n\nFor the shell shape itself, I'm defining a bulbous spiral outline with a sequence of radius/height points, then applying a striped paint function that bands colors like caramel, cream, and chocolate in a spiral pattern around the shell's height and rotation, while being careful about the seam where the rotation wraps around.\n\nFor the body's texture, I'm using a cellular noise pattern to create a pebbly surface, blending pale and dark greenish colors based on noise values, and adding a subtle sheen highlight toward the top-facing normals for a slimy look.\n\nI'm working out the snail's skeleton: eye stalks and feelers as tentacle chains branching from the head joint, a spine chain running from tail to head with a tapering tube radius so the tail narrows to a point while the head stays rounded, and positioning everything so the body sits just above the ground without floating. I'm also placing the shell on the back with a tilted axis so its base rests on the body's surface rather than clipping through it, adjusting the shell's dimensions down to a more proportionate stylized size.\n\nFinally I'm adding a ladybird perched on top of the shell, built from a hemisphere dome for its red back, a small black head sphere, and tiny black spot spheres positioned using local surface coordinates relative to the dome's frame so they sit correctly on its curved top.\n\nSetting up mirrored eye stalks and feelers as short chains from the head joint, with eyeballs and highlights attached rigidly to the stalk tips. Then I'm placing a ladybird on the shell by finding the nearest surface point near the apex, embedding a small red dome there, and scattering black spots and a tiny head sphere on it using local coordinates relative to the dome's own frame so they stay oriented correctly. Now I'm writing out the actual module code—imports, paint functions for the shell's spiral bands and the body's pebbly texture, and the builder setup starting with the root joint and spine chain.\n\n"
+}

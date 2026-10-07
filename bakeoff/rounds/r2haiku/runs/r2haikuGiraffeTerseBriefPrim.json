@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuGiraffeTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "giraffe",
+  "level": "terse",
+  "pitch": "A giraffe.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:25:31.601Z",
+  "wallMs": 33146,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5312,
+    "completion_tokens": 7286,
+    "total_tokens": 12598,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.0036972,
+  "hasCode": true,
+  "reasoning": "I need to build a giraffe model using only the documented SDK methods available to me—things like createBuilder, joints, chains, sweeps, parts, sticks, spikes, rods, capsules, extrusions, lathe shapes, decals, cards, rings, surfaces, limbs, and coloring functions like paint, spots, stripes, and countershading.\n\nI'm sketching out proportions: a roughly 5-meter-tall giraffe with long legs, an elevated torso, a forward-tilting neck reaching up to the head with ossicones, and a tail at the back. I'm working out a coordinate system where the model faces forward along the positive Z axis, and figuring out where to place the root hip joint and how the chain/role options should attach to build the neck and legs correctly, while being cautious about which parameters are actually supported.\n\nDefining leg joint positions...\n\nGiven the uncertainty, the safest approach is to use b.joint for naming skeleton points and b.part for the actual geometry, building limbs with three.js primitives like cylinders, boxes, and spheres positioned using `at`, `bone`, and `dir` parameters to orient them along bone directions.\n\nFor the neck, I'll use a chain of points as a path and sweep a radius along it to form a smooth tube shape.\n\nFor spots/patches, I'm unsure about the paint API, so instead I'll fall back to placing flattened spheres (scaled parts) directly onto the surface as a safer alternative.\n\nNow I'm sketching out the body geometry: a box for the torso, legs built from cylinders for upper and lower segments with hoof boxes at the ends, positioned symmetrically front and back using hip and knee joints at specific coordinates.\n\nI'm defining a helper function to build each limb segment as a cylinder spanning between two joint points, computing the midpoint and orientation so the geometry aligns correctly between the joints.\n\nNow I'm planning the head geometry—a boxy skull with a smaller muzzle, dark eye spheres, thin ossicone cylinders with tipped spheres, and small ear boxes—attached to a head joint positioned at the top of the neck, with the neck chain curving up and tilting from shoulder to head.\n\nFor the neck and tail, I'm defining them as polyline chains swept with tapered radii, adding a tuft sphere at the tail's end. For the mane, I'm planning small dark boxes placed along points sampled from the neck chain's frame function.\n\nAdding spots and coloring...\n\nI'm working out the leg joint heights—hip, knee, ankle, hoof positions—then checking the body and neck proportions so the overall height comes close to a real giraffe's scale. Now I'm defining the joint hierarchy for the rig, starting with torso as root and building up through neck to head.\n\nDrafting leg geometry functions...\n\nStill writing geometry...\n\nFor the mane, I'll add boxes along the neck curve at several t values between 0.2 and 0.9. Then I'll wrap everything up by returning the builder's root, initializing it as a named \"giraffe\" builder.\n\n"
+}

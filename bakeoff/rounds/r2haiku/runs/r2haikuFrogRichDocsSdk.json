@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuFrogRichDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "frog",
+  "level": "rich",
+  "pitch": "A red-eyed tree frog clinging to a leaf. Vivid lime-green skin, blue and cream striped flanks, orange toes with round sticky pads, a creamy white belly, and enormous ruby-red eyes with black slit pupils. It looks a little surprised, as if you just woke it up.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:27:15.245Z",
+  "wallMs": 142630,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32677,
+    "completion_tokens": 19239,
+    "total_tokens": 51916,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.00995572,
+  "hasCode": true,
+  "reasoning": "I'm planning a TypeScript module for a red-eyed tree frog clinging to a leaf, keeping proportions realistic at roughly 6cm body length and 12cm total span, with the leaf serving as its resting surface in the scene.\n\nI'll place the leaf flat near y=0 so the frog's feet rest just above it, with the frog facing forward along the z-axis and centered around a small height offset while I work out the leaf's extrusion geometry.\n\nNow I'm defining the frog's body as a spine chain running along the z-axis from rear to head, building out the skeletal path the loft will follow.\n\nThinking through naming the spine joints and deciding where the head joint attaches, I realize it's simpler to drive the whole body as a sweep over the spine chain's path, letting the chain supply the bones automatically. I'll shape the radius function so the frog's body is wide and flattened, bulging near mid-back and tapering toward the head and tail ends.\n\nFor coloring, I'm settling on a vivid lime green top, cream belly, and blue-cream flank stripes, using the sweep's clock-angle parameter to determine where on the cross-section each paint falls—back near the top, belly near the bottom, and a stripe band along the sides.\n\nNow I'm planning the limb structure: frog legs folded under a sitting pose, with hind legs anchored at the hips and feet placed on the leaf surface, using a limb function with root positions, foot targets, and bend lengths to pose them naturally.\n\nI'm setting up the leg chains with named joints (hip, knee, ankle, foot) and marking the tip as the foot with a \"leg\" role, then planning foot pads and toe details using local offsets from the foot joint frame for a frog-like shape.\n\nFor the toes, I'm figuring out splayed directions from each foot's tip position, building capsule segments for the toe bones and flattened sphere pads for sticky toe tips, with orange coloring. Then I'm working through the eyes—bulging ruby spheres on top of the head with black slit pupils facing forward, positioned using the head joint's local frame.\n\nI'm laying out all the model-space coordinates for the body parts: hips, spine chain via catmull points, head joint position, body sweep for the torso, and a rounded sphere for the head and snout. I'm also planning the belly color patch and leg attachment points for both hind and front limbs, including hip/shoulder positions and foot targets relative to the leaf surface.\n\nI'm drafting a reusable leg-building function that takes hip and foot positions plus bend parameters and returns a named joint chain, then applying it symmetrically for left and right hind and front legs with appropriate parent joints and outward knee bends.\n\nFinally, I'm designing the lily pad leaf itself—an outline shape extruded with thickness, using a lobed silhouette with a pointed tip and smoothed corners, colored leaf green, sized to comfortably fit the frog's footprint.\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuKoalaRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "koala",
+  "level": "rich",
+  "pitch": "A sleepy koala hugging a eucalyptus branch. Soft ash-grey fur with a cream chest and cream-lined fluffy ears, a big black leathery nose, half-closed drowsy brown eyes, strong grey paws with dark claws, and a sprig of blue-green eucalyptus leaves in one hand, mid-munch.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:00:03.193Z",
+  "wallMs": 55138,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5420,
+    "completion_tokens": 12570,
+    "total_tokens": 17990,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.00635,
+  "hasCode": true,
+  "reasoning": "I'm planning out a single TypeScript module built with the SDK, relying on functions like createBuilder, joint, chain, sweep, part, stick, and sprout to construct the geometry, combining three.js shapes for the branch and tail structures while keeping the approach safe and within known API capabilities.\n\nFor the koala itself, I'm figuring out a seated pose roughly 0.7m tall, hugging a eucalyptus branch angled diagonally from the ground, with both arms wrapped around it and a small sprig of leaves held near its mouth, keeping the design grounded at y=0.\n\nPlanning joint hierarchy...\n\nFor eyes I'll layer a brown sphere with a cream eyelid shape on top for the half-closed look, and for the nose I'll use a scaled sphere to get that big ellipsoid shape, using the part-level scale option. Ears will be simple cylinders or discs.\n\nI'm planning paws as spheres with small cone claws, and eucalyptus sprigs made from flattened, scaled spheres for leaves oriented using aim-toward-a-point since rotation isn't directly exposed. For color palette, I'm settling on ash grey, darker grey shadows, cream, black, brown eyes, eucalyptus green, branch brown, and dark claws.\n\nNow I'm setting up a helper function to build parts and working out joint coordinates for a seated koala facing forward — hips, spine, chest, neck, head, with shoulder/elbow/wrist joints for arms wrapping around a diagonal branch positioned in front of the body.\n\nSimplifying: left arm wraps the branch while the right arm lifts a leaf sprig up to the mouth. For the legs, I'm positioning a sitting pose with hips, knees, and ankles angled forward, adding grey paw spheres with claws at the feet. Then for the head, I'm placing rounded ears symmetrically at the top sides.\n\nStill placing head features... muzzle, nose, eyes, and eyelids with grey fur coloring, then building the cream chest patch, grey body sphere, and haunches, skipping a tail or making it a tiny nub, and starting the leaf sprig geometry near the wrist.\n\nI'm sketching the branch sweep geometry with attached leaf clusters, small cone-shaped claws aimed outward from each paw tip, and defining the color palette constants for fur, nose, eyes, claws, and leaves.\n\nDefining the skeleton joints...\n\nStill placing limb geometry...\n\nActually I'm reconsidering the branch placement for the hugging pose — the forearm would intersect the branch if left where I had it, so instead I'm repositioning the branch to run vertically in front of the chest, letting both arms wrap around it from either side while the right hand holds the sprig near it.\n\nI'm working through all the remaining details now: the sprig of leaves held near the mouth, ear and head geometry, eye and eyelid placement, claws on each paw, and the sweep paths for the branch and stem. I'm defining helper functions for ellipsoids and leaves, then laying out the full body with bones, positions, and colors before writing the final code.\n\n"
+}

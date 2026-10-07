@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuFrogTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "frog",
+  "level": "terse",
+  "pitch": "A frog.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:26:56.084Z",
+  "wallMs": 112974,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112460,
+    "completion_tokens": 12923,
+    "total_tokens": 125383,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.037935,
+  "hasCode": true,
+  "reasoning": "I need to plan out a TypeScript module that builds a frog using the SDK's joint, chain, and part functions, making sure I use the builder API correctly so it runs as-is.\n\nI'm settling on realistic small scale — a tree-frog-sized body around 0.14m long sitting roughly 0.045m off the ground, with bulging eyes atop the head and folded hind legs built as limb chains using the ik tools.\n\nFor the hind legs I'm defining a three-point catmull path through hip, knee, and ankle joints, naming the chain segments thighL/shinL/footL so the spans plus tip map correctly, positioning the knee outward and the foot forward on the ground to get that classic folded frog-leg pose.\n\nNow I'm sketching the foot as a flattened toe sweep with splayed digit tips, then setting up the front arms as a similar three-joint chain (shoulder/elbow/wrist) bent under the body with hands on the ground, and starting to lay out the body as a loft with stations defining width and height from the narrow rear to the widest point near the shoulders.\n\nI'm working out the joint hierarchy next: a root \"hips\" joint, a spine chain running toward the head, and separate body joints for lofting the torso shape, making sure each joint's parent is explicitly set and figuring out how the loft's bone list ties joints to positions along the sweep path.\n\nThen I'm planning to add bulging eyes as sphere parts attached to the head joint, positioned symmetrically on either side near the top of the skull.\n\nFor the mouth, I'm sketching out a jaw joint as a child of the head, building the lower jaw as a slim capsule shape colored to match the belly tone, keeping the mouth line itself simple or omitted for now. Next I'm moving on to the front leg chains.\n\nFor the leg sweep, I'm tapering the thigh radius to be thicker near the hip, then adding small capsule rods from ankle to toe points to form the foot, anchoring them to the leg chain's tip joint for proper bone binding. Front legs will follow the same pattern as the arm chains.\n\nFor symmetry I'll write a shared side function taking a sign value so left/right limbs mirror across the body, with unique joint names per side. For coloring, I'm layering a spots pattern with countershade for a lighter belly, plus gold eyes with black pupils rendered as small spheres, and importing THREE directly for the sphere geometry.\n\nI'm scattering small wart spheres across the body surface using a filtered scatter function, then sticking them onto hit points with slight embedding for texture. The spine is built as a joint chain from pelvis through waist, chest, neck, to head, with the body loft bound to that chain and stations defining width/height at each point along the back, and limbs/jaw parented to named joints in that hierarchy.\n\nNow I'm defining the eye spheres and pupils positioned on the head joint, with the pupils poking slightly past the eye surface for a bulging look, plus a tiny highlight sphere for shine. I'm setting up the jaw as a hinge joint with a capsule mouth piece extending forward from"
+}

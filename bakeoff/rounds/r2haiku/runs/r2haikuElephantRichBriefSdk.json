@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuElephantRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "elephant",
+  "level": "rich",
+  "pitch": "A gentle African elephant calf. Wrinkly slate-grey skin with a dusty, reddish tint from rolling in the dirt, huge fan-shaped ears with a pink flush on the inside, a curious trunk curling forward, stubby baby tusks, long lashes over kind brown eyes, a little tufted tail and round, padded feet with pale toenails.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:21:54.721Z",
+  "wallMs": 75271,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5412,
+    "completion_tokens": 14299,
+    "total_tokens": 19711,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00721496,
+  "hasCode": true,
+  "reasoning": "I need to plan out the TypeScript module using only documented SDK helpers, mapping out which builder functions like joint, chain, sweep, loft, and extrude I'll rely on since I don't have full API docs beyond the reference.\n\nI'm being cautious with exact function signatures for sweep, chain, joint, part, stick, and surface, sticking closely to the cheat sheet to avoid errors, and keeping the code manageable in size. My plan is to use chains and sweeps for the trunk and legs while using spheres and boxes for the body, avoiding uncertain paint functions like countershade or spots in favor of plain colors for safety. I'm sketching the skeleton for an elephant calf around 1.1m shoulder height, facing +Z with a forward-curling trunk, starting with hip placement near the root.\n\nWorking out the body construction now, considering a spine chain or sweep with varying radius, then deciding to build the body and head from parts using THREE geometries like spheres, applying scale carefully since the scale option format is uncertain.\n\nI'm sketching the joint hierarchy next: hips as the root joint, chest as a child, with legs attached at hip joints positioned front and back at the sides, feet grounded at y=0, and planning to use sweeps between joint points for limbs and spine rather than relying on an uncertain limb helper function.\n\nI'm also working out the body as a swept barrel shape from hips to chest with a belly addition, the head as a scaled sphere with cheek and forehead bulges, and figuring out ear shapes through flat extruded outlines, plus a tail chain of three joints trailing back from the hips.\n\nEars can be flat tilted disks made from circle geometry with a smaller pink disk inset for the inner ear, baking rotation into the geometry rather than relying on bone orientation options to keep things simple. Eyes get small dark spheres with lash details near the head front, tusks are rotated cone spikes in an ivory tone, feet are padded squashed cylinders with small flattened toenail shapes, and the tail is a tapering sweep along its joint chain.\n\nFor wrinkles, I'm considering thin torus arcs rotated and placed directly on the body ellipsoid surface rather than relying on uncertain surface-hit APIs. I'm picking a muted color palette for body, dust patches, inner ear, tusks, nails, eyes, and lashes, and thinking through how the part placement API handles bone/joint references versus plain position coordinates.\n\nSetting up materials and a sphere-scaling helper function...\n\nI'm working out the full skeletal structure for the elephant calf—joints for hips, chest, neck, head, trunk segments, legs, and ears—then planning the sweep geometry for the trunk and legs, plus the circular ear geometry with inner pink padding facing appropriately based on which side it's on.\n\nI'm adding wrinkle rings around the body and legs using torus geometry, tail with a tuft at the end, eye placement with lashes fanning out, and tusk cones angled from the mouth. For the feet, I'm placing pad spheres with toenail details, and finishing with dust-colored accent spots scattered across the body and head before assembling it all into the final build function.\n\n"
+}

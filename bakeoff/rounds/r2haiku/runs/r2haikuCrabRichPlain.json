@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuCrabRichPlain",
+  "arm": "plain",
+  "subject": "crab",
+  "level": "rich",
+  "pitch": "A feisty red rock crab with one oversized claw raised in challenge. A wide, knobbly shell in brick red speckled with orange and cream, eyes on stalks, eight jointed walking legs with pointed tips, and claws with dark tips and little teeth on the pinchers. A tiny barnacle and a strand of seaweed cling to the back of its shell.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:21:16.358Z",
+  "wallMs": 42765,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 887,
+    "completion_tokens": 10314,
+    "total_tokens": 11201,
+    "prompt_tokens_details": {
+      "cached_tokens": 763
+    }
+  },
+  "costUsd": 0.00517703,
+  "hasCode": true,
+  "reasoning": "I'm planning a three.js module for a red rock crab using basic primitives like spheres, cylinders, boxes, and cones, with a canvas texture for speckling and a seeded RNG, sizing the shell around 0.36m wide and 0.26m long.\n\nI'm sketching out the body parts: a flattened low-poly shell with knobbly bumps and speckle texture, stalked eyes with highlighted spheres, segmented legs built from cylinders and spherical joints, asymmetric claws with pincers and teeth, plus a barnacle dome and a tube-geometry seaweed strand for detail.\n\nNow I'm working out a helper function that draws a limb as a cylinder between two arbitrary points, computing direction, length, and orientation via quaternion, with sphere joints at each end to hide seams. I'm positioning the hip points for each leg along the shell's edges, splaying them outward and spacing them front to back.\n\nStill defining leg geometry...\n\nNow I'm laying out the claws: a larger right claw with shoulder, elbow, and wrist joints leading to a palm, with tapered cylinder pincers pointing forward and a darker tip sphere plus small teeth cones, and a smaller scaled-down left claw held closer to the body.\n\nFor the head, I'm adding eye stalks rising from the shell top with black eye spheres and tiny white highlights. For the shell, I'm shaping it as a flattened, scaled sphere sitting above the legs, scattering dozens of small icosahedron knobs across its upper surface using seeded randomization, and texturing it with a canvas-based speckled pattern in brick red, orange, and cream tones. I'm also starting to add small barnacle-like cylinder shapes onto the shell surface.\n\nWriting seaweed geometry...\n\nStill building leg segments...\n\nStill defining pincer tip coordinates...\n\nNow I'm sketching the raised arm with shoulder-elbow-wrist joints, then a smaller claw variant scaled down for a secondary limb, and finally positioning eye stalks sprouting from the top of the shell.\n\nI'm computing the exact ellipsoid surface positions for the eye stalks and base, deriving the y-coordinate from the shell's radii so the eyes sit correctly above the shell, then working out a rejection-sampling scheme to scatter small knobs across the upper shell surface while keeping them within the ellipsoid bounds.\n\nFor the shell's texture, I'm generating a canvas with a base color and random speckled circles in orange and cream tones to mimic a barnacle-like pattern, then applying it as a CanvasTexture. I'm also planning a curling seaweed strand using a Catmull-Rom curve and tube geometry, with flattened sphere shapes for the leaves.\n\nNow I'm positioning barnacle cylinders on the shell surface using the ellipsoid formula to compute y-coordinates, adding a small dark mouth box at the front, and estimating the total mesh count at around 150. I'm finalizing ground placement so leg tips rest at y=0, then writing the full code with a mulberry32 RNG and careful quaternion handling for limbs that point straight up or down.\n\n"
+}

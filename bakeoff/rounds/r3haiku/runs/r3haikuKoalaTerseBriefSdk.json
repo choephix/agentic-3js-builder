@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuKoalaTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "koala",
+  "level": "terse",
+  "pitch": "A koala.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:59:38.471Z",
+  "wallMs": 49488,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5296,
+    "completion_tokens": 7756,
+    "total_tokens": 13052,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00393186,
+  "hasCode": true,
+  "reasoning": "I'm planning out a koala model using the SDK's documented builder functions, sticking carefully to known APIs like joints, chains, sweeps, and surface tools to keep things safe while aiming for decent visual quality.\n\nI'm sketching the koala's design: grey fluffy body, round ears, black nose, white chest, clawed paws, tiny tail, sitting upright at roughly 0.75m tall. I'm laying out the skeleton with hip, spine, chest, neck, and head joints positioned along the y-axis, then working out how to call the chain function to build the spine from these coordinates.\n\nNow I'm figuring out how to shape the body geometry around that spine — considering sweep versus loft for building a tubular torso, and leaning toward simpler THREE.js primitives like spheres since the exact parameter formats for sweeps and lofts are uncertain.\n\nI'm sketching out the joint hierarchy: hips as root, then a spine chain running up through chest and neck, with a head joint attached somewhere along that chain, though I'm unsure whether the parenting is set through a `parent` option or implied by chain order.\n\nI realize I can skip specifying `bone` for most parts since geometry without an explicit bone just attaches to the nearest joint automatically, which simplifies things considerably — I only need named joints for the limbs where the rig actually needs them, so I'm moving on to setting up arm chains next.\n\nFor the limbs I'm planning out chains for arms and legs with hip/shoulder-to-wrist/ankle positions suited to a sitting koala pose, then building the body visually from an ellipsoid belly, a cream chest patch, a large spherical head, and rotated cylinder discs for the ears with inner pale ear detail.\n\nNow I'm adding the facial features: a black ellipsoid nose, tiny dark spheres for eyes, and small cone-shaped claws rotated to point forward at the paw tips, along with ellipsoid paws placed at the wrist and foot positions. I'm working out thigh and ankle placement so the legs read as a koala sitting with feet pads resting on the ground.\n\nI'm placing a small tuft sphere for the tail, and adding a butt ellipsoid so the body sits flush with the ground when seated, then checking the overall proportions top to bottom. I'm settling on a grey-and-cream color palette with dark nose and tan inner ears, keeping materials as simple flat colors, and planning to use the sweep function with path chains for the limbs rather than textures or decorative patterns.\n\nStarting to write the actual build code now...\n\nPositioning the ears, cheeks, nose, and eyes on the koala head, computing sphere surface offsets so the facial features sit properly on the curved head surface rather than floating inside or outside it.\n\nNow I'm working through the chest patch, body, butt, thighs, feet pads with claws, arms with paws, and tail placement, computing scale and position so each part sits correctly against the adjoining body ellipsoid surfaces. Once the full set of koala parts is placed, I'll return the completed root group as the final code.\n\n"
+}

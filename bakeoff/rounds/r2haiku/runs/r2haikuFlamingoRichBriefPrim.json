@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuFlamingoRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "flamingo",
+  "level": "rich",
+  "pitch": "An elegant flamingo standing tall in shallow water. Candy-pink feathers deepening to coral on the wings, with a flash of black flight feathers at the wing tips, an S-curved neck, a bent beak that is pale pink with a black tip, pale yellow eyes and long rose-coloured legs with knobbly knees and webbed feet.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:16.980Z",
+  "wallMs": 67784,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5419,
+    "completion_tokens": 11757,
+    "total_tokens": 17176,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.0059434,
+  "hasCode": true,
+  "reasoning": "I need to build a single TypeScript module using the SDK, sticking carefully to the documented helper signatures like createBuilder and joint definitions since I don't have full API docs beyond the reference examples.\n\nFor the flamingo, I'm mapping out which primitives to use: chains for joints, sweeps for limbs, extrude/membrane for wings, and part() with scale options for the body shape, while avoiding less-documented helpers like limb() or paint/stripes functions to reduce risk of errors.\n\nNow I'm working through the actual skeleton layout: hips as root joint around y=0.75, long bent legs running from hip through knee to ankle and down to feet near the floor, mirrored on left and right sides at x=±0.09, and a spine chain running from a tail-base point up toward the body for the flamingo's characteristic tilted posture.\n\nI'm then plotting the neck's S-curve as a sequence of control points rising from the base around y=1.0 up to the head near y=1.5, bending forward, back, then forward again to mimic the flamingo's distinctive neck shape, and setting up a catmull-rom chain to connect those points smoothly into the head joint.\n\nWorking out joint hierarchy for the head...\n\nDeciding to use b.chain for the neck with a path of points, where chain.at(1) gives a Frame that I can pass directly as the attachment point for head parts, since Frame converts to a position and inherits bone info. For the beak, I'm planning two mandibles — a pale pink upper piece with a black tip and a lower piece — hanging off a jaw joint attached to the head.\n\nStill working out mandible geometry...\n\nI'll use the \"aim\" option so each part's axis points from a starting location toward an end point, letting me build segments as axis-aligned cylinders regardless of orientation, passing the bone explicitly rather than relying on inference.\n\nFor the body, I'm shaping a sphere geometry with a non-uniform scale vector to get an elongated ellipsoid, keeping it mostly horizontal with a slight tilt. I'm settling on a flamingo pink for the body and coral tones for the wing coverts and flight feathers.\n\nFor wings I'm extruding a 2D outline shape in the side plane (so the wing lies roughly in the Y-Z plane with X as the thickness direction), defining a feather-shaped outline with a handful of points and mirroring it for the opposite side; I add a separate black extrusion near the tip for flight feathers. I work out the extrusion normal direction from the cross product of the chosen local axes and just accept the uncertainty around the default extrusion depth.\n\nI sketch a tail as a flattened coral sphere near the back of the body, and plan webbed feet using a flattened box or sphere scaled thin, with small toe boxes and knobbly knee spheres at the leg joints.\n\nFor the skeleton, I lay out hip, knee, and ankle joints down each leg with approximate coordinates, acknowledging uncertainty about how parent-child joint relationships and chain attachments actually work in this API, and decide to just pass a parent option optimistically. I plan the neck as a chain with an inferred attachment to the spine, and the head as a sphere positioned at the top of the neck.\n\nFor eyes I place small pale yellow spheres with tiny dark pupils offset slightly forward, and for the beak I build two mandible segments (pink bases, black hooked tips) using tapered cylinder geometries rotated so their length axis points along the segment direction, via a small helper that computes the midpoint and target point for each piece.\n\nI decide to keep bone assignments explicit only for legs and wings, letting other parts infer their bone from position, and plan leg segments with pink/rose coloring, flattened webbed feet, and small toe segments. With all this reasoned through, I'm ready to write out the final module code and its export.\n\n"
+}

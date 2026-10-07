@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuCrabTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "crab",
+  "level": "terse",
+  "pitch": "A crab.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:50.008Z",
+  "wallMs": 39409,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5296,
+    "completion_tokens": 8561,
+    "total_tokens": 13857,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00433436,
+  "hasCode": true,
+  "reasoning": "I'm planning out a crab model in three.js, figuring out which SDK helper functions I'll need for building joints, limbs, shells, and surface texturing like spots and stripes.\n\nI'm designing the crab's anatomy: a wide flat carapace with eye stalks, two pincer claws, four pairs of jointed walking legs, and a tucked abdomen, stylized in bold orange-red and cream tones at roughly 0.3 meters across.\n\nFor the skeleton, I'm placing a root body joint and building the carapace from a scaled sphere flattened and widened to look shell-like. For the legs, I'm planning chains of hip-knee-ankle-tip joints per side, swept into tubes with color, trying to keep the API usage conservative since I'm not fully certain of the exact chain/sweep signatures.\n\nDefining the claw arm paths...\n\nSince I'm unsure how the aim/dir parameters orient geometry, I'll play it safe by baking rotations directly into the geometry itself and just using the `at` position for placement.\n\nFor bone attachment, I'll use the wrist joint's bone explicitly for parts that lie along it. For eyes, I'm planning stalks projecting from the carapace front with a white eyeball sphere and a smaller black sphere for the pupil, attached via the eyeStalk joint's bone. For the abdomen, I'll use a scaled, flattened sphere tucked under the body in cream color, plus a small telson sphere, before moving on to carapace surface detailing.\n\nRather than fuss with approximate spot placement, I'll simplify by adding spike-like cone parts along the carapace's front edge, baking any scaling directly into the geometry with a plain three.js scale call instead of relying on an uncertain part-scale option. Then I'm setting up the joint hierarchy, starting with a root body joint and building out the leg chains and eye stalk joints from there.\n\nFor the claws and limbs, I'm assuming chain() auto-generates parented joints along a path and just proceeding with that assumption to keep things coherent, planning the color palette next—burnt orange shell, darker legs, cream belly.\n\nFinalizing color constants, then setting up helper functions for scaled ellipsoid geometry and outward-pointing cones built from rotated cone primitives, before starting the main build function.\n\nModeling the crab body: placing the carapace, belly, and rostrum as separate shell-colored parts anchored to a body joint, then adding jointed eye stalks with small cylinders positioned and rotated outward on each side.\n\nWorking through the eye geometry placement so the stalks, eyeballs, and pupils sit correctly, then sketching out the leg structure as segmented chains with four joints per side sweeping down to a foot tip.\n\nNow I'm defining the arm chains similarly, with paths for shoulder-to-wrist movement and sweep radii for the limb thickness, figuring out how to attach hand parts near the wrist joint without explicit bone references.\n\nFor the pincer hands, I'm shaping the palm as an ellipsoid at the wrist and crafting the fixed and moving pincer fingers from rotated cone geometries, working out the splay angle so the two fingers pinch inward toward each other on the correct side.\n\nStill placing geometry pieces... I'll also add a few small spine cones along the carapace's front edge for extra detail, keeping it minimal.\n\nNow I'm adding a small tail fan and telson segment at the back of the abdomen, and checking how the legs and belly height relate to ground level so the crab stands properly.\n\nFor the eye joints I'll attach them via named joints parented to the body, and set up the meta export with the model's name and description. I don't need the rng import since no randomness is required here—I'll just finalize the part-building helper and write the complete code, passing model-space coordinates and bone references only where needed for the body and eyes.\n\n"
+}

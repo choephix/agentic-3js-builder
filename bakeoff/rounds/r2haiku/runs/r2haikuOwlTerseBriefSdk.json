@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuOwlTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "owl",
+  "level": "terse",
+  "pitch": "An owl.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:22:06.270Z",
+  "wallMs": 30858,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5296,
+    "completion_tokens": 6963,
+    "total_tokens": 12259,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00353536,
+  "hasCode": true,
+  "reasoning": "I need to plan out an owl model using the SDK's building primitives, sticking to the specific APIs available like joints, chains, sweeps, lofts, and parts rather than inventing functions that aren't documented.\n\nI'm assuming geometry is placed at the `at` point with its own default orientation, so I'll just center shapes at origin. Designing a tawny owl around 0.4m tall standing at y=0, with a root \"hips\" joint and spine chain going up to the head, and building the egg-shaped body by scaling sphere geometry vertices directly via three.js's built-in scale method rather than relying on an unknown part option.\n\nNow I'm laying out the full joint hierarchy -- hips, chest, head, shoulder/wrist joints for the wings, and hip/ankle joints for the legs -- then planning the actual mesh parts: a scaled ellipsoid body, a lighter cream belly patch facing forward, a slightly squashed sphere for the head, and flattened cream spheres for the facial disc.\n\nI'm also figuring out the eyes (yellow spheres with dark pupils), a forward-pointing cone for the beak with the right rotation so the tip faces +Z, dark ear tufts, folded ellipsoid wings positioned along the sides, and thin yellow cylinder legs ending in small toe/talon shapes.\n\nNow I'm adjusting the overall proportions so the owl sits properly on the ground and feels right-sized -- shrinking the body and head radii, repositioning the hip/body/head centers along y, and making sure the feet bottom out at y=0 with the legs bridging the gap to the body.\n\nFor the skeleton, I'm sketching out joint positions: hips as the root near the base, with chest, head, shoulders, and hips joints branching off as parents, plus ankles further down the leg chains. I'm uncertain about the exact API for specifying joint parents, so I'll keep the hierarchy simple and just attach most parts directly as bones rather than relying on complex chains. For the wings, I'm deciding to skip a full sweep shape and instead approximate them with ellipsoids attached at the shoulder joints.\n\nWriting owl build code...\n\nAdding belly stripe texture...\n\nNow I'm building the head shape, positioning it in absolute model-space coordinates attached to the head bone.\n\nI'm designing the facial disc with cream-colored hemispheres, then placing the yellow eyes with black pupils and dark rims for contrast, and shaping a small cone beak pointing forward.\n\nFor the ear tufts I'm positioning angled cones in brown and dark tones tilted outward, and then building the wings with ellipsoid shoulder bones and a few dark spot stripes placed along the outer wing edge for texture detail.\n\nNow I'm working on the legs using yellow cylinders for the hip-to-foot segments, with toes as rotated cylinders fanning forward and a backward-pointing hind toe for the foot shape.\n\nFor the tail, I'm adding a brown box geometry angled slightly downward at the back of the hips, checking that its bottom edge clears the ground. I'm also considering adding small dark feather-spot details in rows across the chest/belly, though I need to confirm whether the random number generator function returns a callable before using it for jitter.\n\nStill writing geometry code...\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuHedgehogRichSourcePrim",
+  "arm": "source-prim",
+  "subject": "hedgehog",
+  "level": "rich",
+  "pitch": "A plump hedgehog out on an autumn evening walk. A dome of spines in chestnut brown with cream tips, a soft fawn face with a pointed, twitchy snout, a shiny black button nose, tiny round ears and bright beady eyes. Little pink paws, and a single red maple leaf stuck on its spines like a trophy.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:16.978Z",
+  "wallMs": 49952,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112581,
+    "completion_tokens": 10511,
+    "total_tokens": 123092,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.0319592,
+  "hasCode": true,
+  "reasoning": "I'm planning out the hedgehog model using the SDK, sketching dimensions and orientation, then starting to build the body as a scaled sphere in a chestnut tone.\n\nFor the spines, I'm figuring out how to approximate roughly 120 cone-like spikes using sweep primitives while staying under the part/triangle budget, and considering a color gradient from chestnut at the base to cream at the tips.\n\nWorking out spike geometry...\n\nNow I'm planning the skeleton structure, since creatures need to be built skeleton first: a root \"body\" joint, a \"head\" joint, and short leg chains for the hedgehog's small paws, keeping the rig simple given the compact body shape.\n\nFor the face, I'm working out the geometry: a tapered capsule snout shrinking from a wider base to a narrow tip, a small black nose sphere at the snout's end, and beady black eyes with tiny white highlight spheres positioned on the curved surface of the head sphere using basic sphere-surface math to find the right offset.\n\nFor ears, I'm placing flattened spheres on the sides of the head's top, scaled down in depth for a rounded-ear look. The paws are small pink ellipsoids sitting at ground level at the front and back corners of the body, sized and positioned so they visually touch the floor, with a fawn-colored belly ellipsoid under the chestnut body dome.\n\nNow I'm planning a single red maple leaf accessory, thinking through how to build its five-lobed outline as an extruded flat shape.\n\nWriting leaf outline coordinates...\n\nI'll color the leaf red with extruded thickness and a slight bevel, then move to the spikes: roughly 90 of them arranged in a dome grid, each built from two rod segments colored red at the base and cream at the tip. I'm working out the spike positions using an ellipsoid parametrization centered above the body, computing surface points from latitude and longitude angles while skipping the upper-front region, and planning to use the surface normal for orientation.\n\nNow I'm sizing the spikes with a tapering radius from base to midpoint to tip, and reasoning about head placement so the sphere overlaps slightly with the body without colliding with the front-facing spikes I skipped. I'm setting up the joint hierarchy, defining the body as root and attaching the head joint relative to it.\n\nNow I'm working out leg joint positions for each of the four limbs and planning how paws attach to those joints, then confirming eyes, nose, and snout will bind to the head bone directly.\n\nStill writing snout geometry...\n\nNow I'm shaping the body and belly: an ellipsoid dome for the chestnut body, plus a lighter fawn underside layered on top to suggest the hedgehog's visible belly beneath the spiky back.\n\nI'm filtering which spike normals to skip—hiding spikes below the equator and near the face so they don't poke through the head—then placing black eyes with white highlights, pink paw spots, and small fawn-colored ears angled on top of the head sphere.\n\nFor the leaf accent on the back, I'm tilting its plane slightly and sinking the stem into the spines so it sits naturally among them. I'm writing the spike-generation loop, which uses a seeded random function to scatter needle-like rods across an ellipsoid body, computing each spike's base position and outward normal, then building tapered rods from base to tip in chestnut brown with cream tips. I'm also setting up the skeleton—root body joint, head joint with a forward-downward direction, and leg joints at the body surface—then attaching eyes, paws, and ears as world-coordinate parts bound to their bones.\n\nWriting build function and joints...\n\n"
+}

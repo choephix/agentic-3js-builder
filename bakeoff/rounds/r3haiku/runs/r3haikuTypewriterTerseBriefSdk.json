@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuTypewriterTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "typewriter",
+  "level": "terse",
+  "pitch": "A typewriter.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:01:31.462Z",
+  "wallMs": 34399,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5298,
+    "completion_tokens": 7114,
+    "total_tokens": 12412,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00361106,
+  "hasCode": true,
+  "reasoning": "I'm planning out a blocky, stylized typewriter model using the SDK's box geometry parts, since props without joints can be plain objects positioned with simple coordinates.\n\nStill laying out the typewriter parts...\n\nDeciding on rotation helpers for cylinders and picking a classic typewriter palette: dark charcoal body, cream keys, chrome accents.\n\nStill working out the layout...\n\nConfirming rotateX(0.25) tilts the deck front downward, then working out key placement—rows of small cream key boxes arranged across the sloped deck surface, computing approximate y-heights along the slope so keys sit flush on the tilted plane.\n\nThe deck overlaps the body front, which is fine visually as a sloped panel. I'm planning three key rows along z at roughly 0.02, 0.06, and 0.10, each with 11 keys spaced across x, computing each key's center position from the sloped surface equation plus half the key height.\n\nI'm also adding a wide space bar near the front edge, plus a roller/carriage: a dark cylinder spanning the width behind the keys, with a paper sheet positioned above and tilted back slightly to look like it's feeding up out of the roller toward the user.\n\nSettling paper position at center [0, 0.43, -0.13] with size (0.2, 0.14, 0.003), hanging from the roller top with its front face toward the viewer. Now adding a platen housing box for the top plate/cover section.\n\nI could add tiny dark caps on each key for letter detail, bumping the part count to around 60, but that extra wow factor seems worth it. I'm also thinking about adding thin chrome strips along the body sides for extra detail.\n\nNow I'm skipping the random variation helper and brand plate since they're not essential, and moving to writing the actual geometry code -- cylinders for the lever with proper rotation, feet boxes positioned within the body bounds, and a surface height function for placing keys.\n\nWorking out the key row positions and tilt angles...\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuFlamingoRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "flamingo",
+  "level": "rich",
+  "pitch": "An elegant flamingo standing tall in shallow water. Candy-pink feathers deepening to coral on the wings, with a flash of black flight feathers at the wing tips, an S-curved neck, a bent beak that is pale pink with a black tip, pale yellow eyes and long rose-coloured legs with knobbly knees and webbed feet.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:16.980Z",
+  "wallMs": 40743,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5405,
+    "completion_tokens": 8485,
+    "total_tokens": 13890,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00430726,
+  "hasCode": true,
+  "reasoning": "I'm planning to write a single TypeScript module using the SDK, sticking to documented builder APIs like chain, sweep, part, and extrude to keep the structure reliable while still aiming for a polished result.\n\nFor limbs I'll likely borrow from the IK leg-bending approach but keep it simple with explicit joints. I'm thinking about color strategy—flat colors rather than gradients or textures, using distinct hues for things like coral wing feathers. For the overall build plan, I'll use joints for the skeleton, a chain with sweep geometry for the neck and body, simple geometric shapes for feet and beak, and spheres for eyes. I'm now working out realistic proportions: a flamingo roughly 1.4m tall, with legs making up most of that height, positioning feet near water level and working up through ankle and knee joints.\n\nNow I'm pinning down specific coordinates for the ankle, visible knee, hip, body center, and the S-curved neck leading to the head, with the beak angled downward and forward along the +Z axis. I'm defining the joint hierarchy next—hip position, thigh and shin segments for the legs with a small knobbly sphere at the knee, and webbed foot shapes flattened near ground level, then sketching out the leg chain coordinates.\n\nI'm reasoning through how the chain/joint API likely works, deciding to use explicit parent-child joints for the legs and neck, then sweep tube geometry along those chains for the final limb shapes.\n\nFor eyes and beak I'll use parts with scale and bone assignment, letting unbone geometry snap to whichever joint's bone is closest. For feet I'm considering flat webbed shapes, possibly falling back to plain three.js cylinder geometries scaled for toes since the custom extrude semantics feel too uncertain to rely on.\n\nToes could be boxes elongated along Z, splayed by rotating the geometry itself with rotateY before passing it to part, since geometry is centered at origin relative to the attachment point and doesn't need extra translation. Next I need to figure out the folded wing shape using body sweeps.\n\nAdding a black tip sphere for the wing end and settling on the full color palette—pink body, coral wings, black accents, pale beak and eyes, rose legs. Now I'm planning the head and neck as an S-curve chain of joints from the base up to the head, defining the path points before moving on to hip joints.\n\nFor the legs I'm weighing whether to use explicit joints with a point array swept for geometry versus a chain helper, deciding to keep joints explicit since the sweep mechanism attaches meshes to the nearest bone regardless. I'm starting to write the actual module code now, setting up imports and metadata before defining color constants.\n\nWorking out the color palette for the flamingo — soft pink for the body and neck, coral for wing coverts, black for wingtips, pale pink beak with a black tip, and pale yellow eyes with a tiny dark pupil sphere offset forward. I'm sketching the body as an ellipsoid bound to the hips joint, a small coral tail sphere behind it, and wing covert shapes positioned near the shoulders with coral coloring.\n\nNow I'm working through the skeleton structure — mirroring the wingtip blacks on the left side, building the neck as a chain of joints swept into a tube, and figuring out how the head attaches at the end of that neck chain, defaulting to parenting it to the hips joint since the chain attachment logic is uncertain. Then I'm positioning the beak relative to the head joint.\n\nNow I'm shaping the bent flamingo beak into upper and lower mandible sweeps with pale pink coloring and black tips, placing the pale yellow eyes on either side of the head, and starting to lay out the leg joints from the hip down toward the knee.\n\nFor the legs, I'm building a slender sweep path from hip to knee to ankle with a small knee sphere, then adding webbed feet using a flattened sphere base plus rotated box toes for the webbing detail.\n\nI'll mirror everything for the left side using a side-mapping helper, skip unnecessary lighting setup, remove the unused rng import, and use scale options on the part geometries instead of baking transforms manually. Then I'll finalize the build function to return the root and output the code with a brief explanation.\n\n"
+}

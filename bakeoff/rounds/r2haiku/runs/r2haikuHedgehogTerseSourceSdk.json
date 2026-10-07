@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuHedgehogTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "hedgehog",
+  "level": "terse",
+  "pitch": "A hedgehog.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:16.977Z",
+  "wallMs": 82990,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112463,
+    "completion_tokens": 11912,
+    "total_tokens": 124375,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.035409,
+  "hasCode": true,
+  "reasoning": "I'm planning out a stylized hedgehog model, roughly 0.25m scale, using the SDK's builder with a defined paint size, and sketching how to construct the body as a loft of stations running from snout to rump.\n\nI'm figuring out the joint hierarchy: a root body joint plus a spine-to-head-to-snout chain, and four short leg chains (front/hind, left/right) using the chain API with named joints along hip-knee-ankle paths tied to their parent bones.\n\nSwitching strategy to build the skeleton directly with joints and capsule rods for legs, then loft the hedgehog's body along a curved path with stations. For the spines, I'm planning to scatter points across the body surface and spawn individual spikes at each hit point, oriented along the surface normal.\n\nI need to keep the mesh count manageable — reducing spike sides and count to stay within triangle and part limits while still looking dense. For coloring, I'm considering alternating warm tones between spine tips and bases, and a countershaded paint for the body.\n\nI think bands are the cleanest way to color each spike: a solid cream base transitioning to dark brown near the tip, using t-position bands rather than a full gradient per spike. Now I'm moving on to shaping the hedgehog's face with a snout capsule sweep.\n\nStill writing face and body geometry...\n\nAdding a jaw joint under the head, and deciding to skip the tail or keep it as a tiny nub since hedgehog tails are small. For legs, I'm setting up hip and foot joints parented to the body, building each leg as a capsule between joint positions with small foot spheres, and adjusting the body's vertical position so its underside clears the ground for the legs to attach properly.\n\nI'm working out ground clearance so the feet and belly sit flush with the floor, then scattering spikes across the body surface using normal-based filtering to keep them off the face and belly while giving them slight random length variation for a natural spine look. I'm also setting up rigid bone weighting for the body sweep, adding a mottled gradient-painted head with snout and nose, placing eyes and ears with careful offset math so they sit just on the head sphere's surface, and laying out leg and tail capsules with appropriate colors.\n\nFinally I'm assembling the full joint hierarchy—body, neck, head, jaw, hips—checking naming and parent-child rules, estimating triangle/part counts to stay within limits, applying countershading and head gradient paints, and drafting the exported builder function with body loft stations, head sphere placement, and refined eye/ear/snout coordinates to match the adjusted head position.\n\n"
+}

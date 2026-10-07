@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuLionTerseDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "lion",
+  "level": "terse",
+  "pitch": "A lion.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:56:52.486Z",
+  "wallMs": 148094,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32582,
+    "completion_tokens": 21132,
+    "total_tokens": 53714,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.0138242,
+  "hasCode": true,
+  "reasoning": "I'm planning a three.js lion model built with realistic proportions, aiming for a stylized adult male lion around 2.2m long and 1.2m at the shoulder, standing on the ground plane and facing forward, while being careful to use the API correctly so the code runs without errors.\n\nSetting up a color palette for mane, body, belly, nose, eyes, and teeth, then sketching a joint skeleton with hips as the root, a spine chain running through curved points from hips to chest, and a neck chain extending up toward the head.\n\nI'm now working on the head joint, parenting it to the end of the neck chain, and planning the skull as a slightly scaled sphere to give it a stylized blocky shape.\n\nFor the mane, I'm weighing options between a simple sphere shell positioned behind the head versus a ring of spike shapes swept around the head's back axis for a spikier, more dynamic look -- leaning toward the ring-of-spikes approach with a moderate count and radius to keep it visually readable without being too heavy.\n\nI'm positioning the mane ring slightly behind the head center so spikes radiate outward on all sides, covering the top and sides to read as a mane, with radius around 0.22 and spike length 0.25.\n\nI'm also layering in a mane sphere behind the head and a slightly smaller face sphere in front, adjusting their centers and radii so the face reads clearly in front while the mane fills out the back and sides without fully swallowing it.\n\nThen I'm working through the finer anatomy: muzzle, nose, eyes, pupils, and ears placed using local bone-relative coordinates (forward/up/left), followed by a separate jaw joint so the mouth can open, with upper and lower jaw boxes and small cone-shaped teeth/fangs using spikes.\n\nFor the legs, I'm setting up front and hind limb chains with shoulder/hip joints, three-segment lengths (upper leg, lower leg, paw) with bend directions so the IK solves naturally toward floor targets, parenting front legs to the chest and hind legs to the hips.\n\nI'm also planning the tail as a multi-point chain curving up with a tapering radius and a tufted sphere at the tip, and the body itself as a sweep along the spine chain using a width/depth radius function that bulges slightly at the chest, with belly-colored sectors on the underside and a tapered neck sweep leading up to the head.\n\nFor the mane, I'm arranging rings of outward-pointing spikes around the back of the head using a line-based ring generator, layering two rings at different radii and spike lengths for volume, with a mottled brown paint for color variation; I'm also reconsidering leg joint heights and segment lengths so the IK chains can actually reach the floor targets without falling short, adjusting shoulder/hip y-values and limb lengths until the reach distances line up.\n\nFinally, I'm writing the actual skeleton-building code — defining colors and paint presets (countershade for the coat, mottle for the mane), then constructing the hip root joint, a spine chain running from hips to chest, a neck chain continuing up to a head joint, and a jaw joint parented to the head.\n\nWriting joint hierarchy...\n\nNow I'm adding the tail chain with a tufted tip, then looping over left/right sides to build front and hind leg limbs using inverse kinematics with bend hints, naming each joint (shoulder/elbow/wrist/paw and hip/knee/hock/pa"
+}

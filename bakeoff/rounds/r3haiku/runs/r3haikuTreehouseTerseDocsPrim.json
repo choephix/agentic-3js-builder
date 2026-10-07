@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuTreehouseTerseDocsPrim",
+  "arm": "docs-prim",
+  "subject": "treehouse",
+  "level": "terse",
+  "pitch": "A treehouse.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:01:55.008Z",
+  "wallMs": 59853,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32598,
+    "completion_tokens": 13007,
+    "total_tokens": 45605,
+    "prompt_tokens_details": {
+      "cached_tokens": 32586
+    }
+  },
+  "costUsd": 0.00683056,
+  "hasCode": true,
+  "reasoning": "I'm planning the treehouse scene using basic primitives—a trunk, branches, platform, walls, a cone roof, ladder, maybe a rope bridge and windows with decals and a flag, keeping the TypeScript module compact but visually solid.\n\nFor scale I'm aiming for a platform around 4m up with the whole structure near 9m tall, grounded at y=0. I need to ensure every part attaches properly to joints, so I'll set up a root joint at the origin and route parts through it by default, using sweeps for the tapered trunk and capsules for the branches, while keeping cylinder/box orientations simple since the trunk runs straight up along y.\n\nPlanning out the remaining elements: low-poly icosahedron foliage with flat shading, wood-grain paint patterns for the trunk and planks, simple glowing boxes for windows, a pyramid-style roof made from a rotated four-sided cone, plus ladders, a sagging rope bridge via catmull sweeps, and a small flag at the top of a pole.\n\nFor scenery objects I don't need complex joint hierarchies, just a single base joint as the skeleton root. I'll avoid relying on an rng utility I'm unsure about and instead use deterministic sine-based placement for leaves, sticking only to imports I'm confident exist: the builder function and paint helpers like grain, mottle, spots, and stripes.\n\nNow I'm laying out the full treehouse geometry: a tapering trunk running through a square platform, a walled cabin with a hip roof made from a rotated four-sided cone, door and window openings, railings with a gap for the ladder, and a ladder with evenly spaced rungs climbing to the platform. I'm positioning clustered icosahedron \"canopy\" blobs around the roof and trunk for foliage so the flagpole and roof apex stay visible, adding a small flag using an extruded triangular outline, and finishing with a grass disc base, a few bushes, and consistent wood-grain and shingle paint textures across the wood and roof surfaces.\n\nI'm now defining the color palette and paint textures for bark, planks, walls, roof, leaves, and grass, then writing helper functions for leaves and boxes before assembling the full scene: cabin walls, roofing, windows with frames and glass, a door, corner posts and railings, a ladder, support beams connecting the trunk to the platform, several branch capsules leading into the canopy clusters, a sweep-based trunk with flat start caps, and finishing touches like a lantern, flagpole, flag, grass base, and scattered bushes, wrapped up with an exported meta description.\n\n"
+}

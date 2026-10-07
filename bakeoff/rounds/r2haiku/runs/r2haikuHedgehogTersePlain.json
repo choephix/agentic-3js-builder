@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuHedgehogTersePlain",
+  "arm": "plain",
+  "subject": "hedgehog",
+  "level": "terse",
+  "pitch": "A hedgehog.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:16.978Z",
+  "wallMs": 28978,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 776,
+    "completion_tokens": 6362,
+    "total_tokens": 7138,
+    "prompt_tokens_details": {
+      "cached_tokens": 763
+    }
+  },
+  "costUsd": 0.0031899299999999997,
+  "hasCode": true,
+  "reasoning": "I'm planning a three.js module to build a stylized hedgehog from primitives at realistic scale—sizing the body around 25cm long and 12cm tall, with a scaled sphere for the body, cones radiating across the back as spines using seeded randomness, and a snout cone for the face.\n\nWorking out positioning of the head, snout, legs, and ears so everything sits correctly on the ground plane, with legs reaching from y=0 up into the body. For the spines, I'm placing low-poly cones oriented along each surface normal using quaternion rotation, planning darker brown with lighter tips for visual texture.\n\nNow I'm computing surface points and normals on the ellipsoid body using a Fibonacci sphere sampling, excluding the face and belly regions, and switching to an InstancedMesh so I can render hundreds of spine cones efficiently as a single mesh rather than individual objects.\n\nI'm orienting each spine cone by tilting its normal slightly toward the tail for a natural swept-back look, using a seeded random generator for consistent placement, then adding smaller features: ears, eyes, nose, and feet as simple spheres with appropriate tints, plus a forward-facing cone for the snout positioned at the head.\n\nFor the belly and face, I'm keeping things simple with a cream-colored patch sphere rather than overcomplicating the shading. Now I'm setting up the materials -- dark brown spines with some lighter tan and cream variation applied via instance colors for a stylized look, darker fur tones for the body and legs, and defining the nose color.\n\nSetting up the hedgehog generator function, I'm using a seeded random generator and building the body as a scaled ellipsoid sphere, then working out how to distribute spine points evenly across its surface using a Fibonacci sphere pattern and mapping each direction vector onto the ellipsoid shape.\n\nStill writing spine placement logic...\n\nFor the face, I'm thinking through a cream-colored mask for the head versus making the whole head sphere cream-toned, positioning it near the front where the spines begin.\n\nNow I'm working out the small details - ears, eyes, nose, and snout - placing each with small spheres and a cone, using dark pink-brown for ears and cream for the snout to match the head, then moving on to the legs as simple cylinders.\n\n"
+}

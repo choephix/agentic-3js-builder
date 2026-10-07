@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuClockworkDogRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "clockworkDog",
+  "level": "rich",
+  "pitch": "A wind-up clockwork terrier made of polished brass and copper. Riveted body plates, visible gears turning in its chest, a big winding key on its back, springy jointed legs, floppy leather ears, glass-lens eyes with a green tint, a tail made of a coiled spring, and a little red collar with a brass tag.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:29:05.736Z",
+  "wallMs": 66895,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5411,
+    "completion_tokens": 11122,
+    "total_tokens": 16533,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.0056251,
+  "hasCode": true,
+  "reasoning": "I need to build a single TypeScript module using the SDK, sticking only to the functions named in the reference like createBuilder, joint, chain, sweep, part, stick, surface, sprout, ring, along, decal, extrude, lathe, region, limb, paint, and stripes—keeping the structure reasonably complex but avoiding risky assumptions beyond the documented API.\n\nWorking through the known signatures: createBuilder takes a name and optional detail, joint takes a position and optional aim/dir/up/parent (likely passing the parent joint object directly), chain returns a path I can sample with `.at(t)`, sweep takes a path and radius with a color option, and part/stick/surface build geometry and hit-testing from bodies.\n\nFor the remaining uncertain calls like ring, lathe, and decal, I'll lean on simpler, more reliable approaches instead -- using `along` for distributing items on a path, and plain three.js primitives for things like legs and lathed sh"
+}

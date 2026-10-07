@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuBalloonTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "balloon",
+  "level": "terse",
+  "pitch": "A hot-air balloon.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:30:43.214Z",
+  "wallMs": 61917,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112465,
+    "completion_tokens": 9580,
+    "total_tokens": 122045,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.02958,
+  "hasCode": true,
+  "reasoning": "I'm planning a single TypeScript module that builds a hot-air balloon using the SDK, with an envelope, basket, and connecting ropes. I'm deciding whether to show it resting on the ground or floating, leaning toward a grounded balloon with the basket sitting on the surface.\n\nWorking out the envelope geometry...\n\nI'm worried smoothing near the axis points could pull them off-center, distorting the closed loop, so I should avoid applying corner smoothing there and keep those vertices sharp while rounding only the outer profile corners.\n\nFor the surface coloring, I want vertical gores instead of horizontal bands, so I'm writing a paint function that reads the angle from the lathe surface coordinates and alternates between two colors per gore segment, plus adding a darker collar band near the top based on height.\n\nFor the basket beneath the balloon, I'm thinking of using a tapered frustum shape or a lathe with few segments colored tan, possibly with a woven stripe pattern to suggest wicker texture.\n\nWorking out the basket's lathe profile...\n\nWith basket height 1.1 and ropes 1.4m, I'm placing the lathe profile with absolute y-coordinates from the ground, so the envelope top reaches roughly 20m, matching real balloon scale. Then I'm computing 12 ropes connecting mouth ring points (radius 2.3, y 2.6) to the four basket corners at radius 0.72, y 1.1.\n\nI'm working through the geometry: corners placed at 45°, 135°, 225°, 315° to align with the lathe's spin rotation, with three ropes fanning out to each corner at offset angles. I'm settling on the mouth attachment ring at y=2.6, radius 2.3, and increasing the rope radius to 0.015 for better visibility.\n\nI'm sketching the burner as a grey cylinder spanning from the basket joint up into the envelope mouth, around radius 0.25-0.35. Then I realize I need a root joint since no joints exist yet -- without one the builder will throw a \"no joints\" error -- so I'm planning to create a root joint at the origin and possibly a basket joint as a child, keeping the hierarchy simple for now.\n\nWriting the paint function for the envelope...\n\nI'm adding a thin dark-wood rim slab at the top of the basket, then working out the envelope's lathe profile points and marking the apex and mouth points as sharp so smoothing rounds the shoulders without collapsing the axis. I'm also noting that rope attachment points at the mouth radius will need to account for how smoothing shifts that corner.\n\nI'm sketching out the ropes as rods connecting basket rim corners to mouth attachment points around the envelope, plus a simple grey burner rod rising from the basket center, and settling on paint functions for the envelope gores (alternating cream/red panels with navy seams and skirt bands) and wicker stripes for the basket. I'm also planning the overall builder structure—root joint, lathe calls for envelope/basket/rim, rod calls for ropes and burner—before writing the final exported code.\n\nWriting builder code...\n\n"
+}

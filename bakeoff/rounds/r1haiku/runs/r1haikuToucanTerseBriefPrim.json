@@ -1,0 +1,25 @@
+{
+  "slug": "r1haikuToucanTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "toucan",
+  "level": "terse",
+  "pitch": "A toucan.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:49:51.066Z",
+  "wallMs": 48037,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5171,
+    "completion_tokens": 8156,
+    "total_tokens": 13327,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.0045951,
+  "hasCode": true,
+  "reasoning": "I need to build a toucan model using the SDK, keeping it compact but visually solid. I'll rely on the builder functions I know are available—joints, chains, parts, sweeps, sticks, sprouts, spikes, rods, extrudes, lathes, membranes, cards, rings, and decals—being careful to use them correctly since I don't have complete documentation for all of them.\n\nI'm uncertain about exact function signatures, especially for b.part, so I'll make reasonable assumptions about how geometry, color, and placement options get passed in, favoring the safer documented b.stick signature where possible since its parameters are clearer.\n\nNow I'm sketching out the toucan's design: colorful bill, black body, white chest, blue eye ring, small legs in a perched pose facing forward. I'm working out how to position its feet at ground level while adding a branch underneath for it to stand on, deciding whether the branch should be partially sunk into the ground so the feet still touch y=0.\n\nSimplifying, I decide to skip the branch and just have the toucan stand directly on the ground. I'm figuring out the body coordinates—tilting the hips, chest, and head forward along the z-axis—and working through how to set up the joint hierarchy with parent-child relationships for the spine chain, though I'm uncertain about the exact syntax for passing parent references between joints.\n\nNow I'm planning out the beak as a two-part jaw structure with separate upper and lower mandibles attached to head and jaw joints respectively, using scaled sphere geometries to approximate the elongated shape. I'm working through the leg and foot segments as cylinder primitives oriented via direction vectors, plus the tail as angled boxes, wings as flattened ellipsoids, and color-coding everything—black, white, orange, yellow, blue, red, grey—to match a keel-billed toucan's markings.\n\nWriting the build function with sphere, cylinder, and box primitives for the body, head, beak, eyes, wings, tail, and three-toed feet...\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuKoalaTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "koala",
+  "level": "terse",
+  "pitch": "A koala.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:59:40.803Z",
+  "wallMs": 25543,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5310,
+    "completion_tokens": 5765,
+    "total_tokens": 11075,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.0029365,
+  "hasCode": true,
+  "reasoning": "I need to build a koala model in three.js, working carefully within the documented SDK helpers like builder joints, chains, sweeps, parts, and sticks, since the API reference I have is only partially specified.\n\nFor the koala's look, I'm planning grey fluffy fur, large round ears with fuzzy interiors, a big black nose, small eyes, a chunky head, stubby clawed legs, and no visible tail, sized around 0.7-0.8m. I'll go with a sitting pose, hips around y≈0.2 and head near y≈0.65, using primitive geometries like spheres, boxes, and capsules for the parts, though I'm still working out how positioning relative to bones and anchor points should behave.\n\nI'm also figuring out how joints get parented to each other, likely through a `parent` option pointing to another joint, and deciding to avoid risky chain-role features I'm unsure about, sticking instead to plain joints and parts attached directly to them for simplicity.\n\nNow I'm working out the koala's skeleton coordinates—hips, spine, chest, head, shoulders—then thinking through how to orient limb parts, since I'm uncertain whether the `aim` or `dir` options control a part's axis versus a target point, and considering whether spheres with scaling might sidestep the ambiguity around capsule orientation entirely.\n\nGood news: I've found a `scale` option for parts, so I can use scaled spheres as ellipsoids instead of oriented capsules. I'm now sketching the koala's color palette (grey body, cream chest, black nose/eyes) and building out the joint hierarchy for hips, spine, chest, neck, head, and the hip/knee/ankle chain for the sitting legs.\n\nI'm now working through the arm joints (shoulder, elbow, wrist) positioned to hug the chest, the ear discs with grey outer and cream inner layers, and the head shape — a scaled sphere for the skull, a smaller sphere for the muzzle, a black ellipsoid nose, tiny black eye spheres, and a cream patch for the chest, all placed using absolute model-space coordinates.\n\nPlacing the torso sphere so it meets the head without gaps, adding a neck sphere to hide the seam, and building out the haunches and feet with grey pads and small claw-like spheres at the toes. Then constructing the arms as a chain of spheres — upper arm, forearm, and paw — sized and positioned at the midpoints between the shoulder, elbow, and wrist joints to approximate a tapered limb shape.\n\nMirroring everything by using a side multiplier s=±1, then adding ears with inner ear detail at the head joint. Deciding to skip extra fur texture or ground elements to keep things simple, naming joints like \"shoulderL\"/\"shoulderR\" per side, and now writing the actual build function with a helper that creates ellipsoid shapes from sphere geometry scaled by radii, setting up the color palette and joint hierarchy for the koala model.\n\n"
+}

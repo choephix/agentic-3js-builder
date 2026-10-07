@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuLionRichPlain",
+  "arm": "plain",
+  "subject": "lion",
+  "level": "rich",
+  "pitch": "A proud old lion resting with his head held high. A huge shaggy mane fading from golden blond at the face to dark chocolate at the edges, a tawny body with a pale cream belly and muzzle, amber eyes, a broad black nose, a scar across one eyebrow, big padded paws and a long tail ending in a dark tuft.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:56:52.489Z",
+  "wallMs": 51878,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 877,
+    "completion_tokens": 11063,
+    "total_tokens": 11940,
+    "prompt_tokens_details": {
+      "cached_tokens": 763
+    }
+  },
+  "costUsd": 0.00555053,
+  "hasCode": true,
+  "reasoning": "I'm planning a stylized low-poly lion built from three.js primitives, aiming for a sphinx-like resting pose with the chest and head raised and front legs extended forward.\n\nFor materials I'm thinking tawny body tones, a cream belly, and a mane made from a ring of cones or elongated spheres with colors interpolated between golden blond and dark chocolate depending on distance from the face, giving a gradient effect without needing a complex texture.\n\nI'll organize the mane tufts into inner blond and outer chocolate layers based on radial distance, blending colors across the six-shade palette. Then I'm planning the head details: skull shape, cream muzzle, flattened black nose, amber eyes with pupils, ears tucked into the mane, and a scar rendered as a thin dark box angled across one brow.\n\nNow I'm mapping out the sphinx-pose body: a tawny torso with a lighter cream belly beneath it, a rounded haunch at the rear, straight cylindrical front legs with padded paws, and folded hind legs lying along the ground. I'm also planning a curving tail built from a tube along a spline curve with a dark tufted tip, and positioning the skull atop a neck cylinder connecting to the chest.\n\nI'm placing the muzzle, nose, eyes with amber irises and black pupils, brow ridges, a small diagonal scar detail on the lion's left brow, and rounded ears partly tucked into the mane. For the mane itself I'm computing roughly 70 tufts distributed around the head using a golden-angle spherical pattern, restricting placement to the sides, back, and top while excluding the forward-facing cone where the face sits.\n\nI'm defining cone-shaped tufts oriented outward from the head center, blending blond inner tufts with darker outer ones, plus a solid base sphere underneath for volume, and extending the mane down toward the shoulders for a fuller look.\n\nI'm setting up the color palette with six gradient shades for the mane plus tawny, cream, black, amber, and scar tones, along with a seeded random generator for consistent variation, then sketching paw placement and leg proportions relative to the chest height so the lion sits properly on the ground.\n\nNow I'm working out the torso, neck, and leg geometry — using cylinders angled via quaternion rotations to connect joints like the chest to the head — and adjusting the mane base sphere so it doesn't overlap and cover the face, scaling it down and shifting it slightly backward.\n\nNow I'm planning the tail with a curved tube geometry trailing to the side with a dark tuft at the end, then sketching the haunches and folded hind legs with cylinders and ellipsoid paws, plus a cream belly ellipsoid tucked beneath the torso for added volume.\n\nAdding muzzle, nose, and mouth details, then starting the actual build function with a deterministic seeded random generator and the root group setup.\n\nSetting up materials and lion structure...\n\nWorking out mane tuft placement with directional sampling and length-based coloring, then adding ears, eyebrows, and a small scar detail near the eye region using positioned boxes.\n\nNow I'm placing the amber eyes and black pupils based on skull curvature, then sizing and positioning the skull sphere, muzzle, neck cylinder, torso ellipsoid, and foreleg cylinders to assemble the body proportions.\n\nNext I'm working out the paws with toe pads, haunch sphere, hind leg cylinders rotated to run along the z-axis, chest bib, belly ellipsoid, and a curved tail built from a tube geometry with a dark tuft at the tip, checking that everything connects without gaps before finalizing the full code and returning the root group.\n\n"
+}

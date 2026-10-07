@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuTreasureChestTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "treasureChest",
+  "level": "terse",
+  "pitch": "A treasure chest.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:29:07.712Z",
+  "wallMs": 114731,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112463,
+    "completion_tokens": 16008,
+    "total_tokens": 128471,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.045649,
+  "hasCode": true,
+  "reasoning": "I'm planning out a stylized treasure chest model using the SDK's builder API, combining box geometries for the body and hinged lid, with metal bands, a lock, and gold coin details inside.\n\nFor the paint, I'll use solid gold color for metal fittings and a grain texture for the wood planks. For the lid shape, I'm working out how to build a domed half-cylinder by slicing a CylinderGeometry's theta range and rotating it so it bulges upward over the chest body.\n\nI'll offset the lid group so the hinge sits at the back edge, then scale the dome down vertically since the full radius makes it too tall for a chest lid — flattening to about 0.165 height looks right. The flat half-disk caps on the cylinder ends work fine as end plates, and now I'm planning the body's metal bands and corner brackets using dark iron and gold tones over the wood-grained box.\n\nNext I'm adding a gold lock plate with a keyhole on the front, thin dome-shaped band strips across the lid using open cylinder arcs, and setting the lid to rest slightly open around 35 degrees so gold coins and gems can be visible stacked inside, sitting just above the body's top surface since the body itself is a solid box.\n\nI'm reconsidering collision between the lid and the coin pile — opening the lid wider to around 70 degrees so it swings fully clear of a small heap of coins placed toward the front of the body's top, keeping the pile short enough that the lid's arc avoids it entirely.\n\nWorking through the rotation math for the hinge, I decide to just set the lid's rest pose using an axis-angle rotation around the local X axis at roughly -65 degrees, trusting model-space pose semantics rather than reasoning through the hinge's local frame by hand.\n\nI realize pose applies to the joint and everything attached to it, so I should build the lid geometry in its closed position first, then call pose to rotate it into the open rest state. For the joint hierarchy, I'll make a \"chest\" joint the root, attach the lid joint to it as parent with a hinge role, and place coins and the lock directly on the chest bone.\n\nNow I'm working out the body's actual dimensions — placing the chest joint at the origin, sizing the body box so it sits just above the floor, and adding small foot blocks underneath so the chest appears to rest on the ground. For the lid, I'm calculating the dome radius from the body's depth and figuring out where the hinge sits at the back edge so the arc spans correctly from the closed to open position.\n\nI'm working through the geometry math for the half-cylinder dome lid, figuring out how rotating and scaling the cylinder produces the correct arc shape and position relative to the body top, and checking that the decorative metal bands wrap around it proportionally without floating noticeably off the surface. I'm also deciding colors for the bands versus the gold lock hardware.\n\nI'm sketching out the body's decorative straps and corner brackets as slightly oversized boxes that wrap the chest's edges, and placing a lock plate and keyhole detail on the front face. Then I'm planning the coin pile and gem placement on top of the body, reasoning through the hinge rotation geometry to confirm the opened lid won't clip through the coins since the lid's forward travel stays within a safe z-range.\n\nI'm also sorting out a rigging detail: parts attached to the lid bone need an explicit `at: [0,0,0]` override, otherwise they'd default to the hinge's joint position and get incorrectly offset, whereas chest-bone parts work fine with the default since the chest joint already sits at the origin.\n\nWriting component code for the chest...\n\nI'm finalizing helper functions for boxes and coins, scattering a pile of gold coins using a seeded random generator so they spill naturally over the chest's front edge and stack higher toward the center, then checking that the pile doesn't clip through the lid's rotated-open position. After confirming colors like gold mottle and iron tones, I'll assemble the full TypeScript module and output just the finished code block.\n\n"
+}

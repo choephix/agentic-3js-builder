@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuJellyfishRichDocsPrim",
+  "arm": "docs-prim",
+  "subject": "jellyfish",
+  "level": "rich",
+  "pitch": "A glowing moon jellyfish drifting upward. A translucent pale-blue bell with four pink horseshoe shapes inside, a frilly rim of fine tentacles, and four long, ruffled oral arms trailing below in pearly white and lilac. A soft glow lights it from within, like a lantern in the deep.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:26:17.619Z",
+  "wallMs": 52441,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32696,
+    "completion_tokens": 10845,
+    "total_tokens": 43541,
+    "prompt_tokens_details": {
+      "cached_tokens": 32586
+    }
+  },
+  "costUsd": 0.00575936,
+  "hasCode": true,
+  "reasoning": "I need to write a single TypeScript module using the SDK, carefully following its documented API while keeping the code concise and high quality. Since the jellyfish is a creature drifting in water rather than standing on ground, I'll honor the pitch's rule of keeping it at whatever height was specified off the floor.\n\nFor scale, I'm sizing the bell around half a meter wide, with tentacles trailing downward from the bell center. Since the SDK's materials don't support true transparency or emissive glow directly, I'm considering adding a custom three.js mesh with a semi-transparent MeshBasicMaterial sphere inside the bell to fake a soft inner glow, since the SDK allows attaching custom geometry to joints.\n\nI'm now sticking with the builder's primitives for everything, including a light-colored core for the glow effect, and planning the bell as a lathe-shaped dome with an outer and inner profile to form a flattened shell, colored pale blue, positioned above the body with its opening facing down. I'm also planning four pink horseshoe-shaped gonad markings inside the bell using extruded outlines.\n\nFor positioning them, I'm working out whether to use arc-based tubes or extruded U-shaped polygons placed at four angles around the axis near the dome's underside, leaning toward extrude with a horseshoe outline since arc orientation is getting too fiddly.\n\nPlacing horseshoes in a horizontal plane viewed from below the bell interior, orienting each so the gap points radially outward and positioning four copies around the axis at angles 45°, 135°, 225°, 315°, tucked near the bell's lower rim.\n\nNow I'm adding frilly tentacle-like spikes radiating from the bell rim, using a ring pattern to place short pink spikes angled downward and outward from the rim's circumference.\n\nI'm checking spike's color option works as shown in examples, then turning to the oral arms—four long ruffled tentacles trailing beneath the bell, built as curving chains with swept paths whose radius tapers and wobbles sinusoidally to create the ruffled effect.\n\nSetting up chain and joint structure...\n\nClarifying the band ordering so pearl covers the lower portion and lilac takes the tip. For the glow effect, I'm considering adding a small bright pale cyan core sphere inside the bell near its center to simulate an inner lantern light showing through the translucent material.\n\nFor bell coloring, I'm setting up a gradient paint running from a deeper blue at the base to a pale near-white near the rim, applied to the lathe geometry, with the bell attached via a joint at its base so it inherits the parent bone orientation. For the horseshoe details, I'm generating the outline points programmatically with outer and inner radii and a gap, making sure the shape doesn't self-intersect before extruding it onto the bell.\n\nNow I'm adding a glowing sphere inside the bell for the lantern effect, then placing rim tentacles as a ring of 48 thin spikes positioned just inside the bell's rim radius, pointing downward.\n\nI'm working through the bone inheritance for the ring frame, making sure the spikes attach to the bell joint correctly before any arm bones exist, so the fringe gets parented properly.\n\nNow I'm sketching the four oral arms emerging from beneath the bell mouth at radius 0.09, curving down and outward through several control points toward the tentacle tips, with slight sideways wobble for a more organic curl.\n\nI'll chain and sweep each arm using catmull-rom paths with tapering radius and color bands shifting from pearl white to lilac toward the tips, keeping the default round cross-section and sides for simplicity.\n\nWith the shape plan settled, I'm setting up the imports and color palette, then starting the build function with the bell, horseshoes, core, spikes, and tentacle arms as separate parts to assemble.\n\nNow I'm working through the horseshoe-shaped tentacle rings around the bell, the rim frills using a ring-and-spike pattern, and the four trailing oral arms built from catmull-spline chains with gradient sweep coloring from pearl to lilac. I'm checking that joint names, radii, and y-coordinates stay consistent so the arms dangle naturally below the bell without touching the ground, then finalizing the build function to return the root.\n\n"
+}

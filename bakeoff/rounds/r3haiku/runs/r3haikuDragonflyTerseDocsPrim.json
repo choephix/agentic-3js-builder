@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuDragonflyTerseDocsPrim",
+  "arm": "docs-prim",
+  "subject": "dragonfly",
+  "level": "terse",
+  "pitch": "A dragonfly.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:58:59.246Z",
+  "wallMs": 156836,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32599,
+    "completion_tokens": 23402,
+    "total_tokens": 56001,
+    "prompt_tokens_details": {
+      "cached_tokens": 32586
+    }
+  },
+  "costUsd": 0.01202816,
+  "hasCode": true,
+  "reasoning": "I'm planning a TypeScript module to build a dragonfly model using the SDK, keeping it at realistic scale—roughly a 7cm body and 10cm wingspan modeled in meters.\n\nI'm deciding on the resting pose, with legs touching the ground at y=0 and wings held flat, then sketching the joint hierarchy with a root thorax joint connecting head, abdomen, legs, and wings positioned along a body oriented toward +Z.\n\nNow I'm laying out the abdomen as a tapering chain from the thorax backward, trying to figure out the right number of joints and naming convention for the chain segments.\n\nI'm defining the sweep radius function for the abdomen, aiming for a slender taper with a slight club at the tip, and sketching out striped coloring along its length for a banded dragonfly look.\n\nI'm sorting out imports—everything comes from the single \"agentic-3js-builder\" module, including paint and the pattern helpers like spots, stripes, countershade, and mottle. For the abdomen stripes I'm using the band coordinate to alternate between a dark teal-blue and near-black, mimicking dragonfly segment coloring, then moving on to the eyes—large iridescent compound spheres positioned at the sides of the head.\n\nPlacing the eyes symmetrically using head.local with right/up/forward coordinates, looping over left and right with a sign flip since the geometry is mirror-symmetric. I'm making the head itself a small sphere mostly dominated by the oversized eye spheres, which is characteristic of a dragonfly's head.\n\nFor the thorax, I'm considering whether to build it as a scaled sphere or ellipsoid attached to the thorax bone versus sweeping a tube shape along a curved path for more precise control over its chunky, elongated form — leaning toward trying the scale option first since it's simpler, with sweep as a fallback if the proportions look wrong.\n\nNow I'm thinking through coloring the thorax with a green base and yellow shoulder stripes, likely using a paint function keyed on position or a built-in stripes helper along one axis to get that bold tiger-stripe look without overcomplicating it. For the wings, I'm planning four flat extruded shapes lying roughly horizontal in the XZ plane, sticking out to the sides as thin membrane panels.\n\nWorking out wing outline coordinates...\n\nDefining the hindwing joints and outlines...\n\nSettling on the pterostigma's box dimensions and confirming the part inherits world-axis orientation with the wing bone. Now I'm moving to the six legs — planning hip, knee, and foot joints per leg using a two-segment chain, with hips positioned on the thorax underside and feet resting on the floor.\n\nI'm sketching out hip and foot target coordinates for the three leg pairs (front, middle, back), checking the reach distance against the chosen segment lengths so the legs don't overextend, and settling on 0.018 for both segment lengths to keep the geometry plausible.\n\nFor the bend hints, I'm figuring out how the knee should point outward and slightly upward using a direction vector, since the bend defines the plane the limb bends within relative to the hip-to-foot line.\n\nFinally I'm working out root placement — hips sit above the floor on the thorax underside while foot tips are tiny spheres meant to just touch the ground plane, so I need the thorax height and leg lengths to line up so the feet actually reach y=0.\n\nFor the body I'm laying out concrete joint positions: thorax root, head position with eye sockets, and an abdomen built as a catmull-rom chain curving slightly downward toward a tapered tail tip, using a sweep with a radius function that widens a bit mid-abdomen and tapers at the end, painted in alternating blue-"
+}

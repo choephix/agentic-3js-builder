@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuOwlTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "owl",
+  "level": "terse",
+  "pitch": "An owl.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:22:10.113Z",
+  "wallMs": 48894,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5310,
+    "completion_tokens": 10808,
+    "total_tokens": 16118,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.005458,
+  "hasCode": true,
+  "reasoning": "I'm planning the owl design using the SDK's documented primitives, sticking to safer methods like joint, chain, part, sweep, stick, extrude, lathe, and membrane rather than risking undocumented APIs.\n\nI'm checking the parameter signatures for joints and parts—figuring out how `parent`, `at`, `bone`, `frame`, `aim`, `dir`, and `up` combine so I can correctly attach geometry to specific joints and orient each part properly.\n\nI'm also weighing whether to use the fancier helper functions like `rng`, `sweep`, `paint`, `stripes`, or `countershade`, but since their exact signatures are uncertain, I'm leaning toward keeping things simple and deterministic—plain geometries with flat colors and manually built THREE.js meshes added directly to joints, sharing one material per color to avoid signature guessing errors.\n\nNow I'm designing the owl itself: an upright, stylized body about half a meter tall, standing on the ground with feet at y=0, built from a chain of joints starting at the hips and rising through the spine to the neck. I'm considering using `part({ scale })` to shape the body as a scaled sphere into an egg-like silhouette, since the reference suggests scale is a valid part option.\n\nI'm sketching the joint hierarchy: hips as root at roughly y=0.14, chest above it, head above that, with short feathered legs branching off the hips to small ankle joints near the ground, and simple capsule or cone shapes forming talons for the feet.\n\nWings get a shoulder joint on the chest, modeled as a flattened, scaled sphere folded against the body with a tapered tip to suggest feathers. For the face, I'm planning a flattened cream-colored facial disc, big yellow eyes with dark pupils set slightly forward, a small orange cone beak, and splayed ear tufts made from cones on top of the head, aiming for roughly a 0.5-0.6m tall great horned owl silhouette with chest belly stripe details to follow.\n\nNow I'm placing those brown belly stripes as small flattened capsules on the body front, double-checking eye placement relative to the head sphere's curvature so they bulge slightly off the face disc, and working out the part-building API — passing geometry, color, and placement options like absolute position, parent bone, and either an aim-point or direction vector to orient cones and capsules correctly for beaks and limbs.\n\nI'm now deciding directions for the beak (pointing down-forward), talons (pointing down toward the ground), and ear tufts (tilted outward from the head top), then considering whether a short fan of flattened shapes at the hips can stand in for a simple tail.\n\nI'm settling on hex color codes for the plumage, beak, eyes, and belly spots, then sketching the wing as a scaled sphere capsule at the chest with small cone feathers at the tip, mirrored for the opposite side. I'm also planning the cream belly patch as a bulged sphere and laying out a grid of small flattened brown spots across it.\n\nNow I'm positioning the facial disc, eyes with pupils and dark eye-rings, and the beak cone, calculating offsets so each feature sits slightly in front of the head sphere's surface and pointing outward using direction vectors.\n\nI'm then working through legs, feet pads, and toe cones for the talons, placing them so they sink just slightly into the ground plane, and establishing the body sphere, belly patch, and a deterministic spot pattern computed from an ellipse equation so the cream spots curve naturally along the belly's surface.\n\nI'm setting up the ear tufts, wings with feather-tip cones, and tail fan using joints for hips, chest, head, and tail, mirroring left/right parts with a sign variable, and writing the full build function with colors, geometry calls, and loops to place everything consistently before finalizing the code.\n\n"
+}
