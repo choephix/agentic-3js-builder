@@ -8,6 +8,7 @@ TypeScript SDK that lets fast, cheap language models write primitive-built, skel
 - Using or changing the API → `docs/api.md` (the model-facing reference) and `docs/conventions.md` (behaviours builders need up front). A `src/` change updates them, and any sample it breaks, in the same commit. `README.md` is for people: layout, docs map, commands, showcase; agents don't get it.
 - Style kits → `kits/<name>.ts` with `kits/<name>.md`. Kits sit on top of `src/`; `src/` stays style-neutral and never imports a kit. A new kit gets its own doc and a mention in `GUIDE.md` and `docs/api.md`.
 - Building or briefing a sample → `GUIDE.md`, the brief handed to a builder agent with one subject.
+- Prompt bake-offs (one system prompt + one pitch → one module, as an app runs it) → `bakeoff/README.md`; results on the showcase's `/bakeoff` page.
 - Adding, removing or reshaping a helper → `docs/DESIGN.md`: why each helper exists, with the evidence from 100 builds.
 
 ## Conventions

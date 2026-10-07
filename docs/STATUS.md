@@ -1,4 +1,4 @@
-# Status, 2026-09-29
+# Status, 2026-10-07
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
@@ -218,6 +218,22 @@ On 2026-10-02, spare GPT-6 Astra quota (task `med` effort) went to read-mostly w
 - Five SDK-only sandbox builds (`~/tmp-archive/astra-round/<slug>/`, Muse-round layout plus `harness/`, at most two renders): moonJellyfish, redKangaroo, hummingbirdAtFlower, articulatedDeskLamp, rainyBusStopDiorama. $2.70-$4.56, 7-14 min each; 2.0k-7.0k triangles. Plain builds: the hummingbird is small beside its flower, the lamp's power switch floats 17 mm off the base. Contact sheet: `~/tmp/public/nilo/agentic-3js-builder/showcase/astra-sandbox-round.jpg`. Their build records come from provenance run in the sandbox and lack model and effort.
 - `reports/` holds every raw report, `briefs/` the hunter, auditor, triage, merge and build briefs, `repros/` the repro scripts with imports fixed for the new depth (`npx tsx experiments/astra-hunt/repros/<dir>/<file>.ts`).
 
+## Prompt bake-off
+
+On 2026-10-07 Stefan asked to test how a model builds when the SDK is used the way an app uses it: one system prompt, one pitch, one TypeScript module back, with no tools and no second turn. The model runs through `omp auth-gateway stdio`, which uses the stored omp logins and adds about 50 tokens to the prompt. `bakeoff/README.md` has the runner (`npm run bakeoff`), arms, pitches and data layout. The showcase's `/bakeoff` page shows each round as a grid of pitches × arms, with live 3D, shared-camera compare, blind mode with stars, and a scoreboard. Stefan judges the builds by eye; no model judges them.
+
+- **Arms.** Each arm is a reference crossed with a taste. References: the whole `src/` (about 69k tokens, 108k as billed), `docs/api.md` with `conventions.md` (23k), or the top of `api.md` (the "brief", 4k). Tastes: SDK-first or primitives-first. A plain three.js control has no SDK. All arms share the contract, `bakeoff/prompts/contract.md`.
+- **Round 1.** Sonnet 5.5 at medium effort, SDK `cb52341`: 7 subjects (4 creatures, a knight, a gramophone, a lighthouse diorama), each with a terse and a rich pitch, × 7 arms = 98 builds, $11.71. 86 rendered and 12 crashed; the brief arms account for 8 of the crashes. A failure analysis found five guesses behind most crashes:
+  - meshes added to `b.root` with no bone (9 builds; these render as static meshes and only the lab's rig export rejects them);
+  - `b.part({ geometry, color, ... })`;
+  - `joint.add(mesh)`;
+  - a Chain passed as `parent`;
+  - the radius inside the options object.
+
+  Commit `6cc54cd` makes the SDK accept these forms and gives other wrong inputs named errors; 17 of the 21 original failures then build.
+- **Round 2.** The same arms with the round-1 lessons, SDK `6cc54cd`: 20 new subjects (15 creatures, 4 props, a Japanese garden diorama) × terse/rich × 7 arms = 280 builds.
+- **Harness.** `snap` builds modules that need the browser (canvas textures) in the page only. `SNAP_RENDER_ON_ERROR=1`, which the bake-off sets, renders despite report errors, as a static mesh when the skeleton fails.
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
@@ -260,6 +276,8 @@ Friction the builders reported:
 - [ ] Merge branch `sdk-polish` into main: it carries the `agent-docs` split (README → `docs/api.md`), with `experiments/humanoids` briefs pointing at `docs/api.md`.
 - [ ] Measure the kits: rerun a few round-3 subjects (a pixel, a toon, a clockwork one) with the new docs and compare cost, calls and context against their first builds.
 - [ ] The lean-mesh GUIDE line (batch 11) is untested on a fresh builder: rerun one texture-round subject and compare triangles against its batch 10 build.
+- [ ] Bake-off leftovers: `b.membrane` without `thickness` throws (a default would have saved one r1 build); `part({ dir })` with a zero-length direction reports `aim()` instead of `part()`; the harness's "Assembly has no valid skeleton" hides the per-part errors behind it.
+- [ ] The showcase dev server needs `CHOKIDAR_USEPOLLING=1` when the machine's inotify watchers are nearly used up (125 of 128 on 2026-10-07).
 
 Samples:
 
