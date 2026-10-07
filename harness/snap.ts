@@ -194,7 +194,14 @@ try {
   result = await page
     .evaluate(
       (options) => (window as unknown as { lab: { run(options: unknown): Promise<Result> } }).lab.run(options),
-      { code: creatureBundle.outputFiles[0].text, arm, slug, tag, reportOnly },
+      {
+        code: creatureBundle.outputFiles[0].text,
+        arm,
+        slug,
+        tag,
+        reportOnly,
+        renderOnError: process.env.SNAP_RENDER_ON_ERROR === "1",
+      },
     )
     .catch((reason: Error) => {
       console.error(`Build or render failed: ${reason.message.replace(/^page\.evaluate: /, "")}`);
@@ -267,15 +274,16 @@ if (report.joints.length) {
       `  ${"  ".repeat(joint.depth)}${joint.name} [${joint.parts}] @ ${JSON.stringify(joint.position.map(round))}`,
     );
 }
-if (errors.length) process.exit(1);
-if (reportOnly) process.exit(0);
+// SNAP_RENDER_ON_ERROR=1 (the bake-off) renders anyway; the errors stay in the report and the exit status.
+if (errors.length && process.env.SNAP_RENDER_ON_ERROR !== "1") process.exit(1);
+if (reportOnly) process.exit(errors.length ? 1 : 0);
 
 await mkdir(snapsDir, { recursive: true });
 await mkdir(outDir, { recursive: true });
 const decode = (dataUrl: string) => Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64");
 for (const shot of result.shots) await writeFile(join(snapsDir, `${tag}-${shot.name}.png`), decode(shot.png));
 const sheetPath = join(snapsDir, `${tag}-sheet.jpg`);
-await writeFile(sheetPath, decode(result.sheet!));
+if (result.sheet) await writeFile(sheetPath, decode(result.sheet)); // none when the page found errors
 if (result.atlas) await writeFile(join(snapsDir, `${tag}-atlas.png`), decode(result.atlas));
 await writeFile(join(snapsDir, `${tag}-report.json`), JSON.stringify(report, null, 2));
 await copyFile(entry, join(snapsDir, `${tag}-creature.ts`));

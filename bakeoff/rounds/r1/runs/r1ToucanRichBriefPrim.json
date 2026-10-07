@@ -1,0 +1,25 @@
+{
+  "slug": "r1ToucanRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "toucan",
+  "level": "rich",
+  "pitch": "A keel-billed toucan showing off on a short mossy branch. A huge rainbow beak in lime green, sky blue and orange with a cherry-red tip, a glossy black body, a lemon-yellow bib, a ring of lime-green skin around each eye, bright blue feet and a scarlet patch under the tail. A single pink orchid blooms on the branch beside it.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T14:22:03.581Z",
+  "wallMs": 55551,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5288,
+    "completion_tokens": 7860,
+    "total_tokens": 13148,
+    "prompt_tokens_details": {
+      "cached_tokens": 5160
+    }
+  },
+  "costUsd": 0.079888,
+  "hasCode": true,
+  "reasoning": "I'm uncertain about the exact SDK signatures, so I need to stay conservative and lean on the sparse reference material for builder functions like joint, part, chain, and sweep rather than guessing at unknown parameters.\n\nNow I'm sketching the scene itself: a toucan perched on a horizontal branch lying near the floor, with the bird's body modeled as a tilted ellipsoid positioned above the branch, using rough real-world proportions to size the body, beak, and branch dimensions.\n\nFor the beak I'm planning to assemble it from multiple tapered box segments stacked along a slight downward curve, color-banding them (lime, blue, orange, red tip) to mimic the keel-billed toucan's beak, with the lower jaw as a separate piece attached at a jaw joint. I'm also setting up the skeleton hierarchy starting with a hips joint near the body's base.\n\nFor orienting parts without knowing the exact API behavior for direction/rotation options, I'm deciding to bake rotations directly into the geometry transforms myself and place parts at the origin, then rely on bone assignment to the correct joint, rather than trusting an unverified `dir` parameter.\n\nI'm sketching a helper that scales, rotates, and translates a geometry before passing it to the part function with the joint as the bone reference. Now I'm defining the beak as a sequence of colored box slices running along the head's z-axis, tapering from base to tip with a rainbow-like gradient of colors.\n\nContinuing, I'm laying out the lower jaw slices, eyes with lime rings and black pupils, the yellow throat bib, a small scarlet undertail patch, and finally positioning the feet with blue toe boxes and leg cylinders before starting on the wings.\n\nNow I'm shaping flattened black wing spheres and a tilted tail box, then building the branch from moss and bark colored cylinders with moss patch spheres. I'm adding an orchid growing from the branch with a tilted stem, five pink flattened-sphere petals arranged in a circle facing outward, a darker lip petal, and a yellow center, plus leaves -- and setting up a rotation helper using Euler matrices to orient everything correctly.\n\nStill structuring skeleton and bone hierarchy...\n\nConfirming the tail rotation angle, then working out the beak segments: tapering slices from the base to tip with shrinking height and width, plus a lighter yellow ridge strip along the top for the culmen highlight.\n\nStill positioning the lower jaw...\n\n"
+}

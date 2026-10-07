@@ -8,7 +8,7 @@
 // Output lands in ~/tmp/public/nilo/agentic-3js-builder/snaps/<slug>/<B|A>/ (B with joints, A for plain objects):
 // snaps/<tag>-sheet.jpg, the individual shots, <tag>-report.json, <tag>-creature.ts (the sample as rendered), out/*.glb.
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -36,10 +36,19 @@ const sample = isPath ? resolve(process.cwd(), target) : join(ROOT, "samples", `
 const slug = isPath ? basename(target, ".ts") : target;
 if (!existsSync(sample)) fail(`No sample at ${sample}.`);
 
-// The sample is chosen on the command line, so it can only be imported at run time.
-const built: Object3D = (await import(sample)).default();
+// The sample is chosen on the command line, so it can only be imported at run time. A module that needs the browser
+// (a canvas-drawn texture) can't build in Node; its lane then comes from whether it uses the builder, and the page
+// build below reports any real error.
 let rigged = false;
-built.traverse((node) => (rigged ||= Boolean(node.userData.joint)));
+try {
+  const built: Object3D = (await import(sample)).default();
+  built.traverse((node) => (rigged ||= Boolean(node.userData.joint)));
+} catch (error) {
+  if (!(error instanceof ReferenceError && /\b(document|window|OffscreenCanvas|Image)\b/.test(error.message)))
+    throw error;
+  rigged = readFileSync(sample, "utf8").includes("createBuilder");
+  console.log(`Built in the page only (${error.message} in Node).`);
+}
 const lane = rigged ? "B" : "A";
 const arm = join(OUT, slug, lane);
 mkdirSync(arm, { recursive: true });
