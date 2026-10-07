@@ -5,7 +5,8 @@ import { createHash } from "node:crypto";
 import { watch } from "node:fs";
 import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
-import { defineConfig, searchForWorkspaceRoot } from "vite";
+import { defineConfig, searchForWorkspaceRoot, transformWithOxc } from "vite";
+import { bakeoffRoot, bakeoffRound, bakeoffRounds, bakeoffSlugs } from "./bakeoff-data.mjs";
 import { roundLog } from "./round-log.mjs";
 
 const sampleRoot = resolve("samples");
@@ -205,8 +206,12 @@ const showcaseData = {
     `${arm.id}Test`,
    ]),
   );
+  // Bake-off builds have no sample file, only renders; their page reads the same render indexes.
+  const bakeoffIds = await bakeoffRounds();
+  const bakeoffBuilds = (await Promise.all(bakeoffIds.map(bakeoffSlugs))).flat();
+  const indexed = new Map();
   await json("__sample-created", created);
-  for (const slug of new Set([...Object.keys(created), ...owned])) {
+  for (const slug of new Set([...Object.keys(created), ...owned, ...bakeoffBuilds])) {
    if (slug in created) await copy(join(sampleRoot, `${slug}.ts`), `__sample-source/${slug}`);
    const assets = new Map();
    const fileUrl = (path) => {
@@ -219,9 +224,12 @@ const showcaseData = {
     assets.set(route, join(snapshotRoot, slug, arm, "snaps", `${tag}-creature.ts`));
     return `/${route}`;
    };
-   await json(`__snapshots/${slug}`, await snapshots(slug, fileUrl, sourceUrl));
+   indexed.set(slug, await snapshots(slug, fileUrl, sourceUrl));
+   await json(`__snapshots/${slug}`, indexed.get(slug));
    for (const [route, path] of assets) await copy(path, route);
   }
+  for (const id of bakeoffIds)
+   await json(`__bakeoff/${id}`, await bakeoffRound(id, (slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));
   for (const round of rounds) await json(`__round/${round.id}`, await roundLog(round, resolve(".")));
   await json("__thumbs", await thumbIndex());
  },
@@ -231,6 +239,29 @@ const showcaseData = {
   server.watcher.add(sampleRoot);
   // The round page's markdown and toolkit globs, which builders add files to while a round runs.
   server.watcher.add([experimentRoot, resolve("src")]);
+  // Bake-off rounds fill in while they run: the page's globs (bakeoff-files.ts) see new builds and replies, and a
+  // `bakeoff` event tells it to fetch the run and check records again.
+  server.watcher.add(bakeoffRoot);
+  let bakeoffTimer;
+  const bakeoffChanged = new Set();
+  server.watcher.on("all", (_event, path) => {
+   if (!path.startsWith(`${bakeoffRoot}${sep}`)) return;
+   bakeoffChanged.add(relative(bakeoffRoot, path).split(sep)[0]);
+   clearTimeout(bakeoffTimer);
+   bakeoffTimer = setTimeout(() => {
+    for (const round of bakeoffChanged) server.ws.send({ type: "custom", event: "bakeoff", data: { round } });
+    bakeoffChanged.clear();
+   }, 400);
+  });
+  server.middlewares.use(
+   "/__bakeoff",
+   byName(async ([id], response) => {
+    const data = await bakeoffRound(id, (slug) => snapshots(slug));
+    if (!data) throw new Error(`No bake-off round ${id}`);
+    response.setHeader("Content-Type", "application/json; charset=utf-8");
+    response.end(JSON.stringify(data));
+   }),
+  );
   // What each builder of a round did, parsed from its session log on every request (round-log.mjs).
   server.middlewares.use(
    "/__round",
@@ -302,11 +333,49 @@ const showcaseData = {
  },
 };
 
+// A bake-off build is one unedited model reply: it may not parse or may import a module that doesn't exist. Either
+// becomes a module that throws when the bakeoff page imports it, so the page shows the failure and the static build
+// still succeeds (a missing named export: `shimMissingExports` below).
+const BAKEOFF_BUILD = /[\\/]bakeoff[\\/]rounds[\\/][^\\/]+[\\/]builds[\\/][^\\/]+\.ts$/;
+const MISSING = "\0bakeoff-missing:";
+const thrower = (message) => `throw new Error(${JSON.stringify(message)});\nexport default undefined;\n`;
+
+const bakeoffGuard = {
+ name: "bakeoff-guard",
+ enforce: "pre",
+ resolveId(source, importer) {
+  if (!importer || !BAKEOFF_BUILD.test(importer)) return null;
+  return this.resolve(source, importer, { skipSelf: true }).then((found) => found ?? `${MISSING}${source}`);
+ },
+ load(id) {
+  if (id.startsWith(MISSING)) return thrower(`Cannot find module "${id.slice(MISSING.length)}".`);
+ },
+ async transform(code, id) {
+  if (!BAKEOFF_BUILD.test(id)) return null;
+  try {
+   await transformWithOxc(code, id);
+   return null;
+  } catch (error) {
+   // oxc's message is coloured for a terminal.
+   return thrower(String(error?.message ?? error).replace(/\x1b\[[0-9;]*m/g, ""));
+  }
+ },
+};
+
 export default defineConfig({
  server: { fs: { allow: [searchForWorkspaceRoot(process.cwd()), snapshotRoot] } },
- // Two pages: the sample showcase and the experiment round page (`/round`).
+ // Three pages: the sample showcase, the experiment round page (`/round`) and the prompt bake-off page (`/bakeoff`).
  build: {
-  rolldownOptions: { input: { main: resolve("showcase/index.html"), round: resolve("showcase/round.html") } },
+  rolldownOptions: {
+   input: {
+    main: resolve("showcase/index.html"),
+    round: resolve("showcase/round.html"),
+    bakeoff: resolve("showcase/bakeoff.html"),
+   },
+   // A bake-off build may import a name its module doesn't export: undefined at run time, as the page shows it,
+   // instead of failing the whole build. Samples are typechecked, so they never rely on this.
+   shimMissingExports: true,
+  },
  },
- plugins: [showcaseData],
+ plugins: [bakeoffGuard, showcaseData],
 });

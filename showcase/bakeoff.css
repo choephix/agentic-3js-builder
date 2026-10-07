@@ -1,0 +1,429 @@
+/* The prompt bake-off page (bakeoff.html), on top of round.css: the grid of builds, the detail view, compare,
+   scoreboard and prompts. */
+.grow {
+  flex: 1;
+}
+.rh-meta select {
+  height: 22px;
+}
+.bo-starcount {
+  color: #e67700;
+  font-weight: 600;
+}
+.chip.level.rich {
+  background: #fff4e6;
+  color: #a35a00;
+}
+
+/* Grid: a label column, then one column per arm */
+.bo-grid {
+  --label: 230px;
+}
+.bo-row {
+  display: grid;
+  grid-template-columns: var(--label) repeat(var(--cols), minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.bo-colhead {
+  position: sticky;
+  top: var(--bo-head, 0);
+  z-index: 10;
+  margin: -16px 0 4px;
+  padding: 8px 0 6px;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+.bo-corner {
+  align-self: center;
+  font-size: 12px;
+}
+.bo-col {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  font-size: 12px;
+}
+.bo-col b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.bo-subject {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 18px 0 6px;
+}
+.bo-subject h3 {
+  margin: 0;
+  font-size: 14px;
+}
+.bo-pitch {
+  display: block;
+  white-space: normal;
+  align-self: start;
+  padding: 2px 10px 2px 0;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--fg-2);
+}
+.bo-pitch:hover {
+  color: var(--fg);
+}
+.bo-pitch-text {
+  display: -webkit-box;
+  margin-top: 4px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+.bo-pitch.open .bo-pitch-text {
+  display: block;
+}
+.bo-row.empty .bo-pitch-text {
+  -webkit-line-clamp: 1;
+}
+.bo-none {
+  grid-column: 2 / -1;
+  align-self: center;
+  font-size: 12px;
+}
+
+.bo-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--arm);
+  border-radius: 4px;
+  background: var(--bg);
+  overflow: hidden;
+}
+.bo-cell:hover {
+  box-shadow: 0 1px 6px rgb(0 0 0 / 0.12);
+}
+.bo-media {
+  display: block;
+  width: 100%;
+  padding: 0;
+  aspect-ratio: 1;
+  background: #e9ecef;
+  overflow: hidden;
+}
+/* A harness shot without its slug caption, which names the arm: scaled up from the bottom edge. */
+.bo-crop {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #d5dadf;
+}
+.bo-crop img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.07);
+  transform-origin: 50% 100%;
+}
+.bo-shots {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+.bo-cell.pending .bo-media {
+  cursor: default;
+}
+.bo-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  min-height: 20px;
+  padding: 3px 6px 4px;
+  font-size: 11px;
+  color: var(--fg-2);
+}
+
+/* A failed or unfinished build, in place of its render */
+.bo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  overflow: hidden;
+  text-align: center;
+  font-size: 12px;
+  color: var(--fg-2);
+}
+.bo-card b {
+  font-size: 13px;
+}
+.bo-card span {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font: 11px/1.4 var(--mono);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+}
+.bo-card.crashed {
+  background: #fdeeea;
+}
+.bo-card.crashed b {
+  color: var(--bad);
+}
+.bo-card.api {
+  background: #fff4e6;
+}
+.bo-card.api b {
+  color: #a35a00;
+}
+.bo-card.nocode {
+  background: #eceef1;
+}
+.bo-card.pending,
+.bo-card.checking {
+  background: #f6f7f8;
+  color: var(--fg-3);
+}
+
+.bo-star {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.85);
+  color: var(--fg-3);
+  font-size: 15px;
+  line-height: 24px;
+  opacity: 0;
+}
+.bo-cell:hover .bo-star,
+.bo-star.on {
+  opacity: 1;
+}
+.bo-star.on {
+  color: #f08c00;
+}
+.cell-head .bo-star,
+.bo-detail-bar .bo-star {
+  position: static;
+  background: none;
+  opacity: 1;
+}
+
+/* Detail: a full-window view over the grid */
+#bo-detail {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+}
+#bo-detail[hidden] {
+  display: none;
+}
+body.bo-detail-open {
+  overflow: hidden;
+}
+.bo-detail-bar {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  align-items: center;
+  height: 42px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.bo-detail-bar .icon {
+  font-size: 14px;
+}
+.bo-detail-body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  min-height: 0;
+}
+.bo-detail-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 12px;
+  overflow: auto;
+}
+.bo-live {
+  position: relative;
+  flex: none;
+  height: min(68vh, 760px);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: linear-gradient(#f3f4f6, #e2e5e9);
+  overflow: hidden;
+}
+.bo-live-none {
+  display: grid;
+}
+.bo-live-tools {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.8);
+}
+.bo-live-error {
+  position: absolute;
+  top: 44px;
+  left: 12px;
+  right: 12px;
+}
+.bo-live-error .error-card {
+  width: auto;
+}
+.bo-sheet {
+  display: block;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #dee2e6;
+  overflow: hidden;
+}
+.bo-sheet img {
+  display: block;
+  width: 100%;
+}
+.bo-detail-right {
+  min-height: 0;
+  padding: 12px 16px 40px;
+  overflow: auto;
+  border-left: 1px solid var(--border);
+  background: var(--bg);
+}
+.bo-pitch-full {
+  max-width: 900px;
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+.bo-dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 2px 14px;
+  margin: 0 0 14px;
+}
+.bo-pre {
+  max-height: 50vh;
+  margin: 0;
+  padding: 8px 10px;
+  overflow: auto;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  font: 12px/1.5 var(--mono);
+}
+.bo-loading {
+  padding: 6px 10px;
+}
+.code-block > .md {
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+}
+.code-block > .listing {
+  max-height: 70vh;
+  overflow: auto;
+  min-width: 0;
+  border-top: 1px solid var(--border);
+}
+
+/* Compare */
+.bo-compare {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 1100px) {
+  .bo-compare {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.bo-compare .cell .media {
+  aspect-ratio: 1;
+}
+.bo-compare .cell-head .link {
+  font-size: 12px;
+}
+.bo-media-card {
+  display: grid;
+}
+
+/* Scoreboard and prompts */
+table.bo-score {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+}
+table.bo-score .num {
+  text-align: right;
+}
+.bo-sort {
+  padding: 0;
+  font-weight: 600;
+  color: inherit;
+  white-space: nowrap;
+}
+.bo-sort:hover {
+  color: var(--accent);
+}
+.bo-arm {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--arm);
+  border-radius: 4px;
+  background: var(--bg);
+}
+.bo-arm-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.bo-arm .idea {
+  margin: 6px 0 2px;
+}
+.bo-arm .small {
+  margin: 0 0 8px;
+}
+.bo-prompt .bo-pre {
+  max-height: 70vh;
+  border-top: 1px solid var(--border);
+}
+.bo-blind-note {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  max-width: 640px;
+  padding: 12px 16px;
+  border: 1px dashed #c8c8c8;
+  border-radius: 4px;
+  background: var(--bg);
+}
+.bo-blind-note p {
+  margin: 0;
+}
