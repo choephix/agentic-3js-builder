@@ -205,10 +205,12 @@ async function run(round: string, args: string[]) {
   const manifest = existsSync(manifestPath)
     ? readJson<any>(manifestPath)
     : { id: round, started: new Date().toISOString() };
+  const sdkCommit = (await capture("git", ["rev-parse", "--short", "HEAD"])).stdout.trim();
   writeJson(manifestPath, {
     ...manifest,
     model,
     effort,
+    sdkCommit,
     maxTokens,
     pricing: cost ?? null,
     arms: arms(),
