@@ -1,6 +1,6 @@
 // Thin closed skins: `membrane()` between two edges (blend-skinned, or split per bone) and `slab()` from one polygon.
 import { ShapeUtils, Vector2, Vector3 } from "three";
-import { meshFromWorld, mix, nearestJoint, requireFill, resolveJoint, rigid, weightsFor } from "./context";
+import { describe, fillFor, meshFromWorld, mix, nearestJoint, resolveJoint, rigid, weightsFor } from "./context";
 import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { aim, toPoint } from "./math";
 import type { PointInput } from "./math";
@@ -14,9 +14,13 @@ import type { Skin } from "./sweep";
 export type MembraneEdge = Chain | PathInput;
 
 export type MembraneOptions = Tags & {
-  color: Fill;
-  /** Total thickness; the skin is offset ± thickness/2 along its normal and closed with side walls. */
-  thickness: number;
+  /** Default: the colour of the nearest part already built to edge A's start (grey when there is none). */
+  color?: Fill;
+  /**
+   * Total thickness; the skin is offset ± thickness/2 along its normal and closed with side walls. Default: 2% of
+   * the membrane's width (the mean distance between its edges).
+   */
+  thickness?: number;
   /** Cells between the edges (default 4 × `detail`). */
   rows?: number;
   /** This membrane's own tessellation multiplier for its default `rows` and `cols` (default: the builder's). */
@@ -94,15 +98,18 @@ function prism(grid: Grid, normals: Grid, cells: Array<[number, number]>, half: 
   return { positions, index, sources };
 }
 
-/** `thickness` is a finite number of meters; `call` names the helper in the error. */
-function requireThickness(call: string, thickness: unknown) {
+/** A thin shape's default thickness, as a fraction of its width. */
+const THIN = 0.02;
+
+/** `thickness` in meters: the given one, else `THIN` × `width`; `call` names the helper in the error. */
+function thicknessOf(call: string, thickness: unknown, width: number) {
+  if (thickness === undefined || thickness === null) return THIN * width;
   if (typeof thickness !== "number" || !Number.isFinite(thickness))
-    throw new Error(`${call}: thickness is required: the total thickness in meters, e.g. 0.01`);
+    throw new Error(`${call}: thickness takes the total thickness in meters, e.g. 0.01; got ${describe(thickness)}`);
+  return thickness;
 }
 
-export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions) {
-  requireFill("membrane()", options?.color);
-  requireThickness("membrane()", options.thickness);
+export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions = {}) {
   const chainA = edgeA instanceof Chain ? edgeA : null;
   const chainB = edgeB instanceof Chain ? edgeB : null;
   const pathA = chainA ? null : toPath(edgeA as PathInput);
@@ -129,9 +136,11 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     return weights ? (smooth ? weights : rigid(weights[0][0])) : other ? along(other, t) : rigid(nearestJoint(ctx, at));
   };
 
+  const fill = fillFor(ctx, "membrane()", options.color, () => pointA(0));
   let width = 0;
   for (let k = 0; k <= 8; k++) width += pointA(k / 8).distanceTo(pointB(k / 8)) / 9;
   const length = Math.max((chainA ?? pathA!).length, (chainB ?? pathB!).length);
+  const thickness = thicknessOf("membrane()", options.thickness, width);
   const cols =
     options.cols ??
     Math.min(ctx.segments(24, detail), Math.max(4, Math.round((length / Math.max(width, 1e-6)) * rows)));
@@ -183,9 +192,9 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
         ]);
       }),
     );
-    const { positions, index, sources } = prism(grid, normals, cells, options.thickness / 2);
+    const { positions, index, sources } = prism(grid, normals, cells, thickness / 2);
     return [
-      meshFromWorld(ctx, positions, index, options.color, (v) => weights[sources[v][0]][sources[v][1]], false, tags, {
+      meshFromWorld(ctx, positions, index, fill, (v) => weights[sources[v][0]][sources[v][1]], false, tags, {
         surface: sources.flatMap(([i, j]) => [columns[i], j / rows]),
       }),
     ];
@@ -207,25 +216,28 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     else byJoint.set(joint, [[i, j]]);
   }
   return [...byJoint].map(([joint, group]) => {
-    const { positions, index, sources } = prism(grid, normals, group, options.thickness / 2);
-    return meshFromWorld(ctx, positions, index, options.color, () => rigid(joint), false, tags, {
+    const { positions, index, sources } = prism(grid, normals, group, thickness / 2);
+    return meshFromWorld(ctx, positions, index, fill, () => rigid(joint), false, tags, {
       surface: sources.flatMap(([i, j]) => [columns[i], j / rows]),
     });
   });
 }
 
-/** `bone` (rigid) default: the first built point's weights, else the joint nearest the polygon's centre. */
-export type SlabOptions = Tags & { color: Fill; thickness: number; bone?: JointRef };
+/**
+ * `color` default: the colour of the nearest part already built to the first point (grey when there is none).
+ * `thickness` default: 2% of the polygon's width (the narrower side of its outline). `bone` (rigid) default: the
+ * first built point's weights, else the joint nearest the polygon's centre.
+ */
+export type SlabOptions = Tags & { color?: Fill; thickness?: number; bone?: JointRef };
 
 /**
  * A (roughly) planar polygon as a thin closed prism: fins, leaves, plates, ears. Returns a Part whose frame sits at
  * the polygon's centre, facing its normal (counter-clockwise points seen from the front face you).
  */
-export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptions) {
-  requireFill("slab()", options?.color);
-  requireThickness("slab()", options.thickness);
+export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptions = {}) {
   const pts = points.map((p, i) => toPoint(p, `slab() point ${i}`));
   if (pts.length < 3) throw new Error("slab() needs at least 3 points");
+  const fill = fillFor(ctx, "slab()", options.color, () => pts[0]);
   // Newell normal.
   const n = new Vector3();
   const center = new Vector3();
@@ -244,7 +256,9 @@ export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptio
   const v = new Vector3(0, 1, 0).applyQuaternion(frame);
   const contour = pts.map((p) => new Vector2(p.clone().sub(center).dot(u), p.clone().sub(center).dot(v)));
   const faces = ShapeUtils.triangulateShape(contour, []);
-  const half = options.thickness / 2;
+  const extent = (axis: "x" | "y") =>
+    Math.max(...contour.map((p) => p[axis])) - Math.min(...contour.map((p) => p[axis]));
+  const half = thicknessOf("slab()", options.thickness, Math.min(extent("x"), extent("y"))) / 2;
   const top = pts.map((p) => p.clone().addScaledVector(n, half));
   const bottom = pts.map((p) => p.clone().addScaledVector(n, -half));
   const positions: number[] = [];
@@ -277,7 +291,7 @@ export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptio
     ctx,
     positions,
     index,
-    options.color,
+    fill,
     () => weights,
     false,
     { name: options.name, kind: "slab", group: options.group },

@@ -69,7 +69,7 @@ export class RingItem extends Spot {
  * one fan for moderate poses, `joints: count` articulates every item).
  */
 export function ring(ctx: Ctx, on: FrameInput, options: RingOptions, fn?: (item: RingItem) => void) {
-  const line = toFrame(on);
+  const line = toFrame(on, "ring()");
   const center = line.at;
   const axis = line.axis;
   const { count } = options;

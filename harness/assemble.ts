@@ -595,7 +595,16 @@ export function createStaticMesh(assembly: Assembly, name: string) {
 
 /** A rigid-skinned mesh bound to a fresh bone hierarchy in bind pose. */
 export function createSkinnedMesh(assembly: Assembly, name: string) {
-  if (!assembly.createBones) throw new Error("Assembly has no valid skeleton");
+  if (!assembly.createBones) {
+    const errors = assembly.issues.filter((issue) => issue.level === "error");
+    const shown = errors.slice(0, 3).map((issue) => issue.message);
+    if (errors.length > shown.length) shown.push(`… ${errors.length - shown.length} more`);
+    throw new Error(
+      errors.length
+        ? `Assembly has no valid skeleton: ${errors.length} error(s): ${shown.join("; ")}`
+        : "Assembly has no valid skeleton: it was assembled as a plain mesh (no joints)",
+    );
+  }
   const { root, bones } = assembly.createBones();
   const mesh = new SkinnedMesh(assembly.geometry, surfaceOf(assembly));
   mesh.name = name;

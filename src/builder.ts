@@ -90,42 +90,77 @@ export class Builder {
     return pose(this.ctx, joint, rotation);
   }
 
-  /** `b.part(geometry, color, options)`, or the same in one object: `b.part({ geometry, color, ...options })`. */
+  /**
+   * `b.part(geometry, color, options)`, or the same in one object: `b.part({ geometry, color, ...options })`. A
+   * missing colour (undefined) takes the nearest built part's.
+   */
   part(spec: PartSpec): Part;
   part(geometry: BufferGeometry, color: Fill, options?: PartOptions): Part;
   part(geometry: BufferGeometry | PartSpec, color?: Fill, options?: PartOptions) {
     return part(this.ctx, ...partArgs(geometry, color, options));
   }
 
-  /** The radius goes second, or inside the options: `b.sweep(path, { radius, color })`. */
+  /**
+   * The radius goes second, or inside the options: `b.sweep(path, { radius, color })`. A colour may come right after
+   * the radius, before the options: `b.sweep(path, 0.05, SKIN, { bone })`.
+   */
   sweep(source: PathInput | Chain, options: WithRadius<SweepOptions>): Sweep;
+  sweep(source: PathInput | Chain, radius: Radius, color: Fill, options?: SweepOptions): Sweep;
   sweep(source: PathInput | Chain, radius: Radius, options?: SweepOptions): Sweep;
-  sweep(source: PathInput | Chain, radius: Radius | WithRadius<SweepOptions>, options?: SweepOptions) {
-    return sweep(this.ctx, source, ...radiusArgs("sweep()", radius, options));
+  sweep(
+    source: PathInput | Chain,
+    radius: Radius | WithRadius<SweepOptions>,
+    options?: SweepOptions | Fill,
+    more?: SweepOptions,
+  ) {
+    return sweep(this.ctx, source, ...radiusArgs("sweep()", radius, options, more));
   }
 
   rod(a: PointInput, b: PointInput, options: WithRadius<SweepOptions, TubeRadius>): Sweep;
+  rod(a: PointInput, b: PointInput, r: TubeRadius, color: Fill, options?: SweepOptions): Sweep;
   rod(a: PointInput, b: PointInput, r: TubeRadius, options?: SweepOptions): Sweep;
-  rod(a: PointInput, b: PointInput, r: TubeRadius | WithRadius<SweepOptions, TubeRadius>, options?: SweepOptions) {
-    return rod(this.ctx, a, b, ...radiusArgs("rod()", r, options));
+  rod(
+    a: PointInput,
+    b: PointInput,
+    r: TubeRadius | WithRadius<SweepOptions, TubeRadius>,
+    options?: SweepOptions | Fill,
+    more?: SweepOptions,
+  ) {
+    return rod(this.ctx, a, b, ...radiusArgs("rod()", r, options, more));
   }
 
   capsule(a: PointInput, b: PointInput, options: WithRadius<SweepOptions, TubeRadius>): Sweep;
+  capsule(a: PointInput, b: PointInput, r: TubeRadius, color: Fill, options?: SweepOptions): Sweep;
   capsule(a: PointInput, b: PointInput, r: TubeRadius, options?: SweepOptions): Sweep;
-  capsule(a: PointInput, b: PointInput, r: TubeRadius | WithRadius<SweepOptions, TubeRadius>, options?: SweepOptions) {
-    return capsule(this.ctx, a, b, ...radiusArgs("capsule()", r, options));
+  capsule(
+    a: PointInput,
+    b: PointInput,
+    r: TubeRadius | WithRadius<SweepOptions, TubeRadius>,
+    options?: SweepOptions | Fill,
+    more?: SweepOptions,
+  ) {
+    return capsule(this.ctx, a, b, ...radiusArgs("capsule()", r, options, more));
   }
 
   spike(base: PointInput, dirOrTip: PointInput, len: number | null, options: WithRadius<SweepOptions, number>): Sweep;
+  spike(
+    base: PointInput,
+    dirOrTip: PointInput,
+    len: number | null,
+    r: number,
+    color: Fill,
+    options?: SweepOptions,
+  ): Sweep;
   spike(base: PointInput, dirOrTip: PointInput, len: number | null, r: number, options?: SweepOptions): Sweep;
   spike(
     base: PointInput,
     dirOrTip: PointInput,
     len: number | null,
     r: number | WithRadius<SweepOptions, number>,
-    options?: SweepOptions,
+    options?: SweepOptions | Fill,
+    more?: SweepOptions,
   ) {
-    return spike(this.ctx, base, dirOrTip, len, ...radiusArgs("spike()", r, options));
+    return spike(this.ctx, base, dirOrTip, len, ...radiusArgs("spike()", r, options, more));
   }
 
   frustumBox(
@@ -153,6 +188,14 @@ export class Builder {
     on: FrameInput,
     pathOrTip: PathInput | PointInput,
     radius: Radius,
+    color: Fill,
+    options?: SproutOptions,
+  ): ReturnType<typeof sprout>;
+  sprout(
+    name: string,
+    on: FrameInput,
+    pathOrTip: PathInput | PointInput,
+    radius: Radius,
     options?: SproutOptions,
   ): ReturnType<typeof sprout>;
   sprout(
@@ -160,15 +203,17 @@ export class Builder {
     on: FrameInput,
     pathOrTip: PathInput | PointInput,
     radius: Radius | WithRadius<SproutOptions>,
-    options?: SproutOptions,
+    options?: SproutOptions | Fill,
+    more?: SproutOptions,
   ) {
-    return sprout(this.ctx, name, on, pathOrTip, ...radiusArgs("sprout()", radius, options));
+    return sprout(this.ctx, name, on, pathOrTip, ...radiusArgs("sprout()", radius, options, more));
   }
 
   surface(targets: SurfaceTarget) {
     return new Surface(this.ctx, targets);
   }
 
+  /** A missing colour (undefined) takes the nearest built part's. */
   stick(geometry: BufferGeometry, color: Fill, on: FrameInput, options?: StickOptions) {
     return stick(this.ctx, geometry, color, on, options);
   }
@@ -181,11 +226,11 @@ export class Builder {
     return cards(this.ctx, on, texture, options);
   }
 
-  membrane(edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions) {
+  membrane(edgeA: MembraneEdge, edgeB: MembraneEdge, options: MembraneOptions = {}) {
     return membrane(this.ctx, edgeA, edgeB, options);
   }
 
-  slab(points: readonly PointInput[], options: SlabOptions) {
+  slab(points: readonly PointInput[], options: SlabOptions = {}) {
     return slab(this.ctx, points, options);
   }
 

@@ -5,9 +5,10 @@
 // are rounded); `skin: "rigid"` cuts it into one round-capped piece per bone instead.
 import { Matrix3, Matrix4, Quaternion, Vector3 } from "three";
 import type { Mesh } from "three";
-import { Capture, meshFromWorld, resolveJoint, rigid, spanWeights, weightsFor } from "./context";
+import { Capture, describe, meshFromWorld, nearestFill, resolveJoint, rigid, spanWeights, weightsFor } from "./context";
 import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
+import { Paint } from "./paint";
 import { aim, DEG, flatten } from "./math";
 import type { DirectionInput } from "./math";
 import { smoothPath, toPath } from "./path";
@@ -49,8 +50,9 @@ export type Radius = number | readonly number[] | ((t: number) => number | reado
 
 export type SweepOptions = Tags & {
   /**
-   * Colour or Paint, or `(t) => colour`: the tube is split exactly where the colour changes. Optional when `bands`
-   * cover it.
+   * Colour or Paint, or `(t) => colour`: the tube is split exactly where the colour changes. Default: the colour of
+   * the nearest part already built to the tube's start (grey when there is none); `bands` override it where they
+   * cover the tube.
    */
   color?: Fill | ((t: number) => Fill);
   /** `[[tEnd, color], ...]` ascending, in source t: color bands; each band edge splits the mesh (same bone, no cap). */
@@ -233,9 +235,19 @@ export type WithRadius<O, R = Radius> = O & { radius: R };
 
 /**
  * A tube helper's radius and options, whether the radius came positionally (`b.sweep(path, 0.1, { color })`) or as
- * `radius` in the options (`b.sweep(path, { radius: 0.1, color })`). `call` names the helper in errors.
+ * `radius` in the options (`b.sweep(path, { radius: 0.1, color })`). A colour string or Paint in the options' place
+ * is the colour, with the options after it (`b.rod(a, b, 0.02, BARK, { bone })`). `call` names the helper in errors.
  */
-export function radiusArgs<R, O extends object>(call: string, radius: R | WithRadius<O, R>, options?: O): [R, O] {
+export function radiusArgs<R, O extends object>(
+  call: string,
+  radius: R | WithRadius<O, R>,
+  options?: O | Fill,
+  more?: O,
+): [R, O] {
+  if (typeof options === "string" || options instanceof Paint)
+    return radiusArgs(call, radius, { ...more, color: options } as unknown as O);
+  if (options !== undefined && options !== null && typeof options !== "object")
+    throw new Error(`${call}: the options after the radius take an object or a colour; got ${describe(options)}`);
   if (radius === undefined || radius === null)
     throw new Error(`${call}: radius is required, as an argument or as { radius }`);
   if (typeof radius === "object" && !Array.isArray(radius) && !isContour(radius as Radius)) {
@@ -244,17 +256,9 @@ export function radiusArgs<R, O extends object>(call: string, radius: R | WithRa
         `${call}: radius takes a number, [r0, r1], number[] or (t) => r, as an argument or as { radius }`,
       );
     const { radius: r, ...rest } = radius as WithRadius<O, R>;
-    return radiusArgs(call, r, { ...options, ...rest } as O);
+    return radiusArgs(call, r, { ...(options as O | undefined), ...rest } as O);
   }
-  return [radius as R, options ?? ({} as O)];
-}
-
-/** A tube needs a colour unless `bands` or `sectors` give it one; `call` names the helper in the error. */
-export function requireTubeColor(call: string, options: SweepOptions) {
-  if (options.color === undefined && !options.bands?.length && !options.sectors?.length)
-    throw new Error(
-      `${call}: color is required (a colour string, a paint or (t) => colour), or bands covering the tube`,
-    );
+  return [radius as R, (options as O | undefined) ?? ({} as O)];
 }
 
 /** The shape of a contoured tube: only its vertex count and shading matter, every ring carries its own polygon. */
@@ -613,12 +617,15 @@ function boneSpans(ctx: Ctx, path: Path, items: ReadonlyArray<JointRef | Chain>)
 }
 
 export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, options: SweepOptions = {}) {
-  requireTubeColor("sweep()", options);
   const chain = source instanceof Chain ? source : null;
   const path = source instanceof Chain ? source.path : toPath(source);
   const from = options.from ?? 0;
   const to = options.to ?? 1;
   if (!(from < to)) throw new Error(`sweep(): from (${from}) must be less than to (${to})`);
+  // Without a colour, the tube takes that of the nearest part built before it.
+  const built = ctx.fills.size;
+  let fallback: Fill | undefined;
+  const defaultFill = () => (fallback ??= nearestFill(ctx, path.at(from), built));
   const toT = (u: number) => from + u * (to - from);
   const toU = (t: number) => (t - from) / (to - from);
   const L = path.length;
@@ -761,9 +768,7 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
   const colorAt = (u: number) => {
     const t = toT(u);
     for (const [tEnd, color] of options.bands ?? []) if (t <= tEnd) return color;
-    const color = colorOf ? colorOf(u) : (colorFn as Fill | undefined);
-    if (!color) throw new Error("sweep(): no color for t=" + t.toFixed(3) + "; pass `color` or cover it with `bands`");
-    return color;
+    return (colorOf ? colorOf(u) : (colorFn as Fill | undefined)) || defaultFill();
   };
   /** Clock arcs of the sectors covering sweep t `u` (ranged sectors only inside their stretch). */
   const arcsAt = (u: number) => {

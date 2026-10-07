@@ -97,7 +97,7 @@ export function cards(
   );
 
   on.forEach((input, i) => {
-    const f = toFrame(input);
+    const f = toFrame(input, "cards()");
     const root = f.at;
     const n = f.axis.normalize();
     const pickT = textures.length > 1 ? Math.min(Math.floor(random() * textures.length), textures.length - 1) : 0;

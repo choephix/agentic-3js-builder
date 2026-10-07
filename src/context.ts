@@ -3,6 +3,7 @@
 // bake; bone weights and the inheritance rule (`weightsFor`); `Capture`, which keeps build-time data valid after
 // poses; and the placement primitives every helper uses (`setWorld`, `meshFromWorld`, `makeMesh`, `skinMesh`).
 import {
+  Box3,
   BufferGeometry,
   Float32BufferAttribute,
   Group,
@@ -11,6 +12,7 @@ import {
   Mesh,
   MeshStandardMaterial,
   Quaternion,
+  Triangle,
   Uint16BufferAttribute,
   Vector3,
 } from "three";
@@ -129,11 +131,50 @@ export class Capture {
  */
 export type Tags = { name?: string; group?: string; kind?: string };
 
-/** `color` as a Fill, else an error naming `call`. */
-export function requireFill(call: string, color: unknown): Fill {
+/** The colour of a shape built without `color` when no part is built yet. */
+export const DEFAULT_COLOR = "#999999";
+
+/**
+ * `color` as a Fill. Without one (undefined or null), the fill of the nearest part already built to `at()`, the
+ * point the shape starts from, else `DEFAULT_COLOR`. Anything else is an error naming `call`.
+ */
+export function fillFor(ctx: Ctx, call: string, color: unknown, at: () => Vector3): Fill {
   if (color instanceof Paint || typeof color === "string") return color;
-  if (color === undefined || color === null) throw new Error(`${call}: color is required (a colour string or a paint)`);
+  if (color === undefined || color === null) return nearestFill(ctx, at());
   throw new Error(`${call}: color takes a colour string or a paint; got ${describe(color)}`);
+}
+
+/**
+ * The fill of the SDK-built part whose surface passes closest to `p`, else `DEFAULT_COLOR`. `built` limits the
+ * search to the first meshes made, so a shape never takes its own colour.
+ */
+export function nearestFill(ctx: Ctx, p: Vector3, built = Infinity): Fill {
+  let best: Fill = DEFAULT_COLOR;
+  let bestD = Infinity;
+  const box = new Box3();
+  const triangle = new Triangle();
+  const closest = new Vector3();
+  let seen = 0;
+  for (const [mesh, fill] of ctx.fills) {
+    if (seen++ >= built) break;
+    mesh.updateWorldMatrix(true, false);
+    const geometry = mesh.geometry;
+    geometry.computeBoundingBox();
+    if (box.copy(geometry.boundingBox!).applyMatrix4(mesh.matrixWorld).distanceToPoint(p) >= bestD) continue;
+    const position = geometry.getAttribute("position");
+    const index = geometry.index;
+    const count = index ? index.count : position.count;
+    const corner = (k: number, v: Vector3) =>
+      v.fromBufferAttribute(position, index ? index.getX(k) : k).applyMatrix4(mesh.matrixWorld);
+    for (let k = 0; k + 2 < count; k += 3) {
+      corner(k, triangle.a);
+      corner(k + 1, triangle.b);
+      corner(k + 2, triangle.c);
+      const d = triangle.closestPointToPoint(p, closest).distanceTo(p);
+      if (d < bestD) [best, bestD] = [fill, d];
+    }
+  }
+  return best;
 }
 
 export class Ctx {
@@ -142,6 +183,8 @@ export class Ctx {
   rootJoint: Joint | null = null;
   readonly meshes = new Map<Joint, Mesh[]>();
   readonly owner = new Map<Mesh, Joint>();
+  /** The fill of every mesh the SDK made, in build order: the default colour of a shape without one. */
+  readonly fills = new Map<Mesh, Fill>();
   /** Rig answer-key records, evaluated against the current pose when `b.root` is read. */
   readonly rig: Array<() => RigRecord> = [];
   /** Blend-skinned meshes, re-deformed after every `pose()`. */
@@ -450,14 +493,19 @@ export function makeMesh(
     const { geometry: cut, ...charts } = chartify(geometry, toWorld);
     const mesh = new Mesh(cut, ctx.paintMaterial());
     ctx.paints.push({ mesh, paint: fill, wrap, ...charts });
+    ctx.fills.set(mesh, fill);
     return mesh;
   }
-  if (!texture) return new Mesh(geometry, ctx.material(fill));
-  if (!geometry.getAttribute("uv"))
+  if (texture && !geometry.getAttribute("uv"))
     throw new Error(
       "`texture` needs geometry with UVs: a three.js geometry, or cards; SDK shapes take a paint instead",
     );
-  return new Mesh(geometry, ctx.textured(texture, fill, Boolean(geometry.getAttribute("color"))));
+  const mesh = new Mesh(
+    geometry,
+    texture ? ctx.textured(texture, fill, Boolean(geometry.getAttribute("color"))) : ctx.material(fill),
+  );
+  ctx.fills.set(mesh, fill);
+  return mesh;
 }
 
 /** `skinIndex` / `skinWeight` attributes (indices into the returned bone list), up to 4 influences per vertex. */

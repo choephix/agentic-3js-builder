@@ -231,6 +231,7 @@ On 2026-10-07 Stefan asked to test how a model builds when the SDK is used the w
   - the radius inside the options object.
 
   Commit `6cc54cd` makes the SDK accept these forms and gives other wrong inputs named errors; 17 of the 21 original failures then build.
+
 - **Round 2.** The same arms with the round-1 lessons, SDK `6cc54cd`: 20 new subjects (15 creatures, 4 props, a Japanese garden diorama) × terse/rich × 7 arms = 280 builds.
 - **Harness.** `snap` builds modules that need the browser (canvas textures) in the page only. `SNAP_RENDER_ON_ERROR=1`, which the bake-off sets, renders despite report errors, as a static mesh when the skeleton fails.
 
@@ -260,7 +261,7 @@ Friction the builders reported:
 - [ ] `radius: [r0, r1]` reads as an ellipse but is a linear taper; an ellipse needs `(t) => [rx, ry]`.
 - [ ] `limb` silently straightens when the target is out of reach.
 - [ ] Sloped feet: the round end cap dips below the floor. The snap report now warns from 5 mm off the floor (6979c92).
-- [ ] `surface(joint)` finds no meshes on a smooth-skinned chain; the mesh sits under its heaviest bone.
+- [x] `surface(joint)` finds no meshes on a smooth-skinned chain; the mesh sits under its heaviest bone. A joint with no meshes of its own now takes the blend-skinned meshes that bend with it.
 - [x] Sweep `sectors` on narrow colour-split pieces triggered the harness's inside-out false alarm; the check now needs a closed part (6979c92).
 - [x] `docs/api.md` lines over 1,000 characters: none left in `docs/api.md`, `docs/conventions.md` or `GUIDE.md` (Astra docs hunt, 2026-10-02).
 - [x] One broken sample fails `npm run typecheck` for everyone: `npm run typecheck -- <slug>` checks one file and its imports.
@@ -276,7 +277,7 @@ Friction the builders reported:
 - [ ] Merge branch `sdk-polish` into main: it carries the `agent-docs` split (README → `docs/api.md`), with `experiments/humanoids` briefs pointing at `docs/api.md`.
 - [ ] Measure the kits: rerun a few round-3 subjects (a pixel, a toon, a clockwork one) with the new docs and compare cost, calls and context against their first builds.
 - [ ] The lean-mesh GUIDE line (batch 11) is untested on a fresh builder: rerun one texture-round subject and compare triangles against its batch 10 build.
-- [ ] Bake-off leftovers: `b.membrane` without `thickness` throws (a default would have saved one r1 build); `part({ dir })` with a zero-length direction reports `aim()` instead of `part()`; the harness's "Assembly has no valid skeleton" hides the per-part errors behind it.
+- [x] Bake-off leftovers: membrane thickness defaults to 2% of its width; `part({ dir })` names `part()`; "Assembly has no valid skeleton" lists the first errors. See DESIGN.md, "Bake-off r2 and r3".
 - [ ] The showcase dev server needs `CHOKIDAR_USEPOLLING=1` when the machine's inotify watchers are nearly used up (125 of 128 on 2026-10-07).
 
 Samples:

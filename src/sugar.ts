@@ -8,7 +8,7 @@ import { catmull, Path, polyline, toPath } from "./path";
 import type { PathInput } from "./path";
 import { createChain } from "./skeleton";
 import type { ChainOptions } from "./skeleton";
-import { interpolate, radiusFn, requireTubeColor, sweep } from "./sweep";
+import { interpolate, radiusFn, sweep } from "./sweep";
 import type { Radius, SweepOptions } from "./sweep";
 
 /** Straight tube with flat ends. `r` = radius or [r0, r1] taper. */
@@ -19,7 +19,6 @@ export function rod(
   r: number | readonly [number, number],
   options: SweepOptions = {},
 ) {
-  requireTubeColor("rod()", options);
   return sweep(ctx, [a, b], r, { caps: "flat", ...options });
 }
 
@@ -31,7 +30,6 @@ export function capsule(
   r: number | readonly [number, number],
   options: SweepOptions = {},
 ) {
-  requireTubeColor("capsule()", options);
   return sweep(ctx, [a, b], r, { caps: "round", ...options });
 }
 
@@ -47,7 +45,6 @@ export function spike(
   r: number,
   options: SweepOptions = {},
 ) {
-  requireTubeColor("spike()", options);
   const tip =
     len === null
       ? toPoint(dirOrTip, "spike()")
@@ -64,7 +61,6 @@ export function frustumBox(
   [w1, h1]: readonly [number, number],
   options: SweepOptions = {},
 ) {
-  requireTubeColor("frustumBox()", options);
   return sweep(ctx, [a, b], (t) => [(w0 + (w1 - w0) * t) / 2, (h0 + (h1 - h0) * t) / 2], {
     section: "box",
     caps: "flat",
@@ -79,7 +75,6 @@ export type Station = { at: PointInput; w: number; h: number };
  * `bone` (a chain, or a list of chains and joints the body runs through) skins it as one mesh bending at each joint.
  */
 export function loft(ctx: Ctx, stations: readonly Station[], options: SweepOptions = {}) {
-  requireTubeColor("loft()", options);
   const path = catmull(stations.map((s) => s.at));
   const ts = path.knots;
   const ws = stations.map((s) => s.w / 2);
@@ -109,9 +104,8 @@ export function sprout(
   radius: Radius,
   options: SproutOptions = {},
 ) {
-  requireTubeColor("sprout()", options);
   const { count, bury, names, role, contact, ...rest } = options;
-  const root = toFrame(on);
+  const root = toFrame(on, "sprout()");
   const start = root.at;
   const parent = boneFor(ctx, undefined, [root], start);
   const isPath =

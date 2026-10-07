@@ -53,6 +53,24 @@ export class Joint extends Frame {
     return new Quaternion().setFromRotationMatrix(this.object.matrixWorld);
   }
 
+  /** The three.js group's `userData`, as on any Object3D. */
+  get userData() {
+    return this.object.userData;
+  }
+
+  /**
+   * The three.js group's position, relative to the parent joint as in three.js; the model-space position is `at`.
+   * Turn joints with `b.pose`, which keeps skins and every handle on them in step.
+   */
+  get position() {
+    return this.object.position;
+  }
+
+  /** The three.js group's rotation, relative to the parent joint (radians). Turn joints with `b.pose`. */
+  get rotation() {
+    return this.object.rotation;
+  }
+
   get weights(): Weights {
     return [[this, 1]];
   }
@@ -142,7 +160,7 @@ export function pose(ctx: Ctx, ref: JointRef, rotation: PoseRotation) {
   let delta: Quaternion;
   if ("isQuaternion" in rotation) delta = rotation.clone();
   else if ("about" in rotation) {
-    const hinge = toFrame(rotation.about);
+    const hinge = toFrame(rotation.about, "pose(): about");
     pivot = hinge.at;
     delta = new Quaternion().setFromAxisAngle(hinge.axis, rotation.deg * DEG);
   } else if ("axis" in rotation)
@@ -309,7 +327,14 @@ export function createChain(ctx: Ctx, name: string, source: PathInput, options: 
   const { names } = options;
   const nameOf = (i: number) =>
     names === undefined ? `${name}${i + 1}` : typeof names === "function" ? names(i) : names[i];
-  const ts = options.count ? Array.from({ length: options.count + 1 }, (_, i) => i / options.count!) : path.knots;
+  // Names that fit neither the knot spans nor the spans plus a tip set the joint count, spread by arc length.
+  const spansOf = path.knots.length - 1;
+  const count =
+    options.count ??
+    (Array.isArray(names) && names.length && names.length !== spansOf && names.length !== spansOf + 1
+      ? names.length
+      : undefined);
+  const ts = count ? Array.from({ length: count + 1 }, (_, i) => i / count) : path.knots;
   if (ts.length < 2) throw new Error(`Chain "${name}" needs at least one span`);
   const spans = ts.length - 1;
   if (Array.isArray(names) && names.length !== spans && names.length !== spans + 1)

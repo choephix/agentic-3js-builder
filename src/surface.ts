@@ -1,7 +1,7 @@
 // Surface queries on the REAL built triangles (no analytic stand-ins) and `stick()` to seat parts on any frame.
 import { Box3, Quaternion, Triangle, Vector3 } from "three";
 import type { BufferGeometry, Mesh, Object3D, Texture } from "three";
-import { describe, mix, requireFill, rigid, vertexWeights } from "./context";
+import { describe, fillFor, mix, rigid, vertexWeights } from "./context";
 import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, flatten, rng as makeRng, toDirection, toFrame, toPoint, vec } from "./math";
@@ -51,6 +51,13 @@ export type LoopOptions = {
 
 const PERTURB = new Vector3(0.0123, 0.0321, 0.0231);
 
+/** The blend-skinned meshes that bend with `joint`, for a joint that owns no meshes of its own. */
+function skinnedOn(ctx: Ctx, joint: Joint) {
+  return [...ctx.owner.keys()].filter((mesh) =>
+    (mesh.userData.skinBones as string[] | undefined)?.includes(joint.name),
+  );
+}
+
 export class Surface {
   readonly meshes: Mesh[] = [];
   private readonly joints: Joint[] = [];
@@ -72,7 +79,7 @@ export class Surface {
     const add = (target: SurfaceTarget) => {
       if (target instanceof Sweep) target.meshes.forEach(add);
       else if (target instanceof Part) add(target.mesh);
-      else if (target instanceof Joint) (ctx.meshes.get(target) ?? []).forEach(add);
+      else if (target instanceof Joint) (ctx.meshes.get(target) ?? skinnedOn(ctx, target)).forEach(add);
       else if (Array.isArray(target)) target.forEach(add);
       else if (target && typeof target === "object" && "isObject3D" in target) {
         const object = target as Object3D;
@@ -89,7 +96,12 @@ export class Surface {
         );
     };
     add(targets);
-    if (!this.meshes.length) throw new Error("surface(): no meshes in targets");
+    if (!this.meshes.length)
+      throw new Error(
+        targets instanceof Joint
+          ? `surface(): joint "${targets.name}" carries no meshes (none built on it or bending with it); pass the part or sweep itself`
+          : `surface(): no meshes in ${describe(targets)}`,
+      );
   }
 
   /** Re-read the meshes' world triangles when a `pose()` happened since the last query. */
@@ -505,9 +517,15 @@ export type StickOptions = Tags & {
  * Seat a part on any frame (a surface hit, a tube point, a ring item, a joint...): local +Y along the frame's
  * facing axis (a hit's normal), sunk by `embed` × the part's own height. The part faces that axis.
  */
-export function stick(ctx: Ctx, geometry: BufferGeometry, color: Fill, on: FrameInput, options: StickOptions = {}) {
-  requireFill("stick()", color);
-  const base = toFrame(on);
+export function stick(
+  ctx: Ctx,
+  geometry: BufferGeometry,
+  color: Fill | undefined,
+  on: FrameInput,
+  options: StickOptions = {},
+) {
+  const base = toFrame(on, "stick()");
+  const fill = fillFor(ctx, "stick()", color, () => base.at);
   const n = base.axis;
   const flow = options.flow ? flatten(toDirection(options.flow, "stick()"), n) : null;
   const quat = aim(n, flow && flow.lengthSq() > 1e-10 ? flow : undefined);
@@ -523,5 +541,5 @@ export function stick(ctx: Ctx, geometry: BufferGeometry, color: Fill, on: Frame
   const height = (max.y - min.y) * scale;
   const embed = options.embed ?? 0.2;
   const at = base.at.addScaledVector(n, -(min.y * scale + embed * height));
-  return part(ctx, geometry, color, { ...options, frame: base, at, quat });
+  return part(ctx, geometry, fill, { ...options, frame: base, at, quat });
 }
