@@ -126,7 +126,15 @@ async function refreshData() {
   if (!response?.ok) return;
   data = (await response.json()) as RoundData;
   bySlug = new Map(data.builds.map((build) => [build.slug, build]));
+  // A round run with `--arms` lists every arm in its manifest; show only the arms it has builds for.
+  const all = allArms.get(round) ?? round.arms;
+  allArms.set(round, all);
+  const ran = new Set(data.builds.map((build) => build.arm));
+  round.arms = ran.size ? all.filter((arm) => ran.has(arm.id)) : all;
 }
+
+/** Each round's arms as its manifest lists them, before `refreshData` drops the ones without builds. */
+const allArms = new WeakMap<Round, Arm[]>();
 
 /** The runner's slugs: `r1`, `fennec`, `terse`, `docs-sdk` → `r1FennecTerseDocsSdk`. */
 const camel = (first: string, ...rest: string[]) =>
@@ -197,7 +205,10 @@ function order(pitch: Pitch) {
   return arms;
 }
 
-const armColor = (arm: Arm) => (state.blind ? BLIND_COLOR : ARM_COLORS[round!.arms.indexOf(arm) % ARM_COLORS.length]);
+const armColor = (arm: Arm) =>
+  state.blind
+    ? BLIND_COLOR
+    : ARM_COLORS[(allArms.get(round!) ?? round!.arms).findIndex((item) => item.id === arm.id) % ARM_COLORS.length];
 const armLabel = (arm: Arm, position: number) =>
   state.blind ? `Build ${position + 1}` : `${arm.letter} · ${arm.name}`;
 const armBadge = (arm: Arm, position: number) =>

@@ -234,6 +234,12 @@ const showcaseData = {
   await json("__thumbs", await thumbIndex());
  },
  configureServer(server) {
+  // `/round` and `/bakeoff` are pages, as on Netlify; without this the dev server answers with round.ts and bakeoff.ts.
+  server.middlewares.use((request, _response, next) => {
+   const [path, query] = (request.url ?? "").split("?");
+   if (path === "/round" || path === "/bakeoff") request.url = `${path}.html${query ? `?${query}` : ""}`;
+   next();
+  });
   // samples/ sits outside the Vite root, so only files already loaded are watched. Watching the folder lets the
   // `samples/*` globs in catalog.ts and builds.ts see files being added or removed.
   server.watcher.add(sampleRoot);
