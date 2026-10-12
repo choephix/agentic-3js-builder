@@ -112,7 +112,7 @@ export const ROUND_INFO: Record<
   r3: { set: "r3", checkedOn: "6cc54cd", order: 5 },
   r3opus: { set: "r3", checkedOn: "6cc54cd", order: 6 },
   r4sonnet: { set: "r4", checkedOn: "c000f88", order: 7 },
-  r4opus: { set: "r4", checkedOn: "c000f88", order: 8, note: "High is Opus 5.5's top effort in Stefan's omp setup." },
+  r4opus: { set: "r4", checkedOn: "c000f88", order: 8, note: "High was the top effort available for Opus 5.5." },
   r4astra: { set: "r4", checkedOn: "c000f88", order: 9 },
   r4sol: { set: "r4", checkedOn: "c000f88", order: 10 },
   r1haiku: { set: "r1", checkedOn: "c000f88", order: 11 },
@@ -125,7 +125,7 @@ export const ROUND_INFO: Record<
     set: "r2",
     checkedOn: "c000f88",
     order: 17,
-    note: "Stopped at 44 of 280 builds when its job hit the 2-hour limit for background tasks; checked on 2026-10-12.",
+    note: "Partial: stopped at 44 of 280 builds.",
   },
 };
 export const roundInfo = (id: string) => ROUND_INFO[id] ?? { set: id.slice(0, 2), checkedOn: "?", order: 99 };
@@ -146,7 +146,7 @@ export function runnerLabel(round: LabRound) {
 // ── Outcomes ─────────────────────────────────────────────────────────────────────────────────────────────────────
 
 /**
- * What came of a build. `rigless`: it rendered, but the creature lab's rig export would reject it (say, meshes on no
+ * What came of a build. `rigless`: it rendered, but failed the rig check (say, meshes on no
  * bone), so it shows as a static mesh. `nocode`: the reply had no code block (every one ran out of tokens).
  */
 export type Outcome = "clean" | "rigless" | "crashed" | "nocode" | "unchecked";

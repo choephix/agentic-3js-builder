@@ -129,7 +129,7 @@ export function renderScores(root: HTMLElement) {
     )
     .join("");
   root.innerHTML = `
-    ${sectionHead("Scoreboard", "Every round in the order it ran. “Rendered” counts builds that built and rendered, including those the creature lab's rig export would reject (orange). Click a round to see its builds. Quality is not scored here: that is for your eyes.")}
+    ${sectionHead("Scoreboard", "Every round in the order it ran. “Rendered” counts builds that built and rendered, including those whose rig check failed (orange: some meshes hang on no bone). Click a round to see its builds. Quality is not scored.")}
     <div class="table-wrap"><table class="scores">${head}${body}</table></div>
     ${sectionHead("By model and effort", "All rounds pooled, without the re-check. Each model ran different pitch sets, so use the per-round rows for like-for-like comparisons.")}
     <div class="table-wrap"><table class="scores"><tr><th>Model</th><th>Effort</th><th class="n">Builds</th><th>Outcomes</th><th class="n">Rendered</th><th class="n">Spend</th><th class="n">Per build</th><th class="n">Median time</th><th class="n">Median output</th><th class="n">Out of tokens</th></tr>${modelRows}</table></div>
@@ -857,7 +857,7 @@ export function renderCharts(root: HTMLElement) {
     <section class="chart-box"><h3>Output tokens against time</h3><p>Output counts hidden thinking too. The diagonals are constant speeds: a build far above its model's line was slowed by the provider, not by thinking longer. Rings are replies that ran out of tokens.</p>${tokenScatter()}</section>
     <section class="chart-box"><h3>Streaming speed</h3><p>Output tokens per second of wall time.</p>${roundStrip(speed, (value) => `${Math.round(value)}`, false)}</section>
     <section class="chart-box"><h3>Output tokens per build</h3><p>Medium effort writes 8–30k tokens; xhigh writes 50–128k. 64k was the cap for medium rounds and 128k for xhigh.</p>${roundStrip((build) => build.output ?? NaN, tokens, true)}</section>
-    <section class="chart-box"><h3>Cost per build</h3><p>Estimated from omp's prices (uncached input, cached input, output); calls over a model's long-context threshold are priced at its long-context rates.</p>${roundStrip((build) => build.cost ?? NaN, money, true)}</section>
+    <section class="chart-box"><h3>Cost per build</h3><p>Estimated from list prices (uncached input, cached input, output); calls over a model's long-context threshold are priced at its long-context rates.</p>${roundStrip((build) => build.cost ?? NaN, money, true)}</section>
     <section class="chart-box"><h3>What each prompt costs to send</h3><p>Input tokens per call, by arm (dots coloured by model): as Claude counts them, the whole source is about 113k tokens, the docs about 33k, the brief about 5k and plain about 1k; the GPT models count fewer for the same text. On round 2, Sonnet medium spent ${money(tally(sonnetArms.filter((b) => b.arm === "source-sdk")).costPer)} per build on arm A, ${money(tally(sonnetArms.filter((b) => b.arm === "docs-sdk")).costPer)} on C, ${money(tally(sonnetArms.filter((b) => b.arm === "brief-sdk")).costPer)} on E and ${money(tally(sonnetArms.filter((b) => b.arm === "plain")).costPer)} on plain three.js.</p>${strip(
       armInputs,
       axisFor(
@@ -918,7 +918,7 @@ export function renderFailures(root: HTMLElement) {
     (a, b) => b[1].length - a[1].length,
   );
   root.innerHTML = `
-    ${sectionHead("Failures", `Of ${all.length} builds (without the re-check), <b>${crashed.length}</b> crashed, <b>${nocode.length}</b> ran out of tokens before writing code, and <b>${rigless.length}</b> rendered but would fail the creature lab's rig export. A single-shot build never sees its error, so every crash is a lost build: these lists drove the two SDK passes.`)}
+    ${sectionHead("Failures", `Of ${all.length} builds (without the re-check), <b>${crashed.length}</b> crashed, <b>${nocode.length}</b> ran out of tokens before writing code, and <b>${rigless.length}</b> rendered but failed the rig check. A single-shot build never sees its error, so every crash is a lost build: these lists drove the two SDK passes.`)}
     <section class="chart-box"><h3>Per round</h3>${stacks(
       perRound.map(({ round, t }) => ({
         label: runnerLabel(round),
@@ -935,7 +935,7 @@ export function renderFailures(root: HTMLElement) {
       <div class="table-wrap"><table class="fails">${classRows}</table></div></section>
     <section class="chart-box"><h3>Out of tokens</h3><p>The reply used its whole budget (64k at medium, 128k at xhigh) on thinking and never wrote the code block. All but one are at xhigh.</p>
       <div class="table-wrap"><table class="fails">${nocodeRows}</table></div></section>
-    <section class="chart-box"><h3>Rendered, rig rejected</h3><p>These build and render, as a static mesh where the skeleton fails, which is how an app would show them. The creature lab's rig export would refuse them.</p>
+    <section class="chart-box"><h3>Rendered, rig rejected</h3><p>These build and render, as a static mesh where the skeleton fails, which is how an app would show them, but they can't be exported as rigged characters.</p>
       <div class="table-wrap"><table class="fails">${riglessClasses
         .map(
           ([key, list]) =>
@@ -996,21 +996,21 @@ export function renderMethod(root: HTMLElement) {
       <div class="pipeline">
         <div><b>System prompt</b><small>contract + taste + reference, per arm</small></div><i>+</i>
         <div><b>Pitch</b><small>the user message, terse or rich</small></div><i>→</i>
-        <div><b>Model</b><small>one request through <code>omp auth-gateway</code>; no tools, no second turn</small></div><i>→</i>
+        <div><b>Model</b><small>one API request; no tools, no second turn</small></div><i>→</i>
         <div><b>Module</b><small>the longest fenced code block; its SDK import points at <code>src/index.ts</code></small></div><i>→</i>
         <div><b>Typecheck</b><small>counted, never blocking (unused names ignored)</small></div><i>→</i>
         <div><b>Render</b><small><code>npm run snap</code> on the RTX 3060 Chromium: shots, report, GLB</small></div>
       </div>
       <ul class="facts">
         <li><b>One shot.</b> Each build is one request and one reply. On an API error (429, 5xx) the runner resends the identical request up to 3 times; nothing the model wrote is ever fed back.</li>
-        <li><b>Rendered</b> means the module built a model and the harness rendered it. With <code>SNAP_RENDER_ON_ERROR=1</code> a model the creature lab would reject (meshes on no bone, say) still renders, as a static mesh when its skeleton fails: that is “rendered, rig rejected”.</li>
+        <li><b>Rendered</b> means the module built a model and the harness rendered it. A model that fails the rig check (some meshes on no bone, say) still renders, as a static mesh when its skeleton fails, the way an app would show it: that is “rendered, rig rejected”.</li>
         <li><b>Out of tokens</b>: the reply hit its cap (64k at medium, 128k at xhigh) with no code block.</li>
-        <li><b>Cost</b> is estimated from <code>omp models</code> prices for uncached input, cached input and output. Cache writes aren't reported, so they're priced as plain input. Calls over a long-context threshold (Haiku: 100k) are priced at the long-context rates.</li>
+        <li><b>Cost</b> is estimated from list prices for uncached input, cached input and output. Cache writes aren't reported, so they're priced as plain input. Calls over a long-context threshold (Haiku: 100k) are priced at the long-context rates.</li>
         <li><b>Time</b> is wall time from request to the end of the reply, queueing included. Rounds ran 20–40 requests at once, so time is not pure latency.</li>
-        <li><b>Effort</b>: rounds 1–3 ran at medium; round 4 at xhigh (Opus at high, its top level in this setup); Haiku at each round's effort, plus xhigh copies of rounds 1–3.</li>
-        <li><b>Same prompts</b>: a later model on an earlier round's pitches reuses that round's exact system prompts (<code>--prompts-from</code>). Round 4's prompts were built from commit e50bd37 in a separate worktree while the SDK was being edited.</li>
+        <li><b>Effort</b>: rounds 1–3 ran at medium; round 4 at xhigh (Opus at high, the top level available for it); Haiku at each round's effort, plus xhigh copies of rounds 1–3.</li>
+        <li><b>Same prompts</b>: a later model on an earlier round's pitches reuses that round's exact system prompts (<code>--prompts-from</code>).</li>
         <li><b>Checked on</b>: builds are typechecked and rendered on the SDK of the day. Later SDKs accept more guesses, so later checks are kinder: the scoreboard lists each round's SDK.</li>
-        <li><b>No judging.</b> No model scores the builds. Quality is for your eyes: gallery, compare, blind mode, stars.</li>
+        <li><b>Quality is not scored.</b> No model judges the builds; the gallery, compare views, blind mode and stars are there to judge them by eye.</li>
       </ul></section>
     <section class="chart-box"><h3>Seven arms</h3><p>Each arm is a reference crossed with a taste; plain three.js is the control.</p>
       <div class="arm-grid">
