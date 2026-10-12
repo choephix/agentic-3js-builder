@@ -17,7 +17,7 @@ import {
 } from "./lab-model";
 
 export const store = {
-  data: { generated: "", bakeoffUrl: "/bakeoff", arms: [], subjects: [], rounds: [], builds: [] } as LabData,
+  data: { generated: "", arms: [], subjects: [], rounds: [], builds: [] } as LabData,
   bySlug: new Map<string, LabBuild>(),
   rounds: new Map<string, LabRound>(),
   /** Rounds in the order they ran. */

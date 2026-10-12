@@ -7,7 +7,4 @@ type Renders = {
 };
 export declare const labThumbRoot: string;
 export declare function v01Renders(slug: string, root: string, url: (path: string) => string): Promise<Renders>;
-export declare function labData(
-  renders: (slug: string) => Promise<Renders> | Renders,
-  bakeoffUrl?: string,
-): Promise<LabData>;
+export declare function labData(renders: (slug: string) => Promise<Renders> | Renders): Promise<LabData>;

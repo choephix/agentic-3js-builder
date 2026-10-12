@@ -15,6 +15,7 @@ import {
   type LabBuild,
   type LabData,
 } from "./lab-model";
+import type { Options } from "./lab-3d";
 import { renderStory } from "./lab-story";
 import { armChip, load, roundOf, runnerChip, store, stars, toggleStar, ui } from "./lab-store";
 import {
@@ -79,7 +80,6 @@ function renderHead() {
     <span class="head-tools">
       <button class="toggle${ui.blind ? " on" : ""}" id="blind-toggle" data-tip="Hide model, arm, round and cost wherever a build is shown, and shuffle orders (B)">${ui.blind ? "◉" : "○"} Blind</button>
       <a class="toggle" href="#gallery?starred=1" data-tip="Your starred builds">★ ${starCount}</a>
-      <a class="toggle" href="${store.data.bakeoffUrl}" target="_blank" data-tip="The per-round bake-off page with live 3D">/bakeoff ↗</a>
     </span>`;
   head.querySelector("#blind-toggle")!.addEventListener("click", () => setBlind(!ui.blind));
 }
@@ -122,12 +122,28 @@ const SHOTS = [
   "flex-a",
   "flex-b",
 ];
+type Mode = "3d" | "three-quarter" | "sheet";
+const MODES: Array<[Mode, string]> = [
+  ["3d", "3D ◆"],
+  ["three-quarter", "Three-quarter"],
+  ["sheet", "Sheet"],
+];
 const viewerState = {
   slugs: [] as string[],
   index: 0,
-  shot: "three-quarter",
+  mode: "three-quarter" as Mode,
+  /** The sheet view zoomed into one of its shots, or null for the whole sheet. */
+  zoom: null as string | null,
   pane: "info" as "info" | "code" | "reply",
 };
+/** The 3D view's options, kept from build to build. */
+const view3d: Options = { turntable: true, wiggle: false, skeleton: false, wire: false };
+const TOOLS_3D: Array<[keyof Options, string, string]> = [
+  ["turntable", "Turntable", "T"],
+  ["wiggle", "Wiggle", "W"],
+  ["skeleton", "Skeleton", "K"],
+  ["wire", "Wireframe", "F"],
+];
 
 function openViewer(slug: string, scope: Element | null) {
   const slugs = scope
@@ -139,13 +155,13 @@ function openViewer(slug: string, scope: Element | null) {
   document.body.classList.add("viewing");
   drawViewer();
 }
-/** Stops the 3D view, if one is showing. */
-let unmount3d: (() => void) | null = null;
+/** The 3D view showing, if any. */
+let live3d: { set(next: Partial<Options>): void; reset(): void; dispose(): void } | null = null;
 let mount3dToken = 0;
 function stop3d() {
   mount3dToken++;
-  unmount3d?.();
-  unmount3d = null;
+  live3d?.dispose();
+  live3d = null;
 }
 
 function closeViewer() {
@@ -168,20 +184,36 @@ function drawViewer() {
   const subject = store.subjects.get(build.subject);
   const state = outcome(build);
   const images = SHOTS.filter((name) => build.shots[name]);
-  // "3d": the exported GLB in a live, orbiting view (lab-3d.ts).
-  const shots = build.glb ? ["3d", ...images] : images;
-  const shot =
-    viewerState.shot === "3d" && build.glb ? "3d" : build.shots[viewerState.shot] ? viewerState.shot : images[0];
+  const model3d = build.rig ?? build.glb;
+  // A mode the build can't show falls back to the three-quarter render.
+  const modes = MODES.filter(([mode]) => (mode === "3d" ? model3d : images.length));
+  const mode =
+    viewerState.mode === "3d" && model3d
+      ? "3d"
+      : images.length
+        ? viewerState.mode === "3d"
+          ? "three-quarter"
+          : viewerState.mode
+        : null;
+  const zoom = viewerState.zoom && build.shots[viewerState.zoom] ? viewerState.zoom : null;
+  const tools = TOOLS_3D.map(([key, label, hotkey]) => {
+    const off = (key === "wiggle" || key === "skeleton") && !build.rig;
+    return `<button class="${view3d[key] && !off ? "on" : ""}" data-tool="${key}"${off ? " disabled" : ""} data-tip="${off ? "This build has no rig" : `${label} (${hotkey})`}">${label}</button>`;
+  }).join("");
   const stage =
-    shot === "3d"
-      ? `<div class="three"><span class="three-status"></span><small class="three-hint">Drag to turn · scroll to zoom · right-drag to pan</small></div>`
-      : shot
-        ? `<img class="big" src="${build.shots[shot]}" alt="">`
-        : `<div class="no-render"><span style="color:${OUTCOMES[state].color}">${esc(OUTCOMES[state].name)}</span>${
-            build.crash
-              ? `<code>${esc(build.crash)}</code><small>thrown in ${esc(build.crashWhere ?? "?")}</small>`
-              : ""
-          }${!build.hasCode ? `<small>The reply ran to ${tokens(build.output ?? NaN)} tokens (finish: ${esc(build.finish ?? "?")}) without a code block.</small>` : ""}</div>`;
+    mode === "3d"
+      ? `<div class="three"><span class="three-status"></span><div class="three-tools">${tools}<button data-tool="reset" data-tip="Frame the model again (0)">Reset view</button></div><small class="three-hint">Drag to turn · scroll to zoom · right-drag to pan</small></div>`
+      : mode === "three-quarter"
+        ? `<img class="big" src="${build.shots["three-quarter"] ?? build.shots[images[0]]}" alt="">`
+        : mode === "sheet" && zoom
+          ? `<figure class="sheet-zoom" data-zoom=""><img class="big" src="${build.shots[zoom]}" alt="" data-tip="Back to the sheet (click or Esc)"><figcaption><button data-zoom="">← Sheet</button> ${esc(title(zoom))}</figcaption></figure>`
+          : mode === "sheet"
+            ? `<div class="sheet-grid">${images.map((name) => `<button data-zoom="${name}"><img src="${build.shots[name]}" alt="" loading="lazy"><span>${esc(title(name))}</span></button>`).join("")}</div>`
+            : `<div class="no-render"><span style="color:${OUTCOMES[state].color}">${esc(OUTCOMES[state].name)}</span>${
+                build.crash
+                  ? `<code>${esc(build.crash)}</code><small>thrown in ${esc(build.crashWhere ?? "?")}</small>`
+                  : ""
+              }${!build.hasCode ? `<small>The reply ran to ${tokens(build.output ?? NaN)} tokens (finish: ${esc(build.finish ?? "?")}) without a code block.</small>` : ""}</div>`;
   const row = (label: string, value: string) => `<div class="kv"><span>${label}</span><b>${value}</b></div>`;
   const info = blind
     ? `<p class="blind-note">Blind: who made this is hidden.</p><button class="toggle" data-reveal>Reveal (R)</button>`
@@ -206,14 +238,14 @@ function drawViewer() {
       ${build.errorCount ? `<div class="errs"><b>${build.errorCount} rig error${build.errorCount > 1 ? "s" : ""}</b>${build.errors.map((error) => `<code>${esc(error)}</code>`).join("")}</div>` : ""}
       ${build.crash ? `<div class="errs"><b>Crash</b><code>${esc(build.crash)}</code></div>` : ""}
       ${build.typeErrorSample.length ? `<div class="errs"><b>Type errors</b>${build.typeErrorSample.map((error) => `<code>${esc(error)}</code>`).join("")}</div>` : ""}
-      <p class="links"><a href="${store.data.bakeoffUrl}?round=${build.round}&tab=grid&build=${build.slug}" target="_blank">Live 3D on /bakeoff ↗</a>
+      <p class="links">
       <a href="#compare?set=${roundInfo(build.round).set}&rows=subject&cols=round&subject=${build.subject}&arm=${build.arm}&level=${build.level}&round=" data-close>Same prompt, every model</a>
       <a href="#compare?set=${roundInfo(build.round).set}&rows=level&cols=arm&subject=${build.subject}&round=${build.round}&level=&arm=" data-close>Every arm, both pitches</a></p>`;
   stop3d();
   viewer.innerHTML = `
     <div class="v-stage">
       <div class="v-top"><span class="v-count">${viewerState.index + 1} / ${viewerState.slugs.length}</span>
-        <span class="v-shots">${shots.map((name) => `<button class="${name === shot ? "on" : ""}" data-shot="${name}">${name === "3d" ? "3D ◆" : esc(title(name))}</button>`).join("")}${build.sheet ? `<a href="${build.sheet}" target="_blank">Sheet ↗</a>` : ""}</span>
+        <span class="v-shots">${modes.map(([id, label]) => `<button class="${id === mode ? "on" : ""}" data-mode="${id}">${label}${id === "sheet" ? ` <small>${images.length}</small>` : ""}</button>`).join("")}</span>
         <button class="v-close" data-close title="Close (Esc)">✕</button></div>
       <div class="v-image"><button class="v-nav prev" data-step="-1" title="Previous (←)">‹</button>${stage}<button class="v-nav next" data-step="1" title="Next (→)">›</button></div>
     </div>
@@ -226,7 +258,7 @@ function drawViewer() {
       ${blind ? "" : `<p class="v-slug"><code>${build.slug}</code></p>`}
     </aside>`;
   if (viewerState.pane !== "info") void loadText(build);
-  if (shot === "3d") void show3d(build.glb!);
+  if (mode === "3d") void show3d(model3d!);
 }
 
 async function show3d(url: string) {
@@ -235,10 +267,34 @@ async function show3d(url: string) {
   const { mount } = await import("./lab-3d");
   if (!host || token !== mount3dToken) return;
   const status = host.querySelector<HTMLElement>(".three-status")!;
-  unmount3d = mount(host, url, (text) => {
-    status.textContent = text ?? "";
-    status.hidden = !text;
-  });
+  live3d = mount(
+    host,
+    url,
+    view3d,
+    (text) => {
+      status.textContent = text ?? "";
+      status.hidden = !text;
+    },
+    paintTools,
+  );
+}
+
+/** Light up the 3D toolbar's buttons from the options. */
+function paintTools() {
+  for (const button of viewer.querySelectorAll<HTMLButtonElement>("[data-tool]")) {
+    const key = button.dataset.tool as keyof Options;
+    if (key in view3d) button.classList.toggle("on", view3d[key] && !button.disabled);
+  }
+}
+
+function tool(key: string) {
+  if (!live3d) return;
+  if (key === "reset") return live3d.reset();
+  const option = key as keyof Options;
+  const button = viewer.querySelector<HTMLButtonElement>(`[data-tool="${option}"]`);
+  if (!button || button.disabled) return;
+  live3d.set({ [option]: !view3d[option] });
+  paintTools();
 }
 
 async function loadText(build: LabBuild) {
@@ -260,8 +316,12 @@ async function loadText(build: LabBuild) {
 viewer.addEventListener("click", (event) => {
   const target = event.target as HTMLElement;
   if (target === viewer) return closeViewer();
-  const shot = target.closest<HTMLElement>("[data-shot]")?.dataset.shot;
-  if (shot) return ((viewerState.shot = shot), drawViewer());
+  const mode = target.closest<HTMLElement>("[data-mode]")?.dataset.mode;
+  if (mode) return ((viewerState.mode = mode as Mode), (viewerState.zoom = null), drawViewer());
+  const zoom = target.closest<HTMLElement>("[data-zoom]")?.dataset.zoom;
+  if (zoom !== undefined) return ((viewerState.zoom = zoom || null), drawViewer());
+  const key = target.closest<HTMLElement>("[data-tool]")?.dataset.tool;
+  if (key) return tool(key);
   const delta = target.closest<HTMLElement>("[data-step]")?.dataset.step;
   if (delta) return step(Number(delta));
   const pane = target.closest<HTMLElement>("[data-pane]")?.dataset.pane;
@@ -309,17 +369,24 @@ document.addEventListener("mousemove", (event) => {
 document.addEventListener("keydown", (event) => {
   if ((event.target as HTMLElement).closest("input, select, textarea") || event.metaKey || event.ctrlKey) return;
   if (!viewer.hidden) {
-    if (event.key === "Escape") closeViewer();
-    else if (event.key === "3" || event.key.toLowerCase() === "d") {
-      viewerState.shot = viewerState.shot === "3d" ? "three-quarter" : "3d";
+    const letter = event.key.toLowerCase();
+    if (event.key === "Escape") {
+      if (viewerState.mode === "sheet" && viewerState.zoom) ((viewerState.zoom = null), drawViewer());
+      else closeViewer();
+    } else if (event.key === "3" || letter === "d") {
+      viewerState.mode = viewerState.mode === "3d" ? "three-quarter" : "3d";
       drawViewer();
-    } else if (event.key === "ArrowRight") step(1);
+    } else if (viewerState.mode === "3d" && live3d && ["t", "w", "k", "f", "0"].includes(letter))
+      tool({ t: "turntable", w: "wiggle", k: "skeleton", f: "wire", 0: "reset" }[letter]!);
+    else if (event.key === "ArrowRight") step(1);
     else if (event.key === "ArrowLeft") step(-1);
-    else if (event.key.toLowerCase() === "s") (toggleStar(current().slug), drawViewer());
+    // toggleStar repaints the star itself; a redraw would reload the 3D view.
+    else if (letter === "s") toggleStar(current().slug);
     else if (event.key.toLowerCase() === "r" && ui.blind) (ui.revealed.add(current().slug), drawViewer());
-    else if (event.key.toLowerCase() === "v") {
-      const shots = [...(current().glb ? ["3d"] : []), ...SHOTS.filter((name) => current().shots[name])];
-      viewerState.shot = shots[(shots.indexOf(viewerState.shot) + 1) % shots.length] ?? "three-quarter";
+    else if (letter === "v") {
+      const order = MODES.map(([id]) => id);
+      viewerState.mode = order[(order.indexOf(viewerState.mode) + 1) % order.length];
+      viewerState.zoom = null;
       drawViewer();
     } else return;
     event.preventDefault();

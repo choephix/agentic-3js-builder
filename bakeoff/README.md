@@ -2,7 +2,7 @@
 
 How well does a model build from one system prompt and one pitch, with no tools and no second turn, the way an app would run it? A bake-off sends the same pitches through several system prompts (arms) and shows the results side by side on the showcase's `/bakeoff` page.
 
-The showcase's `/lab` page tells the whole story of every round so far: what was tried in which order and why, with a scoreboard, a filterable gallery, a compare grid with presets, charts of time, tokens and cost, failures by message, the pitches and the method. It reads every round from `lab.json` (`showcase/lab-data.mjs`); its thumbnails come from `npm run lab-thumbs`, a cache outside git that `showcase:build` fills. `npm run lab-export` writes a static copy to webshare, http://axalon:8080/nilo/agentic-3js-builder/lab/, that needs no dev server; only its live 3D links do.
+The showcase's `/lab` page tells the whole story of every round so far: what was tried in which order and why, with a scoreboard, a filterable gallery, a compare grid with presets, charts of time, tokens and cost, failures by message, the pitches and the method. It reads every round from `lab.json` (`showcase/lab-data.mjs`); its thumbnails come from `npm run lab-thumbs`, a cache outside git that `showcase:build` fills. `npm run lab-export` writes a static copy to webshare, http://axalon:8080/nilo/agentic-3js-builder/lab/, that needs no dev server and links nowhere outside itself. Its viewer shows each build's render sheet and its exported GLB in 3D, with turntable, wiggle, skeleton and wireframe.
 
 ## Pieces
 

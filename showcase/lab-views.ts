@@ -1026,7 +1026,7 @@ export function renderMethod(root: HTMLElement) {
         <div><h4>Contract, plain three.js <small>contract-plain.md</small></h4>${md(contractPlain)}</div>
         <div><h4>Taste: SDK-first <small>taste-sdk.md</small></h4>${md(tasteSdk)}<h4>Taste: primitives-first <small>taste-primitives.md</small></h4>${md(tastePrimitives)}</div>
       </div>
-      <p>The contract line “Every piece of geometry joins the model through the builder…” was added after round 1, so round 1's prompts don't have it. The full prompts, reference included, are on <a href="/bakeoff?tab=prompts">/bakeoff → Prompts</a>.</p></section>
+      <p>The contract line “Every piece of geometry joins the model through the builder…” was added after round 1, so round 1's prompts don't have it. Each round's full system prompts, reference included, are kept with its results.</p></section>
     <section class="chart-box"><h3>Reproduce</h3>
       <pre class="prompt">npm run bakeoff -- run r5 --model anthropic/claude-sonnet-5-5 --effort medium --pitches pitches-r4.json --concurrency 30
 npm run bakeoff -- run r5opus --model anthropic/claude-opus-5-5 --effort high --prompts-from r5

@@ -43,6 +43,8 @@ export type LabBuild = {
   shots: Record<string, string>;
   /** The exported model (the harness's static mesh GLB), for the viewer's 3D view. */
   glb: string | null;
+  /** The rigged GLB (skinned mesh and bones), for wiggle and skeleton; null when the rig failed. */
+  rig: string | null;
 };
 export type LabRound = {
   id: string;
@@ -60,8 +62,6 @@ export type LabRound = {
 export type LabSubject = Subject & { set: string };
 export type LabData = {
   generated: string;
-  /** The live 3D page, `/bakeoff` on the showcase. */
-  bakeoffUrl: string;
   arms: Arm[];
   subjects: LabSubject[];
   rounds: LabRound[];

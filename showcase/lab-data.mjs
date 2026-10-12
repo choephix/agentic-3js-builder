@@ -62,8 +62,7 @@ export async function v01Renders(slug, root, url) {
   return { tags, downloads };
 }
 
-/** `bakeoffUrl`: where a build's live 3D view is, `/bakeoff` on the showcase. */
-export async function labData(renders, bakeoffUrl = "/bakeoff") {
+export async function labData(renders) {
   const arms = (await json(join(bakeoffDir, "arms.json"))).arms;
   const subjects = [];
   const seen = new Set();
@@ -94,12 +93,12 @@ export async function labData(renders, bakeoffUrl = "/bakeoff") {
       const issues = report?.issues ?? [];
       const shots = Object.fromEntries((build.render?.shots ?? []).map((shot) => [shot.name, shot.url]));
       const { message, where } = crash(check?.renderError);
-      // The model as the harness exported it, from the lane it rendered in: the static mesh, else the rigged one.
+      // The model as the harness exported it, from the lane it rendered in: the static mesh and the rigged one.
       const glbs = build.render
         ? (await cached(build.slug)).downloads.filter((file) => file.arm === build.render.arm)
         : [];
-      const glb =
-        glbs.find((file) => file.name.endsWith("-mesh.glb")) ?? glbs.find((file) => file.name.endsWith(".glb"));
+      const glb = glbs.find((file) => file.name.endsWith("-mesh.glb"));
+      const rig = glbs.find((file) => file.name.endsWith("-rigged.glb"));
       builds.push({
         slug: build.slug,
         round: id,
@@ -143,8 +142,9 @@ export async function labData(renders, bakeoffUrl = "/bakeoff") {
         sheet: build.render?.sheet ?? null,
         shots,
         glb: glb?.url ?? null,
+        rig: rig?.url ?? null,
       });
     }
   }
-  return { generated: new Date().toISOString(), bakeoffUrl, arms, subjects, rounds, builds };
+  return { generated: new Date().toISOString(), arms, subjects, rounds, builds };
 }
