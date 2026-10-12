@@ -41,6 +41,8 @@ export type LabBuild = {
   thumbViews: string[];
   sheet: string | null;
   shots: Record<string, string>;
+  /** The exported model (the harness's static mesh GLB), for the viewer's 3D view. */
+  glb: string | null;
 };
 export type LabRound = {
   id: string;

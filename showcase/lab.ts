@@ -139,7 +139,17 @@ function openViewer(slug: string, scope: Element | null) {
   document.body.classList.add("viewing");
   drawViewer();
 }
+/** Stops the 3D view, if one is showing. */
+let unmount3d: (() => void) | null = null;
+let mount3dToken = 0;
+function stop3d() {
+  mount3dToken++;
+  unmount3d?.();
+  unmount3d = null;
+}
+
 function closeViewer() {
+  stop3d();
   viewer.hidden = true;
   document.body.classList.remove("viewing");
 }
@@ -157,13 +167,21 @@ function drawViewer() {
   const round = roundOf(build);
   const subject = store.subjects.get(build.subject);
   const state = outcome(build);
-  const shots = SHOTS.filter((name) => build.shots[name]);
-  const shot = build.shots[viewerState.shot] ? viewerState.shot : shots[0];
-  const stage = shot
-    ? `<img class="big" src="${build.shots[shot]}" alt="">`
-    : `<div class="no-render"><span style="color:${OUTCOMES[state].color}">${esc(OUTCOMES[state].name)}</span>${
-        build.crash ? `<code>${esc(build.crash)}</code><small>thrown in ${esc(build.crashWhere ?? "?")}</small>` : ""
-      }${!build.hasCode ? `<small>The reply ran to ${tokens(build.output ?? NaN)} tokens (finish: ${esc(build.finish ?? "?")}) without a code block.</small>` : ""}</div>`;
+  const images = SHOTS.filter((name) => build.shots[name]);
+  // "3d": the exported GLB in a live, orbiting view (lab-3d.ts).
+  const shots = build.glb ? ["3d", ...images] : images;
+  const shot =
+    viewerState.shot === "3d" && build.glb ? "3d" : build.shots[viewerState.shot] ? viewerState.shot : images[0];
+  const stage =
+    shot === "3d"
+      ? `<div class="three"><span class="three-status"></span><small class="three-hint">Drag to turn · scroll to zoom · right-drag to pan</small></div>`
+      : shot
+        ? `<img class="big" src="${build.shots[shot]}" alt="">`
+        : `<div class="no-render"><span style="color:${OUTCOMES[state].color}">${esc(OUTCOMES[state].name)}</span>${
+            build.crash
+              ? `<code>${esc(build.crash)}</code><small>thrown in ${esc(build.crashWhere ?? "?")}</small>`
+              : ""
+          }${!build.hasCode ? `<small>The reply ran to ${tokens(build.output ?? NaN)} tokens (finish: ${esc(build.finish ?? "?")}) without a code block.</small>` : ""}</div>`;
   const row = (label: string, value: string) => `<div class="kv"><span>${label}</span><b>${value}</b></div>`;
   const info = blind
     ? `<p class="blind-note">Blind: who made this is hidden.</p><button class="toggle" data-reveal>Reveal (R)</button>`
@@ -191,10 +209,11 @@ function drawViewer() {
       <p class="links"><a href="${store.data.bakeoffUrl}?round=${build.round}&tab=grid&build=${build.slug}" target="_blank">Live 3D on /bakeoff ↗</a>
       <a href="#compare?set=${roundInfo(build.round).set}&rows=subject&cols=round&subject=${build.subject}&arm=${build.arm}&level=${build.level}&round=" data-close>Same prompt, every model</a>
       <a href="#compare?set=${roundInfo(build.round).set}&rows=level&cols=arm&subject=${build.subject}&round=${build.round}&level=&arm=" data-close>Every arm, both pitches</a></p>`;
+  stop3d();
   viewer.innerHTML = `
     <div class="v-stage">
       <div class="v-top"><span class="v-count">${viewerState.index + 1} / ${viewerState.slugs.length}</span>
-        <span class="v-shots">${shots.map((name) => `<button class="${name === shot ? "on" : ""}" data-shot="${name}">${esc(title(name))}</button>`).join("")}${build.sheet ? `<a href="${build.sheet}" target="_blank">Sheet ↗</a>` : ""}</span>
+        <span class="v-shots">${shots.map((name) => `<button class="${name === shot ? "on" : ""}" data-shot="${name}">${name === "3d" ? "3D ◆" : esc(title(name))}</button>`).join("")}${build.sheet ? `<a href="${build.sheet}" target="_blank">Sheet ↗</a>` : ""}</span>
         <button class="v-close" data-close title="Close (Esc)">✕</button></div>
       <div class="v-image"><button class="v-nav prev" data-step="-1" title="Previous (←)">‹</button>${stage}<button class="v-nav next" data-step="1" title="Next (→)">›</button></div>
     </div>
@@ -207,6 +226,19 @@ function drawViewer() {
       ${blind ? "" : `<p class="v-slug"><code>${build.slug}</code></p>`}
     </aside>`;
   if (viewerState.pane !== "info") void loadText(build);
+  if (shot === "3d") void show3d(build.glb!);
+}
+
+async function show3d(url: string) {
+  const token = ++mount3dToken;
+  const host = viewer.querySelector<HTMLElement>(".three");
+  const { mount } = await import("./lab-3d");
+  if (!host || token !== mount3dToken) return;
+  const status = host.querySelector<HTMLElement>(".three-status")!;
+  unmount3d = mount(host, url, (text) => {
+    status.textContent = text ?? "";
+    status.hidden = !text;
+  });
 }
 
 async function loadText(build: LabBuild) {
@@ -278,12 +310,15 @@ document.addEventListener("keydown", (event) => {
   if ((event.target as HTMLElement).closest("input, select, textarea") || event.metaKey || event.ctrlKey) return;
   if (!viewer.hidden) {
     if (event.key === "Escape") closeViewer();
-    else if (event.key === "ArrowRight") step(1);
+    else if (event.key === "3" || event.key.toLowerCase() === "d") {
+      viewerState.shot = viewerState.shot === "3d" ? "three-quarter" : "3d";
+      drawViewer();
+    } else if (event.key === "ArrowRight") step(1);
     else if (event.key === "ArrowLeft") step(-1);
     else if (event.key.toLowerCase() === "s") (toggleStar(current().slug), drawViewer());
     else if (event.key.toLowerCase() === "r" && ui.blind) (ui.revealed.add(current().slug), drawViewer());
     else if (event.key.toLowerCase() === "v") {
-      const shots = SHOTS.filter((name) => current().shots[name]);
+      const shots = [...(current().glb ? ["3d"] : []), ...SHOTS.filter((name) => current().shots[name])];
       viewerState.shot = shots[(shots.indexOf(viewerState.shot) + 1) % shots.length] ?? "three-quarter";
       drawViewer();
     } else return;
