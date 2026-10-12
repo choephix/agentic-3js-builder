@@ -1,7 +1,6 @@
 // The bake-off lab report (`/lab`): the story of every prompt bake-off round, with a scoreboard, gallery, compare
-// grid, charts, failures, pitches and method, over one table of every build (`/__lab`, lab-data.mjs). Clicking any
+// grid, charts, failures, pitches and method, over one table of every build (`lab.json`, lab-data.mjs). Clicking any
 // build opens the viewer: every render view, the numbers, the pitch, the module and the reply.
-import { replies, sources } from "./bakeoff-files";
 import {
   OUTCOMES,
   duration,
@@ -80,7 +79,7 @@ function renderHead() {
     <span class="head-tools">
       <button class="toggle${ui.blind ? " on" : ""}" id="blind-toggle" data-tip="Hide model, arm, round and cost wherever a build is shown, and shuffle orders (B)">${ui.blind ? "◉" : "○"} Blind</button>
       <a class="toggle" href="#gallery?starred=1" data-tip="Your starred builds">★ ${starCount}</a>
-      <a class="toggle" href="/bakeoff" data-tip="The per-round bake-off page with live 3D">/bakeoff ↗</a>
+      <a class="toggle" href="${store.data.bakeoffUrl}" target="_blank" data-tip="The per-round bake-off page with live 3D">/bakeoff ↗</a>
     </span>`;
   head.querySelector("#blind-toggle")!.addEventListener("click", () => setBlind(!ui.blind));
 }
@@ -189,7 +188,7 @@ function drawViewer() {
       ${build.errorCount ? `<div class="errs"><b>${build.errorCount} rig error${build.errorCount > 1 ? "s" : ""}</b>${build.errors.map((error) => `<code>${esc(error)}</code>`).join("")}</div>` : ""}
       ${build.crash ? `<div class="errs"><b>Crash</b><code>${esc(build.crash)}</code></div>` : ""}
       ${build.typeErrorSample.length ? `<div class="errs"><b>Type errors</b>${build.typeErrorSample.map((error) => `<code>${esc(error)}</code>`).join("")}</div>` : ""}
-      <p class="links"><a href="/bakeoff?round=${build.round}&tab=grid&build=${build.slug}" target="_blank">Live 3D on /bakeoff ↗</a>
+      <p class="links"><a href="${store.data.bakeoffUrl}?round=${build.round}&tab=grid&build=${build.slug}" target="_blank">Live 3D on /bakeoff ↗</a>
       <a href="#compare?set=${roundInfo(build.round).set}&rows=subject&cols=round&subject=${build.subject}&arm=${build.arm}&level=${build.level}&round=" data-close>Same prompt, every model</a>
       <a href="#compare?set=${roundInfo(build.round).set}&rows=level&cols=arm&subject=${build.subject}&round=${build.round}&level=&arm=" data-close>Every arm, both pitches</a></p>`;
   viewer.innerHTML = `
@@ -213,12 +212,14 @@ function drawViewer() {
 async function loadText(build: LabBuild) {
   const target = viewer.querySelector<HTMLElement>("pre.code");
   if (!target) return;
-  const key =
+  // `lab-rounds/` is bakeoff/rounds/: a dev-server route, a symlink in an export.
+  const path =
     viewerState.pane === "code"
-      ? `../bakeoff/rounds/${build.round}/builds/${build.slug}.ts`
-      : `../bakeoff/rounds/${build.round}/runs/${build.slug}.md`;
-  const loader = (viewerState.pane === "code" ? sources : replies)[key];
-  const text = loader ? await loader().catch(() => null) : null;
+      ? `lab-rounds/${build.round}/builds/${build.slug}.ts`
+      : `lab-rounds/${build.round}/runs/${build.slug}.md`;
+  // `raw`: webshare renders markdown as a page unless asked for the file.
+  const response = await fetch(`${path}?raw=1`).catch(() => null);
+  const text = response?.ok ? await response.text() : null;
   if (current() !== build) return;
   target.textContent =
     text ?? (viewerState.pane === "code" ? "No module: the reply had no code block." : "No reply file.");
@@ -303,9 +304,9 @@ addEventListener("hashchange", route);
 async function start() {
   document.body.classList.toggle("blind", ui.blind);
   main.innerHTML = `<p class="loading">Loading every build…</p>`;
-  const response = await fetch("/__lab").catch(() => null);
+  const response = await fetch("lab.json").catch(() => null);
   if (!response?.ok) {
-    main.innerHTML = `<p class="loading">Couldn't load <code>/__lab</code>.</p>`;
+    main.innerHTML = `<p class="loading">Couldn't load <code>lab.json</code>.</p>`;
     return;
   }
   load((await response.json()) as LabData);

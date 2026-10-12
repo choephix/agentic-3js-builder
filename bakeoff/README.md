@@ -2,7 +2,7 @@
 
 How well does a model build from one system prompt and one pitch, with no tools and no second turn, the way an app would run it? A bake-off sends the same pitches through several system prompts (arms) and shows the results side by side on the showcase's `/bakeoff` page.
 
-The showcase's `/lab` page tells the whole story of every round so far: what was tried in which order and why, with a scoreboard, a filterable gallery, a compare grid with presets, charts of time, tokens and cost, failures by message, the pitches and the method. It reads every round from `/__lab` (`showcase/lab-data.mjs`); its thumbnails come from `npm run lab-thumbs`, a cache outside git that `showcase:build` fills.
+The showcase's `/lab` page tells the whole story of every round so far: what was tried in which order and why, with a scoreboard, a filterable gallery, a compare grid with presets, charts of time, tokens and cost, failures by message, the pitches and the method. It reads every round from `lab.json` (`showcase/lab-data.mjs`); its thumbnails come from `npm run lab-thumbs`, a cache outside git that `showcase:build` fills. `npm run lab-export` writes a static copy to webshare, http://axalon:8080/nilo/agentic-3js-builder/lab/, that needs no dev server; only its live 3D links do.
 
 ## Pieces
 
@@ -33,6 +33,7 @@ npm run bakeoff -- run <round> [--model anthropic/claude-sonnet-5-5] [--effort m
 npm run bakeoff -- check <round>           # typecheck and render (snap tag v01) every build without a check yet
 npm run bakeoff -- results <round>         # rebuild results.json
 npm run lab-thumbs                         # thumbnails for the /lab page (missing or outdated ones only)
+npm run lab-export                         # static /lab copy on webshare (rerun after new rounds)
 ```
 
 - `run` only asks for builds that have no run record yet, so an interrupted round resumes where it stopped. To retry a build, delete its `runs/<slug>.json`.

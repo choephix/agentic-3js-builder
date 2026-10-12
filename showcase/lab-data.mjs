@@ -1,6 +1,6 @@
-// Every prompt bake-off round in one flat table, as the lab page (lab.html) reads it: one row per build with its
+// Every prompt bake-off round in one flat table, as the lab page (lab.html) reads it from `lab.json`: one row per build with its
 // round, model, arm, pitch, request numbers, check and render, plus the arms, every pitch set and each arm's prompt
-// size. The dev server serves it at `/__lab`; the static build writes the same JSON. Shape: `LabData` in
+// size. The dev server serves it at `/lab.json`; the static build and `npm run lab-export` write the same JSON. Shape: `LabData` in
 // showcase/lab.ts. Thumbnails come from `npm run lab-thumbs` (scripts/lab-thumbs.ts).
 import { readFile, readdir } from "node:fs/promises";
 import { join, resolve } from "node:path";
@@ -38,7 +38,26 @@ function crash(text) {
   return { message: (line ?? text.split("\n")[0]).slice(0, 400), where };
 }
 
-export async function labData(renders) {
+/**
+ * A build's `v01` renders straight from the render folder, shaped like the dev server's render index
+ * (`snapshots` in vite.config.mjs): for exports that run without it. `url` turns a file path into its address.
+ */
+export async function v01Renders(slug, root, url) {
+  const tags = [];
+  for (const arm of ["B", "A"]) {
+    const dir = join(root, slug, arm, "snaps");
+    const files = await readdir(dir).catch(() => []);
+    if (!files.includes("v01-sheet.jpg")) continue;
+    const shots = files
+      .filter((name) => name.startsWith("v01-") && name.endsWith(".png"))
+      .map((name) => ({ name: name.slice(4, -4), url: url(join(dir, name)) }));
+    tags.push({ tag: "v01", arm, sheet: url(join(dir, "v01-sheet.jpg")), shots });
+  }
+  return { tags, downloads: [] };
+}
+
+/** `bakeoffUrl`: where a build's live 3D view is, `/bakeoff` on the showcase. */
+export async function labData(renders, bakeoffUrl = "/bakeoff") {
   const arms = (await json(join(bakeoffDir, "arms.json"))).arms;
   const subjects = [];
   const seen = new Set();
@@ -101,12 +120,12 @@ export async function labData(renders) {
           .slice(0, 3)
           .map((issue) => issue.message.slice(0, 300)),
         warnings: issues.filter((issue) => issue.level === "warning").length,
-        thumb: thumbs.has(`${build.slug}.webp`) ? `/lab-thumbs/${build.slug}.webp` : null,
+        thumb: thumbs.has(`${build.slug}.webp`) ? `lab-thumbs/${build.slug}.webp` : null,
         thumbViews: THUMB_VIEWS.filter((view) => thumbs.has(`${build.slug}-${view}.webp`)),
         sheet: build.render?.sheet ?? null,
         shots,
       });
     }
   }
-  return { generated: new Date().toISOString(), arms, subjects, rounds, builds };
+  return { generated: new Date().toISOString(), bakeoffUrl, arms, subjects, rounds, builds };
 }

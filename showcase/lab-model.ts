@@ -58,6 +58,8 @@ export type LabRound = {
 export type LabSubject = Subject & { set: string };
 export type LabData = {
   generated: string;
+  /** The live 3D page, `/bakeoff` on the showcase. */
+  bakeoffUrl: string;
   arms: Arm[];
   subjects: LabSubject[];
   rounds: LabRound[];

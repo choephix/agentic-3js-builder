@@ -231,7 +231,7 @@ const showcaseData = {
   }
   for (const id of bakeoffIds)
    await json(`__bakeoff/${id}`, await bakeoffRound(id, (slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));
-  await json("__lab", await labData((slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));
+  await json("lab.json", await labData((slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));
   for (const round of rounds) await json(`__round/${round.id}`, await roundLog(round, resolve(".")));
   await json("__thumbs", await thumbIndex());
  },
@@ -271,11 +271,21 @@ const showcaseData = {
     response.end(JSON.stringify(data));
    }),
   );
-  // Every bake-off round in one table, for the lab page (lab-data.mjs).
-  server.middlewares.use("/__lab", async (request, response, next) => {
+  // Every bake-off round in one table, for the lab page (lab-data.mjs), and the rounds' modules and replies as text.
+  server.middlewares.use("/lab.json", async (request, response, next) => {
    if ((request.url?.split("?")[0] ?? "/") !== "/") return next();
    response.setHeader("Content-Type", "application/json; charset=utf-8");
    response.end(JSON.stringify(await labData((slug) => snapshots(slug))));
+  });
+  server.middlewares.use("/lab-rounds", async (request, response, next) => {
+   const [round, kind, file, ...rest] = (request.url?.split("?")[0] ?? "").split("/").slice(1);
+   const ok =
+    !rest.length &&
+    SLUG.test(round ?? "") &&
+    (kind === "builds" || kind === "runs") &&
+    /^[A-Za-z0-9]+\.(ts|md)$/.test(file ?? "");
+   if (!ok) return next();
+   await sendText(response, join(bakeoffRoot, round, kind, file)).catch(() => next());
   });
   // What each builder of a round did, parsed from its session log on every request (round-log.mjs).
   server.middlewares.use(

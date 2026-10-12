@@ -17,7 +17,7 @@ import {
 } from "./lab-model";
 
 export const store = {
-  data: { generated: "", arms: [], subjects: [], rounds: [], builds: [] } as LabData,
+  data: { generated: "", bakeoffUrl: "/bakeoff", arms: [], subjects: [], rounds: [], builds: [] } as LabData,
   bySlug: new Map<string, LabBuild>(),
   rounds: new Map<string, LabRound>(),
   /** Rounds in the order they ran. */
@@ -123,7 +123,7 @@ export const VIEWS = ["three-quarter", "front", "side", "back", "top"] as const;
 export type View = (typeof VIEWS)[number];
 
 export function thumbFor(build: LabBuild, view: string = "three-quarter") {
-  if (view !== "three-quarter" && build.thumbViews.includes(view)) return `/lab-thumbs/${build.slug}-${view}.webp`;
+  if (view !== "three-quarter" && build.thumbViews.includes(view)) return `lab-thumbs/${build.slug}-${view}.webp`;
   return build.thumb;
 }
 
