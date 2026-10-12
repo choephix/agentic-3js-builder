@@ -233,6 +233,7 @@ On 2026-10-07 Stefan asked to test how a model builds when the SDK is used the w
   Commit `6cc54cd` makes the SDK accept these forms and gives other wrong inputs named errors; 17 of the 21 original failures then build.
 
 - **Round 2.** The same arms with the round-1 lessons, SDK `6cc54cd`: 20 new subjects (15 creatures, 4 props, a Japanese garden diorama) × terse/rich × 7 arms = 280 builds.
+- **Later rounds** (r1opus, r1resdk, r3, r3opus, round 4 on Sonnet/Opus/Astra/Sol, Haiku 5.5 on every round at medium and xhigh) and their numbers: the showcase's `/lab` page, which tells the bake-off in order with a scoreboard, gallery, compare presets, charts, failures, pitches and method. r2haikux stopped at 44 of 280 when its job hit the 2-hour background limit; those 44 were checked on 2026-10-12.
 - **Harness.** `snap` builds modules that need the browser (canvas textures) in the page only. `SNAP_RENDER_ON_ERROR=1`, which the bake-off sets, renders despite report errors, as a static mesh when the skeleton fails.
 
 ## Build records

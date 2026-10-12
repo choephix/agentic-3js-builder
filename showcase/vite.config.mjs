@@ -7,6 +7,7 @@ import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { defineConfig, searchForWorkspaceRoot, transformWithOxc } from "vite";
 import { bakeoffRoot, bakeoffRound, bakeoffRounds, bakeoffSlugs } from "./bakeoff-data.mjs";
+import { labData } from "./lab-data.mjs";
 import { roundLog } from "./round-log.mjs";
 
 const sampleRoot = resolve("samples");
@@ -230,14 +231,16 @@ const showcaseData = {
   }
   for (const id of bakeoffIds)
    await json(`__bakeoff/${id}`, await bakeoffRound(id, (slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));
+  await json("__lab", await labData((slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));
   for (const round of rounds) await json(`__round/${round.id}`, await roundLog(round, resolve(".")));
   await json("__thumbs", await thumbIndex());
  },
  configureServer(server) {
-  // `/round` and `/bakeoff` are pages, as on Netlify; without this the dev server answers with round.ts and bakeoff.ts.
+  // `/round`, `/bakeoff` and `/lab` are pages, as on Netlify; without this the dev server answers with their .ts.
   server.middlewares.use((request, _response, next) => {
    const [path, query] = (request.url ?? "").split("?");
-   if (path === "/round" || path === "/bakeoff") request.url = `${path}.html${query ? `?${query}` : ""}`;
+   if (path === "/round" || path === "/bakeoff" || path === "/lab")
+    request.url = `${path}.html${query ? `?${query}` : ""}`;
    next();
   });
   // samples/ sits outside the Vite root, so only files already loaded are watched. Watching the folder lets the
@@ -268,6 +271,12 @@ const showcaseData = {
     response.end(JSON.stringify(data));
    }),
   );
+  // Every bake-off round in one table, for the lab page (lab-data.mjs).
+  server.middlewares.use("/__lab", async (request, response, next) => {
+   if ((request.url?.split("?")[0] ?? "/") !== "/") return next();
+   response.setHeader("Content-Type", "application/json; charset=utf-8");
+   response.end(JSON.stringify(await labData((slug) => snapshots(slug))));
+  });
   // What each builder of a round did, parsed from its session log on every request (round-log.mjs).
   server.middlewares.use(
    "/__round",
@@ -370,13 +379,15 @@ const bakeoffGuard = {
 
 export default defineConfig({
  server: { fs: { allow: [searchForWorkspaceRoot(process.cwd()), snapshotRoot] } },
- // Three pages: the sample showcase, the experiment round page (`/round`) and the prompt bake-off page (`/bakeoff`).
+ // Four pages: the sample showcase, the experiment round page (`/round`), the prompt bake-off page (`/bakeoff`) and
+ // the bake-off lab report (`/lab`).
  build: {
   rolldownOptions: {
    input: {
     main: resolve("showcase/index.html"),
     round: resolve("showcase/round.html"),
     bakeoff: resolve("showcase/bakeoff.html"),
+    lab: resolve("showcase/lab.html"),
    },
    // A bake-off build may import a name its module doesn't export: undefined at run time, as the page shows it,
    // instead of failing the whole build. Samples are typechecked, so they never rely on this.

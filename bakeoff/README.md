@@ -2,6 +2,8 @@
 
 How well does a model build from one system prompt and one pitch, with no tools and no second turn, the way an app would run it? A bake-off sends the same pitches through several system prompts (arms) and shows the results side by side on the showcase's `/bakeoff` page.
 
+The showcase's `/lab` page tells the whole story of every round so far: what was tried in which order and why, with a scoreboard, a filterable gallery, a compare grid with presets, charts of time, tokens and cost, failures by message, the pitches and the method. It reads every round from `/__lab` (`showcase/lab-data.mjs`); its thumbnails come from `npm run lab-thumbs`, a cache outside git that `showcase:build` fills.
+
 ## Pieces
 
 - `arms.json`: each arm is a contract, an optional taste paragraph and a reference.
@@ -30,6 +32,7 @@ npm run bakeoff -- prompt <arm>            # write an arm's system prompt to scr
 npm run bakeoff -- run <round> [--model anthropic/claude-sonnet-5-5] [--effort medium] [--arms a,b] [--subjects x,y] [--levels terse,rich] [--concurrency 8] [--arm-set arms.json] [--pitches pitches.json]
 npm run bakeoff -- check <round>           # typecheck and render (snap tag v01) every build without a check yet
 npm run bakeoff -- results <round>         # rebuild results.json
+npm run lab-thumbs                         # thumbnails for the /lab page (missing or outdated ones only)
 ```
 
 - `run` only asks for builds that have no run record yet, so an interrupted round resumes where it stopped. To retry a build, delete its `runs/<slug>.json`.
