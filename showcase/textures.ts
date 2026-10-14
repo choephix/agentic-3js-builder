@@ -243,11 +243,9 @@ function atlasSection(latest: Snapshot | undefined, actions: TexturesActions) {
       h(
         "p",
         { class: "muted" },
-        import.meta.env.PROD
-          ? "Harness atlas images stay in the local showcase; live textures are shown above."
-          : latest
-            ? `Render ${latest.tag} predates atlas images; the next \`npm run snap\` saves one.`
-            : "No render yet: `npm run snap` saves the atlas the GLBs carry.",
+        latest
+          ? `Render ${latest.tag} predates atlas images; the next \`npm run snap\` saves one.`
+          : "No render yet: `npm run snap` saves the atlas the GLBs carry.",
       ),
     );
     return section;

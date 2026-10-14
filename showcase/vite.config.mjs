@@ -1,6 +1,6 @@
-// Local endpoints and their static-build equivalents for sample sources and sidebar thumbnails.
-// Development serves harness renders and GLB exports through `/@fs/`; production ships model code and metadata.
-// Render history and model binaries stay local. Thumbnails live in the public folder as `/thumbs/`.
+// Local endpoints and their static-build equivalents for sample sources, harness renders (`npm run snap`) and the
+// sidebar thumbnails. Development serves renders through `/@fs/`; production copies the referenced files into the
+// build. Thumbnails live in the public folder, so both serve them as `/thumbs/`.
 import { createHash } from "node:crypto";
 import { watch } from "node:fs";
 import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
@@ -246,14 +246,15 @@ const showcaseData = {
     };
     const created = await sampleCreated();
     const rounds = await roundManifests();
-    // Round-owned sample names also need an index; their archived renders remain local.
+    // A round's own samples, toolkit tests included: those are deleted once their builders move on, and their
+    // renders stay on the round page.
     const owned = rounds.flatMap((round) =>
       round.arms.flatMap((arm) => [
         ...round.subjects.map((subject) => `${subject.id}${arm.id[0].toUpperCase()}${arm.id.slice(1)}`),
         `${arm.id}Test`,
       ]),
     );
-    // Bake-off pages read the same indexes, with render archives available only in development.
+    // Bake-off builds have no sample file, only renders; their page reads the same render indexes.
     const bakeoffIds = await bakeoffRounds();
     const bakeoffBuilds = (await Promise.all(bakeoffIds.map(bakeoffSlugs))).flat();
     const indexed = new Map();
@@ -264,9 +265,20 @@ const showcaseData = {
     await json("__build-summaries", buildSummaries(records));
     for (const slug of new Set([...Object.keys(created), ...owned, ...bakeoffBuilds])) {
       if (slug in created) await copy(join(sampleRoot, `${slug}.ts`), `__sample-source/${slug}`);
-      // The published viewer generates its models. Keep historical shots and GLB exports in the local showcase.
-      indexed.set(slug, { tags: [], downloads: [] });
+      const assets = new Map();
+      const fileUrl = (path) => {
+        const route = `renders/${relative(snapshotRoot, path).split(sep).join("/")}`;
+        assets.set(route, path);
+        return `/${route}`;
+      };
+      const sourceUrl = (arm, tag) => {
+        const route = `__render-source/${slug}/${arm}/${tag}`;
+        assets.set(route, join(snapshotRoot, slug, arm, "snaps", `${tag}-creature.ts`));
+        return `/${route}`;
+      };
+      indexed.set(slug, await snapshots(slug, fileUrl, sourceUrl));
       await json(`__snapshots/${slug}`, indexed.get(slug));
+      for (const [route, path] of assets) await copy(path, route);
     }
     for (const id of bakeoffIds)
       await json(`__bakeoff/${id}`, await bakeoffRound(id, (slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));

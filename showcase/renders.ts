@@ -152,15 +152,9 @@ export function versionsPanel(
     return h(
       "div",
       { class: "empty-state" },
-      h("p", null, import.meta.env.PROD ? "Render history stays in the local showcase." : "No harness renders yet."),
+      h("p", null, "No harness renders yet."),
       h("code", null, `npm run snap -- ${slug} v01`),
-      h(
-        "p",
-        { class: "muted" },
-        import.meta.env.PROD
-          ? "The published viewer generates models from code; harness images and GLB exports are kept locally."
-          : "Sheets, reports, per-version source and GLBs appear here.",
-      ),
+      h("p", { class: "muted" }, "Sheets, reports, per-version source and GLBs appear here."),
     );
   const current = snapshots.tags.find((tag) => tag.tag === selected) ?? snapshots.tags[0];
   const body = h("div", { class: "versions" });
