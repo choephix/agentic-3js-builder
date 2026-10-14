@@ -37,7 +37,7 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { growth, modules, MODELS, pairMirrors, record } from "./assemble-shared";
+import { growth, hashOf, modules, MODELS, pairMirrors, readHash, record } from "./assemble-shared";
 import type { Call, Recording } from "./assemble-shared";
 
 // ── The animated material ─────────────────────────────────────────────────────────────────────────────────────────
@@ -770,28 +770,73 @@ for (const [name, slug] of MODELS) {
   list.append(link);
 }
 
-const fromHash = () => {
-  const slug = decodeURIComponent(location.hash.slice(1));
-  return `../samples/${slug}.ts` in modules ? slug : MODELS[0][1];
-};
-addEventListener("hashchange", () => show(fromHash()));
-document.getElementById("replay")!.addEventListener("click", replay);
-document.getElementById("skip")!.addEventListener("click", skip);
-for (const select of [timingSelect, colourSelect]) select.addEventListener("change", replay);
 const speedButtons = [...document.querySelectorAll<HTMLButtonElement>("#speeds button")];
+const DEFAULTS = { timing: "staged", colour: "honest", speed: "1", orbit: "1" };
+let shown = "";
+
+const settings = () => ({
+  timing: timingSelect.value,
+  colour: colourSelect.value,
+  speed: String(speed),
+  orbit: orbitBox.checked ? "1" : "0",
+});
+
+/** Mirror the model and settings into the hash (without a history entry) and into the sidebar links. */
+function writeHash() {
+  history.replaceState(null, "", hashOf(shown, settings(), DEFAULTS));
+  for (const link of list.querySelectorAll<HTMLAnchorElement>("a"))
+    link.href = hashOf(link.dataset.slug!, settings(), DEFAULTS);
+}
+
 function setSpeed(value: number) {
   speed = value;
   for (const button of speedButtons) button.classList.toggle("on", Number(button.dataset.speed) === value);
 }
-for (const button of speedButtons) button.addEventListener("click", () => setSpeed(Number(button.dataset.speed)));
+
+function applyHash() {
+  const { model, params } = readHash();
+  const pick = (select: HTMLSelectElement, key: keyof typeof DEFAULTS) => {
+    const value = params.get(key);
+    select.value = [...select.options].some((o) => o.value === value) ? value! : DEFAULTS[key];
+  };
+  const before = `${timingSelect.value}|${colourSelect.value}`;
+  pick(timingSelect, "timing");
+  pick(colourSelect, "colour");
+  setSpeed(speedButtons.some((b) => b.dataset.speed === params.get("speed")) ? Number(params.get("speed")) : 1);
+  orbitBox.checked = params.get("orbit") !== "0";
+  const slug = `../samples/${model}.ts` in modules ? model : MODELS[0][1];
+  if (slug !== shown) {
+    shown = slug;
+    show(slug);
+  } else if (before !== `${timingSelect.value}|${colourSelect.value}`) replay();
+  writeHash();
+}
+
+addEventListener("hashchange", applyHash);
+document.getElementById("replay")!.addEventListener("click", replay);
+document.getElementById("skip")!.addEventListener("click", skip);
+for (const select of [timingSelect, colourSelect])
+  select.addEventListener("change", () => {
+    replay();
+    writeHash();
+  });
+orbitBox.addEventListener("change", writeHash);
+for (const button of speedButtons)
+  button.addEventListener("click", () => {
+    setSpeed(Number(button.dataset.speed));
+    writeHash();
+  });
 addEventListener("keydown", (event) => {
   if (event.target instanceof HTMLSelectElement) return;
   if (event.key === "r" || event.key === " ") {
     event.preventDefault();
     replay();
   } else if (event.key === "s") skip();
-  else if (["1", "2", "3", "4"].includes(event.key)) setSpeed(Number(event.key));
+  else if (["1", "2", "3", "4"].includes(event.key)) {
+    setSpeed(Number(event.key));
+    writeHash();
+  }
 });
 // For the smoke script: the current playback's length and clock.
 Object.assign(window, { assemble: () => (current ? { end: current.plan.end, time: current.time } : null) });
-show(fromHash());
+applyHash();

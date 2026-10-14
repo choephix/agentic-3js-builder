@@ -14,6 +14,8 @@ Two showcase pages show a creature being built. Both run a sample once while the
 
 Recording showed geometry takes tens of milliseconds even for the 700-call griffin; nearly all build time is the paint bake (jadeSerpent 3.1 s of 3.1 s, porcelainElephant 2.4 s). Loading all 43 models into the world grid took 26.7 s, 20.9 s of it synchronous builds that freeze the page; the animation cannot hide that, so a chunked paint bake is the next lever for loading. Every listed model built and played on RTX 3060 without page errors; `npm run typecheck` passed.
 
+Both pages keep the model and settings in the URL hash. The loading page's World (now the first sidebar entry) builds all 43 before anything animates, compiles both material sets and uploads textures off-stage, then starts the models in a seeded shuffled order over 2.5 s. On RTX 3060 headless at 1400×860, building took 25.5 s (22.2 s synchronous); during the 3.6 s arrival 3 of 128 frames exceeded 50 ms (max 50 ms), against 12 of 116 (max 100 ms) before the precompile.
+
 ## Scatter performance, 2026-10-14
 
 The public pixel mammoth blocked the browser's UI thread for 11.1 seconds: its dense body-fur scatter repeatedly transformed accepted hits for every spacing check. `Surface.scatter()` now indexes accepted positions in a numeric spatial grid and refreshes them when the pose changes. The API, random sequence, attempt budget and sample builders are unchanged.

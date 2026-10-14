@@ -1,7 +1,8 @@
 // The assemble page (assemble.ts) reworked as a loading animation. Every model finishes assembling within a hard
 // cap (0.4 / 0.8 / 1.2 s) however many parts it has; the build order and mirrored pairs still decide what comes
 // first, but there is no bloom, skeleton or paint wash, and once a model is done its original materials come back.
-// World mode streams all the models into a grid, building them one after another the way a world would load.
+// World builds every model first, with nothing animating meanwhile, then lets them all arrive in a shuffled order.
+// The model and settings live in the URL hash, so a link opens the same view.
 import {
   Box3,
   BufferAttribute,
@@ -21,7 +22,7 @@ import {
 } from "three";
 import type { Material, Mesh, Object3D, Texture } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { growth, modules, MODELS, pairMirrors, record } from "./assemble-shared";
+import { growth, hashOf, modules, MODELS, pairMirrors, readHash, record } from "./assemble-shared";
 import type { Recording, SampleModule } from "./assemble-shared";
 
 // ── Styles and timing ─────────────────────────────────────────────────────────────────────────────────────────────
@@ -196,6 +197,11 @@ let cap = 0.8;
 let mode: "single" | "world" = "single";
 let models: Model[] = [];
 let session = 0;
+/** World: the arrival order's seed, base 36 in the URL. */
+const newSeed = () => Math.floor(Math.random() * 36 ** 5);
+let seed = newSeed();
+/** World: every model has started arriving within this many ms. */
+const WORLD_SPREAD = 2500;
 
 /** Build one sample, measure it, and set it up to assemble; the holder scales it to a 1 m footprint at `place`. */
 async function load(slug: string, place: Vector3): Promise<Model> {
@@ -378,23 +384,25 @@ async function showSingle(slug: string) {
   start(model, performance.now());
 }
 
-/** Every model into a grid, built one after another; each starts assembling the moment it is ready. */
+/** Every model built first, with nothing animating meanwhile; then all of them arrive in a shuffled order. */
 async function showWorld() {
   clear();
   mode = "world";
   syncButtons();
   const ticket = session;
-  for (const a of document.querySelectorAll("#list a")) a.classList.remove("on");
+  for (const a of document.querySelectorAll("#list a"))
+    a.classList.toggle("on", (a as HTMLElement).dataset.slug === "world");
   const cols = Math.ceil(Math.sqrt(MODELS.length));
   const rows = Math.ceil(MODELS.length / cols);
   frame(cols, rows);
   titleName.textContent = "World";
   const t0 = performance.now();
   let blocked = 0;
+  // Kept in `models` (so leaving mid-build disposes them) but off the stage until every one is built.
   for (let i = 0; i < MODELS.length; i++) {
     const slug = MODELS[i][1];
     status.textContent = `building ${i + 1}/${MODELS.length}`;
-    // Let the models already placed animate for a frame between builds.
+    // Let the progress paint between builds.
     await new Promise(requestAnimationFrame);
     if (ticket !== session) return;
     const place = new Vector3((i % cols) - (cols - 1) / 2, 0, Math.floor(i / cols) - (rows - 1) / 2);
@@ -402,21 +410,65 @@ async function showWorld() {
     if (ticket !== session) return;
     blocked += model.recording.total;
     models.push(model);
-    stage.add(model.holder);
-    start(model, performance.now());
     stats.textContent = [
-      `built    ${models.length}/${MODELS.length} in ${((performance.now() - t0) / 1000).toFixed(1)} s`,
+      `building ${models.length}/${MODELS.length}, ${((performance.now() - t0) / 1000).toFixed(1)} s`,
       `blocked  ${(blocked / 1000).toFixed(1)} s of synchronous builds`,
-      `assembly ${cap} s cap each`,
     ].join("\n");
   }
+  // Compile both material sets and upload every texture before anything moves, so neither a model's first frame
+  // nor its swap back to the original materials stalls the arrival. Off the stage, lit by the scene's lights.
+  status.textContent = "compiling shaders";
+  const staging = new Group();
+  for (const model of models) staging.add(model.holder);
+  await renderer.compileAsync(staging, camera, scene);
+  if (ticket !== session) return;
+  for (const model of models)
+    for (const piece of model.pieces) {
+      if (piece.animated) piece.mesh.material = piece.animated;
+      for (const m of Array.isArray(piece.original) ? piece.original : [piece.original])
+        for (const value of Object.values(m)) if ((value as Texture | null)?.isTexture) renderer.initTexture(value);
+    }
+  await renderer.compileAsync(staging, camera, scene);
+  if (ticket !== session) return;
   status.textContent = "";
+  arrive();
+  for (const model of models) stage.add(model.holder);
+  stats.textContent = [
+    `built    ${MODELS.length} models in ${((performance.now() - t0) / 1000).toFixed(1)} s, before any assembly`,
+    `blocked  ${(blocked / 1000).toFixed(1)} s of synchronous builds`,
+    `arrival  shuffled over ${WORLD_SPREAD / 1000} s, ${cap} s cap each`,
+  ].join("\n");
 }
 
-/** Single: assemble again. World: every model arrives again at a random moment within 2 s, as if from a cache. */
-function replay() {
+/** A seeded shuffle (mulberry32), so a shared link replays the same arrival order. */
+function shuffled(count: number, from: number) {
+  let state = from >>> 0;
+  const random = () => {
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const order = [...Array(count).keys()];
+  for (let i = count - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
+
+/** Start every world model in the seed's order, evenly spaced across the spread. */
+function arrive() {
   const now = performance.now();
-  for (const model of models) start(model, mode === "world" ? now + Math.random() * 2000 : now);
+  shuffled(models.length, seed).forEach((index, rank) =>
+    start(models[index], now + (rank * WORLD_SPREAD) / models.length),
+  );
+}
+
+function replay() {
+  if (mode === "world") return arrive();
+  for (const model of models) start(model, performance.now());
 }
 
 renderer.setAnimationLoop(() => {
@@ -430,41 +482,84 @@ renderer.setAnimationLoop(() => {
 // ── Controls ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
 const list = document.getElementById("list")!;
+const worldLink = document.createElement("a");
+worldLink.className = "world";
+worldLink.textContent = `World · all ${MODELS.length}`;
+worldLink.dataset.slug = "world";
+list.append(worldLink);
 for (const [name, slug] of MODELS) {
   const a = document.createElement("a");
   a.textContent = name;
   a.dataset.slug = slug;
-  a.href = `#${slug}`;
   list.append(a);
 }
 
+const shuffleButton = document.getElementById("shuffle")!;
 function syncButtons() {
-  for (const b of document.querySelectorAll<HTMLButtonElement>("[data-mode]"))
-    b.classList.toggle("on", b.dataset.mode === mode);
   for (const b of document.querySelectorAll<HTMLButtonElement>("[data-style]"))
     b.classList.toggle("on", b.dataset.style === style);
   for (const b of document.querySelectorAll<HTMLButtonElement>("[data-cap]"))
     b.classList.toggle("on", Number(b.dataset.cap) === cap);
+  shuffleButton.hidden = mode !== "world";
+}
+
+const DEFAULTS = { style: "rise", cap: "0.8" };
+/** The sidebar entry on show: a sample's slug, or "world". */
+let shown = "";
+const settings = (withSeed: boolean) => ({
+  style,
+  cap: String(cap),
+  ...(withSeed ? { seed: seed.toString(36) } : {}),
+});
+
+/** Mirror the view and settings into the hash (without a history entry) and into the sidebar links. */
+function writeHash() {
+  history.replaceState(null, "", hashOf(shown, settings(shown === "world"), DEFAULTS));
+  for (const a of list.querySelectorAll<HTMLAnchorElement>("a"))
+    a.href = hashOf(a.dataset.slug!, settings(a.dataset.slug === "world"), DEFAULTS);
+}
+
+function applyHash() {
+  const { model, params } = readHash();
+  const nextStyle = (STYLES as readonly string[]).includes(params.get("style") ?? "")
+    ? (params.get("style") as Style)
+    : "rise";
+  const caps = [...document.querySelectorAll<HTMLButtonElement>("[data-cap]")].map((b) => b.dataset.cap);
+  const nextCap = caps.includes(params.get("cap") ?? "") ? Number(params.get("cap")) : 0.8;
+  const restyled = nextStyle !== style || nextCap !== cap;
+  style = nextStyle;
+  cap = nextCap;
+  const target = model === "world" || `../samples/${model}.ts` in modules ? model : MODELS[0][1];
+  const parsed = Number.parseInt(params.get("seed") ?? "", 36);
+  const reseeded = target === "world" && Number.isFinite(parsed) && parsed !== seed;
+  if (reseeded) seed = parsed;
+  if (target !== shown) {
+    shown = target;
+    if (target === "world") showWorld();
+    else showSingle(target);
+  } else if (reseeded || restyled) replay();
+  syncButtons();
+  writeHash();
 }
 
 for (const b of document.querySelectorAll<HTMLButtonElement>("[data-style]"))
   b.addEventListener("click", () => {
     style = b.dataset.style as Style;
     syncButtons();
+    writeHash();
     replay();
   });
 for (const b of document.querySelectorAll<HTMLButtonElement>("[data-cap]"))
   b.addEventListener("click", () => {
     cap = Number(b.dataset.cap);
     syncButtons();
+    writeHash();
     replay();
   });
-document.querySelector("[data-mode=world]")!.addEventListener("click", () => {
-  if (location.hash === "#world") showWorld();
-  else location.hash = "world";
-});
-document.querySelector("[data-mode=single]")!.addEventListener("click", () => {
-  location.hash = models[0]?.slug ?? MODELS[0][1];
+shuffleButton.addEventListener("click", () => {
+  seed = newSeed();
+  writeHash();
+  replay();
 });
 document.getElementById("replay")!.addEventListener("click", replay);
 addEventListener("keydown", (event) => {
@@ -474,14 +569,8 @@ addEventListener("keydown", (event) => {
   }
 });
 
-function fromHash() {
-  const slug = decodeURIComponent(location.hash.slice(1));
-  if (slug === "world") return showWorld();
-  return showSingle(`../samples/${slug}.ts` in modules ? slug : MODELS[0][1]);
-}
-addEventListener("hashchange", fromHash);
-syncButtons();
-fromHash();
+addEventListener("hashchange", applyHash);
+applyHash();
 // For the smoke script: progress, and holding every model at a moment of its assembly.
 Object.assign(window, {
   loading: () => ({

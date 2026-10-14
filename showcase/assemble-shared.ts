@@ -102,6 +102,21 @@ export const MODELS: Array<[string, string]> = [
   ["Golden pheasant", "goldenPheasant"],
 ];
 
+// ── Page state in the URL ─────────────────────────────────────────────────────────────────────────────────────────
+
+/** The hash is `#<model>&key=value…`: the model first, then every setting that differs from its default. */
+export function readHash() {
+  const [model = "", ...rest] = location.hash.slice(1).split("&");
+  return { model: decodeURIComponent(model), params: new URLSearchParams(rest.join("&")) };
+}
+
+export function hashOf(model: string, settings: Record<string, string>, defaults: Record<string, string>) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(settings)) if (value !== defaults[key]) params.set(key, value);
+  const query = params.toString();
+  return `#${encodeURIComponent(model)}${query ? `&${query}` : ""}`;
+}
+
 // ── Recording one build ───────────────────────────────────────────────────────────────────────────────────────────
 
 /**
