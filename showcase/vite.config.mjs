@@ -1,10 +1,14 @@
 // Local endpoints and their static-build equivalents for sample sources, harness renders (`npm run snap`) and the
-// sidebar thumbnails. Development serves renders through `/@fs/`; production copies the referenced files into the
-// build. Thumbnails live in the public folder, so both serve them as `/thumbs/`.
+// sidebar thumbnails. Development serves renders and GLBs through `/@fs/`; production copies the referenced render
+// images into the build as WebP and ships no GLBs. Thumbnails live in the public folder, so both serve them as
+// `/thumbs/`.
+import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { watch } from "node:fs";
-import { copyFile, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { availableParallelism } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
+import { promisify } from "node:util";
 import { defineConfig, searchForWorkspaceRoot, transformWithOxc } from "vite";
 import { bakeoffRoot, bakeoffRound, bakeoffRounds, bakeoffSlugs } from "./bakeoff-data.mjs";
 import { labData } from "./lab-data.mjs";
@@ -225,6 +229,92 @@ async function roundManifests() {
   return found;
 }
 
+// ── WebP renders for the static build ───────────────────────────────────────────────────────────────────────────
+// Production ships every render image as WebP, encoded by cwebp with settings per image kind (its filename suffix).
+// Encoded files are kept in a cache outside the repo, mirroring the render folder, named with a short id of their
+// encoder settings, so a settings change encodes again.
+
+const webpRoot = resolve(snapshotRoot, "..", "snaps-webp");
+const runFile = promisify(execFile);
+const WEBP_LOSSLESS = ["-lossless", "-exact"];
+const WEBP_VIEW = ["-q", "85", "-sharp_yuv", "-alpha_q", "100"];
+const WEBP_SKELETON = ["-q", "92", "-alpha_q", "100"];
+// Matched in order against the end of the filename, so `-skeleton-side` is tried before `-side`.
+const WEBP_KINDS = [
+  ["-sheet.jpg", ["-q", "85", "-sharp_yuv"]],
+  ["-atlas.png", WEBP_LOSSLESS],
+  ["-bones.png", WEBP_LOSSLESS],
+  ["-groups.png", WEBP_LOSSLESS],
+  ["-head.png", ["-q", "92", "-sharp_yuv", "-alpha_q", "100"]],
+  ["-skeleton-side.png", WEBP_SKELETON],
+  ["-skeleton.png", WEBP_SKELETON],
+  ...["front", "back", "side", "three-quarter", "top", "low", "flex-a", "flex-b"].map((view) => [
+    `-${view}.png`,
+    WEBP_VIEW,
+  ]),
+];
+const RENDER_IMAGE = /\.(png|jpg)$/;
+
+/** The cwebp arguments for a render image, by its filename; an unknown kind encodes lossless, warning once. */
+function webpArgs(path, warned) {
+  const name = basename(path);
+  const kind = WEBP_KINDS.find(([suffix]) => name.endsWith(suffix));
+  if (kind) return kind[1];
+  const suffix = name.slice(Math.max(0, name.lastIndexOf("-")));
+  if (!warned.has(suffix)) {
+    warned.add(suffix);
+    console.warn(`renders: no WebP setting for *${suffix}, encoding lossless`);
+  }
+  return WEBP_LOSSLESS;
+}
+
+/** A render image's cached WebP, encoded with `args` unless the cached file is at least as new as the source. */
+async function cachedWebp(source, args) {
+  const id = createHash("sha1").update(args.join(" ")).digest("hex").slice(0, 8);
+  const cached = join(webpRoot, `${relative(snapshotRoot, source).replace(RENDER_IMAGE, "")}.${id}.webp`);
+  const [input, kept] = await Promise.all([stat(source), mtime(cached)]);
+  if (kept && kept.mtimeMs >= input.mtimeMs)
+    return { path: cached, bytesIn: input.size, bytesOut: kept.size, encoded: false };
+  await mkdir(dirname(cached), { recursive: true });
+  const temp = `${cached}.${process.pid}.tmp`;
+  try {
+    await runFile("cwebp", [...args, source, "-o", temp]);
+    await rename(temp, cached);
+  } catch (error) {
+    await rm(temp, { force: true });
+    throw new Error(`cwebp could not encode ${source}: ${error.message}`, { cause: error });
+  }
+  return { path: cached, bytesIn: input.size, bytesOut: (await stat(cached)).size, encoded: true };
+}
+
+/** Encode (or reuse) every render image and copy its WebP to its route, a few cwebp processes at a time. */
+async function shipWebp(images, copy) {
+  const jobs = [...images];
+  const totals = { encoded: 0, reused: 0, bytesIn: 0, bytesOut: 0 };
+  let next = 0;
+  let failed = false;
+  const worker = async () => {
+    while (!failed && next < jobs.length) {
+      const [route, { source, args }] = jobs[next++];
+      try {
+        const webp = await cachedWebp(source, args);
+        await copy(webp.path, route);
+        totals[webp.encoded ? "encoded" : "reused"] += 1;
+        totals.bytesIn += webp.bytesIn;
+        totals.bytesOut += webp.bytesOut;
+      } catch (error) {
+        failed = true;
+        throw error;
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(12, availableParallelism()) }, worker));
+  const mb = (bytes) => `${(bytes / 1e6).toFixed(1)} MB`;
+  console.log(
+    `renders: ${totals.encoded} WebP images encoded, ${totals.reused} reused; ${mb(totals.bytesIn)} in, ${mb(totals.bytesOut)} out`,
+  );
+}
+
 let buildDirectory;
 
 const showcaseData = {
@@ -258,6 +348,9 @@ const showcaseData = {
     const bakeoffIds = await bakeoffRounds();
     const bakeoffBuilds = (await Promise.all(bakeoffIds.map(bakeoffSlugs))).flat();
     const indexed = new Map();
+    // Every render image the indexes point to, by route: its source and cwebp arguments.
+    const images = new Map();
+    const warned = new Set();
     await json("__sample-created", created);
     await json("__sample-names", await sampleNames());
     const records = await buildRecords();
@@ -267,7 +360,15 @@ const showcaseData = {
       if (slug in created) await copy(join(sampleRoot, `${slug}.ts`), `__sample-source/${slug}`);
       const assets = new Map();
       const fileUrl = (path) => {
-        const route = `renders/${relative(snapshotRoot, path).split(sep).join("/")}`;
+        // No GLB ships: the index's downloads are emptied below.
+        if (path.endsWith(".glb")) return null;
+        const file = relative(snapshotRoot, path).split(sep).join("/");
+        if (RENDER_IMAGE.test(path)) {
+          const route = `renders/${file.replace(RENDER_IMAGE, ".webp")}`;
+          images.set(route, { source: path, args: webpArgs(path, warned) });
+          return `/${route}`;
+        }
+        const route = `renders/${file}`;
         assets.set(route, path);
         return `/${route}`;
       };
@@ -276,10 +377,11 @@ const showcaseData = {
         assets.set(route, join(snapshotRoot, slug, arm, "snaps", `${tag}-creature.ts`));
         return `/${route}`;
       };
-      indexed.set(slug, await snapshots(slug, fileUrl, sourceUrl));
+      indexed.set(slug, { ...(await snapshots(slug, fileUrl, sourceUrl)), downloads: [] });
       await json(`__snapshots/${slug}`, indexed.get(slug));
       for (const [route, path] of assets) await copy(path, route);
     }
+    await shipWebp(images, copy);
     for (const id of bakeoffIds)
       await json(`__bakeoff/${id}`, await bakeoffRound(id, (slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));
     await json("lab.json", await labData((slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));
