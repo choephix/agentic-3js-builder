@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuBalloonTersePlain",
+  "arm": "plain",
+  "subject": "balloon",
+  "level": "terse",
+  "pitch": "A hot-air balloon.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:31:02.444Z",
+  "wallMs": 32041,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 778,
+    "completion_tokens": 7428,
+    "total_tokens": 8206,
+    "prompt_tokens_details": {
+      "cached_tokens": 763
+    }
+  },
+  "costUsd": 0.0037231300000000003,
+  "hasCode": true,
+  "reasoning": "I'm designing a stylized hot-air balloon module using a lathe geometry with a teardrop-shaped envelope, applying a canvas-drawn stripe texture for color, plus a basket built from wicker-like box and cylinder shapes underneath.\n\nRopes connect the basket corners to the envelope's mouth, and a small flame mesh represents the burner. I'm working out realistic proportions, with the basket resting at ground level and the envelope rising roughly 20 meters above it, shaping the lathe profile points so the balloon bulges outward before tapering to a point at the top.\n\nStill refining radius formula...\n\nUsing 24 radial segments, setting the material to double-sided so the inner surface is visible through the mouth opening. For the stripes I'm generating a canvas texture with alternating red/cream vertical gore stripes, mapping the lathe's angular coordinate to the texture's u-axis with six stripe pairs across a 512x256 canvas.\n\nI'm adding a small dark vent disk at the top cap, and considering a decorative torus ring around the envelope's equator at a slightly larger radius for extra detail, finished in a gold tone.\n\nFor the basket, I'm building a tan box body sized roughly 1.6-1.8 wide and about a meter tall, topped with a darker rim frame of thin boxes to simulate the wicker edge, with the whole thing sitting at ground level.\n\nNow I'm adding four ropes connecting the basket's top corners up to mouth points on the balloon, using cylinders oriented between two 3D points via quaternion alignment, and placing a steel burner frame cylinder above the basket between the rope tops and the balloon mouth.\n\nFinishing up details—flame cone glowing orange above the burner, skipping a ground pad, and considering a small cone cap or tiny flag at the balloon's top vent. Now I'm writing a helper function that creates oriented cylindrical struts between two points by computing their distance and aligning a rotated quaternion to connect them.\n\nSetting up materials next: envelope texture, gold trim, tan wicker basket with a canvas-generated crosshatch texture, dark wood, rope, brushed steel, and emissive flame. For the envelope gores, I'm alternating red and cream stripes across 24 lathe segments mapped from a 512px-wide canvas texture. Starting to write the actual module code now, importing three.js and defining the balloon's metadata and creation function.\n\nWriting lathe geometry code...\n\n"
+}

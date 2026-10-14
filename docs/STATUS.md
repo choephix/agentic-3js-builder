@@ -1,6 +1,103 @@
-# Status, 2026-09-29
+# Status, 2026-10-14
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
+
+## Bake lab: painting without freezing the page, 2026-10-14
+
+A throwaway page (`showcase/bake-lab.html`, removed; it is in commit `7d724f5`) built a set of samples one per frame and painted them three ways: sync (the bake runs inside `default()`, as now), sliced (a copy of `bakeSheet` as a generator, run in 10 ms steps between frames) and workers (a pool imports each sample again, builds it and posts back the sheet; the page packs the same layout itself). It patched `Ctx.prototype.bake` to defer; no `src/` file changed. Optionally a 1/4-resolution sheet of the same layout showed first. Paints are the samples' own closures, so a worker has to run the sample; `svg()` already returns a blank texture there.
+
+On RTX 3060 headless, 20 cores (one run each):
+
+| Set, mode                    | All geometry | All final paint | Longest frame | Frames > 100 ms | Identical |
+| ---------------------------- | -----------: | --------------: | ------------: | --------------: | --------: |
+| Heavy 6, sync                |     4,992 ms |        5,010 ms |      1,383 ms |               6 | reference |
+| Heavy 6, sliced              |       421 ms |        8,185 ms |        167 ms |               1 |       6/6 |
+| Heavy 6, workers ×6          |       530 ms |        2,219 ms |        183 ms |               2 |       6/6 |
+| Heavy 6, workers ×6, preview |       972 ms |        1,519 ms |        250 ms |               5 |       6/6 |
+| World 43, sync               |    12,690 ms |       12,786 ms |      1,033 ms |              34 | reference |
+| World 43, sliced             |     4,066 ms |       39,527 ms |        400 ms |              12 |     43/43 |
+| World 43, workers ×6         |     4,937 ms |        5,027 ms |        433 ms |              18 |     43/43 |
+| World 43, workers ×12        |     5,447 ms |        5,540 ms |        400 ms |              19 |     43/43 |
+
+Sliced keeps frames short but paints 1.5–3× slower than sync, because baking gets only what each frame leaves after drawing a growing scene. Workers finish 2.5× sooner than sync, every sheet byte-identical; with the 43, the main thread's own geometry builds (one per frame, ~100 ms each with the draw) set the finish, so 12 workers are no faster than 6. The remaining long frames are main-thread geometry (pixelMammoth, clockworkCarousel 150–230 ms) and first draws of new materials, not paint; texture uploads never were the slowest step. The 1/4 preview costs about 1/16 of a bake on the main thread (clayWalrus +100–180 ms) and looks close to the final sheet, where no preview shows white parts until the sheet lands.
+
+## Building in a worker (spike), 2026-10-14
+
+A throwaway page (`scratch/worker-build/`, gitignored) runs a sample's unchanged `build()` in a module Web Worker, packs the result (nodes, geometries, materials and textures as plain data; geometry and texture buffers transferred, not copied), unpacks it on the main thread and draws the `svg()` textures there (in a worker `svg()` takes its Node path: markup kept, pixels blank). It compares each worker build W with a main-thread build A, and A with a second main build B as the control: every node, transform, geometry buffer hash, material and texture property, plus a pixel diff.
+
+The build pool that grew out of it (`src/worker.ts`, `src/transfer.ts`, and `svg()` split into `drawSvg`/`svgPixels`) lives on the `async` branch, not on `main`.
+
+On RTX 3060 (20 logical cores), all 14 hard samples (the heaviest bakes, griffin, the most `svg()` textures, every kit) came out structurally identical to A, with 0–0.02% of pixels differing. Worker build time matched main (jadeSerpent 3078 vs 3142 ms). Packing took 1–4.5 ms, unpacking 1.5–12 ms on the main thread, and transfers ran 1–25 MB per model (mostly the 2048² paint sheet). Building all 14: the main thread took 13.8 s with a 3050 ms worst frame; 1 worker 15.1 s, 2 workers 8.3 s, 4 workers 4.4–4.7 s, 8 workers 3.5 s, worst frame 180–330 ms.
+
+What broke or needed handling:
+
+- Parameterised geometries (`CircleGeometry` and others) arrive as `BufferGeometry` unless `type`, `parameters` and `_transformed` are carried. The spike packs own properties generically.
+- Module-level state makes a build depend on what that module built before. treehouseDiorama keeps `const sr = rng(11)` at module scope, so its second build in one module instance draws different SVG markup (5.5% of pixels): a reused worker returns something other than a fresh one. paperDragonKite and rainyBusStopDiorama keep a module-level `rng` too. The main thread has the same problem on a rebuild.
+- The SVG drawing stays on the main thread. Its synchronous part (draw, readback, 8-pass dilate) reached 278 ms for stainedGlassMoth (dilate 174 ms, readback 88 ms) and 153 ms for treehouseDiorama; the worst frames during parallel runs line up with these. The dilate is plain typed-array work a worker could do. Not tried.
+- Invalid SVG that only the browser parser catches fails at the call on the main thread, but only at unpack for a worker build.
+- Code that uses `document` throws `ReferenceError` in the worker. SDK errors keep their message and a stack with the sample's function names and lines, but arrive as plain objects.
+- Closures in `userData` are dropped and class instances (a `Vector3`) arrive as plain objects. No sample assigns `userData` today.
+- An endless build is terminated after a timeout and the pool replaces the worker; the page stays responsive.
+- The worker bundle carries its own copy of three and the SDK (630 KB unminified, 131 KB gzipped) and its own sample chunks.
+- Not tried: Vite dev mode and hot reload in workers, Firefox, Safari, phones, peak memory.
+
+## Blob distances without `Math.hypot`, 2026-10-14
+
+A line-level profile of `blob()` (sprinterBlob, lifeguardBlob; 5 builds each plus 3 CPU profiles) put 75% of their builds in `blob()`, half of that in the settle rounds, which call `fold()` 70 times per surface vertex. Inside `fold()`, distance functions take 73–74% and the ingredient bounds tests about 15%. Replaying each call's passing ingredients without any bounds test saved 66–73 ms per sample, an upper bound for an ingredient index, so there is none. The ellipsoid distance was 26–30% of blob time, mostly its two `Math.hypot` calls.
+
+The sphere, ellipsoid, box and degenerate round-cone distances and the settle step limit now use `Math.sqrt` of the summed squares. Both samples built byte-identical to the previous `blob.ts` (geometry, indices, textures, world matrices, bone inverses; 7 alternating builds each). Fastest of 7: sprinterBlob 1,283 → 1,201 ms, lifeguardBlob 920 → 838 ms; medians on the loaded machine moved more (1,817 → 1,486 and 1,196 → 1,085 ms). `hypot` and the plain sum can differ in the last bit for other inputs, so other blobs may move by that much.
+
+## Surface nearest-point tree, 2026-10-14
+
+`Surface.nearest()` measured the distance to every triangle on every query, building a new `Triangle` each time. It now builds a bounding-volume tree on its first query after a pose and skips nodes farther than the best triangle so far, with a slack of 1e-5 of the surface size. Ties go to the lowest triangle index, as in the scan, so it returns the same triangle and point.
+
+All 186 samples built in Chromium on RTX 3060 against the previous `surface.ts` matched every geometry attribute, index, paint-sheet byte, object world matrix and bone inverse; the check flags a 1e-12 nudge to the returned point. 61 samples query `nearest()` (235 trees, 12,037 queries). lifeguardSculpt went from 1.20–1.33 s to 0.73–0.76 s over three runs; sprinterSculpt 1.01–1.17 → 0.83–1.05 s. Other samples moved within the noise of a loaded machine. A tree costs about ten scans to build (0.5 ms at 1,500 triangles, 11 ms at 38,000; a query after that is under 0.01 ms). The 116 trees that answered fewer than ten queries hold 21,554 triangles in total, so the library pays a few milliseconds for them.
+
+## Build records off the showcase's first load, 2026-10-14
+
+The showcase bundled all 186 `samples/*.build.json` records into its startup JS (583 KB of JSON), though the list only uses each builder's model and a tooltip line. The Vite plugin now serves `/__build-summaries` (model, effort, agent, scope, cost, wall time, tags and the cost caveat; 38 KB, 5 KB gzipped) for the model filter and tooltips, and `/__build-records` (every record in one file) for the Builds table; both are static files in the build. The header's "by" line, the Info panel's Build section and the Versions panel use the open sample's record, imported alongside its module.
+
+Production build, JS the page loads before the first sample: 1,389 KB → 871 KB (280 → 226 KB gzipped). On RTX 3060 against the previous build, served locally: all 178 tile tooltips, the model filter and its default, redFox's header, Info Build section and Versions panel, and all 178 Builds-table rows and their sort matched; no page errors in the production or dev build. With 40 ms latency and 20 Mbit/s, the list appeared at about 320 ms (was 345–507) and the first Builds-table open took 126–191 ms (was 133–145).
+
+## Paint bake speed, 2026-10-14
+
+Once the scatter fix was in, the paint bake was 85–96% of the slowest builds, nearly all of it in the noise in `src/paint.ts`. Same arithmetic, less work: `perlin()` evaluates its 8 corner gradients once instead of 12 times through a closure; `grad()` reads three 16-entry tables instead of a 16-way `switch`; `cells()` keeps its nearest cell in plain numbers and measures with `Math.sqrt` instead of `Math.hypot`; and the texel loop in `bakeSheet()` (`src/bake.ts`) accumulates position and normal without a per-texel closure. The API and every sample are unchanged.
+
+Building all 186 samples in Chromium on RTX 3060 against the previous `paint.ts` and `bake.ts` matched every geometry attribute, index and paint-sheet byte. Total build time dropped from 77.1 s to 47.8 s and samples over one second from 21 to 6 (clayWalrus 4.3 → 1.5 s, jadeSerpent 3.2 → 1.2 s, ukiyoeOctopus 2.5 → 0.7 s, pixelMammoth 0.65 → 0.48 s). sprinterBlob stays at 1.4 s: its time is in the experimental `blob()` geometry, not paint. `npm run snap -- clayWalrus v04-noise-speedup` rendered with 0 errors and 0 warnings; `npm run typecheck -- src/paint.ts src/bake.ts` passed.
+
+## Sample names without importing every sample, 2026-10-14
+
+After the open sample was in, the showcase imported every sample module just to read `meta.name` for the list: on the public site that was 165 extra JS requests (1.71 MB decoded) after opening redFox. The Vite plugin now serves `/__sample-names`, read from each sample's `export const meta = { name: "…" }` literal (written as a static file in the build), and the list shows names from its first paint. A sample module is imported only when it is opened or its thumbnail is redrawn. A sample's tile turns red once a run of it throws, no longer because an unopened sample failed to import.
+
+The index matched the imported `meta.name` of all 186 samples. On RTX 3060 the dev showcase opened redFox with 178 listed tiles all named, no page errors, and only the open sample plus stale-thumbnail redraws requested sample modules.
+
+## Assemble pages, 2026-10-14
+
+Two showcase pages show a creature being built. Both run a sample once while the shared recorder (`showcase/assemble-shared.ts`) wraps `Builder`, `Surface.scatter`, `Ctx.bake` and `Object3D.add` for that build, so no SDK file changes. `/assemble` plays the recorded calls back as a showpiece; `/assemble-loading` compresses them into a hard cap for use as a loading animation. Mirrored pairs come from the recorded call site (the sample's own stack frame) plus parts and joints reflected across x = 0 or z = 0.
+
+Recording showed geometry takes tens of milliseconds even for the 700-call griffin; nearly all build time is the paint bake (jadeSerpent 3.1 s of 3.1 s, porcelainElephant 2.4 s). Loading all 43 models into the world grid took 26.7 s, 20.9 s of it synchronous builds that freeze the page; the animation cannot hide that, so a chunked paint bake is the next lever for loading. Every listed model built and played on RTX 3060 without page errors; `npm run typecheck` passed.
+
+Both pages keep the model and settings in the URL hash. The loading page's World (now the first sidebar entry) builds all 43 before anything animates, compiles both material sets and uploads textures off-stage, then starts the models in a seeded shuffled order over 2.5 s. On RTX 3060 headless at 1400×860, building took 25.5 s (22.2 s synchronous); during the 3.6 s arrival 3 of 128 frames exceeded 50 ms (max 50 ms), against 12 of 116 (max 100 ms) before the precompile.
+
+## Scatter performance, 2026-10-14
+
+The public pixel mammoth blocked the browser's UI thread for 11.1 seconds: its dense body-fur scatter repeatedly transformed accepted hits for every spacing check. `Surface.scatter()` now indexes accepted positions in a numeric spatial grid and refreshes them when the pose changes. The API, random sequence, attempt budget and sample builders are unchanged.
+
+A Node smoke comparison matched all geometry attributes, indices, procedural paint pixels and SVG source for pixelMammoth, highlandCow and flowerHedgehog before and after the fix. The mammoth build dropped from 13.5 seconds to 1.0 second; the hedgehog dropped from 1.4 seconds to 0.19 seconds. Another 54 spacing scenarios matched hit order, positions, normals, weights, callback counts and random consumption, including negative coordinates, filters, overlapping meshes and pose changes.
+
+The fixed local showcase built the mammoth in 605 ms on RTX 3060 (initial longest main-thread task: 928 ms). Bend/rest and SVG/paint-sheet selection worked without page errors or WebGL context loss. `npm run snap -- pixelMammoth v04-scatter-grid-fix` rendered all views with 0 errors and 0 warnings; three spacing-boundary smoke cases also matched the old sampler exactly. `npm run typecheck -- src/surface.ts` passed.
+
+## Storage study, 2026-10-14
+
+The showcase's `/storage` page compares current raw `samples/*.ts` files with one latest available final GLB per model: rigged `B/out/<slug>-rigged.glb`, otherwise plain `A/out/<slug>.glb`. `showcase/storage-data.mjs` measures byte sizes without executing builders; the Vite plugin serves that data in development and writes it into the static build. The page loads no model modules or WebGL.
+
+The measured library contains 186 matched models: 4,391,048 bytes of source versus 299,917,120 bytes of GLBs, a 295,526,072-byte difference (98.54% smaller). The page calculates totals from each build's measurements rather than pinning these numbers. It includes search, column sorting, source/sample links and a complete exact-byte CSV with source/export timestamps. Desktop and 390 px mobile layouts, mammoth filtering, sorting, CSV contents and a failed-data response were exercised in Chromium.
+
+The method explicitly compares existing exports with current source (versions may differ), excludes shared SDK/style-kit overhead, and distinguishes raw files from compressed transfer and runtime memory. GLB sizes are measured locally; production publishes the code and measurements, not those binaries. The study is a representation comparison, not a measured bandwidth or billing reduction.
+
+## Production assets, 2026-10-14
+
+The static-build hook now publishes model code, build metadata and thumbnails. GLB exports and the entire harness render archive remain local; production snapshot indexes contain no historical tags or downloads, and the UI explains their local-only availability. Development still serves the local renders and exports. The packaging-hook smoke verified empty production snapshot indexes, no GLB/render files, and no lab GLB, rig or archived-image URLs. The changed viewer files passed targeted typecheck.
 
 ## Origin
 
@@ -243,6 +340,41 @@ On 2026-10-07, branch `more-samples`, commit `d33ba5d`: the same 100 subjects, s
 - Contact sheets: `~/tmp/public/nilo/agentic-3js-builder/showcase/haiku-100.jpg` (all), `haiku-100-part1.jpg` … `part5.jpg` (alphabetical, 20 each), `sonnet-vs-haiku-sample.jpg`.
 - Known flaws the builders reported: yordleMage's description gives 1.35 m against a 1.44 m model; lanternShrine carries a wrong comment blaming a paint-sheet bug; treasureHoard's crown floats a few cm on one side; sakuraKatana and moonlitBow have one joint; humpbackWhale's flipper membranes sit 168 mm off the body by the loose-part check.
 
+### Integration with main
+
+On 2026-10-14, the three 100-build rounds were integrated with main's newer SDK and showcase. Both branches' status histories are retained, along with the relative API example imports and lane-B snapshot gallery.
+
+The newer `Builder.sweep` overloads exposed tuple-inference errors in `seaOtter`, `hippopotamusSonnet` and `frostWyrmSonnet`. Their `shift` callbacks now explicitly return `[number, number]`; coordinates and geometry are unchanged. Historical builder records remain unchanged.
+
+Verification: full `npm run typecheck` and `vite build showcase` pass (the build reports a large-chunk warning). RTX 3060 smoke renders of those three samples and `redPandaHaiku`, tagged `v03-main-merge`, each report 0 errors and 0 warnings; contact sheets were inspected. `harness/snap.ts --gallery` also ran successfully.
+
+## Astra bug hunt and audit
+
+On 2026-10-02, spare GPT-6 Astra quota (task `med` effort) went to read-mostly work in one hour, everything under `experiments/astra-hunt/`. Nothing in `src/`, `docs/` or the existing samples changed.
+
+- `FINDINGS.md`: the SDK work list. 27 hunters (21 one module each, 6 writing realistic quadruped, winged, serpent, mechanical, biped and styled subjects) wrote reproduced findings; 8 triage agents reran every repro, judged intended vs bug and listed the samples each hits; one agent merged them. 3 P0, 37 P1, 23 P2 or docs. Worst: `Frame.moved()` corrupts orientation for any non-cardinal frame and for ±X (`src/frame.ts:51-54`, 17 samples place geometry with it); `spots()`/`scales()` bake an RGB tuple as black; axis-touching lathes emit half their triangles degenerate (dozens of samples). Its first item, the harness's per-part 1.003 growth, is a deliberate z-fighting workaround; what it breaks is `preview --gap`/`--box` numbers and exact model-space export. Solid: posing, surface hits, paint determinism, kits, cards, regions, ordinary sweeps and paths.
+- `SAMPLE-FIXES.md`: a per-sample fix list (no drops). Ten auditors, a redo of group f and nine second looks covered all 186 samples: 25 with a P0, 8 with a P1, 1 with only P2, 152 clean. First passes rubber-stamped: one marked nesYeti (four legs) clean from report counts alone, so every group got a second look against the images; those found nesGoblinShaman facing backwards, brassDiver without a jaw, centaurArcher's bow held by no hand, mantisShrimp's legs off the body, and more.
+- Five SDK-only sandbox builds (`~/tmp-archive/astra-round/<slug>/`, Muse-round layout plus `harness/`, at most two renders): moonJellyfish, redKangaroo, hummingbirdAtFlower, articulatedDeskLamp, rainyBusStopDiorama. $2.70-$4.56, 7-14 min each; 2.0k-7.0k triangles. Plain builds: the hummingbird is small beside its flower, the lamp's power switch floats 17 mm off the base. Contact sheet: `~/tmp/public/nilo/agentic-3js-builder/showcase/astra-sandbox-round.jpg`. Their build records come from provenance run in the sandbox and lack model and effort.
+- `reports/` holds every raw report, `briefs/` the hunter, auditor, triage, merge and build briefs, `repros/` the repro scripts with imports fixed for the new depth (`npx tsx experiments/astra-hunt/repros/<dir>/<file>.ts`).
+
+## Prompt bake-off
+
+On 2026-10-07 Stefan asked to test how a model builds when the SDK is used the way an app uses it: one system prompt, one pitch, one TypeScript module back, with no tools and no second turn. The model runs through `omp auth-gateway stdio`, which uses the stored omp logins and adds about 50 tokens to the prompt. `bakeoff/README.md` has the runner (`npm run bakeoff`), arms, pitches and data layout. The showcase's `/bakeoff` page shows each round as a grid of pitches × arms, with live 3D, shared-camera compare, blind mode with stars, and a scoreboard. Stefan judges the builds by eye; no model judges them.
+
+- **Arms.** Each arm is a reference crossed with a taste. References: the whole `src/` (about 69k tokens, 108k as billed), `docs/api.md` with `conventions.md` (23k), or the top of `api.md` (the "brief", 4k). Tastes: SDK-first or primitives-first. A plain three.js control has no SDK. All arms share the contract, `bakeoff/prompts/contract.md`.
+- **Round 1.** Sonnet 5.5 at medium effort, SDK `cb52341`: 7 subjects (4 creatures, a knight, a gramophone, a lighthouse diorama), each with a terse and a rich pitch, × 7 arms = 98 builds, $11.71. 86 rendered and 12 crashed; the brief arms account for 8 of the crashes. A failure analysis found five guesses behind most crashes:
+  - meshes added to `b.root` with no bone (9 builds; these render as static meshes and only the lab's rig export rejects them);
+  - `b.part({ geometry, color, ... })`;
+  - `joint.add(mesh)`;
+  - a Chain passed as `parent`;
+  - the radius inside the options object.
+
+  Commit `6cc54cd` makes the SDK accept these forms and gives other wrong inputs named errors; 17 of the 21 original failures then build.
+
+- **Round 2.** The same arms with the round-1 lessons, SDK `6cc54cd`: 20 new subjects (15 creatures, 4 props, a Japanese garden diorama) × terse/rich × 7 arms = 280 builds.
+- **Later rounds** (r1opus, r1resdk, r3, r3opus, round 4 on Sonnet/Opus/Astra/Sol, Haiku 5.5 on every round at medium and xhigh) and their numbers: the showcase's `/lab` page, which tells the bake-off in order with a scoreboard, gallery, compare presets, charts, failures, pitches and method. r2haikux stopped at 44 of 280 when its job hit the 2-hour background limit; those 44 were checked on 2026-10-12.
+- **Harness.** `snap` builds modules that need the browser (canvas textures) in the page only. `SNAP_RENDER_ON_ERROR=1`, which the bake-off sets, renders despite report errors, as a static mesh when the skeleton fails.
+
 ## Build records
 
 `npm run provenance` (`scripts/provenance.ts`) writes `samples/<slug>.build.json` for every sample from the omp session logs and the harness reports: builder agent, model, effort, provider, cost, wall and active time, tokens, calls, edits, typechecks, snapshot tags, report issues, dropped connections, later editors. Model, effort, calls, active time, tokens and cost come from the creature lab's `site/scripts/stats.ts`, imported at run time. The showcase shows them in the Info panel's Build section, the sample list tooltips and the Builds table (`P`). Unknowns are null with a reason in `caveats`:
@@ -269,9 +401,9 @@ Friction the builders reported:
 - [ ] `radius: [r0, r1]` reads as an ellipse but is a linear taper; an ellipse needs `(t) => [rx, ry]`.
 - [ ] `limb` silently straightens when the target is out of reach.
 - [ ] Sloped feet: the round end cap dips below the floor. The snap report now warns from 5 mm off the floor (6979c92).
-- [ ] `surface(joint)` finds no meshes on a smooth-skinned chain; the mesh sits under its heaviest bone.
+- [x] `surface(joint)` finds no meshes on a smooth-skinned chain; the mesh sits under its heaviest bone. A joint with no meshes of its own now takes the blend-skinned meshes that bend with it.
 - [x] Sweep `sectors` on narrow colour-split pieces triggered the harness's inside-out false alarm; the check now needs a closed part (6979c92).
-- [ ] `docs/api.md` has lines over 1,000 characters (the `b.chain` and membrane paragraphs), which read tools truncate.
+- [x] `docs/api.md` lines over 1,000 characters: none left in `docs/api.md`, `docs/conventions.md` or `GUIDE.md` (Astra docs hunt, 2026-10-02).
 - [x] One broken sample fails `npm run typecheck` for everyone: `npm run typecheck -- <slug>` checks one file and its imports.
 - [x] Pixel density: `kits/pixel` `tileBox` crops whole texels per face at a fixed texel size; `skinBox` maps a sheet per face.
 - [x] Flat shading: `flat: true` on `part`/`stick`.
@@ -285,11 +417,15 @@ Friction the builders reported:
 - [ ] Merge branch `sdk-polish` into main: it carries the `agent-docs` split (README → `docs/api.md`), with `experiments/humanoids` briefs pointing at `docs/api.md`.
 - [ ] Measure the kits: rerun a few round-3 subjects (a pixel, a toon, a clockwork one) with the new docs and compare cost, calls and context against their first builds.
 - [ ] The lean-mesh GUIDE line (batch 11) is untested on a fresh builder: rerun one texture-round subject and compare triangles against its batch 10 build.
+- [x] Bake-off leftovers: membrane thickness defaults to 2% of its width; `part({ dir })` names `part()`; "Assembly has no valid skeleton" lists the first errors. See DESIGN.md, "Bake-off r2 and r3".
+- [ ] The showcase dev server needs `CHOKIDAR_USEPOLLING=1` when the machine's inotify watchers are nearly used up (125 of 128 on 2026-10-07).
 
 Samples:
 
 - [x] Fix giantAnteater's type errors (abb86a1).
 - [x] Review and commit the untracked guide-test samples: all are committed.
+- [ ] Work through `experiments/astra-hunt/SAMPLE-FIXES.md` (25 samples with a P0).
+- [ ] Work through `experiments/astra-hunt/FINDINGS.md`, "Fix first" down; fixing `Frame.moved()` changes the 17 samples it lists, so re-render them.
 
 Known geometry issues:
 

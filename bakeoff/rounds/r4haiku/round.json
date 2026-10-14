@@ -1,0 +1,119 @@
+{
+  "id": "r4haiku",
+  "started": "2026-10-07T21:05:45.023Z",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "xhigh",
+  "sdkCommit": "07be161",
+  "promptsFrom": "r4",
+  "maxTokens": 128000,
+  "pricing": {
+    "input": 0.1,
+    "output": 0.5,
+    "cacheRead": 0.01,
+    "cacheWrite": 0.125,
+    "longContext": {
+      "inputThreshold": 100000,
+      "input": 0.5,
+      "output": 2.5,
+      "cacheRead": 0.05,
+      "cacheWrite": 0.625
+    }
+  },
+  "arms": [
+    {
+      "id": "source-sdk",
+      "letter": "A",
+      "name": "Source, SDK-first",
+      "idea": "The whole SDK source code as the reference; build with the SDK throughout",
+      "contract": "contract.md",
+      "context": "source",
+      "taste": "taste-sdk.md"
+    },
+    {
+      "id": "source-prim",
+      "letter": "B",
+      "name": "Source, primitives-first",
+      "idea": "The whole SDK source code as the reference; simple primitives first, SDK helpers only where they can't",
+      "contract": "contract.md",
+      "context": "source",
+      "taste": "taste-primitives.md"
+    },
+    {
+      "id": "docs-sdk",
+      "letter": "C",
+      "name": "Docs, SDK-first",
+      "idea": "docs/api.md and docs/conventions.md as the reference; build with the SDK throughout",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-sdk.md"
+    },
+    {
+      "id": "docs-prim",
+      "letter": "D",
+      "name": "Docs, primitives-first",
+      "idea": "docs/api.md and docs/conventions.md as the reference; simple primitives first",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-primitives.md"
+    },
+    {
+      "id": "brief-sdk",
+      "letter": "E",
+      "name": "Brief, SDK-first",
+      "idea": "Only the top of docs/api.md (helper map, cheat sheet, target, module); build with the SDK throughout",
+      "contract": "contract.md",
+      "context": "brief",
+      "taste": "taste-sdk.md"
+    },
+    {
+      "id": "brief-prim",
+      "letter": "F",
+      "name": "Brief, primitives-first",
+      "idea": "Only the top of docs/api.md; simple primitives first",
+      "contract": "contract.md",
+      "context": "brief",
+      "taste": "taste-primitives.md"
+    },
+    {
+      "id": "plain",
+      "letter": "G",
+      "name": "Plain three.js",
+      "idea": "Control: no SDK, three.js only, no rig",
+      "contract": "contract-plain.md",
+      "context": "none",
+      "taste": null
+    }
+  ],
+  "subjects": [
+    {
+      "id": "redPanda",
+      "kind": "creature",
+      "terse": "A red panda.",
+      "rich": "A red panda balancing on a mossy branch. Rusty red fur on its back, a black belly and legs, a round white face with red tear marks running from the eyes, white-rimmed pointed ears, a little black nose, and a big fluffy tail with bold cream and ginger rings. It holds a bamboo shoot in one paw and looks delighted."
+    },
+    {
+      "id": "chameleon",
+      "kind": "creature",
+      "terse": "A chameleon.",
+      "rich": "A panther chameleon walking along a twig. Its body shifts from turquoise at the head through lime green to sunset orange at the tail, with a white stripe along its side and red bars across it. A ridged crest on its head, turret eyes looking in two directions, mitten-like feet gripping the twig, and a tightly coiled tail."
+    },
+    {
+      "id": "pufferfish",
+      "kind": "creature",
+      "terse": "A pufferfish.",
+      "rich": "A startled pufferfish fully puffed up into a ball. Creamy yellow skin with brown leopard spots on top fading to a white belly, short spikes all over, a tiny pouting mouth, big worried round eyes, small fluttering side fins and a stubby fan-shaped tail. A few bubbles rise from its mouth."
+    },
+    {
+      "id": "unicornFoal",
+      "kind": "creature",
+      "terse": "A unicorn foal.",
+      "rich": "A newborn unicorn foal on wobbly long legs. A pearly white coat with a soft lilac shimmer, a short fluffy mane and tail in pastel pink, mint and lavender, a small spiralled horn in gold, big dark eyes with long lashes, little silver hooves, and a daisy chain hanging around its neck."
+    },
+    {
+      "id": "jukebox",
+      "kind": "prop",
+      "terse": "A jukebox.",
+      "rich": "A 1950s diner jukebox. A tall rounded arch of glowing coloured tubes in red, amber and teal, chrome trim everywhere, a domed glass window showing a stack of records and the arm that picks them, rows of chrome selection buttons with little title cards, a speaker grille with a starburst pattern, and a coin slot."
+    }
+  ]
+}

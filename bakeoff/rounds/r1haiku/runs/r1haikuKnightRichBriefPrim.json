@@ -1,0 +1,25 @@
+{
+  "slug": "r1haikuKnightRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "knight",
+  "level": "rich",
+  "pitch": "A fantasy knight in battle-worn plate armour. A great helm with a narrow eye slit and a tall crimson plume, layered shoulder plates etched with gold filigree, a deep-blue surcoat with a silver griffin emblem, a tall kite shield bearing the same griffin, and a broadsword. Dents and scratches tell of many battles, and a torn crimson cape hangs from the shoulders.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:52:27.011Z",
+  "wallMs": 88536,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5301,
+    "completion_tokens": 12150,
+    "total_tokens": 17451,
+    "prompt_tokens_details": {
+      "cached_tokens": 5160
+    }
+  },
+  "costUsd": 0.0061407,
+  "hasCode": true,
+  "reasoning": "I need to write a single TypeScript module using the SDK, but I'm uncertain about the full range of available functions since the reference is only partial. I'll stick to the well-documented, safer parts of the API rather than risk using functions whose signatures I'm not fully sure of.\n\nb.joint's signature looks clear enough with name and options. For part, I'm less sure of the exact API, so I'll lean on the documented b.stick(geo, color, frame) instead, using frame() to position geometry along its facing axis at a given point.\n\nNow I'm planning out the knight's skeleton: a budget of roughly 150-250 parts, with joints for hips, spine, neck, head, shoulders, elbows, and wrists, plus simplified cape and plume made from stacked boxes and cones rather than complex sweeps. I'm sketching approximate coordinates for each joint to build a standing pose.\n\nI'm defining a wrapper function around the part-creation call so I can adjust the underlying API in one place, picking a color palette (steel, gold, crimson, silver, leather, etc.) and settling on using boxes and spheres for most shapes while orienting limb pieces by aiming toward a target point rather than relying on uncertain rotation semantics.\n\nNow I'm setting up the overall build function, importing the builder utilities, defining shorthand helpers for box, cylinder, and sphere geometries, and starting to lay out joint positions for the hips and beyond.\n\nI'm mapping out the full skeleton—spine, neck, head, shoulders, elbows, wrists for both arms (sword in the right hand, shield on the left), hips down through knees and ankles for both legs, and a simple jittered cape chain from the shoulders down the back. I'm also planning the great helm as a cylinder at the head joint with a dark eye slit box and a front visor box positioned slightly forward and up.\n\nNow I'm building out the helm details—a flat box crown, a steel front plate with a slit and small breath-hole boxes, and a tall crimson plume made of stacked boxes arcing up and backward from the helm top. For armor, I'm using a cylinder gorget at the neck, flattened spheres for pauldrons with scattered gold filigree dots instead of torus rings to avoid orientation issues, a breastplate box with gold trim, a blue surcoat panel in front, and a primitive griffin emblem built from spheres, a cone head, and flatt"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2HedgehogTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "hedgehog",
+  "level": "terse",
+  "pitch": "A hedgehog.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:14.005Z",
+  "wallMs": 42850,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112463,
+    "completion_tokens": 5567,
+    "total_tokens": 118030,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.280596,
+  "hasCode": true,
+  "reasoning": "I'm planning a hedgehog model with a realistic scale of roughly 25cm length and 12cm height, laying out a joint hierarchy with root, spine chain, head, jaw, legs, and ears, and sketching coordinates for the oval body and pointed snout facing forward.\n\nNow I'm defining skeleton joints for the spine, neck, head, jaw, and four legs with hip-knee-foot chains, plus a small tail and ears, then building the body shape as a loft along the spine with width/height stations tapering at the snout and rear, and planning the coat coloring with darker brown on the back and cream on the belly.\n\nFor texture, instead of painted spine cards, I'm opting to scatter around 380 small cone-shaped spikes across the body surface as individual low-poly mesh parts, staying under the part/triangle budget, and alternating dark brown and tan colors between them for a two-tone spiky coat effect.\n\nNow I'm figuring out placement: restricting spikes to the back only by filtering surface hits based on normal direction and z-position, then tilting each spike backward by blending the surface normal with a backward vector to build a custom frame, since the stick primitive can take an explicit frame with position and direction.\n\nFor the head itself, I'm sketching a capsule sweep for the snout shape with tan coloring, adding a dark nose sphere, black eye spheres with highlights, and small ear hemispheres on either side.\n\nNow working through legs and jaw details: a jaw sweep, then each leg built as a chained hip-knee-foot sweep with tapering radius, flattened foot boxes with tiny toe spheres, making sure everything lines up to meet the ground plane cleanly.\n\nAdding spine joint role, then ear joints parented to head. Considering whether to add a cream fringe ring between spikes and face, or just use countershading paint on the body loft to fake it.\n\nNow I'm setting up the fur scatter system on the body surface, with distance filtering and buried-point retries, then filtering placement points by normal and position so fur avoids the underside and face. I'm computing each tuft's direction vector by blending the surface normal with a backward-upward bias and normalizing it.\n\nThen I'm attaching the fur frame to the body bone using the correct point and orientation, picking random brown fur colors for the cones, and adding small black-and-white sphere eyes with a highlight plus a scaled sphere nose.\n\n"
+}

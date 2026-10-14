@@ -1,0 +1,4 @@
+import { Quaternion, Vector3 } from 'three';
+import { createBuilder } from '../../../../src/builder';
+function run(order:'pc'|'cp'){const b=createBuilder({name:order});const r=b.joint('r',{at:[1,2,3],dir:[0,1,0]});const c=b.joint('c',{parent:r,at:[1,3,3],dir:[0,1,0]});const grand=b.joint('g',{parent:c,at:[1,4,3],dir:[0,0,1]}); const oldC=c.at.clone(), oldG=grand.at.clone(); if(order==='pc'){b.pose(r,{axis:[0,0,1],deg:40});const p=r.at.clone();b.pose(c,{axis:[1,0,0],deg:25});console.log(order,'r',r.at.toArray(), 'c',c.at.toArray(),'g',grand.at.toArray(),'dists',c.at.distanceTo(p),grand.at.distanceTo(c.at));} else {b.pose(c,{axis:[1,0,0],deg:25});const cp=c.at.clone();b.pose(r,{axis:[0,0,1],deg:40});console.log(order,'r',r.at.toArray(), 'c',c.at.toArray(),'g',grand.at.toArray(),'dists',c.at.distanceTo(r.at),grand.at.distanceTo(c.at));}}
+run('pc');run('cp');

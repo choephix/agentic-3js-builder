@@ -1,0 +1,25 @@
+{
+  "slug": "r2GiraffeRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "giraffe",
+  "level": "rich",
+  "pitch": "A young reticulated giraffe. Chestnut patches outlined by bright cream lines all over its body and neck, a short mane of stiff brown hair down the neck, two fuzzy ossicones with black tufts on top, big ears, long lashes, a long dark tongue just peeking out, and slender legs fading to cream above the hooves.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:10:11.287Z",
+  "wallMs": 57157,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5401,
+    "completion_tokens": 8082,
+    "total_tokens": 13483,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.08210719999999999,
+  "hasCode": true,
+  "reasoning": "I don't have exact signatures beyond the reference, so I'll stick to documented APIs and keep things simple but solid. I'm planning a young giraffe around 2.6m tall with a proportionally larger head, and I'm setting up the joint hierarchy starting with the hips.\n\nFor the body parts, I'll rely on the confirmed APIs like part, sweep, spike, and stick rather than guessing at uncertain ones like rod or paint. For the giraffe's patches, I'm thinking of scattering flattened dodecahedron shapes across the surface with a cream outline underneath to mimic the coat pattern, oriented along the surface normal.\n\nI'll just commit to Y-axis orientation for the bumps, scaling cream and brown icosahedra slightly differently so brown sits higher. For the torso, instead of a constant-radius sweep which looks dull, I'll shape it from a scaled sphere instead.\n\nI'm figuring out how scaling actually works with the part API — probably safer to scale the geometry directly before passing it in, then use surface scatter on the resulting part for texture. For the neck I'll sweep along a short path with surface scatter too, and for legs I'm considering cylinders placed with part and an aim parameter, though I'm unsure exactly how that option is specified.\n\nLegs are probably safer as sweeps along polylines (hip to knee to ankle) with hooves as dark boxes at the end, using brown-ish upper leg and cream lower leg coloring with patches. I'm now sketching out the skeleton: hips root, spine, chest, neck segments, head, jaw, ears, tail, and leg joints down to ankles, parented appropriately so bones inherit automatically by proximity.\n\nI'm working out proportions for a roughly 2.4m tall calf — torso center around y=1.15, front legs near the chest at x=±0.17, hind legs further back, with a sloped back from chest to haunches and the torso shaped as a scaled ellipsoid.\n\nNow I'm plotting the neck curve up to the head, shaping the skull and muzzle as tapered forms angled forward and down, adding a jaw with a protruding tongue, eyes with cream rings and lash spikes, big sideways-pointing ears with pink interiors, thin ossicone spikes topped with fuzzy tufts, and a mane running along the back of the neck built from points sampled along a curve.\n\nStill working out the mane cone orientation and neck taper, I'm testing rotation angles so the spiky cones lean back along the curve, and considering building the neck from several overlapping tapered segments to get a believable thickness gradient before scattering patches across the surface.\n\nNow I'm planning the rest of the body: scattering patches on torso surfaces, adding a thin tapered tail with a tuft, and settling on a cream-chestnut-dark color palette. For the legs, I'm laying out joint positions from shoulder to hoof and deciding to color the upper legs brownish fading into cream lower legs, with patches concentrated near the top.\n\nI'm setting up mirrored joint hierarchies for left/right sides, then moving to head details—jaw, upper skull/snout, a small dark tongue poking from the mouth, and lash spikes near each eye, with eye spheres positioned precisely on the face.\n\nNow I'm working through the skull shape, snout box with a darker nose tip, jaw positioning relative to the neck joint, and adding ossicones with fuzzy dark tufts and ears angled outward and upward from the head.\n\nNext I'm setting up the mane along a Catmull-Rom neck curve, sweeping the neck in three tapered segments with spheres hiding the joints, and planning patch counts for torso, neck, and leg scatter points before defining the neck joint positions.\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r3LionTerseDocsPrim",
+  "arm": "docs-prim",
+  "subject": "lion",
+  "level": "terse",
+  "pitch": "A lion.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:06:27.888Z",
+  "wallMs": 54616,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32596,
+    "completion_tokens": 7460,
+    "total_tokens": 40056,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.139792,
+  "hasCode": true,
+  "reasoning": "I'm planning the lion's proportions and skeleton structure, setting up a spine chain from hips to chest as the basis for the body sweep.\n\nNow mapping out the full joint hierarchy: hips as root, spine chain curving toward the shoulders, a neck chain leading into the head joint and jaw, then outward to limbs and tail. I'm defining the head's shape next -- a rounded skull with a muzzle, lower jaw, ears, eyes, and a mane made of clustered spheres around the neck and head.\n\nFor the mane, I'm using a scattered shell of small icosahedron pieces in varying brown tones to fake volume cheaply, maybe 60 pieces total. Then I'm planning the body sweep along a curved path from rump to chest, deciding to anchor it to the spine chain rather than hips directly to keep the bone hierarchy simple.\n\nNow I'm defining the body's radius profile (rump, belly, chest sizes) and curve path coordinates for countershaded tawny/cream coloring, then starting on the front leg placement and bone lengths for shoulders and feet.\n\nFor the leg chains, I'm working out bend directions and segment lengths for both front and hind legs, naming each bone (shoulder/elbow/wrist for front, hip/knee/hock/paw for hind) so the IK chains reach their foot targets correctly.\n\nI'm also sizing the paw ellipsoids and adjusting the target heights so the paw bottoms sit right at ground level, and sketching the tail as a curving chain of points from the hip down and back up with a tapering sweep radius.\n\nFor the tail tuft, I'm adding a dark elongated sphere plus cone at the tip, setting up the joint parenting to the hips with five segments. Then I'm working out the head placement, anchoring it relative to the neck end point and deciding to use absolute model-space coordinates built off the head anchor point rather than relying on local direction vectors, since the head's forward tilt is small enough to ignore.\n\nNow I'm detailing the head geometry: skull sphere, muzzle box with a cream-tan tone, dark nose box, lip pads, a jawbone with its own joint for opening the mouth, small fang cones, amber eyes with pupils, brow boxes, and scaled ear spheres with inner detail positioned symmetrically on both sides.\n\nFor the mane, I'm planning a randomized scatter of about 70 icosahedron pieces around the head and neck, computing angles and radii to place them in a ring with a downward drop toward the chest, scaling each piece to look shaggy and layered.\n\nI'll keep the mane pieces as separate objects rather than merging geometries since 80 or so is well under any performance concern, assigning each to the head bone and giving them random rotations and three brown color variants for natural variation.\n\nFor body coloring, I'm using a tawny-to-cream countershading effect for the torso and legs, keeping the neck a slightly smaller radius than the body since the mane will cover that transition anyway. I'm double-checking proportions -- paws at ground level, tail base above the paws, mane reaching the top -- before finalizing the skeleton naming for the neck segments and head joint.\n\nStill writing joint definitions...\n\nBuilding the chain from the point array, then setting up a loop over left and right sides to mirror the limbs.\n\n"
+}

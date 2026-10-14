@@ -1,0 +1,25 @@
+{
+  "slug": "r2ClockworkDogRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "clockworkDog",
+  "level": "rich",
+  "pitch": "A wind-up clockwork terrier made of polished brass and copper. Riveted body plates, visible gears turning in its chest, a big winding key on its back, springy jointed legs, floppy leather ears, glass-lens eyes with a green tint, a tail made of a coiled spring, and a little red collar with a brass tag.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:12:51.277Z",
+  "wallMs": 66208,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5397,
+    "completion_tokens": 9158,
+    "total_tokens": 14555,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.0928592,
+  "hasCode": true,
+  "reasoning": "Without being able to verify the SDK precisely, I need to stick to APIs I'm fairly confident about from the reference—things like joint, part, and sweep functions with their expected parameter shapes, being cautious about exact signatures like how parent relationships get specified in joint calls.\n\nNow I'm sketching the actual design: a terrier-shaped robot roughly 0.45m tall and 0.6m long, facing forward, with a hips joint anchoring the structure and a brass box body, plus I'm considering how to represent visible chest gears using cylinder geometry with enough radial segments to fake teeth.\n\nThen I'm planning the legs as hip-knee-ankle joint chains with cylinder segments, torus-stack springs for the lower legs, and copper box paws, followed by the head assembly with separate jaw, snout, ears, and transparent green sphere eyes with a bright pupil accent. For the tail I'm working out a coiled spring built from small spheres or cylinders arranged along a helical path across four tail joints.\n\nFor the key accessory I'm sketching a cylinder stem with a butterfly-shaped head and bow, plus a spinning joint, and I'm adding a red neck collar with a brass tag, rivet spheres along plate edges, and thin copper seam boxes across the body. I'm also working out the ground-level leg geometry so the feet land at y=0, placing the hip joint at 0.30, knee around 0.17, and ankle near 0.07.\n\nNow I'm writing a helper function to connect two points with a rotated cylinder rod, computing the direction and midpoint to orient it correctly, and setting up a color palette (brass, copper, dark leather, red, green, steel) along with a gear-building function that places core cylinders and teeth boxes around a center point.\n\nPlacing second gear with smaller radius offset below the first for a meshing look, then setting up the joint hierarchy: hips as root, with chest, neck, and head bones chained upward, and front/rear leg joints branching off hips and chest with hip, knee, and ankle segments.\n\nFor the legs I'm defining thigh rods running hip to knee, shin segments as coiled springs with a central steel rod from knee to ankle, brass knee spheres, and small foot boxes at the ankles, mirroring each part across both sides using a sign multiplier.\n\nNow I'm shaping the head: a brass box skull with a copper snout bone up front, a hinged lower jaw box, a dark nose sphere, green eye spheres with brass rings and dark pupils positioned symmetrically, and I'm starting on the ear joints next.\n\nFor the ears, I'm defining leather box shapes that hang forward at an angle off joints near the top of the skull, giving the terrier its folded-forward ear look. Now I'm working out the neck as a brass cylinder running up to the head, with a tilted collar torus that needs to be manually rotated to align with the neck's axis rather than relying on quaternion utilities.\n\nPlacing the tag with a small disc cylinder and tiny ring above it, then working on the tail using a helix of small tori or spheres curving up and back along a tilted axis to approximate the spring shape.\n\nAdding wind-up key stem and wings, then sketching body box dimensions with top/bottom bounds for the legs and a belly band detail.\n\n"
+}

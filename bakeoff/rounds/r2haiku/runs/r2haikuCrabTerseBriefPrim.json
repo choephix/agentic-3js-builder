@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuCrabTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "crab",
+  "level": "terse",
+  "pitch": "A crab.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:54.470Z",
+  "wallMs": 35452,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5310,
+    "completion_tokens": 7875,
+    "total_tokens": 13185,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.0039915,
+  "hasCode": true,
+  "reasoning": "I'm planning out a crab model with a wide flattened carapace around 0.4m, eye stalks, claws on the front arms, and four walking legs per side with the abdomen tucked underneath, keeping the proportions realistic.\n\nI'm sticking to well-documented API primitives like joints, parts, chains, and sweeps, and trying to recall the correct option structure for things like bone attachment, scaling, and chain roles -- since I'm not fully certain how the role parameter is passed, I'll make a reasonable guess and let it fail gracefully if wrong.\n\nI'm sketching out the overall body plan: a root joint for the body, a stretched sphere scaled flat and wide for the carapace, legs built as chains with sweeps along their path, and figuring out shell coloring.\n\nI'm also working out the smaller features — eye stalks built from small joint chains topped with white-and-black eyeballs, and arms with shoulder-elbow-wrist chains leading into claws made from a scaled sphere palm plus finger shapes like capsules or cones, oriented using aim points.\n\nNow I'm planning the legs: four chains per side running from coxa to knee to foot, swept into tubes, with small spheres or cones capping the foot tips.\n\nI'm working out leg placement geometry per side and index, plus adjusting body proportions so the carapace sits properly on the floor without being oversized relative to a crab's real scale.\n\nShrinking the carapace to a 0.2 radius sphere with scale giving width 0.4, depth 0.32, height 0.14, centered at y=0.12 so it rests just above the legs. Now adding smaller details — a flattened abdomen sphere behind, a rostrum box at the front, and starting the eye stalk chain extending from the body.\n\nMapping out the eyestalk segments ending in a white eyeball with a black pupil offset forward, then working through the claw arm chain positions for the pincers, aiming for an open claw shape with upper and lower fingers pointing forward.\n\nDefining pincer tips as cones with bright orange color and darker tips, then setting up a mirror helper for left/right sides and laying out four legs per side with root, knee, and foot chain points spreading outward and backward.\n\nWalking leg sweeps get a dark red color, with joint chains named by convention like \"legL0\" so the binding system recognizes them. I'm adding small raised bumps on the carapace for texture, placing them near the shell's top surface, plus a simple front mouth box, while noting uncertainty around how the part scaling actually behaves.\n\nNow I'm setting up the color palette and defining the root body joint, then starting to build out the crab's parts from the body joint outward—shell, eyes, claws, and legs.\n\nReasoning that positions are in model space rather than relative to joints, so I adjust the carapace sphere to sit at the body's actual coordinates. I'm adding the darker abdomen section tucked slightly below and behind the main shell to suggest the underside, then moving on to shape the rostrum at the front.\n\nStill planning placement... working out the carapace bumps, eye stalks with white sphere eyes and black pupils, and mirroring everything across the x-axis for the right side, then starting on the arm chain joints.\n\nNow I'm detailing the arm segments down to the palm and claw, placing the palm as a scaled sphere and the fingers as tapered cones aimed at their tips, with small dark spheres marking the tip color before moving on to the legs.\n\nFor the legs, I'm setting up left/right pairs across four z-positions with root, knee, and foot joints, sweeping each chain with a thin leg radius and capping the foot with a small tip sphere, making sure chain names stay unique and the feet clear the ground plane. I'll leave the mouth as the existing rostrum box and finish by returning the root with a brief explanation.\n\n"
+}

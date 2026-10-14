@@ -1,0 +1,25 @@
+{
+  "slug": "r2FlamingoTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "flamingo",
+  "level": "terse",
+  "pitch": "A flamingo.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:14.007Z",
+  "wallMs": 56853,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5298,
+    "completion_tokens": 8110,
+    "total_tokens": 13408,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.091696,
+  "hasCode": true,
+  "reasoning": "I need to build a flamingo model using the SDK, working carefully from the reference since I'm unsure of exact API signatures. I'm planning to use safe builder methods like joint, chain, sweep, part, stick, and capsule, inferring parameters such as how joints relate to parents when constructing the skeleton.\n\nGiven the ambiguity around how orientation and direction parameters work for parts, I'll avoid relying on those and instead construct geometry myself—building cylinder segments between two points, rotating and translating them manually with a quaternion, then passing the finished geometry into the part function with a bone and color.\n\nNow I'm sketching out the flamingo's skeleton: a hips joint around chest height, a chest joint tilted slightly forward, a curved chain of neck joints leading up to the head and beak, a tail joint at the back, and hip joints branching down into the legs for a standing pose with the neck extended upward.\n\nContinuing down to knee, ankle, and toe joints along each leg, then building wing joints for shoulder, elbow, and wrist with the wings angled moderately outward rather than fully folded. I'm planning helper functions for ellipsoid shapes and limb segments to keep the construction code compact.\n\nFor the neck, I'm plotting an S-curve path of points from base to head, then checking overall proportions -- the total height comes out a bit tall for a real flamingo, but it's close enough, so I'll adjust leg length and body center height slightly to compensate.\n\nNow I'm working out the head and beak geometry: a sphere for the head with eye details, and a bent upper beak built from tapered cylinder segments transitioning from pink to black, plus a thinner lower beak segment forming the jaw joint.\n\nFor the legs, I'm placing hip, knee, and ankle joints to capture flamingo anatomy accurately -- the visible \"knee-like\" bend is actually the ankle joint flexing backward, with a thick feathered thigh above it leading down to the thinner tarsus and foot.\n\nThen I'm building three webbed toes splayed forward from the ankle, flattened near the ground, with a triangular web membrane connecting them using a thin flat geometry.\n\nFor the body, I'm shaping an ellipsoid torso tilted slightly forward, adding a tapered tail ellipsoid tilted downward at the rear, and layering smaller ellipsoids along the sides to suggest folded wing coverts.\n\nNow I'm defining the wing joints (shoulder, elbow, wrist) per side and building out the wing structure with cylindrical upper-arm segments, pink-red covert slabs, and a fan of flat black flight feather boxes extending back from the wrist.\n\nStill writing feather geometry...\n\nI'm settling on a limited pink-toned color palette for body, legs, and wings, then assembling everything into a parented joint hierarchy rooted at the hips -- naming each joint uniquely (hips, chest, neck segments, head, jaw, tail, leg joints for left/right, and wing joints) so body parts can bind correctly.\n\nWriting helper functions for bone geometry...\n\nI also need to mirror symmetric body parts for left/right sides, and place small eye spheres with pupils and a yellow iris ring on the head.\n\nI'm placing the head sphere near the top of the neck chain, with the beak base attached just in front of it, then finishing by assembling everything into the final export.\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2HedgehogRichDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "hedgehog",
+  "level": "rich",
+  "pitch": "A plump hedgehog out on an autumn evening walk. A dome of spines in chestnut brown with cream tips, a soft fawn face with a pointed, twitchy snout, a shiny black button nose, tiny round ears and bright beady eyes. Little pink paws, and a single red maple leaf stuck on its spines like a trophy.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:14.006Z",
+  "wallMs": 54820,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32689,
+    "completion_tokens": 7024,
+    "total_tokens": 39713,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.135618,
+  "hasCode": true,
+  "reasoning": "I'm planning the hedgehog's proportions and skeleton structure—spine, head, jaw, legs, ears, and nose—before deciding to build the body using a sweep along the spine chain to keep the SDK usage safe and manageable.\n\nNow I'm figuring out how to render the spiky dome of fur: scattering a few hundred cone-shaped spines across the upper body, limiting the part count, and considering how to color them chestnut with cream tips without doubling the part budget—likely settling on simple brown cones with embedded tips rather than a more complex two-part coloring scheme.\n\nI'm also working through the body silhouette itself, sweeping an egg-like radius profile along a short spine chain so the body tapers properly from rump to shoulders, while filtering spine placement so quills don't poke through the face.\n\nNow I'm setting up the color sectors, giving the body a dark brown base with a fawn-colored underside patch, and building the neck and head as a separate chain sloping down to a narrower snout.\n\nFor the head itself, I'm tapering the sweep radius from wider at the neck to a thin tip near the nose, adding a black sphere for the nose, small eyes with tiny white glints, flattened fawn ears with pink inner detail, and separate upper and lower jaw pieces to give the face some structure.\n\nFor eyes I'll use surface hits on the head sweep to position them accurately with small spheres, falling back gracefully if the hit fails. Then I'll build the four legs as short chains with hip, knee, and foot joints, placing each leg symmetrically off the body's sides.\n\nStill writing leg geometry...\n\nSetting up the skeleton hierarchy now: hips as root joint, a spine chain with two spans connecting toward the front, and rear/front legs parented to the appropriate spine joints. I'll add a small tail nub and start sketching the maple leaf extrusion.\n\nI'm now placing a red maple leaf resting on top of the spine quills near the back, extruding its outline with a slight tilt so it sits pierced among a few spines. I'm calculating the body's surface height at that point—roughly y=0.21 accounting for spine length—and positioning the leaf around [0.025, 0.2, -0.04] with a thin extrusion thickness, bound to the spine1 bone.\n\nI'm generating the maple leaf's star-shaped outline by alternating outer and inner polygon radii across five lobes at offset angles, then adding a thin brownish stem rod and considering a small darker vein rod on the leaf face, though I may skip the vein for simplicity.\n\nAdding the ears as small fawn-colored spheres flattened on one axis near the head joint, with smaller pink spheres offset forward for the inner ear, and starting the nose as a small sphere too.\n\nFor spine geometry, I'm scattering cone shapes for the spines with alternating brown shades and cream tips, positioning each one sunk into the body surface along its normal direction based on an embed ratio.\n\nStill writing geometry setup...\n\n"
+}

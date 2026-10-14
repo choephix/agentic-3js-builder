@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuBalloonTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "balloon",
+  "level": "terse",
+  "pitch": "A hot-air balloon.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:30:58.327Z",
+  "wallMs": 42558,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5315,
+    "completion_tokens": 9312,
+    "total_tokens": 14627,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.0047105,
+  "hasCode": true,
+  "reasoning": "I'm planning out a stylized hot-air balloon model using primitives, thinking through realistic proportions for the envelope and basket, and considering whether it should float above the ground to suggest flight.\n\nSince the balloon is just a prop, it doesn't need a skeleton, so I'll give it one simple root joint at the origin. For the envelope shape, I'm weighing options between a lathe profile, a scaled sphere, or multiple gore panels, and leaning toward using a basic sphere geometry with enough width segments to fake the gore-paneled look, then applying color variation across it.\n\nFor the alternating colored gores, I'll build separate sphere slices using phiStart/phiLength parameters so each gore can be colored independently, using 12 gores alternating between two colors, then stretch the shape vertically by applying scale directly on the geometry rather than risking an unfamiliar scale prop API. For the teardrop silhouette, I'm using theta parameters to cut off the bottom of the sphere, creating a narrower opening near where the balloon's mouth would be.\n\nNow I'm working out the basket, skirt ring, and connecting ropes — since the rope-drawing helper function's exact signature is unclear, I'll fall back to building cylinder geometry directly and positioning each rope using a midpoint and direction vector between the basket corners and the envelope skirt.\n\nWorking out the envelope sphere math, I settle on a thetaLength of 0.9π giving a mouth ring at y=5.8 with radius 2.2, which looks like a proper balloon skirt size. Then I'm positioning four diagonal ropes connecting the basket corners up to that ring at 45° angle intervals using thin cylinders.\n\nFor the gores, I'm defining a segmented sphere geometry with 12 alternating red and cream panels, scaled vertically by 1.2 then translated upward to center the envelope at the right height, with sensible width/height segment counts for a stylized low-poly look.\n\nI'm adding a torus ring at the mouth of the balloon in a dark brown tone to suggest the skirt opening, and considering a decorative yellow band torus partway up the envelope, calculating its radius and placement by working out the sphere's theta angle at that height.\n\nI'm placing a small vent cap cylinder at the top of the envelope, then sketching out the burner and flame geometry above the basket — a steel cylinder burner with orange and yellow cone flames positioned just below the mouth opening, leaving clearance so it doesn't overlap the fabric.\n\nFor the basket, I'm building a wicker-colored box with darker protruding bands for a woven look and a top rim trim, then computing rope attachment points at the basket corners connecting up to ring points on the envelope mouth, with lengths and directions calculated via vector math in code rather than hardcoded.\n\nI'm working out the envelope's gore panels using scaled sphere geometry segments alternating red and cream, plus torus bands for the colored stripe and mouth opening, computing their exact radii and heights trigonometrically based on the sphere's theta range so everything aligns with the balloon's curved shape. I also add a dark interior disc near the mouth opening for depth, a propane tank cylinder beside the basket, and skip extra embellishments like corner posts or a pennant to keep things focused, then finalize the single root joint setup and imports before writing the complete code block.\n\n"
+}

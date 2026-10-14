@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuFrogRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "frog",
+  "level": "rich",
+  "pitch": "A red-eyed tree frog clinging to a leaf. Vivid lime-green skin, blue and cream striped flanks, orange toes with round sticky pads, a creamy white belly, and enormous ruby-red eyes with black slit pupils. It looks a little surprised, as if you just woke it up.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:27:17.385Z",
+  "wallMs": 87161,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5391,
+    "completion_tokens": 11803,
+    "total_tokens": 17194,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00596486,
+  "hasCode": true,
+  "reasoning": "I'm planning the module structure using the SDK's builder functions, sticking to documented calls like joint, chain, sweep, and part to avoid signature errors while keeping the code concise.\n\nFor the pose, I'm thinking of a frog clinging to a leaf: the leaf as a flat prop mesh added directly to the root joint, and the frog's body built from a spine chain running from hips to head with a squat, ellipsoid-like sweep.\n\nRather than fighting with sweep/loft for the body shape, I'll use scaled sphere geometry placed via part() with explicit position, bone, and scale options, which seems to be the supported way to get non-tube body shapes. For the overall layout, I'm leaning toward making the leaf the lowest point resting at y=0, with the frog positioned on top of it in a clinging pose.\n\nFor the limbs, I'm trying to figure out whether to use the limb() IK helper or build chains manually with b.chain() and sweep geometry, since the exact return shapes and joint-naming conventions for both aren't fully clear to me from the spec, so I'm leaning toward the safer manual chain approach for the legs.\n\nGiven the API uncertainty, I'll keep the body simple: spheres for the torso and head, eyes stuck onto surface hit points, and legs built from joints with a sweep connecting hip, knee, and ankle points since sweep rides bones by closest joint. For the toe pads, I'll stick small sphere geometries onto surface hit points colored orange.\n\nFor the eyes, I'm placing large ruby spheres at the head's sides with flattened black vertical-slit pupils positioned slightly forward on the eye surface, aiming for a wide, surprised look with the head tilted up and the jaw slightly open. For the flank markings, I plan to use the stripes paint function from the module, since it's imported and should have a defined signature even though I'm not fully certain of its parameters.\n\nStill defining leaf geometry...\n\nNow I'm laying out the frog's anatomy: body and belly spheres positioned at the hips, a head sphere with ruby eyes and pupils, and a joint hierarchy (hips, head, shoulders, elbows, wrists) so the front legs can bend and grip the leaf's edge.\n\nI'm figuring out the leaf's extrusion geometry so I know its top surface height, then placing foot pads right on that surface. I'm working out joint coordinates for the front limbs — shoulder, elbow, wrist, and toe pads — deciding to simplify each hand down to a few digit sweeps with small pad spheres at the tips.\n\nNow I'm planning the rear legs with hip, knee, ankle joints and a fan of toe tips, mirroring everything for the opposite side by flipping the X sign. I'm defining color choices for the lime body, cream belly, ruby eyes, orange toe pads, and leaf green, plus small details like white eye highlights and a vertical pupil slit using scaled spheres.\n\nI'm working through how to attach eyes, head, and limb sweeps to their respective bones, and calculating stripe paths along the body's ellipsoid surface by adjusting radius per z-slice so the stripes hug the curved flank correctly. I'm also adding a midrib vein sweep along the leaf and double-checking that the lowest points of the model (toe pads) sit just above the floor at y=0.\n\nFinally I'm sequencing the joint creation order — hips, head, then each limb's chain — and planning to export the frog as a default build function with a name and description.\n\n"
+}

@@ -1,7 +1,7 @@
 // Surface queries on the REAL built triangles (no analytic stand-ins) and `stick()` to seat parts on any frame.
 import { Box3, Quaternion, Triangle, Vector3 } from "three";
 import type { BufferGeometry, Mesh, Object3D, Texture } from "three";
-import { mix, rigid, vertexWeights } from "./context";
+import { describe, fillFor, mix, rigid, vertexWeights } from "./context";
 import type { Ctx, Fill, JointRef, Tags, Weights } from "./context";
 import { Spot } from "./frame";
 import { aim, DEG, flatten, rng as makeRng, toDirection, toFrame, toPoint, vec } from "./math";
@@ -28,7 +28,8 @@ export class Hit extends Spot {
   }
 }
 
-export type SurfaceTarget = Mesh | Part | Sweep | Joint | readonly SurfaceTarget[];
+/** Meshes, Parts, a Sweep, a Joint (its meshes), any other three.js object (every mesh under it), or arrays of them. */
+export type SurfaceTarget = Mesh | Part | Sweep | Joint | Object3D | readonly SurfaceTarget[];
 
 export type ScatterOptions = {
   /** Random source in [0, 1) (e.g. `rng(7)` or `kit.rng(7)`); default `rng(1)`. */
@@ -50,6 +51,138 @@ export type LoopOptions = {
 
 const PERTURB = new Vector3(0.0123, 0.0321, 0.0231);
 
+/** Triangles per leaf of a `NearestTree`. */
+const LEAF = 8;
+
+/**
+ * A bounding-volume tree over a surface's world triangles. `nearest()` skips every node farther away than the best
+ * triangle so far, and returns what a scan of every triangle in index order would: the lowest-index triangle at the
+ * least squared distance, measured the same way.
+ */
+class NearestTree {
+  /** Triangle indices, each leaf's in one run. */
+  private readonly order: Int32Array;
+  /** Per node: min x, y, z, then max x, y, z of its triangles. */
+  private readonly bounds: number[] = [];
+  /** Per node: a leaf's first position in `order`; an inner node's right child (its left child is the next node). */
+  private readonly start: number[] = [];
+  /** Per node: a leaf's triangle count, or -1 for an inner node. */
+  private readonly count: number[] = [];
+  private readonly stack: number[] = [];
+  private readonly scratch = new Triangle();
+  private readonly closest = new Vector3();
+
+  constructor(
+    private readonly tris: number[],
+    /** Slack on the skip test, far above rounding, so no node holding a tie or the winner is ever skipped. */
+    private readonly margin: number,
+  ) {
+    const n = tris.length / 9;
+    this.order = Int32Array.from({ length: n }, (_, i) => i);
+    this.build(0, n);
+  }
+
+  private build(from: number, to: number): void {
+    const { tris, order } = this;
+    const node = this.count.length;
+    const lo = [Infinity, Infinity, Infinity];
+    const hi = [-Infinity, -Infinity, -Infinity];
+    const centreLo = [Infinity, Infinity, Infinity];
+    const centreHi = [-Infinity, -Infinity, -Infinity];
+    for (let k = from; k < to; k++) {
+      const o = order[k] * 9;
+      for (let a = 0; a < 3; a++) {
+        const x = tris[o + a];
+        const y = tris[o + 3 + a];
+        const z = tris[o + 6 + a];
+        lo[a] = Math.min(lo[a], x, y, z);
+        hi[a] = Math.max(hi[a], x, y, z);
+        const centre = x + y + z;
+        centreLo[a] = Math.min(centreLo[a], centre);
+        centreHi[a] = Math.max(centreHi[a], centre);
+      }
+    }
+    this.bounds.push(...lo, ...hi);
+    this.start.push(from);
+    this.count.push(to - from);
+    if (to - from <= LEAF) return;
+    // Split at the middle of the widest spread of triangle centres (summed corners); halve the run when they coincide.
+    let axis = 0;
+    for (let a = 1; a < 3; a++) if (centreHi[a] - centreLo[a] > centreHi[axis] - centreLo[axis]) axis = a;
+    const cut = (centreLo[axis] + centreHi[axis]) / 2;
+    let mid = from;
+    for (let k = from; k < to; k++) {
+      const o = order[k] * 9 + axis;
+      if (tris[o] + tris[o + 3] + tris[o + 6] < cut) {
+        const swap = order[mid];
+        order[mid++] = order[k];
+        order[k] = swap;
+      }
+    }
+    if (mid === from || mid === to) mid = (from + to) >> 1;
+    this.count[node] = -1;
+    this.build(from, mid);
+    this.start[node] = this.count.length;
+    this.build(mid, to);
+  }
+
+  private distanceSq(node: number, q: Vector3) {
+    const b = this.bounds;
+    const o = node * 6;
+    const dx = q.x < b[o] ? b[o] - q.x : q.x > b[o + 3] ? q.x - b[o + 3] : 0;
+    const dy = q.y < b[o + 1] ? b[o + 1] - q.y : q.y > b[o + 4] ? q.y - b[o + 4] : 0;
+    const dz = q.z < b[o + 2] ? b[o + 2] - q.z : q.z > b[o + 5] ? q.z - b[o + 5] : 0;
+    return dx * dx + dy * dy + dz * dz;
+  }
+
+  /** The nearest triangle's index (-1 for none), with its closest point to `q` in `point`. */
+  nearest(q: Vector3, point: Vector3) {
+    const { tris, order, stack, scratch, closest } = this;
+    let best = -1;
+    let bestD = Infinity;
+    // Squared distance beyond which a node can hold nothing as near as `bestD`.
+    let reach = Infinity;
+    stack.length = 0;
+    stack.push(0);
+    while (stack.length) {
+      const node = stack.pop()!;
+      if (this.distanceSq(node, q) > reach) continue;
+      const count = this.count[node];
+      if (count < 0) {
+        const left = node + 1;
+        const right = this.start[node];
+        // The nearer child goes on top.
+        if (this.distanceSq(left, q) <= this.distanceSq(right, q)) stack.push(right, left);
+        else stack.push(left, right);
+        continue;
+      }
+      for (let k = this.start[node]; k < this.start[node] + count; k++) {
+        const i = order[k];
+        const o = i * 9;
+        scratch.a.set(tris[o], tris[o + 1], tris[o + 2]);
+        scratch.b.set(tris[o + 3], tris[o + 4], tris[o + 5]);
+        scratch.c.set(tris[o + 6], tris[o + 7], tris[o + 8]);
+        scratch.closestPointToPoint(q, closest);
+        const d = closest.distanceToSquared(q);
+        if (d < bestD || (d === bestD && i < best)) {
+          bestD = d;
+          best = i;
+          point.copy(closest);
+          reach = (Math.sqrt(d) + this.margin) ** 2;
+        }
+      }
+    }
+    return best;
+  }
+}
+
+/** The blend-skinned meshes that bend with `joint`, for a joint that owns no meshes of its own. */
+function skinnedOn(ctx: Ctx, joint: Joint) {
+  return [...ctx.owner.keys()].filter((mesh) =>
+    (mesh.userData.skinBones as string[] | undefined)?.includes(joint.name),
+  );
+}
+
 export class Surface {
   readonly meshes: Mesh[] = [];
   private readonly joints: Joint[] = [];
@@ -63,6 +196,8 @@ export class Surface {
   private box = new Box3();
   private eps = 0;
   private version = -1;
+  /** Built by the first `nearest()` after a sync. */
+  private tree: NearestTree | null = null;
 
   constructor(
     private readonly ctx: Ctx,
@@ -71,16 +206,29 @@ export class Surface {
     const add = (target: SurfaceTarget) => {
       if (target instanceof Sweep) target.meshes.forEach(add);
       else if (target instanceof Part) add(target.mesh);
-      else if (target instanceof Joint) (ctx.meshes.get(target) ?? []).forEach(add);
-      else if ("isMesh" in target) {
-        if (!this.meshes.includes(target)) {
-          this.meshes.push(target);
-          this.joints.push(ctx.owner.get(target) ?? ownerJoint(ctx, target));
+      else if (target instanceof Joint) (ctx.meshes.get(target) ?? skinnedOn(ctx, target)).forEach(add);
+      else if (Array.isArray(target)) target.forEach(add);
+      else if (target && typeof target === "object" && "isObject3D" in target) {
+        const object = target as Object3D;
+        if (!(object as Mesh).isMesh) {
+          object.updateWorldMatrix(true, true);
+          object.traverse((node) => node !== object && (node as Mesh).isMesh && add(node as Mesh));
+        } else if (!this.meshes.includes(object as Mesh)) {
+          this.meshes.push(object as Mesh);
+          this.joints.push(ctx.owner.get(object as Mesh) ?? ownerJoint(ctx, object));
         }
-      } else (target as readonly SurfaceTarget[]).forEach(add);
+      } else
+        throw new Error(
+          `surface(): takes meshes, Parts, a Sweep, a Joint, any three.js object (every mesh under it) or arrays of them; got ${describe(target)}`,
+        );
     };
     add(targets);
-    if (!this.meshes.length) throw new Error("surface(): no meshes in targets");
+    if (!this.meshes.length)
+      throw new Error(
+        targets instanceof Joint
+          ? `surface(): joint "${targets.name}" carries no meshes (none built on it or bending with it); pass the part or sweep itself`
+          : `surface(): no meshes in ${describe(targets)}`,
+      );
   }
 
   /** Re-read the meshes' world triangles when a `pose()` happened since the last query. */
@@ -88,6 +236,7 @@ export class Surface {
     if (this.version === this.ctx.poses) return;
     this.version = this.ctx.poses;
     this.tris = [];
+    this.tree = null;
     this.normals = [];
     this.owner = [];
     this.corners = [];
@@ -179,20 +328,9 @@ export class Surface {
   nearest(p: PointInput): Hit {
     this.sync();
     const q = toPoint(p, "nearest()");
-    let best = -1;
-    let bestD = Infinity;
-    const closest = new Vector3();
+    this.tree ??= new NearestTree(this.tris, this.eps);
     const point = new Vector3();
-    for (let i = 0; i < this.normals.length; i++) {
-      this.triangle(i).closestPointToPoint(q, closest);
-      const d = closest.distanceToSquared(q);
-      if (d < bestD) {
-        bestD = d;
-        best = i;
-        point.copy(closest);
-      }
-    }
-    return this.hit(best, point);
+    return this.hit(this.tree.nearest(q, point), point);
   }
 
   /** First surface hit along the ray, or null. */
@@ -439,6 +577,51 @@ export class Surface {
     const random = options.rng ?? makeRng(1);
     const total = this.cumArea[this.cumArea.length - 1];
     const hits: Hit[] = [];
+    const minDist = options.minDist;
+    const grid =
+      minDist && minDist > 0 && Number.isFinite(minDist)
+        ? new Map<number, Map<number, Map<number, Vector3[]>>>()
+        : null;
+    let gridPose = this.ctx.poses;
+    const indexPosition = (hit: Hit) => {
+      const p = hit.at;
+      const x = Math.floor(p.x / minDist!);
+      const y = Math.floor(p.y / minDist!);
+      const z = Math.floor(p.z / minDist!);
+      let ys = grid!.get(x);
+      if (!ys) grid!.set(x, (ys = new Map()));
+      let zs = ys.get(y);
+      if (!zs) ys.set(y, (zs = new Map()));
+      let points = zs.get(z);
+      if (!points) zs.set(z, (points = []));
+      points.push(p);
+    };
+    const tooClose = (p: Vector3) => {
+      if (!grid) return minDist && hits.some((hit) => hit.at.distanceTo(p) < minDist);
+      // Frames stay live after pose(), but spacing only needs one position read per accepted hit and pose.
+      if (gridPose !== this.ctx.poses) {
+        grid.clear();
+        for (const hit of hits) indexPosition(hit);
+        gridPose = this.ctx.poses;
+      }
+      const x = Math.floor(p.x / minDist!);
+      const y = Math.floor(p.y / minDist!);
+      const z = Math.floor(p.z / minDist!);
+      // A cell is minDist wide: only it and its 26 neighbours can contain a point that's too close.
+      for (let dx = -1; dx <= 1; dx++) {
+        const ys = grid.get(x + dx);
+        if (!ys) continue;
+        for (let dy = -1; dy <= 1; dy++) {
+          const zs = ys.get(y + dy);
+          if (!zs) continue;
+          for (let dz = -1; dz <= 1; dz++) {
+            const points = zs.get(z + dz);
+            if (points) for (const point of points) if (point.distanceTo(p) < minDist!) return true;
+          }
+        }
+      }
+      return false;
+    };
     for (let attempt = 0; attempt < count * 60 && hits.length < count; attempt++) {
       const target = random() * total;
       let lo = 0;
@@ -457,11 +640,12 @@ export class Surface {
       const tri = this.triangle(lo);
       const p = tri.a.clone().addScaledVector(tri.b.clone().sub(tri.a), u).addScaledVector(tri.c.clone().sub(tri.a), v);
       if (options.keepOut?.(p)) continue;
-      if (options.minDist && hits.some((h) => h.at.distanceTo(p) < options.minDist!)) continue;
+      if (tooClose(p)) continue;
       const hit = this.hit(lo, p);
       if (options.filter && !options.filter(hit)) continue;
       if (this.buried(p, lo)) continue;
       hits.push(hit);
+      if (grid) indexPosition(hit);
     }
     return hits;
   }
@@ -496,8 +680,15 @@ export type StickOptions = Tags & {
  * Seat a part on any frame (a surface hit, a tube point, a ring item, a joint...): local +Y along the frame's
  * facing axis (a hit's normal), sunk by `embed` × the part's own height. The part faces that axis.
  */
-export function stick(ctx: Ctx, geometry: BufferGeometry, color: Fill, on: FrameInput, options: StickOptions = {}) {
-  const base = toFrame(on);
+export function stick(
+  ctx: Ctx,
+  geometry: BufferGeometry,
+  color: Fill | undefined,
+  on: FrameInput,
+  options: StickOptions = {},
+) {
+  const base = toFrame(on, "stick()");
+  const fill = fillFor(ctx, "stick()", color, () => base.at);
   const n = base.axis;
   const flow = options.flow ? flatten(toDirection(options.flow, "stick()"), n) : null;
   const quat = aim(n, flow && flow.lengthSq() > 1e-10 ? flow : undefined);
@@ -513,5 +704,5 @@ export function stick(ctx: Ctx, geometry: BufferGeometry, color: Fill, on: Frame
   const height = (max.y - min.y) * scale;
   const embed = options.embed ?? 0.2;
   const at = base.at.addScaledVector(n, -(min.y * scale + embed * height));
-  return part(ctx, geometry, color, { ...options, frame: base, at, quat });
+  return part(ctx, geometry, fill, { ...options, frame: base, at, quat });
 }

@@ -1,0 +1,25 @@
+{
+  "slug": "r2ElephantTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "elephant",
+  "level": "terse",
+  "pitch": "An elephant.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:52.052Z",
+  "wallMs": 53513,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112461,
+    "completion_tokens": 6876,
+    "total_tokens": 119337,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.091272,
+  "hasCode": true,
+  "reasoning": "I'm planning the elephant's skeletal structure: a root joint at the pelvis, a spine chain running from hips to chest to neck to head, four leg chains each with hip-knee-ankle joints, a six-joint trunk chain, and a tail chain, all scaled to roughly 3.2m shoulder height and facing forward.\n\nI'm also sketching ears, a jaw joint, and tusks, while planning to build the body as a sweep along the spine path with varying width and height radii to approximate realistic elephant proportions—wide belly, rounded back, correct overall height.\n\nI need a root joint before chaining the spine since nearestJoint logic throws without one, so I'm adding a root joint and parenting the spine chain to it. Then I'm setting up the neck and head chain with proper joint names so the tip lands exactly on the head, followed by shaping the head as a scaled sphere with cheeks, forehead dome, and a separate jaw joint for the lower jaw.\n\nNow I'm building the trunk as a curved chain from the head down through a series of catmull points, tapering the radius and adding wrinkle stripes along the y-axis plus a mottled gray paint for the skin. I'm about to set up the four leg chains starting with the front hip joints.\n\nLegs are straight pillars with hip-knee-ankle-foot joints, tapering radius slightly, and I'm adding cylindrical feet with small toenail boxes attached at the bottom.\n\nI'm figuring out the spine chain naming and parenting — rear legs attach to spine1, front legs to spine3, with the neck chain parented to spine3. Now I'm working out how ears should be constructed as extruded outline shapes facing outward from the head.\n\nWorking out ear outline coordinates...\n\nWorking out the normal vectors for the bone directions...\n\nRealizing the normal sign doesn't actually matter for this symmetric ear geometry, so I can reuse the same outline for the mirrored ear. Now I'm placing the eyes as small dark spheres near the head surface, positioning them symmetrically on either side.\n\nI'm sweeping curved tusks from near the trunk base outward and forward with tapering radius, assigning them ivory color and attaching them to the head bone rigidly. For the mouth, I'm starting to add a small box for the lower jaw beneath the trunk base.\n\nNow I'm chaining together a tail from the rear of the body downward, parenting it to the spine with tapering sweep radius and a dark tufted end, checking that its root position matches the body's rear extent. I'm also planning small toenail boxes for the front of each foot.\n\nStill assigning body part roles and writing sweep calls for each chain...\n\nSetting front legs at z=0.6 and offsetting x by ±0.5, then returning the completed root structure.\n\n"
+}

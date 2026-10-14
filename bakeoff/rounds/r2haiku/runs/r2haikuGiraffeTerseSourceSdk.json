@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuGiraffeTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "giraffe",
+  "level": "terse",
+  "pitch": "A giraffe.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:25:19.004Z",
+  "wallMs": 61536,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112462,
+    "completion_tokens": 12888,
+    "total_tokens": 125350,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.0378485,
+  "hasCode": true,
+  "reasoning": "I'm planning the giraffe's proportions and skeletal structure using the SDK—sketching out body length, leg and neck height, and the joint hierarchy starting from a root body joint.\n\nFor the legs, I'm working out the hip-knee-ankle coordinates and figuring out how to use a chain of joints with a polyline path, naming each joint point so the tip lands correctly at the ankle.\n\nI want parents set explicitly to \"body\" rather than relying on nearest-joint inference, and I'm assigning a \"leg\" role so contact gets recorded automatically. For the body itself, I'm considering using a loft through stations along the spine, with a bone list controlling weights, and I'm now laying out the root joint position for the torso.\n\nNext I'm sketching the neck as a chain of joints following a catmull path curving forward and up, then placing a head joint at the chain's tip aimed forward-up, and considering sweeping the neck geometry along that same chain with a tapering radius.\n\nFor the head, I'm weighing between a lofted shape with stations for skull and snout versus a simpler blocky box geometry attached to the head bone, leaning toward the box for a chunkier aesthetic while figuring out how positioning and world coordinates interact with the joint's default placement.\n\nSince geometry stays world-axis-oriented regardless of joint rotation, I can freely build the model in absolute coordinates and just translate parts into place, relying on skinning to handle the actual pose.\n\nI'm now laying out the full giraffe structure: body as a lofted torso with tapered stations, a three-segment neck chain curving up and forward, a head joint with separate skull and snout boxes, a jaw joint for mouth articulation, ossicone spikes, eye and ear parts, a drooping tail chain with a tufted tip, and four-legged chains with tapered sweeps ending in hoof cylinders attached via extension past the ankle joints. For coloring, I'm planning to use a tan base with brown rosette-style spot patterns on the body and neck sweeps, plus a darker mane sector along the neck's dorsal ridge, while keeping head and leg parts simpler solid colors, all ordered so joints are created before the parts that depend on them as the nearest bone.\n\nWriting component code...\n\n"
+}

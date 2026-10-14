@@ -1,0 +1,25 @@
+{
+  "slug": "r3PenguinTerseDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "penguin",
+  "level": "terse",
+  "pitch": "A penguin.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:06:27.890Z",
+  "wallMs": 77596,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32583,
+    "completion_tokens": 9886,
+    "total_tokens": 42469,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.164026,
+  "hasCode": true,
+  "reasoning": "I'm planning a stylized emperor penguin model around 1.1m tall, working out the skeleton structure with hips as root and a spine chain running up through chest, neck, and head, with the body built as a loft along a vertical path with a radius profile.\n\nI'm defining the body as an egg-shaped sweep along the spine, extending from the hips down to around y=0.14 and up to y=1.0, figuring out the radius function that tapers to a round bottom and narrower top.\n\nI'm working out the head and neck placement, planning a short spine chain with named joints (spine1, spine2, neck) and path points running from the hips up to around y=1.02, matching the joint count to the number of path segments.\n\nStill defining joints and features... adding the head sphere, orange ear-patch accents for the emperor look, and separate upper and lower beak geometry.\n\nWriting body paint logic...\n\nNow I'm planning the flipper joint chains, defining shoulder-elbow-wrist positions angled outward from the body for a natural resting paddle pose.\n\nFor the flipper mesh itself, I need to figure out orientation - the broad flat faces should point outward (±X direction) since flippers hang along the penguin's sides, with the width spanning front-to-back rather than up-down, so I'm working out how to extrude the cross-section correctly along the bone chain.\n\nDefining flipper outline points...\n\nWorking out the chain path to match the ydir line, computing shoulder/elbow/wrist joint positions, and confirming that side s=1 corresponds to the left (+X) side for naming the joints.\n\nNow I'm sketching the leg joints too, placing hip, knee, and ankle points for a simple webbed-foot chain and figuring out rough coordinates for each so the limbs stay proportionate and rooted near the body.\n\nWriting foot outline geometry...\n\nBuilding the tail as a two-segment tapered chain from the hips down and back, using a sweep/frustum shape so it tilts and narrows toward the tip, keeping it just clear of the ground with named joint bones for articulation.\n\nNow I'm working out overall proportions: the body's bottom contour needs a rounded cap near the leg base, so I'm tuning the radius profile along the body sweep to get a natural dome shape there, then stacking the head on top with its own center and radius to lock in a consistent total height.\n\nRechecking the scale against a real emperor penguin's ~1.1m height, slightly stylized with an oversized head, I'm adjusting the body sweep range and spine joint positions so the neck cap meets the head base cleanly, then redefining the spine chain points from hips upward to keep everything parented and aligned at the root.\n\nNow I'm defining the body's catmull curve path and a tapering radius profile (wide mid-body, narrowing toward tail and neck), plus setting up the skeleton with hips as a joint and spine as a chain, assigning belly paint color for the next section.\n\nMoving to the head and neck, I'm placing a scaled sphere for the head on the head bone with black coloring, then adding orange ear patches positioned via surface coordinates (azimuth/elevation) on the head geometry.\n\nPlacing white eye rings...\n\nStill sculpting the beak curve...\n\nI'll skip the noisy feather texture idea since I'm unsure the SDK exports a noise function, and just use plain belly gradient paint with simple thresholds instead. For the flippers, I'll chain them as a short polyline of three points parented to the spine's second joint, naming the shoulder joints by side (L/R).\n\nFor the legs, I'll parent them to the hips with a \"leg\" role, sweep them in a darker orange tone since they're mostly hidden by the belly anyway, and extrude the flipper outline in dark navy, skipping any lighter inner highlight for simplicity.\n\nFeet and legs should both be near-black like real emperor penguins, using the leg's tip bone for attachment, with a constant radius for the limbs. I also need to handle head surface placement safely, guarding against null bounding box centers, and finalize the imports and interpolation helper before writing the metadata.\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuSnailTerseSourcePrim",
+  "arm": "source-prim",
+  "subject": "snail",
+  "level": "terse",
+  "pitch": "A snail.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:24:32.138Z",
+  "wallMs": 79840,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112474,
+    "completion_tokens": 10412,
+    "total_tokens": 122886,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.0316582,
+  "hasCode": true,
+  "reasoning": "I'm planning a TypeScript module that builds a stylized snail using the SDK's available exports, sizing the shell and body proportionally to real-world dimensions while relying on helpers like rng and paint utilities for coloring.\n\nI'm structuring the model around a root joint with a flattened capsule for the foot, then sketching the body/neck as a tapered sweep along a chain of joints extending forward from the shell.\n\nTapering radius values along the body...\n\nFor the shell, I'm thinking a sphere scaled slightly oval and placed on the mantle's back, with decreasing torus rings stacked flat on its surface to suggest a stylized spiral whorl.\n\nI'm giving the shell a mottled brown-and-cream paint for a natural texture, with the whorl rings tinted a lighter gold to stand out. For the eyes, I'm planning rod-shaped stalks extending from joints on the head up to small eye tips, so they can angle outward naturally.\n\nI'm switching the stalks to proper chains using a catmull curve through a few points, swept into a tapered tube and capped with a small dark sphere eye at the tip, anchored to the final joint frame for correct weighting. I'll leave the lower tentacles for later.\n\nSkipping the mouth/jaw. For the foot I'm using a capsule spanning the body's underside, considering a flattened or frustum variant for a more natural footprint shape, with a tiny dark dot sphere for the pneumostome and a mottled paint fill on the mantle sweep for body texture. I still need to set up the root joint and name the neck chain's joints properly with a \"neck\" role.\n\nFor the head chain I'm deciding between naming schemes so the head joint lands at the actual tip point, settling on four joint names (spine, neck, head, headTip) to get the tip positioned correctly, with role \"neck\". For the eye stalks I'm building a small catmull curve chain from two or three points near the head's top, naming the spans so the tip is either named or left anonymous, assigning role \"tentacle\", and letting the chain auto-parent to the nearest head joint -- now working out the exact coordinates for the head and stalk positions.\n\nNow I'm laying out the body's four control points along the spine and tapering radius values from the midsection down toward the foot so the shapes overlap smoothly at the ground. For the shell I'm sculpting it from a scaled sphere, squashing it vertically and stretching it along one axis so it sits like a coiled shell attached near the body's rear joint, letting it inherit bone weighting from the nearest spine joint by default.\n\nNow I'm thinking about how to suggest the shell's spiral texture—considering layering a few torus rings around the shell's dome to mimic a coil, positioning and sizing them so they trace the curve of the shell's surface realistically.\n\nWriting spiral paint function...\n\nNow I'm planning the remaining body parts: black eyes, a capsule foot colored a pale cream, a tiny dark pneumostome dot placed on the body surface, and eye stalks rising from the head joint near the top.\n\nI'm sketching the full module structure: imports from the builder library, a meta export, and a snail function that builds a root joint, a four-point spine chain with named joints (rear, mid, neck, head), a tapered body sweep, a tapered foot capsule, a spiral-banded shell sphere mounted on the rear joint with an optional small apex cap, mottled body paint, and paired eye stalk chains with eyeball spheres at their tips.\n\nI'm checking ground contact — adjusting the foot capsule's radius and vertical placement so its lowest point at the back just touches y=0 while the body stays safely above it — before finalizing the code as a single returned builder root.\n\n"
+}

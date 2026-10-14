@@ -1,0 +1,14 @@
+import * as THREE from "three";
+import { createBuilder } from "../../../../src/builder";
+import { paint } from "../../../../src/paint";
+const b = createBuilder({ name: "paint-root" });
+b.joint("root", { at: [0, 1, 0] });
+const first = b.root;
+const coat = paint(() => "#ff0000");
+const part = b.part(new THREE.BoxGeometry(.2,.2,.2), coat, { at: [0,1,0] });
+console.log("before", part.mesh.material instanceof THREE.MeshStandardMaterial, (part.mesh.material as THREE.MeshStandardMaterial).map?.name ?? null);
+const second = b.root;
+const mat = part.mesh.material as THREE.MeshStandardMaterial;
+console.log("after", first === second, mat.name, mat.map?.name ?? null, Boolean(mat.map), b.ctx.paints.length);
+const third = b.root;
+console.log("again", second === third, (part.mesh.material as THREE.MeshStandardMaterial).map === mat.map, b.ctx.paints.length);

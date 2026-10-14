@@ -1,0 +1,25 @@
+{
+  "slug": "r3ForestSpiritRichDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "forestSpirit",
+  "level": "rich",
+  "pitch": "A small forest spirit, part deer and part mossy stone. A body of grey river stone covered in soft green moss, slender wooden legs ending in little hooves, branching antlers sprouting tiny white flowers and leaves, a pale wooden mask-like face with two glowing green eyes, and a few fireflies circling its head.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:09:17.680Z",
+  "wallMs": 72292,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32683,
+    "completion_tokens": 9804,
+    "total_tokens": 42487,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.10477639999999999,
+  "hasCode": true,
+  "reasoning": "I'm planning the scale and structure of a small deer-like spirit figure—sweeping stone body, limbs via IK, antlers with branches, tiny flowers, and glowing firefly spheres.\n\nNow I'm laying out the skeleton: hip and spine joints as a catmull chain, a neck chain rising to the head joint, and a jaw joint positioned relative to the head for the muzzle shape, keeping parent-child relationships consistent across the rig.\n\nFor the body geometry, I'm sweeping an elliptical cross-section along the spine chain to form the torso, with stone-colored mottled paint on the belly and a greenish countershaded moss texture on the back using blended paint levels.\n\nI'm scattering small low-poly icosahedron clumps as moss patches on upward-facing surfaces, plus flattened dodecahedrons as grey stone patches, then adding a small tufted tail capsule near the hips. For the legs, I'm placing shoulder and hip joints and planning three-segment limbs with hooves targeting specific foot positions.\n\nWorking out limb bend directions for front and hind legs...\n\nNaming the joint chains for each leg (shoulder, elbow, wrist, hoof) and assigning parent bones—front legs attach to the spine, hind legs attach to the hips, since the role is \"leg\". I'm also sizing the leg sweep geometry and choosing a dark cylinder shape for the hoof.\n\nI'm adjusting the hoof so it actually touches the ground, tweaking its height and radius so the bottom sits right at floor level. Now I'm moving on to the head, placing a sphere for the cranium slightly forward of the neck joint and scaling it into an ellipsoid shape.\n\nI'm then shaping the muzzle as a tapered frustum extending forward from the head, adding a small dark sphere for the nose tip, a thinner frustum for the lower jaw, and positioning glowing green eye spheres out to each side of the head using the local forward/right/up offsets.\n\nAdding eye sockets and brow ridges...\n\nNow sketching the antlers: computing base points near the head and building curved beam points that rise and sweep outward, then sweeping a shape along that curve to form the antler geometry.\n\nI'm adding branch spikes at several points along the beam, each extending outward with a small radius, plus flower clusters using a yellow center sphere surrounded by petal spheres at the branch tips and along the antler.\n\nStill adding leaves...\n\nNow I'm placing fireflies circling the head at radius 0.3, small bright yellow-green spheres at varying heights attached to the head bone, and figuring out the overall height bounds from feet to antler tips.\n\nFor the neck I'm setting up a tapered sweep with mossy wood coloring, scattering a few moss clumps near the base, then defining mottled green paints for the body surface to give it a stone-and-moss texture.\n\nWorking out the body's spine chain with varying radii for a rounded, tapered shape, then checking that the body and neck segments overlap correctly in z-position so the geometry connects smoothly.\n\nNow I'm scattering small decorative elements across the body surface: grey stone chunks using low-poly dodecahedron shapes filtered to the sides, and moss clumps using tiny icosahedrons filtered to upward-facing normals, alternating between a few shades of green for variation.\n\nI'm also adding a few tiny glowing cylinder accents near the flanks where the normal points strongly sideways, then setting up vector helper functions and figuring out how to properly convert the local-space head position into a usable Vector3 for positioning calculations.\n\nNow I'm working out the antler geometry, building each antler as a curve of points branching outward and upward from the base position on the head, using head-relative left/up/back directions mirrored for both sides.\n\nI'm sweeping that curve into a tapered beam shape and adding smaller branch spikes along the way, then placing flower decorations at the tips—each flower made of a yellow center sphere surrounded by petals arranged radially.\n\nNow I'm positioning leaves near the branches, two per branch, then working on facial mask details like dark brow rods, nostril spheres, and jaw joint placement using local offsets from the head bone.\n\n"
+}

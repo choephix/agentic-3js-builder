@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuFlamingoTerseDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "flamingo",
+  "level": "terse",
+  "pitch": "A flamingo.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:16.979Z",
+  "wallMs": 152445,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32584,
+    "completion_tokens": 21018,
+    "total_tokens": 53602,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.01083592,
+  "hasCode": true,
+  "reasoning": "I'm planning out a TypeScript module to build a flamingo using the SDK, sketching a real-world scale of about 1.4m standing height with the body around 0.5m, positioned on the ground plane. I'm working through the skeleton design—an S-curved neck, thin bent legs, pink body with black accents—with the model facing forward along +Z.\n\nWorking out the leg joint hierarchy...\n\nFor the hip parent, I'll attach the chain's first joint directly to the hips root. Now I'm sketching the body spine axis, from tail tip back through hips and chest up to the neck base, roughly positioning the flamingo's teardrop body horizontally with the neck rising from the front.\n\nSetting up the joint hierarchy...\n\nFinishing the neck curve points, then setting up the neck as a joint chain parented to the chest, with names for neck1 through neck3 and a head joint at the tip.\n\nFor the head orientation, I need it to point forward and slightly down as a flamingo naturally would while feeding, so I'm adjusting the final neck control points to get a forward-pointing tangent rather than the upward one I had originally. The hooked beak will sweep downward from the head joint as a curved bezier shape.\n\nStill shaping the beak curve...\n\nNow I'm placing small dark eye spheres on the head sides using head-local coordinates, with left/right mapped to +X/-X, then moving on to sweep the body chain with a radius function.\n\nWriting sweep radius array...\n\nI'll also add a short stub tail to match the flamingo's short tail shape.\n\nReconsidering the wing shape as an extruded flat silhouette instead, computing orientation vectors to place it correctly against the body's back direction.\n\nMirroring the wing across the other side with the opposite Z thickness, I'm checking that the cross product still gives proper thickness along X. For coloring, I'm making the wings pink with black tips, painting based on whether the local x-coordinate exceeds a threshold.\n\nNow I'm applying the same black-tip logic to the trailing wing feathers using a position threshold, mimicking flamingo flight feathers. I'm confirming the paint function is imported correctly from the builder module, then moving to the legs -- defining sweeps along a polyline chain with a dark pinkish-red color, plus small toe spikes extending forward from the foot joint near the hip position.\n\nWorking through the leg joint anatomy: the hip sits high and forward, the visible bend (hock) is actually the backward-angled joint lower on the leg, while the true knee stays hidden near the body, and the foot/ankle extends forward-down from there. I'm calculating the segment lengths between hip, hock, and foot points to get the geometry right, then figuring out how to name the three points so the joint array lines up correctly for the sweep function.\n\nNow I'm placing the feet so they just touch the floor, accounting for leg radius, and spacing the legs close together near the centerline like a real flamingo stance. For the toes, I'm working out local offsets from the foot joint—spreading three small webbed toe stubs forward and to each side along the floor, using the foot's local forward/left directions relative to its own orientation.\n\nFor color, I'm defining the palette: soft pink body, deeper coral for the wing coverts, a muted rose for the legs, near-black for the beak tip and eye, with a lighter pink beak base. I'm setting up a paint function that switches the beak color from black to pink based on position along its curve.\n\nNow I'm sketching a small tail feather as an extruded triangle shape positioned at the rear of the spine, extending backward with a flat vertical profile and tapering tips colored with a pink-to-black gradient via the paint function. I'm also laying out the body's spine chain points from front to back to define its overall curve.\n\nI'm working out the body radius sweep along the spine chain, checking that the proportions give a roughly 1.6m total height which feels close enough to a real flamingo, and making sure the legs and hips sit sensibly relative to the belly. For the radius profile I'm using a few key thickness values spread across the body chain's spans rather than a single uniform value, and I'm figuring out which joint name marks the chest point where the neck chain should attach to the body.\n\nI'm restructuring the spine so the chest tip and neck base aren't duplicate points -- settling on a 4-point catmull body chain (spine1, spine2, chest) with the chest as tip, then deciding the neck should actually parent off"
+}

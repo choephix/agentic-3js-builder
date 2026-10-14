@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuPenguinRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "penguin",
+  "level": "rich",
+  "pitch": "An emperor penguin chick's proud parent. Glossy blue-black back and head, a crisp white belly blending into a warm golden-yellow patch at the neck and ear, a long slender beak with an orange-pink stripe, stubby flippers held slightly out, and big black feet. A fluffy grey chick peeks out from between its feet.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:56:52.492Z",
+  "wallMs": 40159,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5402,
+    "completion_tokens": 8741,
+    "total_tokens": 14143,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.0049107,
+  "hasCode": true,
+  "reasoning": "I'm planning the proportions for the penguin model, sketching out the adult's upright height and the smaller fluffy chick peeking between its feet, then working out joint placement starting from the hips and legs.\n\nI'm structuring the body as a spine chain running from the hips up through the neck to the head, then adding the head as a sphere attached to a bone joint and shaping the beak as a tapered spike.\n\nFor the wings and feet, I'm planning flipper chains swept with a slim tapering radius, and flat extruded outlines for the feet to give them that broad, black, webbed look.\n\nFor the feet shape, I'm thinking it's safer to sidestep ambiguity and build them using plain three.js ExtrudeGeometry from a 2D shape, rotated to lie flat, then wrap it with the part API. For the chick, I'm picturing a fluffy grey form made from a few overlapping small spheres nestled between the feet near the front.\n\nI'm settling on a color palette: dark blue-black for the back, white for the belly, gold for accents, near-black for the beak and feet, pink for a beak stripe, and grey for the chick, all sharing a consistent glossy material with fixed roughness. For the head's golden patch near the ear, I'll use a scaled sphere positioned at the side. The back and belly are built from scaled ellipsoid spheres anchored to the hips joint, and I'm working out how joints like hips and neck should be structured for the rest of the body.\n\nI'm weighing whether to use a chain for the spine and neck versus explicit joints with parent references, since the module's exact parenting syntax is unclear -- I'll default to assuming a `parent` option pointing to the parent joint object. To avoid uncertainty around how chains expose their joints, I'm leaning toward building the body with explicit joints and parts, possibly using a sweep along a tapering path for the torso instead.\n\nWriting penguin build code...\n\nStill placing body parts and spikes...\n\nFor the feet, I'm shaping a simple extruded triangle-ish toe outline and figuring out how rotating it about the X-axis maps it flat onto the ground plane.\n\nLegs should stay mostly hidden since real penguin legs are short, so I need the torso's bottom edge to sit close to the feet near the ground. I'm reconsidering the torso dimensions so the belly ends around y≈0.1-0.12, matching an emperor penguin's proportions where the body nearly touches the floor.\n\nLet me sketch out the final proportions: torso center around y=0.58 with semi-axes roughly 0.2 x 0.46 x 0.16, giving a total body height near 1.0, topped by a head sphere around y=1.0-1.1 for an overall height close to 1.1 units. For coloring, I'll layer a blue ellipsoid for the back and a slightly offset white ellipsoid for the belly, letting them overlap so blue shows on the back/sides and white dominates the front.\n\nNow I'm placing the head details—a gold ear patch sticking out near the head, a small chest patch partially embedded in the torso—then working out the chick: a small grey fluffy form made of several jittered spheres sitting between the feet near the front, with a tiny head, beak, and dark eye spheres positioned on its face.\n\nStill writing geometry setup...\n\nFor the adult's beak, I'm adding a spike shape for the main beak and a thinner pink spike layered on top for the stripe detail, making sure it sits just above the beak surface. Then I'll finish out the build function with proper bone attachment, parenting, and metadata like name and description.\n\n"
+}

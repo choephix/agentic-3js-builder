@@ -287,9 +287,9 @@ async function exportGlb(object: THREE.Object3D, atlas: THREE.DataTexture) {
   return toBase64(result);
 }
 
-type RunOptions = { code: string; arm: Arm; slug: string; tag: string; reportOnly: boolean };
+type RunOptions = { code: string; arm: Arm; slug: string; tag: string; reportOnly: boolean; renderOnError?: boolean };
 
-async function run({ code, arm, slug, tag, reportOnly }: RunOptions) {
+async function run({ code, arm, slug, tag, reportOnly, renderOnError }: RunOptions) {
   const rigged = arm !== "A";
   (globalThis as { THREE?: typeof THREE }).THREE = THREE;
   (0, eval)(code);
@@ -409,7 +409,7 @@ async function run({ code, arm, slug, tag, reportOnly }: RunOptions) {
     issues: assembly.issues,
     assembleMs: Math.round(performance.now() - started),
   };
-  if (errors.length || reportOnly) return { report, shots: [], sheet: null, atlas: null, glb: {} };
+  if ((errors.length && !renderOnError) || reportOnly) return { report, shots: [], sheet: null, atlas: null, glb: {} };
 
   const scene = new THREE.Scene();
   scene.add(new THREE.HemisphereLight(0xf5f1ea, 0x6d655c, 1.9));
@@ -446,7 +446,8 @@ async function run({ code, arm, slug, tag, reportOnly }: RunOptions) {
   ground.receiveShadow = true;
   scene.add(ground);
 
-  const skinned = rigged ? createSkinnedMesh(assembly, slug) : null;
+  // With renderOnError (the bake-off) a model whose skeleton failed renders as a static mesh, the way an app shows it.
+  const skinned = rigged && (assembly.createBones || !renderOnError) ? createSkinnedMesh(assembly, slug) : null;
   const model = skinned ? skinned.mesh : createStaticMesh(assembly, slug);
   model.castShadow = true;
   model.receiveShadow = true;

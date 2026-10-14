@@ -1,0 +1,19 @@
+# Quadruped helper-combination hunt
+
+### QUAD-1: A terminal part stuck to `sweep.at(1)` ignores poses of the chain's explicit foot tip
+- Severity: P1 (documented tip/attachment behaviour is surprising and can leave a hoof or claw rigid while the named foot joint poses)
+- Repro: `scratch/hunt-quadruped/hunt-quadruped-pose.ts` — run `npx tsx scratch/hunt-quadruped/hunt-quadruped-pose.ts` (the sample is `scratch/hunt-quadruped/hunt-quadruped-sample.ts`).
+- Expected: The chain docs say that giving one extra `names` entry creates a tip joint at the path end (the hand/foot/hoof bone) and that “the tip joint carries what you attach to it” (`docs/api.md:167-176`). In this realistic limb workflow, a claw seated on the terminal tube surface should follow the named `hindLPaw` pose.
+- Actual: The probe's `hindLPaw` axis changes from `[0,0,1]` to `[0,-0.573576,0.819152]` after `b.pose("hindLPaw", { axis: [1,0,0], deg: 35 })`, but both the terminal `hindLClaw` centre (`[0.36,0.198132,-0.520984]`) and `hindLTube` centre (`[0.321531,0.573686,-0.582521]`) are bit-identical before/after. Preview confirms the parts are owned by `hindLAnkle`, not `hindLPaw`: `--bones hindLClaw` reports `hindLAnkle 100%`, and `--bones hindLTube` reports `hindLAnkle 40%, hindLKnee 32%, hindLHip 28%`.
+- Cause: `src/sweep.ts:618-642` builds chain-sweep weights from `chain.spanJoints` only; `src/skeleton.ts:197-203` keeps the explicit `tip` outside `spanJoints`. `sweep.at(1)` therefore returns the last span bone, and `stick()` inherits it.
+- Fix: Either make the terminal sweep surface/weights expose the explicit tip bone (including the endpoint cap) or make the docs/sample contract explicit that surface/stick attachments on a chain sweep must use the chain's `tip` frame directly when they need to follow tip-only poses.
+
+## Covered
+
+- `scratch/hunt-quadruped/hunt-quadruped-sample.ts` is a docs-shaped fox/dog-scale build: one `loft` from tail tip through hips/spine/neck to skull over a forked skeleton; four mirrored `limb(..., { sole })` chains; painted body and legs; `surface`/`stick` ears and claws; a jaw joint and muzzle; all expected meshes are finite.
+- `npm run typecheck -- scratch/hunt-quadruped/hunt-quadruped-sample.ts` and `npm run typecheck -- scratch/hunt-quadruped/hunt-quadruped-five.ts` passed.
+- Medium `npm run preview -- scratch/hunt-quadruped/hunt-quadruped-sample.ts --gap hindLTube body --gap frontLTube body --bones body --bones hindLTube --bones frontLTube` produced 13 parts / 1,096 triangles, overlapping body/leg roots (no gaps), body bone shares including `hips 9%` and `shoulder 7%`, and mirrored L/R leg shares. The floor probe measured min y `-0.01365 m`; preview's 2%-height allowance reported “Sunk deeper ... none” (the documented sloped-foot/round-cap floor caveat remains present).
+- Five-metre wrapper `scratch/hunt-quadruped/hunt-quadruped-five.ts` preview measured exactly `5 m` z extent, 13 parts / 1,096 triangles, finite painted geometry, overlapping leg/body roots, and no sunk-list entry (min y `-0.0166 m`, allowance `41.6 mm`).
+- `scratch/hunt-quadruped/hunt-quadruped-metrics.ts` ran details `0.5/1/2/3`: `404/1,096/3,392/7,384` triangles with no non-finite vertices; the 5 m build at detail 1 remained 1,096 triangles. No detail-driven budget cliff reproduced.
+- `scratch/hunt-quadruped/hunt-quadruped-pose.ts` also confirmed the intended paths: posing `neck2` moved both stuck ears and the loft body; posing `jaw` moved the jaw muzzle while ears/body stayed put. The rig key contained tail/spine/neck roles, four leg chains with L/R sides and explicit contacts, plus a jaw hinge `[-1,0,0]`.
+- `npm run preview -- ... --gap hindLClaw hindLTube --gap hindRClaw hindRTube --gap frontLClaw frontLTube --gap frontRClaw frontRTube` reported all claw/leg pairs overlapping.

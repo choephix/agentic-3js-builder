@@ -1,0 +1,25 @@
+{
+  "slug": "r2GiraffeTerseSourcePrim",
+  "arm": "source-prim",
+  "subject": "giraffe",
+  "level": "terse",
+  "pitch": "A giraffe.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:09:53.225Z",
+  "wallMs": 67585,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112476,
+    "completion_tokens": 9047,
+    "total_tokens": 121523,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.1129868,
+  "hasCode": true,
+  "reasoning": "I'm planning the giraffe's proportions and skeleton layout—overall height, neck length, body dimensions, and joint positions for the legs and hips, aiming for a realistic yet efficient model.\n\nFor the coat, I'll use a painted patch pattern for the cream-and-brown blotches across the body, neck, and legs, with lighter coloring on the lower legs via a procedural gradient function. Then I'm setting up the joint hierarchy, starting with the hips root and a spine chain running from the hips up to the chest.\n\nWriting spine path and radius function...\n\nNow I'm setting up the neck chain from the base of the spine upward with catmull control points, parented to the last spine joint, with three segments named neck1-3 plus a tip joint.\n\nFor the mane, I'm placing small dark brown tufts along the neck's dorsal line using the sweep's point-and-angle lookup, orienting each tuft stick to follow the curve's normal so they sit flush against the neck's upper edge.\n\nNow moving to the head, I'm positioning the skull box at the neck's tip joint and tilting it forward with a pitch rotation so the snout angles downward, since rotating around the x-axis in this direction swings the box's long axis from pointing up toward pointing forward and down.\n\nStill building the muzzle, jaw, nose, eyes, and ear geometry...\n\nNow I'm adding ossicones as thin tapered rods from the head with dark tufted tips, plus a small median horn, before moving on to constructing the giraffe's legs as straight chains with shoulder and knee joints.\n\nTapering the leg radius from thigh to cannon, then adding a knee bump, a fetlock joint sphere, a pastern rod, and a dark hoof box near the ground.\n\nNow I'm planning the hind legs, placing the hip, hock, and fetlock joints at staggered depths to give the giraffe its characteristic bent back-leg stance, then adding matching hooves.\n\nI'll mirror the leg geometry across both sides with a sign-based offset, then set up coat coloring: lighter cream stockings on the lower legs, and a patchy upper coat using warm brown-orange tones for the giraffe's spot pattern.\n\nFor the tail, I'm chaining three joints from the hips down with decreasing thickness, parented to a new pelvis root joint rather than directly to the spine, and capping it with a dark tufted tip.\n\nFinishing the radius formula for the shoulder hump, then connecting the neck sweep into the body and head joints. Now I'm placing mane tufts along the neck sweep at intervals.\n\nAdding face details next...\n\nI'm defining the coordinate helper using normalized forward/up vectors, then checking that the resulting head and ossicone positions line up sensibly relative to the neck tip, landing on a total height around 5.45.\n\nNow I'm working through the geometry details—boxes and low-poly spheres for body parts, with patches and the eye placed using the coordinate function and bound to the head bone. Time to write the actual code.\n\nWriting body patches and paint functions...\n\n"
+}

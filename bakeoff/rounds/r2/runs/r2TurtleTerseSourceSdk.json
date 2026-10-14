@@ -1,0 +1,25 @@
+{
+  "slug": "r2TurtleTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "turtle",
+  "level": "terse",
+  "pitch": "A sea turtle.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:08:23.528Z",
+  "wallMs": 52552,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112463,
+    "completion_tokens": 7095,
+    "total_tokens": 119558,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.093466,
+  "hasCode": true,
+  "reasoning": "I'm planning a green sea turtle model — roughly 1 meter shell length, facing +Z, with flippers extended outward and resting so the plastron and flipper tips touch the ground plane.\n\nI'm sketching out the skeleton: root joint, spine chain, neck leading to head and jaw, tail chain going back, plus front flippers rigged as arms and rear flippers rigged as legs, each with positioned joint chains.\n\nFor the shell, I'm using a loft to build the carapace from elliptical cross-sections along the body length, aiming for a rounded dome on top with a flatter plastron underside, then I'll layer a separate belly color.\n\nNow for coloring, I'm defining sectors so the belly region gets a cream color while the rest gets painted olive/brown scute patches with dark edges, and I'm weighting the mesh so the loft deforms along the spine chain rather than staying rigid.\n\nFor the skeleton, I'm setting up a root joint and a spine chain with named joints parented to root, then adding a neck chain that curves upward from the spine's end toward a head joint at the tip, parented to the last spine joint.\n\nThen I'm sweeping the neck with a tapering radius profile and cream/olive coloring, placing a scaled sphere skull at the head joint oriented forward, and starting work on a small beak wedge plus a jaw joint for articulation.\n\nStill writing geometry...\n\nThen I'm defining the lower jaw and upper beak as scaled spheres, adding black eye spheres with tiny white glints, and painting the head with brownish-yellow patches for texture. For the tail I'm building a short polyline chain of two spans tapering in radius and parented to the first spine bone, then moving on to sketch out the front flippers.\n\nSetting the chain's up vector to vertical so the binormal gives horizontal width and the normal gives vertical thickness, then shaping the flipper radius to be widest near the base, tapering toward a thin tip.\n\nStill shaping flipper geometry... Now thinking about adding a small claw spike near the front flipper tips, then moving on to defining the rear flippers with shorter joint chains and shoulder-to-tip positioning.\n\nI'm also mapping out the carapace cross-section profile along the z-axis, setting width and height at each station so the shell loft tapers properly from front to back while keeping the rounded plastron touching the floor along a single line.\n\nI'm sketching the shell coloring with a yellowish rim band and cream belly sectors, then considering whether to add a few decorative touches like a vertebral keel ridge or scattered barnacle/algae bumps across the surface, though I'm leaning toward skipping the extra ridge detail to keep things simpler.\n\nNow I'm scattering small cone-shaped barnacles across the upper shell surface using a filtered scatter function, then working out the head's position relative to the neck -- placing the head sphere just beyond the neck tip with matching proportions so the beak and jaw line up naturally.\n\nSetting eye placement symmetrically on the head, then defining the jaw joint and validating chain naming conventions for the neck's catmull-rom spline. I'm choosing olive tones for the skin with cream undersides on the flippers, then building out the limb joint hierarchy with left/right suffixes for shoulders, elbows, hands, hips, knees, and feet. Writing flipper sweep and paint patch logic...\n\n"
+}

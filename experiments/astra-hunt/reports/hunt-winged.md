@@ -1,0 +1,15 @@
+# Winged helper-combination hunt
+
+### WINGED-1: Shared-root wing membranes emit degenerate faces
+- Severity: P1 (ordinary bat-wing construction silently produces invalid triangles)
+- Repro: `scratch/hunt-winged/hunt-winged-membrane-root.ts` — `npx tsx scratch/hunt-winged/hunt-winged-membrane-root.ts`
+- Expected: `docs/api.md:20,40,63` presents `b.membrane` as the web/wing-skin helper and says membrane vertices on chains are smoothly skinned; two finger chains conventionally start at the same wrist/root. The resulting closed membrane should not contain zero-area indexed faces.
+- Actual: Two 2-point finger chains sharing `[0.3, 1, 0]`, with `thickness: 0.012`, `rows: 3`, and `cols: 8`, produce 420 vertices and 140 triangles, including 12 zero-area triangles (`min area = 0`). The mesh does have valid chain skinning (`skinBones: ["fingerABase","fingerBBase"]`; all 420 weight sums are exactly 1), and all positions remain finite. Posing one finger tip by 70° still leaves 4 zero-area triangles; this is a real wing-root artifact even though the mesh otherwise deforms.
+- Cause: `src/membrane.ts:136-142` always creates the full grid even when edge A and edge B coincide at their shared root, and `src/membrane.ts:68-92` emits both face triangles and boundary walls for every cell without skipping zero-area cells. The first column of the bat web therefore collapses, and the closed-prism walls add more collapsed triangles.
+- Fix: Detect collapsed grid cells/edges (especially a shared edge root), omit zero-area face/wall triangles, and preserve the shared-root pole/skin sources rather than emitting a full duplicate column.
+
+## Covered
+- `scratch/hunt-winged/hunt-winged-combo.ts` built a bat-like model with arm/finger chains, two inter-finger membranes plus membranes to the body, an extruded feather row, a 7-feather tail fan from `b.ring(..., { joints: 3 })`, and separate upper/lower beak jaws. The wing membrane had 420/420 vertices with normalized weights; after posing the wrist/finger joints, all positions stayed finite and the membrane's maximum vertex displacement was `0.5806500247 m`. The extruded flight feather on the posed wrist moved `0.1889326939 m`, and the lower jaw moved `0.0329749656 m`, confirming ordinary bone following.
+- Mirrored arm tubes had 58 vertices per side and a set-based reflected Hausdorff error of `1.48e-16 m` (`scratch/hunt-winged/hunt-winged-symmetry.ts`). Mirrored extruded feathers also matched exactly (`scratch/hunt-winged/hunt-winged-mirror.ts`) when using the documented side-signed local width axis (`at.dir([side, 0, 0])`).
+- Paint shared across body sweep and wing membrane used the same baked `paint` map, with UVs on both and finite positions (`scratch/hunt-winged/hunt-winged-paint.ts`).
+- Exact duplicate feather extrudes have coincident vertices (`scratch/hunt-winged/hunt-winged-overlap.ts`: 2 meshes, 164 coincident vertex pairs counted), so intentionally coplanar overlapping feathers can z-fight; this is caller overlap rather than an SDK defect. `docs/api.md:462` already warns that surfaces at the same depth flicker.

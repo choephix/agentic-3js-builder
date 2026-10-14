@@ -1,0 +1,25 @@
+{
+  "slug": "r2HedgehogRichSourcePrim",
+  "arm": "source-prim",
+  "subject": "hedgehog",
+  "level": "rich",
+  "pitch": "A plump hedgehog out on an autumn evening walk. A dome of spines in chestnut brown with cream tips, a soft fawn face with a pointed, twitchy snout, a shiny black button nose, tiny round ears and bright beady eyes. Little pink paws, and a single red maple leaf stuck on its spines like a trophy.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:14.006Z",
+  "wallMs": 49298,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112581,
+    "completion_tokens": 6451,
+    "total_tokens": 119032,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.289672,
+  "hasCode": true,
+  "reasoning": "I'm planning the hedgehog model as a single TypeScript module with a skeleton of root, spine, head, jaw, legs, ears, and tail, then scattering around 250 cone shapes over the dome to form spines with chestnut-to-cream coloring.\n\nI'm working out the math for placing each spine using spherical coordinates on an ellipsoid body, excluding the front face region so spines don't cover the hedgehog's snout, and sweeping the spine directions backward for a natural lean.\n\nEach spine gets a two-part cone shape (brown lower section, cream tip) sized and tapered appropriately, with colors randomized across a few earthy tones. The dome body itself is a dark chestnut ellipsoid, and now I'm starting on the head — a fawn-colored sphere with a forward-pointing conical snout.\n\nStill adding facial features...\n\nNow I'm adjusting proportions so the body sits properly on the floor with legs visible beneath, tweaking the body ellipsoid's center and radius so the belly and paws touch ground correctly, and sizing the head and spines relative to a realistic hedgehog height.\n\nFor the maple leaf, I'm designing a 2D polygon with alternating lobe tips and notches at specific radii to form a stylized five-lobed maple shape, which I'll place tilted on the hedgehog's back.\n\nWorking out the leaf orientation via cross product so the normal points up and back, settling on a y-direction vector that places the leaf correctly relative to the spines reaching up to about 0.2.\n\nI'll skip detailed vein rods for now and just add a thin stem rod using local leaf coordinates, with darker colored veins running from the leaf base to each tip if needed. Then I'm placing a small tail cone at the back and defining the skeleton joints: root, head, and jaw positions along the body.\n\nNow I'm setting up bone names for parts and assigning joint roles, like marking the jaw joint and leg joints appropriately, before writing a sphere helper function for generating scaled spheres. I'm scattering points across the body surface using a spherical distribution formula, skipping points that fall into the face region to keep that area clear for other features.\n\n"
+}

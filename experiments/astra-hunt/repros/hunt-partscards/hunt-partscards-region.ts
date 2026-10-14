@@ -1,0 +1,15 @@
+import { createBuilder } from "../../../../src/builder";
+import { aim } from "../../../../src/math";
+import * as THREE from "three";
+const b=createBuilder({name:"r"});
+const root=b.joint("root",{at:[0,0,0],dir:[0,1,0]});
+const head=b.joint("head",{parent:root,at:[0,1,0],dir:[0,0,1]});
+const r=b.region({at:head,scale:2,quat:aim([0,0,1],[0,1,0],"z")});
+const local=[0.1,0.2,0.3] as const;
+const p=r.p(local); const q=r.q(); const d=r.d([0,0,1]);
+console.log("before",p.toArray(),q.toArray(),d.toArray());
+const j=r.joint("jaw",{parent:head,at:local,dir:[0,0,1]});
+const part=b.part(new THREE.BoxGeometry(.1,.1,.1),"#f00",{bone:head,at:r.p([0,0,0])});
+console.log("joint",j.at.toArray(),"part",part.at.toArray());
+b.pose(head,{axis:[1,0,0],deg:90});
+console.log("after",r.p(local).toArray(),r.local(local).toArray(),j.at.toArray(),part.at.toArray());

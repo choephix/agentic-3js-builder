@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuFrogTerseSourcePrim",
+  "arm": "source-prim",
+  "subject": "frog",
+  "level": "terse",
+  "pitch": "A frog.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:26:58.957Z",
+  "wallMs": 81648,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112474,
+    "completion_tokens": 15327,
+    "total_tokens": 127801,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.0439457,
+  "hasCode": true,
+  "reasoning": "I'm planning out a frI'm planning out the frog model structure, reviewing the available SDK primitives like joints, parts, and paint functions, and sketching rough real-world proportions for the body in meters before building the resting pose.\n\nNow I'm working through the joint hierarchy: starting with a root body joint, then chest, head, and jaw joints with their positions and parent relationships, followed by eye stalk joints positioned symmetrically on either side of the head.\n\nI'm figuring out the hind leg chains next, mapping hip-knee-ankle-foot joint positions to mimic a frog's folded leg posture, using a polyline chain structure where four named joints define three spans.\n\nFor the leg geometry, I'm using capsules swept between adjacent joint frames to form the thigh and shin, noting that each capsule rigidly follows its first endpoint's bone, so it'll look right at rest but won't visually bend between hip and knee if the knee rotates independently.\n\nActually, I realize sweeping over an entire chain is cleaner—it smoothly skins across all joints, so bending at the knee deforms the leg tube naturally. I'll vary the radius along the sweep to taper from thick thigh to thinner shin, then add small spheres for knees/toe pads and keep the feet simple for now, with webbing as a later refinement.\n\nNow I'm planning the front legs/arms as a separate chain with shoulder, elbow, wrist, and hand-tip joints positioned to angle forward and down, explicitly setting the parent to \"body\" so the chain attaches correctly rather than inferring nearest-joint weighting. For the body itself I'm considering a wide, flattened egg shape, likely scaling a sphere primitive to get that squat frog silhouette rather than building a full loft.\n\nWorking through the full rig now: head and jaw joints nested under body, eye joints perched on stalks above the head with gold iris spheres and tiny dark pupils, and hind-leg chains with hip/knee/ankle/foot joints bent into a realistic crouching pose. I'm defining explicit absolute coordinates for each joint so the thigh, shin, and foot segments sweep naturally outward and backward, adding sphere joints at the knees for visual bulk, and sketching webbed foot plates as flat polygon slabs fanning out behind the ankle. For coloring I'm composing a skin paint by layering a mottled spot pattern over a countershaded base so the back is darker olive-green and the belly fades to a pale cream.\n\nWriting chain and joint definitions...\n\n"
+}

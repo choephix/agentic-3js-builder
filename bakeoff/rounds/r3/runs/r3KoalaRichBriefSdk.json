@@ -1,0 +1,25 @@
+{
+  "slug": "r3KoalaRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "koala",
+  "level": "rich",
+  "pitch": "A sleepy koala hugging a eucalyptus branch. Soft ash-grey fur with a cream chest and cream-lined fluffy ears, a big black leathery nose, half-closed drowsy brown eyes, strong grey paws with dark claws, and a sprig of blue-green eucalyptus leaves in one hand, mid-munch.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:08:52.131Z",
+  "wallMs": 44510,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5406,
+    "completion_tokens": 6546,
+    "total_tokens": 11952,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.0667572,
+  "hasCode": true,
+  "reasoning": "Since I can't test the API directly, I should stick to conservative, reliable usage patterns—relying mainly on joint and part calls with basic geometry and positioning options rather than riskier chain operations whose signatures I'm less certain about.\n\nFor the design itself, I'm picturing a koala sitting with arms reaching forward to hug a vertical eucalyptus branch planted in front of it, keeping the pose simple rather than overly complex. I'm sketching out the skeleton with hips, spine, chest, neck, head, and limb joints, each parented appropriately, while sizing the koala around 0.75m and the branch as a vertical trunk rising to about 1.1m. I'm also planning a small helper that builds a sphere geometry and scales it non-uniformly to create rounded body parts.\n\nNow I'm fleshing out the body parts in detail — a grey ellipsoid torso with a cream belly patch, an oval head with big round ears built from layered spheres (cream outer, pinkish-grey inner, with tiny cream fluff spheres around the rim), a large black elongated nose, half-closed eyes made from small dark spheres topped with flattened grey lids, and a small cream-grey jaw ellipsoid.\n\nThen I'm working out the mid-munch pose: positioning a eucalyptus branch and sprig near the mouth, with one arm reaching to grip the branch and the other arm bending up to hold the leaf sprig near the mouth, defining shoulder-elbow-hand joint coordinates for each limb since there's no built-in rod/capsule primitive to rely on.\n\nI'm writing my own cylinder-segment helper that builds oriented geometry between two points and bakes it into world coordinates for a given bone, then positioning the legs (hip, knee, foot) and designing simple paw hands with spheres and small dark claws.\n\nAdding leaf and branch helpers...\n\n"
+}

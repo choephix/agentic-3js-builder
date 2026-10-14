@@ -2,7 +2,7 @@
 // Outlines always close, can be corner-cut smooth with "sharp" corners kept, and throw on a loop that crosses itself.
 // Extrudes taper across the outline's height and take a bevel that shrinks itself until it fits.
 import { Matrix4, Quaternion, ShapeUtils, Vector2, Vector3 } from "three";
-import { meshFromWorld, weightsFor } from "./context";
+import { describe, fillFor, meshFromWorld, weightsFor } from "./context";
 import type { Ctx, Fill, JointRef, Tags } from "./context";
 import { aim, DEG, toDirection, toPoint } from "./math";
 import type { DirectionInput, PointInput } from "./math";
@@ -19,7 +19,8 @@ export type OutlineInput = readonly (OutlinePoint | readonly (number | string)[]
 type Vec2 = [number, number];
 
 export type ExtrudeOptions = Tags & {
-  color: Fill;
+  /** Default: the colour of the nearest part already built to `at` (grey when there is none). */
+  color?: Fill;
   /** Outline origin in model space. Default bone: `at`'s bones when it came from something built, else the nearest joint. */
   at: PointInput;
   /** Model-space direction of the outline's +x (default [0, 0, 1], forward: a side-view drawing). */
@@ -31,6 +32,8 @@ export type ExtrudeOptions = Tags & {
    * lowest y to its highest y; either end may be 0 for a knife edge.
    */
   thickness: number | readonly [number, number];
+  /** three.js's name for `thickness`; `thickness` wins when both are given. */
+  depth?: number | readonly [number, number];
   /**
    * Rounds the front and back rims inward by this much; shrinks itself to fit the outline and half the thickness.
    * Drawn in 3 × `detail` steps (at least 1, a plain chamfer).
@@ -44,7 +47,8 @@ export type ExtrudeOptions = Tags & {
 };
 
 export type LatheOptions = Tags & {
-  color: Fill;
+  /** Default: the colour of the nearest part already built to `at` (grey when there is none). */
+  color?: Fill;
   /** Where the outline's origin sits on the axis. Default bone: as for `extrude`. */
   at: PointInput;
   /** Model-space spin axis, the outline's +y (default [0, 1, 0], up). */
@@ -141,25 +145,34 @@ function checked(call: string, authored: OutlineInput): readonly OutlinePoint[] 
 function prepare(call: string, authored: readonly OutlinePoint[], smoothing = 0): Outline {
   if (!Number.isInteger(smoothing) || smoothing < 0 || smoothing > MAX_SMOOTHING)
     throw new Error(`${call}: smoothing is a whole number from 0 to ${MAX_SMOOTHING}, got ${smoothing}`);
-  let points = authored.map((p): Vec2 => [p[0], p[1]]);
-  let sharp = authored.map((p) => p[2] === "sharp");
+  // A point repeated straight after itself is one corner (sharp if either is); a last point back on the first
+  // closes the loop. `sources` keeps the authored numbers for errors.
+  const points: Vec2[] = [];
+  const sharp: boolean[] = [];
+  const sources: number[] = [];
+  authored.forEach((p, i) => {
+    if (points.length && dist(points[points.length - 1], [p[0], p[1]]) < MIN_EDGE) {
+      sharp[sharp.length - 1] ||= p[2] === "sharp";
+      return;
+    }
+    points.push([p[0], p[1]]);
+    sharp.push(p[2] === "sharp");
+    sources.push(i);
+  });
   if (points.length > 1 && dist(points[0], points[points.length - 1]) < MIN_EDGE) {
-    points = points.slice(0, -1);
-    sharp = sharp.slice(0, -1);
+    points.pop();
+    sharp.pop();
+    sources.pop();
   }
   if (points.length < 3) throw new Error(`${call}: an outline needs at least 3 distinct points`);
-  points.forEach((p, i) => {
-    const j = (i + 1) % points.length;
-    if (dist(p, points[j]) < MIN_EDGE) throw new Error(`${call}: points ${i} and ${j} are the same spot`);
-  });
   const hit = crossing(points);
   if (hit) {
-    const [a, b] = hit.map((i) => `${i}→${(i + 1) % points.length}`);
+    const [a, b] = hit.map((i) => `${sources[i]}→${sources[(i + 1) % points.length]}`);
     throw new Error(`${call}: the outline crosses itself: edge ${a} meets edge ${b}`);
   }
   if (Math.abs(area(points)) < MIN_EDGE * MIN_EDGE) throw new Error(`${call}: the outline encloses no area`);
 
-  let loop = { points, sharp, sources: points.map((_, i) => i) };
+  let loop = { points, sharp, sources };
   for (let round = 0; round < smoothing; round++) {
     const next = { points: [] as Vec2[], sharp: [] as boolean[], sources: [] as number[] };
     const n = loop.points.length;
@@ -261,7 +274,12 @@ function toWorld(local: number[], at: Vector3, quat: Quaternion) {
  */
 export function extrude(ctx: Ctx, points: OutlineInput, options: ExtrudeOptions) {
   const outline = prepare("extrude()", checked("extrude()", points), options.smoothing);
-  const [t0, t1] = typeof options.thickness === "number" ? [options.thickness, options.thickness] : options.thickness;
+  const given = options.thickness ?? options.depth;
+  if (typeof given !== "number" && !(Array.isArray(given) && given.length === 2))
+    throw new Error(
+      `extrude(): thickness is required: the total thickness in meters, or [atLowest, atHighest]; got ${describe(given)}`,
+    );
+  const [t0, t1] = typeof given === "number" ? [given, given] : given;
   if (!(t0 >= 0 && t1 >= 0 && Math.max(t0, t1) > 0))
     throw new Error("extrude(): thickness is positive, or [atLowest, atHighest] with at least one end above 0");
   const full = Math.max(t0, t1);
@@ -328,12 +346,12 @@ export function extrude(ctx: Ctx, points: OutlineInput, options: ExtrudeOptions)
   const quat = new Quaternion().setFromRotationMatrix(
     new Matrix4().makeBasis(xDir, yDir, new Vector3().crossVectors(xDir, yDir)),
   );
-  const weights = weightsFor(ctx, options.bone, [options.at], at);
+  const weights = weightsFor(ctx, options.bone, [options.at], at, "extrude(): bone");
   const mesh = meshFromWorld(
     ctx,
     toWorld(local, at, quat),
     index,
-    options.color,
+    fillFor(ctx, "extrude()", options.color, () => at),
     () => weights,
     false,
     { name: options.name, kind: "extrude", group: options.group },
@@ -399,12 +417,12 @@ export function lathe(ctx: Ctx, authored: OutlineInput, options: LatheOptions) {
 
   const at = toPoint(options.at, "lathe()");
   const quat = aim(toDirection(options.axis ?? [0, 1, 0], "lathe()"), undefined, "y");
-  const weights = weightsFor(ctx, options.bone, [options.at], at);
+  const weights = weightsFor(ctx, options.bone, [options.at], at, "lathe(): bone");
   const mesh = meshFromWorld(
     ctx,
     toWorld(local, at, quat),
     index,
-    options.color,
+    fillFor(ctx, "lathe()", options.color, () => at),
     () => weights,
     smooth,
     { name: options.name, kind: "lathe", group: options.group },

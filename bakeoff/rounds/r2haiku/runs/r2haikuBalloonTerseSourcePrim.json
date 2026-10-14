@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuBalloonTerseSourcePrim",
+  "arm": "source-prim",
+  "subject": "balloon",
+  "level": "terse",
+  "pitch": "A hot-air balloon.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:30:43.891Z",
+  "wallMs": 47129,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112479,
+    "completion_tokens": 9264,
+    "total_tokens": 121743,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.028790700000000002,
+  "hasCode": true,
+  "reasoning": "I'm planning a TypeScript module that builds a hot-air balloon using the SDK, with a lathed striped envelope, a boxy basket, connecting ropes, and a burner with flames.\n\nFor sizing and structure, I'm going with a basket resting on the ground and the envelope floating above it, roughly 18m tall with a 1.5m basket, totaling about 20m. Since there's no natural skeleton here, I still need a root joint for rigid parts to attach to, so I'll create one at the origin and build the envelope as a child joint off it.\n\nFor the envelope shape itself, I'm lathing a teardrop profile — narrow mouth at the bottom widening to about 4.8m radius near the lower-middle, then tapering to a point at the top, across roughly 16m of height using a modest segment count for a stylized, slightly faceted look.\n\nFor coloring, I want gored balloon panels rather than horizontal rings, so I'm writing a custom paint function keyed on the lathe surface angle coordinate — splitting the 360° into 8 gores of 45° each and alternating between two colors, plus a darker skirt band near the bottom based on the profile height coordinate.\n\nNow I'm picking the actual palette (red, yellow, cream, teal) and working out the alternating gore pattern, plus figuring out the full vertical layout: basket height, rope length to the envelope mouth, and the envelope's total height so everything stacks up to roughly 19 meters tall.\n\nI'm positioning the rigging ropes to run from attachment points on the envelope's lower skirt down to the basket's corners, then building the basket itself as a wicker-textured box with a darker rim, using horizontal stripe bands to fake a woven look.\n\nFor the burner, I'm adding a small silver cylinder suspended under the envelope mouth with an orange flame cone nestled just inside it, positioned to overlap realistically between the basket top and the mouth opening.\n\nFor the ropes connecting basket to envelope, I'm attaching four corner points on the envelope surface at roughly radius 3.2-3.4 down to the basket's corners, plus a horizontal torus ring at the attachment height to visually anchor them, and adding a small pennant flag on a pole at the very top as a finishing detail.\n\nI'm setting up the joint hierarchy with a root joint at the base and an envelope joint higher up that the lathe geometry binds to, while the basket and ropes default to the nearest root joint. For the balloon's surface coloring, I'm writing a paint function that checks the surface height to render a dark skirt near the bottom and otherwise cycles through eight gore colors (red, cream, yellow) based on the angular position, refining the lathe profile points to get a pleasing silhouette from the open mouth at the bottom to the pointed crown at the top, then working out the exact ring and rope attachment radii by interpolating the profile curve at that height.\n\nFinally I'm assembling the basket with striped wood paint, a rim box, fuel tanks rotated horizontally, and putting together the full export with the balloon's metadata and default constructor function.\n\n"
+}

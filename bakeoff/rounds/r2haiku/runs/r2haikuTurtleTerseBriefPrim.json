@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuTurtleTerseBriefPrim",
+  "arm": "brief-prim",
+  "subject": "turtle",
+  "level": "terse",
+  "pitch": "A sea turtle.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:23:41.052Z",
+  "wallMs": 59795,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5313,
+    "completion_tokens": 11601,
+    "total_tokens": 16914,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.0058548,
+  "hasCode": true,
+  "reasoning": "I need to plan out a sea turtle model using the SDK's builder functions, thinking through how to construct the flattened shell, limbs, and head with the available primitives like joints, chains, sweeps, and scaled parts.\n\nI'm figuring out rough proportions and coordinates for the turtle at roughly 1 meter long, resting flat on the ground, with a root body joint around [0, 0.3, 0] from which the shell dome and other body parts will be attached.\n\nThe shell is a scaled hemisphere sized to around 0.42m half-width and 0.5m half-length, positioned so its top sits near y=0.48, while flipper tips will hang down to touch the ground near y=0.04-0.05 so the whole creature appears grounded naturally.\n\nFor the shell's bottom I'm adding a second flattened hemisphere in a pale cream color to form the plastron, sharing the same center but scaled flat. For the dark hexagonal scute pattern on top, I'm computing surface points analytically on the ellipsoid and placing small flattened cylinders oriented along the local normal direction rather than relying on a surface-sampling helper that may not exist for this part type.\n\nI'm planning hexagonal scute rings at varying elevations with olive-brown coloring, then moving to the head: a front-facing sphere with a hooked beak made from jaw joints, dark eyes with highlights, and a neck built as a chain of joints swept into a tube connecting body to head.\n\nI'm uncertain about chain role options and attachment behavior, so I'm keeping the neck and tail paths simple—short point sequences swept with constant-radius tubes rather than tapered ones, and planning front flippers as flat extruded shapes from a 2D outline.\n\nI'm reconsidering body proportions since the shell seemed too tall for a turtle resting on sand—lowering the body center and shell dimensions so the plastron sits closer to the ground and flipper tips just touch down.\n\nNow I'm designing the flipper shapes as paddle-like outlines extruded outward along local x/y axes, mirroring left and right sides, plus smaller rear flippers near the tail, while sketching the head, jaw, beak, and eye geometry as simple primitives attached to head and jaw joints.\n\nI'm defining color palette constants for shell, scutes, plastron, skin, beak, and eyes, along with helper functions to compute points and normals on the shell's ellipsoid surface for later scute placement.\n\nWriting turtle builder code...\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2ScorpionRichSourceSdk",
+  "arm": "source-sdk",
+  "subject": "scorpion",
+  "level": "rich",
+  "pitch": "A desert scorpion in a threatening pose, tail arched high over its back. Glossy amber armour with darker bands at every joint, big crab-like pincers held forward, eight thin legs, a segmented tail ending in a bulbous dark stinger, and a cluster of tiny black eyes on the head shield.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:07:59.634Z",
+  "wallMs": 87066,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112556,
+    "completion_tokens": 10620,
+    "total_tokens": 123176,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.128902,
+  "hasCode": true,
+  "reasoning": "I'm sizing the scorpion at a realistic scale, roughly 15cm total length, and starting to lay out the skeleton hierarchy beginning with the root body joint.\n\nNow I'm fleshing out the body segments: carapace up front, seven mesosoma segments each as a scaled sphere with a darker cylindrical band between them for the joint contrast, then starting the five-segment tail chain.\n\nStill writing tail curve and radius tapering...\n\nNow pincers: arms as three-joint chains from shoulder to elbow to wrist near the front of the carapace, tapering sweep, then a palm ellipsoid at the wrist forming the base of the claw.\n\nFor the claw itself, I'm sweeping a tapered curved path for the fixed finger from the palm outward to a thin tip, and adding a separate movable jaw joint parented to the wrist with its own curved sweep, offsetting the two fingers slightly in x so there's a visible gap between them like a real pincer.\n\nConfirming catmull is exported for smooth path sweeps, then planning the four-legged structure as chains of hip-knee-ankle-foot joints, each positioned to arc outward and down from the body.\n\nNow I'm structuring the body joint hierarchy—attaching legs to a root \"body\" joint, then adding small chelicerae as paired boxes near the head with a separate lower jaw joint for the mouth, and laying out a spine chain of joints running front to back along the body.\n\nI'm continuing the skeleton setup: positioning the head joint forward of the root, building a spine chain of joints toward the rear, then adding the tail chain parented to the last spine joint. For the carapace I'm shaping a flattened wedge-like sphere on the head, and placing tiny black spheres for the median and lateral eye clusters.\n\nI'm defining the eye placement using a height function along the ellipsoid surface, then moving to lay out the mesosoma tergite segments along the z-axis for the body.\n\nWriting segment geometry...\n\nNow I'm adding a darker belly plate underneath, positioning legs at the body's underside, and settling on the color palette: amber tones for the body, dark brown-black bands, and near-black eyes.\n\nFor texture I'll use paint-based gradients instead of material roughness -- countershading the body from darker amber to lighter belly tones, and mottling the carapace with mixed amber hues for a natural speckled look. The tail segments get banded coloring, and the stinger ends in a dark bulbous tip.\n\nNow I'm computing the curved stinger spike: I'm tracking the tail chain's endpoint position and tangent direction to position the bulb and base of the spike, then building a catmull-rom curve that hooks forward and downward from there, bending the point toward the underside to give it that classic scorpion hook shape.\n\nAdding radius tapering and color bands...\n\nSetting up leg naming and contact roles, then moving to the pedipalp arm chains with shoulder-elbow-wrist joints, a palm piece, and a movable jaw joint hinged at the wrist for the claw sweep.\n\nStill working out finger geometry...\n\nAdding jaw joint geometry...\n\nStill writing tail taper math and mirroring logic for leg positions...\n\n"
+}

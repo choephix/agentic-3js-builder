@@ -1,0 +1,25 @@
+{
+  "slug": "r1resdkLighthouseRichDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "lighthouse",
+  "level": "rich",
+  "pitch": "A cozy lighthouse diorama on a tiny rocky island. A red-and-white striped tower with a glowing lantern room and a black iron balcony, a keeper's cottage with a crooked chimney and a blue door, a wooden jetty with a rowboat tied to it, a couple of seagulls, tufts of grass and wildflowers between the rocks, and turquoise water with white foam around the shore, all on a round display base.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T14:29:24.276Z",
+  "wallMs": 84278,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32081,
+    "completion_tokens": 11624,
+    "total_tokens": 43705,
+    "prompt_tokens_details": {
+      "cached_tokens": 31936
+    }
+  },
+  "costUsd": 0.12291719999999999,
+  "hasCode": true,
+  "reasoning": "I'll structure this as a single module with one root joint named \"base,\" building out the scene using part, lathe, and extrude primitives. I'm planning the scale now: roughly a 1.2m diameter circular base with a lighthouse standing about 1m tall.\n\nFor the diorama details, I'm laying out the base lathe, water disc, and rocky island, then building the lighthouse itself as stacked frustum cylinders alternating red and white stripes, topped with a gallery, railing, lantern room, and roof cone, all positioned explicitly via a small helper function for placing geometry with color and transform.\n\nFor the cottage, I'm using a box for the walls and working out angled roof slabs by rotating boxes around the z-axis, calculating the slope angle and slab length from the house's half-width and roof height so the two roof pieces meet correctly at the ridge.\n\nI'm also planning gable triangles via extrusion, a slightly crooked chimney made from a rotated box with a cap, plus a blue door and glowing yellow windows on the front face. For the jetty, I'm laying out planks as boxes extending from the island's edge toward the water.\n\nFor the rowboat, I'm figuring out how to extrude a pointy hull outline using cross-product logic to orient it properly, giving it a brown outer shell with a lighter inner layer.\n\nFor the gulls, I'm adding heads, orange beak cones, gray box wings, and tails, placing two gulls (one on the jetty post, one on a rock) through a reusable gull function that handles position, scale, and rotation with manual offset rotation math. For rocks, I'm using low-detail dodecahedrons in grey shades ringing the island, with the island base built from a tapered cylinder frustum sitting in the water.\n\nNow I'm adding a grass cap on top of the island, foam rings using flattened tori plus squashed foam-blob spheres around the waterline, and working out the tub/barrel structure with a dark wood base cylinder, a lighter wood rim wall, and the water disc nested inside at the right height.\n\nRefining the ring into a lathe-shelled rim, then adding a base disc, water cylinder, scattered foam blobs, and grass/flower clusters placed randomly across the island's surface.\n\nI'm checking placement distances to avoid overlap between the lighthouse, cottage, and decorative elements, so I'm enlarging the island to radius 0.42/0.5 and shrinking the cottage footprint to keep its corners clear of the edge.\n\nNow I'm positioning rocks around the island's outer rim and working out where to attach the jetty, adjusting its starting coordinates and length so it stays within the circular boundary while reaching far enough out for the boat to dock comfortably.\n\nI shrink the boat's scale slightly and reposition it so its ends stay within the island's radius, then decide to skip placing rocks near that zone to avoid collisions. I set up a helper function for creating parts attached to the root bone, then start writing a gull creation helper with its body as a sphere.\n\nWriting gull geometry...\n\nNow shifting to the lighthouse: computing tapering tower segments with radius shrinking by height, adding a door and small windows along the front face, and topping it with a gallery floor cylinder.\n\nContinuing up with railing posts and a torus rail ring, then a glass lantern with mullions, a red roof cone with ball finial, and a brighter inner sphere for the light halo. Now I'm also setting up a varied grey palette for rocks and a green tone for grass.\n\nAdding flower colors, scattering small flattened boxes as water ripples outside the island radius, and working out cottage details -- stone foundation, shutters, door knob, chimney smoke puffs, plus wall and gable roof dimensions with the ridge running along z.\n\nAdding the gable thickness, then placing a crooked two-segment chimney with smoke puffs, a blue front door, yellow windows with white frames, and a grey step to finish off the small house details.\n\n"
+}

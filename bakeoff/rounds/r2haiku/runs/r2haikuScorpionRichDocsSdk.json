@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuScorpionRichDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "scorpion",
+  "level": "rich",
+  "pitch": "A desert scorpion in a threatening pose, tail arched high over its back. Glossy amber armour with darker bands at every joint, big crab-like pincers held forward, eight thin legs, a segmented tail ending in a bulbous dark stinger, and a cluster of tiny black eyes on the head shield.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:23:03.555Z",
+  "wallMs": 132074,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32678,
+    "completion_tokens": 20358,
+    "total_tokens": 53036,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.01051532,
+  "hasCode": true,
+  "reasoning": "I'm planning out a TypeScript module using the SDK, thinking through realistic scorpion proportions and setting up coordinate ranges for the body and tail to build an anatomically plausible model.\n\nI want to structure the skeleton with a spine chain running from the prosoma up front back to the abdomen, oriented along the Z-axis, and I'm working out how to import the right builder functions and color/pattern utilities for painting the scorpion's surface.\n\nI'm settling on color values for the amber, dark banding, and stinger tip, and planning to apply alternating bands along the tail segments. For the root hierarchy, I'm deciding whether \"hips\" or a separate spine chain with named joints (chest, waist, rear) should serve as the base joint for the whole structure.\n\nFor the body shape, I'm defining a radius function that varies cross-section width and height along the spine path to create a wide prosoma tapering into a narrower abdomen, using a sine-based profile to keep the transition smooth.\n\nFor coloring, I'm setting up a paint function that reads the segment parameter along the body and alternates between a darker band color and amber, creating striped joint markings on the body and tail.\n\nFor the tail, I'm sketching path coordinates that arch up and back from the rear of the body, curving high over the back before bending forward toward the tip where the stinger will sit.\n\nAdding the stinger geometry...\n\nNow I'm planning the pincer arms—shoulder, elbow, wrist, and hand points forming a chain for each pedipalp, forward and outward from the chest.\n\nFor the chelae themselves I'm sketching a crab-claw design: a bulbous palm shape with a fixed finger and a movable finger, considering ways to build the palm as a lathe or capsule-like form with thin tapered fingers.\n\nWriting claw sweep code...\n\nI'll switch to using explicit model-space coordinates for the pincer sweep with the hand bone specified directly, which keeps things rigid and simple since the model isn't posed. For the legs, I'll use a limb helper with femur/tibia/tarsus segment lengths to generate the four-point chains from body root to foot, applying bend parameters at each joint for the scorpion's characteristic leg angles.\n\nPlacing the leg roots along the body sides at varying z-depths with outward-splayed foot targets so the reach stays within the total leg length.\n\nNow I'm working out the chain naming scheme for each leg, using unique joint names like hipL1, kneeL1, ankleL1, footL1 per side and index, attaching to a root joint rather than the spine for simplicity. I'm defining the sweep radii and color banding for the leg segments, darker near the joints and amber along the rest.\n\nI'm also planning the eyes, pincers, tail, and stinger: small black spheres placed using nearest-surface lookups on the head shield, pincer chains for each arm with mirrored coordinates for left/right, a scaled sphere for the palm plus curved finger sweeps, and a tail path with a bulbous dark stinger at the tip using a sphere plus spike geometry. I'm sketching the loop structure for generating all eight legs with mirrored x-coordinates, computing root and foot positions per leg index, generating limb points with bends, then creating each chain and sweeping it with banded coloring — just working out variable naming so the leg root point doesn't clash with the overall root joint.\n\nNow I'm working out the plate geometry for the head shield using an extrude call with an outline array and thickness along the cross product of its axes, checking whether the plate's width would actually sit flush against the body's curved surface at that height or float awkwardly beyond it, and adjusting the outline dimensions to keep it closer to the body. I'm finalizing paint functions for body, legs, and tail that create banding near joints using modulo on the chain parameter, and deciding to keep the shield plate small rather than cut it since it adds character. With the geometry, coloring, and joint hierarchy mostly settled, I'm moving toward writing the actual module code with imports, meta info, and the builder calls for the root joint, spine chain, tail, arms, legs, eyes, and plate.\n\n"
+}

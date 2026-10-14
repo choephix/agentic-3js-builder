@@ -1,0 +1,25 @@
+{
+  "slug": "r3KoalaTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "koala",
+  "level": "terse",
+  "pitch": "A koala.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:08:32.223Z",
+  "wallMs": 72633,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112460,
+    "completion_tokens": 9380,
+    "total_tokens": 121840,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.11631,
+  "hasCode": true,
+  "reasoning": "I'm planning a koala model built with the SDK, aiming for compact but good quality geometry at roughly real scale, sitting upright with arms extended slightly outward and legs forward.\n\nSetting up the skeleton: I need a pelvis joint first to serve as root, then a spine chain running up through the torso to the neck, since joint weighting requires at least one existing joint before building a chain. From there I'll attach a head joint with its own direction vector, and the head will feature large round ears, a prominent black nose, and small eyes to give it that characteristic koala look.\n\nFor the body shape, I'm sweeping a varying radius profile along the spine path to create a pear-shaped torso -- wider at the belly and narrowing toward the neck, matching a sitting koala's proportions.\n\nFor the head, I'm adding a scaled sphere positioned above the head joint, slightly squashed on the horizontal axes to give it a wide, round koala-face shape.\n\nNow I'm setting up the jaw mechanism: a separate hinge joint for the jaw, a small scaled sphere for the lower jaw bone, and an upper muzzle sphere positioned just below the nose, with a larger black rounded oval nose placed on top of the muzzle.\n\nI'm placing small black eye spheres with tiny white glints, then building the ears as flattened spheres rotated outward with pale inner-ear patches and white fringe detail, parented to the head via dedicated joints — before moving on to sprout the arms from the shoulders.\n\nWriting arm chains and paws...\n\nNow I'm planning the legs for a sitting pose, positioning hip, knee, and ankle joints with forward-angled coordinates and tapering thigh radii, then adding foot spheres with toe sprouts extending forward from the ankle.\n\nI'm skipping a tail since koalas are tailless, and deciding to add fur color via paint—using a grey back, cream belly countershading combined with mottling, defining specific hex colors for grey, dark grey, and cream tones.\n\nSince the koala is sitting, the belly faces front rather than up, so I need a custom paint function that blends grey and cream based on both surface normal direction and vertical position for a chest-patch effect.\n\nConfirming the explicit named export overrides the star export, so that naming conflict resolves fine. Now I'm working out the head paint logic, blending grey fur with cream shading on the cheeks and muzzle using smoothstep thresholds on position so the muzzle flows continuously from the head coloring.\n\nFor the ears, I'm shaping flattened spheres rotated outward to face forward, with grey on the outside and cream inset for the inner ear positioned slightly forward along the ear's facing direction, and considering small tufts of white fringe detail.\n\nFor the eyes, I'm computing positions on the head's curved surface so they sit flush, using the sphere's scale and radius to find the correct surface height at each eye's x-offset, then adding black spheres with small white highlight dots.\n\nNext I'm placing the muzzle as a slightly flattened sphere projecting from the lower face, with the nose a tiny black ellipsoid centered near its top, checking that the eye positions clear the muzzle's radius so nothing overlaps. Then I'm starting to position the lower jaw sphere for the mouth line.\n\nStill defining skeleton joints...\n\nAdding hand details now - sprouting fingers and thumb from the wrist joint with fanned-out tips, using dark grey skin tone, then starting on claw spikes at the fingertips.\n\nFor legs, I'm setting up the hip-knee-ankle chain parented to the pelvis with tapering sweep radii, adding a flattened sole pad sphere at the ankle, and planning toe sprouts next.\n\nI'm positioning four small toes off the ankle with slight offsets, checking that each joint's radius keeps it from poking through the limb below it, then placing the hip/knee/ankle joints symmetrically on both sides. I'm skipping extras like a tail nub or eucalyptus leaf since this is just the koala model, and moving on to adding small cream tufts around the ear rim.\n\nNow I'm sketching the spine as a chain of points running from the pelvis up through the neck to the head, choosing a sweep radius profile that widens at the belly for a sitting pose and tapers toward the head, while nudging the start coordinates so the body isn't too wide and the bottom cap stays rounded. Writing spine and body geometry code...\n\n"
+}

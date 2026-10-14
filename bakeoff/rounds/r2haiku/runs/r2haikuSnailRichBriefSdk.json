@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuSnailRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "snail",
+  "level": "rich",
+  "pitch": "A garden snail on an adventure. A glossy spiral shell striped in caramel, chocolate and cream, a soft grey-green body with a pebbly texture and a slimy shine, two long eye stalks with little black eyes and two short feelers below. A tiny ladybird hitches a ride on top of the shell.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:25:14.339Z",
+  "wallMs": 37382,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5393,
+    "completion_tokens": 7090,
+    "total_tokens": 12483,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00360856,
+  "hasCode": true,
+  "reasoning": "Since the SDK's signatures are only loosely documented, I need to stick with the safest, most commonly referenced helper shapes—using createBuilder and joint calls with the documented at/aim/dir/up parameters—to minimize the risk of runtime errors from mismatched signatures.\n\nI'm now planning out the snail's structure: a chain-based body sweep from tail to head, a coiled shell built from stacked, shrinking tori positioned on a tilted spiral to mimic a real shell's whorls, and eye stalks/feelers as thin sweeps. I'm working through realistic scaling (snail body ~15cm, shell ~12cm diameter, ladybird ~1cm) and placing joints like \"hips,\" \"head,\" and \"shell\" with explicit coordinate arrays so parts can anchor to bones without relying on ambiguous chain APIs.\n\nFor texture and detail, I'm opting for safe, verifiable techniques—plain THREE.js geometries (spheres, tori) rotated and scaled via standard methods, colored in bands (caramel, chocolate, cream) to fake the spiral stripe pattern, plus scattered pebble-bump spheres on the body for texture, rather than risking unverified paint/stripe APIs. I'm also laying out the ladybird as a flattened hemisphere with black spot spheres positioned via polar coordinates, sized and placed to sit naturally on top of the shell's apex, aiming for a cohesive, grounded composition where the snail's lowest body points touch y=0.\n\n"
+}

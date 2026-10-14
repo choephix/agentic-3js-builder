@@ -1,0 +1,17 @@
+import * as THREE from 'three';
+import { createBuilder } from '../../../../src/builder';
+import { rng } from '../../../../src/math';
+import { pixelTexture, tileBox, skinLayout, skinBox, cellPaint, pick, bayer, stepped } from '../../../../kits/pixel';
+import { animeEye, cel, furEdge, INK, inkLines } from '../../../../kits/toon';
+import { coil, gaugeTexture, gearGeometry, gearSize, gearTexture, gearTrain, metal, TINT } from '../../../../kits/clockwork';
+import { glow } from '../../../../kits/glow';
+const TEXEL=0.02, rand=rng(1); const rootB=createBuilder({name:'docs'}); const root=rootB.joint('root',{at:[0,1,0]});
+const TILE=pixelTexture(32,30,g=>{g.fill((x,y)=>y%6===0?'#aa0000':y%6===1?'#cc0000':pick(['#111','#222'],.4+.3*rand(),bayer(x,y))); g.stamp(10,2,['n.n'],{n:'#fff'});});
+rootB.part(tileBox([.36,.17,.26],TILE,.0115,{rand,step:[1,6]}),'#fff',{texture:TILE,bone:root,at:[0,.125,-.02]});
+const layout=skinLayout({head:[8,8,8],body:[10,8,16]}); const sheet=pixelTexture(...layout.size, g=>{for(const faces of Object.values(layout.faces)) for(const rect of Object.values(faces)) g.fill((x,y,_w,h)=>pick(['#123456','#654321'],.7-y/h/2,bayer(x,y)),rect);}); rootB.part(skinBox(sheet,layout.faces.head,TEXEL),'#fff',{texture:sheet,bone:root,at:[0,1,.1]});
+const SKIN=cellPaint(.02,c=>c.pick(['#111','#222'],.4+.35*c.n.y+.6*(Math.sin(c.at.x)-.5)),{dither:true}); rootB.sweep([[0,1,0],[0,1,.2]],.03,{color:SKIN,bone:root});
+const ORANGE=cel('#ffb036'); const coat=furEdge(ORANGE,'#fff',{level:-.2,teeth:.22,period:.024,ink:INK}); const e=inkLines(ORANGE,{levels:[.2]}); rootB.sweep([[0,1,0],[0,1,.2]],.03,{color:coat,bone:root}); rootB.sweep([[0,1,0],[0,1,.2]],.03,{color:e,bone:root});
+const eye=animeEye({iris:'#ff8a1c'}); rootB.part(new THREE.PlaneGeometry(.1,.1),'#fff',{bone:root,at:[0,1,.2],dir:[0,0,1],axis:'z',texture:eye});
+const gshape={teeth:18,module:.004,spokes:4}; gearSize(gshape); rootB.part(gearGeometry(gshape),metal('brass'),{bone:root,at:[0,1,.2],dir:[0,1,0]}); rootB.part(new THREE.PlaneGeometry(gearSize(gshape).plane,gearSize(gshape).plane),TINT.brass,{bone:root,at:[0,1,.2],dir:[0,1,0],texture:gearTexture(gshape)});
+const train=gearTrain(rootB,{at:[0,1,.2],axis:[0,0,1],module:.008,spin:'g',bone:root,gears:[{teeth:24,spokes:5},{teeth:12,angle:60},{teeth:16,from:0,angle:-110,holes:4,color:metal('gilt')},{teeth:28,on:1,shift:.03,spokes:6,texture:true,color:TINT.brass},{teeth:10,from:3,angle:160}]}); train.spin(12);
+const p=glow(rootB.part(new THREE.BoxGeometry(.1,.1,.1),'#ffb347',{bone:root,at:[0,1,0]}),1.5); console.log('built',p.mesh.name,layout.size,eye.userData.svg!==undefined,coil([0,1,0],[0,2,0],.025,8).length,gaugeTexture({needle:60}).userData.svg!==undefined,stepped([[0,3],[1,3]],TEXEL));

@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuFrogRichPlain",
+  "arm": "plain",
+  "subject": "frog",
+  "level": "rich",
+  "pitch": "A red-eyed tree frog clinging to a leaf. Vivid lime-green skin, blue and cream striped flanks, orange toes with round sticky pads, a creamy white belly, and enormous ruby-red eyes with black slit pupils. It looks a little surprised, as if you just woke it up.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:27:26.688Z",
+  "wallMs": 32663,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 868,
+    "completion_tokens": 7845,
+    "total_tokens": 8713,
+    "prompt_tokens_details": {
+      "cached_tokens": 763
+    }
+  },
+  "costUsd": 0.0039406300000000005,
+  "hasCode": true,
+  "reasoning": "I'm planning a three.js scene for a red-eyed tree frog perched on a leaf, thinking through realistic proportions—roughly 7cm body length—and positioning the leaf at the base of the scene so the frog rests naturally on top of it.\n\nI'm sketching out the frog's geometry piece by piece: scaled spheres for the body, head, and bulging ruby-colored eyes with dark slit pupils, plus a flattened cream belly and blue-and-cream flank stripes built from thin boxes or stripes along the sides.\n\nFor the limbs, I'm planning jointed legs with capsule-like upper and lower segments, paws gripping the leaf surface, and small orange sticky toe pads capping each digit. I'm also designing the leaf itself as a curved, extruded shape with a midrib, sized and rotated flat so the frog can perch convincingly on top.\n\nSo the leaf thickness ends up positioned correctly with its top surface at y=0.003, and I'll keep the mesh flat with no bevel. For the midrib I'll add a thin box along z sitting on top of the leaf, and I'm now working out how the frog's body and legs need to be positioned so they properly rest on the leaf surface.\n\nI'm placing the body ellipsoid with its bottom edge resting near the leaf, then working out joint coordinates for front and back legs using shoulder, elbow, wrist, hip, knee, and ankle points so the limbs bend naturally. I'm building cylinder-based limb segments between these joints with sphere joints at the connections, then adding toe pads radiating out from each paw and foot in fan-like patterns.\n\nPositioning toe geometry...\n\nNow I'm designing the big ruby eyes with vertical pupil slits and small white highlight spheres, plus a simple dark mouth line and nostrils on the head, and considering whether to add stripe or mottling texture along the flanks.\n\nI'm picking out the final color palette: lime green body, cream belly, orange toes, ruby eyes, and leaf green accents. Then I'm sketching the helper functions for building cylindrical limb segments with joint spheres, and planning the limb-chain function that connects multiple points into a jointed leg or arm.\n\nNow I'm working out the mirrored coordinates for the front and hind legs on both sides of the body, placing shoulder, elbow, wrist joints for the front limbs and hip, knee, ankle joints for the hind limbs, then defining toe/finger tip offsets so each paw has a spread of small digit segments.\n\nI'm also planning the pads as small orange spheres at the toe tips, setting up the material palette (lime, blue, cream, orange, ruby, black, white, plus leaf greens), and sketching a helper ellipsoid function built from a scaled sphere geometry before writing the full mesh-building code.\n\n"
+}

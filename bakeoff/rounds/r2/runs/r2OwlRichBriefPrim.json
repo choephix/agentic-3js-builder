@@ -1,0 +1,25 @@
+{
+  "slug": "r2OwlRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "owl",
+  "level": "rich",
+  "pitch": "A great horned owl perched on a gnarled branch. Mottled bark-brown and buff feathers with fine dark barring, a pale bib at the throat, tall feathered ear tufts, a round tawny facial disc rimmed in black, huge orange eyes and a hooked grey beak. Feathered legs end in strong black talons gripping the wood.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:07:45.566Z",
+  "wallMs": 62392,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5420,
+    "completion_tokens": 9168,
+    "total_tokens": 14588,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.09298,
+  "hasCode": true,
+  "reasoning": "Since I can't test this, I need to be conservative with the API and stick to the basics I'm confident about—parts using THREE geometries, joints with parent references, and minimal chains—rather than risky helper functions I'm unsure about.\n\nFor orientation, rather than gambling on uncertain `dir`/`aim` parameters, I'll pre-rotate geometries myself before passing them in, keeping the part calls simple with just position and bone attachment. I'm planning the owl facing forward at roughly 0.55m tall, with a horizontal branch along the X axis.\n\nNow I'm laying out the actual shapes: the branch sitting near the floor, the body as a tilted ellipsoid above it, a wide head with a facial disc made from flattened spheres and a torus-like rim, orange eyes with black pupils, a hooked grey beak, tilted ear tufts with dark tips, a pale throat bib, dark barring boxes across the chest, folded wing shapes with stripe detailing, an angled tail box, and feathered cylindrical legs.\n\nI'm adding four-toed feet with capsule toes and black cone talons gripping the branch, building the gnarled branch out of bent cylinder segments with small twigs and knots, and setting up a scaling helper so ellipsoid geometries can be stretched and rotated correctly before placing them. I'm also starting to define a bone hierarchy with a root body joint and child joints for the head and jaw.\n\nNow I'm continuing the bone hierarchy with tail, wing, hip, and foot joints, then mirroring left/right parts by looping over a sign factor. For the branch, I'm laying out segments along the x-axis with slight positional variation and working out how to orient each cylinder between two points, weighing whether to use a quaternion-based approach despite guidance suggesting I avoid it.\n\nI'm defining a helper function to build cylindrical rods for talons and branch segments, handling quaternion rotation and placement, and working through how joint positions and model-space coordinates interact with bone assignment. I'm also calculating the branch's vertical extent so the owl's feet sit correctly on top of it.\n\nNow I'm placing the toes relative to the legs — three spreading forward across the branch with a rear toe behind, each ending in a downward-pointing talon cone — and checking that the body ellipsoid's bottom edge meets the legs properly while tallying up total figure height from feet to head.\n\nBuilding head geometry...\n\nStill working out owl facial details...\n\n"
+}

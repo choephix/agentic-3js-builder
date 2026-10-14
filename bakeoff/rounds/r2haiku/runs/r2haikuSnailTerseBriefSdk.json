@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuSnailTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "snail",
+  "level": "terse",
+  "pitch": "A snail.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:24:51.556Z",
+  "wallMs": 27447,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5296,
+    "completion_tokens": 5867,
+    "total_tokens": 11163,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00298736,
+  "hasCode": true,
+  "reasoning": "I'm planning out a snail model using the SDK, sticking to documented functions like part, sweep, chain, and paint to keep the construction robust and avoid risky, undocumented APIs.\n\nI'm working out dimensions and placement: a stylized shell roughly 0.36m across and 0.4m tall, built from stacked torus whorls via a lathe, with the body laid along the Z-axis — foot spanning about 0.5m, head near z=+0.2, and shell centered toward the back around y=0.28.\n\nFor joints, I'm planning a root \"body\" bone, a neck chain leading to the head, and separate chains for the left and right eye stalks. Since the exact lathe outline format is uncertain, I'm leaning toward baking scale directly into sphere geometry rather than risking the unknown API, then building the shell's spiral look from tilted torus rings of decreasing radius layered along the shell axis.\n\nActually, simpler approach: I'll build the shell as a stack of overlapping spheres shrinking in size along the Z coil axis, giving a stepped spiral look, then add darker torus bands per whorl for stripes—blocky but robust.\n\nFor color, I'm going with shell brown with cream bands, olive/ochre body and head, black sphere eyes on stalk tips, and tentacles. I'm shaping the foot and body from scaled spheres acting as flattened capsules, and building the head as another scaled sphere positioned above the body.\n\nFor the eye stalks, I'm defining them as chains of points and sweeping a thin tube radius along that path with the given color, treating the chain itself as the path input.\n\nGood, chain.at(1) returns a frame at the tip, so I can place the eyeball part there directly. Now I'm defining joint positions for the skeleton—a root \"body\" joint and a \"head\" joint offset upward and forward.\n\nWriting snail skeleton code...\n\nWorking through the shell geometry, I'm stacking spheres along the Z-axis to mimic a spiral whorl, with the largest sphere near the front opening and sizes tapering down toward a small apex at the back.\n\nI'm adding thin torus bands at each sphere's position to emphasize the coil ridges, giving the stepped sphere stack a more convincing spiral shell look, then making sure the foot sphere sits right at ground level so nothing clips below zero.\n\nFor the head, I'm planning two pairs of eye stalks — upper tentacles curving from the head up and outward, with a shorter lower pair — as simple point chains, placing eye spheres at the tip of each stalk.\n\nSkipping gills and mouth details for simplicity. I'm settling on a tan color like \"#d9c27a\" for the body, foot, and head, with dark eyes, and I'll build parts using explicit position and bone attachment, writing the whole structure out as a concise return of the root bone with sweeps along chain paths for the tentacles.\n\n"
+}

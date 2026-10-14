@@ -1,0 +1,25 @@
+{
+  "slug": "r1resdkFennecRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "fennec",
+  "level": "rich",
+  "pitch": "A fennec fox kit standing alert on a little sand dune at dusk. Enormous satin ears lined in pale peach, cream fur warming to sandy gold along its back, a fluffy tail with a smudge of black at the tip, and big dark eyes with a tiny white sparkle. Its paws are a touch oversized, like it hasn't grown into them yet, and it wears a woven leather collar with a small brass bell.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T14:20:07.933Z",
+  "wallMs": 55516,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5289,
+    "completion_tokens": 8019,
+    "total_tokens": 13308,
+    "prompt_tokens_details": {
+      "cached_tokens": 5146
+    }
+  },
+  "costUsd": 0.0815052,
+  "hasCode": true,
+  "reasoning": "I'm uncertain about the full SDK API beyond the documented signatures for createBuilder, joint, chain, and sweep, so I need to stick closely to what's shown rather than guessing at unknown options, possibly relying on plain three.js geometry attached to joints where the API is unclear.\n\nI'll write a helper that adds meshes either as children of a joint (computing local offset from world position) or falls back to the root if the joint isn't a proper Object3D. For the actual design, I'm planning a fox facing +Z standing atop a flattened sand dune, with the dune's peak around y=0.12.\n\nI'm sketching out proportions: the dune sits at y0=0.1, the fox's body is an ellipsoid above that, with cylindrical legs and paw shapes, a head with a snout, nose, eyes, and tall layered ears (cream outside, peach inside), a tapered tail with a dark tip, and a collar with a bell and small decorative boxes around the torus. I'm starting to pick colors, beginning with a cream tone for the fur.\n\nStill placing legs and paws...\n\nNow I'm shaping the head: a scaled sphere for the skull, a small cream snout cone, a dark nose tip, a lower jaw bump, and tiny eye spheres positioned symmetrically.\n\nStill working on the ears...\n\nNow I'm positioning the tail using a chain of shrinking spheres curving backward and downward, ending in a small black tip, then setting up a torus collar at the neck with its rotation tilted to match the forward neck angle.\n\nI'm adding a weave of tiny boxes around the collar ring plus a small bell and slit detail, grouped and rotated together at the neck joint, then starting a lathe profile for a dune shape.\n\n"
+}

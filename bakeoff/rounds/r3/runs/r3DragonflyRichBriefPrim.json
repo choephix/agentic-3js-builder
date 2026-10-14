@@ -1,0 +1,25 @@
+{
+  "slug": "r3DragonflyRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "dragonfly",
+  "level": "rich",
+  "pitch": "An emperor dragonfly hovering above a pond. A long, slim abdomen in electric blue with black markings down its back, an apple-green thorax, huge wraparound turquoise eyes, and four glassy wings with a fine net of dark veins and a faint golden sheen, held flat and wide. Six thin legs are tucked under it.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:08:24.992Z",
+  "wallMs": 70463,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5415,
+    "completion_tokens": 9654,
+    "total_tokens": 15069,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.09783,
+  "hasCode": true,
+  "reasoning": "Since I can't verify the exact API precisely, I should stick closely to the documented methods I'm confident about—mainly joint, chain, and part builders—rather than risk invented signatures. I'm recalling that joints take a name with an \"at\" position and optional parent, and that chains are built from a path returning joint references.\n\nI'll hover the model at roughly 0.3m above a small pond disc with a lily pad for grounding, keeping the dragonfly's real-world tiny scale (7cm body, 10cm wingspan). The body runs along -Z with the head forward, thorax centered, and the abdomen built from ten tapering cylindrical segments with blue coloring, dark dorsal marks, and black tip appendages. For the wings, I'm weighing whether to use an extrude shape or thin scaled boxes.\n\nFor the wing surfaces I'll build a flat custom shape geometry laid out in the XY plane and rotated to lie horizontal, giving it a pale glassy tint with a golden leading edge, then add vein detail using thin dark boxes for the costa, radial veins, and a few cross-veins.\n\nStill working out wing geometry...\n\nDefining wing outline coordinates...\n\nStill writing wing vein and body geometry...\n\nI'm positioning cylinders between vein points, adding a dark leading-edge costa and small golden pterostigma patch near the wingtip for that amber sheen, then building turquoise eye spheres sized and placed close together at the head sides, plus a pale frons spot and mandible details for the face.\n\nNow I'm setting up the thorax as an elongated green ellipsoid with subtle stripes, then building the joint skeleton -- head, jaw, neck, chained abdomen segments, wings, and six legs each with hip/knee/foot joints using thin cylinder bones, computing leg placement under the thorax with side offsets for left/right pairs.\n\nFor the abdomen I'm laying out ten tapering segments starting narrow at the thorax junction, swelling slightly at the base then narrowing toward the tip with a gentle downward sag, giving each segment a blue cylindrical body and adding small black dorsal marking boxes on top of most segments to mimic the real pattern.\n\nI'm adding darker rings at the joints between segments for definition, plus tiny dark cone-shaped cerci at the abdomen's tip, then shifting scale to the scene itself -- setting up a pond surface as a shallow teal-colored cylinder, a green lily pad disc floating on it, and a reed rising up from the water toward the dragonfly's perch height.\n\nSizing everything proportionally now -- the dragonfly's wingspan against the pond's diameter, with the body hovering around 0.22 units up, and adding thin rippling torus rings beneath it rotated flat to suggest water disturbance. I'm wiring up the body parts with their joint hierarchy (thorax parenting the head, head parenting the jaw), then placing the eyes as small spheres with darker pupil-highlight spheres positioned on their front surfaces for a glossy look.\n\nNow I'm building out the head details -- antennae as tiny cylinders, a frons sphere, a clypeus box, labrum, and lower jaw -- positioning them at the correct head height and depth. For the thorax, I'm scaling a sphere to give it an elongated shape and adding slanted dark stripe segments on each side using thin cylinders running diagonally across the surface.\n\n"
+}

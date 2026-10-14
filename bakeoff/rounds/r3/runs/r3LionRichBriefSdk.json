@@ -1,0 +1,25 @@
+{
+  "slug": "r3LionRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "lion",
+  "level": "rich",
+  "pitch": "A proud old lion resting with his head held high. A huge shaggy mane fading from golden blond at the face to dark chocolate at the edges, a tawny body with a pale cream belly and muzzle, amber eyes, a broad black nose, a scar across one eyebrow, big padded paws and a long tail ending in a dark tuft.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:06:27.889Z",
+  "wallMs": 76765,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5400,
+    "completion_tokens": 10553,
+    "total_tokens": 15953,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.11633,
+  "hasCode": true,
+  "reasoning": "I'm planning a conservative TypeScript module using the SDK, sticking to well-documented calls like joints, parts, and basic THREE geometries to minimize the risk of misusing uncertain API signatures.\n\nFor ellipsoid shapes, I'll pre-scale sphere geometries manually rather than relying on uncertain part scale options. Now I'm working out the joint hierarchy and 3D positioning for a sphinx-like lion pose — hips, chest, neck, and head joints placed to create a body lying down with the head held up and front paws forward.\n\nLegs need front limbs extended forward and hind legs folded under in a lying posture, plus a tail chain curling toward the ground with a tuft at the end. Since I'm unsure of a built-in rod/cylinder helper for limb segments, I'm considering writing my own function to orient cylinder geometry between two joint points using position and direction.\n\nI'll default to including `at:[0,0,0]` alongside explicit bone since the geometry is baked in model space already. For the mane, I'm planning layered rings of flattened cones/icosahedrons radiating outward from the head, with a gradient from golden near the face to chocolate at the tips, covering the back of the head, neck, shoulders, and chest.\n\nFor the head I'm building separate pieces: skull and muzzle ellipsoids, a black nose, a jaw on its own joint, amber eyes with black pupils, round ears, a brow ridge, a scar across the left eyebrow, whisker dots, and small cone teeth. For the body I'm shaping a tawny torso ellipsoid with a cream belly underneath, a shoulder hump, haunches, and I'm now working on the paws.\n\nStill placing body geometry...\n\nI'm recalculating the skull surface curve at the eye position to make sure the eyes sit properly embedded rather than floating outside the head, then placing the scar geometry nearby using a similar surface approximation.\n\nNow I'm positioning the ears as flattened dark brown-tan spheres, then setting up the mane as layered tufted shells around the head center, with radii and color gradients from golden to dark brown across the layers, skipping directions near the face opening so the mane frames rather than covers it.\n\nExtending the mane down toward the chest and shoulders with darker extra tufts, I'm building a lower, larger shell for the back of the mane and defining cone-shaped tufts oriented outward with a backward tilt. I'm writing a helper function to place and orient these cone parts efficiently across all the layers.\n\nUsing a Fibonacci sphere distribution to scatter tuft directions naturally, skipping ones pointing too far forward, and blending each cone's orientation with a backward-downward bias so they flow like fur. Now I'm setting the tawny, belly, and dark coloring, and moving on to building the tail as a chain of cylinder segments with an ellipsoid tuft at the end.\n\nNow I'm defining tail curve points that bend the tail to rest along the ground off to one side, with joints tail1-tail4 tapering in radius and spheres added at the joints for smoothness. I'm positioning the front legs lying down—shoulder joint, elbow near the ground, forearm resting along the floor to the wrist, and paw ellipsoid at the end.\n\nStill placing leg joints...\n\nI'm adjusting the torso and belly heights so the lion's body sits close to the ground, lowering the tail radius, and clamping mane tufts so none dip below the floor. Then I'm setting up the joint hierarchy starting with hips, spine, and chest positions.\n\nI'm considering how to attach the mane to the neck versus the head bone, and whether to bother defining chain roles for the joints given the uncertainty around the API's parent typing -- leaning toward skipping that for safety and just using simple parent references.\n\nNow I'm sketching out the facial details: a black pupil in front of the amber iris, a broad black nose ellipsoid with a brow above it, a cream lower jaw for the mouth line, small dark whisker dots on the muzzle, and tiny white cones for teeth, all built from low-poly spheres and rods for efficiency.\n\nWriting rod/bone geometry...\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuForestSpiritRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "forestSpirit",
+  "level": "rich",
+  "pitch": "A small forest spirit, part deer and part mossy stone. A body of grey river stone covered in soft green moss, slender wooden legs ending in little hooves, branching antlers sprouting tiny white flowers and leaves, a pale wooden mask-like face with two glowing green eyes, and a few fireflies circling its head.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:00:27.570Z",
+  "wallMs": 40949,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5397,
+    "completion_tokens": 9424,
+    "total_tokens": 14821,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00477596,
+  "hasCode": true,
+  "reasoning": "I need to write a single TypeScript module using the SDK, sticking only to the documented APIs I've seen since the reference is partial, and keeping things reasonably sized while still functional. I'm noting the known builder and joint APIs to use carefully.\n\nI'm working through how parenting works for joints, chains, sweeps, parts, sticks, surfaces, cards, and ring/along helpers -- trying to infer the correct option names and callback signatures from context since the docs are incomplete, and making reasonable guesses where the API shape is ambiguous.\n\nFor the stone body, I'm planning to use faceted dodecahedron geometries for rocky chunks and a flattened icosahedron for moss on top, distinguishing grey stone pieces from green moss through color and placement.\n\nFor the face, I'm thinking of a pale wood mask using a lathe or scaled sphere, with simple bright green spheres for glowing eyes since I can't use custom emissive materials, plus small yellow-green spheres scattered near the head bone for fireflies.\n\nFor antlers, I'll sprout main branches from a surface hit point on the head and then sprout secondary branches off points along those, adding white sphere flowers and flattened leaf spheres at the tips. For legs, I'm leaning toward chains of hip, knee, and ankle joints rather than the limb function since its behavior is unclear.\n\nI'm working out the body as a tube swept along a spine chain with a constant radius, then sticking dodecahedron stones onto its surface for a rocky texture, and setting up a head joint similarly attached near the top of that spine.\n\nNow I'm sketching the mask and eyes, placing a scaled sphere for the face and small glowing green spheres stuck onto its surface for eyes, while keeping in mind the 64-color limit. I'm also laying out rough proportions for the whole figure and defining leg chains as hip-to-knee-to-hoof point sequences for each of the four legs, then adding small cylinder hooves at the ground contact points with brown coloring.\n\nI'm now building the spine chain from tail through hips, mid-body, chest, and neck base up to the neck top, trying to work out how to properly reference the head joint so I can later attach antlers without running into parent/joint naming issues.\n\nRather than fighting the joint-parenting system for antlers, I think it's simpler to make the head its own small chain/sweep, then find a surface hit point on top of that sweep and sprout the antlers from there. I'm also sketching a pale wood mask part positioned near the head's upper area.\n\nFor eyes and antler branches, I'm leaning toward placing simple sphere parts directly at coordinates rather than relying on surface-hit targeting, and building antler branches as manual polyline sweeps with small radii instead of using the sprout branching mechanism, since its exact behavior feels too uncertain to trust here.\n\nFlowers and leaves on antler tips can just be small white spheres and flattened green blobs placed directly. For moss on the body, I'm planning to scatter flattened icosahedron geometries across surface points computed from the spine curve, using nearest-point lookups at an approximate body radius, and stone blocks as simple dodecahedron geometries.\n\nFor fireflies, I'll scatter small bright yellow-green spheres near the head, letting them auto-attach to the nearest bone. I've settled on a full color palette for stone, moss, wood, hooves, antler, flowers, leaves, and glow effects, and I'm setting up the rng seed and starting the build function with the meta export and the spine chain definition.\n\nDefining body chains and sweeps...\n\nI'm scattering moss patches around the spine surface using polar coordinates mapped to the body's curve, then placing glowing eye spheres just inside the head mask near the front.\n\nFor the antlers, I'm sketching branching polylines on each side with mirrored x-coordinates, adding small flower spheres and leaf icosahedrons at the tips, plus a handful of firefly spheres floating near the head. I'll finalize everything using the part builder with simple color and position props, and add a few moss tufts on the head surface before writing the final code.\n\n"
+}

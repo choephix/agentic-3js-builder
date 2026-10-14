@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuArmadilloRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "armadillo",
+  "level": "rich",
+  "pitch": "A nine-banded armadillo trotting along. A shell of overlapping banded plates in dusty pinkish-tan, a pointy snout, tall leathery ears, small beady eyes, sturdy clawed feet and a long armoured tail tapering to a point. A sprinkle of coarse pale hairs pokes out between the bands.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:58:35.987Z",
+  "wallMs": 82554,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5401,
+    "completion_tokens": 17094,
+    "total_tokens": 22495,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00861136,
+  "hasCode": true,
+  "reasoning": "I'm planning to build a TypeScript module using the SDK, sticking to documented APIs, and working out realistic proportions for a nine-banded armadillo model based on real body, tail, and height measurements.\n\nI'm sketching the skeleton structure: a hip root joint, spine and neck chains, a multi-joint tail, front and back leg chains, plus ears and jaw as separate pieces, while trying to figure out the exact parent/child joint syntax and whether to use individual joints or a chain helper for the tail.\n\nFor the body surface, I'm thinking of sweeping a tube along the spine path and layering banded ring segments for the shell texture, using an \"along path\" helper to place oriented cylinder or box geometry at intervals rather than relying on torus shapes that wouldn't follow the tube's curve.\n\nFor the body I'm thinking a simple sweep radius works well enough, with bands made from thin open cylinders placed along the path for the shell texture, maybe nine across the mid-body in a contrasting tan color. The head gets its own chain with a cone-shaped snout aimed forward using the part's direction parameter, and I still need to figure out the tail.\n\nFor the tail, I'm leaning toward chaining several short tapering sweeps between joint points with decreasing radius, explicitly assigning the bone so it tracks correctly, then adding ring bands along that path the same way as the body. I'm also considering sparse pale hairs between the bands using a spike primitive anchored to points along the surface.\n\nStill working out the hair placement...\n\nFor the body, I'll switch to using sticks for the small plates and quills, orienting thin cone geometry to point outward along the surface normal at each hit point. Then I need to lay out the leg skeleton: hip, knee, ankle, and foot joints positioned so the lowest claw points touch the ground, with diagonal leg pairs offset forward/back to suggest a trotting gait.\n\nI'm defining the spine as a chain of joints running from hips to chest, then working through how the chain's role/options and joint access might work given the uncertain API signature.\n\nSketching leg joint hierarchy...\n\nNow I'm working through the full skeleton and geometry plan: defining tail joints with tapering radii and a spike tip, leg joint positions for a trotting gait, head/snout/ear/eye/jaw construction using spheres, cones, and swept bezier paths, and the shell bands distributed along the spine with a cylinder ring geometry. I'm also sorting out hair placement using random spherical coordinates around the body surface, picking a dusty tan and brown color palette for body, bands, legs, claws, eyes, and hairs, and planning the final metadata export.\n\nScattering fine hairs across the body surface using random azimuth/elevation sampling and small cone geometries, then finalizing the band placements along the spine and double-checking all joint names are defined before assembling the final return statement with the necessary imports.\n\n"
+}

@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuCrabTerseSourcePrim",
+  "arm": "source-prim",
+  "subject": "crab",
+  "level": "terse",
+  "pitch": "A crab.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:20:16.981Z",
+  "wallMs": 59401,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112474,
+    "completion_tokens": 11533,
+    "total_tokens": 124007,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.0344607,
+  "hasCode": true,
+  "reasoning": "I need to build a crab model as a single TypeScript module using the SDK, with a default export function returning the root builder result and a meta export. I'm sizing it realistically, planning a carapace about 0.22 m wide with legs spanning roughly 30 cm, and setting up the coordinate system before constructing the body and legs.\n\nI'm structuring the joints: a root \"body\" joint, a \"carapace\" part, and four legs per side built as chains with hip, knee, and ankle names, then swept into tapered capsule shapes for the limb segments, positioning them along the body sides.\n\nNow I'm working out the actual coordinates for each leg's hip, knee, ankle, and foot tip so the legs angle outward and down to touch near the ground plane, with slight z-offsets per leg for a natural splay.\n\nGood—tip joint uses tangentAt(1) with point at(1), confirming the knot mapping works for the polyline chain with 3 spans. Now I'm setting up the sweep radius taper for the leg, going from thicker at the hip down to thinner at the foot.\n\nFor coloring, I'm giving the body a vivid crab orange-red with a mottled lighter accent for texture, and shaping the carapace as a flattened, scaled sphere to get a wide, dome-like shell proportion.\n\nFor the eyes, I'm adding small eye stalks as joints protruding from the front of the body, each topped with a tiny sphere to form the eyeball, likely white with a black pupil for contrast.\n\nNow I'm planning the claws: a jointed chain for each arm (shoulder, elbow, wrist, hand) extending from the front sides of the body, with a scaled sphere forming the palm and capsule-shaped fingers extending from the wrist to create the pincer shape.\n\nStill placing finger capsules...\n\nI'll mirror the whole arm/hand setup for the right side by negating x coordinates through a helper function, keeping naming conventions and colors consistent across both sides.\n\nNow I'm sketching the crab's abdomen as a flattened, lighter-colored sphere tucked near the back, then working out leg geometry—four legs per side with hip, knee, ankle, and foot joints positioned and tapered to look proportionate.\n\nFor eyes, I'm planning small capsule stalks rising from the carapace with spherical eyes and dark pupils on top, rigged with their own joints parented to the body. I'm also making sure all joint names across legs, arms, eyes, and body stay unique to avoid naming collisions in the chain hierarchy.\n\nSetting up chain and sweep logic...\n\nWorking through the carapace geometry now, checking that the hip joints for the legs sit just inside the ellipsoid surface so the legs emerge naturally from underneath. I'm sizing and positioning the abdomen sphere similarly, keeping proportions crab-like without adding extra rim details.\n\nAdding the mouth, eye stalks, and front spikes now using small capsules, spheres, and cone spikes with appropriate bone parenting and color options...\n\nNow I'm setting up the color palette and starting the main crab construction function, defining a mottled shell color, a lighter belly tone, and placing the root body joint before adding the first carapace part.\n\n"
+}

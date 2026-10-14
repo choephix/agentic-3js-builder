@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuScorpionRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "scorpion",
+  "level": "rich",
+  "pitch": "A desert scorpion in a threatening pose, tail arched high over its back. Glossy amber armour with darker bands at every joint, big crab-like pincers held forward, eight thin legs, a segmented tail ending in a bulbous dark stinger, and a cluster of tiny black eyes on the head shield.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:23:14.605Z",
+  "wallMs": 43746,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5406,
+    "completion_tokens": 9852,
+    "total_tokens": 15258,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.0049896,
+  "hasCode": true,
+  "reasoning": "I need to produce a single TypeScript module with the SDK, but I'm missing full docs for several helpers like part, joint, chain, sweep, limb, and paint, so I'll stick closely to the documented signatures I do have, like createBuilder and joint definitions with position and orientation parameters, to minimize risk of misusing the API.\n\nFor chains, parts, sweeps, and sticks, I'm inferring reasonable call patterns from the examples given, using parent references for child joints and simple color strings instead of complex paint/stripe systems to stay robust and reduce risk of API misuse.\n\nNow I'm designing the actual scorpion: a real-world-ish size with a body around 12-14cm long, legs reaching the floor while the body floats slightly above them, and a tail chain arching up over the back from the rear of the body, curving high and then forward-down to end at the stinger near the front.\n\nI'm figuring out how to construct the tail as a series of segments that follow the chain's bones, considering whether to use a sweep along the path or build individual capsule/cylinder parts at each joint aimed along the tail's direction.\n\nFor legs I need eight total, four per side, each with hip, knee, and foot joints connected by tapered segments running from the body down to the floor, with symmetry mirrored across sides.\n\nI'm working out a helper to build each leg segment as a thin cylinder by computing its midpoint, length, and orientation from the two endpoint joints, then aligning the cylinder's axis to match that direction vector.\n\nFor the body, I'm blocking out a boxy prosoma shape for the blocky puppet aesthetic, adding small black spheres clustered on top-front as eyes, and sketching out the pedipalp (pincer arm) joint chain with shoulder, elbow, and wrist points extending forward from the body.\n\nNow I'm defining the claw itself with fixed and moving finger boxes, deciding boxes don't need directional orientation since their dimensions align naturally to the model axes. Then I'm laying out the mesosoma and tail segments with darker banded boxes at the joints to suggest exoskeleton plates, continuing the tail joint chain upward and backward.\n\nThe tail arcs up and curves forward, ending in a bulb sphere and sharp spike for the stinger, with tapering cylinder segments and ring bands between joints. I'm setting up the parent bone chain for each tail segment, picking amber and dark brown color values for the body, legs, pincers, and stinger, and placing six small black eye spheres near the front top of the prosoma.\n\nNow I'm writing the module imports and defining the leg joint hierarchy (hip, knee, foot) for each side, then building the builder setup with a root body joint positioned above the floor so the legs reach down to ground level. Writing segment helper function...\n\nStill placing body segments...\n\nStill placing tail joints...\n\nAdding the stinger as a tapering cylinder from the bulb to a sharp tip pointing toward the prosoma, then setting up the shoulder joint bones for the pedipalps.\n\nContinuing with the pedipalp segments down to elbow and wrist, then building the pincer hand with a fixed finger and a splayed inner/outer finger pair as separate boxes positioned at the wrist.\n\nFor the head, I'm placing a six-sphere eye cluster in a rough arc near the front of the prosoma, plus a darker front shield box, and I'm planning a lighter amber highlight stripe along the top of the carapace for a glossy armor look.\n\nI'll finish up by exporting the root bone from the build function, loosely typing the joint helper with `any` to sidestep strict parent/bone typing issues, then writing out the final concise code.\n\n"
+}

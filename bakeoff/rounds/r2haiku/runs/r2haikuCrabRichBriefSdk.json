@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuCrabRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "crab",
+  "level": "rich",
+  "pitch": "A feisty red rock crab with one oversized claw raised in challenge. A wide, knobbly shell in brick red speckled with orange and cream, eyes on stalks, eight jointed walking legs with pointed tips, and claws with dark tips and little teeth on the pinchers. A tiny barnacle and a strand of seaweed cling to the back of its shell.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:21:13.504Z",
+  "wallMs": 60176,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5410,
+    "completion_tokens": 13532,
+    "total_tokens": 18942,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.0068312600000000005,
+  "hasCode": true,
+  "reasoning": "I need to pick a safe, well-documented subset of SDK functions to build this module with—things like builder constructors, part/stick/surface primitives, pattern helpers like paint, spots, and stripes, and geometry utilities like lerp, arc, and bezier.\n\nFor joints and chains, I'm being cautious since the exact parent-passing convention isn't fully clear from the examples. I'll follow the pattern of naming a joint and giving it an `at` position, then linking children via a `parent` reference, and treat chains as named paths built from sequences of these joints.\n\nFor the legs, I'll build chains of hip-knee-ankle-tip joints and then sweep tubes along them for geometry, favoring correctness of the render over precise rig articulation since that's not the main focus here. Eyes will sit on stalks using sprouted sphere parts positioned at the end of each chain.\n\nFor the shell I'll use a scaled sphere part to form an ellipsoid body shape at a specified position and scale. For the knobs, rather than relying on uncertain surface-scattering APIs, I'll compute positions analytically on the ellipsoid surface and place small spheres slightly outward from it. I'm skipping the paint/spots/stripes helpers since their signatures are unclear, and instead varying color by using several small knob spheres in different orange and cream tones to fake speckling.\n\nNow I'm figuring out the claw and pincer construction -- placing an oversized claw on the raised side, building the arm as a chain of parts toward the wrist, and forming the pincer pieces by extruding a 2D triangle-like outline, falling back to plain three.js Shape and ExtrudeGeometry if the custom extrude helper's options are too uncertain. For teeth, I'm considering using small spike primitives but am unsure whether color is a supported parameter there.\n\nI'm deciding to switch teeth to simple small cones or boxes using plain geometry with manual rotation instead of relying on uncertain orientation options. I'm also planning eye stalks as short upward sweeps topped with sphere eyes in cream with dark pupils, and sketching out the leg system as joint chains (hip-knee-ankle-tip) built with `b.chain` and swept into tapered limbs, with pointed tips formed from rotated cone geometry.\n\nWorking out the cone orientation using the `aim` parameter on `b.part`, positioning the cone's center partway along the tip direction so it points outward correctly. I'm then moving on to the claws, planning an arm chain from shoulder to elbow to wrist, with a palm shape and extruded pincer pieces at the wrist.\n\nNow I'm laying out the overall crab proportions: shell dimensions roughly 0.6m wide, legs positioned at various z-offsets front to back, with hip, knee, ankle, and tip coordinates mapped out to create the outward-and-down leg shape touching the ground. I'm naming the leg chains and considering whether to pass a \"role\" option to mark them as legs.\n\nFor the claw arm, I'm positioning the shoulder, elbow, and wrist joints, then building the palm as a scaled ellipsoid at the wrist with pincers extending forward. I'm working out how to construct the pincer shapes using extruded 2D outlines in the local XY plane, then rotating them so the extrusion points forward along Z instead of X, using rotation math to figure out the correct axis transforms and centering offsets.\n\nI'm also planning smaller details like dark pincer tips, teeth as small boxes, a barnacle cone on the shell, seaweed swept along a path, and eye stalks with cream eyeballs and dark pupils. For attachment, I'm deciding to let parts auto-bind to the nearest joint rather than specifying bones explicitly, since that seems to be how the builder handles rigging.\n\nWriting crab build script...\n\n"
+}

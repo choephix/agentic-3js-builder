@@ -1,0 +1,25 @@
+{
+  "slug": "r2SnailTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "snail",
+  "level": "terse",
+  "pitch": "A snail.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:09:21.487Z",
+  "wallMs": 69819,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112460,
+    "completion_tokens": 8417,
+    "total_tokens": 120877,
+    "prompt_tokens_details": {
+      "cached_tokens": 112450
+    }
+  },
+  "costUsd": 0.10668,
+  "hasCode": true,
+  "reasoning": "I'm planning a snail model with a jointed skeleton, sizing the body around 9cm and shell around 4.5cm diameter, then laying out a root joint and spine chain from tail to head with neck, head, and tentacle bones of varying lengths.\n\nI'm working through the body sweep geometry, deciding how the path curves and how radii taper at the tail and head so the foot sits flush with the floor while giving the snail a natural tapered shape.\n\nNow I'm settling on a five-joint chain (tail, hip, mid, neck, head) with a head sphere at the end, adding jaw geometry as a small box joint for the mouth, and planning eyestalks sprouting from the head that angle up and forward with bead-like eye tips.\n\nI'll use a 3-point polyline with 2 named joints for each stalk, attaching an eye bead as a small black sphere bound to the tip joint, with a tiny white highlight sphere for shine. The lower tentacles get similar but shorter treatment, angled forward-down with rounded tips. Then I'll move on to building the shell using a logarithmic spiral.\n\nFor the shell, I'm thinking through a planar coil in the YZ plane with the axis along X, sweeping a tube whose radius shrinks geometrically from the aperture outward to the tight inner coil, though I need to watch for overlapping tubes since the spiral has zero pitch.\n\nWorking through the tangency condition, I get k≈0.26 for touching coils, but that's too thin, so I'll just let the whorls overlap into a solid shell using a larger tube radius ratio (~0.45-0.55) with a slight pitch offset per turn. Settling on 2.5 turns, radius shrinking from 0.016 to 0.004, tube radius scaling with it to give an overall diameter around 0.05, and I'll flare the opening wider near the start for a more natural shell aperture.\n\nI'm now checking the vertical placement so the shell sits correctly against the body without clipping through the floor or sinking into the body mesh — adjusting the shell's center height and the body's width so the bottom of the coil rests just above ground level and aligns against the back of the body shape.\n\nFor the spiral itself, I'm working out the starting rotation so the coil's helix winds correctly around the axis, placing the aperture (the opening end) toward the front-bottom-right so it reads as facing forward naturally.\n\nEither spiral direction works visually since it's just mirrored chirality, so I'll go with turns of 2.5 starting from the front-bottom aperture, letting it wrap under and around toward the top. Now I want to add coloring—brownish stripe bands running along the spiral surface to give it that classic snail shell look, probably using surface coordinate-based paint.\n\nNow I'm setting up the shell joint parented to the mid-body skeleton for rigging, then handling the skin shading with countershading and mottled texture for the back and lighter belly tones based on surface normal. I'll also consider adding small tubercle-like spots sticking out on the back for texture detail.\n\nNext, I'm positioning the head: adding a flattened mantle collar near the shell edge, placing a scaled head sphere at the chain's tip joint, then building out the mouth with an upper jaw box and a lower jaw joint parented to the head.\n\nNow I'm setting up the skeletal structure—defining the spine chain with root, tail, hip, mid, neck, and head joints, confirming the span count matches the tentacle sprouting function I'm about to write for the side-mounted tentacles.\n\nStill writing tentacle path code...\n\nUsing low-poly sphere geometry for body parts attached to bones with scaling, and building the shell with a spiral helper function that creates a cone-like helix offset along the x-axis, with a radius function tapering along the shell's length.\n\nNow I'm defining the paint shader for the shell, mapping stripe bands based on angular position around the spiral with darker bands for a fraction of the cycle, and blending shade based on position along the tube so the tip appears lighter than the base.\n\nI'm also checking the mantle placement as a scaled sphere sitting on the shell joint, and verifying the body's lowest point sits flush with the ground by matching the taper factor and radius at the midpoint.\n\n"
+}

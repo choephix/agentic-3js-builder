@@ -3,6 +3,7 @@
 // bake; bone weights and the inheritance rule (`weightsFor`); `Capture`, which keeps build-time data valid after
 // poses; and the placement primitives every helper uses (`setWorld`, `meshFromWorld`, `makeMesh`, `skinMesh`).
 import {
+  Box3,
   BufferGeometry,
   Float32BufferAttribute,
   Group,
@@ -11,6 +12,7 @@ import {
   Mesh,
   MeshStandardMaterial,
   Quaternion,
+  Triangle,
   Uint16BufferAttribute,
   Vector3,
 } from "three";
@@ -20,13 +22,13 @@ import type { Painted } from "./bake";
 import type { Frame } from "./frame";
 import { Paint } from "./paint";
 import type { RigRecord } from "./rig";
-import type { Joint } from "./skeleton";
+import type { Chain, Joint } from "./skeleton";
 
 /** What every `color` option takes: a colour string, or a Paint baked into a texture over the surface. */
 export type Fill = string | Paint;
 
-/** A joint handle or a joint name. */
-export type JointRef = Joint | string;
+/** A joint: its handle, its name, a Chain (its last joint) or the joint's three.js group (`joint.object`). */
+export type JointRef = Joint | string | Chain | Object3D;
 
 /**
  * Bone influences, heaviest first, summing to 1: `[[joint, weight], ...]`. One entry = rigid on that bone. Empty =
@@ -129,12 +131,60 @@ export class Capture {
  */
 export type Tags = { name?: string; group?: string; kind?: string };
 
+/** The colour of a shape built without `color` when no part is built yet. */
+export const DEFAULT_COLOR = "#999999";
+
+/**
+ * `color` as a Fill. Without one (undefined or null), the fill of the nearest part already built to `at()`, the
+ * point the shape starts from, else `DEFAULT_COLOR`. Anything else is an error naming `call`.
+ */
+export function fillFor(ctx: Ctx, call: string, color: unknown, at: () => Vector3): Fill {
+  if (color instanceof Paint || typeof color === "string") return color;
+  if (color === undefined || color === null) return nearestFill(ctx, at());
+  throw new Error(`${call}: color takes a colour string or a paint; got ${describe(color)}`);
+}
+
+/**
+ * The fill of the SDK-built part whose surface passes closest to `p`, else `DEFAULT_COLOR`. `built` limits the
+ * search to the first meshes made, so a shape never takes its own colour.
+ */
+export function nearestFill(ctx: Ctx, p: Vector3, built = Infinity): Fill {
+  let best: Fill = DEFAULT_COLOR;
+  let bestD = Infinity;
+  const box = new Box3();
+  const triangle = new Triangle();
+  const closest = new Vector3();
+  let seen = 0;
+  for (const [mesh, fill] of ctx.fills) {
+    if (seen++ >= built) break;
+    mesh.updateWorldMatrix(true, false);
+    const geometry = mesh.geometry;
+    geometry.computeBoundingBox();
+    if (box.copy(geometry.boundingBox!).applyMatrix4(mesh.matrixWorld).distanceToPoint(p) >= bestD) continue;
+    const position = geometry.getAttribute("position");
+    const index = geometry.index;
+    const count = index ? index.count : position.count;
+    const corner = (k: number, v: Vector3) =>
+      v.fromBufferAttribute(position, index ? index.getX(k) : k).applyMatrix4(mesh.matrixWorld);
+    for (let k = 0; k + 2 < count; k += 3) {
+      corner(k, triangle.a);
+      corner(k + 1, triangle.b);
+      corner(k + 2, triangle.c);
+      const d = triangle.closestPointToPoint(p, closest).distanceTo(p);
+      if (d < bestD) [best, bestD] = [fill, d];
+    }
+  }
+  return best;
+}
+
 export class Ctx {
   readonly root = new Group();
   readonly joints = new Map<string, Joint>();
   rootJoint: Joint | null = null;
   readonly meshes = new Map<Joint, Mesh[]>();
   readonly owner = new Map<Mesh, Joint>();
+  /** The fill of every mesh the SDK made, in build order: the default colour of a shape without one. */
+  readonly fills = new Map<Mesh, Fill>();
   /** Rig answer-key records, evaluated against the current pose when `b.root` is read. */
   readonly rig: Array<() => RigRecord> = [];
   /** Blend-skinned meshes, re-deformed after every `pose()`. */
@@ -175,6 +225,7 @@ export class Ctx {
 
   /** One shared matte material per colour, like the creature-lab kit. */
   material(color: string) {
+    if (typeof color !== "string") throw new Error(`color takes a colour string or a paint; got ${describe(color)}`);
     const key = color.toLowerCase();
     let cached = this.materials.get(key);
     if (!cached) {
@@ -252,10 +303,16 @@ export function weightsOf(x: unknown): Weights | null {
 /**
  * The weights for new geometry: explicit `bone` (rigid), else the weights of the first input that came from
  * something built (a joint, part, hit, sweep, tube or chain point, or a path made from them), else rigid on the
- * joint nearest to `at`.
+ * joint nearest to `at`. `where` names the call and option in errors ("part(): bone").
  */
-export function weightsFor(ctx: Ctx, explicit: JointRef | undefined, inputs: readonly unknown[], at: Vector3) {
-  if (explicit !== undefined) return rigid(resolveJoint(ctx, explicit));
+export function weightsFor(
+  ctx: Ctx,
+  explicit: JointRef | undefined,
+  inputs: readonly unknown[],
+  at: Vector3,
+  where = "bone",
+) {
+  if (explicit !== undefined) return rigid(resolveJoint(ctx, explicit, where));
   for (const input of inputs) {
     const mesh = input && typeof input === "object" && "isMesh" in input ? ctx.owner.get(input as Mesh) : undefined;
     const weights = weightsOf(input) ?? (mesh ? rigid(mesh) : null);
@@ -265,20 +322,55 @@ export function weightsFor(ctx: Ctx, explicit: JointRef | undefined, inputs: rea
 }
 
 /** The bone for new joints: the heaviest bone of `weightsFor`. */
-export function boneFor(ctx: Ctx, explicit: JointRef | undefined, inputs: readonly unknown[], at: Vector3) {
-  return weightsFor(ctx, explicit, inputs, at)[0][0];
+export function boneFor(
+  ctx: Ctx,
+  explicit: JointRef | undefined,
+  inputs: readonly unknown[],
+  at: Vector3,
+  where = "parent",
+) {
+  return weightsFor(ctx, explicit, inputs, at, where)[0][0];
 }
 
-/** The joint for `ref`; omitted = the root joint. */
-export function resolveJoint(ctx: Ctx, ref?: JointRef) {
+/** A short description of a value for error messages. */
+export function describe(x: unknown): string {
+  if (x === null || x === undefined) return String(x);
+  if (typeof x === "string") return `"${x}"`;
+  if (typeof x !== "object") return `${typeof x} ${String(x)}`;
+  if (Array.isArray(x)) return `an array of ${x.length}`;
+  const name = (x as { name?: unknown }).name;
+  const type = String((x as { type?: unknown }).type ?? x.constructor?.name ?? "Object");
+  const what = type === "Object" ? "an object" : `${/^[AEIOU]/.test(type) ? "an" : "a"} ${type}`;
+  return `${what}${typeof name === "string" && name ? ` "${name}"` : ""}`;
+}
+
+/**
+ * The joint for `ref`: a Joint, a joint name, a Chain (its last joint) or a joint's three.js group
+ * (`userData.joint`); omitted = the root joint. `where` names the call and option in errors ("joint(): parent").
+ */
+export function resolveJoint(ctx: Ctx, ref?: JointRef, where = "bone"): Joint {
   if (ref === undefined) {
     if (!ctx.rootJoint) throw new Error("No root joint yet: create one with b.joint(name, { at }) first");
     return ctx.rootJoint;
   }
-  if (typeof ref !== "string") return ref;
-  const joint = ctx.joints.get(ref);
-  if (!joint) throw new Error(`Unknown joint "${ref}"`);
-  return joint;
+  const named = (name: unknown) => (typeof name === "string" ? ctx.joints.get(name) : undefined);
+  if (typeof ref === "string") {
+    const joint = named(ref);
+    if (!joint) throw new Error(`${where}: no joint named "${ref}"`);
+    return joint;
+  }
+  if (ref && typeof ref === "object") {
+    if (named((ref as Joint).name) === ref) return ref as Joint;
+    if ("spanJoints" in ref && Array.isArray((ref as Chain).joints)) {
+      const joints = (ref as Chain).joints;
+      return joints[joints.length - 1];
+    }
+    if ("isObject3D" in ref) {
+      const joint = named((ref as Object3D).userData.joint);
+      if (joint && joint.object === ref) return joint;
+    }
+  }
+  throw new Error(`${where} takes a Joint, a joint name or a Chain; got ${describe(ref)}`);
 }
 
 /** Parent `object` under `parent` so its WORLD transform is (position, quat, scale); matrices are left current. */
@@ -401,14 +493,19 @@ export function makeMesh(
     const { geometry: cut, ...charts } = chartify(geometry, toWorld);
     const mesh = new Mesh(cut, ctx.paintMaterial());
     ctx.paints.push({ mesh, paint: fill, wrap, ...charts });
+    ctx.fills.set(mesh, fill);
     return mesh;
   }
-  if (!texture) return new Mesh(geometry, ctx.material(fill));
-  if (!geometry.getAttribute("uv"))
+  if (texture && !geometry.getAttribute("uv"))
     throw new Error(
       "`texture` needs geometry with UVs: a three.js geometry, or cards; SDK shapes take a paint instead",
     );
-  return new Mesh(geometry, ctx.textured(texture, fill, Boolean(geometry.getAttribute("color"))));
+  const mesh = new Mesh(
+    geometry,
+    texture ? ctx.textured(texture, fill, Boolean(geometry.getAttribute("color"))) : ctx.material(fill),
+  );
+  ctx.fills.set(mesh, fill);
+  return mesh;
 }
 
 /** `skinIndex` / `skinWeight` attributes (indices into the returned bone list), up to 4 influences per vertex. */

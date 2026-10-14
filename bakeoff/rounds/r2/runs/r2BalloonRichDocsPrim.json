@@ -1,0 +1,25 @@
+{
+  "slug": "r2BalloonRichDocsPrim",
+  "arm": "docs-prim",
+  "subject": "balloon",
+  "level": "rich",
+  "pitch": "A hot-air balloon about to take off. A big envelope in bold vertical stripes of sunflower yellow, tomato red and sky blue with a patterned band around the middle, a burner glowing orange at the mouth, ropes down to a woven wicker basket with sandbags hanging on its sides and a little flag on one corner.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:14:19.443Z",
+  "wallMs": 54464,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32697,
+    "completion_tokens": 7286,
+    "total_tokens": 39983,
+    "prompt_tokens_details": {
+      "cached_tokens": 32586
+    }
+  },
+  "costUsd": 0.0795992,
+  "hasCode": true,
+  "reasoning": "I'm planning a simple module for a hot-air balloon, using a root joint as a safe base even without a creature rig. I'm sizing it realistically—envelope around 15m tall and wide, basket about 1.2x1.2x1m—and placing the basket on the ground to suggest it's about to take off.\n\nFor the envelope, I'm lathing a profile around the vertical axis and painting stripes based on angle, using atan2 to divide it into color gores. I'm sketching out the radius-height profile points to shape the bulging envelope body, mouth skirt, and taper toward the top, while planning ropes connecting the basket rim up to the envelope's mouth.\n\nFor the mid-band decoration, I'm figuring out a diamond pattern of dark navy with cream triangles by computing a local angular fraction and vertical fraction within the band to create a zigzag effect.\n\nI'm planning the cap colors (cream at top, maybe cream at skirt bottom too), then moving on to the burner assembly: posts rising from the basket corners to a burner frame with a coil and an orange emissive flame cone pointing upward.\n\nNow sketching the burner flame geometry with orange and yellow core colors, silver burner pipe, steel support poles from basket corners up to the envelope mouth, connecting ropes, and starting the wicker basket shape as a frustum box.\n\nAdding the rim boxes and leather bands at different heights, then placing hanging sandbags as scaled spheres with sand coloring and small tie cylinders at the sides and front/back positions, attached with ropes near the basket's outer faces.\n\nNow I'm adding a flag pole at a corner, rising upward, with a pennant shape extruding sideways using a swallowtail notch outline.\n\nI'm also adding a ground tether rope connecting the basket to a stake near the floor, and starting to lay out the joint hierarchy (basket, envelope, burner) so each part is properly bound.\n\nNow I'm computing the rope attachments connecting the pole tops to the mouth ring of the envelope, using angles derived from each pole's corner position to place attachment points around the circular mouth at the right radius and height.\n\nFor the burner, I'm adding a torus-shaped coil ring plus skipping the propane tanks since they'd be hidden inside the basket box, and instead adding a cross-bar frame connecting the pole tops above the burner.\n\nNow I'm writing the paint function for the balloon envelope, computing angular gore divisions with atan2 and mapping bands of color by height for the stripes and gold trim.\n\nI'm setting up the lathe call for the vessel shape, but worried smoothing might cause issues near the axis, so I'll switch to smoothing 0 and add more profile points instead for cleaner corners. I'm sketching out the radius-by-height points from bottom to top to define the full outline.\n\n"
+}

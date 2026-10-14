@@ -1,0 +1,25 @@
+{
+  "slug": "r2OwlTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "owl",
+  "level": "terse",
+  "pitch": "An owl.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:07:27.080Z",
+  "wallMs": 29165,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5296,
+    "completion_tokens": 4227,
+    "total_tokens": 9523,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.043347199999999995,
+  "hasCode": true,
+  "reasoning": "I'm planning to build an owl model using a small set of well-documented SDK calls—joints, chains, sweeps, and parts—keeping the API usage minimal and safe to avoid relying on unclear signatures.\n\nFor geometry, I'll use spheres, boxes, and cones with scale and dir parameters, assuming cone axes align along the dir vector (like the beak pointing down-forward). I'm sketching out the joint hierarchy—root, body, head, jaw, wings, tail, legs, feet—with parent relationships, and planning a rest pose roughly owl-sized, with wings held slightly spread and angled out from the body rather than fully extended.\n\nNow I'm laying out precise positions: root near the base, body center raised with an ellipsoid scale, legs and clawed feet below, and a head positioned up top with scaled sphere proportions for the facial shape. I'm adding facial discs, yellow eyes with black pupils, a beak, ear tufts, brow ridges, chest streak details, and an angled tail box, aiming for a total height around 0.62m including the tufts.\n\nNow I'm defining a low-poly sphere geometry and a helper function to place colored parts at bone positions, mirroring wing ellipsoids symmetrically across the X axis with tilted directional vectors. I'm computing chest barring by sampling points across the body ellipsoid's front surface using its radii to scatter small cream and dark spheres as feather markings.\n\nSetting the color palette next — brown, buff, dark, face tones, yellow, beak black, and talon gray — then parenting the head to the body's bone before writing it out.\n\n"
+}

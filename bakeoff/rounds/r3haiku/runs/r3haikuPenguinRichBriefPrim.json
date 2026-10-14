@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuPenguinRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "penguin",
+  "level": "rich",
+  "pitch": "An emperor penguin chick's proud parent. Glossy blue-black back and head, a crisp white belly blending into a warm golden-yellow patch at the neck and ear, a long slender beak with an orange-pink stripe, stubby flippers held slightly out, and big black feet. A fluffy grey chick peeks out from between its feet.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:56:52.492Z",
+  "wallMs": 37245,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5416,
+    "completion_tokens": 8073,
+    "total_tokens": 13489,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.004101100000000001,
+  "hasCode": true,
+  "reasoning": "I'm planning to stick to only the documented SDK methods I know are safe—things like joints, chains, sweeps, parts, surfaces, decals, and the various shading/pattern helpers—rather than guessing at undocumented API surface.\n\nI'm reasoning through how b.part likely handles placement and orientation, leaning toward using `at`, `bone`, and `dir` parameters to position and align each geometry since the exact semantics of `aim` are unclear. I'll keep the implementation simple, relying mainly on b.part with occasional b.sweep for things like a neck, to minimize the risk of misusing the API.\n\nNow I'm sketching the penguin's skeleton: setting the body's root joint around hip height, then chaining up through chest, neck, and head joints with approximate coordinates, using scaled spheres for a rounded torso and keeping everything as simple parent-child b.joint relationships rather than more complex chain structures I'm unsure about.\n\nFlippers branch off the chest as angled capsules, legs branch off the hips down to flattened sphere feet with toe capsules, and I'm placing a small fluffy chick cluster near the feet attached to the hips joint since only one root joint is allowed. For materials I'm picking a palette of blue-black, white, gold, orange-pink, black, and grey to color the different body parts.\n\nNow I'm adding the belly, gold neck patches, and ear patches as scaled spheres positioned around the chest and head, then shaping the beak as a slender forward-angled cone with a thin orange stripe box near its tip, plus a small black sphere for the eye. I'm checking the part API supports a scale option alongside position and bone attachment, confirming the function needs to export meta and return the root bone, and planning to use the rng utility to scatter several small spheres for the chick's fluffy texture.\n\nI'm deciding to skip rng entirely and use fixed sine-based offsets for deterministic jitter instead, keeping imports simple to just createBuilder. For the chick, I'm placing a cluster of grey fluff spheres near the feet by attaching them to a dedicated \"chick\" joint off the hips, then working out the penguin's upright proportions -- torso and belly as scaled spheres sized to fit a roughly 1.15 unit tall body, with the dark back and white front belly shaped as overlapping ellipsoids.\n\nNow I'm working out positions for the head, feet, legs, and flippers using spheres and capsules with specific scale and direction vectors to get the right stubby proportions and outward-held flipper angle, then planning to write the actual geometry code with low-poly spheres and capsules plus a small orange beak stripe.\n\nI'm defining the color palette and starting the joint hierarchy for the penguin rig, setting up hips, chest, neck, head, shoulders, and leg joints with parent relationships to establish the skeletal structure.\n\nNow I'm placing the body parts: back and belly spheres scaled to form the torso shape, gold patches for the chest bib, neck, and ear markings, and the head sphere with eye placement calculated relative to the head's surface position.\n\nFor the beak, I'm using a dark cone shape oriented forward from the head joint to form the long slender emperor penguin beak, then adding a thin cylinder as the characteristic orange stripe running along its lower edge.\n\nFor the limbs, I'm sketching capsule shapes for the flippers angled outward and down from the chest, dark leg capsules under the hips, and flattened sphere feet with a small toe sphere, spacing them so there's room between the feet for the chick.\n\nFor the baby chick peeking out, I'm layering several soft grey spheres to build a fluffy rounded body and head, adding a tiny black eye and a small dark cone beak, then finalizing the structure to return the completed root bone with all joint positions as proper 3-value coordinate arrays.\n\n"
+}

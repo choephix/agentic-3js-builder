@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuKoalaTerseSourcePrim",
+  "arm": "source-prim",
+  "subject": "koala",
+  "level": "terse",
+  "pitch": "A koala.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:59:26.943Z",
+  "wallMs": 41425,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112474,
+    "completion_tokens": 8926,
+    "total_tokens": 121400,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.0279432,
+  "hasCode": true,
+  "reasoning": "I'm planning out a koala model as a single TS module for the SDK—thinking through realistic proportions for a sitting koala around 0.7m tall, with a stylized big round head, large ears, chunky body, facing forward.\n\nI'm mapping out the joint hierarchy: hips as the root joint, then spine chain up through chest, neck, and head, plus leg joints for hips/knees/feet, arm joints for shoulders/elbows/wrists hugging forward, ear joints, and a small tail nub, all with specific coordinates in meters with +Z forward.\n\nFor the fur coloring, I'm settling on a greyish palette with mottled variation for the back, a lighter cream belly using countershading, dark nose and eyes, and pinkish-tan inner ears. I'm deciding to keep the pose simple—a sitting koala on the ground without a branch to hug—and starting to write the setup function with the builder.\n\nSetting up joint hierarchy...\n\nWith names length 3 matching spans+1, the tip joint \"ankleL\" lands at the path's end, giving a proper leg chain with role leg and default contact there. I should pass parent explicitly (e.g. hips) rather than relying on inferred nearest-joint weighting from the raw point array.\n\nFor geometry I'm leaning toward sweeping the limb chains directly rather than building separate capsules — using tapered radius arrays like [0.07, 0.05, 0.06] for arms, legs, neck, and tail, while the body itself stays as simple sphere/ellipsoid parts attached to the chest bone.\n\nI'm scaling the body and rump spheres into ellipsoid shapes and positioning the head, ears, and inner ears as flattened spheres attached to the head bone, adjusting their positions and scale ratios so the ears sit correctly on top of the head.\n\nNow I'm defining the face: a dark nose sphere and pale muzzle sphere positioned below it, plus small black eye spheres with highlight considerations. For the arms I'm setting up a shoulder-elbow-wrist chain with varying sweep radii so the limbs taper naturally, placing a paw sphere at the wrist and considering whether to add tiny spike-based claws.\n\nNow I'm working out the sitting posture for the legs, positioning hip, knee, and ankle joints and sizing the foot pad sphere so its bottom just touches ground level at y=0, then setting up the leg chain similarly to the arms with named joints for hip, knee, and ankle.\n\nI need to mirror the legs across the X axis for left and right sides, parenting both to the hips joint, then sweep a tapering radius profile along each leg chain using the fur color. I'll add a small tail nub sphere behind the hips, and apply countershading paint to the belly and fur-colored sweeps for the final stylized look.\n\nWriting module imports and setup...\n\nNow I'm defining a sphere helper function and building out the joint hierarchy, starting with hips, chest, and neck bones for the koala's skeleton.\n\nAdding neck capsule, head sphere...\n\nStill defining arm chains...\n\nContinuing legs...\n\nAdding small claw spikes...\n\nChecking the leg geometry down through knee and ankle radii, the foot bottom lands right around zero with a slight tolerable sink. That all checks out, so I'll write a short intro line followed by the code, keeping things concise overall.\n\n"
+}

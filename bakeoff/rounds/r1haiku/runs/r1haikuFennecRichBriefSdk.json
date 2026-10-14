@@ -1,0 +1,25 @@
+{
+  "slug": "r1haikuFennecRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "fennec",
+  "level": "rich",
+  "pitch": "A fennec fox kit standing alert on a little sand dune at dusk. Enormous satin ears lined in pale peach, cream fur warming to sandy gold along its back, a fluffy tail with a smudge of black at the tip, and big dark eyes with a tiny white sparkle. Its paws are a touch oversized, like it hasn't grown into them yet, and it wears a woven leather collar with a small brass bell.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T20:49:51.065Z",
+  "wallMs": 45297,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5289,
+    "completion_tokens": 9566,
+    "total_tokens": 14855,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.0053119,
+  "hasCode": true,
+  "reasoning": "I need to write a single TypeScript module using the SDK, sticking only to well-documented helper functions I'm confident about since I don't have the full API reference for paint, textures, or SVG details — using things like createBuilder, joint, chain, sweep, loft, and similar helpers to avoid errors from guessing at unfamiliar APIs.\n\nGiven the ambiguity around exact parameter signatures for joints, chains, and sweeps, I'll minimize the API surface I rely on and commit to plausible, conservative options rather than risk incorrect calls.\n\nI'm thinking about getting surface points from bodies via b.surface(body).nearest(p), then building the fox's body as a chain of joints along the spine, using a loft of stations (each with position and radius) to form the sweep shape. I'll keep the API assumptions minimal and self-consistent, relying mainly on joint and chain primitives rather than uncertain helpers like paint or region.\n\nFor the surrounding scene I'm sketching a small dusk desert setting: a fox kit roughly 0.45m tall and 0.5m long perched on a gently mounded sand dune, which I'll approximate with a flattened sphere-like geometry.\n\nI'm working out the orientation so the fox faces +Z with feet resting at y=0, while the dune forms a mound beneath it dipping into the ground so the feet appear planted naturally on top.\n\nSketching proportions now: paws to ear tips around 0.6 total height, with body length roughly 0.5.\n\nNow I'm setting joint positions for the skeleton—hips, spine chain, chest—building toward the leg and shoulder structure.\n\nI'm thinking through a simpler approach: build the spine, neck, tail, and legs as joint chains, then attach mesh pieces (sweeps, sticks) to each joint frame as the actual visible geometry, since joints are just Object3D-like frames that can parent child meshes.\n\nFor stick-placed geometry, I'll assume it centers at the frame point with the shape's axis aligned to dir. For ears I'm considering extrude with a 2D outline shape positioned via at/x/y axes, sketching a simple triangular profile.\n\nStill refining shapes... I'll layer two extrudes per ear, an outer cream-gold one and a smaller peach inset in front, to get a lined look. Now I'm picking the palette: cream-gold body \"#e8c48a\", sandy gold back, pale cream belly \"#f6e7cf\", and ear tones split between a darker gold outer \"#c9914f\" and peach inner \"#f2c4a6\".\n\nFor the rest, I'm settling on near-black eye and tail-tip shades, dark socks for the paws, and leather-brown with brass accents for the collar. I'm sketching out the loft-based body construction using stations with position and radius, then building a joint chain for the spine starting at the hips and running up toward the neck.\n\nStill building the skeleton chains...\n\nDefining leg positions...\n\nPositioning the dune in sand color with proportions that keep the fox's paws resting naturally on its surface. Now I'm working out the ear geometry, using cone shapes attached at the head joint and tilted back to give them a triangular, satin-eared look.\n\nAdding eyes, sparkle highlights, nose, and muzzle details positioned on the head's front surface.\n\nFor the collar, I'm using a torus shape placed around the neck, orienting its ring normal to align with the neck's direction so it wraps naturally around that area.\n\nFor the bell, I'm adding a small brass sphere hanging at the front-bottom of the collar ring. For the tail, I'm planning to loft it with stations of increasing radius for a fluffy look, plus a separate darker sphere at the very tip for the smudge effect.\n\nNow I'm setting up the build function, defining the builder, hips joint, and a spine chain with positioned points moving upward and forward along the body.\n\nStill writing body geometry...\n\nStill building leg chains and paws...\n\n"
+}

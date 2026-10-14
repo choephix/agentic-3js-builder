@@ -1,0 +1,25 @@
+{
+  "slug": "r3haikuKoalaRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "koala",
+  "level": "rich",
+  "pitch": "A sleepy koala hugging a eucalyptus branch. Soft ash-grey fur with a cream chest and cream-lined fluffy ears, a big black leathery nose, half-closed drowsy brown eyes, strong grey paws with dark claws, and a sprig of blue-green eucalyptus leaves in one hand, mid-munch.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:00:02.976Z",
+  "wallMs": 35742,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5406,
+    "completion_tokens": 8277,
+    "total_tokens": 13683,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00420336,
+  "hasCode": true,
+  "reasoning": "I need to work only with the documented SDK functions available, like the builder methods for joints, chains, sweeps, lofts, and other shape primitives, since I don't have access to undocumented API details.\n\nFor the koala design, I'll use b.part with THREE geometries combined with joints and chains to build a rounded, ash-grey body, sitting and hugging a branch with one arm wrapped around it and the other hand gripping.\n\nI'm placing the branch as a fallen log lying at ground level, with the koala perched on top so the whole model rests on y=0. I'm defining hip and spine joints at roughly 0.22 height, planning to use a sweep or loft along the spine chain to give the body its characteristic rounded, slightly tapered shape.\n\nWorking through how to build the spine chain, deciding to approximate the koala's body with ellipsoid parts attached to joints using scaled sphere geometry, while figuring out how the chain and joint-naming conventions likely work from the available builder functions.\n\nFor the head, I'm placing a joint and attaching sphere-based parts for the skull, ears, eyes with half-closed lids, and a large nose ellipsoid, computing approximate surface positions by hand since there's no direct surface-attachment API. For the arms hugging the branch, I'm considering using a limb or chain function anchored from a shoulder joint toward a target point, though the exact signature remains uncertain.\n\nI'm planning arm chains with shoulder, elbow, and paw joints, using a spike function for small dark claw cones, and building a eucalyptus sprig held near the mouth with a swept stem and flattened teal leaf spheres oriented via aim or dir parameters. For the branch itself, I'm sweeping a brown tube along a polyline path that the koala sits on.\n\nNow I'm settling on a palette of gray fur, cream, black, dark claws, teal leaves, brown eyes, and branch brown, keeping total colors within the 64 budget. I'm sketching the leg chains with hip, knee, and foot joints, adding paw ellipsoids and claw spikes based on tip position and direction, and planning for the arms to wrap around the branch in a simple hug pose using an ellipsoid-part helper for body shapes. Now I'm starting to lay out the joint hierarchy beginning with the hip root joint before building up to the head.\n\nWorking out the branch polyline coordinates, body sphere placements for rump and belly, and the neck/head joint chain with appropriate positions and scales for the koala sitting on the branch.\n\nTo avoid naming conflicts, I decide to build joints manually rather than relying on chain-generated names: hips, spine, neck, and head joints each parented in sequence with specific coordinates, plus starting on shoulder and elbow joints for the arm.\n\nStill placing joints...\n\nThen I'll add the nose, ears with cream inner detail, chest patch, and small claw spikes on each paw using a simple cone-like helper. I'll keep bone assignments explicit for clarity and aim for a compact script around 150 lines.\n\n"
+}

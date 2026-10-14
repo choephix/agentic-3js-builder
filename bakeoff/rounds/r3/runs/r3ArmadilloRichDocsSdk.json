@@ -1,0 +1,25 @@
+{
+  "slug": "r3ArmadilloRichDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "armadillo",
+  "level": "rich",
+  "pitch": "A nine-banded armadillo trotting along. A shell of overlapping banded plates in dusty pinkish-tan, a pointy snout, tall leathery ears, small beady eyes, sturdy clawed feet and a long armoured tail tapering to a point. A sprinkle of coarse pale hairs pokes out between the bands.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:07:40.245Z",
+  "wallMs": 60678,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32687,
+    "completion_tokens": 7718,
+    "total_tokens": 40405,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.0839244,
+  "hasCode": true,
+  "reasoning": "I need to design a complete, well-structured armadillo model without being able to test it, so I'll plan carefully: roughly 0.4m long body, 0.25m height, standing/trotting rest pose with legs neutral. I'm sketching the skeleton hierarchy starting from a root hips joint, with a spine chain extending forward to the neck and head, and a separate tail chain extending backward.\n\nFor the spine chain I'm plotting joint positions from hips through mid-body, shoulders, neck, and head, giving the body a gentle forward curve. For the tail I'm plotting a drooping sequence of points that taper down toward the ground. For the body itself I'm planning to sweep the spine path with a radius function to create the shell shape, keeping the joint and point counts simple so the chain naming works cleanly.\n\nFor the dome-shaped body shell, I'm setting a radius function with slightly wider horizontal than vertical extent, positioning the body so its bottom roughly meets short armadillo-style legs reaching the floor. For the banded plates, I'm sweeping small loops at intervals along the spine between two points along the body length to create raised ridges, using the chain's frames to orient each band, with alternating shell coloring planned for the bands.\n\nNow I'm layering in paint treatments: a scaled texture for the main shell with a paler countershaded belly, a darker flat tone for the ridge bands, and scattered hair-like card textures along those band loops, collecting orientation frames from each loop to place the cards leaning outward and flowing backward.\n\nFor the head, I'm planning the chain structure—spine joints leading to a separate head joint and jaw joint—then building the snout and lower jaw as tapering swept geometry attached to those bones.\n\nStill defining head shapes... now adding the skull, nose tip, eyes as small spheres, and ears as extruded leathery outlines tilted outward from the head.\n\nMoving to the leg structure, I'm setting up IK for four limbs with hip and foot positions, bend directions for front elbows and hind knees, and segment lengths based on the distances between joints.\n\nThen I'm adding toes as small spike claws projecting from each foot, with a flattened sphere foot pad positioned so the bottom touches the ground plane at y=0.\n\nNow I'm checking the body proportions: setting spine height and the sweep radii for the torso so the legs attach within the body silhouette, with hip joints placed inside the body's cross-section at that point along the spine.\n\nNow I'm defining the tail geometry attaching at the hips, sweeping downward and tapering to a point near the ground with a shrinking radius profile.\n\nChecking the parenting: the tail chain and spine chain both attach to the hips root point, which keeps the body connected correctly. For the rear body surface, I'm adding small lift loops along the spine at intervals to shape the hip area smoothly.\n\nNow I'm thinking through the shell banding and belly countershading, plus adding sparse pale hair cards across the loops for texture, keeping the frame counts manageable.\n\nFor the head, I'm sweeping a tapered shape bridging the body into a flattened skull toward the snout tip, defining radii that shrink smoothly along the path, then setting up the head joint position and orientation for later limb attachment.\n\nNow I'm placing the jaw joint and eye sockets, checking that the eye spheres sit correctly against the head's elliptical cross-section at that height so they read as slightly embedded rather than floating outside the skull surface.\n\nNext I'm positioning ears and nose tip relative to the head curve, then setting up skin-tone materials shared across head, body, and limbs. For the legs, I'm wiring up parent spine joints for front and hind pairs and building the limb chain function that takes root/target points and bend parameters to generate a joint path, plus adding a small foot sphere at the chain tip for ground contact.\n\nStill writing foot and claw geometry...\n\n"
+}

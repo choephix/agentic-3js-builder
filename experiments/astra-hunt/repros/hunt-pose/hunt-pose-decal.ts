@@ -1,0 +1,4 @@
+import { DataTexture, RGBAFormat, UnsignedByteType } from 'three';
+import { createBuilder } from '../../../../src/builder';
+const pixels=new Uint8Array([255,255,255,255]);const tex=new DataTexture(pixels,1,1,RGBAFormat,UnsignedByteType);tex.needsUpdate=true;
+const b=createBuilder({name:'decal',detail:.5});const r=b.joint('r',{at:[0,0,0],dir:[0,1,0]});const ch=b.chain('ch',[[0,0,0],[0,1,0],[0,2,1]],{parent:r});const sw=b.sweep(ch,.2,{color:'#fff',detail:.5});const surf=b.surface(sw);const hit=surf.nearest([0,1,0]);const d=b.decal(surf,tex,{at:hit,size:[.15,.15],dir:hit});const before=d.at.clone();b.pose(r,{axis:[1,0,0],deg:35});const after=d.at; const p=d.mesh.geometry.getAttribute('position'); console.log('before',before.toArray(),'after',after.toArray(),'vertices',p.count,'finite',Array.from(p.array).every(Number.isFinite));

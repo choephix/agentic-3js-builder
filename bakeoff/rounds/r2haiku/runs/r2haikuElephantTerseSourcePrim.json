@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuElephantTerseSourcePrim",
+  "arm": "source-prim",
+  "subject": "elephant",
+  "level": "terse",
+  "pitch": "An elephant.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:21:20.108Z",
+  "wallMs": 65225,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112475,
+    "completion_tokens": 13719,
+    "total_tokens": 126194,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.039926199999999995,
+  "hasCode": true,
+  "reasoning": "I'm planning out an elephant model using the builder SDK, working out stylized real-world proportions—shoulder height around 2.8m, body length roughly 4m—and setting up the coordinate orientation with feet grounded at the origin.\n\nNow I'm sketching the skeleton hierarchy: a pelvis root joint, a spine chain running through chest and shoulder points, and a neck chain leading up to the head, figuring out joint names, span counts, and how parent-child relationships resolve when chain paths use literal coordinate arrays rather than weighted inputs.\n\nSwitching approach to define joints explicitly with named parents instead of nested chains, laying out pelvis, chest, neck, and head positions with aim directions, then planning a trunk chain that curves down and forward from the head with catmull-spline points to form the tip.\n\nFor the trunk itself, I'm treating it as a tapering tentacle-like appendage attached to the head joint, with radius shrinking along its length, and setting up a sweep function to generate the tube geometry with that taper.\n\nFor the body, I'm planning a loft through a series of stations from rump to shoulder, adjusting each station's height and width so the belly clears the legs and the back height matches a realistic elephant silhouette — working through the vertical placement numbers to get the proportions right.\n\nI'm now figuring out how to bind the body to the skeleton: deciding whether to rig it rigidly to a single joint like \"chest\" or \"pelvis\", or build a proper spine chain so the loft deforms more naturally across multiple joints. Leaning toward keeping it simple with a single bone binding for now, accepting the rump will move rigidly with the chest since this is a static model.\n\nNow I'm planning the leg geometry, defining joint names like shoulderL, elbowL, and wristL with straight columnar paths typical of elephant legs, laying out approximate 3D coordinates for the front-left limb from shoulder down to foot.\n\nI'm using chain and sweep functions to turn these joint paths into tapered 3D limb meshes, adding a cylinder shape for rounded elephant feet, and mirroring the setup for the hind legs attached to the pelvis.\n\nFor the head and ears, I'm using a scaled sphere for the skull and flattened cylinders positioned at the sides of the head to form the large ear shapes.\n\nFor the tusks, I'm settling on spike primitives angled downward and forward from the base of the head front, giving a simple cone shape rather than a curved form.\n\nNow I'm placing the small dark eye spheres, defining the ear position relative to the head bone, and setting up the tail as a tapering three-segment chain from the pelvis back. I'm also laying out the trunk as a chain hanging from the head joint, with a tapering radius function from thick at the base to narrow at the tip.\n\nI'm working through the leg joints next—shoulder, elbow, and wrist for front legs, hip, knee, ankle for hind legs—mirroring left and right sides, then attaching cylindrical feet with small toenail spheres at the front. I'm also defining the body skeleton hierarchy from pelvis through chest, neck, and head, sizing the loft stations so the sphere head and tusks sit properly inside the silhouette, and assigning a shared mottled skin paint across the body, legs, ears, and trunk for a cohesive look.\n\n"
+}

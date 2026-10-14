@@ -109,41 +109,14 @@ const unit = (x: number, y: number, z: number, seed: number) => hash(x, y, z, se
 
 const fade = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
 
+// The gradient for each of the 16 hash values: `GX[h] * x + GY[h] * y + GZ[h] * z`.
+const GX = [1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0, 1, -1, 0, 0];
+const GY = [1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, 1, -1, -1];
+const GZ = [0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1, 0, 0, 1, -1];
+
 function grad(h: number, x: number, y: number, z: number) {
-  switch (h & 15) {
-    case 0:
-      return x + y;
-    case 1:
-      return -x + y;
-    case 2:
-      return x - y;
-    case 3:
-      return -x - y;
-    case 4:
-      return x + z;
-    case 5:
-      return -x + z;
-    case 6:
-      return x - z;
-    case 7:
-      return -x - z;
-    case 8:
-      return y + z;
-    case 9:
-      return -y + z;
-    case 10:
-      return y - z;
-    case 11:
-      return -y - z;
-    case 12:
-      return x + y;
-    case 13:
-      return -x + y;
-    case 14:
-      return -y + z;
-    default:
-      return -y - z;
-  }
+  const i = h & 15;
+  return GX[i] * x + GY[i] * y + GZ[i] * z;
 }
 
 /** Gradient noise, about -1..1, one feature per unit. */
@@ -157,11 +130,18 @@ function perlin(x: number, y: number, z: number, seed: number) {
   const u = fade(fx);
   const v = fade(fy);
   const w = fade(fz);
-  const g = (i: number, j: number, k: number) => grad(hash(X + i, Y + j, Z + k, seed), fx - i, fy - j, fz - k);
-  const x00 = g(0, 0, 0) + u * (g(1, 0, 0) - g(0, 0, 0));
-  const x10 = g(0, 1, 0) + u * (g(1, 1, 0) - g(0, 1, 0));
-  const x01 = g(0, 0, 1) + u * (g(1, 0, 1) - g(0, 0, 1));
-  const x11 = g(0, 1, 1) + u * (g(1, 1, 1) - g(0, 1, 1));
+  const g000 = grad(hash(X, Y, Z, seed), fx, fy, fz);
+  const g100 = grad(hash(X + 1, Y, Z, seed), fx - 1, fy, fz);
+  const g010 = grad(hash(X, Y + 1, Z, seed), fx, fy - 1, fz);
+  const g110 = grad(hash(X + 1, Y + 1, Z, seed), fx - 1, fy - 1, fz);
+  const g001 = grad(hash(X, Y, Z + 1, seed), fx, fy, fz - 1);
+  const g101 = grad(hash(X + 1, Y, Z + 1, seed), fx - 1, fy, fz - 1);
+  const g011 = grad(hash(X, Y + 1, Z + 1, seed), fx, fy - 1, fz - 1);
+  const g111 = grad(hash(X + 1, Y + 1, Z + 1, seed), fx - 1, fy - 1, fz - 1);
+  const x00 = g000 + u * (g100 - g000);
+  const x10 = g010 + u * (g110 - g010);
+  const x01 = g001 + u * (g101 - g001);
+  const x11 = g011 + u * (g111 - g011);
   const y0 = x00 + v * (x10 - x00);
   const y1 = x01 + v * (x11 - x01);
   return y0 + w * (y1 - y0);
@@ -205,8 +185,13 @@ export function cells(p: Vector3, size: number, seed = 0): Cell {
   const Z = Math.floor(z);
   let d1 = Infinity;
   let d2 = Infinity;
-  let best = [0, 0, 0];
-  let bestC = [0, 0, 0];
+  // The nearest cell's integer corner and its feature point.
+  let bx = 0;
+  let by = 0;
+  let bz = 0;
+  let fx = 0;
+  let fy = 0;
+  let fz = 0;
   for (let i = -1; i <= 1; i++)
     for (let j = -1; j <= 1; j++)
       for (let k = -1; k <= 1; k++) {
@@ -216,19 +201,26 @@ export function cells(p: Vector3, size: number, seed = 0): Cell {
         const px = cx + unit(cx, cy, cz, seed);
         const py = cy + unit(cx, cy, cz, seed + 7);
         const pz = cz + unit(cx, cy, cz, seed + 13);
-        const d = Math.hypot(px - x, py - y, pz - z);
+        const dx = px - x;
+        const dy = py - y;
+        const dz = pz - z;
+        const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
         if (d < d1) {
           d2 = d1;
           d1 = d;
-          best = [cx, cy, cz];
-          bestC = [px, py, pz];
+          bx = cx;
+          by = cy;
+          bz = cz;
+          fx = px;
+          fy = py;
+          fz = pz;
         } else if (d < d2) d2 = d;
       }
   return {
     d1,
     d2,
-    id: unit(best[0], best[1], best[2], seed + 29),
-    center: new Vector3(bestC[0] * size, bestC[1] * size, bestC[2] * size),
+    id: unit(bx, by, bz, seed + 29),
+    center: new Vector3(fx * size, fy * size, fz * size),
   };
 }
 
@@ -243,8 +235,9 @@ function warp(p: Vector3, size: number, amount: number, seed: number) {
   );
 }
 
+/** One colour from a list by `t`; an `[r, g, b]` tuple is one colour, not a list. */
 const pick = (colors: Colors, t: number): ColorInput =>
-  Array.isArray(colors)
+  Array.isArray(colors) && typeof colors[0] !== "number"
     ? (colors as readonly ColorInput[])[Math.min(Math.floor(t * colors.length), colors.length - 1)]
     : (colors as ColorInput);
 

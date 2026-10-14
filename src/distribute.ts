@@ -69,7 +69,7 @@ export class RingItem extends Spot {
  * one fan for moderate poses, `joints: count` articulates every item).
  */
 export function ring(ctx: Ctx, on: FrameInput, options: RingOptions, fn?: (item: RingItem) => void) {
-  const line = toFrame(on);
+  const line = toFrame(on, "ring()");
   const center = line.at;
   const axis = line.axis;
   const { count } = options;
@@ -97,7 +97,7 @@ export function ring(ctx: Ctx, on: FrameInput, options: RingOptions, fn?: (item:
   const groupOf = (i: number) => Math.floor((i * groups) / count);
   const joints: Joint[] = [];
   if (groups) {
-    const parent = boneFor(ctx, options.parent, [line], center);
+    const parent = boneFor(ctx, options.parent, [line], center, "ring(): parent");
     const { names } = options;
     for (let k = 0; k < groups; k++) {
       const run = Array.from({ length: count }, (_, i) => i).filter((i) => groupOf(i) === k);

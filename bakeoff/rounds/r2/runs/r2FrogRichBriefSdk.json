@@ -1,0 +1,25 @@
+{
+  "slug": "r2FrogRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "frog",
+  "level": "rich",
+  "pitch": "A red-eyed tree frog clinging to a leaf. Vivid lime-green skin, blue and cream striped flanks, orange toes with round sticky pads, a creamy white belly, and enormous ruby-red eyes with black slit pupils. It looks a little surprised, as if you just woke it up.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:11:40.013Z",
+  "wallMs": 72299,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5391,
+    "completion_tokens": 10250,
+    "total_tokens": 15641,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.1037672,
+  "hasCode": true,
+  "reasoning": "Since I can't verify the exact API precisely, I'll stick to the safer, more commonly documented parts of the SDK—using joint, part, and sweep sparingly with known patterns like at/parent for positioning, geometry/color/bone for parts, and aim/dir for rotation rather than guessing at riskier calls.\n\nNow I'm designing a frog resting on a leaf at real-world scale, roughly a 5cm tree frog on a 15cm leaf, with the leaf modeled as a thin flat slab near the floor and the frog's toes resting just above it. I'm planning the skeleton with a hip root, spine chain up to the head and jaw, plus front limbs (shoulder, elbow, wrist, fingers) and hind limbs (hip, knee, ankle, toes), keeping joint calls simple with at/parent options since I'm unsure whether a role parameter is actually supported.\n\nI'm sketching out limb geometry using cylinder-based segments connecting joint pairs, uncertain about the exact orientation convention for aiming parts along a direction, so I may need to construct the cylinder transforms manually rather than relying on an assumed aim/dir API.\n\nNow I'm planning out the individual body parts: a lime ellipsoid body, cream belly, wide head sphere, large red eyes with slit pupils, separate upper/lower jaw, nostrils, and flank stripes made from thin flattened ellipsoids placed along the body's sides, working out approximate positions and radii for each.\n\nI'm calculating helper geometry to position alternating blue and cream vertical bars on the ellipsoid's surface, then moving on to leg placement — starting with the hind legs in an extended, splayed pose from hip to knee joints.\n\nWorking out the front limb joints next—shoulder, elbow, wrist, and fanning fingers—plus tapered limb radii, then placing the head as a wide flat ellipsoid with separate upper and lower jaw joints.\n\nNow I'm positioning the bulging eyes with red spheres and oriented vertical slit pupils, working out a direction vector and scale to angle each pupil forward-out on the eye surface.\n\nI'm adding a lime eyelid cap over the top of each eye using a partial sphere geometry to give a surprised, partly-open look, then placing tiny dark nostril spheres on the snout.\n\nNow I'm building the leaf shape with a bezier outline, extruding it for thickness, then rotating it flat so it lies along the correct plane with the tip pointing the right way.\n\nI'm adding a lighter midrib on top and small side veins, giving the leaf a deeper green distinct from the lime frog color, and placing a stem cylinder behind it. Since only one root joint is allowed, I'm attaching the leaf as a static child joint of the hips bone rather than creating a separate root.\n\nNow I'm working out the body's vertical position so the belly sits properly above the leaf without clipping through it.\n\nChecking the total height comes to about 4cm with the leaf base at zero, which works. Now I'm adding the cream-colored belly and throat ellipsoids, and small blue patches on the thighs and shins for color detail, then moving on to setting up the joint rig with named spine joints for hips and up.\n\nWriting helper functions...\n\nPlacing more cream and blue stripe segments...\n\nNow for the eyelid, I'm rotating a sphere cap geometry so it tilts slightly forward and up, then translating it to sit at the eye center—visible only from outside since the eye sphere handles the interior. I'll keep the leaf flat rather than adding curl, and then finalize the code with small triangle counts.\n\n"
+}

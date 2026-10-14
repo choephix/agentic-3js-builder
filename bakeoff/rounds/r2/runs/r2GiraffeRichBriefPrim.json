@@ -1,0 +1,25 @@
+{
+  "slug": "r2GiraffeRichBriefPrim",
+  "arm": "brief-prim",
+  "subject": "giraffe",
+  "level": "rich",
+  "pitch": "A young reticulated giraffe. Chestnut patches outlined by bright cream lines all over its body and neck, a short mane of stiff brown hair down the neck, two fuzzy ossicones with black tufts on top, big ears, long lashes, a long dark tongue just peeking out, and slender legs fading to cream above the hooves.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:10:14.969Z",
+  "wallMs": 73568,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5415,
+    "completion_tokens": 10219,
+    "total_tokens": 15634,
+    "prompt_tokens_details": {
+      "cached_tokens": 5300
+    }
+  },
+  "costUsd": 0.10348,
+  "hasCode": true,
+  "reasoning": "Without being able to verify the SDK precisely, I need to stick to well-documented API calls I'm confident about—createBuilder, joint definitions with position/parent, and part creation with geometry, color, and bone attachment—rather than risk using signatures like chain() that I'm unsure about.\n\nSince I'm unsure how part orientation options work, I'll bake rotation directly into the geometry itself (using rotate/applyQuaternion and translating to the midpoint) rather than relying on uncertain dir/aim parameters, since positions are stated in model space. For patches and rounded shapes, I'll approximate with flattened low-poly geometry like dodecahedrons rather than relying on an unverified paint API.\n\nFor the coat pattern, I'm computing surface points and normals on an ellipsoid to place patches with correct orientation, using a cream base covered mostly by chestnut reticulated patches with thin cream gaps between them.\n\nNow I'm laying out the skeleton -- setting body proportions for a young giraffe around 3m tall, then defining joint positions for hips, spine, neck segments, head, jaw, ears, tail, and leg joints (hip/knee/ankle per leg), without worrying about joint orientation for now.\n\nI'm writing a helper function to build tapered cylinder segments between two points, orienting them using a quaternion rotation from the default axis to the segment direction. Then I'm shaping the body as a scaled ellipsoid sphere with a bigger chest, and plotting curved neck points angling forward and upward from shoulder to head base before starting on the head shape.\n\nStill building head details... now adding eyes, lashes, ears, ossicones with fuzzy tufts, and a mane of small dark boxes along the neck, followed by leg placement with upper and lower segments plus cream-colored socks near the hooves.\n\nI'm plotting precise joint coordinates for each leg (shoulder, knee, fetlock for front; hip, knee, hock, ankle for hind), adding darker hooves at ground level, and coloring the legs with a gradient from chestnut upper sections to cream lower ones, along with a system for placing coat patches along the neck's centerline.\n\nScaling and orienting the body patches...then assigning each patch to its nearest bone (spine or neck segment), and setting up cream, chestnut, and darker chestnut coloring via a seeded random function.\n\nI'll skip importing an external rng and just write a simple deterministic generator myself, then build helper functions for creating parts and limb segments with tapering radius, bone attachment, and configurable polygon sides.\n\nNow I'm placing facial features: skull ellipsoid for the head, a tapered muzzle segment with a dark nose tip, a lower jaw segment attached to a jaw bone with its own joint, and a tongue box inside the mouth.\n\nAdding eyes and ears...\n\nStill working out mane placement...\n\nFor body patches, I'm scattering them across the ellipsoid torso using elevation/azimuth sampling with patch size around 0.13, yielding roughly 39 patches per side. For legs, I'll just add a couple of flat patches on the upper outer sides rather than full lattice coverage.\n\nNow I'm adding a tail with a thin tapering shape from near the hips down to a tufted black tip, defined with two joints. I'm mapping each body region to its skeletal bone — torso to spine, legs to hip joints with front legs parented to the spine and hind legs to the hips — then writing the joint placement code and returning the root structure.\n\n"
+}

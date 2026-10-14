@@ -1,0 +1,20 @@
+import { Vector3 } from 'three';
+import { createBuilder } from '../../../../src/builder';
+import { frame } from '../../../../src/frame';
+import { polyline } from '../../../../src/path';
+
+const b = createBuilder({name:'weighted'});
+const root = b.joint('root',{at:[0,0,0]});
+const chain = b.chain('bend', polyline([[0,0,0],[0,1,0],[0,2,1]]), {parent:root, count:2});
+const sweep = b.sweep(chain, 0.2, {sides:8, color:'#fff'});
+const p = sweep.at(0.5);
+console.log('p initial',p.at.toArray(),'weights',p.weights.map(([j,w])=>[j.name,w]),'axis',p.axis.toArray(),'normal',p.n.toArray());
+const moved = p.moved([0,0.1,0]);
+const n = frame(p, p.axis);
+console.log('moved initial',moved.at.toArray(),moved.axis.toArray(),moved.weights.map(([j,w])=>[j.name,w]));
+console.log('frame initial',n.at.toArray(),n.axis.toArray(),n.weights.map(([j,w])=>[j.name,w]));
+b.pose(chain.joints[0], {dir:[0,1,1]});
+console.log('p posed',p.at.toArray(),'axis',p.axis.toArray(),'n',p.n.toArray());
+console.log('moved posed',moved.at.toArray(),'axis',moved.axis.toArray());
+console.log('frame posed',n.at.toArray(),n.axis.toArray());
+const p2 = sweep.at(0.5); console.log('p2 posed',p2.at.toArray(),p2.axis.toArray(),p2.weights.map(([j,w])=>[j.name,w]));

@@ -2,6 +2,7 @@
 // orientation primitive, `aim()`.
 import { Box3, Matrix4, Quaternion, Vector3 } from "three";
 import type { Mesh } from "three";
+import { Spot } from "./frame";
 import type { Frame } from "./frame";
 
 /**
@@ -36,21 +37,56 @@ export function axisVector(a: Axis | V3, call: string) {
   return new Vector3(a === "x" ? 1 : 0, a === "y" ? 1 : 0, a === "z" ? 1 : 0);
 }
 
-/** The Frame of a Frame input. */
-export function toFrame(x: FrameInput) {
-  return "frame" in x ? x.frame : x;
+/**
+ * The Frame of a Frame input. A plain `{ at, axis }` or `{ at, dir }` object (optionally with `up`) is read as the
+ * line it spells, `frame(at, axis, up)`. `call` names the caller in errors.
+ */
+export function toFrame(x: FrameInput, call = "toFrame()"): Frame {
+  const object = x as unknown as Record<string, unknown> | null;
+  if (object && typeof object === "object") {
+    if (typeof object.local === "function" && "quat" in object) return x as Frame;
+    if ("frame" in object) return toFrame(object.frame as FrameInput, call);
+    const facing = object.axis ?? object.dir;
+    if (object.at !== undefined && typeof object.at !== "function" && facing !== undefined) {
+      const d = toDirection(facing as DirectionInput, call);
+      if (d.lengthSq() === 0) throw new Error(`${call}: the line's direction is zero-length`);
+      const up = object.up === undefined ? undefined : toDirection(object.up as DirectionInput, call);
+      return new Spot(toPoint(object.at as PointInput, call), aim(d, up), []);
+    }
+  }
+  throw new Error(
+    `${call}: takes a Frame (a joint, part, hit, sweep, chain or tube point, ring item, frame() or line()) or { at, axis }; got ${describeInput(x)}`,
+  );
+}
+
+/** A short description of an input for errors. */
+function describeInput(x: unknown) {
+  if (x === null || x === undefined) return String(x);
+  if (Array.isArray(x)) return `an array of ${x.length}`;
+  if (typeof x !== "object") return `${typeof x} ${String(x)}`;
+  const keys = Object.keys(x);
+  return keys.length ? `an object with ${keys.join(", ")}` : "an empty object";
 }
 
 /** A fresh model-space point from any point input. `call` names the caller when a literal is malformed. */
 export function toPoint(x: PointInput, call = "toPoint()") {
+  if (!x || typeof x !== "object")
+    throw new Error(`${call}: a point is [x, y, z], a Vector3 or a Frame; got ${describeInput(x)}`);
   if (Array.isArray(x) || "isVector3" in x) return vec(x as V3, call);
   if ("isMesh" in x) return new Box3().setFromObject(x as Mesh).getCenter(new Vector3());
-  return toFrame(x as FrameInput).at;
+  const object = x as unknown as Record<string, unknown>;
+  const plain = typeof object.local !== "function" && !("frame" in object);
+  if (plain && object.at !== undefined && typeof object.at !== "function")
+    return toPoint(object.at as PointInput, call);
+  if (plain) throw new Error(`${call}: a point is [x, y, z], a Vector3 or a Frame; got ${describeInput(x)}`);
+  return toFrame(x as FrameInput, call).at;
 }
 
 /** A fresh direction (not normalised) from any direction input: literal, or a Frame's facing axis. */
 export function toDirection(x: DirectionInput, call = "toDirection()") {
-  return Array.isArray(x) || "isVector3" in x ? vec(x as V3, call) : toFrame(x as FrameInput).axis;
+  if (!x || typeof x !== "object")
+    throw new Error(`${call}: a direction is [x, y, z], a Vector3 or a Frame; got ${describeInput(x)}`);
+  return Array.isArray(x) || "isVector3" in x ? vec(x as V3, call) : toFrame(x as FrameInput, call).axis;
 }
 
 export function lerp(a: PointInput, b: PointInput, t: number) {

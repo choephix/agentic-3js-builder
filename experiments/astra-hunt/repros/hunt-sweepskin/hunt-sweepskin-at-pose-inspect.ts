@@ -1,0 +1,5 @@
+import * as THREE from 'three';
+import { createBuilder } from '../../../../src/builder';
+const b=createBuilder({name:'x'}); const hips=b.joint('hips',{at:[0,0,0]}); const c=b.chain('leg',[[0,0,0],[0,1,0],[0,2,0]],{parent:hips,names:['leg1','leg2']}); const s=b.sweep(c,.2,{color:'#fff',sides:8});
+const m=s.meshes[0]; const a=m.geometry.getAttribute('position'); const si=m.geometry.getAttribute('skinIndex'); const sw=m.geometry.getAttribute('skinWeight'); console.log('bones',m.userData.skinBones,'count',a.count); for(const i of [0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,128,136]) if(i<a.count) console.log('pre',i,new THREE.Vector3().fromBufferAttribute(a,i).toArray(),[0,1,2,3].map(k=>[si.getComponent(i,k),sw.getComponent(i,k)]));
+b.pose('leg2',{axis:[0,0,1],deg:60}); m.updateWorldMatrix(true,false); for(const i of [0,8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,128,136]) if(i<a.count) console.log('post',i,new THREE.Vector3().fromBufferAttribute(a,i).applyMatrix4(m.matrixWorld).toArray()); console.log('at',s.at(.75).at.toArray());

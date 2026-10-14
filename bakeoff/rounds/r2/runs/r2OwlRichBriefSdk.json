@@ -1,0 +1,25 @@
+{
+  "slug": "r2OwlRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "owl",
+  "level": "rich",
+  "pitch": "A great horned owl perched on a gnarled branch. Mottled bark-brown and buff feathers with fine dark barring, a pale bib at the throat, tall feathered ear tufts, a round tawny facial disc rimmed in black, huge orange eyes and a hooked grey beak. Feathered legs end in strong black talons gripping the wood.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:07:45.076Z",
+  "wallMs": 45054,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5406,
+    "completion_tokens": 6300,
+    "total_tokens": 11706,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.0642972,
+  "hasCode": true,
+  "reasoning": "Since I can't verify the SDK precisely, I should stick to APIs I'm confident about and use documented signatures conservatively to avoid throwing errors—mainly relying on joint, chain, and part functions with plain geometries and known options like scale, at, bone, aim, dir, and up.\n\nFor the owl design, I'm planning a perched pose roughly 0.55m tall, with a stump-and-branch base so the lowest points touch the floor—a vertical trunk from the ground up to a horizontal branch where the owl's feet rest. I'll pre-rotate cylinder geometries myself for proper orientation along axes, and build the body as a scaled sphere for an ellipsoid shape.\n\nNow I'm mapping out the joint hierarchy: hips as root, then spine, chest, neck, head, and jaw, plus leg chains (hip, knee, ankle, toes) and wing/shoulder joints and a tail joint, each parented appropriately with approximate positions. I'm placing the body ellipsoid around y=0.78 with the legs spanning from the feet at the branch up to the hips, and the head ellipsoid positioned above the body.\n\nNow I'm positioning the facial disc, eyes, pupils, and hooked beak -- tawny flattened discs with a black rim ring on the face, orange eye spheres with black pupils, and a small grey cone rotated to point forward-down for the hooked beak, plus a lower jaw piece.\n\nAdding ear tufts, bib, and barring...\n\nNow I'm placing the folded wings at the shoulders, shaping the angled tail slab with bars, and starting on the feathered legs and toes.\n\nPositioning the toes and talons on the branch, then building the perch itself with a branch cylinder, small twigs, and a stump with knots in brown tones.\n\nFor bones I'll keep things simple, naming the branch root bone \"hips\" and skipping explicit toe joints, just defining the core skeleton: hips, spine, neck, head, jaw, shoulders, tail, hips, knees, and ankles for left/right sides without worrying about chain roles.\n\n"
+}

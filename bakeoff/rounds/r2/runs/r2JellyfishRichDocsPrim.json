@@ -1,0 +1,25 @@
+{
+  "slug": "r2JellyfishRichDocsPrim",
+  "arm": "docs-prim",
+  "subject": "jellyfish",
+  "level": "rich",
+  "pitch": "A glowing moon jellyfish drifting upward. A translucent pale-blue bell with four pink horseshoe shapes inside, a frilly rim of fine tentacles, and four long, ruffled oral arms trailing below in pearly white and lilac. A soft glow lights it from within, like a lantern in the deep.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:10:49.280Z",
+  "wallMs": 38396,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32696,
+    "completion_tokens": 4942,
+    "total_tokens": 37638,
+    "prompt_tokens_details": {
+      "cached_tokens": 32586
+    }
+  },
+  "costUsd": 0.0561572,
+  "hasCode": true,
+  "reasoning": "I'm planning a compact moon jellyfish module that drifts upward off the ground, deciding how low the oral arms and tentacle tips should hang so nothing sits directly on the floor.\n\nFor the skeleton, I'm sketching a root joint for the bell with chains for trailing oral arms and ring joints for tentacle groups, keeping the rig simple. I'm working out how to give the bell a translucent look despite the material system not natively supporting transparency -- planning to traverse the built mesh afterward and set opacity on the bell's material specifically, while keeping other painted parts opaque.\n\nI'm mapping out the bell's lathe outline with coordinates for the outer dome, rim, and inner wall to give it proper thickness, using enough segments for a smooth curve. For the inner glow I'm adding a small flattened emissive sphere core, and planning four horseshoe-shaped gonads using partial torus arcs arranged in a ring inside the bell.\n\nPositioning the four gonads at 90-degree intervals around the axis, each rotated flat and oriented so their openings face outward, working out the right Euler rotation order to get the torus arcs angled correctly.\n\nI'm adding an inner glow sphere near the bell's center, a short manubrium tube beneath it, and a ring of 48 short tentacle spikes around the rim.\n\nNow I'm placing the rim tentacles as spikes angled outward and downward, plus a thin torus outlining the rim edge in a lilac-blue tone. I'm also starting on four oral arms extending from the manubrium at a small radius.\n\nNow I'm adding a second thinner twisted sweep offset in lilac for depth, then setting up the chain and joint hierarchy—root at the bell base, arm tips reaching down near y≈0.02 so the total height works out to about 1.15 units, with the bell positioned around y=0.95.\n\nWriting material and arm geometry code...\n\nAdding the manubrium as a short narrow sweep for the bell's central structure, pale lilac with a slight rotation for a bone-like taper.\n\n"
+}

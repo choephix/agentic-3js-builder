@@ -234,7 +234,7 @@ export default function build() {
   const body = b.sweep(bodyPath, bodyR, {
     bone: [hips, spine, neck],
     color: skin,
-    shift: () => [0, -0.04],
+    shift: (): [number, number] => [0, -0.04],
     sides: 14,
     caps: "round",
     name: "body",

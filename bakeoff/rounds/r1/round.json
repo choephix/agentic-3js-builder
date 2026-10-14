@@ -1,0 +1,123 @@
+{
+  "id": "r1",
+  "started": "2026-10-07T14:19:53.744Z",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "maxTokens": 64000,
+  "pricing": {
+    "input": 2,
+    "output": 10,
+    "cacheRead": 0.2,
+    "cacheWrite": 2.5
+  },
+  "arms": [
+    {
+      "id": "source-sdk",
+      "letter": "A",
+      "name": "Source, SDK-first",
+      "idea": "The whole SDK source code as the reference; build with the SDK throughout",
+      "contract": "contract.md",
+      "context": "source",
+      "taste": "taste-sdk.md"
+    },
+    {
+      "id": "source-prim",
+      "letter": "B",
+      "name": "Source, primitives-first",
+      "idea": "The whole SDK source code as the reference; simple primitives first, SDK helpers only where they can't",
+      "contract": "contract.md",
+      "context": "source",
+      "taste": "taste-primitives.md"
+    },
+    {
+      "id": "docs-sdk",
+      "letter": "C",
+      "name": "Docs, SDK-first",
+      "idea": "docs/api.md and docs/conventions.md as the reference; build with the SDK throughout",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-sdk.md"
+    },
+    {
+      "id": "docs-prim",
+      "letter": "D",
+      "name": "Docs, primitives-first",
+      "idea": "docs/api.md and docs/conventions.md as the reference; simple primitives first",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-primitives.md"
+    },
+    {
+      "id": "brief-sdk",
+      "letter": "E",
+      "name": "Brief, SDK-first",
+      "idea": "Only the top of docs/api.md (helper map, cheat sheet, target, module); build with the SDK throughout",
+      "contract": "contract.md",
+      "context": "brief",
+      "taste": "taste-sdk.md"
+    },
+    {
+      "id": "brief-prim",
+      "letter": "F",
+      "name": "Brief, primitives-first",
+      "idea": "Only the top of docs/api.md; simple primitives first",
+      "contract": "contract.md",
+      "context": "brief",
+      "taste": "taste-primitives.md"
+    },
+    {
+      "id": "plain",
+      "letter": "G",
+      "name": "Plain three.js",
+      "idea": "Control: no SDK, three.js only, no rig",
+      "contract": "contract-plain.md",
+      "context": "none",
+      "taste": null
+    }
+  ],
+  "subjects": [
+    {
+      "id": "fennec",
+      "kind": "creature",
+      "terse": "A fennec fox.",
+      "rich": "A fennec fox kit standing alert on a little sand dune at dusk. Enormous satin ears lined in pale peach, cream fur warming to sandy gold along its back, a fluffy tail with a smudge of black at the tip, and big dark eyes with a tiny white sparkle. Its paws are a touch oversized, like it hasn't grown into them yet, and it wears a woven leather collar with a small brass bell."
+    },
+    {
+      "id": "toucan",
+      "kind": "creature",
+      "terse": "A toucan.",
+      "rich": "A keel-billed toucan showing off on a short mossy branch. A huge rainbow beak in lime green, sky blue and orange with a cherry-red tip, a glossy black body, a lemon-yellow bib, a ring of lime-green skin around each eye, bright blue feet and a scarlet patch under the tail. A single pink orchid blooms on the branch beside it."
+    },
+    {
+      "id": "octopus",
+      "kind": "creature",
+      "terse": "An octopus.",
+      "rich": "A curious reef octopus in coral and rust tones, covered in little bumps and paler mottling. A soft, bulbous head, golden eyes with bar-shaped pupils and a slightly grumpy brow. Its eight arms curl out in every direction, each lined with rows of cream suckers, and one arm proudly holds up an old brass key it found on a shipwreck."
+    },
+    {
+      "id": "dragonling",
+      "kind": "creature",
+      "terse": "A baby dragon.",
+      "rich": "A baby dragon the size of a house cat, sitting proudly beside the broken shell of its speckled egg. Teal scales fading to a buttery belly, stubby horns, a row of soft orange spines down its back, oversized wings it can't fly with yet, with translucent amber skin between the fingers, and a chubby tail ending in a little spade. Big amber eyes, a toothy grin and a wisp of smoke curling from one nostril."
+    },
+    {
+      "id": "knight",
+      "kind": "humanoid",
+      "terse": "An armored knight.",
+      "rich": "A fantasy knight in battle-worn plate armour. A great helm with a narrow eye slit and a tall crimson plume, layered shoulder plates etched with gold filigree, a deep-blue surcoat with a silver griffin emblem, a tall kite shield bearing the same griffin, and a broadsword. Dents and scratches tell of many battles, and a torn crimson cape hangs from the shoulders."
+    },
+    {
+      "id": "gramophone",
+      "kind": "prop",
+      "terse": "A gramophone.",
+      "rich": "An antique gramophone on a carved walnut cabinet. A huge flaring brass horn shaped like a morning-glory flower, a black record with a red label on the turntable, a silver tonearm, a wind-up crank on the side and little claw feet. The brass has a warm, slightly green patina, and the wood is inlaid with a pale floral pattern."
+    },
+    {
+      "id": "lighthouse",
+      "kind": "diorama",
+      "terse": "A lighthouse on a tiny island.",
+      "rich": "A cozy lighthouse diorama on a tiny rocky island. A red-and-white striped tower with a glowing lantern room and a black iron balcony, a keeper's cottage with a crooked chimney and a blue door, a wooden jetty with a rowboat tied to it, a couple of seagulls, tufts of grass and wildflowers between the rocks, and turquoise water with white foam around the shore, all on a round display base."
+    }
+  ],
+  "sdkCommit": "cb52341"
+}

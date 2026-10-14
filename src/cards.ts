@@ -97,7 +97,7 @@ export function cards(
   );
 
   on.forEach((input, i) => {
-    const f = toFrame(input);
+    const f = toFrame(input, "cards()");
     const root = f.at;
     const n = f.axis.normalize();
     const pickT = textures.length > 1 ? Math.min(Math.floor(random() * textures.length), textures.length - 1) : 0;
@@ -111,7 +111,7 @@ export function cards(
     t.normalize();
     if (turn) t.applyAxisAngle(n, turn).normalize();
     const side = n.clone().cross(t).normalize();
-    const weights = weightsFor(ctx, options.bone, [input], root);
+    const weights = weightsFor(ctx, options.bone, [input], root, "cards(): bone");
     const color = options.color instanceof Paint ? options.color.at(root, n) : null;
     const batch = batches[distinct.indexOf(textures[pickT])];
 

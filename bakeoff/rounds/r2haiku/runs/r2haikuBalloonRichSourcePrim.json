@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuBalloonRichSourcePrim",
+  "arm": "source-prim",
+  "subject": "balloon",
+  "level": "rich",
+  "pitch": "A hot-air balloon about to take off. A big envelope in bold vertical stripes of sunflower yellow, tomato red and sky blue with a patterned band around the middle, a burner glowing orange at the mouth, ropes down to a woven wicker basket with sandbags hanging on its sides and a little flag on one corner.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:31:06.560Z",
+  "wallMs": 62049,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112575,
+    "completion_tokens": 12801,
+    "total_tokens": 125376,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.0376812,
+  "hasCode": true,
+  "reasoning": "I'm planning a hot-air balloon model using a lathe-shaped envelope, with vertical gore stripes painted by computing the angle around the y-axis from the x/z coordinates.\n\nI realize the closing chord creates a solid wedge rather than a hollow shell, which isn't quite right for a balloon shape, but it should still read visually fine since we only see the outer surface anyway.\n\nActually, simpler path: just close the bottom at the axis with a small point hidden beneath where the burner sits, since real balloons have an open mouth anyway and the burner assembly covers that area visually.\n\nFor scale, I'll shift everything so the lowest point touches the ground floor at y=0 — basket bottom sits at 0, basket top around 1.1, then the burner/mouth region spans roughly 2.6 to 3.0, with the envelope itself rising from about 2.6 up to 6.8, bulging to its widest radius near 4.6.\n\nWorking through the rope positions, they run from the basket's top corners up to points on the envelope surface near its mouth, keeping the attachment radius slightly smaller than the actual surface for a clean look. I'm now sketching the lathe profile — a series of (radius, height) points tracing the balloon's silhouette from a narrow neck at the bottom widening outward and tapering back to a point at the top — and realizing I need to leave the very bottom open rather than closed, since the balloon's mouth should be a visible opening rather than solid.\n\nI'm also planning the burner as a small cylinder with a glowing orange flame cone sitting between the basket and the envelope's bottom opening, plus support struts connecting it to the basket rim. For the basket itself, I'm thinking a wicker-weave pattern using a custom paint function based on diagonal grid cells in two colors, with a rim box, hanging sandbag spheres squashed slightly, and a small pennant flag on a thin pole at one corner made from a triangular slab.\n\nFor the envelope's coloring, I'm setting up a custom paint function that computes angular sectors around the vertical axis to create twelve colored gores cycling through yellow, red, and blue, plus a horizontal checkered band partway up using a grid of angle and height cells alternating between white and navy — overriding the stripe colors within that band region.\n\nWriting envelope lathe code...\n\nNow I'm double-checking the lathe outline points, making sure the profile starts and ends on the central axis without creating a degenerate cone shape, and confirming the joint hierarchy with a base joint at the origin and an envelope joint above it for the lathe part to attach to.\n\nWriting the full balloon build function...\n\n"
+}

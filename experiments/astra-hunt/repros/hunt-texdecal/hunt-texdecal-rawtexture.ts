@@ -1,0 +1,14 @@
+import * as THREE from 'three';
+import { buildAtlas } from '../../../../harness/atlas';
+import { createBuilder } from '../../../../src/builder';
+const b=createBuilder({name:'rawTexture'});
+b.joint('root',{at:[0,0,0]});
+const texture=new THREE.DataTexture(new Uint8Array([255,0,0,255]),1,1);
+const blue=b.part(new THREE.PlaneGeometry(.1,.1),'#0000ff',{texture,at:[0,0,0]});
+const white=b.part(new THREE.PlaneGeometry(.1,.1),'#ffffff',{texture,at:[0,0,0.2]});
+const atlas=await buildAtlas([], [{key:'raw-blue',texture,tint:'#0000ff'},{key:'raw-white',texture,tint:'#ffffff'}]);
+const blueTile=atlas.tiles.get('raw-blue')!;
+const whiteTile=atlas.tiles.get('raw-white')!;
+const bluePixel=(blueTile.y*atlas.size+blueTile.x)*4;
+const whitePixel=(whiteTile.y*atlas.size+whiteTile.x)*4;
+console.log('raw-colour',{userDataColoured:texture.userData.coloured,blueMaterial:(blue.mesh.material as THREE.MeshStandardMaterial).color.getHexString(),whiteMaterial:(white.mesh.material as THREE.MeshStandardMaterial).color.getHexString(),blueAtlasRGBA:Array.from((atlas.texture.image.data as Uint8Array).slice(bluePixel,bluePixel+4)),whiteAtlasRGBA:Array.from((atlas.texture.image.data as Uint8Array).slice(whitePixel,whitePixel+4))});

@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuFrogTersePlain",
+  "arm": "plain",
+  "subject": "frog",
+  "level": "terse",
+  "pitch": "A frog.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:27:10.060Z",
+  "wallMs": 24240,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 773,
+    "completion_tokens": 5690,
+    "total_tokens": 6463,
+    "prompt_tokens_details": {
+      "cached_tokens": 763
+    }
+  },
+  "costUsd": 0.0028536300000000002,
+  "hasCode": true,
+  "reasoning": "I'm planning out a stylized frog model built from primitives at roughly real-world scale, around 10 cm long, with a squashed sphere body merging into a head and large bulging eyes on top.\n\nI'm mapping out the folded hind legs, small front arms with sphere fingers, a mouth line, and darker flattened-sphere spots, keeping geometry low-poly. For positioning, I plan to build everything as groups, then use a bounding box to shift the whole model so it rests exactly at y=0 and stays centered on x, rather than hand-computing coordinates.\n\nWriting material definitions...\n\nWorking out the knee-ankle-toe joint positions...\n\nSetting radii for thigh, shin, and foot segments, then scattering small flattened spheres across the back using a seeded random generator to place them on the body ellipsoid's surface.\n\nFor the belly I'll use a pale ellipsoid overlay intersecting the lower body, then fix grounding by computing the bounding box and shifting the whole group up so its minimum y touches the ground. I also need to position protruding eye spheres near the top of the head, then write a compact helper function for creating these ellipsoid meshes.\n\nWriting helper function...\n\nI also need a limb-building function that creates a cylinder stretched between two points with joint spheres at each end, oriented via quaternion alignment, plus a mirroring helper for symmetric left/right limbs and a seeded random generator for slight natural variation. Then I'll finalize by centering the group horizontally and dropping it to rest on the ground, aiming for a frog roughly 10cm long, before writing up the answer with the full code block.\n\n"
+}

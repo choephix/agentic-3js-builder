@@ -1,0 +1,25 @@
+{
+  "slug": "r2ClockworkDogTerseDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "clockworkDog",
+  "level": "terse",
+  "pitch": "A clockwork dog.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:12:14.257Z",
+  "wallMs": 60860,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32586,
+    "completion_tokens": 8451,
+    "total_tokens": 41037,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.09105239999999999,
+  "hasCode": true,
+  "reasoning": "I'm sketching a compact tin clockwork dog design, standing on four legs, roughly 0.6m long with a blocky tin body, brass gears, a side wind-up key, extruded ear plates, and a spring-coil tail.\n\nNow I'm building the skeleton hierarchy—hips, spine chain, neck chain, and head joint—working out coordinates and parent-child relationships so the legs bend naturally and the head sits forward and upright.\n\nFor the jaw, I'm placing it slightly below and forward of the head, with an aim target further forward for the bite direction. Then I'm lofting the body shape along the spine, defining width and height at each station from tail to shoulders, making sure the loft start point aligns with the spine chain's beginning.\n\nFor color, I'm going with a countershade paint—blue on top, cream below—to give the tin toy look, then adding a scattered row of small brass rivet hemispheres along the body surface as a decorative belt.\n\nNow I'm working out the four legs symmetrically, placing hip joints at offset x/z positions for front and back pairs, defining limb chains with named shoulder-elbow-paw joints and appropriate bend directions, and sweeping them with a hexagonal cross-section before attaching box-shaped paws.\n\nI'm also adding a brass gear-disc at each hip, generating a toothed outline via an extrusion technique rather than a plain cylinder for mechanical detail, carefully alternating inner/outer radii at each angle step to avoid self-intersecting geometry.\n\nNow I'm placing a wind-up key on the back of the body—a stem rod plus a butterfly-shaped bow built from an extruded polygon outline with wing coordinates defined in the x-y plane.\n\nThen I'm shifting focus to the head: constructing it from box shapes forming the skull frustum and snout, positioned forward of the body.\n\nStill working out eyes, brows, and ear geometry...\n\nNow I'm figuring out the tail: a spring-like coiled shape built from a bone chain with a spiral sweep around it, giving it that springy look rising from the hips.\n\nI'll sweep that coil path into a brass tube attached to the tail bone, with a red ball tip at the end. For the collar, I'm considering a torus ring positioned around the neck bone, oriented along its axis, as a simpler alternative to a full sweep.\n\nI'm also adding a small brass disc near the neck as a tag detail, and checking that paw boxes sit flush with the ground so the model's bounds stay grounded at y=0.\n\nFor the neck chain, I'm setting up tapered sweep radii and linking the chain to the spine tip, with the head parented to the neck's end joint. For the legs, I'm attaching the hind limbs to the hip joint and the front limbs to the spine tip, since those are the nearest logical parents, and passing hip positions into the limb-building function as arrays defining each leg's path.\n\nI'm setting bend directions so the front legs bend backward at the elbow and hind legs bend forward at the knee, matching natural dog anatomy, then sweeping each leg chain with tapered radii and adding brass sphere joints at the elbows and knees for visual detail. I'm also defining the color palette—blue, cream, red, brass, dark, white—and starting work on a red belly stripe using a countershading technique.\n\nFor the belt, I'm skinning a loop around the body and sweeping a thin brass tube along it, but deciding to skip rivets since aligning them properly along the tangent is tricky—opting instead for scattered small brass spheres with minimum distance spacing. Now I'm writing the actual export code, including a gear outline function and side gear extrusions with axle hubs, letting bone placement default to the nearest joint.\n\nWorking through the math for gear positioning relative to the loft's half-width so the gears sit embedded correctly into the body surface at the right thickness. Skipping the jaw tongue detail—finalizing and writing the output now.\n\n"
+}

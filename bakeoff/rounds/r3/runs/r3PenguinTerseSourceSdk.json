@@ -1,0 +1,25 @@
+{
+  "slug": "r3PenguinTerseSourceSdk",
+  "arm": "source-sdk",
+  "subject": "penguin",
+  "level": "terse",
+  "pitch": "A penguin.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:06:27.889Z",
+  "wallMs": 75588,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112461,
+    "completion_tokens": 9029,
+    "total_tokens": 121490,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.315212,
+  "hasCode": true,
+  "reasoning": "I'm planning out an emperor-penguin model around 1.1m tall, standing upright facing forward, with a skeleton including hips, spine chain to neck and head, short legs with webbed feet, flipper-arms, a small tail, and upper/lower beak joints.\n\nI'm setting up a root joint and a spine chain built from a polyline of points, then using a loft/sweep bound to that chain to shape the egg-like body, defining station widths and depths along the way.\n\nNow I'm working on the penguin's coloring, planning a custom paint function based on surface normals and position to separate the black back from the white belly, with a yellow-orange chest patch and black head.\n\nStill working out the body shading...I'm figuring out the head paint next: black fur with orange-yellow ear patches placed by distance to approximate ear coordinates near the head sphere location.\n\nFor the skeleton, I'm planning a simple spine chain with four joints (spine1, spine2, neck, head) rising up the back, feeding the loft and head sphere placement.\n\nThen I'm adding a jaw joint off the head for beak articulation, positioning the head center and sketching the beak as a tapered cone shape in dark coloring with a hint of the orange-pink stripe characteristic of emperor penguins.\n\nFor the eyes, I'm adding small white spheres with black pupils positioned at the front sides of the black head so they read clearly against the dark coloring.\n\nNow I'm working out the flipper chains, placing shoulder, elbow, and wrist joints along a diagonal path from the body outward and downward, parented to the spine for proper movement, then figuring out how to shape each flipper as a flat extruded blade rather than a cylindrical limb.\n\nFinishing the blade outline points and thinking through the extrusion direction so the flippers tilt slightly outward and downward from the shoulder joint.\n\nNow I'm working out the shoulder-elbow-wrist chain for the rig, using a three-point path so there are two spans leading to the tip, and placing the blade at the shoulder position with the correct orientation.\n\nI'll mirror the left side to the right by negating x, writing a helper function keyed on a sign value. Then I'm setting up short hidden thighs with visible feet, placing hip joints symmetrically on each side.\n\nDefining the leg chain with hip, knee, and ankle joints, parented to root, using a thin sweep radius with a dark color since the legs are mostly hidden by the body. For the feet, I'm sculpting a flat webbed shape extruded slightly along the vertical axis to give it thickness, starting to outline the toe fan...\n\nMapping out toe lobe coordinates...\n\nAdding tail2 and tail3 joints with a tapering radius sweep for a flattened, narrowing tail shape, making sure the tip stays above ground level. I'm also checking that the body's bottom cap sits above the legs and feet so there's no visual overlap.\n\nNow I'm working through the spine chain setup — placing the root joint around y=0.3 or 0.4 with legs and tail parented to it — and figuring out how loft sweeps orient their cross-sections along the path using aim and binormal/normal axes so width and height map correctly onto the creature's silhouette as it curves upward.\n\nFor coloring, I'm sketching the penguin's paint scheme: dark back (#1d2229), white belly (#f6f3ec), and a yellow chest patch blending in using a smooth gradient between y=0.58 and 0.82, with the head staying black near the top of the body around y=0.9–0.99.\n\nNow I'm refining the belly paint function, mixing dark back color with white-to-yellow belly gradient based on z-facing normal and y-position, then fading it to black near the neck/head transition around y=0.86-0.93. Flippers stay a flat dark color, and the head is painted solid black.\n\nWorking out the head details now: placing yellow ear patches using distance-based smoothstep blending near small ear bumps on either side, and positioning the eyes as tiny black spheres, checking whether their offset coordinates land correctly on the scaled head sphere.\n\nNow I'm planning the beak with an upper dark gray spike and a lower pinkish-orange one attached at the jaw joint, then working out the build order: root, spine chain, jaw, arms, legs, tail, followed by each part with bone references and radius options for the lofted spikes. I'm setting up the body loft stations next.\n\nWriting leg sweep and head sphere code...\n\nStill refining leg joint positions...\n\n"
+}

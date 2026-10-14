@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuTurtleTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "turtle",
+  "level": "terse",
+  "pitch": "A sea turtle.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:23:37.194Z",
+  "wallMs": 31317,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5299,
+    "completion_tokens": 6829,
+    "total_tokens": 12128,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.0034686599999999997,
+  "hasCode": true,
+  "reasoning": "I need to plan out a sea turtle model using only the SDK's documented primitives and helpers like builder, joint, sweep, loft, surface, decal, and paint functions, without relying on undocumented APIs.\n\nI'm sketching the turtle's skeleton with a flattened domed shell for the carapace, a hip joint as root, and a chained neck leading to the head, sizing everything to roughly a one-meter-long sea turtle.\n\nFor the flippers, I'm weighing whether to use chains with a \"fan\" role or joint-based arms, planning to pass path points through b.chain with a role option despite being unsure of the exact signature, and figuring out how to properly parent child joints like the neck to the root hip joint.\n\nI'm now working out the shell's dimensions: a dome roughly 1m long, 0.8m wide, sitting with the body centered around y=0.22, and sketching the sphere geometry and scale values that would produce a shell top near 0.41 and bottom near 0.09.\n\nFor the scutes on top, I'm weighing options—surface attachment on a built part, paint/pattern functions, or manually computing positions on an ellipsoid using trig—since I'm unsure which API calls are actually supported, and leaning toward hand-computing the hexagonal plate positions directly with ellipsoid math as the safer path.\n\nFor the head, I'm placing a sphere up front with a neck chain connecting it to the body, then considering a cone part with an aim direction for the beak, plus small dark and white spheres for the eyes. For the flippers, I'm deciding between a tapered sweep for a tubular look or an extrude with a 2D outline for a flatter, more realistic flipper shape.\n\nI'm sketching out the control points for front and back flipper chains (mirrored on the X axis) and a tapering tail chain running from the body to its tip, each to be rendered as a sweep with a small radius. I'm also setting up the neck chain's path toward the head sphere, naming the flipper chains and joints distinctly, and starting to pick an olive color for the shell.\n\nNow I'm choosing colors for the skin, head, plastron, and eyes, placing a flattened plastron sphere beneath the shell, and planning how to scatter small scute plates across the shell's surface using a parametric ellipsoid formula to position each one.\n\nSwitching to flattened hexagonal cylinders for the scutes instead of spheres, since low-poly hexagons read better, and setting up a staggered grid loop with jittered scale to position them just above the shell surface.\n\nNow I'm defining the palette — olive greens, tans, and dark/white accents for shell, skin, plastron, and eyes — then placing the eyes as nested white and dark spheres on the head and sketching a cone for the beak.\n\nFinalizing the flipper shapes with tapered sweeps and scaled sphere tips, then writing the complete code using the chain and sweep helper functions with per-part color options.\n\n"
+}

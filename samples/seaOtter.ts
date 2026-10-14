@@ -106,7 +106,7 @@ export default function build() {
 
   const torso = b.sweep(spine, (t) => 0.21 + 0.045 * Math.sin(t * Math.PI), {
     color: COAT_PAINT,
-    shift: () => [0, -0.015],
+    shift: (): [number, number] => [0, -0.015],
     section: { ngon: 8 },
     name: "torso",
   });

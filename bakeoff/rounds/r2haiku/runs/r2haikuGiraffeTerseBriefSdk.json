@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuGiraffeTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "giraffe",
+  "level": "terse",
+  "pitch": "A giraffe.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:25:30.937Z",
+  "wallMs": 75237,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5298,
+    "completion_tokens": 6297,
+    "total_tokens": 11595,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00320256,
+  "hasCode": true,
+  "reasoning": "I'm planning a giraffe model using the SDK in a single TypeScript code block, aiming for a stylized but recognizable design with a long neck, spots, ossicones, and realistic proportions—roughly 5m tall, 2.5m body length, 1.8m legs.\n\nI'm working out joint placement for hips, knees, and ankles, then building leg chains with appropriate roles, though I'm uncertain about the exact API signature for chains and joints so I'm making careful guesses based on the reference.\n\nI'm narrowing to simpler, safer API calls: using `b.part` for boxes/spheres with explicit positions, and for spots I'll generate my own scattered points and query the surface with `nearest(p)` rather than relying on uncertain scatter/random methods.\n\nFor the ossicones and neck, I'm leaning toward `b.spike` with a base point and direction vector, assuming it adds the geometry directly rather than returning raw data. For skin texture (spots/stripes/countershade), since the exact signatures of those imported functions are unclear, I'm considering skipping them or using the safest minimal call pattern to avoid breaking the build.\n\nNow I'm sketching the body geometry as a spine chain running from rump to chest, swept into a tube shape with a radius around 0.32-0.36 to approximate the giraffe's torso depth, while keeping the import list trimmed to only what's actually used.\n\nNext I'm building the neck as a chain of points rising from the chest toward the head with a roughly 0.19 radius sweep, then placing the head as a box with a smaller muzzle box, spike-shaped ossicones with darker tips, small dark sphere eyes, and angled ear boxes.\n\nLegs come next as four chains with hip, knee, and hoof points, swept with a tan radius and capped with dark hoof boxes sitting just above the floor; the tail is a thin sweep from the rump tapering to a dark tuft sphere at the tip.\n\nFor body texture I'm planning to use a surface API that lets me project scattered points onto the torso and neck sweeps via a \"nearest\" lookup, then stick flattened box or sphere patches at those hits to simulate giraffe spots, using a seeded random generator for placement and a tan/brown color palette for the body, patches, ossicones, hooves, eyes, and muzzle. I'm keeping patch count modest to stay within part limits, then finalizing the code structure with the default export and metadata.\n\n"
+}

@@ -245,7 +245,7 @@ export default function build() {
   const ry = prof([[0, 0.66], [0.5, 0.74], [0.8, 0.9], [1, 0.72]]);
   const torso = b.sweep(spine, (t) => [rx(t), ry(t)], {
     color: SINEW_P,
-    shift: () => [0, -0.5],
+    shift: (): [number, number] => [0, -0.5],
     sides: 10,
   });
   b.sweep(tail, prof([[0, 0.68], [0.15, 0.55], [0.45, 0.36], [0.75, 0.2], [1, 0.1]]), {

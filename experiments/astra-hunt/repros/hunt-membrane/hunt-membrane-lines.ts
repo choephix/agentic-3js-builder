@@ -1,0 +1,16 @@
+import * as THREE from "three";
+import { createBuilder } from "../../../../src/builder";
+const b = createBuilder({ name: "line-membrane" });
+const root = b.joint("root", { at: [0, 0, 0] });
+const chain = b.chain("wing", [[0, 0, 0], [0, 1, 0], [0, 2, 0], [0, 3, 0]], { parent: root });
+const tube = b.sweep(chain, 0.2, { color: "#fff" });
+const a = tube.line(0); const c = tube.line(180);
+const membranes = b.membrane(a, c, { thickness: 0.02, color: "#f00", rows: 2, cols: 8, name: "lineMem" });
+const mesh = membranes[0];
+const indices = mesh.geometry.getAttribute("skinIndex"); const weights = mesh.geometry.getAttribute("skinWeight");
+const position = mesh.geometry.getAttribute("position");
+const before = Array.from(position.array).slice(-3);
+console.log({ owner: b.ctx.owner.get(mesh)?.name, bones: mesh.userData.skinBones, vertices: position.count, hasSkin: Boolean(indices), firstWeights: weights ? Array.from(weights.array).slice(0, 48) : null, chainTs: chain.ts, farBefore: before });
+b.pose("wing2", { axis: [1, 0, 0], deg: 90 });
+const after = Array.from(position.array).slice(-3);
+console.log({ farAfter: after, worldFar: new THREE.Vector3(...after).applyMatrix4(mesh.matrixWorld).toArray() });

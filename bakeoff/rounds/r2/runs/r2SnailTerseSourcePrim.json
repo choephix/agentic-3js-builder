@@ -1,0 +1,25 @@
+{
+  "slug": "r2SnailTerseSourcePrim",
+  "arm": "source-prim",
+  "subject": "snail",
+  "level": "terse",
+  "pitch": "A snail.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:09:21.710Z",
+  "wallMs": 49576,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112474,
+    "completion_tokens": 6211,
+    "total_tokens": 118685,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.0846228,
+  "hasCode": true,
+  "reasoning": "I'm planning the snail model at a realistic scale—roughly 8cm long with a 6cm body and 3.5cm shell—and sketching out the skeleton with a body root joint and a spine chain running from tail to head along the z-axis.\n\nI'm adding the neck rise, eye stalks with long and short tentacle pairs, a hinged upper/lower jaw, and a shell joint on the back, then planning to build the spine using a joint chain with four named segments. I'm working out a radius function so the body sweeps from a tapered tail point up through a raised head, with a flat separate sole for the foot running the length of the body to keep it grounded.\n\nNow I'm placing a sphere for the head at the chain's tip, adding jaw joints and small boxes for upper/lower jaw with a darker mouth cavity, then setting up eye stalk chains branching off the head with tapered sweep radii for the tentacle segments.\n\nI'm mirroring the eye stalks and lower tentacles to the right side with negated x-coordinates, parenting both chains to \"head\" since sweeps infer their nearest joint as default parent. For the shell, I'm defining a spiral joint off spine2 and planning to sweep a spiral path with increasing radius to build the coiled shell shape.\n\nWorking out the spiral geometry now — coiling around the x-axis for a sideways-facing shell with the aperture angled front-right, computing tube radius as a function of t that shrinks from the outer whorl down toward the apex over several turns.\n\nFor the stripe pattern, I'll paint bands using the angular coordinate along the shell's spiral, giving dark brown stripes against a tan base to mimic a garden snail's banding.\n\nNow I'm working out the shell's geometry — sweeping a tube along a spiral path, positioning the shell's center behind and above the body, and figuring out where the aperture needs to sit so the outer whorl touches the back properly.\n\nThe rotation about +x carries the starting point from front to bottom to back to top as the spiral winds inward three turns, keeping the aperture facing front. I'll skip the extra lip and aperture disc details for simplicity and focus on defining the radius function for the sweep along the spiral path, tapering it over the parameter t.\n\nFor coloring, I'm mottling two tan-grey tones for the body with a lighter foot shade, and considering nested spot patterns for subtle dark markings while skipping tubercle bumps.\n\nNow I'm shaping the body sweep as a tapered chain: width narrowing toward both the tail and head ends, with the radius profile easing in from zero near the tail and tapering down near the head, while tracking the vertical path so the body sits properly above the foot without floating.\n\nThen I'm laying out the head geometry—a tapered neck chain leading into a head sphere at the tip, eye stalks mounted on the forehead, and a mouth assembly with an upper lip box and a pinkish lower jaw box positioned just in front of the head, plus tiny black eye spheres at the tentacle tips.\n\nI need the chain helper to require at least one root joint before building the tentacle, so I'm making sure the first joint is created and parented properly before the taper sweep runs along it.\n\nAdding a root joint, then chaining spine1 through spine3 and head off it, with the shell attached at spine2. I'm plotting the eye stalk and short tentacle points with their own sweep radii, then writing a mirroring helper to duplicate them on the opposite side.\n\nNow I'm placing the foot box on the floor and sketching the shell paint function, striping it with a stepped color mix and darkening toward the apex, before baking the texture to a 1024 sheet.\n\n"
+}

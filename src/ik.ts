@@ -57,8 +57,9 @@ function fold(lengths: readonly number[], sides: readonly number[], dist: number
 
 /**
  * Joint positions `[root, ..., end]` for segments of exactly `lengths` from `root` to `target`. `bends` is one
- * direction per inner joint (or one for all) saying which way that joint points: alternate them for a digitigrade
- * leg (knee forward, hock back). The limb is planar: the plane holds root, target and the first hint.
+ * direction per inner joint (or one, alone or in a list, for all) saying which way that joint points: alternate
+ * them for a digitigrade leg (knee forward, hock back). The limb is planar: the plane holds root, target and the
+ * first hint.
  *
  * Rule for the extra freedom of 3+ segments: the last segment runs parallel to root→target (a vertical cannon
  * under a hip) when that respects its hint and reach; otherwise every joint turns by the same angle. Out of reach:
@@ -74,10 +75,12 @@ export function limb(
   options: { sole?: DirectionInput } = {},
 ): Vector3[] {
   const n = lengths.length;
+  const list = Array.isArray(bends) && typeof bends[0] !== "number" ? (bends as readonly DirectionInput[]) : null;
+  // One direction, or a list of one, holds for every inner joint.
   const hints =
-    Array.isArray(bends) && typeof bends[0] !== "number"
-      ? (bends as readonly DirectionInput[]).map((d) => toDirection(d, "limb()"))
-      : lengths.slice(1).map(() => toDirection(bends as DirectionInput, "limb()"));
+    list && list.length !== 1
+      ? list.map((d) => toDirection(d, "limb()"))
+      : lengths.slice(1).map(() => toDirection(list ? list[0] : (bends as DirectionInput), "limb()"));
   const needed = options.sole ? n - 2 : n - 1;
   if (hints.length < needed)
     throw new Error(

@@ -1,0 +1,25 @@
+{
+  "slug": "r3ArmadilloTerseDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "armadillo",
+  "level": "terse",
+  "pitch": "An armadillo.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:07:20.024Z",
+  "wallMs": 58447,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32584,
+    "completion_tokens": 7353,
+    "total_tokens": 39937,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.0800684,
+  "hasCode": true,
+  "reasoning": "I'm planning a nine-banded armadillo model with realistic proportions—roughly 0.45m body, 0.35m tail, 0.25m height—and sketching out the skeleton structure starting from the hips, keeping the spine chain simple while capturing the long snout, big ears, short legs, and banded carapace.\n\nNow I'm detailing the joint hierarchy: spine chain running from hips to shoulders, neck and head joints leading forward, and a tapering tail chain of four segments curving down and back. For the legs, I'm placing front and hind limb joints with appropriate hip and foot positions, giving front legs a backward-bending elbow and hind legs a forward-bending knee, parented appropriately to the spine and hips.\n\nI'm figuring out side conventions (left = positive X) and working out the body mesh: sweeping an ellipse profile along the spine chain for the carapace shape, then planning the coloring scheme with a brownish-gray carapace on top, cream belly, and banded stripe patterns along the shell.\n\nNow I'm checking vertical placement so the body sits properly above the legs and feet touch the ground plane, sinking foot boxes to y=0 with small claw details, and planning dome-shaped shoulder and pelvic shield plates with ridge bands along the spine.\n\nFor the dark ridge bands, I'm looping cuts around the body surface at nine positions along the z-axis, restricting each loop to just the top arc so the belly stays smooth, then sweeping thin dark rods along those arcs to form the segmented plating.\n\nFor the shoulder shield, I'm building a half-dome using a partial sphere geometry scaled to fit near the spine, roughly positioned to overlap the body at the shoulder, colored in a muted brown-gray with a scales texture applied to give it a plated look.\n\nI'm also working out the body's radius profile so it tapers smoothly at both ends using sine-based interpolation for the x and y radii, giving the torso rounded caps.\n\nNow I'm building the head: a scaled sphere for the skull, a tapered rod swept forward for the snout with a pink nose tip, and small eye spheres positioned to the sides using local offsets from the head joint.\n\nNext I'm adding flattened cone ears tilted slightly outward and attaching a lower jaw rod from a jaw joint offset below and forward of the head.\n\nDefining neck and head joints...\n\nFor the head shield I'll scale a sphere and paint scales on top with a muted shield color, then handle the tail as a tapered catmull sweep with stripe patterns parented to the hips, and finally build the legs as colored sweep chains leading into a box-based hand.\n\nNow I'm placing claws as small cone spikes angled toward the front of each foot box, sizing them so front feet get longer claws than hind feet, with the foot geometry positioned so the bottom sits flush at ground level.\n\nThen I'm adding tiny black spheres for the eyes and a small nose shape, and moving on to writing the leg limb function itself—it'll take root and target points plus bend directions and segment lengths, with front legs reaching from hip to foot across a distance that fits within the two-segment leg length, and hind legs sized similarly but slightly shorter. I'm checking that the hip placement keeps the legs tucked properly under the body radius.\n\nNow I'm defining the surface sweep for the body, building a loop of points around the body contour with slight lift offsets, then slicing that loop to form the top ridge and sweeping a thin tube along it to create a spine-like detail. I'm banding the body into several z-slices and checking that these bands don't awkwardly overlap the shoulder and pelvic dome regions.\n\nI decide to shrink the dome scales so they don't swallow the bands, repositioning the shoulder dome around z=0.19 and the pelvic dome around z=-0.14, then recompute evenly spaced bands (aiming for 9 of them) between roughly z=-0.05 and z=0.09, giving each a darker countershade color relative to the base uniform tone of the body.\n\n"
+}

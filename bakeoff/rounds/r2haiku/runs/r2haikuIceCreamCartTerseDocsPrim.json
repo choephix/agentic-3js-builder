@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuIceCreamCartTerseDocsPrim",
+  "arm": "docs-prim",
+  "subject": "iceCreamCart",
+  "level": "terse",
+  "pitch": "An ice cream cart.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:31:40.351Z",
+  "wallMs": 75849,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32600,
+    "completion_tokens": 14271,
+    "total_tokens": 46871,
+    "prompt_tokens_details": {
+      "cached_tokens": 32586
+    }
+  },
+  "costUsd": 0.007462760000000001,
+  "hasCode": true,
+  "reasoning": "I'm planning out a single TypeScript module that builds an ice cream cart using the SDK's documented builder functions, keeping the implementation self-contained and sized reasonably while sticking to well-known calls like joints, parts, sweeps, and painting utilities.\n\nI picture a realistic street cart around 1.2m wide: a rectangular body with a striped awning, a light-coloured display case, cylinder wheels, a handle bar, a freezer top, and a cone-and-scoop sign, all in bold red-and-cream colors with a pastel accent. To keep placement simple and avoid ambiguity about root joints, I'll create an explicit root joint for the cart and attach every part to it by bone reference.\n\nI'm now working through all the geometry and placement math: wheels as rotated cylinders on an axle, a chassis and body box, a recessed serving window with a counter, a top freezer lid, chrome support posts holding up a tilted canopy with a scalloped valance made from half-sphere hemispheres, and a tall decorative cone-and-scoop sign stacked on top using layered lathe profiles. I'm calculating exact heights and centers for each piece so they stack cleanly (chassis around 0.3m, body up to 0.95m, posts to about 1.8m, canopy near 1.85m, sign reaching roughly 2.3m), while also planning the push handle as simple rods, the wheel hubs, and body color choices—leaning toward a solid mint body with cream trim rather than busy stripes to keep it visually clean. I'm also sketching a small painted sign plane with \"ICE CREAM\" text rendered via an SVG texture mapped onto the front of the cart.\n\nNow I'm actually writing out the code: setting up imports, defining the color palette, creating the root joint, and building each part—chassis, body, skirt, freezer lid—as box geometries attached to the cart bone with precise position offsets.\n\nContinuing the build, I'm adding the window panel, a plane for the storefront sign using the svg texture helper, the wheel and hub cylinders, the counter box, and two tubs with scoop-shaped lathe geometry on top. I'm writing a reusable scoop helper function that generates a scaled lathe profile for ice cream scoops, then using it for the counter tubs and the oversized rooftop scoop sign, complete with a cherry sphere on top and a waffle cone beneath it.\n\nI'm also laying out the canopy as a striped box with scalloped hemisphere valance pieces along the front edge, chrome rod posts connecting the canopy to the cart body, and a rear push-handle made from rods. I'm double-checking the coordinate math so the wheels sit flush with the ground, the posts align with the lid and canopy without clipping, and the cone-topped scoop sign rests centered on the canopy peak, then finalizing the code with minimal extra commentary.\n\n"
+}

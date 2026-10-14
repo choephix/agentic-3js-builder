@@ -1,0 +1,25 @@
+{
+  "slug": "r3TypewriterTerseDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "typewriter",
+  "level": "terse",
+  "pitch": "A typewriter.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:09:52.440Z",
+  "wallMs": 86014,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32584,
+    "completion_tokens": 11224,
+    "total_tokens": 43808,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.11877839999999999,
+  "hasCode": true,
+  "reasoning": "I'm planning the typewriter model structure with a root base joint and a carriage joint, sizing it roughly 0.36 wide, 0.36 deep, and 0.2 high, with the keyboard facing +Z and a platen cylinder running along X at the back.\n\nFor the body, I'm defining an extruded side profile that slopes from the flat base up into a raised rear housing, giving it that classic tapered typewriter silhouette, with a slight bevel and dark coloring. Next I'm working out the staggered, sloped key rows for the keyboard section.\n\nDesigning the keycaps as small cylinders with cream centers on black bases, arranging roughly 44 keys in rows of varying counts with consistent spacing, then adding a space bar box near the front edge of the board.\n\nStill building the typewriter geometry...\n\nWorking through exact z-depths so the paper sheet sits just behind the platen without clipping through it, extending the paper box from y 0.20 to 0.34 so it emerges visibly above the platen's curve.\n\nNow I'm positioning the mechanical details: a paper support rod, a carriage return lever on the left side with a swept knob shape, and the ribbon spool cylinders sitting on top of the body forward of the platen, working out their x/z offsets and flange dimensions so they clear the carriage bracket above.\n\nI'm tightening the geometry so the basket of typebars and the ribbon spools don't overlap, checking radii against center offsets, then thinking through how the typebars fan out radially from a central pivot point to strike the platen in an upright arc.\n\nStill working out the arc geometry and spool placement coordinates, then checking how the body outline's top edge slopes between the floating arc base and the basket shape below.\n\nI'm settling on four rows of keys spaced along the sloped surface, tilting each key to match the slope's normal angle so they sit flush against the keyboard face.\n\nEach key gets a small cap cylinder offset along the normal with a flat disc for the keytop, and I'm planning rubber feet cylinders under the base to finish the frame.\n\nI'll apply this Y0 offset consistently through a helper function, then move on to decorations: a small brass badge with decal text on the front face, and the paper bail rod running along the carriage with its arms and margin stops.\n\nNow I'm working out the carriage geometry itself, setting up the joint hierarchy so carriage parts attach to a \"carriage\" bone parented to the base, and figuring out the platen's span, knob positions, and the end plate dimensions that need to clear the body width and rail height without overlapping.\n\nI'm checking that the carriage rail sits a few millimeters above the body top so it rides freely without clipping, then switching to defining the platen knobs as small cylinders oriented along the X axis with a ridged texture.\n\nFor the levers, I'm sweeping a curved path for the carriage return lever with a chrome rod and black sphere knob at the end, then deciding to skip costly keycap lettering in favor of simple dark rings, and keeping the extra guide details minimal with just a small box for the typing point guide.\n\nFor the ribbon spools, I'm using cylinder geometry for the flanges and core with a wound ribbon section, then connecting a thin rod path between the spools to represent the ribbon. For the paper, I'm adding typed text lines as simple grey rectangles to suggest typed content.\n\nNow I'm setting the SVG background to a full cream rect so colors render correctly, using a viewBox sized for the paper's aspect ratio with text lines as varying-width rects. I'm defining the color palette -- deep teal body, chrome grey, dark key, cream, black rubber, brass, and paper tones -- then starting the builder code with the base joint and carriage joint hierarchy.\n\nBuilding the keyboard model structure...\n\nLaying out the typebars in a radial arc with rod and slug geometry, adding a basket arc rail along the curve, and placing four feet cylinders at the base corners to support the body.\n\n"
+}

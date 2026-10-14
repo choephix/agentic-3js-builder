@@ -1,0 +1,25 @@
+{
+  "slug": "r3TypewriterTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "typewriter",
+  "level": "terse",
+  "pitch": "A typewriter.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:09:53.257Z",
+  "wallMs": 341721,
+  "status": 200,
+  "error": null,
+  "finishReason": "length",
+  "usage": {
+    "prompt_tokens": 5298,
+    "completion_tokens": 72192,
+    "total_tokens": 77490,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.7230011999999999,
+  "hasCode": false,
+  "reasoning": "I need to build a typewriter model using the SDK's part and joint helpers, being cautious since I can't test the API directly. I'll set up a root joint as the base and attach parts via positioning, though I'm unsure how rotation is specified for each piece.\n\nFor the design, I'm planning a vintage typewriter around 0.35x0.3x0.25 with a base plate and small feet cylinders, a lower body box with a sloped keyboard deck, a rear upper housing, and a carriage assembly with a platen cylinder, end knobs, a rail, and paper sticking out the back with thin dark lines simulating text, plus a paper bail rod across the top.\n\nI'm adding a typebar basket made from fanned thin rods or a partial torus arc in front of the housing, and laying out round keys with cream tops and chrome rings across four staggered rows positioned along the sloped deck using computed tilt angles and row offsets.\n\nFor colors, I'm going with a deep green-teal body, chrome accents, cream keys with dark rims, plus red ribbon spools, a return lever, margin scale details, and a small gold brand badge—bringing the total part count to around 60.\n\nNow I'm writing the helper function for placing geometry with materials and rotations, setting up a root joint, and working out how to construct the typebar rods as angled cylinders connecting the key arc to the platen center.\n\nI'm planning the body dimensions: the lower box at a specific width, height, and depth, with feet planted at the ground and a sloped deck built with an extrusion shape.\n\nWorking out the deck shape's rotation and axis mapping so the extrude direction lines up correctly with world coordinates.\n\nI'm computing the slope of the key wedge surface so each row of keycaps sits at the right height, deciding to leave them upright rather than add tilt since it looks fine as is. Now sketching the rear housing as a simple box roughly 0.36 by 0.10 by 0.14.\n\nI'll fan short rods from the basket front through the housing slot to the typebar tips, keeping them simple visible plates. That should be enough detail—time to write it out.\n\n"
+}

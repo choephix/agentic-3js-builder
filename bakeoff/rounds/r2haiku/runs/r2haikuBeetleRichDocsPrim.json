@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuBeetleRichDocsPrim",
+  "arm": "docs-prim",
+  "subject": "beetle",
+  "level": "rich",
+  "pitch": "A proud stag beetle on a mossy log. A glossy chestnut wing case with a mirror shine, a black head and thorax, huge branched antler-like jaws in reddish brown, elbowed antennae with feathery tips, and six spiny black legs gripping the bark. A dewdrop clings to one of its antlers.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:26:46.175Z",
+  "wallMs": 148851,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32697,
+    "completion_tokens": 21414,
+    "total_tokens": 54111,
+    "prompt_tokens_details": {
+      "cached_tokens": 32586
+    }
+  },
+  "costUsd": 0.011043959999999999,
+  "hasCode": true,
+  "reasoning": "I'm planning a single TypeScript module using the SDK to model a stag beetle on a mossy log, aiming for realistic proportions at actual beetle scale while keeping the code manageable and high quality.\n\nI'm sketching the log as a cylinder oriented along the Z axis, applying a bark grain paint and scattering mossy blobs across its surface, then designing the beetle body along the same axis with the head facing forward and the root joint positioned at the body's center.\n\nNow I'm placing the thorax and head joints above the log's surface, then building out the body parts—head, pronotum, elytra, abdomen—using scaled sphere geometry with black for the head and thorax and a glossy chestnut tone for the wing cases, since material shine isn't adjustable so color alone will convey that look.\n\nNow I'm working out the six legs gripping the log's bark, placing hip, knee, and foot joints so feet land on the curved log surface, and considering whether to use explicit chain points or an IK limb function to bend each leg naturally toward its foothold.\n\nThe foot tip sits on the surface with claws gripping. I'm planning the six legs hanging from thorax joints, spaced front/middle/hind along z, with hips and feet positioned to grip the sides of the log near its top edge, and now I'm sketching out the body/head joint hierarchy with the thorax as root and a forward-aimed head joint as child.\n\nNow I'm working out the mandibles: branching jaw joints off the head, curved forward and outward then inward at the tips like a stag beetle's, built as tapering tubes with a small spike tooth branching off the midpoint of each mandible curve.\n\nFor the antennae I'm planning an elbowed scape-and-flagellum structure as a small jointed chain swept into a thin black rod, then adding feathery tips by ringing several small flattened capsule shapes around the end point to simulate lamellae.\n\nWorking through ring geometry logic...\n\nNow thinking about the dewdrop detail — a small translucent sphere positioned near the mandible tip, computing its placement by offsetting a chain point along the local normal so it sits just above the jaw surface, colored pale icy blue.\n\nFor the log, I'm placing a cylinder rotated along the z-axis as the trunk base, then applying a bark grain pattern using a paint function. I'm layering noise-driven blending so moss color appears where the surface normal points upward (top of the log) and gradually transitions into bark grain elsewhere, using the normal's y-component plus noise to decide the moss/bark boundary.\n\nI'm scattering small flattened sphere clumps across the log's upper surface to represent moss, filtering placements so they only land where the normal points mostly upward, with randomized spacing. Then I'm working out the beetle's anatomy -- placing scaled spheres for the pronotum, elytra, and head, using paint to add a glossy highlight near the top of the elytra, and setting precise coordinates so each body part sits correctly relative to the log's curved surface.\n\nI'm building the joint hierarchy next: a root body joint, then head, then symmetric left/right jaw joints for the mandibles, each mandible built as a tapered sweep with a secondary branching tine using a rod, and a small dew droplet placed rigidly on one tine using an explicit bone reference. I'm also defining antenna chains as elbowed polylines from the head, wrapped in tapered sweeps, with a feathery fan of small capsules radiating outward at the tip using a ring arrangement tilted forward.\n\nNow"
+}

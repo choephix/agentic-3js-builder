@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="A measured comparison of procedural three.js model code and its exported GLBs: exact bytes, MB savings, methodology and tradeoffs."
+    />
+    <title>Code vs. GLB · Storage study</title>
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./storage.css" />
+  </head>
+  <body>
+    <header class="site-head">
+      <a class="brand" href="/">agentic-3js-builder</a>
+      <nav aria-label="Website">
+        <a href="/">Samples</a>
+        <a href="/lab">Lab</a>
+        <a href="/storage" aria-current="page">Storage study</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="title">
+        <p class="eyebrow">A study in procedural representation</p>
+        <h1 id="title">Tiny recipes.<br /><span>Full-size creatures.</span></h1>
+        <p class="intro">
+          How much smaller is the code that builds a 3D model than the finished model itself? We measured the source
+          files in this library against their exported GLBs.
+        </p>
+        <p class="measurement" id="measurement">Loading file measurements…</p>
+        <div id="study-error" role="alert" hidden></div>
+        <div class="summary-wrap" id="summary-wrap" hidden>
+          <table class="summary">
+            <caption id="summary-caption"></caption>
+            <thead>
+              <tr>
+                <th scope="col">Model code · MB</th>
+                <th scope="col">Exported GLBs · MB</th>
+                <th scope="col">Difference · MB</th>
+                <th scope="col">Size reduction</th>
+              </tr>
+            </thead>
+            <tbody id="summary-body"></tbody>
+          </table>
+          <p class="unit-note">
+            Decimal units: 1 MB = 1,000,000 bytes. Raw file sizes; shared SDK overhead excluded. These are
+            representation-size savings, not space already removed from the website.
+          </p>
+        </div>
+      </section>
+
+      <section class="explanation" aria-labelledby="why">
+        <div>
+          <p class="eyebrow">Why the gap exists</p>
+          <h2 id="why">Store the instructions,<br />not every result.</h2>
+        </div>
+        <div class="prose">
+          <p>
+            A loop can describe hundreds of feathers in a few lines. A curve and a radius can describe a trunk. An SVG
+            drawing or a paint function can describe a patterned coat. The code stores the recipe and its parameters.
+          </p>
+          <p>
+            The finished GLB stores the generated geometry, UV coordinates, skin weights and skeleton, plus embedded
+            rasterised textures. Repetition becomes actual vertices and pixels.
+          </p>
+          <p>
+            <strong>The work moves, it does not disappear.</strong> Loading a small recipe means the visitor’s browser
+            must construct the model and generate its textures. A GLB needs decoding and rendering, but avoids rerunning
+            those construction algorithms. Smaller storage does not mean lower runtime memory or faster loading.
+          </p>
+        </div>
+      </section>
+
+      <section class="models" aria-labelledby="models-title">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">The measurements</p>
+            <h2 id="models-title">Every model, side by side.</h2>
+          </div>
+          <button id="download" class="download" disabled>Download exact bytes · CSV</button>
+        </div>
+        <div class="table-tools">
+          <label for="search"
+            >Find a model <input id="search" type="search" placeholder="Mammoth, peafowl, treehouse…" disabled
+          /></label>
+          <span id="row-count" role="status" aria-live="polite"></span>
+        </div>
+        <div
+          class="table-scroll"
+          tabindex="0"
+          role="region"
+          aria-label="Model size comparisons; scroll horizontally for all columns"
+        >
+          <table class="model-table">
+            <caption class="sr-only">
+              Current source files compared with the latest available final GLB exports
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" data-sort="slug">
+                  <button>Model <span aria-hidden="true"></span></button>
+                </th>
+                <th scope="col" data-sort="sourceBytes">
+                  <button>Code KB <span aria-hidden="true"></span></button>
+                </th>
+                <th scope="col" data-sort="glbBytes">
+                  <button>GLB MB <span aria-hidden="true"></span></button>
+                </th>
+                <th scope="col" data-sort="saved">
+                  <button>Saved MB <span aria-hidden="true"></span></button>
+                </th>
+                <th scope="col" data-sort="ratio">
+                  <button>GLB / code <span aria-hidden="true"></span></button>
+                </th>
+                <th scope="col" data-sort="reduction">
+                  <button>Reduction <span aria-hidden="true"></span></button>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="model-rows"></tbody>
+          </table>
+        </div>
+        <p class="unit-note">
+          Select a column heading to sort. Model names open the sample; “source” opens the measured TypeScript file.
+          Hover a number for exact bytes. The CSV includes file timestamps and export filenames.
+        </p>
+        <p id="unmatched" class="unit-note" hidden></p>
+      </section>
+
+      <section class="method" aria-labelledby="method-title">
+        <p class="eyebrow">Reproducible, with limits</p>
+        <h2 id="method-title">What this comparison counts.</h2>
+        <div class="method-grid">
+          <article>
+            <h3>One source, one final export</h3>
+            <p>
+              All direct <code>samples/*.ts</code> files are measured by their byte length, including comments,
+              formatting, inline SVGs and paint functions. Each is paired with its latest available
+              <code>B/out/&lt;slug&gt;-rigged.glb</code>, or <code>A/out/&lt;slug&gt;.glb</code> for a plain model.
+              Mesh-only duplicates, historical renders and experiment builds are not added together.
+            </p>
+          </article>
+          <article>
+            <h3>An existing-export snapshot</h3>
+            <p>
+              The website build measures current source files and existing exports; it does not regenerate every model.
+              Export and source versions may differ. Both file timestamps are recorded in the CSV. Models without a
+              final export are excluded from totals and listed separately.
+            </p>
+          </article>
+          <article>
+            <h3>The arithmetic</h3>
+            <p>
+              Saved bytes = GLB bytes − source bytes. Reduction = saved bytes ÷ GLB bytes × 100. The library’s reduction
+              is calculated from summed bytes, not the average of model percentages. “GLB / code” is the GLB size
+              divided by the source size.
+            </p>
+          </article>
+          <article>
+            <h3>What is outside the numbers</h3>
+            <p>
+              Shared SDK, style kits, three.js and viewer code are not included in each model’s source size. This is not
+              a measurement of network transfer, minified or gzip/Brotli-compressed JavaScript, or
+              Draco/Meshopt-compressed GLBs. GLB sizes are measured from local exports; the published viewer generates
+              models from code and does not host those binaries. This comparison is not a measured bandwidth or bill
+              reduction.
+            </p>
+          </article>
+        </div>
+      </section>
+      <footer class="page-foot">
+        <a href="/">Explore the generated models →</a><span>Measured files. No size estimates.</span>
+      </footer>
+    </main>
+    <script type="module" src="./storage.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuBalloonRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "balloon",
+  "level": "rich",
+  "pitch": "A hot-air balloon about to take off. A big envelope in bold vertical stripes of sunflower yellow, tomato red and sky blue with a patterned band around the middle, a burner glowing orange at the mouth, ropes down to a woven wicker basket with sandbags hanging on its sides and a little flag on one corner.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:31:14.166Z",
+  "wallMs": 72893,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5397,
+    "completion_tokens": 16039,
+    "total_tokens": 21436,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.00808346,
+  "hasCode": true,
+  "reasoning": "I need to stick to only documented SDK helpers, so I'm cataloging the available builder functions like joint, chain, sweep, part, stick, surface, lathe, extrude, and the various painting and pattern utilities before writing the module.\n\nSince this is a balloon rather than a creature, I don't need a rest pose—I'm figuring out realistic proportions instead: basket resting at ground level, ropes rising a few meters, envelope roughly 18m tall and 14m wide, with a glowing burner at the mouth. Given uncertainty about exact signatures for things like lathe outlines, I'm leaning toward simpler, more reliable primitive shapes built with part() and scale transforms rather than risking unfamiliar geometry formats.\n\nI'm planning to build the envelope as a scaled sphere, stretched taller via a y-scale factor, and create vertical stripes by splitting the sphere into six 60° colored sectors using phi start/length parameters—alternating yellow, red, and blue. For the decorative band around the equator, I'm considering a cylinder or torus-like ring overlay.\n\nWorking out the balloon's open mouth: cutting the sphere's bottom with a theta angle so it doesn't close fully, giving an opening around y≈5.3 with radius 4.5. I'm considering adding a darker disk or ring there to suggest the interior shadow of the envelope mouth.\n\nFor the stripe pattern, I'm splitting the balloon into six colored sectors of equal angular width, cycling yellow, red, and blue so adjacent panels share seams cleanly. For the burner, I'm planning a small grey cylindrical housing just below the mouth with an orange cone or cylinder above it to suggest a flame.\n\nNow I'm working out the gondola basket dimensions and how ropes should connect its top corners up to a load ring near the balloon's mouth, avoiding forbidden orientation methods like setFromUnitVectors by instead building cylinders with manual transforms or using a provided rod helper.\n\nActually, I realize b.part supports an aim option directly, which seems safer than manual rod math — I'll orient cylinder geometry along its aim axis using at/aim. For the ropes, I'm planning the path from the basket corners up to the mouth ring, positioning the geometry between those two points.\n\nI'll place the load ring as a torus just below the envelope mouth with the burner housing nested inside it. For the sandbags, I'm positioning a few tan, sphere-based shapes hanging against the basket's outer walls on the sides and front to look like they're resting against the rim. Now I'm thinking through how to construct the woven basket body itself.\n\nFor the basket shape, I'm using a four-sided tapered cylinder rotated 45 degrees and scaled to give it a squarish, slightly oval frustum form that stands wider at the top. To get the wicker look, I'll add alternating thin horizontal slats in two tan tones along the sides plus a dark brown rim frame made of boxes at the top, and I'm now considering vertical stake elements to complete the woven texture.\n\nWorking out exact dimensions now: body box sized around 1.8x1.25x1.2 with a base plank underneath, weave bands as thin protruding boxes at alternating heights and colors, and vertical stakes spaced along x and z on each face. I'm also planning a corner flagpole rising above the basket with a flat box for the cloth near the top.\n\nNow I'm sketching the full balloon structure in code — scaled sphere geometry for the envelope with six colored sectors forming vertical stripes, a checkered band ring around the equator built from alternating tangent-oriented boxes, a load ring torus with ropes connecting basket corners to ring points, a burner housing with layered flame cones, and the wicker basket with weave bands and stakes plus sandbags using scaled spheres. Writing geometry code...\n\n"
+}

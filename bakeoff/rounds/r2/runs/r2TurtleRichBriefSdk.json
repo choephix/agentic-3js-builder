@@ -1,0 +1,25 @@
+{
+  "slug": "r2TurtleRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "turtle",
+  "level": "rich",
+  "pitch": "A green sea turtle gliding through the water. A heart-shaped shell with olive and caramel plates traced in darker brown, a pale yellow belly plate, a blunt head with cream-edged scales, dark wise eyes and a gentle beak. Long front flippers spread wide, short rear flippers, and a little remora fish riding under its shell.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:08:50.516Z",
+  "wallMs": 52417,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5404,
+    "completion_tokens": 7454,
+    "total_tokens": 12858,
+    "prompt_tokens_details": {
+      "cached_tokens": 5286
+    }
+  },
+  "costUsd": 0.0758332,
+  "hasCode": true,
+  "reasoning": "I'm uncertain about the exact SDK signatures available, so I'll stick to conservative, well-documented builder calls like joint, part, and chain rather than risk unsupported options.\n\nFor the actual turtle design, I'm sketching proportions: a shell roughly 1.0m long, 0.8m wide, 0.25m tall, body centered around y≈0.3, with flippers spread flat and a remora positioned underneath the belly so the lowest point of the model sits near y=0.\n\nFor the geometry itself, I'm building the shell as layered squashed spheres for the top carapace and lighter plastron underneath, then adding rows of hexagonal scute plates positioned along the ellipsoid surface with normal-aligned orientation and alternating olive/caramel coloring outlined in dark brown.\n\nFor the head, I'm placing neck and head joints along the front, scaling a small olive sphere for the skull, adding beak shapes, dark eyes with white highlights, and a few cream scales on top, then connecting it all with a capsule-shaped neck.\n\nFor the limbs, I'm setting up a three-joint chain per flipper with shoulder and tip joints, using elongated flattened spheres angled backward to form the front flipper shape stretching from the shoulder toward the tip.\n\nNow I'm baking rotation directly into each flipper's geometry since I'm not sure the part system supports rotation natively -- scaling and rotating the ellipsoid around the Y-axis so the long axis sweeps backward, mirroring the angle for the opposite side so both flippers point outward symmetrically.\n\nI'm adding a small remora attached under the shell, with a grey ellipsoid body, tail fin, flat sucker disc, and eye detail. Then I'm working out the vertical placement math so the plastron, flippers, and remora all sit consistently above a floor plane without clipping below zero.\n\nNow I'm figuring out the shell's hemisphere geometry and plastron positioning so the open bottom of the shell dome is properly covered, then setting up the shell plate normals so they sit just above the curved surface.\n\n"
+}

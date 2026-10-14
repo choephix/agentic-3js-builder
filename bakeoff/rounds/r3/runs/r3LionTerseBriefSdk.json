@@ -1,0 +1,25 @@
+{
+  "slug": "r3LionTerseBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "lion",
+  "level": "terse",
+  "pitch": "A lion.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T19:06:27.888Z",
+  "wallMs": 45822,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5296,
+    "completion_tokens": 6877,
+    "total_tokens": 12173,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.079362,
+  "hasCode": true,
+  "reasoning": "I need to build a lion model using the SDK, but I'm uncertain about exact API signatures, so I should stick to documented functions like joint, chain, sweep, and part builders and be conservative in how I call them.\n\nRather than relying on uncertain options like dir or role, I'll bake rotations and scaling directly into the geometries before passing them, and construct the skeleton using joints with explicit parent references, keeping named joints recognizable while avoiding risky unknown options.\n\nNow I'm sketching out the lion's proportions and joint placement: a body roughly 1.8m long with shoulder height around 1.1m, facing +Z, with hips, spine, chest, neck, head, and jaw joints running front to back, a tail chain extending behind the hips, and front/hind leg joints (shoulder-elbow-wrist and hip-knee-ankle) positioned symmetrically at x=±0.25. I'm also planning a helper function that builds tapered cylinder segments between two points to represent limb and torso segments, oriented and colored per bone.\n\nI'm working out how to orient these cylinder segments correctly using quaternion rotation baked directly into the geometry so each segment points from one joint to the next, then defining the first ellipsoid-based torso part with its center, scale, and low-poly sphere geometry.\n\nNow I'm fleshing out the rest of the horse: haunches as spheres near the hips, a shaggy mane built from clusters of flattened icosahedra around the neck and chest, a head assembled from boxes and ellipsoids for the skull, muzzle, jaw, ears, eyes, and teeth, plus legs with tapered segments and toes, and a tapered tail ending in a dark tuft. I'm pinning down the coordinates so the neck connects torso to head smoothly and the torso spans the right length along the z-axis.\n\nDefining joint positions...\n\nAdding chest beard with low-detail icosahedra scaled for an elongated look, arranged in two rings, plus a neck joint bone so the head attaches and pokes slightly out the front of the mane.\n\n"
+}

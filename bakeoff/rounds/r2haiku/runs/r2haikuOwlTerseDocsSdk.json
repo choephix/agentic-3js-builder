@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuOwlTerseDocsSdk",
+  "arm": "docs-sdk",
+  "subject": "owl",
+  "level": "terse",
+  "pitch": "An owl.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:22:00.069Z",
+  "wallMs": 132998,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 32582,
+    "completion_tokens": 17980,
+    "total_tokens": 50562,
+    "prompt_tokens_details": {
+      "cached_tokens": 32572
+    }
+  },
+  "costUsd": 0.009316719999999999,
+  "hasCode": true,
+  "reasoning": "I'm planning the owl's design: a round body, large facial disc, big eyes, beak, ear tufts, folded wings, and feet with toes, possibly perched on a simple branch for visual interest while keeping the scope manageable.\n\nI'm settling on a ground-standing owl to keep things simple, and mapping out the SDK pieces I'll need—joints and chains for structure, sweeps for the body and limbs, spheres for eyes, spikes or sweeps for the beak, and flattened sweep paths for the wings and ear tufts.\n\nNow I'm sketching the actual skeleton coordinates, aiming for roughly 0.45m total height with feet at ground level and the head near the top. I'm defining a root hip joint and a spine chain made of catmull points running from the hips up to the neck base, keeping the body mostly rigid with a chain reserved for neck/head articulation.\n\nI'm then adding the neck-to-head chain, naming its joints and parenting it to the top of the spine, before moving on to sketching short, feathered owl legs branching off the hips with their own small chains.\n\nFor the legs I'll just use a simple point-to-point chain from hip to knee to ankle rather than full IK, then add toe claws as small spikes or capsules angled forward from the foot tip.\n\nFor the folded wings, I'm planning a shoulder-to-side chain swept with a tapering radius to get a flattened wing shape, possibly switching to an extrude approach along the body's side instead.\n\nWorking out wing outline coordinates...\n\nI realize thickness is centered symmetrically, so the same x/y vectors work for both wing sides -- only the `at` position needs to change. Now I'm thinking about how to build the owl's body, considering a lathe or loft approach based on spine stations rather than a simple sweep.\n\nStill working through the sweep radius function...\n\nActually I should shift the body chain upward so it doesn't sit on the ground, repositioning hips to around y=0.2 with wider middle radius, legs dropping down from there. For the head, I'm considering a sphere primitive attached to the head joint versus building it as its own sweep shape for a rounder, more owl-like silhouette.\n\nSetting up the head joint attachment, then working through placing facial features using the local coordinate words like forward/up/left relative to the head's orientation, being careful about which direction corresponds to which named axis when the bone points upward.\n\nI'm deciding to sidestep the local-frame ambiguity entirely by using literal model-space coordinates for all head parts (eyes, disc, beak, ear tufts) paired with explicit bone binding, which avoids confusion since the head isn't rotated. From there I work out the full owl body: a flattened sphere-based head with a tan facial disc, gold eyes with dark pupils and a ring outline, a downward-curving beak spike, feathered ear tufts, a countershaded/striped body sweep along a spine chain, folded wing extrudes positioned just outside the body silhouette, a short tail sweep off the hips, and jointed leg chains ending in capsule toes with small claw spikes — working through exact coordinates, radii, and color choices for each part while keeping bone assignments explicit to avoid local-frame issues.\n\nI'm now assembling this all into the actual module: importing the builder utilities (createBuilder, catmull, polyline, stripes, countershade) from the package, defining color constants, and writing the build function that chains together hips → spine → head joints, sweeps the body and tail, extrudes mirrored wings on"
+}

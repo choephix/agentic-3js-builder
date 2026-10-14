@@ -1,0 +1,25 @@
+{
+  "slug": "r2HedgehogTerseSourcePrim",
+  "arm": "source-prim",
+  "subject": "hedgehog",
+  "level": "terse",
+  "pitch": "A hedgehog.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T15:06:14.005Z",
+  "wallMs": 74574,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112477,
+    "completion_tokens": 9641,
+    "total_tokens": 122118,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.321364,
+  "hasCode": true,
+  "reasoning": "I'm planning a hedgehog model proportioned realistically, roughly 0.25m long and 0.13m tall, facing forward with an oval body, back quills, pointed snout, small ears, legs, and a tiny tail, and sketching out a skeleton with hips, spine joints, neck, and head.\n\nNow I'm working out body placement and dimensions, sizing the body as a scaled sphere with the bottom resting near the ground so legs are short, then planning the quill coat as a mottled brown/cream base with many small cone shapes scattered across the back hemisphere, oriented outward from the body surface and tilted backward, while staying within part and triangle budget limits.\n\nFiguring out quill placement using a Fibonacci sphere sampling approach to evenly distribute ~300 small cones over the dorsal region, with each quill's position and tilt derived from the body's ellipsoid normal plus a backward/jitter offset, varying colors across three brown/tan/cream tones for texture.\n\nNow I'm sketching the body's shading: dark brown back with a cream/tan belly countershade applied as a paint gradient on the body geometry, and building the head as a scaled sphere with a tan tone plus a forward-pointing cone snout for the face structure.\n\nFor the nose and jaw I'm adding a small dark sphere tip and a lighter lower-jaw cone positioned below the snout, then placing black eye spheres with tiny highlights and flattened pinkish-tan ear shapes on the head, with forehead quills matching the body's spiky fringe. Now I'm moving on to the leg structure, planning capsule shapes from hip to foot with joint placements.\n\nAdding toe spheres for all four legs, naming hips/feet with L/R convention since left is positive X, and considering a leg \"chain\" helper to build the hip-to-foot path more cleanly.\n\nEach leg has three named joints (hip, knee, foot) so capsule bones connect hip-to-knee and knee-to-foot. Now I'm laying out the spine chain: hips at the base, then spine, neck, head, and jaw positions moving forward along z.\n\nI'm working out a four-point spine chain spanning hips through neck with intermediate spine joints, making sure the root joint gets created before the chain tries to parent to it.\n\nStill defining joints...\n\nFor the face I'm setting a tan head sphere with darker brow patches around the eyes and black bead eyes, then building a cone-shaped snout tapering from the head front to a narrow tip.\n\nI'm adding a small dark nose sphere at the snout tip and a lower jaw spike, positioning it so it tucks mostly under the upper snout but peeks out slightly.\n\nThen I'm placing ear spheres with a scaled oval shape near the top of the head, black eye spheres with tiny white highlights, and a dark mask around them, before mapping out quill placement across the head and body ellipsoid, including an extra crest ring over the top of the head.\n\nExcluding quills near the tail region so it stays smooth, I'm defining each quill as a thin cone tilted backward relative to its surface normal, with jitter for natural variation and length controlled by a scale factor.\n\nWeighting colors toward dark brown with some mid-tone and cream mixed in to give a speckled, hedgehog-like texture, I'm placing around 400 quills using a fibonacci sampling pattern sunk slightly into the ellipsoid surface.\n\nNow I'm defining the quill geometry placement with position, direction, and bone attachment, then adding feet and a tail spike. Checking the overall body proportions, I realize the combined length from rear to snout is too long for a realistic hedgehog size, so I'm shrinking the body radius and shifting its center to bring the total length down closer to 0.22-0.25 meters.\n\nWorking out final joint coordinates for hips, spine chain, head, and jaw, then setting body ellipsoid dimensions and checking that the belly clears the floor once legs are positioned. I'm placing leg joints with front/rear x and z offsets, knee bend directions, and capsule radii for upper and lower leg segments, then starting on the head sphere placement.\n\nAdding crest quills...\n\nStill placing quills around the body...\n\nFor the body shape itself, I'm using an imported countershade paint utility and a basic ellipsoid built from a scaled sphere geometry, returning the root node with metadata attached.\n\n"
+}

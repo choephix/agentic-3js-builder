@@ -118,7 +118,7 @@ export function decal(ctx: Ctx, target: Surface | SurfaceTarget, texture: Textur
   const positions: number[] = [];
   hits.forEach((hit, i) => hit.at.addScaledVector(hit.n, rise[i]).toArray(positions, i * 3));
 
-  const fixed = options.bone === undefined ? null : rigid(resolveJoint(ctx, options.bone));
+  const fixed = options.bone === undefined ? null : rigid(resolveJoint(ctx, options.bone, "decal(): bone"));
   const weightAt = (vertex: number): Weights => fixed ?? hits[vertex].weights;
   const mesh = meshFromWorld(
     ctx,

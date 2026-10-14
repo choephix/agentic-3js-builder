@@ -1,0 +1,25 @@
+{
+  "slug": "r1resdkToucanRichBriefSdk",
+  "arm": "brief-sdk",
+  "subject": "toucan",
+  "level": "rich",
+  "pitch": "A keel-billed toucan showing off on a short mossy branch. A huge rainbow beak in lime green, sky blue and orange with a cherry-red tip, a glossy black body, a lemon-yellow bib, a ring of lime-green skin around each eye, bright blue feet and a scarlet patch under the tail. A single pink orchid blooms on the branch beside it.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T14:22:00.859Z",
+  "wallMs": 62163,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 5274,
+    "completion_tokens": 8509,
+    "total_tokens": 13783,
+    "prompt_tokens_details": {
+      "cached_tokens": 5146
+    }
+  },
+  "costUsd": 0.0863752,
+  "hasCode": true,
+  "reasoning": "I need to figure out the SDK's builder API without full visibility into its signatures, so I'm being cautious about which methods I rely on, since I'm unsure how geometry parts are actually constructed.\n\nGiven the uncertainty, I'll take a more robust hybrid approach: use the SDK's joint system for structure but attach plain THREE.js meshes directly to the root for the actual geometry, treating the model as mostly static rather than fully rigged.\n\nNow I'm sketching the overall toucan model -- roughly 0.55m tall with a 0.2m beak, perched on a horizontal branch rendered as a cylinder, working out proportions and positioning before building out the geometry.\n\nI'm figuring out the precise placement and tilt angles for the toucan's body, tail, and beak using ellipsoids, boxes, and cones, calculating how rotations around the x-axis shift each part forward/backward and up/down to get a natural perched pose.\n\nNow I'm working out the beak as colored segments\u2014lime base transitioning through sky blue, orange, to a cherry tip\u2014using tapered cylinder frustums rotated to point forward and curved downward in stages to mimic the natural beak shape.\n\nStill building beak geometry...\n\nThen I work out downward slope rotation direction using the scale-then-rotate order, confirming negative dy gives positive rotation angle. For the feet I'm placing small blue toe boxes and short leg cylinders at the branch position, checking the body bottom height lines up. For the branch itself I'm adding mossy green lumps scattered randomly across a brown cylinder using a seeded random function.\n\nI plan the orchid flower growing from the branch: a curved green stem leading up to a flower center, with five radial petals shaped as flattened ellipsoid spheres rotated around in a group, a darker magenta lip at the center, and small flattened leaves at the stem's base, all built using a reusable rod helper for cylindrical connections oriented via quaternions.\n\nNow I'm setting up the penguin's skeleton joints -- hips, spine, neck, head, jaw, tail -- then placing all meshes under the root with cached standard materials using flat shading. I'm adding the glossy black head with a slightly tilted pose, a yellow bib extending toward the chin, folded black wing ellipsoids at the sides, and small yellow accents near the rump for the tail coverts.\n\nWriting eye placement coordinates...\n\nI'm computing the jaw joint position and defining a parabolic curve for the beak's droop along its length, then segmenting it into 8 pieces with slope calculations and color bands for the toucan's keel pattern.\n\nI'm refining the color scheme into lime, blue, orange, and red bands across 10 segments for both upper and lower beak curves, setting their width/height taper profiles, and adding a thin dark ring near the base to mark the beak's attachment point.\n\n"
+}

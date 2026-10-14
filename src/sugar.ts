@@ -105,7 +105,7 @@ export function sprout(
   options: SproutOptions = {},
 ) {
   const { count, bury, names, role, contact, ...rest } = options;
-  const root = toFrame(on);
+  const root = toFrame(on, "sprout()");
   const start = root.at;
   const parent = boneFor(ctx, undefined, [root], start);
   const isPath =

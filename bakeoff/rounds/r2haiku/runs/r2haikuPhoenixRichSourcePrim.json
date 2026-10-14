@@ -1,0 +1,25 @@
+{
+  "slug": "r2haikuPhoenixRichSourcePrim",
+  "arm": "source-prim",
+  "subject": "phoenix",
+  "level": "rich",
+  "pitch": "A phoenix rising with its wings flung open. Feathers blaze from deep crimson at the body through orange to golden yellow at the tips, a crest of flame-shaped plumes on its head, long trailing tail feathers like ribbons of fire, glowing amber eyes and a golden hooked beak. Embers and sparks drift off its wings.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "medium",
+  "started": "2026-10-07T21:27:46.519Z",
+  "wallMs": 128332,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 112582,
+    "completion_tokens": 17753,
+    "total_tokens": 130335,
+    "prompt_tokens_details": {
+      "cached_tokens": 112464
+    }
+  },
+  "costUsd": 0.0500647,
+  "hasCode": true,
+  "reasoning": "I'm planning to write a single TypeScript module using the SDK's builder API, focusing on joints, chains, and part geometry to keep it compact but functionally correct.\n\nFor the phoenix itself, I'm picturing a mythical bird mid-flight, body length around 1.2 meters with a wingspan near 2.4 meters, and deciding to position it at roughly y≈1.6 so it reads clearly as airborne rather than grounded.\n\nNow I'm sketching the skeleton: a root body joint feeding into a spine chain toward the neck, head, and jaw for the beak, then branching into wing chains running from shoulder through elbow out to the wingtip on each side.\n\nFor feather detail, I'm planning to use feathered cards along the wings rather than a solid membrane, textured via SVG gradients shifting from crimson to gold, with paint gradients applied across body and wings so color transitions from deep crimson near the torso to orange and then golden at the wingtips.\n\nFor eyes I'll use glowing amber spheres with a dark pupil, and for the head I'm adding flame-like spike plumes with gradient color. For the tail, I'm planning ribbon-style sweep feathers with tapering width/thickness along catmull curves radiating outward from the body's tail point, keeping wing feathers as flat cards.\n\nNow I'm working through how wing feather cards should orient — chain frames give a tangent axis along the wing rather than a surface normal, so standard card placement would stand them upright instead of laying them flat and leaning back like real feathers. I'm considering alternatives like sticks or custom surface frames to get the right lean and overlap for the wing feathers.\n\nInstead I switch to building each feather as an extrude of a leaf-shaped outline (a curved point path giving a tapered, slightly asymmetric feather silhouette) with set thickness, oriented using the chain point's position as the bone anchor and custom x/y directions for feather length and spread, letting overlapping extrudes along the wing path create the layered feather look.\n\nI'm laying out the full skeleton and geometry plan: a lathe-based teardrop body rigged to a body joint, a head sphere with hooked beak sweeps, glowing eyes, flame-like crest sweeps, and mirrored wing chains (arm, forearm, hand) running from shoulder to wingtip with primaries and secondaries attached at different points along the tangent, oriented backward and spread flat for a wing-like profile.\n\nI'm defining the fire paint function that blends crimson, orange, and gold based on distance from the body center, plus feather outline shapes, trailing tail ribbons swept from a tail joint, and scattered ember particles using small icosahedron geometries colored in warm tones. I'm also working out joint hierarchy and naming (neck, jaw, tail, head) with appropriate parent-child relationships and directions, then wiring everything into a single build function that returns the baked root.\n\nWriting component layout...\n\n"
+}
