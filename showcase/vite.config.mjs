@@ -120,6 +120,35 @@ async function sampleNames() {
   return names;
 }
 
+/** Every build record in samples/ (`Build` in builds.ts), in one file for the Builds table. */
+async function buildRecords() {
+  const files = (await list(sampleRoot)).filter((file) => file.endsWith(".build.json"));
+  return Promise.all(files.map(async (file) => JSON.parse(await readFile(join(sampleRoot, file), "utf8"))));
+}
+
+/**
+ * What the sample list uses from each build record (`BuildSummary` in builds.ts), so the page loads a sample's full
+ * record only when the sample opens.
+ */
+const buildSummaries = (records) =>
+  Object.fromEntries(
+    records.map(({ slug, builder, cost, wallSeconds, tags, caveats }) => [
+      slug,
+      {
+        builder: builder && {
+          agent: builder.agent,
+          model: builder.model,
+          effort: builder.effort,
+          scope: builder.scope,
+        },
+        cost,
+        wallSeconds,
+        tags,
+        caveats: caveats.cost ? { cost: caveats.cost } : {},
+      },
+    ]),
+  );
+
 // ── Sidebar thumbnails ───────────────────────────────────────────────────────────────────────────────────────────
 // The page renders a thumbnail and posts it here; one image per sample is kept in `showcase/public/thumbs/`
 // (a cache outside git, filled by `npm run thumbs` before every build and copied into it as `/thumbs/`), named by a
@@ -230,6 +259,9 @@ const showcaseData = {
     const indexed = new Map();
     await json("__sample-created", created);
     await json("__sample-names", await sampleNames());
+    const records = await buildRecords();
+    await json("__build-records", records);
+    await json("__build-summaries", buildSummaries(records));
     for (const slug of new Set([...Object.keys(created), ...owned, ...bakeoffBuilds])) {
       if (slug in created) await copy(join(sampleRoot, `${slug}.ts`), `__sample-source/${slug}`);
       // The published viewer generates its models. Keep historical shots and GLB exports in the local showcase.
@@ -319,6 +351,15 @@ const showcaseData = {
     server.middlewares.use("/__sample-names", async (_request, response) => {
       response.setHeader("Content-Type", "application/json; charset=utf-8");
       response.end(JSON.stringify(await sampleNames()));
+    });
+    // The sample list's model filter and tooltips, and the Builds table; see `buildSummaries`, `buildRecords`.
+    server.middlewares.use("/__build-summaries", async (_request, response) => {
+      response.setHeader("Content-Type", "application/json; charset=utf-8");
+      response.end(JSON.stringify(buildSummaries(await buildRecords())));
+    });
+    server.middlewares.use("/__build-records", async (_request, response) => {
+      response.setHeader("Content-Type", "application/json; charset=utf-8");
+      response.end(JSON.stringify(await buildRecords()));
     });
     server.middlewares.use("/__storage-study", async (_request, response, next) => {
       try {

@@ -109,41 +109,14 @@ const unit = (x: number, y: number, z: number, seed: number) => hash(x, y, z, se
 
 const fade = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
 
+// The gradient for each of the 16 hash values: `GX[h] * x + GY[h] * y + GZ[h] * z`.
+const GX = [1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0, 1, -1, 0, 0];
+const GY = [1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, 1, -1, -1];
+const GZ = [0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1, 0, 0, 1, -1];
+
 function grad(h: number, x: number, y: number, z: number) {
-  switch (h & 15) {
-    case 0:
-      return x + y;
-    case 1:
-      return -x + y;
-    case 2:
-      return x - y;
-    case 3:
-      return -x - y;
-    case 4:
-      return x + z;
-    case 5:
-      return -x + z;
-    case 6:
-      return x - z;
-    case 7:
-      return -x - z;
-    case 8:
-      return y + z;
-    case 9:
-      return -y + z;
-    case 10:
-      return y - z;
-    case 11:
-      return -y - z;
-    case 12:
-      return x + y;
-    case 13:
-      return -x + y;
-    case 14:
-      return -y + z;
-    default:
-      return -y - z;
-  }
+  const i = h & 15;
+  return GX[i] * x + GY[i] * y + GZ[i] * z;
 }
 
 /** Gradient noise, about -1..1, one feature per unit. */
@@ -210,18 +183,15 @@ export function cells(p: Vector3, size: number, seed = 0): Cell {
   const X = Math.floor(x);
   const Y = Math.floor(y);
   const Z = Math.floor(z);
-  // Squared distances pick the two nearest; hypot on those two gives exactly the distances a hypot per cell would.
-  let q1 = Infinity;
-  let q2 = Infinity;
+  let d1 = Infinity;
+  let d2 = Infinity;
+  // The nearest cell's integer corner and its feature point.
   let bx = 0;
   let by = 0;
   let bz = 0;
-  let x1 = 0;
-  let y1 = 0;
-  let z1 = 0;
-  let x2 = 0;
-  let y2 = 0;
-  let z2 = 0;
+  let fx = 0;
+  let fy = 0;
+  let fz = 0;
   for (let i = -1; i <= 1; i++)
     for (let j = -1; j <= 1; j++)
       for (let k = -1; k <= 1; k++) {
@@ -234,31 +204,23 @@ export function cells(p: Vector3, size: number, seed = 0): Cell {
         const dx = px - x;
         const dy = py - y;
         const dz = pz - z;
-        const q = dx * dx + dy * dy + dz * dz;
-        if (q < q1) {
-          q2 = q1;
-          x2 = x1;
-          y2 = y1;
-          z2 = z1;
-          q1 = q;
-          x1 = px;
-          y1 = py;
-          z1 = pz;
+        const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (d < d1) {
+          d2 = d1;
+          d1 = d;
           bx = cx;
           by = cy;
           bz = cz;
-        } else if (q < q2) {
-          q2 = q;
-          x2 = px;
-          y2 = py;
-          z2 = pz;
-        }
+          fx = px;
+          fy = py;
+          fz = pz;
+        } else if (d < d2) d2 = d;
       }
   return {
-    d1: Math.hypot(x1 - x, y1 - y, z1 - z),
-    d2: Math.hypot(x2 - x, y2 - y, z2 - z),
+    d1,
+    d2,
     id: unit(bx, by, bz, seed + 29),
-    center: new Vector3(x1 * size, y1 * size, z1 * size),
+    center: new Vector3(fx * size, fy * size, fz * size),
   };
 }
 

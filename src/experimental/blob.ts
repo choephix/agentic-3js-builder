@@ -122,7 +122,12 @@ export function sphere(at: PointInput, r: number, options: IngredientOptions = {
     anchors: [at],
     bounds: box3([c], r),
     center: c,
-    make: () => (x, y, z) => Math.hypot(x - c.x, y - c.y, z - c.z) - r,
+    make: () => (x, y, z) => {
+      const dx = x - c.x;
+      const dy = y - c.y;
+      const dz = z - c.z;
+      return Math.sqrt(dx * dx + dy * dy + dz * dz) - r;
+    },
   };
 }
 
@@ -170,8 +175,11 @@ export function ellipsoid(
       const lx = (px * a.x.x + py * a.x.y + pz * a.x.z) / rx;
       const ly = (px * a.y.x + py * a.y.y + pz * a.y.z) / ry;
       const lz = (px * a.z.x + py * a.z.y + pz * a.z.z) / rz;
-      const k0 = Math.hypot(lx, ly, lz);
-      const k1 = Math.hypot(lx / rx, ly / ry, lz / rz);
+      const k0 = Math.sqrt(lx * lx + ly * ly + lz * lz);
+      const ux = lx / rx;
+      const uy = ly / ry;
+      const uz = lz / rz;
+      const k1 = Math.sqrt(ux * ux + uy * uy + uz * uz);
       return k1 < 1e-9 ? -smallest : (k0 * (k0 - 1)) / k1;
     },
   };
@@ -201,7 +209,10 @@ export function box(
       const qx = Math.abs(px * a.x.x + py * a.x.y + pz * a.x.z) - hx;
       const qy = Math.abs(px * a.y.x + py * a.y.y + pz * a.y.z) - hy;
       const qz = Math.abs(px * a.z.x + py * a.z.y + pz * a.z.z) - hz;
-      return Math.hypot(Math.max(qx, 0), Math.max(qy, 0), Math.max(qz, 0)) + Math.min(Math.max(qx, qy, qz), 0) - round;
+      const ox = Math.max(qx, 0);
+      const oy = Math.max(qy, 0);
+      const oz = Math.max(qz, 0);
+      return Math.sqrt(ox * ox + oy * oy + oz * oz) + Math.min(Math.max(qx, qy, qz), 0) - round;
     },
   };
 }
@@ -215,8 +226,15 @@ function roundCone(a: Vector3, b: Vector3, r1: number, r2: number): Dist {
   const rr = r1 - r2;
   const a2 = l2 - rr * rr;
   if (l2 < 1e-12 || a2 <= 1e-12)
-    return (x, y, z) =>
-      Math.min(Math.hypot(x - a.x, y - a.y, z - a.z) - r1, Math.hypot(x - b.x, y - b.y, z - b.z) - r2);
+    return (x, y, z) => {
+      const ax = x - a.x;
+      const ay = y - a.y;
+      const az = z - a.z;
+      const ex = x - b.x;
+      const ey = y - b.y;
+      const ez = z - b.z;
+      return Math.min(Math.sqrt(ax * ax + ay * ay + az * az) - r1, Math.sqrt(ex * ex + ey * ey + ez * ez) - r2);
+    };
   const il2 = 1 / l2;
   return (x, y, z) => {
     const pax = x - a.x;
@@ -611,7 +629,7 @@ export function blob(b: Builder, ingredients: readonly Ingredient[], options: Bl
       const dx = x - pos[v * 3];
       const dy = y - pos[v * 3 + 1];
       const dz = z - pos[v * 3 + 2];
-      const away = Math.hypot(dx, dy, dz);
+      const away = Math.sqrt(dx * dx + dy * dy + dz * dz);
       if (away > limit) {
         x = pos[v * 3] + (dx * limit) / away;
         y = pos[v * 3 + 1] + (dy * limit) / away;

@@ -261,11 +261,14 @@ export function bakeSheet(painted: readonly Painted[], material: MeshStandardMat
   charts.forEach(({ entry, chart }, ci) => {
     const [ox, oy] = packed!.at[ci];
     const uv = entry.mesh.geometry.getAttribute("uv") as BufferAttribute;
+    const { world, normal } = entry;
     const px = (id: number) => ox + PAD + 0.5 + (entry.flat[id * 2] - chart.min[0]) * density;
     const py = (id: number) => oy + PAD + 0.5 + (entry.flat[id * 2 + 1] - chart.min[1]) * density;
     for (const id of new Set(chart.tris)) uv.setXY(id, px(id) / width, py(id) / height);
     for (let t = 0; t < chart.tris.length; t += 3) {
       const ids = [chart.tris[t], chart.tris[t + 1], chart.tris[t + 2]];
+      // Where each corner's position and normal start in `world` and `normal`.
+      const [a, b, c] = [ids[0] * 3, ids[1] * 3, ids[2] * 3];
       const xs = ids.map(px);
       const ys = ids.map(py);
       // The triangle's surface coordinates, an angle unwrapped so a triangle across 0° doesn't average to 180°.
@@ -297,18 +300,26 @@ export function bakeSheet(painted: readonly Painted[], material: MeshStandardMat
           w1 = Math.max(w1, 0);
           w2 = Math.max(w2, 0);
           const sum = w0 + w1 + w2;
-          const o0 = ids[0] * 3;
-          const o1 = ids[1] * 3;
-          const o2 = ids[2] * 3;
-          const world = entry.world;
-          const normal = entry.normal;
-          // Summed in the order the weights were always added, so the sheet stays byte-identical.
-          p.x = 0 + (world[o0] * w0) / sum + (world[o1] * w1) / sum + (world[o2] * w2) / sum;
-          p.y = 0 + (world[o0 + 1] * w0) / sum + (world[o1 + 1] * w1) / sum + (world[o2 + 1] * w2) / sum;
-          p.z = 0 + (world[o0 + 2] * w0) / sum + (world[o1 + 2] * w1) / sum + (world[o2 + 2] * w2) / sum;
-          n.x = 0 + normal[o0] * w0 + normal[o1] * w1 + normal[o2] * w2;
-          n.y = 0 + normal[o0 + 1] * w0 + normal[o1 + 1] * w1 + normal[o2 + 1] * w2;
-          n.z = 0 + normal[o0 + 2] * w0 + normal[o1 + 2] * w1 + normal[o2 + 2] * w2;
+          p.set(0, 0, 0);
+          n.set(0, 0, 0);
+          p.x += (world[a] * w0) / sum;
+          p.y += (world[a + 1] * w0) / sum;
+          p.z += (world[a + 2] * w0) / sum;
+          p.x += (world[b] * w1) / sum;
+          p.y += (world[b + 1] * w1) / sum;
+          p.z += (world[b + 2] * w1) / sum;
+          p.x += (world[c] * w2) / sum;
+          p.y += (world[c + 1] * w2) / sum;
+          p.z += (world[c + 2] * w2) / sum;
+          n.x += normal[a] * w0;
+          n.y += normal[a + 1] * w0;
+          n.z += normal[a + 2] * w0;
+          n.x += normal[b] * w1;
+          n.y += normal[b + 1] * w1;
+          n.z += normal[b + 2] * w1;
+          n.x += normal[c] * w2;
+          n.y += normal[c + 1] * w2;
+          n.z += normal[c + 2] * w2;
           if (n.lengthSq() < 1e-12) n.set(0, 1, 0);
           let s: [number, number] | undefined;
           if (ss) {

@@ -2,12 +2,6 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
-## Paint noise, 2026-10-14
-
-Noise is about 71% of paint time (a CPU profile of all 43 assemble models: 933 million hash evaluations over 20 million `paint.at` calls). `perlin()` in `src/paint.ts` evaluated four of its eight corner gradients twice; it now evaluates each once. The 27 painted sheets among the 43 are byte-identical to before (hashed under Node). Paint got 1.16× faster in the browser (20.5 s to 17.7 s summed over the 43) and 1.10× under Node. Squaring cellular distances was byte-identical too but not faster.
-
-A second pass took the rest of the per-texel overhead out. `perlin()` no longer builds a corner closure on every call; `cells()` compares squared distances and calls `Math.hypot` only on the two nearest (so `d1`, `d2` are the same numbers), with no arrays per candidate; the bake loop in `src/bake.ts` interpolates position and normal without a per-texel array and callback, adding the terms in the same order. All 186 samples' textures and UVs hash the same as before under Node. In Chrome on the RTX 3060 the six heaviest painters build 1.8× faster than after the first pass (14.8 s to 8.2 s summed; jadeSerpent 3.1 s to 1.65 s, clayWalrus 4.4 s to 2.0 s). Under Node the gain is smaller: 1.18× over all 186.
-
 ## Builds in a Web Worker, 2026-10-14
 
 `src/worker.ts` (optional, not in `src/index.ts`) runs unchanged `build()` functions in a pool of module Web Workers: `serveBuilds` in the worker, `createBuildPool({ spawn })` on the page. `src/transfer.ts` packs a model into plain data with its geometry and texture buffers transferred and unpacks it on the page. `src/texture.ts` split the drawing out of `svg()`: `drawSvg` decodes on the page and `svgPixels` draws, reads back and dilates, in a page or a worker. README "Building in a Web Worker" is the how-to; DESIGN "Builds off the main thread" has the reasons.
@@ -22,6 +16,30 @@ A throwaway page (`scratch/worker-build/`, gitignored; its build is written to `
 - The worker bundle carries its own copy of three and the SDK (131 KB gzipped in the spike's unminified build).
 - The loading page's World now builds through the pool (`showcase/assemble-worker.ts` records each build in the worker and sends the recording as tree indices on `userData.assembly`). On RTX 3060, all 43 models were in after 8 to 9 s instead of 27 s, with 0.5 s of unpacking and setup on the page instead of 21 s of frozen builds. Pieces and mirrored pairs matched main-thread builds for griffin, ps1CaveSpider, mimicHermitCrab, treehouseDiorama and pixelMammoth. Warming shaders and textures all at once then held one frame for ~480 ms; it now goes one model per step, yielding between frames (worst step 31 to 47 ms). While building, frames stayed within 67 ms but for one or two of 83 to 150 ms. The Vite dev server ran the same World through workers.
 - Not tried: hot reload in workers, Firefox, Safari, phones, peak memory.
+
+## Blob distances without `Math.hypot`, 2026-10-14
+
+A line-level profile of `blob()` (sprinterBlob, lifeguardBlob; 5 builds each plus 3 CPU profiles) put 75% of their builds in `blob()`, half of that in the settle rounds, which call `fold()` 70 times per surface vertex. Inside `fold()`, distance functions take 73–74% and the ingredient bounds tests about 15%. Replaying each call's passing ingredients without any bounds test saved 66–73 ms per sample, an upper bound for an ingredient index, so there is none. The ellipsoid distance was 26–30% of blob time, mostly its two `Math.hypot` calls.
+
+The sphere, ellipsoid, box and degenerate round-cone distances and the settle step limit now use `Math.sqrt` of the summed squares. Both samples built byte-identical to the previous `blob.ts` (geometry, indices, textures, world matrices, bone inverses; 7 alternating builds each). Fastest of 7: sprinterBlob 1,283 → 1,201 ms, lifeguardBlob 920 → 838 ms; medians on the loaded machine moved more (1,817 → 1,486 and 1,196 → 1,085 ms). `hypot` and the plain sum can differ in the last bit for other inputs, so other blobs may move by that much.
+
+## Surface nearest-point tree, 2026-10-14
+
+`Surface.nearest()` measured the distance to every triangle on every query, building a new `Triangle` each time. It now builds a bounding-volume tree on its first query after a pose and skips nodes farther than the best triangle so far, with a slack of 1e-5 of the surface size. Ties go to the lowest triangle index, as in the scan, so it returns the same triangle and point.
+
+All 186 samples built in Chromium on RTX 3060 against the previous `surface.ts` matched every geometry attribute, index, paint-sheet byte, object world matrix and bone inverse; the check flags a 1e-12 nudge to the returned point. 61 samples query `nearest()` (235 trees, 12,037 queries). lifeguardSculpt went from 1.20–1.33 s to 0.73–0.76 s over three runs; sprinterSculpt 1.01–1.17 → 0.83–1.05 s. Other samples moved within the noise of a loaded machine. A tree costs about ten scans to build (0.5 ms at 1,500 triangles, 11 ms at 38,000; a query after that is under 0.01 ms). The 116 trees that answered fewer than ten queries hold 21,554 triangles in total, so the library pays a few milliseconds for them.
+
+## Build records off the showcase's first load, 2026-10-14
+
+The showcase bundled all 186 `samples/*.build.json` records into its startup JS (583 KB of JSON), though the list only uses each builder's model and a tooltip line. The Vite plugin now serves `/__build-summaries` (model, effort, agent, scope, cost, wall time, tags and the cost caveat; 38 KB, 5 KB gzipped) for the model filter and tooltips, and `/__build-records` (every record in one file) for the Builds table; both are static files in the build. The header's "by" line, the Info panel's Build section and the Versions panel use the open sample's record, imported alongside its module.
+
+Production build, JS the page loads before the first sample: 1,389 KB → 871 KB (280 → 226 KB gzipped). On RTX 3060 against the previous build, served locally: all 178 tile tooltips, the model filter and its default, redFox's header, Info Build section and Versions panel, and all 178 Builds-table rows and their sort matched; no page errors in the production or dev build. With 40 ms latency and 20 Mbit/s, the list appeared at about 320 ms (was 345–507) and the first Builds-table open took 126–191 ms (was 133–145).
+
+## Paint bake speed, 2026-10-14
+
+Once the scatter fix was in, the paint bake was 85–96% of the slowest builds, nearly all of it in the noise in `src/paint.ts`. Same arithmetic, less work: `perlin()` evaluates its 8 corner gradients once instead of 12 times through a closure; `grad()` reads three 16-entry tables instead of a 16-way `switch`; `cells()` keeps its nearest cell in plain numbers and measures with `Math.sqrt` instead of `Math.hypot`; and the texel loop in `bakeSheet()` (`src/bake.ts`) accumulates position and normal without a per-texel closure. The API and every sample are unchanged.
+
+Building all 186 samples in Chromium on RTX 3060 against the previous `paint.ts` and `bake.ts` matched every geometry attribute, index and paint-sheet byte. Total build time dropped from 77.1 s to 47.8 s and samples over one second from 21 to 6 (clayWalrus 4.3 → 1.5 s, jadeSerpent 3.2 → 1.2 s, ukiyoeOctopus 2.5 → 0.7 s, pixelMammoth 0.65 → 0.48 s). sprinterBlob stays at 1.4 s: its time is in the experimental `blob()` geometry, not paint. `npm run snap -- clayWalrus v04-noise-speedup` rendered with 0 errors and 0 warnings; `npm run typecheck -- src/paint.ts src/bake.ts` passed.
 
 ## Sample names without importing every sample, 2026-10-14
 
