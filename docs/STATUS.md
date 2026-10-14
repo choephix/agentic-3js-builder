@@ -2,6 +2,14 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Scatter performance, 2026-10-14
+
+The public pixel mammoth blocked the browser's UI thread for 11.1 seconds: its dense body-fur scatter repeatedly transformed accepted hits for every spacing check. `Surface.scatter()` now indexes accepted positions in a numeric spatial grid and refreshes them when the pose changes. The API, random sequence, attempt budget and sample builders are unchanged.
+
+A Node smoke comparison matched all geometry attributes, indices, procedural paint pixels and SVG source for pixelMammoth, highlandCow and flowerHedgehog before and after the fix. The mammoth build dropped from 13.5 seconds to 1.0 second; the hedgehog dropped from 1.4 seconds to 0.19 seconds. Another 54 spacing scenarios matched hit order, positions, normals, weights, callback counts and random consumption, including negative coordinates, filters, overlapping meshes and pose changes.
+
+The fixed local showcase built the mammoth in 605 ms on RTX 3060 (initial longest main-thread task: 928 ms). Bend/rest and SVG/paint-sheet selection worked without page errors or WebGL context loss. `npm run snap -- pixelMammoth v04-scatter-grid-fix` rendered all views with 0 errors and 0 warnings; three spacing-boundary smoke cases also matched the old sampler exactly. `npm run typecheck -- src/surface.ts` passed.
+
 ## Origin
 
 Nilo Creature Lab (`~/workspace/nilo-creature-lab`, site https://nilo-creature-lab.netlify.app, data `~/tmp/public/nilo/creature-lab/`) is a library of primitive-built, skeleton-rigged, non-humanoid creatures for benchmarking AI auto-rigging and animation services. Claude Opus 5.5 built 100 of them with only a tiny kit (`harness/kit.ts`); GPT-6 Astra low/xhigh rebuilt them. Scouts read every Opus build and classified all 304 iteration diffs: most builds re-invented world-space joint placement and surface math, and a third of all steps went to tuning surface offsets and retyping dependents. Stefan asked for an SDK that removes that repeated and hard-to-position work, as its own project. His overriding requirement: "a simple, understandable, easy-to-use API is key since we're going to give this work to fast and cheap language models."

@@ -460,6 +460,51 @@ export class Surface {
     const random = options.rng ?? makeRng(1);
     const total = this.cumArea[this.cumArea.length - 1];
     const hits: Hit[] = [];
+    const minDist = options.minDist;
+    const grid =
+      minDist && minDist > 0 && Number.isFinite(minDist)
+        ? new Map<number, Map<number, Map<number, Vector3[]>>>()
+        : null;
+    let gridPose = this.ctx.poses;
+    const indexPosition = (hit: Hit) => {
+      const p = hit.at;
+      const x = Math.floor(p.x / minDist!);
+      const y = Math.floor(p.y / minDist!);
+      const z = Math.floor(p.z / minDist!);
+      let ys = grid!.get(x);
+      if (!ys) grid!.set(x, (ys = new Map()));
+      let zs = ys.get(y);
+      if (!zs) ys.set(y, (zs = new Map()));
+      let points = zs.get(z);
+      if (!points) zs.set(z, (points = []));
+      points.push(p);
+    };
+    const tooClose = (p: Vector3) => {
+      if (!grid) return minDist && hits.some((hit) => hit.at.distanceTo(p) < minDist);
+      // Frames stay live after pose(), but spacing only needs one position read per accepted hit and pose.
+      if (gridPose !== this.ctx.poses) {
+        grid.clear();
+        for (const hit of hits) indexPosition(hit);
+        gridPose = this.ctx.poses;
+      }
+      const x = Math.floor(p.x / minDist!);
+      const y = Math.floor(p.y / minDist!);
+      const z = Math.floor(p.z / minDist!);
+      // A cell is minDist wide: only it and its 26 neighbours can contain a point that's too close.
+      for (let dx = -1; dx <= 1; dx++) {
+        const ys = grid.get(x + dx);
+        if (!ys) continue;
+        for (let dy = -1; dy <= 1; dy++) {
+          const zs = ys.get(y + dy);
+          if (!zs) continue;
+          for (let dz = -1; dz <= 1; dz++) {
+            const points = zs.get(z + dz);
+            if (points) for (const point of points) if (point.distanceTo(p) < minDist!) return true;
+          }
+        }
+      }
+      return false;
+    };
     for (let attempt = 0; attempt < count * 60 && hits.length < count; attempt++) {
       const target = random() * total;
       let lo = 0;
@@ -478,11 +523,12 @@ export class Surface {
       const tri = this.triangle(lo);
       const p = tri.a.clone().addScaledVector(tri.b.clone().sub(tri.a), u).addScaledVector(tri.c.clone().sub(tri.a), v);
       if (options.keepOut?.(p)) continue;
-      if (options.minDist && hits.some((h) => h.at.distanceTo(p) < options.minDist!)) continue;
+      if (tooClose(p)) continue;
       const hit = this.hit(lo, p);
       if (options.filter && !options.filter(hit)) continue;
       if (this.buried(p, lo)) continue;
       hits.push(hit);
+      if (grid) indexPosition(hit);
     }
     return hits;
   }
