@@ -51,6 +51,131 @@ export type LoopOptions = {
 
 const PERTURB = new Vector3(0.0123, 0.0321, 0.0231);
 
+/** Triangles per leaf of a `NearestTree`. */
+const LEAF = 8;
+
+/**
+ * A bounding-volume tree over a surface's world triangles. `nearest()` skips every node farther away than the best
+ * triangle so far, and returns what a scan of every triangle in index order would: the lowest-index triangle at the
+ * least squared distance, measured the same way.
+ */
+class NearestTree {
+  /** Triangle indices, each leaf's in one run. */
+  private readonly order: Int32Array;
+  /** Per node: min x, y, z, then max x, y, z of its triangles. */
+  private readonly bounds: number[] = [];
+  /** Per node: a leaf's first position in `order`; an inner node's right child (its left child is the next node). */
+  private readonly start: number[] = [];
+  /** Per node: a leaf's triangle count, or -1 for an inner node. */
+  private readonly count: number[] = [];
+  private readonly stack: number[] = [];
+  private readonly scratch = new Triangle();
+  private readonly closest = new Vector3();
+
+  constructor(
+    private readonly tris: number[],
+    /** Slack on the skip test, far above rounding, so no node holding a tie or the winner is ever skipped. */
+    private readonly margin: number,
+  ) {
+    const n = tris.length / 9;
+    this.order = Int32Array.from({ length: n }, (_, i) => i);
+    this.build(0, n);
+  }
+
+  private build(from: number, to: number): void {
+    const { tris, order } = this;
+    const node = this.count.length;
+    const lo = [Infinity, Infinity, Infinity];
+    const hi = [-Infinity, -Infinity, -Infinity];
+    const centreLo = [Infinity, Infinity, Infinity];
+    const centreHi = [-Infinity, -Infinity, -Infinity];
+    for (let k = from; k < to; k++) {
+      const o = order[k] * 9;
+      for (let a = 0; a < 3; a++) {
+        const x = tris[o + a];
+        const y = tris[o + 3 + a];
+        const z = tris[o + 6 + a];
+        lo[a] = Math.min(lo[a], x, y, z);
+        hi[a] = Math.max(hi[a], x, y, z);
+        const centre = x + y + z;
+        centreLo[a] = Math.min(centreLo[a], centre);
+        centreHi[a] = Math.max(centreHi[a], centre);
+      }
+    }
+    this.bounds.push(...lo, ...hi);
+    this.start.push(from);
+    this.count.push(to - from);
+    if (to - from <= LEAF) return;
+    // Split at the middle of the widest spread of triangle centres (summed corners); halve the run when they coincide.
+    let axis = 0;
+    for (let a = 1; a < 3; a++) if (centreHi[a] - centreLo[a] > centreHi[axis] - centreLo[axis]) axis = a;
+    const cut = (centreLo[axis] + centreHi[axis]) / 2;
+    let mid = from;
+    for (let k = from; k < to; k++) {
+      const o = order[k] * 9 + axis;
+      if (tris[o] + tris[o + 3] + tris[o + 6] < cut) {
+        const swap = order[mid];
+        order[mid++] = order[k];
+        order[k] = swap;
+      }
+    }
+    if (mid === from || mid === to) mid = (from + to) >> 1;
+    this.count[node] = -1;
+    this.build(from, mid);
+    this.start[node] = this.count.length;
+    this.build(mid, to);
+  }
+
+  private distanceSq(node: number, q: Vector3) {
+    const b = this.bounds;
+    const o = node * 6;
+    const dx = q.x < b[o] ? b[o] - q.x : q.x > b[o + 3] ? q.x - b[o + 3] : 0;
+    const dy = q.y < b[o + 1] ? b[o + 1] - q.y : q.y > b[o + 4] ? q.y - b[o + 4] : 0;
+    const dz = q.z < b[o + 2] ? b[o + 2] - q.z : q.z > b[o + 5] ? q.z - b[o + 5] : 0;
+    return dx * dx + dy * dy + dz * dz;
+  }
+
+  /** The nearest triangle's index (-1 for none), with its closest point to `q` in `point`. */
+  nearest(q: Vector3, point: Vector3) {
+    const { tris, order, stack, scratch, closest } = this;
+    let best = -1;
+    let bestD = Infinity;
+    // Squared distance beyond which a node can hold nothing as near as `bestD`.
+    let reach = Infinity;
+    stack.length = 0;
+    stack.push(0);
+    while (stack.length) {
+      const node = stack.pop()!;
+      if (this.distanceSq(node, q) > reach) continue;
+      const count = this.count[node];
+      if (count < 0) {
+        const left = node + 1;
+        const right = this.start[node];
+        // The nearer child goes on top.
+        if (this.distanceSq(left, q) <= this.distanceSq(right, q)) stack.push(right, left);
+        else stack.push(left, right);
+        continue;
+      }
+      for (let k = this.start[node]; k < this.start[node] + count; k++) {
+        const i = order[k];
+        const o = i * 9;
+        scratch.a.set(tris[o], tris[o + 1], tris[o + 2]);
+        scratch.b.set(tris[o + 3], tris[o + 4], tris[o + 5]);
+        scratch.c.set(tris[o + 6], tris[o + 7], tris[o + 8]);
+        scratch.closestPointToPoint(q, closest);
+        const d = closest.distanceToSquared(q);
+        if (d < bestD || (d === bestD && i < best)) {
+          bestD = d;
+          best = i;
+          point.copy(closest);
+          reach = (Math.sqrt(d) + this.margin) ** 2;
+        }
+      }
+    }
+    return best;
+  }
+}
+
 /** The blend-skinned meshes that bend with `joint`, for a joint that owns no meshes of its own. */
 function skinnedOn(ctx: Ctx, joint: Joint) {
   return [...ctx.owner.keys()].filter((mesh) =>
@@ -71,6 +196,8 @@ export class Surface {
   private box = new Box3();
   private eps = 0;
   private version = -1;
+  /** Built by the first `nearest()` after a sync. */
+  private tree: NearestTree | null = null;
 
   constructor(
     private readonly ctx: Ctx,
@@ -109,6 +236,7 @@ export class Surface {
     if (this.version === this.ctx.poses) return;
     this.version = this.ctx.poses;
     this.tris = [];
+    this.tree = null;
     this.normals = [];
     this.owner = [];
     this.corners = [];
@@ -200,20 +328,9 @@ export class Surface {
   nearest(p: PointInput): Hit {
     this.sync();
     const q = toPoint(p, "nearest()");
-    let best = -1;
-    let bestD = Infinity;
-    const closest = new Vector3();
+    this.tree ??= new NearestTree(this.tris, this.eps);
     const point = new Vector3();
-    for (let i = 0; i < this.normals.length; i++) {
-      this.triangle(i).closestPointToPoint(q, closest);
-      const d = closest.distanceToSquared(q);
-      if (d < bestD) {
-        bestD = d;
-        best = i;
-        point.copy(closest);
-      }
-    }
-    return this.hit(best, point);
+    return this.hit(this.tree.nearest(q, point), point);
   }
 
   /** First surface hit along the ray, or null. */

@@ -2,6 +2,12 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Surface nearest-point tree, 2026-10-14
+
+`Surface.nearest()` measured the distance to every triangle on every query, building a new `Triangle` each time. It now builds a bounding-volume tree on its first query after a pose and skips nodes farther than the best triangle so far, with a slack of 1e-5 of the surface size. Ties go to the lowest triangle index, as in the scan, so it returns the same triangle and point.
+
+All 186 samples built in Chromium on RTX 3060 against the previous `surface.ts` matched every geometry attribute, index, paint-sheet byte, object world matrix and bone inverse; the check flags a 1e-12 nudge to the returned point. 61 samples query `nearest()` (235 trees, 12,037 queries). lifeguardSculpt went from 1.20–1.33 s to 0.73–0.76 s over three runs; sprinterSculpt 1.01–1.17 → 0.83–1.05 s. Other samples moved within the noise of a loaded machine. A tree costs about ten scans to build (0.5 ms at 1,500 triangles, 11 ms at 38,000; a query after that is under 0.01 ms). The 116 trees that answered fewer than ten queries hold 21,554 triangles in total, so the library pays a few milliseconds for them.
+
 ## Build records off the showcase's first load, 2026-10-14
 
 The showcase bundled all 186 `samples/*.build.json` records into its startup JS (583 KB of JSON), though the list only uses each builder's model and a tooltip line. The Vite plugin now serves `/__build-summaries` (model, effort, agent, scope, cost, wall time, tags and the cost caveat; 38 KB, 5 KB gzipped) for the model filter and tooltips, and `/__build-records` (every record in one file) for the Builds table; both are static files in the build. The header's "by" line, the Info panel's Build section and the Versions panel use the open sample's record, imported alongside its module.
