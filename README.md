@@ -48,34 +48,6 @@ npm run provenance       # rewrite samples/*.build.json from the session logs
 
 `preview` builds the model in the same Chromium and writes every texture (each drawing and the paint sheet) as PNG, a parts table with world bounds, the parts sunk into the floor deeper than 2% of the model's height and, with `--shot`, a three-quarter and a front image to `~/tmp/public/nilo/agentic-3js-builder/preview/<slug>/`. It never counts as a render. Both commands take a file path as well as a slug, so a throwaway file under `scratch/` (gitignored) renders without joining `samples/`.
 
-## Building in a Web Worker
-
-A build function is synchronous code with no DOM in it, so an app can run it in a module Web Worker and keep its page responsive. `src/worker.ts` has both halves. It is not part of `src/index.ts`, and model-written code never sees it.
-
-```ts
-// build.worker.ts
-import { serveBuilds } from "../src/worker";
-serveBuilds(async (name) => (await import(`./models/${name}.ts`)).default);
-
-// on the page
-import { createBuildPool } from "../src/worker";
-const pool = createBuildPool({
-  spawn: () => new Worker(new URL("./build.worker.ts", import.meta.url), { type: "module" }),
-});
-const { root, ready } = await pool.build("griffin");
-scene.add(root);
-await ready; // every svg() drawing is in
-```
-
-- The worker runs the build and `pack`s the result. Geometry and texture buffers move to the page without a copy, and `unpack` rebuilds the tree there. Both live in `src/transfer.ts` for apps that move models some other way. On the 14 hardest samples, every node, transform, buffer, material and texture matched a main-thread build.
-- A worker can't draw SVG, so `svg()` leaves its pixels blank there. The page decodes each drawing and an idle pool worker draws it, reads it back and dilates it (`drawSvg`, `svgPixels` in `src/texture.ts`). Markup only the browser's parser rejects throws from `pool.build`, not from the `svg()` call.
-- A build that throws rejects `pool.build` with its message and stack. One that runs past `timeout` (30 s by default) has its worker stopped and replaced.
-- Some things don't cross. Functions and promises in `userData` are dropped, and class instances there arrive as plain objects. Objects other than `Object3D`, `Group`, `Mesh` and `Bone` arrive as `Object3D`, and materials other than the six `Mesh*Material` kinds the pack knows arrive as `MeshStandardMaterial`. Only `DataTexture`s with byte data cross. `Built.losses` counts all of it; SDK-built models lose nothing.
-- A pooled worker may have built the same model before, so a build must not depend on state an earlier build left in its module (GUIDE: `build()` creates every generator it draws from).
-- The worker bundle carries its own copy of three and the SDK.
-
-Building the 14 hardest samples took 14 to 15 s on the main thread, with frames up to 3.1 s apart. A pool of 4 took 4.4 to 5.3 s with frames at most 33 to 67 ms apart (RTX 3060 box, 20 cores).
-
 ## Samples and showcase
 
 `samples/` is the sample library: small scripts, not exported models. The showcase runs a script and shows what it returns.
