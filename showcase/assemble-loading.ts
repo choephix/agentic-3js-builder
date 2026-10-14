@@ -1,5 +1,5 @@
 // The assemble page (assemble.ts) reworked as a loading animation. Every model finishes assembling within a hard
-// cap (0.4 / 0.8 / 1.2 s) however many parts it has; the build order and mirrored pairs still decide what comes
+// cap (0.2 to 3 s) however many parts it has; the build order and mirrored pairs still decide what comes
 // first, but there is no bloom, skeleton or paint wash, and once a model is done its original materials come back.
 // World builds every model first, with nothing animating meanwhile, then lets them all arrive in a shuffled order.
 // The model and settings live in the URL hash, so a link opens the same view.
@@ -194,8 +194,8 @@ function resize() {
 new ResizeObserver(resize).observe(host);
 resize();
 
-let style: Style = "rise";
-let cap = 0.8;
+let style: Style = "pop";
+let cap = 1.2;
 let mode: "single" | "world" = "single";
 let models: Model[] = [];
 let session = 0;
@@ -550,7 +550,7 @@ function syncButtons() {
   shuffleButton.hidden = mode !== "world";
 }
 
-const DEFAULTS = { style: "rise", cap: "0.8" };
+const DEFAULTS = { style: "pop", cap: "1.2" };
 /** The sidebar entry on show: a sample's slug, or "world". */
 let shown = "";
 const settings = (withSeed: boolean) => ({
@@ -570,9 +570,9 @@ function applyHash() {
   const { model, params } = readHash();
   const nextStyle = (STYLES as readonly string[]).includes(params.get("style") ?? "")
     ? (params.get("style") as Style)
-    : "rise";
+    : "pop";
   const caps = [...document.querySelectorAll<HTMLButtonElement>("[data-cap]")].map((b) => b.dataset.cap);
-  const nextCap = caps.includes(params.get("cap") ?? "") ? Number(params.get("cap")) : 0.8;
+  const nextCap = caps.includes(params.get("cap") ?? "") ? Number(params.get("cap")) : 1.2;
   const restyled = nextStyle !== style || nextCap !== cap;
   style = nextStyle;
   cap = nextCap;
