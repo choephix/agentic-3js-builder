@@ -22,8 +22,8 @@ import {
 } from "three";
 import type { Material, Mesh, Object3D, Texture } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { growth, hashOf, modules, MODELS, pairMirrors, readHash, record, recordingFrom } from "./assemble-shared";
-import type { Recording, RecordingData, SampleModule } from "./assemble-shared";
+import { growth, hashOf, modules, MODELS, pairMirrors, readHash, recordingFrom } from "./assemble-shared";
+import type { Recording, RecordingData } from "./assemble-shared";
 import { createBuildPool } from "../src/worker";
 import type { BuildPool, Built } from "../src/worker";
 
@@ -204,30 +204,34 @@ const newSeed = () => Math.floor(Math.random() * 36 ** 5);
 let seed = newSeed();
 /** World: every model has started arriving within this many ms. */
 const WORLD_SPREAD = 2500;
-/** World: builds run in this pool of workers (src/worker.ts), so the page keeps drawing while they run. */
+/** Builds run in this pool of workers (src/worker.ts), so the page keeps drawing while they run. */
 let pool: BuildPool | null = null;
 const buildPool = () =>
   (pool ??= createBuildPool({
     spawn: () => new Worker(new URL("./assemble-worker.ts", import.meta.url), { type: "module" }),
   }));
+/** Builds asked of the pool and not yet back; leaving a view closes the pool only while some are running. */
+let inFlight = 0;
 /** World: milliseconds per step of the last world load, for the smoke script. */
 const worldSteps: Record<string, number> = {};
 
-/** Build one sample on this thread and set it up to assemble at `place`. */
-async function load(slug: string, place: Vector3): Promise<Model> {
-  const module: SampleModule = await modules[`../samples/${slug}.ts`]!();
-  const recording = record(module.default, slug);
-  const textures = new Set<Texture>();
-  recording.root.traverse((node) => {
-    const mesh = node as Mesh;
-    if (!mesh.isMesh) return;
-    for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
-      const map = (m as Material & { map?: Texture }).map;
-      if (map) textures.add(map);
-    }
-  });
-  await Promise.allSettled([...textures].map((t) => t.userData.ready).filter(Boolean));
-  return prepare(recording, slug, place);
+/** Build one sample in the pool and wait for its drawings. */
+async function fromPool(slug: string): Promise<Built> {
+  inFlight++;
+  try {
+    const built = await buildPool().build(slug);
+    await built.ready;
+    return built;
+  } finally {
+    inFlight--;
+  }
+}
+
+/** Turn a pooled model's recording back into calls on its tree and set it up to assemble at `place`. */
+function prepareBuilt(built: Built, slug: string, place: Vector3): Model {
+  const { assembly, ...userData } = built.root.userData;
+  built.root.userData = userData;
+  return prepare(recordingFrom(built.root, assembly as RecordingData), slug, place);
 }
 
 /** Measure a recorded build and set it up to assemble; the holder scales it to a 1 m footprint at `place`. */
@@ -359,9 +363,11 @@ function clear() {
       if (piece.animated)
         for (const m of Array.isArray(piece.animated) ? piece.animated : [piece.animated]) m.dispose();
   models = [];
-  // Builds still running belong to the view being left.
-  pool?.close();
-  pool = null;
+  // Builds still running belong to the view being left; an idle pool stays warm for the next one.
+  if (inFlight) {
+    pool?.close();
+    pool = null;
+  }
 }
 
 function frame(width: number, depth: number) {
@@ -388,16 +394,26 @@ async function showSingle(slug: string) {
   for (const a of document.querySelectorAll("#list a"))
     a.classList.toggle("on", (a as HTMLElement).dataset.slug === slug);
   frame(1, 1);
-  // Two frames, so "building…" and the spinner are on screen before the synchronous build holds this thread.
-  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  let built: Built;
+  try {
+    built = await fromPool(slug);
+  } catch (error) {
+    if (ticket !== session) return;
+    status.textContent = "";
+    stats.textContent = `build failed: ${(error as Error).message}`;
+    console.error(slug, error);
+    return;
+  }
   if (ticket !== session) return;
-  const model = await load(slug, new Vector3());
-  if (ticket !== session) return;
+  const t = performance.now();
+  const model = prepareBuilt(built, slug, new Vector3());
+  const setup = built.ms.unpack + performance.now() - t;
   models = [model];
   stage.add(model.holder);
   status.textContent = "";
   stats.textContent = [
-    `build    ${model.recording.total.toFixed(0)} ms (the page is blocked meanwhile)`,
+    `build    ${built.ms.build.toFixed(0)} ms in a worker`,
+    `page     ${setup.toFixed(0)} ms of unpacking and setup on this thread`,
     `parts    ${model.pieces.length} meshes, ${model.pairs} mirrored pairs`,
     `assembly ${cap} s cap`,
   ].join("\n");
@@ -427,8 +443,7 @@ async function showWorld() {
     MODELS.map(async ([, slug], i) => {
       let built: Built;
       try {
-        built = await buildPool().build(slug);
-        await built.ready;
+        built = await fromPool(slug);
       } catch (error) {
         if (ticket === session) failed++;
         console.error(slug, error);
@@ -436,10 +451,8 @@ async function showWorld() {
       }
       if (ticket !== session) return;
       const t = performance.now();
-      const { assembly, ...userData } = built.root.userData;
-      built.root.userData = userData;
       const place = new Vector3((i % cols) - (cols - 1) / 2, 0, Math.floor(i / cols) - (rows - 1) / 2);
-      models.push(prepare(recordingFrom(built.root, assembly as RecordingData), slug, place));
+      models.push(prepareBuilt(built, slug, place));
       const setup = built.ms.unpack + performance.now() - t;
       onPage += setup;
       worldSteps.worstSetup = Math.max(worldSteps.worstSetup ?? 0, setup);

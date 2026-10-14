@@ -1,5 +1,6 @@
-// The whole SDK from one module, for apps that load a model-written module and map one import name to it.
-// `mix` is the paint colour mix; the bone-weight mix stays in "./context".
+// The whole model-facing SDK from one module, for apps that load a model-written module and map one import name to
+// it. `mix` is the paint colour mix; the bone-weight mix stays in "./context". The page-side SVG drawing
+// (`drawSvg`, `svgPixels`) and the worker layer (`./transfer`, `./worker`) are for apps and stay out.
 export * from "./bake";
 export * from "./builder";
 export * from "./cards";
@@ -20,5 +21,5 @@ export * from "./skeleton";
 export * from "./sugar";
 export * from "./surface";
 export * from "./sweep";
-export * from "./texture";
+export { svg } from "./texture";
 export { mix } from "./paint";
