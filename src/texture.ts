@@ -1,6 +1,7 @@
 // `svg()`: an SVG drawing as a texture for cards and textured parts. The drawing is rasterised by the browser (the
-// showcase and the creature-lab harness both run in one); under Node the texture keeps its size and markup and stays
-// blank. Transparent pixels cut the surface away, so a drawn leaf on a card is a leaf.
+// showcase and the creature-lab harness both run in one); under Node and in a Web Worker the texture keeps its size
+// and markup and stays blank, and `drawSvg` draws it once it reaches a page. Transparent pixels cut the surface away,
+// so a drawn leaf on a card is a leaf.
 import {
   Color,
   DataTexture,
@@ -39,13 +40,6 @@ export function svg(markup: string, options: { size?: number; pixelated?: boolea
   const side = Math.min(Math.max(Math.round(options.size ?? DEFAULT_SIZE), 8), 2048);
   const width = Math.max(1, Math.round(w >= h ? side : (side * w) / h));
   const height = Math.max(1, Math.round(h >= w ? side : (side * h) / w));
-  const tag = open[0]
-    .replace(/\s(width|height)\s*=\s*["'][^"']*["']/gi, "")
-    .replace(
-      /^<svg\b/i,
-      `<svg width="${width}" height="${height}"${/\sxmlns\s*=/.test(open[0]) ? "" : ' xmlns="http://www.w3.org/2000/svg"'}${options.pixelated && !/\sshape-rendering\s*=/i.test(open[0]) ? ' shape-rendering="crispEdges"' : ""}`,
-    );
-  const source = markup.replace(open[0], tag);
 
   const data = new Uint8Array(width * height * 4);
   const texture = new DataTexture(data, width, height, RGBAFormat, UnsignedByteType);
@@ -58,33 +52,74 @@ export function svg(markup: string, options: { size?: number; pixelated?: boolea
   texture.userData.svg = markup;
   texture.userData.coloured = inColour(markup);
   if (typeof document === "undefined") return texture;
+  texture.userData.ready = drawSvg(texture);
+  return texture;
+}
 
+/** Draws decoded drawings somewhere else, typically a worker calling `svgPixels`, and resolves with their pixels. */
+export type SvgOffload = (bitmap: ImageBitmap, width: number, height: number) => Promise<Uint8Array>;
+
+/**
+ * Draws an `svg()` texture's markup into its pixels; needs a page (DOM). This is what `svg()` does in a browser, and
+ * what a model built in a worker, where `svg()` leaves the pixels blank, needs once it reaches the page. Markup the
+ * browser can't parse throws here. The promise resolves once the pixels are in. With `offload`, the page only decodes
+ * the drawing; drawing it, reading it back and dilating its edges happen wherever `offload` sends them.
+ */
+export function drawSvg(texture: DataTexture, offload?: SvgOffload): Promise<void> {
+  const markup: unknown = texture.userData.svg;
+  if (typeof markup !== "string") throw new Error("drawSvg(): the texture was not made by svg()");
+  const { width, height, data } = texture.image;
+  if (!data) throw new Error("drawSvg(): the texture has no pixels");
+  const open = /<svg\b[^>]*>/i.exec(markup)!;
+  const tag = open[0]
+    .replace(/\s(width|height)\s*=\s*["'][^"']*["']/gi, "")
+    .replace(
+      /^<svg\b/i,
+      `<svg width="${width}" height="${height}"${/\sxmlns\s*=/.test(open[0]) ? "" : ' xmlns="http://www.w3.org/2000/svg"'}${texture.magFilter === NearestFilter && !/\sshape-rendering\s*=/i.test(open[0]) ? ' shape-rendering="crispEdges"' : ""}`,
+    );
+  const source = markup.replace(open[0], tag);
   const parsed = new DOMParser().parseFromString(source, "image/svg+xml");
   const error = parsed.querySelector("parsererror");
   if (error) throw new Error(`svg(): the markup is not valid SVG: ${error.textContent?.trim().split("\n")[0] ?? ""}`);
   const image = new Image(width, height);
   image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(source)}`;
-  texture.userData.ready = image
+  return image
     .decode()
     .catch(() => {
       throw new Error(`svg(): the browser could not draw this SVG (${markup.slice(0, 80)}…)`);
     })
-    .then(() => {
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const context = canvas.getContext("2d", { willReadFrequently: true })!;
-      context.drawImage(image, 0, 0, width, height);
-      const pixels = context.getImageData(0, 0, width, height).data;
-      // Texture rows run bottom-up (v = 0 at the bottom); canvas rows run top-down.
-      const row = width * 4;
-      for (let y = 0; y < height; y++) data.set(pixels.subarray((height - 1 - y) * row, (height - y) * row), y * row);
-      const filled = new Uint8Array(width * height);
-      for (let i = 0; i < filled.length; i++) filled[i] = data[i * 4 + 3] > 0 ? 1 : 0;
-      dilate(data, filled, width, height, 8);
+    .then(() =>
+      offload
+        ? createImageBitmap(image).then((bitmap) => offload(bitmap, width, height))
+        : svgPixels(image, width, height),
+    )
+    .then((pixels) => {
+      data.set(pixels);
       texture.needsUpdate = true;
     });
-  return texture;
+}
+
+/**
+ * A decoded drawing as texture pixels: drawn at `width` × `height`, rows bottom-up (v = 0 at the bottom), colour
+ * spread 8 texels past the drawn edges so filtering never pulls in black. Runs in a page or a worker (OffscreenCanvas).
+ */
+export function svgPixels(image: CanvasImageSource, width: number, height: number): Uint8Array {
+  const canvas =
+    typeof document === "undefined"
+      ? new OffscreenCanvas(width, height)
+      : Object.assign(document.createElement("canvas"), { width, height });
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) throw new Error("svgPixels(): no 2D canvas context");
+  context.drawImage(image, 0, 0, width, height);
+  const pixels = context.getImageData(0, 0, width, height).data;
+  // Texture rows run bottom-up (v = 0 at the bottom); canvas rows run top-down.
+  const data = new Uint8Array(width * height * 4);
+  const row = width * 4;
+  for (let y = 0; y < height; y++) data.set(pixels.subarray((height - 1 - y) * row, (height - y) * row), y * row);
+  const filled = new Uint8Array(width * height);
+  for (let i = 0; i < filled.length; i++) filled[i] = data[i * 4 + 3] > 0 ? 1 : 0;
+  dilate(data, filled, width, height, 8);
+  return data;
 }
 
 /**
