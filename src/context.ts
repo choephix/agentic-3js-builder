@@ -413,7 +413,8 @@ export function addMesh(ctx: Ctx, mesh: Mesh, joint: Joint, tags: Tags) {
 
 /**
  * Per-vertex extras for `meshFromWorld`: model-space normals (else computed), uvs, linear vertex colours, a texture,
- * and the shape's own surface coordinates for paints (2 per vertex; `wrap` when the second is degrees round a loop).
+ * the shape's own surface coordinates for paints (2 per vertex; `wrap` when the second is degrees round a loop), and
+ * its growth coordinate (1 per vertex, see `GROWTH`).
  */
 export type MeshExtras = {
   normals?: number[];
@@ -422,7 +423,16 @@ export type MeshExtras = {
   texture?: Texture;
   surface?: number[];
   wrap?: boolean;
+  growth?: ArrayLike<number>;
 };
+
+/**
+ * Geometry attribute with how far along its own construction each vertex is, 0..1: a sweep's position along its
+ * path, a lathe's height up its axis, an extrusion's or slab's distance out from its anchor, a membrane's span from
+ * edge A to edge B, a decal's distance from its middle, a card batch's placement order and each card's root to tip.
+ * Build-time data for apps that animate a model coming together; three.js geometry passed to `part()` has none.
+ */
+export const GROWTH = "_growth";
 
 /**
  * A mesh from WORLD-space triangles with weights per vertex. It hangs under its heaviest bone with an identity
@@ -462,6 +472,7 @@ export function meshFromWorld(
   if (extras.colors) geometry.setAttribute("color", new Float32BufferAttribute(extras.colors, 3));
   if (extras.surface && fill instanceof Paint)
     geometry.setAttribute(SURFACE, new Float32BufferAttribute(extras.surface, 2));
+  if (extras.growth) geometry.setAttribute(GROWTH, new Float32BufferAttribute(extras.growth, 1));
   geometry.setIndex(index);
   const bones = totals.size > 1 ? writeWeights(geometry, count, weightAt) : null;
   if (!smooth) geometry = geometry.toNonIndexed();

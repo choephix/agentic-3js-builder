@@ -926,6 +926,9 @@ export function sweep(ctx: Ctx, source: PathInput | Chain, radius: Radius, optio
           meshFromWorld(ctx, buf.positions, buf.index, buf.color, (v) => buf.weights[v], smooth, tags, {
             surface: buf.surface,
             wrap: true,
+            growth: Float32Array.from({ length: buf.surface.length / 2 }, (_, v) =>
+              Math.min(1, Math.max(0, toU(buf.surface[v * 2]))),
+            ),
           }),
         );
     buffers = [];

@@ -196,6 +196,7 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     return [
       meshFromWorld(ctx, positions, index, fill, (v) => weights[sources[v][0]][sources[v][1]], false, tags, {
         surface: sources.flatMap(([i, j]) => [columns[i], j / rows]),
+        growth: sources.map(([, j]) => j / rows),
       }),
     ];
   }
@@ -219,6 +220,7 @@ export function membrane(ctx: Ctx, edgeA: MembraneEdge, edgeB: MembraneEdge, opt
     const { positions, index, sources } = prism(grid, normals, group, thickness / 2);
     return meshFromWorld(ctx, positions, index, fill, () => rigid(joint), false, tags, {
       surface: sources.flatMap(([i, j]) => [columns[i], j / rows]),
+      growth: sources.map(([, j]) => j / rows),
     });
   });
 }
@@ -283,10 +285,14 @@ export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptio
   const weights = weightsFor(ctx, options.bone, points, center, "slab(): bone");
   const q = new Vector3();
   const surface: number[] = [];
+  const growth: number[] = [];
   for (let i = 0; i < positions.length; i += 3) {
     q.fromArray(positions, i).sub(center);
     surface.push(q.dot(u), q.dot(v));
+    growth.push(Math.hypot(q.dot(u), q.dot(v)));
   }
+  const far = Math.max(...growth);
+  if (far > 0) for (let i = 0; i < growth.length; i++) growth[i] /= far;
   const mesh = meshFromWorld(
     ctx,
     positions,
@@ -295,7 +301,7 @@ export function slab(ctx: Ctx, points: readonly PointInput[], options: SlabOptio
     () => weights,
     false,
     { name: options.name, kind: "slab", group: options.group },
-    { surface },
+    { surface, growth },
   );
   return new Part(mesh, center, frame, weights, [0, 0, 1]);
 }

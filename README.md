@@ -76,6 +76,32 @@ await ready; // every svg() drawing is in
 
 Building the 14 hardest samples took 14 to 15 s on the main thread, with frames up to 3.1 s apart. A pool of 4 took 4.4 to 5.3 s with frames at most 33 to 67 ms apart (RTX 3060 box, 20 cores).
 
+## Revealing a build as it loads
+
+`src/record.ts` records a build and `src/reveal.ts` plays it back as a short loading animation. Neither is part of `src/index.ts`, and builds need no changes for either.
+
+```ts
+import { record } from "../src/record";
+import { Reveal } from "../src/reveal";
+
+const recording = record(build); // runs build() and logs every builder call
+scene.add(recording.root);
+const reveal = new Reveal(recording, { style: "pop", cap: 1.2 });
+reveal.start();
+renderer.setAnimationLoop(() => {
+  reveal.update(); // false once the model is finished
+  renderer.render(scene, camera);
+});
+```
+
+- The recording lists every builder call with the parts and joints it added, the joints it moved (a `pose()`), the line of code that called it, and when it ran. In a worker, `recordingData` turns it into plain data that can ride on `root.userData` through `pack`, and `recordingFrom` turns it back on the page.
+- Every part arrives within `cap` seconds however many there are, in build order. A big part takes a bigger share of the time than a small one. Calls from one line of code whose parts mirror each other across x = 0 or z = 0 build both sides at once (`pairMirrors`).
+- Styles: `pop` (parts scale in from their bones), `rise` (each part grows along its own construction), `ghost` (a stippled outline first, then rise) and `print` (one cut plane sweeps up the model).
+- Every SDK shape has a `_growth` vertex attribute (`GROWTH` in `src/context.ts`): a sweep's position along its path, a lathe's height up its axis, an extrusion's or slab's distance out from its anchor, a membrane's span from edge A to edge B, a decal's distance from its middle, and a card batch's placement order with each card root to tip. Three.js geometry passed to `part()` has none, so `growthOf` estimates it from the part's long axis.
+- Joints the build posed start where they stood before the pose and swing into it. Rigid parts ride their joints; blend-skinned parts are re-deformed from their finished vertices.
+- Parts with `castShadow` cast only what has grown.
+- `warm(renderer, camera, scene)` compiles both material sets and uploads the textures first, so neither the first frame nor the switch back to the model's own materials stalls. When the reveal finishes, the model has its own materials, scales and pose back.
+
 ## Samples and showcase
 
 `samples/` is the sample library: small scripts, not exported models. The showcase runs a script and shows what it returns.
@@ -113,7 +139,7 @@ Production ships the code that generates each model, build metadata and small th
 - **Textures** (`X`): every texture the live sample generates (the paint sheet and each SVG drawing), shown upright over a checkerboard with UV wireframes. Hover a part to single out its UVs; click the picture to enlarge it. The local showcase additionally displays the latest harness atlas saved by `npm run snap` as `<tag>-atlas.png`.
 - **Builds** (`P`, or the table icon beside the sample list header): every sample's builder, model, effort, cost, time, tokens, calls, edits, tags and report issues in one sortable table. Hovering a sample in the list shows its model, cost and time.
 - **Storage study** ([`/storage`](https://agentic-3d-builder-sdk-showcase.netlify.app/storage)): current model source sizes versus their latest available final GLBs, measured at website build time. The page shows library-wide MB savings and every model in a searchable, sortable table, with exact bytes and file timestamps downloadable as CSV. Its methodology separates representation size from shared SDK overhead, compressed transfer, runtime memory and actual hosting storage.
-- **Assemble** ([`/assemble`](https://agentic-3d-builder-sdk-showcase.netlify.app/assemble)): 43 hand-picked samples built once while every builder call is recorded, then played back in call order: the skeleton draws itself, parts grow out of their bones with a glowing edge, card batches sprout, and the paint sheet washes over. Staged timing groups repeated and tiny parts into waves and gives big parts more time; mirrored pairs (same sample line, reflected geometry) build both sides at once. Real timing replays each call when it actually ran. Speed `1`–`4`. The hash holds the model and every non-default setting (`#griffin&timing=real5&speed=2`), so a link opens the same view.
-- **Assemble, loading version** ([`/assemble-loading`](https://agentic-3d-builder-sdk-showcase.netlify.app/assemble-loading)): the same recording as a loading animation with a hard cap (0.2 to 3 s per model, 1.2 s by default) and no bloom, in four styles (pop by default, rise, ghost, print). Every build runs in a pool of Web Workers (`src/worker.ts`; each worker records its build and sends the recording along), so the page keeps drawing while a model builds. "World" at the top of the list builds all 43 at once, then lets them arrive in a seeded shuffled order over 2.5 s; Shuffle picks a new seed. The hash holds the model or `world`, the style, the cap and the seed.
+- **Assemble** ([`/assemble`](https://agentic-3d-builder-sdk-showcase.netlify.app/assemble)): 43 hand-picked samples built once while every builder call is recorded (`src/record.ts`), then played back in call order: the skeleton draws itself, parts grow along their own construction (`_growth`: a sweep along its path, a lathe up its axis) with a glowing edge, card batches sprout, posed joints swing from where they stood into their pose, and the paint sheet washes over. Shadows grow with the parts. Staged timing groups repeated and tiny parts into waves and gives big parts more time; mirrored pairs (same line of code, reflected geometry) build both sides at once. Real timing replays each call when it actually ran. Speed `1`–`4`. The hash holds the model and every non-default setting (`#griffin&timing=real5&speed=2`), so a link opens the same view.
+- **Assemble, loading version** ([`/assemble-loading`](https://agentic-3d-builder-sdk-showcase.netlify.app/assemble-loading)): the same recording as a loading animation, played by `src/reveal.ts`, with a hard cap (0.2 to 3 s per model, 1.2 s by default) and no bloom, in four styles (pop by default, rise, ghost, print); posed joints swing into place within the cap. Every build runs in a pool of Web Workers (`src/worker.ts`; each worker records its build and sends the recording along), so the page keeps drawing while a model builds. "World" at the top of the list builds all 43 at once, then lets them arrive in a seeded shuffled order over 2.5 s; Shuffle picks a new seed. The hash holds the model or `world`, the style, the cap and the seed.
 - **Bake lab** (local only, `/bake-lab.html`): builds six paint-heavy samples or the 43 assemble models one per frame and paints them three ways: in `default()` as today, sliced into 10 ms steps between frames, or in a worker pool that builds each sample again. Optionally a quarter-resolution preview sheet shows first. A table reports time to geometry and to final paint, frame gaps, the slowest main-thread step, and whether every sheet and uv matches the normal build byte for byte. `window.__bakeLab.run(mode, options)` runs it from a script.
 - An error thrown while loading or building a sample shows in the page, with its stack mapped to source lines, without affecting other samples. Editing a sample, or any SDK file it imports, re-runs it in place and keeps the camera; a sample file added to or removed from `samples/` joins or leaves the list without a restart; new renders appear as they land.

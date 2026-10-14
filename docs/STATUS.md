@@ -2,6 +2,16 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Recording and revealing builds in the SDK, 2026-10-14
+
+The assemble prototype's recorder and loading animation moved into optional SDK modules outside `src/index.ts`: `src/record.ts` (`record`, `recordingData` / `recordingFrom` for workers, `pairMirrors`) and `src/reveal.ts` (`Reveal` with the pop, rise, ghost and print styles, `growthOf`, `poser`). The loading page is now a thin user of `Reveal`, and the showpiece uses the recorder, growth and poses with its own glow shaders. README has a "Revealing a build as it loads" section; DESIGN has the reasons.
+
+- **Real growth directions.** Every SDK shape now writes a `_growth` attribute: a sweep along its path, a lathe up its axis, an extrusion or slab out from its anchor, a membrane from edge A to edge B, a decal from its middle, and cards in placement order, each root to tip. Built in Node, all 186 samples kept every other attribute and index byte for byte. 15,755 of 27,590 meshes carry it; the rest are three.js geometry, which keeps the long-axis estimate.
+- **Poses replay.** The recorder catches every joint a call moves. Playback starts posed joints where they stood before the pose and swings them into it, and re-deforms blend-skinned parts. Rewinding giantAnteater's three poses gives its unposed build exactly for rigid parts and within 0.7 mm for skinned ones. In the 43 assemble models, 15 pose (the crab's chest lid opens last, the spider's fangs swing in).
+- **Shadows grow with the parts** in the showpiece, through a growth-aware `customDepthMaterial`; the floor shadow shows from the start.
+- **Mirrored pairs** now key on the frame that called the builder, so the recorder needs no file name. Pair counts matched the prototype on 11 models, within 2.
+- Checked in Chrome on the RTX 3060 against the dev server: the showpiece played the crab and the griffin, the loading page held the spider and the crab at seven moments in three styles, and World loaded 43/43. There were no page errors. Screenshots are in `~/tmp/public/nilo/agentic-3js-builder/reveal-shots/`. Firefox, Safari and phones are untested.
+
 ## Bake lab: painting without freezing the page, 2026-10-14
 
 `showcase/bake-lab.html` (local only) builds a set of samples one per frame and paints them three ways: sync (the bake runs inside `default()`, as now), sliced (a copy of `bakeSheet` as a generator, run in 10 ms steps between frames) and workers (a pool imports each sample again, builds it and posts back the sheet; the page packs the same layout itself). It patches `Ctx.prototype.bake` to defer; no `src/` file changes. Optionally a 1/4-resolution sheet of the same layout shows first. Paints are the samples' own closures, so a worker has to run the sample; `svg()` already returns a blank texture there.

@@ -84,6 +84,7 @@ export function cards(
   const tint = options.color instanceof Paint ? null : (options.color ?? "#ffffff");
   const tags = { name: options.name, kind: "cards", group: options.group };
 
+  /** `growth` per vertex: the card's place in `on` (most of the range), then root to tip. */
   type Batch = {
     positions: number[];
     normals: number[];
@@ -91,9 +92,10 @@ export function cards(
     colors: number[];
     index: number[];
     weights: Weights[];
+    growth: number[];
   };
   const batches = distinct.map(
-    (): Batch => ({ positions: [], normals: [], uvs: [], colors: [], index: [], weights: [] }),
+    (): Batch => ({ positions: [], normals: [], uvs: [], colors: [], index: [], weights: [], growth: [] }),
   );
 
   on.forEach((input, i) => {
@@ -132,6 +134,7 @@ export function cards(
       spine.push(spine[k].clone().addScaledVector(d, h / segments));
       dirs.push(dirAt((k + 1) / segments));
     }
+    const place = (0.8 * i) / Math.max(on.length - 1, 1);
     const strip = (across: (k: number) => Vector3) => {
       const first = batch.positions.length / 3;
       spine.forEach((p, k) => {
@@ -146,6 +149,7 @@ export function cards(
           batch.uvs.push(u, k / segments);
           if (color) batch.colors.push(...linear(color));
           batch.weights.push(weights);
+          batch.growth.push(place + (0.2 * k) / segments);
         }
       });
       for (let k = 0; k < segments; k++) {
@@ -167,6 +171,7 @@ export function cards(
         uvs: batch.uvs,
         colors: tint ? undefined : batch.colors,
         texture: distinct[k],
+        growth: batch.growth,
       }),
     );
   });

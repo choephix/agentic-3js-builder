@@ -131,6 +131,9 @@ export function decal(ctx: Ctx, target: Surface | SurfaceTarget, texture: Textur
     {
       uvs,
       texture,
+      growth: Array.from({ length: uvs.length / 2 }, (_, v) =>
+        Math.min(1, Math.hypot(uvs[v * 2] - 0.5, uvs[v * 2 + 1] - 0.5) / Math.SQRT1_2),
+      ),
     },
   );
   const middle = hits[Math.floor(rows / 2) * (cols + 1) + Math.floor(cols / 2)];

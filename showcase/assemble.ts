@@ -1,11 +1,11 @@
-// The assemble page: build a sample once while recording every builder call (which joints and meshes it added, and when),
-// then play the finished creature back in that order: skeleton first, each helper call's parts growing out of their
-// bones with a glowing edge, fur batches sprouting card by card, and the paint sheet washing over at the end.
-// Nothing here touches the SDK's files: the recorder wraps prototypes for the duration of one build.
+// The assemble page: build a sample once while recording every builder call (src/record.ts: which joints and meshes
+// it added, which joints it posed, and when), then play the finished creature back in that order: skeleton first,
+// each helper call's parts growing along their own construction (a sweep along its path, a lathe up its axis) with a
+// glowing edge, fur batches sprouting card by card, posed joints swinging into place, and the paint sheet washing
+// over at the end. Shadows grow with the parts.
 import {
   AdditiveBlending,
   Box3,
-  BufferAttribute,
   BufferGeometry,
   Color,
   DirectionalLight,
@@ -17,28 +17,38 @@ import {
   HemisphereLight,
   LineSegments,
   Mesh,
+  MeshBasicMaterial,
+  MeshDepthMaterial,
+  MeshLambertMaterial,
+  MeshPhongMaterial,
+  MeshStandardMaterial,
   NeutralToneMapping,
   Object3D,
   PCFShadowMap,
   PerspectiveCamera,
   PlaneGeometry,
   Points,
+  RGBADepthPacking,
   Scene,
   ShaderMaterial,
   ShadowMaterial,
   SRGBColorSpace,
+  Texture,
   Vector2,
   Vector3,
   WebGLRenderer,
 } from "three";
-import type { Material, Texture } from "three";
+import type { Material } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { growth, hashOf, modules, MODELS, pairMirrors, readHash, record } from "./assemble-shared";
-import type { Call, Recording } from "./assemble-shared";
+import { hashOf, modules, MODELS, readHash } from "./assemble-shared";
+import { pairMirrors, record } from "../src/record";
+import type { Call, Recording } from "../src/record";
+import { growthOf, poser } from "../src/reveal";
+import type { Poser } from "../src/reveal";
 
 // ── The animated material ─────────────────────────────────────────────────────────────────────────────────────────
 
@@ -96,13 +106,14 @@ type Piece = {
 };
 
 function animated(original: Material, cards: boolean): [Material, { value: number }, { value: number }] | null {
-  const m = original as Material & {
-    isMeshStandardMaterial?: boolean;
-    isMeshBasicMaterial?: boolean;
-    isMeshLambertMaterial?: boolean;
-    isMeshPhongMaterial?: boolean;
-  };
-  if (!(m.isMeshStandardMaterial || m.isMeshBasicMaterial || m.isMeshLambertMaterial || m.isMeshPhongMaterial))
+  if (
+    !(
+      original instanceof MeshStandardMaterial ||
+      original instanceof MeshBasicMaterial ||
+      original instanceof MeshLambertMaterial ||
+      original instanceof MeshPhongMaterial
+    )
+  )
     return null;
   const material = original.clone();
   const grow = { value: 0 };
@@ -135,6 +146,29 @@ if (!gl_FrontFacing && uCross > 0.5) gl_FragColor.rgb = uGlow * 0.9;
   return [material, grow, washable];
 }
 
+/** The shadow pass of a growing part: it casts only what has grown, so shadows grow with the parts. */
+function growingDepth(source: Material, grow: { value: number }) {
+  const material = new MeshDepthMaterial({
+    depthPacking: RGBADepthPacking,
+    map: "map" in source && source.map instanceof Texture ? source.map : null,
+    alphaTest: source.alphaTest,
+  });
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uGrow = grow;
+    shader.vertexShader = shader.vertexShader
+      .replace("void main() {", "attribute float aGrow;\nvarying float vGrow;\nvoid main() {")
+      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvGrow = aGrow;");
+    shader.fragmentShader = shader.fragmentShader
+      .replace("void main() {", "uniform float uGrow;\nvarying float vGrow;\nvoid main() {")
+      .replace(
+        "#include <clipping_planes_fragment>",
+        "#include <clipping_planes_fragment>\nif (vGrow > uGrow) discard;",
+      );
+  };
+  material.customProgramCacheKey = () => "assemble-depth-1";
+  return material;
+}
+
 function prepare(object: Object3D, cards: boolean): Piece {
   const piece: Piece = {
     object,
@@ -149,7 +183,7 @@ function prepare(object: Object3D, cards: boolean): Piece {
   };
   const mesh = object as Mesh;
   if (!mesh.isMesh) return piece;
-  mesh.geometry.setAttribute("aGrow", new BufferAttribute(growth(mesh.geometry, cards), 1));
+  mesh.geometry.setAttribute("aGrow", growthOf(mesh.geometry));
   const list = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
   const next = list.map((original) => {
     if (original.name === "paint") piece.painted = true;
@@ -162,6 +196,11 @@ function prepare(object: Object3D, cards: boolean): Piece {
   });
   mesh.material = Array.isArray(mesh.material) ? next : next[0];
   mesh.castShadow = true;
+  if (piece.materials.length) {
+    const grow = { value: 0 };
+    piece.grow.push(grow);
+    mesh.customDepthMaterial = growingDepth(piece.materials[0], grow);
+  }
   return piece;
 }
 
@@ -177,6 +216,8 @@ type Skeleton = {
     uPx: { value: number };
   };
   size: number;
+  /** Redraw the bones where the joints stand now (they swing while a pose plays). */
+  follow: () => void;
 };
 
 function skeleton(joints: Array<{ joint: Object3D; t0: number }>, extent: number): Skeleton {
@@ -192,12 +233,14 @@ function skeleton(joints: Array<{ joint: Object3D; t0: number }>, extent: number
   const dotTime: number[] = [];
   const a = new Vector3();
   const b = new Vector3();
+  const bones: Array<[Object3D, Object3D]> = [];
   for (const { joint, t0 } of joints) {
     joint.getWorldPosition(b);
     dots.push(b.x, b.y, b.z);
     dotTime.push(t0);
     const parent = parentOf(joint);
     if (!parent) continue;
+    bones.push([parent, joint]);
     parent.getWorldPosition(a);
     position.push(a.x, a.y, a.z, b.x, b.y, b.z);
     from.push(a.x, a.y, a.z, a.x, a.y, a.z);
@@ -272,7 +315,23 @@ function skeleton(joints: Array<{ joint: Object3D; t0: number }>, extent: number
   lines.frustumCulled = points.frustumCulled = false;
   const group = new Group();
   group.add(lines, points);
-  return { group, uniforms, size: extent * 0.014 };
+  const follow = () => {
+    const ends = lineGeometry.getAttribute("position");
+    const starts = lineGeometry.getAttribute("aFrom");
+    bones.forEach(([parent, joint], i) => {
+      parent.getWorldPosition(a);
+      joint.getWorldPosition(b);
+      ends.setXYZ(i * 2, a.x, a.y, a.z);
+      ends.setXYZ(i * 2 + 1, b.x, b.y, b.z);
+      starts.setXYZ(i * 2, a.x, a.y, a.z);
+      starts.setXYZ(i * 2 + 1, a.x, a.y, a.z);
+    });
+    ends.needsUpdate = starts.needsUpdate = true;
+    const centres = dotGeometry.getAttribute("position");
+    joints.forEach(({ joint }, i) => centres.setXYZ(i, ...joint.getWorldPosition(b).toArray()));
+    centres.needsUpdate = true;
+  };
+  return { group, uniforms, size: extent * 0.014, follow };
 }
 
 // ── Planning the playback ─────────────────────────────────────────────────────────────────────────────────────────
@@ -291,7 +350,14 @@ type Beat = {
   /** Mirrored pairs in this beat's wave. */
   pairs: number;
 };
-type Plan = { beats: Beat[]; wash: { start: number; dur: number } | null; geometryEnd: number; end: number };
+/** `moves`: when each call that posed joints swings them, start and duration in playback seconds. */
+type Plan = {
+  beats: Beat[];
+  moves: Map<Call, { start: number; dur: number }>;
+  wash: { start: number; dur: number } | null;
+  geometryEnd: number;
+  end: number;
+};
 type Options = { timing: string; colour: string };
 
 /** Staged playback length at 1× before the paint wash; longer builds are compressed to fit. */
@@ -310,6 +376,8 @@ type Wave = {
   lastKind: string;
   lastMass: number;
   joints: boolean;
+  /** A run of poses: joints swinging into place, with nothing added. */
+  pose: boolean;
   spread: number;
   gap: number;
 };
@@ -323,7 +391,7 @@ function plan(recording: Recording, pieces: Map<Object3D, Piece>, extent: number
   );
   const kind = (call: Call) => {
     const first = call.objects[0];
-    if (!first) return "joints";
+    if (!first) return call.moves.length ? "pose" : "joints";
     const m = pieces.get(first)?.materials[0] as (Material & { color?: Color; map?: Texture | null }) | undefined;
     return `${call.label}|${m?.color?.getHexString() ?? ""}|${m?.map?.uuid ?? ""}|${call.objects.length}`;
   };
@@ -363,27 +431,36 @@ function plan(recording: Recording, pieces: Map<Object3D, Piece>, extent: number
   } else {
     const waves: Wave[] = [];
     for (const call of recording.calls) {
-      if ((!call.objects.length && !call.joints.length) || call.twinOf) continue;
+      if ((!call.objects.length && !call.joints.length && !call.moves.length) || call.twinOf) continue;
       const unit = call.twin ? [call, call.twin] : [call];
       const k = kind(call);
       const m = masses.get(call)!;
       const last = waves[waves.length - 1];
       const joints = k === "joints";
+      const pose = k === "pose";
       const ratio = last ? Math.max(m, last.lastMass) / Math.max(Math.min(m, last.lastMass), 1e-4) : Infinity;
-      const repeat = last && k === last.lastKind && (joints || ratio < 2.5);
-      const crumbs = last && !joints && !last.joints && call.label !== "cards" && m < TINY && last.mass < TINY;
+      const repeat = last && k === last.lastKind && (joints || pose || ratio < 2.5);
+      const crumbs =
+        last &&
+        !joints &&
+        !pose &&
+        !last.joints &&
+        !last.pose &&
+        call.label !== "cards" &&
+        m < TINY &&
+        last.mass < TINY;
       if (last && (repeat || crumbs)) {
         last.units.push(unit);
         last.mass = Math.max(last.mass, m);
         last.lastKind = k;
         last.lastMass = m;
-      } else waves.push({ units: [unit], mass: m, lastKind: k, lastMass: m, joints, spread: 0, gap: 0 });
+      } else waves.push({ units: [unit], mass: m, lastKind: k, lastMass: m, joints, pose, spread: 0, gap: 0 });
     }
     // Big parts get a long grow and a pause after them; small ones pass quickly and overlap the next wave.
     for (const w of waves) {
       if (w.units.length > 1)
         w.spread = Math.min((w.joints ? 0.04 : 0.05) * (w.units.length - 1), w.joints ? 0.4 : 1.1);
-      w.gap = w.joints ? 0.04 + w.spread * 0.5 : 0.05 + 0.55 * Math.sqrt(w.mass) + 0.6 * w.spread;
+      w.gap = w.pose ? 0.7 : w.joints ? 0.04 + w.spread * 0.5 : 0.05 + 0.55 * Math.sqrt(w.mass) + 0.6 * w.spread;
     }
     const natural = waves.reduce((s, w) => s + w.gap, 0);
     const squeeze = natural > STAGED ? STAGED / natural : 1;
@@ -413,7 +490,7 @@ function plan(recording: Recording, pieces: Map<Object3D, Piece>, extent: number
           startOf.set(call, start);
           const cards = call.label === "cards";
           const m = masses.get(call)!;
-          const dur = (cards ? 0.9 + 0.8 * Math.sqrt(m) : 0.25 + 0.9 * Math.sqrt(m)) * slow;
+          const dur = (wave.pose ? 0.8 : cards ? 0.9 + 0.8 * Math.sqrt(m) : 0.25 + 0.9 * Math.sqrt(m)) * slow;
           const beat = beatOf(call, start, dur, calls.length, ms, index > 0 || side > 0, pairs);
           call.objects.forEach((object, i) => {
             const piece = pieces.get(object);
@@ -436,10 +513,14 @@ function plan(recording: Recording, pieces: Map<Object3D, Piece>, extent: number
     beats.sort((a, b) => a.start - b.start);
   }
 
+  const moves = new Map(
+    beats.filter((b) => b.call.moves.length).map((b) => [b.call, { start: b.start, dur: Math.max(b.dur, 1 / 60) }]),
+  );
   const geometryEnd = Math.max(
     lead,
     ...beats.flatMap((b) => b.pieces.map((p) => p.start + p.dur)),
     ...beats.flatMap((b) => b.joints.map((j) => j.t0 + 0.35)),
+    ...[...moves.values()].map((m) => m.start + m.dur),
   );
   const anyPaint = [...pieces.values()].some((p) => p.painted);
   const sculpt = options.colour === "sculpt";
@@ -452,7 +533,7 @@ function plan(recording: Recording, pieces: Map<Object3D, Piece>, extent: number
     else wash = { start: Math.max(lead, geometryEnd - 0.8), dur: 1.8 };
   }
   const end = Math.max(geometryEnd, wash ? wash.start + wash.dur : 0) + 0.2;
-  return { beats, wash, geometryEnd, end };
+  return { beats, moves, wash, geometryEnd, end };
 }
 
 // ── The page ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -513,8 +594,8 @@ type Current = {
   recording: Recording;
   pieces: Map<Object3D, Piece>;
   skeleton: Skeleton;
+  poser: Poser | null;
   floor: Group;
-  shadow: ShadowMaterial;
   extent: number;
   plan: Plan;
   time: number;
@@ -532,6 +613,7 @@ function dispose(model: Current) {
     if (!mesh.isMesh) return;
     mesh.geometry.dispose();
     for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) m.dispose();
+    mesh.customDepthMaterial?.dispose();
   });
   for (const piece of model.pieces.values()) for (const m of piece.materials) m.dispose();
   model.skeleton.group.traverse((node) => {
@@ -558,7 +640,7 @@ async function show(slug: string) {
     // Let "building…" paint before the synchronous build.
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     if (ticket !== loading) return;
-    const recording = record(module.default, slug);
+    const recording = record(module.default);
     const textures = new Set<Texture>();
     recording.root.traverse((node) => {
       const mesh = node as Mesh;
@@ -590,16 +672,17 @@ async function show(slug: string) {
     const size = bounds.getSize(new Vector3());
     const center = bounds.getCenter(new Vector3());
     const extent = Math.max(size.x, size.y, size.z, 0.2);
-    pairMirrors(recording.calls, pieces, extent);
+    pairMirrors(recording);
+    const posing = poser(recording);
     shared.uWashSpan.value.set(bounds.min.y, bounds.max.y);
     shared.uWashFreq.value = 4 / extent;
 
-    // Floor: a faint grid and a contact shadow that fades in once the build is done.
+    // Floor: a faint grid and a contact shadow, which grows with the parts.
     const floor = new Group();
     const grid = new GridHelper(extent * 6, 24, 0x2a3240, 0x1a2029);
     (grid.material as Material).transparent = true;
     (grid.material as Material).opacity = 0.6;
-    const shadow = new ShadowMaterial({ opacity: 0, transparent: true });
+    const shadow = new ShadowMaterial({ opacity: 0.18, transparent: true });
     const plane = new Mesh(new PlaneGeometry(extent * 8, extent * 8), shadow);
     plane.rotation.x = -Math.PI / 2;
     plane.receiveShadow = true;
@@ -650,10 +733,11 @@ async function show(slug: string) {
       `paint bake   ${bake.toFixed(0)} ms`,
       `calls        ${visualCalls} that added parts or joints${options().timing === "staged" ? `, played in ${waves} waves` : ""}`,
       `mirrored     ${recording.calls.filter((c) => c.twin).length} pairs built both sides at once`,
+      `posed        ${posing?.calls.length ?? 0} calls swing joints into place`,
       `parts        ${pieces.size} meshes · ${Math.round(triangles).toLocaleString()} triangles`,
     ].join("\n");
 
-    current = { slug, recording, pieces, skeleton: bones, floor, shadow, extent, plan: p, time: 0 };
+    current = { slug, recording, pieces, skeleton: bones, poser: posing, floor, extent, plan: p, time: 0 };
     replay();
   } catch (error) {
     if (ticket !== loading) return;
@@ -695,7 +779,7 @@ function logLine(beat: Beat) {
   const detail = names.slice(0, 3).join(", ") + (names.length > 3 ? ` +${names.length - 3}` : "");
   const ms = beat.ms;
   const count = (beat.count > 1 ? ` ×${beat.count}` : "") + (beat.pairs ? " ⇄" : "");
-  line.className = call.objects.length ? "" : call.joints.length ? "joint" : "quiet";
+  line.className = call.objects.length ? "" : call.joints.length || call.moves.length ? "joint" : "quiet";
   line.innerHTML = `<i>${call.t0.toFixed(0).padStart(5)} ms</i> <b>${call.label}${count}</b> ${detail}${ms >= 1 ? ` <i>(${ms.toFixed(ms < 10 ? 1 : 0)} ms)</i>` : ""}`;
   log.append(line);
   while (log.childElementCount > 40) log.firstElementChild!.remove();
@@ -711,7 +795,7 @@ function apply(model: Current, time: number) {
       !beat.logged &&
       !beat.silent &&
       time >= beat.start &&
-      (beat.call.objects.length || beat.call.joints.length || beat.ms >= 2)
+      (beat.call.objects.length || beat.call.joints.length || beat.call.moves.length || beat.ms >= 2)
     ) {
       beat.logged = true;
       logLine(beat);
@@ -726,13 +810,18 @@ function apply(model: Current, time: number) {
       piece.object.scale.copy(piece.scale).multiplyScalar(k >= 1 ? 1 : pop);
     }
   }
+  // Posed joints stand where the build had them until their pose plays, then swing into it.
+  model.poser?.apply((call) => {
+    const move = p.moves.get(call);
+    return move ? ease(Math.min(Math.max((time - move.start) / move.dur, 0), 1)) : 1;
+  });
+  if (model.poser) model.skeleton.follow();
   const bones = model.skeleton.uniforms;
   bones.uTime.value = time;
   bones.uFade.value = 1 - Math.min(Math.max((time - p.geometryEnd * 0.85) / 0.8, 0), 1);
   bones.uPx.value =
     model.skeleton.size * (renderer.domElement.height / (2 * Math.tan(((camera.fov / 2) * Math.PI) / 180)));
   model.skeleton.group.visible = bones.uFade.value > 0;
-  model.shadow.opacity = 0.18 * Math.min(Math.max((time - p.end + 0.2) / 0.6, 0), 1);
   bar.style.width = `${Math.min(time / p.end, 1) * 100}%`;
 }
 

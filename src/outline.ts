@@ -355,7 +355,7 @@ export function extrude(ctx: Ctx, points: OutlineInput, options: ExtrudeOptions)
     () => weights,
     false,
     { name: options.name, kind: "extrude", group: options.group },
-    { surface: local.flatMap((value, i) => (i % 3 === 2 ? [] : [value])) },
+    { surface: local.flatMap((value, i) => (i % 3 === 2 ? [] : [value])), growth: outward(local, 0, 1) },
   );
   return new Part(mesh, at, quat, weights, [0, 0, 1]);
 }
@@ -426,7 +426,24 @@ export function lathe(ctx: Ctx, authored: OutlineInput, options: LatheOptions) {
     () => weights,
     smooth,
     { name: options.name, kind: "lathe", group: options.group },
-    { surface, wrap: true },
+    { surface, wrap: true, growth: outward(local, 1) },
   );
   return new Part(mesh, at, quat, weights, [0, 1, 0]);
+}
+
+/**
+ * Growth coordinates for `local` xyz triples: the distance from the origin in the plane of axes `a` and `b`, or the
+ * height along axis `a` from its lowest point without `b`; scaled to 0..1.
+ */
+function outward(local: number[], a: number, b?: number) {
+  const count = local.length / 3;
+  const out = new Float32Array(count);
+  let low = Infinity;
+  if (b === undefined) for (let i = 0; i < count; i++) low = Math.min(low, local[i * 3 + a]);
+  for (let i = 0; i < count; i++)
+    out[i] = b === undefined ? local[i * 3 + a] - low : Math.hypot(local[i * 3 + a], local[i * 3 + b]);
+  let high = 0;
+  for (const value of out) high = Math.max(high, value);
+  if (high > 0) for (let i = 0; i < count; i++) out[i] /= high;
+  return out;
 }
