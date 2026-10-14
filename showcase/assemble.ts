@@ -548,6 +548,9 @@ async function show(slug: string) {
   if (current) dispose(current);
   current = null;
   log.replaceChildren();
+  titleName.textContent = "";
+  titleBy.textContent = "";
+  stats.textContent = "";
   busy.className = "";
   busy.textContent = "building…";
   try {

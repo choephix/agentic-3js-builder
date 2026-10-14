@@ -346,6 +346,7 @@ function step(model: Model, now: number) {
 function clear() {
   session++;
   stage.clear();
+  stats.textContent = "";
   for (const model of models)
     model.recording.root.traverse((node) => {
       const mesh = node as Mesh;
@@ -387,7 +388,9 @@ async function showSingle(slug: string) {
   for (const a of document.querySelectorAll("#list a"))
     a.classList.toggle("on", (a as HTMLElement).dataset.slug === slug);
   frame(1, 1);
-  await new Promise(requestAnimationFrame);
+  // Two frames, so "building…" and the spinner are on screen before the synchronous build holds this thread.
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  if (ticket !== session) return;
   const model = await load(slug, new Vector3());
   if (ticket !== session) return;
   models = [model];
