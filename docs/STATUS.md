@@ -2,6 +2,10 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Paint noise, 2026-10-14
+
+Noise is about 71% of paint time (a CPU profile of all 43 assemble models: 933 million hash evaluations over 20 million `paint.at` calls). `perlin()` in `src/paint.ts` evaluated four of its eight corner gradients twice; it now evaluates each once. The 27 painted sheets among the 43 are byte-identical to before (hashed under Node). Paint got 1.16× faster in the browser (20.5 s to 17.7 s summed over the 43) and 1.10× under Node. Squaring cellular distances was byte-identical too but not faster.
+
 ## Builds in a Web Worker, 2026-10-14
 
 `src/worker.ts` (optional, not in `src/index.ts`) runs unchanged `build()` functions in a pool of module Web Workers: `serveBuilds` in the worker, `createBuildPool({ spawn })` on the page. `src/transfer.ts` packs a model into plain data with its geometry and texture buffers transferred and unpacks it on the page. `src/texture.ts` split the drawing out of `svg()`: `drawSvg` decodes on the page and `svgPixels` draws, reads back and dilates, in a page or a worker. README "Building in a Web Worker" is the how-to; DESIGN "Builds off the main thread" has the reasons.

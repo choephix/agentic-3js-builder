@@ -158,10 +158,14 @@ function perlin(x: number, y: number, z: number, seed: number) {
   const v = fade(fy);
   const w = fade(fz);
   const g = (i: number, j: number, k: number) => grad(hash(X + i, Y + j, Z + k, seed), fx - i, fy - j, fz - k);
-  const x00 = g(0, 0, 0) + u * (g(1, 0, 0) - g(0, 0, 0));
-  const x10 = g(0, 1, 0) + u * (g(1, 1, 0) - g(0, 1, 0));
-  const x01 = g(0, 0, 1) + u * (g(1, 0, 1) - g(0, 0, 1));
-  const x11 = g(0, 1, 1) + u * (g(1, 1, 1) - g(0, 1, 1));
+  const g000 = g(0, 0, 0);
+  const g010 = g(0, 1, 0);
+  const g001 = g(0, 0, 1);
+  const g011 = g(0, 1, 1);
+  const x00 = g000 + u * (g(1, 0, 0) - g000);
+  const x10 = g010 + u * (g(1, 1, 0) - g010);
+  const x01 = g001 + u * (g(1, 0, 1) - g001);
+  const x11 = g011 + u * (g(1, 1, 1) - g011);
   const y0 = x00 + v * (x10 - x00);
   const y1 = x01 + v * (x11 - x01);
   return y0 + w * (y1 - y0);
