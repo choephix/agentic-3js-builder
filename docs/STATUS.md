@@ -16,7 +16,11 @@ The showcase's `/storage` page compares current raw `samples/*.ts` files with on
 
 The measured library contains 186 matched models: 4,391,048 bytes of source versus 299,917,120 bytes of GLBs, a 295,526,072-byte difference (98.54% smaller). The page calculates totals from each build's measurements rather than pinning these numbers. It includes search, column sorting, source/sample links and a complete exact-byte CSV with source/export timestamps. Desktop and 390 px mobile layouts, mammoth filtering, sorting, CSV contents and a failed-data response were exercised in Chromium.
 
-The method explicitly compares existing exports with current source (versions may differ), excludes shared SDK/style-kit overhead, and distinguishes raw files from compressed transfer and runtime memory. Both representations are still hosted; the study claims potential representation savings, not freed hosting space.
+The method explicitly compares existing exports with current source (versions may differ), excludes shared SDK/style-kit overhead, and distinguishes raw files from compressed transfer and runtime memory. GLB sizes are measured locally; production publishes the code and measurements, not those binaries. The study is a representation comparison, not a measured bandwidth or billing reduction.
+
+## Production assets, 2026-10-14
+
+The static-build hook now publishes model code, build metadata and thumbnails. GLB exports and the entire harness render archive remain local; production snapshot indexes contain no historical tags or downloads, and the UI explains their local-only availability. Development still serves the local renders and exports. The packaging-hook smoke verified empty production snapshot indexes, no GLB/render files, and no lab GLB, rig or archived-image URLs. The changed viewer files passed targeted typecheck.
 
 ## Origin
 
