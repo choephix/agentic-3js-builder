@@ -2,6 +2,24 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Building in a worker (spike), 2026-10-14
+
+A throwaway page (`scratch/worker-build/`, gitignored) runs a sample's unchanged `build()` in a module Web Worker, packs the result (nodes, geometries, materials and textures as plain data; geometry and texture buffers transferred, not copied), unpacks it on the main thread and draws the `svg()` textures there (in a worker `svg()` takes its Node path: markup kept, pixels blank). It compares each worker build W with a main-thread build A, and A with a second main build B as the control: every node, transform, geometry buffer hash, material and texture property, plus a pixel diff.
+
+On RTX 3060 (20 logical cores), all 14 hard samples (the heaviest bakes, griffin, the most `svg()` textures, every kit) came out structurally identical to A, with 0–0.02% of pixels differing. Worker build time matched main (jadeSerpent 3078 vs 3142 ms). Packing took 1–4.5 ms, unpacking 1.5–12 ms on the main thread, and transfers ran 1–25 MB per model (mostly the 2048² paint sheet). Building all 14: the main thread took 13.8 s with a 3050 ms worst frame; 1 worker 15.1 s, 2 workers 8.3 s, 4 workers 4.4–4.7 s, 8 workers 3.5 s, worst frame 180–330 ms.
+
+What broke or needed handling:
+
+- Parameterised geometries (`CircleGeometry` and others) arrive as `BufferGeometry` unless `type`, `parameters` and `_transformed` are carried. The spike packs own properties generically.
+- Module-level state makes a build depend on what that module built before. treehouseDiorama keeps `const sr = rng(11)` at module scope, so its second build in one module instance draws different SVG markup (5.5% of pixels): a reused worker returns something other than a fresh one. paperDragonKite and rainyBusStopDiorama keep a module-level `rng` too. The main thread has the same problem on a rebuild.
+- The SVG drawing stays on the main thread. Its synchronous part (draw, readback, 8-pass dilate) reached 278 ms for stainedGlassMoth (dilate 174 ms, readback 88 ms) and 153 ms for treehouseDiorama; the worst frames during parallel runs line up with these. The dilate is plain typed-array work a worker could do. Not tried.
+- Invalid SVG that only the browser parser catches fails at the call on the main thread, but only at unpack for a worker build.
+- Code that uses `document` throws `ReferenceError` in the worker. SDK errors keep their message and a stack with the sample's function names and lines, but arrive as plain objects.
+- Closures in `userData` are dropped and class instances (a `Vector3`) arrive as plain objects. No sample assigns `userData` today.
+- An endless build is terminated after a timeout and the pool replaces the worker; the page stays responsive.
+- The worker bundle carries its own copy of three and the SDK (630 KB unminified, 131 KB gzipped) and its own sample chunks.
+- Not tried: Vite dev mode and hot reload in workers, Firefox, Safari, phones, peak memory.
+
 ## Sample names without importing every sample, 2026-10-14
 
 After the open sample was in, the showcase imported every sample module just to read `meta.name` for the list: on the public site that was 165 extra JS requests (1.71 MB decoded) after opening redFox. The Vite plugin now serves `/__sample-names`, read from each sample's `export const meta = { name: "…" }` literal (written as a static file in the build), and the list shows names from its first paint. A sample module is imported only when it is opened or its thumbnail is redrawn. A sample's tile turns red once a run of it throws, no longer because an unopened sample failed to import.
