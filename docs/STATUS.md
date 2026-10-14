@@ -2,23 +2,19 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
-## Building in a worker (spike), 2026-10-14
+## Builds in a Web Worker, 2026-10-14
 
-A throwaway page (`scratch/worker-build/`, gitignored) runs a sample's unchanged `build()` in a module Web Worker, packs the result (nodes, geometries, materials and textures as plain data; geometry and texture buffers transferred, not copied), unpacks it on the main thread and draws the `svg()` textures there (in a worker `svg()` takes its Node path: markup kept, pixels blank). It compares each worker build W with a main-thread build A, and A with a second main build B as the control: every node, transform, geometry buffer hash, material and texture property, plus a pixel diff.
+`src/worker.ts` (optional, not in `src/index.ts`) runs unchanged `build()` functions in a pool of module Web Workers: `serveBuilds` in the worker, `createBuildPool({ spawn })` on the page. `src/transfer.ts` packs a model into plain data with its geometry and texture buffers transferred and unpacks it on the page. `src/texture.ts` split the drawing out of `svg()`: `drawSvg` decodes on the page and `svgPixels` draws, reads back and dilates, in a page or a worker. README "Building in a Web Worker" is the how-to; DESIGN "Builds off the main thread" has the reasons.
 
-On RTX 3060 (20 logical cores), all 14 hard samples (the heaviest bakes, griffin, the most `svg()` textures, every kit) came out structurally identical to A, with 0–0.02% of pixels differing. Worker build time matched main (jadeSerpent 3078 vs 3142 ms). Packing took 1–4.5 ms, unpacking 1.5–12 ms on the main thread, and transfers ran 1–25 MB per model (mostly the 2048² paint sheet). Building all 14: the main thread took 13.8 s with a 3050 ms worst frame; 1 worker 15.1 s, 2 workers 8.3 s, 4 workers 4.4–4.7 s, 8 workers 3.5 s, worst frame 180–330 ms.
+A throwaway page (`scratch/worker-build/`, gitignored; its build is written to `~/tmp/public/nilo/agentic-3js-builder/worker-build/`) builds each sample twice on the main thread (A, and B as the control) and once through the pool (W), and compares them property by property and as pixels. On RTX 3060 (20 logical cores):
 
-What broke or needed handling:
-
-- Parameterised geometries (`CircleGeometry` and others) arrive as `BufferGeometry` unless `type`, `parameters` and `_transformed` are carried. The spike packs own properties generically.
-- Module-level state makes a build depend on what that module built before. treehouseDiorama keeps `const sr = rng(11)` at module scope, so its second build in one module instance draws different SVG markup (5.5% of pixels): a reused worker returns something other than a fresh one. paperDragonKite and rainyBusStopDiorama keep a module-level `rng` too. The main thread has the same problem on a rebuild.
-- The SVG drawing stays on the main thread. Its synchronous part (draw, readback, 8-pass dilate) reached 278 ms for stainedGlassMoth (dilate 174 ms, readback 88 ms) and 153 ms for treehouseDiorama; the worst frames during parallel runs line up with these. The dilate is plain typed-array work a worker could do. Not tried.
-- Invalid SVG that only the browser parser catches fails at the call on the main thread, but only at unpack for a worker build.
-- Code that uses `document` throws `ReferenceError` in the worker. SDK errors keep their message and a stack with the sample's function names and lines, but arrive as plain objects.
-- Closures in `userData` are dropped and class instances (a `Vector3`) arrive as plain objects. No sample assigns `userData` today.
-- An endless build is terminated after a timeout and the pool replaces the worker; the page stays responsive.
-- The worker bundle carries its own copy of three and the SDK (630 KB unminified, 131 KB gzipped) and its own sample chunks.
-- Not tried: Vite dev mode and hot reload in workers, Firefox, Safari, phones, peak memory.
+- All 14 hard samples (the heaviest bakes, griffin, the most `svg()` textures, every kit) came out identical to A, with 0 to 0.02% of pixels differing. Unpacking took 1.7 to 11 ms on the main thread.
+- Building all 14: 14 to 15 s on the main thread with frames up to 3.1 s apart; a pool of 4 took 4.4 to 5.3 s with frames 33 to 67 ms apart, a pool of 8 3.9 to 4.9 s with a few frames up to 117 ms. Before the SVG drawing moved to a worker, the pool of 4 still had 200 ms frames.
+- The main-thread `svg()` output is byte-identical to before the split over 146 drawings in 8 samples.
+- Seven trap builds: an SDK error keeps its message and stack; invalid SVG that only the browser parser catches throws from `pool.build` instead of the `svg()` call; code that touches `document` throws `ReferenceError` in the worker; closures in `userData` are dropped and a `Vector3` there arrives as a plain object (both counted in `losses`); `Math.random` differs per build as it does on the main thread; an endless build is stopped at the timeout and its worker replaced.
+- Built twice in one Node process, 2 of 186 samples differed the second time. treehouseDiorama drew its meadow from a module-level generator during `build()`; it now draws it at load. rainyBusStopDiorama created its generator outside `build()`; it now creates it inside. Both first builds are unchanged. GUIDE says `build()` creates every generator it draws from.
+- The worker bundle carries its own copy of three and the SDK (131 KB gzipped in the spike's unminified build).
+- Not tried: Vite dev mode and hot reload in workers, Firefox, Safari, phones, peak memory. Nothing in the showcase uses the pool yet.
 
 ## Sample names without importing every sample, 2026-10-14
 
