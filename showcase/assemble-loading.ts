@@ -4,7 +4,6 @@
 // World builds every model first, with nothing animating meanwhile, then lets them all arrive in a shuffled order.
 // The model and settings live in the URL hash, so a link opens the same view.
 import {
-  Box3,
   BufferAttribute,
   Color,
   DirectionalLight,
@@ -22,7 +21,19 @@ import {
 } from "three";
 import type { Material, Mesh, Object3D, Texture } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { growth, hashOf, modules, MODELS, pairMirrors, readHash, record } from "./assemble-shared";
+import {
+  growth,
+  hashOf,
+  measure,
+  modules,
+  MODELS,
+  pairMirrors,
+  popScale,
+  readHash,
+  record,
+  schedule,
+  SPAWN,
+} from "./assemble-shared";
 import type { Recording, SampleModule } from "./assemble-shared";
 
 // ── Styles and timing ─────────────────────────────────────────────────────────────────────────────────────────────
@@ -31,8 +42,6 @@ import type { Recording, SampleModule } from "./assemble-shared";
  * scales parts in with a small overshoot; print sweeps one cut plane up through the model. */
 const STYLES = ["rise", "ghost", "pop", "print"] as const;
 type Style = (typeof STYLES)[number];
-/** Share of the cap in which parts start; each part then grows for the rest. */
-const SPAWN = 0.65;
 
 const global = { uStyle: { value: 0 }, uGhost: { value: new Color("#5d7a9c") } };
 
@@ -133,30 +142,6 @@ function animate(original: Material, piece: Piece, model: Model): Material | nul
   return material;
 }
 
-/**
- * When each part starts, as a share of the cap: units (a call, or a call and its mirror image) in build order, each
- * given a slice of the spawn window in proportion to its size, so the big parts set the pace and runs of small ones
- * land almost together.
- */
-function schedule(recording: Recording, byObject: Map<Object3D, Piece>, extent: number) {
-  const units = recording.calls
-    .filter((call) => call.objects.length && !call.twinOf)
-    .map((call) => (call.twin ? [call, call.twin] : [call]));
-  const weights = units.map((unit) =>
-    Math.max(0.002, ...unit[0].objects.map((o) => (byObject.get(o)?.size ?? 0) / extent)),
-  );
-  const total = weights.reduce((s, w) => s + w, 0);
-  let before = 0;
-  units.forEach((unit, i) => {
-    for (const call of unit)
-      for (const object of call.objects) {
-        const piece = byObject.get(object);
-        if (piece) piece.start = (SPAWN * before) / total;
-      }
-    before += weights[i];
-  });
-}
-
 // ── The page ──────────────────────────────────────────────────────────────────────────────────────────────────────
 
 const host = document.getElementById("view")!;
@@ -218,10 +203,7 @@ async function load(slug: string, place: Vector3): Promise<Model> {
   });
   await Promise.allSettled([...textures].map((t) => t.userData.ready).filter(Boolean));
 
-  recording.root.updateMatrixWorld(true);
-  const bounds = new Box3().setFromObject(recording.root);
-  const size = bounds.getSize(new Vector3());
-  const extent = Math.max(size.x, size.y, size.z, 0.05);
+  const { bounds, size, extent, pieces: measured } = measure(recording);
   const model: Model = {
     slug,
     name: MODELS.find(([, s]) => s === slug)?.[0] ?? module.meta?.name ?? slug,
@@ -238,34 +220,32 @@ async function load(slug: string, place: Vector3): Promise<Model> {
   };
   const cards = new Set(recording.calls.filter((c) => c.label === "cards").flatMap((c) => c.objects));
   const byObject = new Map<Object3D, Piece>();
-  for (const call of recording.calls)
-    for (const object of call.objects) {
-      const mesh = object as Mesh;
-      if (!mesh.geometry || byObject.has(mesh)) continue;
-      if (!mesh.geometry.boundingSphere) mesh.geometry.computeBoundingSphere();
-      const piece: Piece = {
-        mesh,
-        original: mesh.material,
-        animated: null,
-        k: { value: 0 },
-        scale: mesh.scale.clone(),
-        size: mesh.geometry.boundingSphere!.radius * mesh.matrixWorld.getMaxScaleOnAxis(),
-        center: mesh.geometry.boundingSphere!.center.clone().applyMatrix4(mesh.matrixWorld),
-        start: 0,
-      };
-      if (mesh.isMesh) {
-        mesh.geometry.setAttribute("aGrow", new BufferAttribute(growth(mesh.geometry, cards.has(mesh)), 1));
-        const list = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map(
-          (m) => animate(m, piece, model) ?? m,
-        );
-        piece.animated = Array.isArray(mesh.material) ? list : list[0];
-      }
-      byObject.set(mesh, piece);
-      model.pieces.push(piece);
+  for (const [object, { size: radius, center }] of measured) {
+    const mesh = object as Mesh;
+    const piece: Piece = {
+      mesh,
+      original: mesh.material,
+      animated: null,
+      k: { value: 0 },
+      scale: mesh.scale.clone(),
+      size: radius,
+      center,
+      start: 0,
+    };
+    if (mesh.isMesh) {
+      mesh.geometry.setAttribute("aGrow", new BufferAttribute(growth(mesh.geometry, cards.has(mesh)), 1));
+      const list = (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).map(
+        (m) => animate(m, piece, model) ?? m,
+      );
+      piece.animated = Array.isArray(mesh.material) ? list : list[0];
     }
+    byObject.set(mesh, piece);
+    model.pieces.push(piece);
+  }
   pairMirrors(recording.calls, byObject, extent);
   model.pairs = recording.calls.filter((c) => c.twin).length;
-  schedule(recording, byObject, extent);
+  for (const [object, start] of schedule(recording, new Map([...byObject].map(([o, p]) => [o, p.size])), extent))
+    byObject.get(object)!.start = start;
 
   // Fit into a 1 m cell standing on the floor.
   const scale = 0.85 / extent;
@@ -298,7 +278,6 @@ function finish(model: Model) {
 }
 
 const easeOut = (k: number) => 1 - Math.pow(1 - k, 3);
-const easeBack = (k: number) => 1 + 2.70158 * Math.pow(k - 1, 3) + 1.70158 * Math.pow(k - 1, 2);
 
 /** Smoke-script override: every unfinished model is drawn at this many seconds into its assembly. */
 let held: number | null = null;
@@ -318,9 +297,10 @@ function step(model: Model, now: number) {
         piece.animated !== null || piece.center.y * model.holder.scale.y + model.holder.position.y < model.front.value;
       piece.mesh.scale.copy(piece.scale);
     } else if (style === "pop") {
+      const scale = popScale(piece.start, t, cap);
       piece.k.value = 1;
-      piece.mesh.visible = k > 0;
-      piece.mesh.scale.copy(piece.scale).multiplyScalar(Math.max(easeBack(k), 0.001));
+      piece.mesh.visible = scale > 0;
+      piece.mesh.scale.copy(piece.scale).multiplyScalar(Math.max(scale, 0.001));
     } else {
       piece.k.value = easeOut(k);
       piece.mesh.visible = style === "ghost" || k > 0;

@@ -2,6 +2,12 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Showcase: samples pop in, 2026-10-14
+
+Opening a different sample no longer covers the stage with its thumbnail. The stage clears to a small centred spinner (the loading chip drops its own meanwhile) while the sample imports and builds; once its textures are in, its parts pop in within 1.2 s, in build order with mirrored pairs together: `/assemble-loading`'s pop style at its default cap. A reload of the same sample after an edit swaps in as before. `main.ts` records the build with `record()` from `assemble-shared.ts` and hands `Viewer.show` an `Arrival` (each part's scale over time); the schedule and the pop curve (`measure`, `schedule`, `popStarts`, `popScale`) moved into `assemble-shared.ts`, and `/assemble-loading` uses them unchanged. Skinned parts switch to a detached bind while they scale (an attached one cancels the mesh's own scale) and back at the end.
+
+Checked in the RTX 3060 Chrome: clayWalrus and redFox show the spinner on an empty stage while importing, then pop in; on redFox all 28 skinned parts measured exactly half size at scale 0.5, then attached and the same as a plain show; no page errors. Recording adds 2 to 33 ms to a build (griffin 50 → 62 ms, clockworkAutomaton 542 → 575 ms), which the Info panel's build time now includes for a fresh open.
+
 ## Bake lab: painting without freezing the page, 2026-10-14
 
 A throwaway page (`showcase/bake-lab.html`, removed; it is in commit `7d724f5`) built a set of samples one per frame and painted them three ways: sync (the bake runs inside `default()`, as now), sliced (a copy of `bakeSheet` as a generator, run in 10 ms steps between frames) and workers (a pool imports each sample again, builds it and posts back the sheet; the page packs the same layout itself). It patched `Ctx.prototype.bake` to defer; no `src/` file changed. Optionally a 1/4-resolution sheet of the same layout showed first. Paints are the samples' own closures, so a worker has to run the sample; `svg()` already returns a blank texture there.

@@ -1,6 +1,6 @@
-// Shared by the assemble pages (assemble.ts, assemble-loading.ts): the model list, the build recorder, per-vertex
-// growth coordinates and mirrored-pair detection.
-import { Object3D, Vector3 } from "three";
+// Shared by the assemble pages (assemble.ts, assemble-loading.ts) and the sample viewer's arrival: the model list,
+// the build recorder, per-vertex growth coordinates, mirrored-pair detection and the pop-in schedule.
+import { Box3, Object3D, Vector3 } from "three";
 import type { BufferGeometry, LineSegments, Mesh, Points } from "three";
 import { Builder } from "../src/builder";
 import { Ctx } from "../src/context";
@@ -346,4 +346,65 @@ export function pairMirrors(calls: Call[], pieces: Map<Object3D, { size: number;
       }
     }
   }
+}
+
+// ── Popping in ────────────────────────────────────────────────────────────────────────────────────────────────────
+
+/** Share of the cap in which parts start; each part then grows for the rest. */
+export const SPAWN = 0.65;
+
+/** Every part a recording kept, with its world bounding-sphere centre and radius, and the model's bounds. */
+export function measure(recording: Recording) {
+  recording.root.updateMatrixWorld(true);
+  const bounds = new Box3().setFromObject(recording.root);
+  const size = bounds.getSize(new Vector3());
+  const extent = Math.max(size.x, size.y, size.z, 0.05);
+  const pieces = new Map<Object3D, { size: number; center: Vector3 }>();
+  for (const call of recording.calls)
+    for (const object of call.objects) {
+      const mesh = object as Mesh;
+      if (!mesh.geometry || pieces.has(mesh)) continue;
+      if (!mesh.geometry.boundingSphere) mesh.geometry.computeBoundingSphere();
+      pieces.set(mesh, {
+        size: mesh.geometry.boundingSphere!.radius * mesh.matrixWorld.getMaxScaleOnAxis(),
+        center: mesh.geometry.boundingSphere!.center.clone().applyMatrix4(mesh.matrixWorld),
+      });
+    }
+  return { bounds, size, extent, pieces };
+}
+
+/**
+ * When each part starts, as a share of the cap: units (a call, or a call and its mirror image) in build order, each
+ * given a slice of the spawn window in proportion to its size, so the big parts set the pace and runs of small ones
+ * land almost together. `sizes` holds each part's world bounding-sphere radius.
+ */
+export function schedule(recording: Recording, sizes: Map<Object3D, number>, extent: number) {
+  const starts = new Map<Object3D, number>();
+  const units = recording.calls
+    .filter((call) => call.objects.length && !call.twinOf)
+    .map((call) => (call.twin ? [call, call.twin] : [call]));
+  const weights = units.map((unit) => Math.max(0.002, ...unit[0].objects.map((o) => (sizes.get(o) ?? 0) / extent)));
+  const total = weights.reduce((s, w) => s + w, 0);
+  let before = 0;
+  units.forEach((unit, i) => {
+    for (const call of unit)
+      for (const object of call.objects) if (sizes.has(object)) starts.set(object, (SPAWN * before) / total);
+    before += weights[i];
+  });
+  return starts;
+}
+
+/** Each part's start for a pop-in of a recorded build, as a share of the cap, with mirrored pairs arriving together. */
+export function popStarts(recording: Recording) {
+  const { extent, pieces } = measure(recording);
+  pairMirrors(recording.calls, pieces, extent);
+  return schedule(recording, new Map([...pieces].map(([object, piece]) => [object, piece.size])), extent);
+}
+
+const easeBack = (k: number) => 1 + 2.70158 * Math.pow(k - 1, 3) + 1.70158 * Math.pow(k - 1, 2);
+
+/** A popping part's scale `t` seconds into a `cap`-second assembly: 0 until its start, then up past 1 and back. */
+export function popScale(start: number, t: number, cap: number) {
+  const k = Math.min(Math.max((t - start * cap) / (cap * (1 - SPAWN)), 0), 1);
+  return k > 0 ? Math.max(easeBack(k), 0.001) : 0;
 }

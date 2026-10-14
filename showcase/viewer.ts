@@ -3,11 +3,13 @@
 // paint for one bone, a skeleton x-ray, and the bend test. For the bend test every smooth-skinned part becomes a
 // `SkinnedMesh` over its `userData.skinBones`, so it deforms through its own weights; rigid parts ride their joint.
 import {
+  AttachedBindMode,
   Box3,
   BufferAttribute,
   BufferGeometry,
   Color,
   CylinderGeometry,
+  DetachedBindMode,
   DirectionalLight,
   Euler,
   Float32BufferAttribute,
@@ -88,6 +90,8 @@ export type Hit =
 export type Display = { mode: ColorMode; skeleton: boolean; wire: boolean; focus: Focus | null };
 /** Where the orbit camera sits and looks, for keeping several viewers in step. */
 export type CameraView = { position: [number, number, number]; target: [number, number, number] };
+/** How a freshly shown sample arrives: each part's scale `seconds` into the arrival (0 hides it), for `duration` s. */
+export type Arrival = { scale: (part: number, seconds: number) => number; duration: number };
 
 /** Deterministic PRNG in [0, 1) (mulberry32), the same as harness/page.ts uses for its flex poses. */
 function rng(seed: number) {
@@ -154,6 +158,8 @@ export class Viewer {
   private dirty = true;
   /** Settles once the shown sample's SVG textures have drawn. */
   private textures: Promise<unknown> = Promise.resolve();
+  /** The arrival under way: when it started (null until the textures are in) and each view's own scale. */
+  private arrival: (Arrival & { at: number | null; rest: Vector3[] }) | null = null;
   /** The camera is still where `frame()` put it, so a resize re-frames instead of cropping. */
   private framed = true;
   private pointer: { x: number; y: number } | null = null;
@@ -296,6 +302,7 @@ export class Viewer {
       this.setHoveredJoint(hit?.kind === "joint" ? hit.joint.name : null);
       this.onHover(hit, this.pointer.x, this.pointer.y);
     }
+    if (this.arrival?.at != null) this.arrive((time - this.arrival.at) / 1000);
     if (!this.dirty) return;
     this.dirty = false;
     if (this.overlay.visible) this.updateOverlay();
@@ -304,9 +311,10 @@ export class Viewer {
 
   /**
    * Show a built sample (or nothing). `keepCamera` keeps the orbit when the same sample reloads after an edit.
-   * Pose and display settings carry over.
+   * Pose and display settings carry over. With `arrival`, the parts stay hidden until the textures are in, then
+   * scale in as it says.
    */
-  show(root: Object3D | null, info: Inspection | null, keepCamera = false) {
+  show(root: Object3D | null, info: Inspection | null, keepCamera = false, arrival: Arrival | null = null) {
     this.clear();
     this.root = root;
     this.info = info;
@@ -337,9 +345,33 @@ export class Viewer {
           .map((material) => (material as MeshStandardMaterial).map?.userData.ready as Promise<unknown> | undefined)
           .filter(Boolean) as Array<Promise<unknown>>,
     );
+    if (arrival) {
+      this.arrival = { ...arrival, at: null, rest: this.views.map((view) => view.mesh.scale.clone()) };
+      for (const view of this.views) {
+        view.mesh.visible = false;
+        // An attached skin cancels its mesh's own scale; a detached one keeps its bind and follows it.
+        if ((view.mesh as SkinnedMesh).isSkinnedMesh) (view.mesh as SkinnedMesh).bindMode = DetachedBindMode;
+      }
+    }
     this.textures = Promise.allSettled(pending).then(() => {
-      if (this.root === root) this.dirty = true;
+      if (this.root !== root) return;
+      this.dirty = true;
+      if (this.arrival) this.arrival.at = performance.now();
     });
+  }
+
+  /** Scale every part to where the arrival is `seconds` in; at its end, back to its own scale and bind. */
+  private arrive(seconds: number) {
+    const arrival = this.arrival!;
+    const done = seconds >= arrival.duration;
+    this.views.forEach((view, index) => {
+      const scale = done ? 1 : arrival.scale(view.part.index, seconds);
+      view.mesh.visible = scale > 0;
+      view.mesh.scale.copy(arrival.rest[index]).multiplyScalar(Math.max(scale, 0.001));
+      if (done && (view.mesh as SkinnedMesh).isSkinnedMesh) (view.mesh as SkinnedMesh).bindMode = AttachedBindMode;
+    });
+    if (done) this.arrival = null;
+    this.dirty = true;
   }
 
   /** Settles once the shown sample's SVG textures have drawn. */
@@ -437,6 +469,7 @@ export class Viewer {
       group.clear();
     }
     this.root = null;
+    this.arrival = null;
     this.views = [];
     this.joints = [];
     this.rest = [];

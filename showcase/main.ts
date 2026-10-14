@@ -1,5 +1,7 @@
 // The showcase page. One sample at a time in one viewer; everything else (data panels, legends, the bend bar) is a
 // key or a click away and lives in the URL: `#redFox?mode=bones&skeleton&bend=40&seed=11&panel=tree&focus=bone:neck1`.
+import type { Object3D } from "three";
+import { popScale, popStarts, record } from "./assemble-shared";
 import { buildSection, buildTip, buildsTable, builtBy, loadBuild, loadBuilds } from "./builds";
 import type { Build, BuildSummary } from "./builds";
 import * as catalog from "./catalog";
@@ -16,7 +18,7 @@ import type { TexturesView } from "./textures";
 import { Thumbs } from "./thumbs";
 import { roundSlugs } from "./rounds";
 import { FLEX_DEGREES, Viewer } from "./viewer";
-import type { ColorMode, Focus } from "./viewer";
+import type { Arrival, ColorMode, Focus } from "./viewer";
 
 type Panel = "info" | "tree" | "rig" | "code" | "versions" | "textures";
 const PANELS: Array<{ id: Panel; label: string; key: string }> = [
@@ -334,36 +336,8 @@ function showLoading(name: string | null) {
   if (name !== null) $("loading-name").textContent = name;
 }
 
-/**
- * Cover the stage with the opening sample's sidebar thumbnail while it builds. Settles once the picture can paint,
- * or after a short wait for one that isn't cached, so the blocking build never starts in front of an empty stage.
- */
-function showPlaceholder(url: string) {
-  const box = $("placeholder");
-  const image = $<HTMLImageElement>("placeholder-image");
-  // Stop a fade-out still running from the last sample.
-  for (const animation of box.getAnimations()) animation.cancel();
-  box.hidden = false;
-  image.src = url;
-  return Promise.race([image.decode().catch(() => undefined), new Promise((resolve) => setTimeout(resolve, 250))]);
-}
-
-/** Fade the placeholder out over the live view. */
-function hidePlaceholder() {
-  const box = $("placeholder");
-  if (box.hidden) return;
-  const fade = box.animate([{ opacity: getComputedStyle(box).opacity }, { opacity: 0 }], {
-    duration: 200,
-    fill: "forwards",
-  });
-  void fade.finished.then(
-    () => {
-      box.hidden = true;
-      fade.cancel();
-    },
-    () => undefined,
-  );
-}
+/** Seconds a newly opened sample takes to pop in, the loading page's default cap. */
+const ARRIVAL = 1.2;
 
 async function run(keepCamera: boolean) {
   const token = ++loading;
@@ -374,9 +348,10 @@ async function run(keepCamera: boolean) {
   const slug = state.slug;
   const entry = entries.find((item) => item.slug === slug);
   showLoading(entry?.name ?? slug);
-  // A different sample: show its picture at once instead of the previous sample during the import and build.
-  const thumb = loaded?.slug === slug ? null : thumbs.url(slug);
-  const painted = thumb ? showPlaceholder(thumb) : null;
+  // A different sample: clear the stage at once, with a small spinner, instead of the previous sample.
+  const fresh = loaded?.slug !== slug;
+  if (fresh) viewer.show(null, null);
+  $("stage-spinner").hidden = !fresh;
   // The clicked tile takes the selection now, not once the sample is in.
   renderList();
   const next: Loaded = {
@@ -395,7 +370,6 @@ async function run(keepCamera: boolean) {
     entry ? current.sources[entry.path]() : Promise.resolve(null),
     loadSnapshots(slug),
     loadBuild(slug),
-    painted,
   ]);
   if (token !== loading) return;
   // The build blocks the page, so let the indicator paint first (hidden tabs get no animation frames); its
@@ -411,16 +385,24 @@ async function run(keepCamera: boolean) {
   }
   if (build.status === "fulfilled") next.build = build.value;
   let root = null;
+  let starts: Map<Object3D, number> | null = null;
   if (module.status === "rejected") {
     next.error = module.reason;
     next.phase = "import";
   } else {
     next.meta = module.value.meta;
+    const make = () => {
+      const built = module.value.default();
+      if (!built?.isObject3D) throw new Error(`samples/${slug}.ts: the default export must return a THREE.Object3D.`);
+      return built;
+    };
     try {
       const started = performance.now();
-      root = module.value.default();
+      // A different sample pops in part by part in build order, so its builder calls are recorded.
+      const recording = fresh ? record(make, slug) : null;
+      root = recording?.root ?? make();
       next.ms = performance.now() - started;
-      if (!root?.isObject3D) throw new Error(`samples/${slug}.ts: the default export must return a THREE.Object3D.`);
+      if (recording) starts = popStarts(recording);
       next.info = inspect(root);
     } catch (reason) {
       root = null;
@@ -429,10 +411,15 @@ async function run(keepCamera: boolean) {
     }
   }
   if (entry) entry.failed = next.error !== null;
-  const sameSample = loaded?.slug === slug;
+  const sameSample = !fresh;
   loaded = next;
+  let arrival: Arrival | null = null;
+  if (starts && next.info) {
+    const at = next.info.parts.map((part) => starts.get(part.mesh) ?? 0);
+    arrival = { scale: (part, seconds) => popScale(at[part], seconds, ARRIVAL), duration: ARRIVAL };
+  }
   try {
-    viewer.show(root, next.info, keepCamera && sameSample);
+    viewer.show(root, next.info, keepCamera && sameSample, arrival);
   } catch (reason) {
     // A shape the viewer cannot stage is still this sample's problem to show, not the page's.
     viewer.show(null, null);
@@ -453,7 +440,7 @@ async function run(keepCamera: boolean) {
   await viewer.ready;
   if (token !== loading) return;
   showLoading(null);
-  hidePlaceholder();
+  $("stage-spinner").hidden = true;
 }
 
 // ── Viewer sync ──────────────────────────────────────────────────────────────────────────────────────────────────

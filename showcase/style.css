@@ -430,22 +430,18 @@ details.parts summary,
   height: 100%;
   outline: none;
 }
-/* The opening sample's sidebar thumbnail, over the previous sample while the new one imports and builds. It shows at
-   once, with no fade-in: the page paints it in the frame before the build blocks, and a fade that has yet to start
-   then could stay invisible for the whole build. It paints under the floating panels. */
-#placeholder {
+/* While a different sample imports and builds, the stage is empty but for a small spinner at its centre. It shows at
+   once, with no fade-in: a fade that has yet to start when the build blocks the page could stay invisible for the
+   whole build, while the spin itself (a transform) keeps running. The loading chip drops its own spinner meanwhile. */
+#stage-spinner {
   position: absolute;
   inset: 0;
   display: grid;
   place-items: center;
-  background: inherit;
   pointer-events: none;
 }
-#placeholder img {
-  height: 80%;
-  max-width: 80%;
-  aspect-ratio: 1;
-  object-fit: contain;
+#stage-spinner:not([hidden]) ~ #loading .spinner {
+  display: none;
 }
 .float {
   position: absolute;
@@ -494,7 +490,8 @@ details.parts summary,
   color: var(--fg);
   font-weight: 600;
 }
-#loading .spinner {
+#loading .spinner,
+#stage-spinner .spinner {
   width: 12px;
   height: 12px;
   border: 2px solid var(--accent-soft);
