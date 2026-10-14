@@ -2,6 +2,12 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Paint bake speed, 2026-10-14
+
+Once the scatter fix was in, the paint bake was 85–96% of the slowest builds, nearly all of it in the noise in `src/paint.ts`. Same arithmetic, less work: `perlin()` evaluates its 8 corner gradients once instead of 12 times through a closure; `grad()` reads three 16-entry tables instead of a 16-way `switch`; `cells()` keeps its nearest cell in plain numbers and measures with `Math.sqrt` instead of `Math.hypot`; and the texel loop in `bakeSheet()` (`src/bake.ts`) accumulates position and normal without a per-texel closure. The API and every sample are unchanged.
+
+Building all 186 samples in Chromium on RTX 3060 against the previous `paint.ts` and `bake.ts` matched every geometry attribute, index and paint-sheet byte. Total build time dropped from 77.1 s to 47.8 s and samples over one second from 21 to 6 (clayWalrus 4.3 → 1.5 s, jadeSerpent 3.2 → 1.2 s, ukiyoeOctopus 2.5 → 0.7 s, pixelMammoth 0.65 → 0.48 s). sprinterBlob stays at 1.4 s: its time is in the experimental `blob()` geometry, not paint. `npm run snap -- clayWalrus v04-noise-speedup` rendered with 0 errors and 0 warnings; `npm run typecheck -- src/paint.ts src/bake.ts` passed.
+
 ## Sample names without importing every sample, 2026-10-14
 
 After the open sample was in, the showcase imported every sample module just to read `meta.name` for the list: on the public site that was 165 extra JS requests (1.71 MB decoded) after opening redFox. The Vite plugin now serves `/__sample-names`, read from each sample's `export const meta = { name: "…" }` literal (written as a static file in the build), and the list shows names from its first paint. A sample module is imported only when it is opened or its thumbnail is redrawn. A sample's tile turns red once a run of it throws, no longer because an unopened sample failed to import.
