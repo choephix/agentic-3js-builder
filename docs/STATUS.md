@@ -2,6 +2,25 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Bake lab: painting without freezing the page, 2026-10-14
+
+`showcase/bake-lab.html` (local only) builds a set of samples one per frame and paints them three ways: sync (the bake runs inside `default()`, as now), sliced (a copy of `bakeSheet` as a generator, run in 10 ms steps between frames) and workers (a pool imports each sample again, builds it and posts back the sheet; the page packs the same layout itself). It patches `Ctx.prototype.bake` to defer; no `src/` file changes. Optionally a 1/4-resolution sheet of the same layout shows first. Paints are the samples' own closures, so a worker has to run the sample; `svg()` already returns a blank texture there.
+
+On RTX 3060 headless, 20 cores (one run each):
+
+| Set, mode                    | All geometry | All final paint | Longest frame | Frames > 100 ms | Identical |
+| ---------------------------- | -----------: | --------------: | ------------: | --------------: | --------: |
+| Heavy 6, sync                |     4,992 ms |        5,010 ms |      1,383 ms |               6 | reference |
+| Heavy 6, sliced              |       421 ms |        8,185 ms |        167 ms |               1 |       6/6 |
+| Heavy 6, workers ×6          |       530 ms |        2,219 ms |        183 ms |               2 |       6/6 |
+| Heavy 6, workers ×6, preview |       972 ms |        1,519 ms |        250 ms |               5 |       6/6 |
+| World 43, sync               |    12,690 ms |       12,786 ms |      1,033 ms |              34 | reference |
+| World 43, sliced             |     4,066 ms |       39,527 ms |        400 ms |              12 |     43/43 |
+| World 43, workers ×6         |     4,937 ms |        5,027 ms |        433 ms |              18 |     43/43 |
+| World 43, workers ×12        |     5,447 ms |        5,540 ms |        400 ms |              19 |     43/43 |
+
+Sliced keeps frames short but paints 1.5–3× slower than sync, because baking gets only what each frame leaves after drawing a growing scene. Workers finish 2.5× sooner than sync, every sheet byte-identical; with the 43, the main thread's own geometry builds (one per frame, ~100 ms each with the draw) set the finish, so 12 workers are no faster than 6. The remaining long frames are main-thread geometry (pixelMammoth, clockworkCarousel 150–230 ms) and first draws of new materials, not paint; texture uploads never were the slowest step. The 1/4 preview costs about 1/16 of a bake on the main thread (clayWalrus +100–180 ms) and looks close to the final sheet, where no preview shows white parts until the sheet lands.
+
 ## Blob distances without `Math.hypot`, 2026-10-14
 
 A line-level profile of `blob()` (sprinterBlob, lifeguardBlob; 5 builds each plus 3 CPU profiles) put 75% of their builds in `blob()`, half of that in the settle rounds, which call `fold()` 70 times per surface vertex. Inside `fold()`, distance functions take 73–74% and the ingredient bounds tests about 15%. Replaying each call's passing ingredients without any bounds test saved 66–73 ms per sample, an upper bound for an ingredient index, so there is none. The ellipsoid distance was 26–30% of blob time, mostly its two `Math.hypot` calls.
