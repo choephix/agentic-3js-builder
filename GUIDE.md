@@ -9,7 +9,7 @@ Read these in full before you write code: [`docs/api.md`](docs/api.md), the API;
 - One file, `samples/<slug>.ts`, with a lowerCamel slug. It is the only file you write.
 - It default-exports a function with no arguments that returns a `THREE.Object3D`, and exports `meta = { name, description }`.
 - It imports `three`, the SDK by relative path (`../src/builder`, `../src/path`, …) and any kit (`../kits/pixel`).
-- Randomness comes from `rng(seed)`, so every run builds the same model.
+- Randomness comes from `rng(seed)`, so every run builds the same model. `build()` creates every generator it draws from, so building twice gives the same model twice.
 
 ## The model
 

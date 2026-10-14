@@ -589,6 +589,10 @@ const BUNTING = [
   bunting("#e7dcc0", "#5d9d9b"),
 ];
 
+// Drawn when the module loads, after every drawing above: `sr` is shared module state, so drawing the meadow inside
+// build() gave each later build of this module a different meadow.
+const MEADOW = meadowTexture();
+
 // ---------------------------------------------------------------------------------------------------------------
 // Build
 // ---------------------------------------------------------------------------------------------------------------
@@ -651,7 +655,7 @@ export default function build() {
   const mound = b.part(moundGeo, GRASS, { bone: base, at: [0, 0, 0], flat: true, name: "mound" });
   const moundSurf = b.surface(mound);
   const gy = (x: number, z: number) => moundSurf.ray([x, 1, z], [0, -1, 0])?.at.y ?? PLINTH_H;
-  b.decal(moundSurf, meadowTexture(), {
+  b.decal(moundSurf, MEADOW, {
     at: [0, 0.3, 0],
     dir: [0, 1, 0],
     up: [0, 0, -1],

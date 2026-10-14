@@ -81,9 +81,8 @@ const TIMETABLE = pixelArt(
   { B: "#142838", W: "#dfe7d8", C: "#75b4ba", A: "#f2b04b" },
 );
 
-const rand = rng(481516);
-
 export default function build() {
+  const rand = rng(481516);
   const b = createBuilder({ name: "rainyBusStopDiorama", detail: 0.85, paintSize: 1024 });
   const root = b.joint("ground", { at: [0, 0, 0], role: "spine" });
   const part = (
