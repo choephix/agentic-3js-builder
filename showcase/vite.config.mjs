@@ -450,8 +450,19 @@ const bakeoffGuard = {
   },
 };
 
+// The dependency scan reads every module the pages' globs reach, and one unparseable bake-off build fails it, so
+// the dev server skips pre-bundling. The scan leaves bake-off builds out: their imports are three and src/, which
+// the samples already reach.
+const bakeoffScanSkip = {
+  name: "bakeoff-scan-skip",
+  resolveId(source) {
+    if (BAKEOFF_BUILD.test(source)) return { id: source, external: true };
+  },
+};
+
 export default defineConfig({
   server: { fs: { allow: [searchForWorkspaceRoot(process.cwd()), snapshotRoot] } },
+  optimizeDeps: { rolldownOptions: { plugins: [bakeoffScanSkip] } },
   // The sample viewer, experiment round, prompt bake-off, lab report, measured storage study and the two assembly
   // animations (showpiece and loading).
   build: {
