@@ -470,7 +470,5 @@ export default defineConfig({
       shimMissingExports: true,
     },
   },
-  // The loading page's build worker imports samples on demand, which needs ES module output.
-  worker: { format: "es" },
   plugins: [bakeoffGuard, showcaseData],
 });

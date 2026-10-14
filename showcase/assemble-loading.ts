@@ -22,10 +22,8 @@ import {
 } from "three";
 import type { Material, Mesh, Object3D, Texture } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { growth, hashOf, modules, MODELS, pairMirrors, readHash, record, recordingFrom } from "./assemble-shared";
-import type { Recording, RecordingData, SampleModule } from "./assemble-shared";
-import { createBuildPool } from "../src/worker";
-import type { BuildPool, Built } from "../src/worker";
+import { growth, hashOf, modules, MODELS, pairMirrors, readHash, record } from "./assemble-shared";
+import type { Recording, SampleModule } from "./assemble-shared";
 
 // ── Styles and timing ─────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -204,16 +202,8 @@ const newSeed = () => Math.floor(Math.random() * 36 ** 5);
 let seed = newSeed();
 /** World: every model has started arriving within this many ms. */
 const WORLD_SPREAD = 2500;
-/** World: builds run in this pool of workers (src/worker.ts), so the page keeps drawing while they run. */
-let pool: BuildPool | null = null;
-const buildPool = () =>
-  (pool ??= createBuildPool({
-    spawn: () => new Worker(new URL("./assemble-worker.ts", import.meta.url), { type: "module" }),
-  }));
-/** World: milliseconds per step of the last world load, for the smoke script. */
-const worldSteps: Record<string, number> = {};
 
-/** Build one sample on this thread and set it up to assemble at `place`. */
+/** Build one sample, measure it, and set it up to assemble; the holder scales it to a 1 m footprint at `place`. */
 async function load(slug: string, place: Vector3): Promise<Model> {
   const module: SampleModule = await modules[`../samples/${slug}.ts`]!();
   const recording = record(module.default, slug);
@@ -227,18 +217,14 @@ async function load(slug: string, place: Vector3): Promise<Model> {
     }
   });
   await Promise.allSettled([...textures].map((t) => t.userData.ready).filter(Boolean));
-  return prepare(recording, slug, place);
-}
 
-/** Measure a recorded build and set it up to assemble; the holder scales it to a 1 m footprint at `place`. */
-function prepare(recording: Recording, slug: string, place: Vector3): Model {
   recording.root.updateMatrixWorld(true);
   const bounds = new Box3().setFromObject(recording.root);
   const size = bounds.getSize(new Vector3());
   const extent = Math.max(size.x, size.y, size.z, 0.05);
   const model: Model = {
     slug,
-    name: MODELS.find(([, s]) => s === slug)?.[0] ?? slug,
+    name: MODELS.find(([, s]) => s === slug)?.[0] ?? module.meta?.name ?? slug,
     recording,
     holder: new Group(),
     pieces: [],
@@ -359,9 +345,6 @@ function clear() {
       if (piece.animated)
         for (const m of Array.isArray(piece.animated) ? piece.animated : [piece.animated]) m.dispose();
   models = [];
-  // Builds still running belong to the view being left.
-  pool?.close();
-  pool = null;
 }
 
 function frame(width: number, depth: number) {
@@ -417,49 +400,31 @@ async function showWorld() {
   frame(cols, rows);
   titleName.textContent = "World";
   const t0 = performance.now();
-  let inWorkers = 0;
-  let onPage = 0;
-  let failed = 0;
-  status.textContent = "building in workers";
-  // Every build runs in the pool at once; each model is set up as it arrives. Kept in `models` (so leaving mid-build
-  // disposes them) but off the stage until every one is in.
-  await Promise.all(
-    MODELS.map(async ([, slug], i) => {
-      let built: Built;
-      try {
-        built = await buildPool().build(slug);
-        await built.ready;
-      } catch (error) {
-        if (ticket === session) failed++;
-        console.error(slug, error);
-        return;
-      }
-      if (ticket !== session) return;
-      const t = performance.now();
-      const { assembly, ...userData } = built.root.userData;
-      built.root.userData = userData;
-      const place = new Vector3((i % cols) - (cols - 1) / 2, 0, Math.floor(i / cols) - (rows - 1) / 2);
-      models.push(prepare(recordingFrom(built.root, assembly as RecordingData), slug, place));
-      const setup = built.ms.unpack + performance.now() - t;
-      onPage += setup;
-      worldSteps.worstSetup = Math.max(worldSteps.worstSetup ?? 0, setup);
-      inWorkers += built.ms.build;
-      stats.textContent = [
-        `building ${models.length}/${MODELS.length}, ${((performance.now() - t0) / 1000).toFixed(1)} s`,
-        `page     ${(onPage / 1000).toFixed(2)} s of unpacking and setup on this thread`,
-      ].join("\n");
-    }),
-  );
-  if (ticket !== session) return;
+  let blocked = 0;
+  // Kept in `models` (so leaving mid-build disposes them) but off the stage until every one is built.
+  for (let i = 0; i < MODELS.length; i++) {
+    const slug = MODELS[i][1];
+    status.textContent = `building ${i + 1}/${MODELS.length}`;
+    // Let the progress paint between builds.
+    await new Promise(requestAnimationFrame);
+    if (ticket !== session) return;
+    const place = new Vector3((i % cols) - (cols - 1) / 2, 0, Math.floor(i / cols) - (rows - 1) / 2);
+    const model = await load(slug, place);
+    if (ticket !== session) return;
+    blocked += model.recording.total;
+    models.push(model);
+    stats.textContent = [
+      `building ${models.length}/${MODELS.length}, ${((performance.now() - t0) / 1000).toFixed(1)} s`,
+      `blocked  ${(blocked / 1000).toFixed(1)} s of synchronous builds`,
+    ].join("\n");
+  }
   // Compile both material sets and upload every texture before anything moves, so neither a model's first frame
   // nor its swap back to the original materials stalls the arrival. One model at a time, off the stage but lit by the
   // scene's lights, yielding a frame whenever a frame's worth of work is done: all at once held one frame ~480 ms.
   status.textContent = "compiling shaders";
   const compiling: Promise<unknown>[] = [];
   let slice = performance.now();
-  worldSteps.worstWarmup = 0;
   for (const model of models) {
-    const start = performance.now();
     compiling.push(renderer.compileAsync(model.holder, camera, scene));
     for (const piece of model.pieces) {
       if (piece.animated) piece.mesh.material = piece.animated;
@@ -467,7 +432,6 @@ async function showWorld() {
         for (const value of Object.values(m)) if ((value as Texture | null)?.isTexture) renderer.initTexture(value);
     }
     compiling.push(renderer.compileAsync(model.holder, camera, scene));
-    worldSteps.worstWarmup = Math.max(worldSteps.worstWarmup, performance.now() - start);
     if (performance.now() - slice > 8) {
       await new Promise(requestAnimationFrame);
       if (ticket !== session) return;
@@ -480,9 +444,8 @@ async function showWorld() {
   arrive();
   for (const model of models) stage.add(model.holder);
   stats.textContent = [
-    `built    ${models.length} models in ${((performance.now() - t0) / 1000).toFixed(1)} s, before any assembly${failed ? `; ${failed} failed (console)` : ""}`,
-    `page     ${(onPage / 1000).toFixed(2)} s of unpacking and setup on this thread`,
-    `workers  ${(inWorkers / 1000).toFixed(1)} s of builds, side by side`,
+    `built    ${MODELS.length} models in ${((performance.now() - t0) / 1000).toFixed(1)} s, before any assembly`,
+    `blocked  ${(blocked / 1000).toFixed(1)} s of synchronous builds`,
     `arrival  shuffled over ${WORLD_SPREAD / 1000} s, ${cap} s cap each`,
   ].join("\n");
 }
@@ -625,8 +588,6 @@ Object.assign(window, {
     models: models.length,
     done: models.filter((m) => m.done).length,
     status: status.textContent,
-    pieces: Object.fromEntries(models.map((m) => [m.slug, [m.pieces.length, m.pairs]])),
-    steps: worldSteps,
   }),
   hold: (seconds: number | null) => {
     held = seconds;

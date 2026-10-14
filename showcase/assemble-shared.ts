@@ -227,48 +227,6 @@ export function record(build: () => Object3D, slug: string): Recording {
   return { root, calls, bakes, total };
 }
 
-/**
- * A recording as plain data for a build run in a worker: objects and joints by their index in the tree's pre-order
- * (the order `pack` and `unpack` keep), so it can ride on `root.userData` to the page.
- */
-export type RecordingData = {
-  calls: Array<Omit<Call, "objects" | "joints" | "twin" | "twinOf"> & { objects: number[]; joints: number[] }>;
-  bakes: Recording["bakes"];
-  total: number;
-};
-
-export function recordingData({ root, calls, bakes, total }: Recording): RecordingData {
-  const index = new Map<Object3D, number>();
-  root.traverse((node) => index.set(node, index.size));
-  return {
-    calls: calls.map(({ label, t0, t1, site, objects, joints }) => ({
-      label,
-      t0,
-      t1,
-      site,
-      objects: objects.map((o) => index.get(o)!),
-      joints: joints.map((o) => index.get(o)!),
-    })),
-    bakes,
-    total,
-  };
-}
-
-export function recordingFrom(root: Object3D, data: RecordingData): Recording {
-  const nodes: Object3D[] = [];
-  root.traverse((node) => nodes.push(node));
-  return {
-    root,
-    calls: data.calls.map((call) => ({
-      ...call,
-      objects: call.objects.map((i) => nodes[i]),
-      joints: call.joints.map((i) => nodes[i]),
-    })),
-    bakes: data.bakes,
-    total: data.total,
-  };
-}
-
 // ── Growth coordinates ────────────────────────────────────────────────────────────────────────────────────────────
 
 /**
