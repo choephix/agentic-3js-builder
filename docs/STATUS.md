@@ -4,7 +4,7 @@ Where the work stands. The API is in `docs/api.md`, the reasons behind it in `do
 
 ## Bake lab: painting without freezing the page, 2026-10-14
 
-`showcase/bake-lab.html` (local only) builds a set of samples one per frame and paints them three ways: sync (the bake runs inside `default()`, as now), sliced (a copy of `bakeSheet` as a generator, run in 10 ms steps between frames) and workers (a pool imports each sample again, builds it and posts back the sheet; the page packs the same layout itself). It patches `Ctx.prototype.bake` to defer; no `src/` file changes. Optionally a 1/4-resolution sheet of the same layout shows first. Paints are the samples' own closures, so a worker has to run the sample; `svg()` already returns a blank texture there.
+A throwaway page (`showcase/bake-lab.html`, removed; it is in commit `7d724f5`) built a set of samples one per frame and painted them three ways: sync (the bake runs inside `default()`, as now), sliced (a copy of `bakeSheet` as a generator, run in 10 ms steps between frames) and workers (a pool imports each sample again, builds it and posts back the sheet; the page packs the same layout itself). It patched `Ctx.prototype.bake` to defer; no `src/` file changed. Optionally a 1/4-resolution sheet of the same layout showed first. Paints are the samples' own closures, so a worker has to run the sample; `svg()` already returns a blank texture there.
 
 On RTX 3060 headless, 20 cores (one run each):
 
