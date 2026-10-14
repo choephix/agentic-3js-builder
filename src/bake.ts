@@ -297,17 +297,18 @@ export function bakeSheet(painted: readonly Painted[], material: MeshStandardMat
           w1 = Math.max(w1, 0);
           w2 = Math.max(w2, 0);
           const sum = w0 + w1 + w2;
-          p.set(0, 0, 0);
-          n.set(0, 0, 0);
-          [w0, w1, w2].forEach((w, k) => {
-            const o = ids[k] * 3;
-            p.x += (entry.world[o] * w) / sum;
-            p.y += (entry.world[o + 1] * w) / sum;
-            p.z += (entry.world[o + 2] * w) / sum;
-            n.x += entry.normal[o] * w;
-            n.y += entry.normal[o + 1] * w;
-            n.z += entry.normal[o + 2] * w;
-          });
+          const o0 = ids[0] * 3;
+          const o1 = ids[1] * 3;
+          const o2 = ids[2] * 3;
+          const world = entry.world;
+          const normal = entry.normal;
+          // Summed in the order the weights were always added, so the sheet stays byte-identical.
+          p.x = 0 + (world[o0] * w0) / sum + (world[o1] * w1) / sum + (world[o2] * w2) / sum;
+          p.y = 0 + (world[o0 + 1] * w0) / sum + (world[o1 + 1] * w1) / sum + (world[o2 + 1] * w2) / sum;
+          p.z = 0 + (world[o0 + 2] * w0) / sum + (world[o1 + 2] * w1) / sum + (world[o2 + 2] * w2) / sum;
+          n.x = 0 + normal[o0] * w0 + normal[o1] * w1 + normal[o2] * w2;
+          n.y = 0 + normal[o0 + 1] * w0 + normal[o1 + 1] * w1 + normal[o2 + 1] * w2;
+          n.z = 0 + normal[o0 + 2] * w0 + normal[o1 + 2] * w1 + normal[o2 + 2] * w2;
           if (n.lengthSq() < 1e-12) n.set(0, 1, 0);
           let s: [number, number] | undefined;
           if (ss) {

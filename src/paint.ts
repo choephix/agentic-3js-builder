@@ -157,15 +157,18 @@ function perlin(x: number, y: number, z: number, seed: number) {
   const u = fade(fx);
   const v = fade(fy);
   const w = fade(fz);
-  const g = (i: number, j: number, k: number) => grad(hash(X + i, Y + j, Z + k, seed), fx - i, fy - j, fz - k);
-  const g000 = g(0, 0, 0);
-  const g010 = g(0, 1, 0);
-  const g001 = g(0, 0, 1);
-  const g011 = g(0, 1, 1);
-  const x00 = g000 + u * (g(1, 0, 0) - g000);
-  const x10 = g010 + u * (g(1, 1, 0) - g010);
-  const x01 = g001 + u * (g(1, 0, 1) - g001);
-  const x11 = g011 + u * (g(1, 1, 1) - g011);
+  const g000 = grad(hash(X, Y, Z, seed), fx, fy, fz);
+  const g100 = grad(hash(X + 1, Y, Z, seed), fx - 1, fy, fz);
+  const g010 = grad(hash(X, Y + 1, Z, seed), fx, fy - 1, fz);
+  const g110 = grad(hash(X + 1, Y + 1, Z, seed), fx - 1, fy - 1, fz);
+  const g001 = grad(hash(X, Y, Z + 1, seed), fx, fy, fz - 1);
+  const g101 = grad(hash(X + 1, Y, Z + 1, seed), fx - 1, fy, fz - 1);
+  const g011 = grad(hash(X, Y + 1, Z + 1, seed), fx, fy - 1, fz - 1);
+  const g111 = grad(hash(X + 1, Y + 1, Z + 1, seed), fx - 1, fy - 1, fz - 1);
+  const x00 = g000 + u * (g100 - g000);
+  const x10 = g010 + u * (g110 - g010);
+  const x01 = g001 + u * (g101 - g001);
+  const x11 = g011 + u * (g111 - g011);
   const y0 = x00 + v * (x10 - x00);
   const y1 = x01 + v * (x11 - x01);
   return y0 + w * (y1 - y0);
@@ -207,10 +210,18 @@ export function cells(p: Vector3, size: number, seed = 0): Cell {
   const X = Math.floor(x);
   const Y = Math.floor(y);
   const Z = Math.floor(z);
-  let d1 = Infinity;
-  let d2 = Infinity;
-  let best = [0, 0, 0];
-  let bestC = [0, 0, 0];
+  // Squared distances pick the two nearest; hypot on those two gives exactly the distances a hypot per cell would.
+  let q1 = Infinity;
+  let q2 = Infinity;
+  let bx = 0;
+  let by = 0;
+  let bz = 0;
+  let x1 = 0;
+  let y1 = 0;
+  let z1 = 0;
+  let x2 = 0;
+  let y2 = 0;
+  let z2 = 0;
   for (let i = -1; i <= 1; i++)
     for (let j = -1; j <= 1; j++)
       for (let k = -1; k <= 1; k++) {
@@ -220,19 +231,34 @@ export function cells(p: Vector3, size: number, seed = 0): Cell {
         const px = cx + unit(cx, cy, cz, seed);
         const py = cy + unit(cx, cy, cz, seed + 7);
         const pz = cz + unit(cx, cy, cz, seed + 13);
-        const d = Math.hypot(px - x, py - y, pz - z);
-        if (d < d1) {
-          d2 = d1;
-          d1 = d;
-          best = [cx, cy, cz];
-          bestC = [px, py, pz];
-        } else if (d < d2) d2 = d;
+        const dx = px - x;
+        const dy = py - y;
+        const dz = pz - z;
+        const q = dx * dx + dy * dy + dz * dz;
+        if (q < q1) {
+          q2 = q1;
+          x2 = x1;
+          y2 = y1;
+          z2 = z1;
+          q1 = q;
+          x1 = px;
+          y1 = py;
+          z1 = pz;
+          bx = cx;
+          by = cy;
+          bz = cz;
+        } else if (q < q2) {
+          q2 = q;
+          x2 = px;
+          y2 = py;
+          z2 = pz;
+        }
       }
   return {
-    d1,
-    d2,
-    id: unit(best[0], best[1], best[2], seed + 29),
-    center: new Vector3(bestC[0] * size, bestC[1] * size, bestC[2] * size),
+    d1: Math.hypot(x1 - x, y1 - y, z1 - z),
+    d2: Math.hypot(x2 - x, y2 - y, z2 - z),
+    id: unit(bx, by, bz, seed + 29),
+    center: new Vector3(x1 * size, y1 * size, z1 * size),
   };
 }
 
