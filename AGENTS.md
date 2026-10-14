@@ -17,7 +17,7 @@ TypeScript SDK that lets fast, cheap language models write primitive-built, skel
 - Format touched files only: `~/.herdr/worktrees/nilo/better-puppet-examples/node_modules/.bin/prettier --write --print-width 120 <files>`.
 - npm, not pnpm.
 - Verify with smoke renders (`npm run snap`); add permanent tests and run test suites only when Stefan asks.
-- Renders use the shared NVIDIA headless Chromium on 127.0.0.1:9333. The main agent starts it with `~/workspace/nilo-wayfinder/.agents/skills/nilo-live-qa/chrome-nvidia.sh --user-data-dir=/tmp/creature-lab-chrome --remote-debugging-port=9333 --headless=new`, checks the WebGL renderer reports RTX 3060, and when done stops it and removes `/tmp/creature-lab-chrome`. Subagents only connect to it.
+- Renders use the shared NVIDIA headless Chromium on 127.0.0.1:9333. The main agent starts it with `~/.omp/profiles/nilo/agent/skills/nilo-live-qa/chrome-nvidia.sh --user-data-dir=/tmp/creature-lab-chrome --remote-debugging-port=9333 --headless=new`, checks the WebGL renderer reports RTX 3060, and when done stops it and removes `/tmp/creature-lab-chrome`. Subagents only connect to it.
 - Images for Stefan go under `~/tmp/public/nilo/agentic-3js-builder/`.
 - Text written for models (GUIDE, `docs/api.md`, `docs/conventions.md`, kit docs, briefs): the target and hard requirements, positively phrased; capable models choose their own construction.
 
