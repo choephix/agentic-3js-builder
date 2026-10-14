@@ -1,5 +1,5 @@
 // Shared by the assemble pages (assemble.ts, assemble-loading.ts) and the sample viewer's arrival: the model list,
-// the build recorder, per-vertex growth coordinates, mirrored-pair detection and the pop-in schedule.
+// the build recorder, per-vertex growth coordinates, mirrored-pair detection and the arrival schedule.
 import { Box3, Object3D, Vector3 } from "three";
 import type { BufferGeometry, LineSegments, Mesh, Points } from "three";
 import { Builder } from "../src/builder";
@@ -394,8 +394,8 @@ export function schedule(recording: Recording, sizes: Map<Object3D, number>, ext
   return starts;
 }
 
-/** Each part's start for a pop-in of a recorded build, as a share of the cap, with mirrored pairs arriving together. */
-export function popStarts(recording: Recording) {
+/** Each part's start for an arrival of a recorded build, as a share of the cap, with mirrored pairs arriving together. */
+export function arrivalStarts(recording: Recording) {
   const { extent, pieces } = measure(recording);
   pairMirrors(recording.calls, pieces, extent);
   return schedule(recording, new Map([...pieces].map(([object, piece]) => [object, piece.size])), extent);
@@ -407,4 +407,10 @@ const easeBack = (k: number) => 1 + 2.70158 * Math.pow(k - 1, 3) + 1.70158 * Mat
 export function popScale(start: number, t: number, cap: number) {
   const k = Math.min(Math.max((t - start * cap) / (cap * (1 - SPAWN)), 0), 1);
   return k > 0 ? Math.max(easeBack(k), 0.001) : 0;
+}
+
+/** A rising part's growth front `t` seconds into a `cap`-second assembly: 0 until its start, then eased out to 1. */
+export function riseProgress(start: number, t: number, cap: number) {
+  const k = Math.min(Math.max((t - start * cap) / (cap * (1 - SPAWN)), 0), 1);
+  return 1 - Math.pow(1 - k, 3);
 }

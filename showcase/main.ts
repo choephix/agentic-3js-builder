@@ -1,7 +1,8 @@
 // The showcase page. One sample at a time in one viewer; everything else (data panels, legends, the bend bar) is a
 // key or a click away and lives in the URL: `#redFox?mode=bones&skeleton&bend=40&seed=11&panel=tree&focus=bone:neck1`.
 import type { Object3D } from "three";
-import { popScale, popStarts, record } from "./assemble-shared";
+import { arrivalStarts, growth, record, riseProgress } from "./assemble-shared";
+import type { Recording } from "./assemble-shared";
 import { buildSection, buildTip, buildsTable, builtBy, loadBuild, loadBuilds } from "./builds";
 import type { Build, BuildSummary } from "./builds";
 import * as catalog from "./catalog";
@@ -336,7 +337,7 @@ function showLoading(name: string | null) {
   if (name !== null) $("loading-name").textContent = name;
 }
 
-/** Seconds a newly opened sample takes to pop in, the loading page's default cap. */
+/** Seconds a newly opened sample takes to ghost in, the loading page's default cap. */
 const ARRIVAL = 1.2;
 
 async function run(keepCamera: boolean) {
@@ -385,6 +386,7 @@ async function run(keepCamera: boolean) {
   }
   if (build.status === "fulfilled") next.build = build.value;
   let root = null;
+  let recording: Recording | null = null;
   let starts: Map<Object3D, number> | null = null;
   if (module.status === "rejected") {
     next.error = module.reason;
@@ -398,11 +400,11 @@ async function run(keepCamera: boolean) {
     };
     try {
       const started = performance.now();
-      // A different sample pops in part by part in build order, so its builder calls are recorded.
-      const recording = fresh ? record(make, slug) : null;
+      // A different sample ghosts in part by part in build order, so its builder calls are recorded.
+      recording = fresh ? record(make, slug) : null;
       root = recording?.root ?? make();
       next.ms = performance.now() - started;
-      if (recording) starts = popStarts(recording);
+      if (recording) starts = arrivalStarts(recording);
       next.info = inspect(root);
     } catch (reason) {
       root = null;
@@ -414,9 +416,16 @@ async function run(keepCamera: boolean) {
   const sameSample = !fresh;
   loaded = next;
   let arrival: Arrival | null = null;
-  if (starts && next.info) {
+  if (recording && starts && next.info) {
     const at = next.info.parts.map((part) => starts.get(part.mesh) ?? 0);
-    arrival = { scale: (part, seconds) => popScale(at[part], seconds, ARRIVAL), duration: ARRIVAL };
+    // Cards grow along their strip; any other part outwards from its bone.
+    const cards = new Set(recording.calls.filter((call) => call.label === "cards").flatMap((call) => call.objects));
+    const parts = next.info.parts;
+    arrival = {
+      order: (part) => growth(parts[part].mesh.geometry, cards.has(parts[part].mesh)),
+      progress: (part, seconds) => riseProgress(at[part], seconds, ARRIVAL),
+      duration: ARRIVAL,
+    };
   }
   try {
     viewer.show(root, next.info, keepCamera && sameSample, arrival);

@@ -2,7 +2,13 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
-## Showcase: samples pop in, 2026-10-14
+## Showcase: samples ghost in, 2026-10-15
+
+Opening a different sample now uses `/assemble-loading`'s ghost style instead of pop (rise was tried first and dropped). Once the textures are in and the arrival's shaders are compiled, the whole sample shows as a sparse blue-grey stipple, then each part grows solid out of its bone with a pale rim at the front, in the same build-order schedule within the same 1.2 s. `main.ts` hands `Viewer.show` an `Arrival` of each part's per-vertex growth order (`growth()`, cards along their strip) and its front over time (`riseProgress()`); the starts come from `arrivalStarts()` (was `popStarts`). `showcase/ghost.ts` holds the shader: while the arrival runs, `paint()` dresses every part in a ghosting copy of the material it picks, and a matching `customDepthMaterial` keeps the shadow to the solid part. A part whose material cannot ghost (not Standard, Lambert, Phong or Basic) stays hidden until its start. Parts no longer scale, so the detached-bind switch below is gone.
+
+Checked in the RTX 3060 Chrome, clayWalrus → redFox: the stippled fox, then body, ears and face filling in, then the plain fox; no page errors. Frame pacing in that shared headless Chrome (about 10 fps) matched pop's.
+
+## Showcase: samples pop in, 2026-10-14 (superseded by ghost, above)
 
 Opening a different sample no longer covers the stage with its thumbnail. The stage clears to a small centred spinner (the loading chip drops its own meanwhile) while the sample imports and builds; once its textures are in, its parts pop in within 1.2 s, in build order with mirrored pairs together: `/assemble-loading`'s pop style at its default cap. A reload of the same sample after an edit swaps in as before. `main.ts` records the build with `record()` from `assemble-shared.ts` and hands `Viewer.show` an `Arrival` (each part's scale over time); the schedule and the pop curve (`measure`, `schedule`, `popStarts`, `popScale`) moved into `assemble-shared.ts`, and `/assemble-loading` uses them unchanged. Skinned parts switch to a detached bind while they scale (an attached one cancels the mesh's own scale) and back at the end.
 

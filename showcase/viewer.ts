@@ -3,13 +3,11 @@
 // paint for one bone, a skeleton x-ray, and the bend test. For the bend test every smooth-skinned part becomes a
 // `SkinnedMesh` over its `userData.skinBones`, so it deforms through its own weights; rigid parts ride their joint.
 import {
-  AttachedBindMode,
   Box3,
   BufferAttribute,
   BufferGeometry,
   Color,
   CylinderGeometry,
-  DetachedBindMode,
   DirectionalLight,
   Euler,
   Float32BufferAttribute,
@@ -41,6 +39,7 @@ import {
 import type { Bone, Material, Object3D } from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { Inspection, JointInfo, Part } from "./inspect";
+import { ghostDepth, ghostMaterial } from "./ghost";
 
 /** The harness's three-quarter view direction and lens. */
 const VIEW = new Vector3(0.78, 0.34, 0.85).normalize();
@@ -90,8 +89,16 @@ export type Hit =
 export type Display = { mode: ColorMode; skeleton: boolean; wire: boolean; focus: Focus | null };
 /** Where the orbit camera sits and looks, for keeping several viewers in step. */
 export type CameraView = { position: [number, number, number]; target: [number, number, number] };
-/** How a freshly shown sample arrives: each part's scale `seconds` into the arrival (0 hides it), for `duration` s. */
-export type Arrival = { scale: (part: number, seconds: number) => number; duration: number };
+/**
+ * How a freshly shown sample arrives, over `duration` s: every part shows as a stipple at once, then grows solid out
+ * of its bone, its vertices turning solid in the 0–1 order `order(part)` gives them, up to the front
+ * `progress(part, seconds)`.
+ */
+export type Arrival = {
+  order: (part: number) => Float32Array;
+  progress: (part: number, seconds: number) => number;
+  duration: number;
+};
 
 /** Deterministic PRNG in [0, 1) (mulberry32), the same as harness/page.ts uses for its flex poses. */
 function rng(seed: number) {
@@ -158,8 +165,19 @@ export class Viewer {
   private dirty = true;
   /** Settles once the shown sample's SVG textures have drawn. */
   private textures: Promise<unknown> = Promise.resolve();
-  /** The arrival under way: when it started (null until the textures are in) and each view's own scale. */
-  private arrival: (Arrival & { at: number | null; rest: Vector3[] }) | null = null;
+  /**
+   * The arrival under way: when it started (null until the textures are in and its shaders compiled), each view's
+   * growth front, each view's ghosting copies of the materials it has worn (null: arrives whole at its start), and
+   * every copy made.
+   */
+  private arrival:
+    | (Arrival & {
+        at: number | null;
+        fronts: Array<{ value: number }>;
+        copies: Array<Map<Material, Material | null>>;
+        ghosts: Set<Material>;
+      })
+    | null = null;
   /** The camera is still where `frame()` put it, so a resize re-frames instead of cropping. */
   private framed = true;
   private pointer: { x: number; y: number } | null = null;
@@ -336,6 +354,20 @@ export class Viewer {
     this.stage();
     if (!keepCamera) this.frame();
     this.applyPose();
+    if (arrival) {
+      this.arrival = {
+        ...arrival,
+        at: null,
+        fronts: this.views.map(() => ({ value: 0 })),
+        copies: this.views.map(() => new Map()),
+        ghosts: new Set(),
+      };
+      this.views.forEach((view, index) => {
+        view.mesh.visible = false;
+        view.mesh.geometry.setAttribute("aGrow", new BufferAttribute(arrival.order(view.part.index), 1));
+        view.mesh.customDepthMaterial = ghostDepth(this.arrival!.fronts[index]);
+      });
+    }
     this.paint();
     // SVG textures draw asynchronously; show them once they are in.
     const pending = info.parts.flatMap(
@@ -345,33 +377,66 @@ export class Viewer {
           .map((material) => (material as MeshStandardMaterial).map?.userData.ready as Promise<unknown> | undefined)
           .filter(Boolean) as Array<Promise<unknown>>,
     );
-    if (arrival) {
-      this.arrival = { ...arrival, at: null, rest: this.views.map((view) => view.mesh.scale.clone()) };
-      for (const view of this.views) {
-        view.mesh.visible = false;
-        // An attached skin cancels its mesh's own scale; a detached one keeps its bind and follows it.
-        if ((view.mesh as SkinnedMesh).isSkinnedMesh) (view.mesh as SkinnedMesh).bindMode = DetachedBindMode;
-      }
-    }
-    this.textures = Promise.allSettled(pending).then(() => {
+    this.textures = Promise.allSettled(pending).then(async () => {
       if (this.root !== root) return;
+      if (this.arrival) {
+        // The ghost shaders compile before the clock starts, so the first frames of growth don't stall. `compile`
+        // gathers only visible objects, and does so before it returns.
+        for (const view of this.views) view.mesh.visible = true;
+        const compiled = this.renderer.compileAsync(root, this.camera, this.scene);
+        for (const view of this.views) view.mesh.visible = false;
+        await compiled;
+        if (this.root !== root || !this.arrival) return;
+        this.arrival.at = performance.now();
+      }
       this.dirty = true;
-      if (this.arrival) this.arrival.at = performance.now();
     });
   }
 
-  /** Scale every part to where the arrival is `seconds` in; at its end, back to its own scale and bind. */
+  /** Ghost and grow every part to where the arrival is `seconds` in; at its end, each whole on its usual material. */
   private arrive(seconds: number) {
     const arrival = this.arrival!;
-    const done = seconds >= arrival.duration;
+    if (seconds >= arrival.duration) {
+      this.endArrival();
+      for (const view of this.views) view.mesh.visible = true;
+      this.paint();
+      return;
+    }
     this.views.forEach((view, index) => {
-      const scale = done ? 1 : arrival.scale(view.part.index, seconds);
-      view.mesh.visible = scale > 0;
-      view.mesh.scale.copy(arrival.rest[index]).multiplyScalar(Math.max(scale, 0.001));
-      if (done && (view.mesh as SkinnedMesh).isSkinnedMesh) (view.mesh as SkinnedMesh).bindMode = AttachedBindMode;
+      const front = arrival.progress(view.part.index, seconds);
+      arrival.fronts[index].value = front;
+      // A part that cannot ghost stays hidden until it starts.
+      const worn = view.mesh.material;
+      const ghosted = Array.isArray(worn) ? worn.every((m) => arrival.ghosts.has(m)) : arrival.ghosts.has(worn);
+      view.mesh.visible = front > 0 || ghosted;
     });
-    if (done) this.arrival = null;
     this.dirty = true;
+  }
+
+  /** Drop the arrival and the materials it made. */
+  private endArrival() {
+    const arrival = this.arrival;
+    if (!arrival) return;
+    this.arrival = null;
+    for (const view of this.views) {
+      view.mesh.customDepthMaterial?.dispose();
+      view.mesh.customDepthMaterial = undefined;
+    }
+    for (const material of arrival.ghosts) material.dispose();
+  }
+
+  /** The arrival's ghosting copy of what a view is to wear, made once per view and material. */
+  private ghosting(index: number, material: Material | Material[]) {
+    const { fronts, copies, ghosts } = this.arrival!;
+    const copy = (entry: Material) => {
+      if (!copies[index].has(entry)) {
+        const ghost = ghostMaterial(entry, fronts[index]);
+        copies[index].set(entry, ghost);
+        if (ghost) ghosts.add(ghost);
+      }
+      return copies[index].get(entry) ?? entry;
+    };
+    return Array.isArray(material) ? material.map(copy) : copy(material);
   }
 
   /** Settles once the shown sample's SVG textures have drawn. */
@@ -442,6 +507,7 @@ export class Viewer {
   }
 
   private clear() {
+    this.endArrival();
     if (this.root) {
       this.scene.remove(this.root);
       this.root.traverse((object) => {
@@ -469,7 +535,6 @@ export class Viewer {
       group.clear();
     }
     this.root = null;
-    this.arrival = null;
     this.views = [];
     this.joints = [];
     this.rest = [];
@@ -684,7 +749,7 @@ export class Viewer {
     const xray = skeleton && this.rigged;
     const bones = focus?.bones ? new Set(focus.bones) : null;
     const key = focus?.bones?.join(",") ?? "";
-    for (const view of this.views) {
+    for (const [index, view] of this.views.entries()) {
       const { part, mesh } = view;
       let material: Material | Material[];
       let faded = false;
@@ -711,11 +776,12 @@ export class Viewer {
         if (focus?.groups && !focus.groups.includes(part.group)) faded = true;
         if (focus?.part !== undefined && focus.part !== part.index) faded = true;
       }
-      mesh.material = faded
+      const shown = faded
         ? this.variant(this.ghost, false, wire)
         : Array.isArray(material)
           ? material.map((entry) => this.variant(entry, xray, wire))
           : this.variant(material, xray, wire);
+      mesh.material = this.arrival ? this.ghosting(index, shown) : shown;
       mesh.castShadow = !faded && !xray;
     }
     for (const { ball, joint } of this.balls) {
