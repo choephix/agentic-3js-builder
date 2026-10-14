@@ -2,6 +2,12 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Sample names without importing every sample, 2026-10-14
+
+After the open sample was in, the showcase imported every sample module just to read `meta.name` for the list: on the public site that was 165 extra JS requests (1.71 MB decoded) after opening redFox. The Vite plugin now serves `/__sample-names`, read from each sample's `export const meta = { name: "…" }` literal (written as a static file in the build), and the list shows names from its first paint. A sample module is imported only when it is opened or its thumbnail is redrawn. A sample's tile turns red once a run of it throws, no longer because an unopened sample failed to import.
+
+The index matched the imported `meta.name` of all 186 samples. On RTX 3060 the dev showcase opened redFox with 178 listed tiles all named, no page errors, and only the open sample plus stale-thumbnail redraws requested sample modules.
+
 ## Assemble pages, 2026-10-14
 
 Two showcase pages show a creature being built. Both run a sample once while the shared recorder (`showcase/assemble-shared.ts`) wraps `Builder`, `Surface.scatter`, `Ctx.bake` and `Object3D.add` for that build, so no SDK file changes. `/assemble` plays the recorded calls back as a showpiece; `/assemble-loading` compresses them into a hard cap for use as a loading animation. Mirrored pairs come from the recorded call site (the sample's own stack frame) plus parts and joints reflected across x = 0 or z = 0.

@@ -103,6 +103,23 @@ async function sampleCreated() {
   return Object.fromEntries(files.map((file, i) => [basename(file, ".ts"), times[i]]));
 }
 
+/** `meta = { name: "…" }` at the top of a sample: its name as a double-quoted string literal. */
+const META_NAME = /export const meta\s*=\s*\{[^}]*?\bname:\s*("(?:[^"\\\n]|\\.)*")/;
+
+/**
+ * Each sample's display name (`meta.name`), read from its source so the sample list can show names without
+ * importing every sample module. A sample whose name is not a double-quoted literal is left out and listed by slug.
+ */
+async function sampleNames() {
+  const files = (await list(sampleRoot)).filter((file) => file.endsWith(".ts"));
+  const names = {};
+  for (const file of files) {
+    const literal = (await readFile(join(sampleRoot, file), "utf8")).match(META_NAME)?.[1];
+    if (literal) names[basename(file, ".ts")] = JSON.parse(literal);
+  }
+  return names;
+}
+
 // ── Sidebar thumbnails ───────────────────────────────────────────────────────────────────────────────────────────
 // The page renders a thumbnail and posts it here; one image per sample is kept in `showcase/public/thumbs/`
 // (a cache outside git, filled by `npm run thumbs` before every build and copied into it as `/thumbs/`), named by a
@@ -212,6 +229,7 @@ const showcaseData = {
     const bakeoffBuilds = (await Promise.all(bakeoffIds.map(bakeoffSlugs))).flat();
     const indexed = new Map();
     await json("__sample-created", created);
+    await json("__sample-names", await sampleNames());
     for (const slug of new Set([...Object.keys(created), ...owned, ...bakeoffBuilds])) {
       if (slug in created) await copy(join(sampleRoot, `${slug}.ts`), `__sample-source/${slug}`);
       // The published viewer generates its models. Keep historical shots and GLB exports in the local showcase.
@@ -296,6 +314,11 @@ const showcaseData = {
       const created = await sampleCreated();
       response.setHeader("Content-Type", "application/json; charset=utf-8");
       response.end(JSON.stringify(created));
+    });
+    // Each sample's display name, for the sample list; see `sampleNames`.
+    server.middlewares.use("/__sample-names", async (_request, response) => {
+      response.setHeader("Content-Type", "application/json; charset=utf-8");
+      response.end(JSON.stringify(await sampleNames()));
     });
     server.middlewares.use("/__storage-study", async (_request, response, next) => {
       try {
