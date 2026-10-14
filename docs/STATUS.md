@@ -2,6 +2,12 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Blob distances without `Math.hypot`, 2026-10-14
+
+A line-level profile of `blob()` (sprinterBlob, lifeguardBlob; 5 builds each plus 3 CPU profiles) put 75% of their builds in `blob()`, half of that in the settle rounds, which call `fold()` 70 times per surface vertex. Inside `fold()`, distance functions take 73–74% and the ingredient bounds tests about 15%. Replaying each call's passing ingredients without any bounds test saved 66–73 ms per sample, an upper bound for an ingredient index, so there is none. The ellipsoid distance was 26–30% of blob time, mostly its two `Math.hypot` calls.
+
+The sphere, ellipsoid, box and degenerate round-cone distances and the settle step limit now use `Math.sqrt` of the summed squares. Both samples built byte-identical to the previous `blob.ts` (geometry, indices, textures, world matrices, bone inverses; 7 alternating builds each). Fastest of 7: sprinterBlob 1,283 → 1,201 ms, lifeguardBlob 920 → 838 ms; medians on the loaded machine moved more (1,817 → 1,486 and 1,196 → 1,085 ms). `hypot` and the plain sum can differ in the last bit for other inputs, so other blobs may move by that much.
+
 ## Surface nearest-point tree, 2026-10-14
 
 `Surface.nearest()` measured the distance to every triangle on every query, building a new `Triangle` each time. It now builds a bounding-volume tree on its first query after a pose and skips nodes farther than the best triangle so far, with a slack of 1e-5 of the surface size. Ties go to the lowest triangle index, as in the scan, so it returns the same triangle and point.
