@@ -229,7 +229,7 @@ const showcaseData = {
     // The report and experiment routes are pages, as on Netlify; otherwise Vite answers with their .ts files.
     server.middlewares.use((request, _response, next) => {
       const [path, query] = (request.url ?? "").split("?");
-      if (path === "/round" || path === "/bakeoff" || path === "/lab" || path === "/storage")
+      if (["/round", "/bakeoff", "/lab", "/storage", "/assemble", "/assemble-loading"].includes(path))
         request.url = `${path}.html${query ? `?${query}` : ""}`;
       next();
     });
@@ -388,7 +388,8 @@ const bakeoffGuard = {
 
 export default defineConfig({
   server: { fs: { allow: [searchForWorkspaceRoot(process.cwd()), snapshotRoot] } },
-  // The sample viewer, experiment round, prompt bake-off, lab report and measured storage study.
+  // The sample viewer, experiment round, prompt bake-off, lab report, measured storage study and the two assembly
+  // animations (showpiece and loading).
   build: {
     rolldownOptions: {
       input: {
@@ -397,6 +398,8 @@ export default defineConfig({
         bakeoff: resolve("showcase/bakeoff.html"),
         lab: resolve("showcase/lab.html"),
         storage: resolve("showcase/storage.html"),
+        assemble: resolve("showcase/assemble.html"),
+        "assemble-loading": resolve("showcase/assemble-loading.html"),
       },
       // A bake-off build may import a name its module doesn't export: undefined at run time, as the page shows it,
       // instead of failing the whole build. Samples are typechecked, so they never rely on this.

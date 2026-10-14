@@ -2,6 +2,12 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Assemble pages, 2026-10-14
+
+Two showcase pages show a creature being built. Both run a sample once while the shared recorder (`showcase/assemble-shared.ts`) wraps `Builder`, `Surface.scatter`, `Ctx.bake` and `Object3D.add` for that build, so no SDK file changes. `/assemble` plays the recorded calls back as a showpiece; `/assemble-loading` compresses them into a hard cap for use as a loading animation. Mirrored pairs come from the recorded call site (the sample's own stack frame) plus parts and joints reflected across x = 0 or z = 0.
+
+Recording showed geometry takes tens of milliseconds even for the 700-call griffin; nearly all build time is the paint bake (jadeSerpent 3.1 s of 3.1 s, porcelainElephant 2.4 s). Loading all 43 models into the world grid took 26.7 s, 20.9 s of it synchronous builds that freeze the page; the animation cannot hide that, so a chunked paint bake is the next lever for loading. Every listed model built and played on RTX 3060 without page errors; `npm run typecheck` passed.
+
 ## Scatter performance, 2026-10-14
 
 The public pixel mammoth blocked the browser's UI thread for 11.1 seconds: its dense body-fur scatter repeatedly transformed accepted hits for every spacing check. `Surface.scatter()` now indexes accepted positions in a numeric spatial grid and refreshes them when the pose changes. The API, random sequence, attempt budget and sample builders are unchanged.

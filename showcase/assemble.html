@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watch it assemble</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d1015;
+        --panel: #141922;
+        --line: #232b38;
+        --fg: #e8e4dc;
+        --muted: #8a93a3;
+        --accent: #ffcf7a;
+        --cool: #7fd8ff;
+        font:
+          13px/1.45 ui-sans-serif,
+          system-ui,
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        height: 100vh;
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        background: var(--bg);
+        color: var(--fg);
+        overflow: hidden;
+      }
+      aside {
+        border-right: 1px solid var(--line);
+        background: var(--panel);
+        overflow-y: auto;
+        padding: 12px 8px 24px;
+      }
+      aside h1 {
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 6px 10px;
+        letter-spacing: 0.02em;
+      }
+      aside h1 span {
+        display: block;
+        color: var(--muted);
+        font-weight: 400;
+        font-size: 11px;
+      }
+      .item {
+        display: block;
+        padding: 4px 6px;
+        border-radius: 6px;
+        color: var(--fg);
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .item:hover {
+        color: var(--accent);
+      }
+      .item.on {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      main {
+        position: relative;
+        overflow: hidden;
+      }
+      #view {
+        position: absolute;
+        inset: 0;
+      }
+      #view canvas {
+        display: block;
+      }
+      .bar {
+        position: absolute;
+        top: 10px;
+        left: 12px;
+        right: 12px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        pointer-events: none;
+      }
+      .bar > * {
+        pointer-events: auto;
+      }
+      button,
+      select {
+        background: #1b2230cc;
+        color: var(--fg);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 5px 9px;
+        font: inherit;
+        cursor: pointer;
+      }
+      button:hover,
+      select:hover {
+        border-color: #3a4558;
+      }
+      label.toggle {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+        background: #1b2230cc;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 4px 8px;
+      }
+      .speeds {
+        display: flex;
+      }
+      .speeds button {
+        border-radius: 0;
+        margin-left: -1px;
+        min-width: 36px;
+      }
+      .speeds button:first-child {
+        border-radius: 6px 0 0 6px;
+        margin-left: 0;
+      }
+      .speeds button:last-child {
+        border-radius: 0 6px 6px 0;
+      }
+      .speeds button.on {
+        background: #ffcf7a33;
+        border-color: var(--accent);
+        color: var(--accent);
+        position: relative;
+      }
+      #title {
+        position: absolute;
+        top: 52px;
+        left: 14px;
+        pointer-events: none;
+        text-shadow: 0 1px 6px #000;
+      }
+      #title b {
+        font-size: 18px;
+        font-weight: 600;
+        display: block;
+      }
+      #title small {
+        color: var(--muted);
+      }
+      #stats {
+        margin-top: 4px;
+        color: var(--muted);
+        font:
+          11px/1.5 ui-monospace,
+          monospace;
+        white-space: pre;
+      }
+      #log {
+        position: absolute;
+        left: 14px;
+        bottom: 26px;
+        width: min(560px, 60%);
+        font:
+          11px/1.5 ui-monospace,
+          monospace;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        max-height: 40%;
+        overflow: hidden;
+        mask-image: linear-gradient(to top, #000 70%, transparent);
+      }
+      #log div {
+        flex-shrink: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: var(--muted);
+        animation: in 0.35s ease-out;
+      }
+      #log div b {
+        color: var(--accent);
+        font-weight: 500;
+      }
+      #log div.joint b {
+        color: var(--cool);
+      }
+      #log div.quiet b {
+        color: #9aa4b5;
+      }
+      #log div.paint b {
+        color: #ff8fc7;
+      }
+      #log div i {
+        color: #5d6676;
+        font-style: normal;
+      }
+      @keyframes in {
+        from {
+          opacity: 0;
+          transform: translateX(-8px);
+        }
+      }
+      #progress {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 3px;
+        background: #ffffff10;
+      }
+      #progress div {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, var(--cool), var(--accent), #ff8fc7);
+      }
+      #busy {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        pointer-events: none;
+        font-size: 14px;
+      }
+      #busy.error {
+        color: #ff8080;
+        white-space: pre-wrap;
+        padding: 40px;
+        font:
+          12px/1.5 ui-monospace,
+          monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <aside>
+      <h1>
+        Watch it assemble<span
+          >record the build, play it back · <a href="/assemble-loading" style="color: inherit">loading version</a> ·
+          <a href="/" style="color: inherit">samples</a></span
+        >
+      </h1>
+      <nav id="list"></nav>
+    </aside>
+    <main>
+      <div id="view"></div>
+      <div id="busy"></div>
+      <div id="title">
+        <b></b><small></small>
+        <div id="stats"></div>
+      </div>
+      <div class="bar">
+        <button id="replay" title="R or Space">Replay</button>
+        <button id="skip" title="S">Skip to end</button>
+        <select
+          id="timing"
+          title="Staged: helper calls in their real order, repeated and tiny parts grouped into waves, big parts given more time. Real: helper calls at the times they ran in this browser."
+        >
+          <option value="staged">Staged timing</option>
+          <option value="real1">Real timing ×1</option>
+          <option value="real5">Real timing ×5</option>
+          <option value="real25">Real timing ×25</option>
+        </select>
+        <div class="speeds" id="speeds" title="Playback speed (keys 1–4)">
+          <button data-speed="1" class="on">1×</button>
+          <button data-speed="2">2×</button>
+          <button data-speed="3">3×</button>
+          <button data-speed="4">4×</button>
+        </div>
+        <select
+          id="colour"
+          title="Honest: flat colours and SVG textures arrive with their parts; the paint sheet washes in after the bake. Sculpt then paint: every part arrives in clay and colour washes over everything."
+        >
+          <option value="honest">Colour: honest order</option>
+          <option value="sculpt">Colour: sculpt, then paint</option>
+        </select>
+        <label class="toggle"><input type="checkbox" id="orbit" checked /> orbit</label>
+      </div>
+      <div id="log"></div>
+      <div id="progress"><div></div></div>
+    </main>
+    <script type="module" src="./assemble.ts"></script>
+  </body>
+</html>
