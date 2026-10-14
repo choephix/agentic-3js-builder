@@ -1,4 +1,4 @@
-# Status, 2026-10-07
+# Status, 2026-10-14
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
@@ -9,6 +9,14 @@ The public pixel mammoth blocked the browser's UI thread for 11.1 seconds: its d
 A Node smoke comparison matched all geometry attributes, indices, procedural paint pixels and SVG source for pixelMammoth, highlandCow and flowerHedgehog before and after the fix. The mammoth build dropped from 13.5 seconds to 1.0 second; the hedgehog dropped from 1.4 seconds to 0.19 seconds. Another 54 spacing scenarios matched hit order, positions, normals, weights, callback counts and random consumption, including negative coordinates, filters, overlapping meshes and pose changes.
 
 The fixed local showcase built the mammoth in 605 ms on RTX 3060 (initial longest main-thread task: 928 ms). Bend/rest and SVG/paint-sheet selection worked without page errors or WebGL context loss. `npm run snap -- pixelMammoth v04-scatter-grid-fix` rendered all views with 0 errors and 0 warnings; three spacing-boundary smoke cases also matched the old sampler exactly. `npm run typecheck -- src/surface.ts` passed.
+
+## Storage study, 2026-10-14
+
+The showcase's `/storage` page compares current raw `samples/*.ts` files with one latest available final GLB per model: rigged `B/out/<slug>-rigged.glb`, otherwise plain `A/out/<slug>.glb`. `showcase/storage-data.mjs` measures byte sizes without executing builders; the Vite plugin serves that data in development and writes it into the static build. The page loads no model modules or WebGL.
+
+The measured library contains 186 matched models: 4,391,048 bytes of source versus 299,917,120 bytes of GLBs, a 295,526,072-byte difference (98.54% smaller). The page calculates totals from each build's measurements rather than pinning these numbers. It includes search, column sorting, source/sample links and a complete exact-byte CSV with source/export timestamps. Desktop and 390 px mobile layouts, mammoth filtering, sorting, CSV contents and a failed-data response were exercised in Chromium.
+
+The method explicitly compares existing exports with current source (versions may differ), excludes shared SDK/style-kit overhead, and distinguishes raw files from compressed transfer and runtime memory. Both representations are still hosted; the study claims potential representation savings, not freed hosting space.
 
 ## Origin
 
