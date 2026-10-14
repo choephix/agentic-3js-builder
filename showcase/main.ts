@@ -1,6 +1,7 @@
 // The showcase page. One sample at a time in one viewer; everything else (data panels, legends, the bend bar) is a
 // key or a click away and lives in the URL: `#redFox?mode=bones&skeleton&bend=40&seed=11&panel=tree&focus=bone:neck1`.
-import { buildSection, buildTip, builds, buildsTable, builtBy } from "./builds";
+import { buildSection, buildTip, buildsTable, builtBy, loadBuild, loadBuilds } from "./builds";
+import type { Build, BuildSummary } from "./builds";
 import * as catalog from "./catalog";
 import type { Catalog, SampleModule } from "./catalog";
 import { h } from "./dom";
@@ -62,6 +63,7 @@ type Loaded = {
   phase: "import" | "build" | null;
   ms: number | null;
   snaps: Snapshots;
+  build: Build | undefined;
 };
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -69,6 +71,7 @@ const slugOf = (path: string) => path.slice(path.lastIndexOf("/") + 1, -".ts".le
 
 let current: Catalog = { modules: catalog.modules, sources: catalog.sources };
 let entries: Entry[] = [];
+let summaries: Record<string, BuildSummary> = {};
 let loaded: Loaded | null = null;
 let loading = 0;
 let preview: string | null = null;
@@ -180,11 +183,13 @@ async function refreshEntries() {
     fetch(url)
       .then((response) => (response.ok ? response.json() : {}))
       .catch(() => ({}));
-  const [created, names] = (await Promise.all([
+  const [created, names, builds] = (await Promise.all([
     json("/__sample-created"),
     json("/__sample-names"),
+    json("/__build-summaries"),
     thumbs.reload(),
-  ])) as [Record<string, number>, Record<string, string>, void];
+  ])) as [Record<string, number>, Record<string, string>, Record<string, BuildSummary>, void];
+  summaries = builds;
   entries = paths
     .map((path) => {
       const slug = slugOf(path);
@@ -193,6 +198,7 @@ async function refreshEntries() {
     })
     // Newest sample first; slug order among samples with no known creation time.
     .sort((a, b) => (created[b.slug] ?? 0) - (created[a.slug] ?? 0) || a.slug.localeCompare(b.slug));
+  setModels();
   renderList();
 }
 
@@ -210,17 +216,24 @@ const filterSearch = $("filter-search");
 const searchButton = $<HTMLButtonElement>("search-button");
 const models = $("models");
 const MODEL_FILTER_KEY = "showcase-model-filter";
-const modelNames = [
-  ...new Set(
-    Object.values(builds)
-      .map((build) => build.builder?.model)
-      .filter((model): model is string => model !== null),
-  ),
-].sort((a, b) => a.localeCompare(b));
-const sonnetModel = modelNames.find((model) => model.toLowerCase().includes("sonnet")) ?? null;
-const savedModel = localStorage.getItem(MODEL_FILTER_KEY);
-let selectedModel =
-  savedModel === "all" ? null : savedModel && modelNames.includes(savedModel) ? savedModel : sonnetModel;
+let modelNames: string[] = [];
+let selectedModel: string | null = null;
+
+/** The model filter's choices from the listed samples' builders; the saved choice if listed, else Sonnet. */
+function setModels() {
+  modelNames = [
+    ...new Set(
+      entries.map((entry) => summaries[entry.slug]?.builder?.model).filter((model): model is string => model != null),
+    ),
+  ].sort((a, b) => a.localeCompare(b));
+  const saved = localStorage.getItem(MODEL_FILTER_KEY);
+  selectedModel =
+    saved === "all"
+      ? null
+      : saved && modelNames.includes(saved)
+        ? saved
+        : (modelNames.find((model) => model.toLowerCase().includes("sonnet")) ?? null);
+}
 
 function renderModels() {
   models.replaceChildren(
@@ -268,7 +281,7 @@ function visibleEntries() {
   const query = filter.value.trim().toLowerCase();
   return entries.filter(
     (entry) =>
-      (!selectedModel || builds[entry.slug]?.builder?.model === selectedModel) &&
+      (!selectedModel || summaries[entry.slug]?.builder?.model === selectedModel) &&
       (!query || `${entry.name} ${entry.slug}`.toLowerCase().includes(query)),
   );
 }
@@ -281,7 +294,7 @@ function tile(entry: Entry) {
       class: `tile${entry.slug === state.slug ? " on" : ""}${entry.failed ? " failed" : ""}`,
       href: format({ ...state, slug: entry.slug, focus: null, compare: null, tag: null, texture: 0 }),
       "data-slug": entry.slug,
-      "data-tip": entry.failed ? "Threw on its last run" : buildTip(builds[entry.slug]),
+      "data-tip": entry.failed ? "Threw on its last run" : buildTip(summaries[entry.slug]),
       onclick: (event: MouseEvent) => {
         if (event.metaKey || event.ctrlKey || event.shiftKey) return;
         event.preventDefault();
@@ -375,11 +388,13 @@ async function run(keepCamera: boolean) {
     phase: null,
     ms: null,
     snaps: snapshotsBySlug.get(slug) ?? { tags: [], downloads: [] },
+    build: undefined,
   };
-  const [module, source, snaps] = await Promise.allSettled([
+  const [module, source, snaps, build] = await Promise.allSettled([
     entry ? current.modules[entry.path]() : Promise.reject(new Error(`No sample "${slug}" in samples/.`)),
     entry ? current.sources[entry.path]() : Promise.resolve(null),
     loadSnapshots(slug),
+    loadBuild(slug),
     painted,
   ]);
   if (token !== loading) return;
@@ -394,6 +409,7 @@ async function run(keepCamera: boolean) {
     next.snaps = snaps.value;
     snapshotsBySlug.set(slug, snaps.value);
   }
+  if (build.status === "fulfilled") next.build = build.value;
   let root = null;
   if (module.status === "rejected") {
     next.error = module.reason;
@@ -481,7 +497,7 @@ function renderHeader() {
   const meta = loaded?.meta;
   $("name").textContent = meta?.name ?? state.slug;
   $("desc").textContent = meta?.description ?? "";
-  const by = builtBy(builds[state.slug]) ?? meta?.builtBy;
+  const by = builtBy(loaded?.build) ?? meta?.builtBy;
   $("by").textContent = by ? `by ${by}` : "";
   $("desc").title = meta?.description ?? "";
 }
@@ -682,7 +698,7 @@ function renderPanel() {
             ? codePanel(loaded)
             : panel === "textures"
               ? (texturesView?.element ?? missing("Nothing built."))
-              : versionsPanel(loaded.slug, loaded.snaps, builds[loaded.slug]?.versions ?? [], state.tag, {
+              : versionsPanel(loaded.slug, loaded.snaps, loaded.build?.versions ?? [], state.tag, {
                   select: (tag) => set({ tag }),
                   compare: (from, to) => set({ panel: "code", compare: `${from}..${to}` }),
                   lightbox: (items, index) => lightbox.show(items, index),
@@ -703,7 +719,7 @@ function infoPanel(sample: Loaded) {
   const info = sample.info;
   const meta = sample.meta;
   const latest = sample.snaps.tags[0];
-  const by = builtBy(builds[sample.slug]) ?? meta?.builtBy;
+  const by = builtBy(sample.build) ?? meta?.builtBy;
   const body = h(
     "div",
     { class: "info" },
@@ -811,7 +827,7 @@ function infoPanel(sample: Loaded) {
         h("p", { class: "muted" }, "Not rendered yet: ", h("code", null, `npm run snap -- ${sample.slug} v01`)),
       ),
     );
-  body.append(h("section", null, buildSection(builds[sample.slug])));
+  body.append(h("section", null, buildSection(sample.build)));
   return body;
 }
 
@@ -1147,16 +1163,18 @@ const reseed = () =>
 const togglePanel = (panel: Panel) => set({ panel: state.panel === panel ? null : panel });
 
 /** The Builds table over the page; picking a row opens that sample. */
-function toggleBuilds() {
+async function toggleBuilds() {
   const overlay = $("builds");
   overlay.hidden = !overlay.hidden;
-  if (!overlay.hidden)
-    $("builds-body").replaceChildren(
-      buildsTable(state.slug, (slug) => {
-        overlay.hidden = true;
-        select(slug);
-      }),
-    );
+  if (overlay.hidden) return;
+  const records = await loadBuilds();
+  if (overlay.hidden) return;
+  $("builds-body").replaceChildren(
+    buildsTable(records, state.slug, (slug) => {
+      overlay.hidden = true;
+      select(slug);
+    }),
+  );
 }
 
 for (const button of document.querySelectorAll<HTMLButtonElement>("[data-mode]"))

@@ -2,7 +2,8 @@
 // `npm run provenance` (scripts/provenance.ts) extracts these from the omp session logs and the harness reports
 // into `samples/<slug>.build.json`; builders never write them. A value the logs can't give is null, and `caveats`
 // holds the reason under the field's name; a value that is only a lower bound keeps its number and a caveat too.
-// Shown in the Info panel's Build section, the sample list's tooltips and the Builds table.
+// Shown in the Info panel's Build section, the sample list's tooltips and the Builds table. The page imports a
+// sample's record when the sample opens; the list reads `/__build-summaries` and the table `/__build-records`.
 import { h } from "./dom";
 import type { Child } from "./dom";
 import { roundSlugs } from "./rounds";
@@ -115,12 +116,24 @@ export type Build = {
   caveats: Record<string, string>;
 };
 
-/** Every library sample's build record; a round's samples belong to the round page (rounds.ts). */
-export const builds: Record<string, Build> = Object.fromEntries(
-  Object.values(import.meta.glob<Build>("../samples/*.build.json", { eager: true, import: "default" }))
-    .filter((build) => !roundSlugs.has(build.slug))
-    .map((build) => [build.slug, build]),
-);
+/** What the sample list uses from a build record (model filter, tooltip), served as `/__build-summaries`. */
+export type BuildSummary = Pick<Build, "cost" | "wallSeconds" | "tags"> & {
+  builder: Pick<Builder, "agent" | "model" | "effort" | "scope"> | null;
+  caveats: { cost?: string };
+};
+
+const records = import.meta.glob<Build>("../samples/*.build.json", { import: "default" });
+
+/** A sample's build record, or undefined without one. */
+export const loadBuild = (slug: string): Promise<Build | undefined> =>
+  records[`../samples/${slug}.build.json`]?.() ?? Promise.resolve(undefined);
+
+/** Every library sample's build record, in one request; a round's samples belong to the round page (rounds.ts). */
+export async function loadBuilds() {
+  const response = await fetch("/__build-records");
+  if (!response.ok) throw new Error(`/__build-records: ${response.status}`);
+  return ((await response.json()) as Build[]).filter((build) => !roundSlugs.has(build.slug));
+}
 
 const money = (value: number) => `$${value.toFixed(2)}`;
 
@@ -146,7 +159,7 @@ function known(build: Build, field: string, text: string | null): Child {
 const utc = (iso: string) => `${iso.slice(0, 16).replace("T", " ")} UTC`;
 
 /** One line for the sample list's tooltip, or null without a record. */
-export function buildTip(build: Build | undefined) {
+export function buildTip(build: BuildSummary | undefined) {
   const builder = build?.builder;
   if (!build || !builder) return null;
   return [
@@ -376,10 +389,10 @@ const COLUMNS: Column[] = [
 let sortBy = 2;
 let descending = false;
 
-/** Every sample's build side by side; a row click picks that sample. */
-export function buildsTable(selected: string, choose: (slug: string) => void): HTMLElement {
+/** Every sample's build side by side (`loadBuilds`); a row click picks that sample. */
+export function buildsTable(records: Build[], selected: string, choose: (slug: string) => void): HTMLElement {
   const column = COLUMNS[sortBy];
-  const rows = Object.values(builds).sort((a, b) => {
+  const rows = [...records].sort((a, b) => {
     const [x, y] = [column.key(a), column.key(b)];
     if (x === y) return a.slug.localeCompare(b.slug);
     if (x === null) return 1;
@@ -404,7 +417,7 @@ export function buildsTable(selected: string, choose: (slug: string) => void): H
               onclick: () => {
                 descending = i === sortBy ? !descending : Boolean(item.numeric);
                 sortBy = i;
-                table.replaceWith(buildsTable(selected, choose));
+                table.replaceWith(buildsTable(records, selected, choose));
               },
             },
             item.label,

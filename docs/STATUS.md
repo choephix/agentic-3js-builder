@@ -2,6 +2,12 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Build records off the showcase's first load, 2026-10-14
+
+The showcase bundled all 186 `samples/*.build.json` records into its startup JS (583 KB of JSON), though the list only uses each builder's model and a tooltip line. The Vite plugin now serves `/__build-summaries` (model, effort, agent, scope, cost, wall time, tags and the cost caveat; 38 KB, 5 KB gzipped) for the model filter and tooltips, and `/__build-records` (every record in one file) for the Builds table; both are static files in the build. The header's "by" line, the Info panel's Build section and the Versions panel use the open sample's record, imported alongside its module.
+
+Production build, JS the page loads before the first sample: 1,389 KB → 871 KB (280 → 226 KB gzipped). On RTX 3060 against the previous build, served locally: all 178 tile tooltips, the model filter and its default, redFox's header, Info Build section and Versions panel, and all 178 Builds-table rows and their sort matched; no page errors in the production or dev build. With 40 ms latency and 20 Mbit/s, the list appeared at about 320 ms (was 345–507) and the first Builds-table open took 126–191 ms (was 133–145).
+
 ## Paint bake speed, 2026-10-14
 
 Once the scatter fix was in, the paint bake was 85–96% of the slowest builds, nearly all of it in the noise in `src/paint.ts`. Same arithmetic, less work: `perlin()` evaluates its 8 corner gradients once instead of 12 times through a closure; `grad()` reads three 16-entry tables instead of a 16-way `switch`; `cells()` keeps its nearest cell in plain numbers and measures with `Math.sqrt` instead of `Math.hypot`; and the texel loop in `bakeSheet()` (`src/bake.ts`) accumulates position and normal without a per-texel closure. The API and every sample are unchanged.
