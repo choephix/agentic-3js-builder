@@ -25,6 +25,8 @@ Held-out result (12 subjects, three judges, 72 judgments):
 
 Sol + 2 turns minus agent final: +0.36 overall (bootstrap 95% CI 0.04–0.72); every judge, Opus included, put it above the agent finals. Sonnet + 2 turns is at parity (+0.07, CI −0.43–0.64). Picking the better of the Sonnet and Sol chains with a third judge helped on the dev set but not reliably on the held-out set, because the judges disagree on which builder is better. Contact sheets: `~/tmp/public/nilo/agentic-3js-builder/gap/` (`r5-grid.jpg`, `heldout-grid.jpg`). The study spent about $138 in API calls.
 
+A third Sol turn (`r7solc3`, panel `heldout-turn3`) beat the second only 41/72 at the same overall score (7.25 vs 7.25, agent final 6.97 in that panel): two critique turns are the useful depth.
+
 Caveats: the judges reward detail and staged bases (detail and overall correlate at 0.88), every one-shot arm builds a base where several agent finals have none, and GPT rates GPT builds highest. Wall times exclude renders, which take seconds each.
 
 ## Showcase: samples ghost in, 2026-10-15
