@@ -28,11 +28,19 @@ export type Report = {
   /** Absent in reports from before textures. */
   textures?: number;
   atlas?: {
-    size: number;
+    width?: number;
+    height?: number;
+    /** The square atlas's side, in reports from before atlases could be 2:1 rectangles. */
+    size?: number;
     tiles: number;
     alpha: boolean;
     /** Where each tile sits, in texels from the bottom-left (v up). Absent in reports from before it. */
-    layout?: { colors: Placed; textures: Array<Placed & { texture: string; tint: string }> };
+    layout?: {
+      colors: Placed;
+      textures: Array<Placed & { texture: string; tint: string }>;
+      /** Each paint sheet's charts, one tile apiece. Absent in reports that packed the sheet as one tile. */
+      charts?: Array<{ texture: string; tint: string; tiles: Placed[] }>;
+    };
   };
   size: [number, number, number];
   bounds: { min: number[]; max: number[] };
@@ -351,7 +359,12 @@ function reportSummary(report: Report) {
     ["Vertices", count(report.vertices)],
     ["Colours", String(report.colors)],
     ...(report.textures
-      ? ([["Textures", `${report.textures} · atlas ${report.atlas?.size ?? "?"} px`]] as Array<[string, string]>)
+      ? ([
+          [
+            "Textures",
+            `${report.textures} · atlas ${report.atlas ? `${report.atlas.width ?? report.atlas.size} × ${report.atlas.height ?? report.atlas.size}` : "?"} px`,
+          ],
+        ] as Array<[string, string]>)
       : []),
     ["Joints", String(report.joints.length)],
     ["Size", `${report.size.map((v) => v.toFixed(2)).join(" × ")} m`],

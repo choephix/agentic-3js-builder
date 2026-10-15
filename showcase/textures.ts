@@ -260,7 +260,7 @@ function atlasSection(latest: Snapshot | undefined, actions: TexturesActions) {
     h(
       "p",
       { class: "muted small" },
-      "The one texture of the exported GLBs: flat colour cells and every tinted texture, padded.",
+      "The one texture of the exported GLBs: flat colour cells, every tinted texture and each chart of the paint sheet, padded.",
     ),
     rows,
   );
@@ -268,40 +268,55 @@ function atlasSection(latest: Snapshot | undefined, actions: TexturesActions) {
     const atlas = report?.atlas;
     const layout = atlas?.layout;
     if (!atlas || !layout) return;
-    overlay.width = overlay.height = OVERLAY;
-    const scale = OVERLAY / atlas.size;
-    const tiles: Array<{ label: string; tint: string | null; place: Placed }> = [
-      { label: `Flat colours · ${report.colors}`, tint: null, place: layout.colors },
+    const width = atlas.width ?? atlas.size!;
+    const height = atlas.height ?? atlas.size!;
+    overlay.width = OVERLAY;
+    overlay.height = Math.round((OVERLAY * height) / width);
+    const scale = OVERLAY / width;
+    const tiles: Array<{ label: string; tint: string | null; places: Placed[]; size: string }> = [
+      {
+        label: `Flat colours · ${report.colors}`,
+        tint: null,
+        places: [layout.colors],
+        size: `${layout.colors.w} × ${layout.colors.h}`,
+      },
       ...layout.textures.map((tile, i) => ({
         label: `${kindOf(tile.texture.split(":")[0])} · tile ${i + 1}`,
         tint: tile.tint,
-        place: tile,
+        places: [tile],
+        size: `${tile.w} × ${tile.h}`,
+      })),
+      ...(layout.charts ?? []).map((group) => ({
+        label: kindOf(group.texture.split(":")[0]),
+        tint: group.tint,
+        places: group.tiles,
+        size: `${group.tiles.length} charts`,
       })),
     ];
     const draw = (hot: number | null) => {
       const context = overlay.getContext("2d")!;
-      context.clearRect(0, 0, OVERLAY, OVERLAY);
-      tiles.forEach(({ place }, i) => {
-        // Layout y runs up from the bottom; the picture's rows run down from the top.
-        const top = (atlas.size - place.y - place.h) * scale;
-        context.lineWidth = i === hot ? 5 : 2;
+      context.clearRect(0, 0, overlay.width, overlay.height);
+      tiles.forEach(({ places }, i) => {
+        context.lineWidth = i === hot ? 5 : places.length > 1 ? 1 : 2;
         context.strokeStyle = i === hot ? HOT : WIRE;
-        context.strokeRect(place.x * scale, top, place.w * scale, place.h * scale);
+        // Layout y runs up from the bottom; the picture's rows run down from the top.
+        for (const place of places)
+          context.strokeRect(place.x * scale, (height - place.y - place.h) * scale, place.w * scale, place.h * scale);
       });
     };
     draw(null);
     rows.replaceChildren(
-      ...tiles.map(({ label, tint, place }, i) =>
+      ...tiles.map(({ label, tint, size }, i) =>
         h(
           "div",
           { class: "part-row", onmouseenter: () => draw(i), onmouseleave: () => draw(null) },
           tint ? h("span", { class: "swatch", style: `background:${tint}`, "data-tip": `tint ${tint}` }) : h("span"),
           h("span", { class: "name" }, label),
-          h("span", { class: "muted num" }, `${place.w} × ${place.h}`),
+          h("span", { class: "muted num" }, size),
         ),
       ),
     );
-    section.querySelector("h3")!.textContent = `Atlas · ${latest.tag} · ${atlas.size} px`;
+    section.querySelector("h3")!.textContent = `Atlas · ${latest.tag} · ${width} × ${height} px`;
   });
   return section;
 }

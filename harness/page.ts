@@ -599,7 +599,8 @@ async function run({ code, arm, slug, tag, reportOnly, renderOnError }: RunOptio
 
   // The atlas as a picture, v up so drawings stand upright; transparent texels stay transparent.
   const atlasCanvas = document.createElement("canvas");
-  atlasCanvas.width = atlasCanvas.height = atlas.image.width;
+  atlasCanvas.width = atlas.image.width;
+  atlasCanvas.height = atlas.image.height;
   const pixels = new ImageData(atlas.image.width, atlas.image.height);
   const row = atlas.image.width * 4;
   const stored = atlas.image.data as Uint8Array;

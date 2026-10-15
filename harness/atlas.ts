@@ -1,8 +1,9 @@
-// The one texture of an assembled creature, packed like a sprite sheet: a block of flat colour cells in a corner
-// (flat parts point every UV at their cell's centre) and every texture the builder used, each tinted by its
-// material colour, with its edge pixels repeated into a gutter so filtering and mip levels never reach a
-// neighbour. Rows run bottom-up: row 0 is v = 0, which is how three reads a texture with flipY off and how glTF
-// stores it.
+// The one texture of an assembled creature, packed like a sprite sheet: a block of flat colour cells (flat parts
+// point every UV at their cell's centre), every texture the builder used, each tinted by its material colour, and
+// the paint sheet's charts one by one rather than the sheet as a whole. Textures get their edge pixels repeated into
+// a gutter so filtering and mip levels never reach a neighbour; charts bring their own dilated padding. The atlas is
+// a power-of-two square or a 2:1 rectangle, whichever is smallest. Rows run bottom-up: row 0 is v = 0, which is how
+// three reads a texture with flipY off and how glTF stores it.
 import {
   DataTexture,
   LinearFilter,
@@ -14,17 +15,25 @@ import {
 } from "three";
 import type { Texture } from "three";
 
-/** A texture as a material uses it: tinted by the material colour. `key` is unique per (texture, tint). */
-export type TileSource = { key: string; texture: Texture; tint: string };
+/**
+ * A texture as a material uses it: tinted by the material colour. `key` is unique per (texture, tint). With
+ * `rects` (a paint sheet's charts, already padded), each rectangle of the texture is packed as its own tile and the
+ * rest of the texture is left out.
+ */
+export type TileSource = { key: string; texture: Texture; tint: string; rects?: Placed[] };
 /** A tile's texels in the atlas (x, y from the bottom-left corner). */
 export type Placed = { x: number; y: number; w: number; h: number };
 export type Atlas = {
   texture: DataTexture;
-  size: number;
+  width: number;
+  height: number;
   /** UV of each flat colour's cell centre. */
   colorUv: Map<string, [number, number]>;
-  /** Every source key's tile. Sources whose tinted pixels are identical share one tile (aliases, as in TexturePacker). */
-  tiles: Map<string, Placed>;
+  /**
+   * Every source key's tiles: one for a whole texture, one per rectangle for a source with `rects`, in order.
+   * Sources whose tinted pixels are identical share one tile (aliases, as in TexturePacker).
+   */
+  tiles: Map<string, Placed[]>;
   /** Tiles actually packed, after duplicates are merged. */
   packed: number;
   /** The flat colour cells. */
@@ -123,6 +132,18 @@ function dilate(data: Uint8ClampedArray, width: number, height: number, passes: 
   }
 }
 
+/** The `rect` of `tile` as a tile of its own. */
+function crop(tile: Pixels, rect: Placed): Pixels {
+  const data = new Uint8ClampedArray(rect.w * rect.h * 4);
+  for (let y = 0; y < rect.h; y++) {
+    const from = ((rect.y + y) * tile.width + rect.x) * 4;
+    data.set(tile.data.subarray(from, from + rect.w * 4), y * rect.w * 4);
+  }
+  let alpha = false;
+  for (let i = 3; i < data.length && !alpha; i += 4) if (data[i] < 255) alpha = true;
+  return { data, width: rect.w, height: rect.h, alpha };
+}
+
 /** Halve a tile `times` times by averaging 2×2 blocks. */
 function shrink(tile: Pixels, times: number): Pixels {
   let { data, width, height } = tile;
@@ -151,28 +172,38 @@ function shrink(tile: Pixels, times: number): Pixels {
   return { data, width, height, alpha: tile.alpha };
 }
 
-/** Shelf-pack padded rectangles into a size × size square; null when they don't fit. */
-function pack(sizes: Array<{ w: number; h: number }>, size: number) {
-  const order = sizes.map((_, i) => i).sort((i, j) => sizes[j].h - sizes[i].h);
+/** Shelf-pack rectangles, each with its own gutter, into width × height; null when they don't fit. */
+function pack(sizes: Array<{ w: number; h: number; gutter: number }>, width: number, height: number) {
+  const order = sizes
+    .map((_, i) => i)
+    .sort((i, j) => sizes[j].h + 2 * sizes[j].gutter - sizes[i].h - 2 * sizes[i].gutter);
   const at: Array<[number, number]> = new Array(sizes.length);
   let x = 0;
   let y = 0;
   let shelf = 0;
   for (const i of order) {
-    const w = sizes[i].w + 2 * GUTTER;
-    const h = sizes[i].h + 2 * GUTTER;
-    if (w > size) return null;
-    if (x + w > size) {
+    const { gutter } = sizes[i];
+    const w = sizes[i].w + 2 * gutter;
+    const h = sizes[i].h + 2 * gutter;
+    if (w > width) return null;
+    if (x + w > width) {
       y += shelf;
       x = 0;
       shelf = 0;
     }
-    if (y + h > size) return null;
-    at[i] = [x + GUTTER, y + GUTTER];
+    if (y + h > height) return null;
+    at[i] = [x + gutter, y + gutter];
     x += w;
     shelf = Math.max(shelf, h);
   }
   return at;
+}
+
+/** Atlas shapes from smallest to largest: power-of-two squares and 2:1 rectangles, MIN_SIZE to MAX_SIZE a side. */
+const SHAPES: Array<[number, number]> = [];
+for (let side = MIN_SIZE; side <= MAX_SIZE; side *= 2) {
+  if (side / 2 >= MIN_SIZE) SHAPES.push([side, side / 2]);
+  SHAPES.push([side, side]);
 }
 
 /** FNV-1a over a tile's size and texels, to find candidate duplicates; equal hashes are confirmed byte by byte. */
@@ -183,38 +214,52 @@ function hashOf(tile: Pixels) {
 }
 
 export async function buildAtlas(colors: string[], sources: TileSource[]): Promise<Atlas> {
-  const all = await Promise.all(sources.map((source) => pixels(source.texture, source.tint)));
-  // Identical tinted pixels pack once: `slot[i]` is source i's index into `tiles`.
-  const tiles: Pixels[] = [];
+  const whole = await Promise.all(sources.map((source) => pixels(source.texture, source.tint)));
+  // Every tile before merging duplicates: a whole texture, or each of its rects. Rects bring their own padding.
+  const pieces = sources.flatMap((source, i) =>
+    source.rects
+      ? source.rects.map((rect) => ({ source: i, tile: crop(whole[i], rect), gutter: 0 }))
+      : [{ source: i, tile: whole[i], gutter: GUTTER }],
+  );
+  // Identical tinted pixels pack once: `slot[i]` is piece i's index into `tiles`.
+  const tiles: Array<{ tile: Pixels; gutter: number }> = [];
   const byHash = new Map<number, number[]>();
-  const slot = all.map((tile) => {
+  const slot = pieces.map(({ tile, gutter }) => {
     const hash = hashOf(tile);
     const candidates = byHash.get(hash) ?? [];
     const found = candidates.find((index) => {
       const other = tiles[index];
       return (
-        other.width === tile.width && other.height === tile.height && other.data.every((v, i) => v === tile.data[i])
+        other.gutter === gutter &&
+        other.tile.width === tile.width &&
+        other.tile.height === tile.height &&
+        other.tile.data.every((v, i) => v === tile.data[i])
       );
     });
     if (found !== undefined) return found;
-    candidates.push(tiles.push(tile) - 1);
+    candidates.push(tiles.push({ tile, gutter }) - 1);
     byHash.set(hash, candidates);
     return tiles.length - 1;
   });
   const cells = Math.max(1, Math.ceil(Math.sqrt(colors.length)));
-  const block = { w: cells * CELL, h: cells * CELL };
+  const block = { w: cells * CELL, h: cells * CELL, gutter: GUTTER };
   let halvings = 0;
-  let size = MIN_SIZE;
+  let [width, height] = SHAPES[0];
   let placed: Array<[number, number]> | null = null;
-  let scaled = tiles;
+  let scaled = tiles.map(({ tile }) => tile);
   for (; !placed; halvings++) {
-    scaled = halvings ? tiles.map((tile) => shrink(tile, halvings)) : tiles;
-    const sizes = [block, ...scaled.map((tile) => ({ w: tile.width, h: tile.height }))];
-    for (size = MIN_SIZE; size <= MAX_SIZE && !placed; size *= 2) placed = pack(sizes, size);
-    size /= 2;
+    scaled = tiles.map(({ tile }) => (halvings ? shrink(tile, halvings) : tile));
+    const sizes = [block, ...scaled.map((tile, i) => ({ w: tile.width, h: tile.height, gutter: tiles[i].gutter }))];
+    for (const [w, h] of SHAPES) {
+      placed = pack(sizes, w, h);
+      if (placed) {
+        [width, height] = [w, h];
+        break;
+      }
+    }
   }
 
-  const data = new Uint8Array(size * size * 4);
+  const data = new Uint8Array(width * height * 4);
   const [bx, by] = placed[0];
   const colorUv = new Map<string, [number, number]>();
   colors.forEach((color, index) => {
@@ -223,20 +268,22 @@ export async function buildAtlas(colors: string[], sources: TileSource[]): Promi
     const y0 = by + Math.floor(index / cells) * CELL;
     for (let y = y0; y < y0 + CELL; y++)
       for (let x = x0; x < x0 + CELL; x++)
-        data.set([(hex >> 16) & 255, (hex >> 8) & 255, hex & 255, 255], (y * size + x) * 4);
-    colorUv.set(color, [(x0 + CELL / 2) / size, (y0 + CELL / 2) / size]);
+        data.set([(hex >> 16) & 255, (hex >> 8) & 255, hex & 255, 255], (y * width + x) * 4);
+    colorUv.set(color, [(x0 + CELL / 2) / width, (y0 + CELL / 2) / height]);
   });
   // The block's gutter repeats its edge cells.
-  blit(data, size, { data: new Uint8ClampedArray(0), width: 0, height: 0, alpha: false }, bx, by, block.w, block.h);
+  const empty = { data: new Uint8ClampedArray(0), width: 0, height: 0, alpha: false };
+  blit(data, width, height, empty, bx, by, block.w, block.h, GUTTER);
 
   const placedTiles = scaled.map((tile, i) => {
     const [x, y] = placed![i + 1];
-    blit(data, size, tile, x, y, tile.width, tile.height);
+    blit(data, width, height, tile, x, y, tile.width, tile.height, tiles[i].gutter);
     return { x, y, w: tile.width, h: tile.height };
   });
-  const tilesAt = new Map<string, Placed>(sources.map((source, i) => [source.key, placedTiles[slot[i]]]));
+  const tilesAt = new Map<string, Placed[]>(sources.map((source) => [source.key, []]));
+  pieces.forEach((piece, i) => tilesAt.get(sources[piece.source].key)!.push(placedTiles[slot[i]]));
 
-  const texture = new DataTexture(data, size, size, RGBAFormat, UnsignedByteType);
+  const texture = new DataTexture(data, width, height, RGBAFormat, UnsignedByteType);
   texture.name = "atlas";
   texture.colorSpace = SRGBColorSpace;
   // One sampler for the whole atlas: a pixelated source texture (nearest magnification) makes it all pixelated.
@@ -249,30 +296,42 @@ export async function buildAtlas(colors: string[], sources: TileSource[]): Promi
   texture.needsUpdate = true;
   return {
     texture,
-    size,
+    width,
+    height,
     colorUv,
     tiles: tilesAt,
     packed: tiles.length,
     block: { x: bx, y: by, w: block.w, h: block.h },
-    alpha: tiles.some((tile) => tile.alpha),
+    alpha: tiles.some(({ tile }) => tile.alpha),
   };
 }
 
 /**
- * Copy `tile` to (x, y) and repeat its edge texels GUTTER deep around it. With an empty tile, only the gutter is
+ * Copy `tile` to (x, y) and repeat its edge texels `gutter` deep around it. With an empty tile, only the gutter is
  * written, from the w × h texels already in the atlas at (x, y).
  */
-function blit(data: Uint8Array, size: number, tile: Pixels, x: number, y: number, w: number, h: number) {
-  const read = (sx: number, sy: number) => (tile.width ? (sy * tile.width + sx) * 4 : ((y + sy) * size + (x + sx)) * 4);
+function blit(
+  data: Uint8Array,
+  width: number,
+  height: number,
+  tile: Pixels,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  gutter: number,
+) {
+  const read = (sx: number, sy: number) =>
+    tile.width ? (sy * tile.width + sx) * 4 : ((y + sy) * width + (x + sx)) * 4;
   const source = tile.width ? tile.data : data;
-  for (let dy = -GUTTER; dy < h + GUTTER; dy++)
-    for (let dx = -GUTTER; dx < w + GUTTER; dx++) {
+  for (let dy = -gutter; dy < h + gutter; dy++)
+    for (let dx = -gutter; dx < w + gutter; dx++) {
       const inside = dx >= 0 && dy >= 0 && dx < w && dy < h;
       if (inside && !tile.width) continue;
       const tx = x + dx;
       const ty = y + dy;
-      if (tx < 0 || ty < 0 || tx >= size || ty >= size) continue;
+      if (tx < 0 || ty < 0 || tx >= width || ty >= height) continue;
       const from = read(Math.min(Math.max(dx, 0), w - 1), Math.min(Math.max(dy, 0), h - 1));
-      data.set(source.subarray(from, from + 4), (ty * size + tx) * 4);
+      data.set(source.subarray(from, from + 4), (ty * width + tx) * 4);
     }
 }

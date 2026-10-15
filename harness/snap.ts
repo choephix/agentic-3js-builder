@@ -148,7 +148,7 @@ type Report = {
   vertices: number;
   colors: number;
   textures: number;
-  atlas: { size: number; tiles: number; alpha: boolean };
+  atlas: { width: number; height: number; tiles: number; alpha: boolean };
   size: number[];
   bounds: { min: number[]; max: number[] };
   groups: Array<{ name: string; parts: number }>;
@@ -225,7 +225,7 @@ const warnings = report.issues.filter((issue) => issue.level === "warning");
 console.log(`Issues: ${errors.length} error(s), ${warnings.length} warning(s)`);
 for (const issue of report.issues) console.log(`  ${issue.level.toUpperCase().padEnd(7)} ${issue.message}`);
 console.log(
-  `Parts: ${report.parts} · triangles: ${report.triangles} · vertices: ${report.vertices} · colors: ${report.colors} · textures: ${report.textures} · atlas: ${report.atlas.size} px, ${report.atlas.tiles} tile(s)${report.atlas.alpha ? ", cut-out" : ""}`,
+  `Parts: ${report.parts} · triangles: ${report.triangles} · vertices: ${report.vertices} · colors: ${report.colors} · textures: ${report.textures} · atlas: ${report.atlas.width} × ${report.atlas.height} px, ${report.atlas.tiles} tile(s)${report.atlas.alpha ? ", cut-out" : ""}`,
 );
 if (report.fine.length) {
   const mm = (m: number) => `${Math.round(m * 1000)} mm`;

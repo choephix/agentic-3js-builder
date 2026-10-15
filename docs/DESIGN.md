@@ -290,3 +290,14 @@ Rounds r2 and r3 (Sonnet 5.5), r3opus (Opus 5.5), r1opus and r1resdk ran on SDK 
 - **Named errors**: `part({ dir })` with a zero-length direction names `part()` and the value; `toPoint`, `toDirection` and `toFrame` name their caller and list an unusable object's keys; the harness's "Assembly has no valid skeleton" now carries the error count and the first three errors.
 
 Rerun on report-only renders: 21 of the 28 now build with no error-level issues (one was a browser connection drop). Of the 7 left, three outlines cross themselves by the model's own coordinates (two by under a millimetre), one `part` aims along a zero-length segment, one asks `surface` for a joint that carries nothing, one treats joints as three.js objects throughout (`getWorldPosition`), and one plain three.js build passes an undefined geometry. Every sample and every r3 and r3opus build that already rendered reports the same parts, triangles, joints and issues as before.
+
+## The atlas packs paint charts, not the paint sheet
+
+Stefan, looking at a model's textures: a paint sheet packed inside the atlas is a sprite sheet inside a sprite sheet. The measurement agreed: across the latest render of 496 samples, the median atlas used 25% of its texels, and the paint sheet was 95% of what it used. The atlas was a square at least twice the sheet's width, so a 2048 sheet always made a 4096 atlas.
+
+- **Charts are tiles.** `bakeSheet` records each chart's padded rectangle on the sheet (`texture.userData.charts`). The harness cuts every chart out and packs it beside the textures and the colour block in one shelf pass, then moves each painted vertex's UV from its chart on the sheet into that chart's tile. Texels are copied, not resampled, so the paint looks as it did. A chart keeps its 4 texels of dilated padding as its gutter; drawings keep their 8.
+- **2:1 rectangles.** The atlas is the smallest power-of-two square or 2:1 rectangle that fits. Powers of two keep mipmaps and block compression simple everywhere the GLB goes; glTF and WebGL2 need nothing more.
+- **The SDK is unchanged for builders.** The live model still uses the paint sheet: it needs one material for every painted part, and drawings rasterise asynchronously while `b.root` returns at once, so the one-atlas pass stays in the harness.
+- **Identical charts pack once,** like identical drawings already did: the cargo dock's 415 charts pack as 393 tiles.
+
+On 40 random samples (report-only, before and after), atlas texels fell 63% (298M to 109M): 21 atlases quartered, 11 halved, 8 unchanged (flat-coloured or already small). Six full renders (cargoDockCratesSonnet, redFox, griffin, scarecrow, gelatinousCube, juniperBonsai) match their before shots to within 0.25% of pixels; a side-by-side crop of the cargo dock's front shows no visible change. A shelf packer still leaves the cargo dock's 4096 × 2048 atlas 46% full: its 3.9M used texels are 92% of 2048 × 2048, more than shelf packing reaches.

@@ -497,7 +497,7 @@ b.cards(hits, tuft, { size: [0.03, 0.07], lean: 65, bend: 30, vary: 0.3, rng: rn
 
 ### Budget
 
-The harness bakes the model into one mesh with one texture, the atlas: a block of flat colour cells, the paint sheet (`paintSize` texels wide) and every texture with its tint. It packs up to 4096 texels square and shrinks textures when they don't fit; the report prints the atlas size.
+The harness bakes the model into one mesh with one texture, the atlas: a block of flat colour cells, every chart of the paint sheet as its own tile, and every texture with its tint. It packs into a power-of-two square or 2:1 rectangle up to 4096 texels and shrinks tiles when they don't fit; the report prints the atlas size.
 
 ### Decals
 

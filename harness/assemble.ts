@@ -2,7 +2,8 @@
 // way Nilo bakes a puppet: every part is baked into model space, and every
 // colour and texture lives in one atlas packed like a sprite sheet (harness/atlas.ts):
 // flat parts point their UVs at their colour's cell, textured parts keep their
-// own UVs mapped into their tile, and transparent texels are cut away. In the
+// own UVs mapped into their tile, painted parts map each chart of the paint sheet
+// into that chart's own tile, and transparent texels are cut away. In the
 // rigged arms every part is skinned to its bone (or its own per-vertex weights).
 // Parts with a standard three.js `emissive` material glow in their own colours: they are grouped at the end of the
 // mesh and drawn with a copy of the material that emits the atlas itself at their `emissiveIntensity`.
@@ -66,14 +67,19 @@ export type Assembly = {
   /** Distinct textures (by name, else uuid); tinted copies share one entry here but get their own tiles. */
   textures: string[];
   /**
-   * The atlas: its side in texels, tile count, whether it cuts out, and where each tile sits (texels from the
-   * bottom-left, v up): the flat colour block and each texture with its tint.
+   * The atlas: its size in texels, tile count, whether it cuts out, and where each tile sits (texels from the
+   * bottom-left, v up): the flat colour block, each texture with its tint, and each paint sheet's charts.
    */
   atlas: {
-    size: number;
+    width: number;
+    height: number;
     tiles: number;
     alpha: boolean;
-    layout: { colors: Placed; textures: Array<Placed & { texture: string; tint: string }> };
+    layout: {
+      colors: Placed;
+      textures: Array<Placed & { texture: string; tint: string }>;
+      charts: Array<{ texture: string; tint: string; tiles: Placed[] }>;
+    };
   };
   issues: Issue[];
   triangles: number;
@@ -102,6 +108,27 @@ function inherited(object: Object3D, read: (candidate: Object3D) => string | und
 function visibleInTree(object: Object3D) {
   for (let current: Object3D | null = object; current; current = current.parent) if (!current.visible) return false;
   return true;
+}
+
+/** The index of the rectangle holding texel (x, y), or -1; rectangles don't overlap. A coarse grid keeps it fast. */
+function rectFinder(rects: Placed[], width: number, height: number) {
+  const CELL = 64;
+  const cols = Math.ceil(width / CELL);
+  const grid: number[][] = Array.from({ length: cols * Math.ceil(height / CELL) }, () => []);
+  rects.forEach((rect, index) => {
+    for (let cy = Math.floor(rect.y / CELL); cy <= Math.floor((rect.y + rect.h - 1) / CELL); cy++)
+      for (let cx = Math.floor(rect.x / CELL); cx <= Math.floor((rect.x + rect.w - 1) / CELL); cx++)
+        grid[cy * cols + cx]?.push(index);
+  });
+  return (x: number, y: number) => {
+    const cell = grid[Math.floor(y / CELL) * cols + Math.floor(x / CELL)] ?? [];
+    return (
+      cell.find((index) => {
+        const rect = rects[index];
+        return x >= rect.x && y >= rect.y && x < rect.x + rect.w && y < rect.y + rect.h;
+      }) ?? -1
+    );
+  };
 }
 
 /** How a part is coloured: its colour alone, or a texture tinted by that colour (and by vertex colours), and its glow. */
@@ -327,7 +354,13 @@ export async function assemble(root: Object3D, rigged: boolean): Promise<Assembl
       texture = textureNames.indexOf(name);
       if (texture < 0) texture = textureNames.push(name) - 1;
       const key = `${look.texture.uuid}|${color}`;
-      if (!tileSources.has(key)) tileSources.set(key, { key, texture: look.texture, tint: color });
+      if (!tileSources.has(key))
+        tileSources.set(key, {
+          key,
+          texture: look.texture,
+          tint: color,
+          rects: look.texture.userData.charts as Placed[] | undefined,
+        });
     } else if (!colorSeen.has(color)) {
       colorSeen.add(color);
       colorList.push(color);
@@ -408,20 +441,48 @@ export async function assemble(root: Object3D, rigged: boolean): Promise<Assembl
   // Sphere poles overshoot 0..1 by half a segment; only real repeats are worth a warning.
   const WRAP_SLACK = 0.07;
   const wrapped = new Set<string>();
+  const finders = new Map<string, (x: number, y: number) => number>();
+  const offChart = new Set<string>();
   baked.forEach((geometry, index) => {
     const count = geometry.getAttribute("position").count;
     const look = looks[index];
     const part = new Float32Array(count).fill(index);
     const uv = new Float32Array(count * 2);
     if (look.texture) {
-      const tile = atlas.tiles.get(`${look.texture.uuid}|${look.color}`)!;
+      const key = `${look.texture.uuid}|${look.color}`;
+      const tiles = atlas.tiles.get(key)!;
+      const rects = tileSources.get(key)!.rects;
       const own = geometry.getAttribute("uv");
-      for (let i = 0; i < count; i++) {
-        const u = own.getX(i);
-        const v = own.getY(i);
-        if (u < -WRAP_SLACK || u > 1 + WRAP_SLACK || v < -WRAP_SLACK || v > 1 + WRAP_SLACK) wrapped.add(labels[index]);
-        uv[i * 2] = (tile.x + Math.min(Math.max(u, 0), 1) * tile.w) / atlas.size;
-        uv[i * 2 + 1] = (tile.y + Math.min(Math.max(v, 0), 1) * tile.h) / atlas.size;
+      if (rects) {
+        // A painted part: its UVs point into one chart of the sheet; move them into that chart's tile.
+        const { width, height } = look.texture.image as { width: number; height: number };
+        if (!finders.has(key)) finders.set(key, rectFinder(rects, width, height));
+        const find = finders.get(key)!;
+        const used = new Uint8Array(count);
+        for (const id of geometry.index!.array) used[id] = 1;
+        for (let i = 0; i < count; i++) {
+          const x = own.getX(i) * width;
+          const y = own.getY(i) * height;
+          const chart = find(x, y);
+          if (chart < 0) {
+            if (used[i]) offChart.add(labels[index]);
+            continue;
+          }
+          const rect = rects[chart];
+          const tile = tiles[chart];
+          uv[i * 2] = (tile.x + ((x - rect.x) * tile.w) / rect.w) / atlas.width;
+          uv[i * 2 + 1] = (tile.y + ((y - rect.y) * tile.h) / rect.h) / atlas.height;
+        }
+      } else {
+        const tile = tiles[0];
+        for (let i = 0; i < count; i++) {
+          const u = own.getX(i);
+          const v = own.getY(i);
+          if (u < -WRAP_SLACK || u > 1 + WRAP_SLACK || v < -WRAP_SLACK || v > 1 + WRAP_SLACK)
+            wrapped.add(labels[index]);
+          uv[i * 2] = (tile.x + Math.min(Math.max(u, 0), 1) * tile.w) / atlas.width;
+          uv[i * 2 + 1] = (tile.y + Math.min(Math.max(v, 0), 1) * tile.h) / atlas.height;
+        }
       }
     } else {
       const center = atlas.colorUv.get(look.color) ?? [0.5, 0.5];
@@ -504,6 +565,11 @@ export async function assemble(root: Object3D, rigged: boolean): Promise<Assembl
       level: "warning",
       message: `${[...wrapped].slice(0, 3).join("; ")}${wrapped.size > 3 ? ` and ${wrapped.size - 3} more` : ""}: texture coordinates outside 0..1 are clamped; atlas tiles do not repeat`,
     });
+  if (offChart.size)
+    issues.push({
+      level: "error",
+      message: `${[...offChart].slice(0, 3).join("; ")}${offChart.size > 3 ? ` and ${offChart.size - 3} more` : ""}: painted texture coordinates fall outside every paint chart`,
+    });
   const material = new MeshStandardMaterial({
     map: atlas.texture,
     color: 0xffffff,
@@ -556,16 +622,26 @@ export async function assemble(root: Object3D, rigged: boolean): Promise<Assembl
     colors: colorList,
     textures: textureNames,
     atlas: {
-      size: atlas.size,
+      width: atlas.width,
+      height: atlas.height,
       tiles: atlas.packed,
       alpha: atlas.alpha,
       layout: {
         colors: atlas.block,
-        textures: [...tileSources.values()].map((source) => ({
-          texture: textureName(source.texture),
-          tint: source.tint,
-          ...atlas.tiles.get(source.key)!,
-        })),
+        textures: [...tileSources.values()]
+          .filter((source) => !source.rects)
+          .map((source) => ({
+            texture: textureName(source.texture),
+            tint: source.tint,
+            ...atlas.tiles.get(source.key)![0],
+          })),
+        charts: [...tileSources.values()]
+          .filter((source) => source.rects)
+          .map((source) => ({
+            texture: textureName(source.texture),
+            tint: source.tint,
+            tiles: atlas.tiles.get(source.key)!,
+          })),
       },
     },
     issues,

@@ -351,6 +351,9 @@ export function bakeSheet(painted: readonly Painted[], material: MeshStandardMat
   texture.generateMipmaps = true;
   texture.anisotropy = 8;
   texture.needsUpdate = true;
+  // Each chart's rectangle with its padding, in texels from the bottom-left (v up): an exporter can pack the charts
+  // one by one instead of the whole sheet.
+  texture.userData.charts = packed.at.map(([x, y], ci) => ({ x, y, w: sizes[ci][0], h: sizes[ci][1] }));
   material.map = texture;
   material.needsUpdate = true;
   return { texture, density };
