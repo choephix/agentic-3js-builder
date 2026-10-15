@@ -6,6 +6,7 @@ import {
   duration,
   esc,
   int,
+  model,
   money,
   outcome,
   roundInfo,
@@ -223,6 +224,10 @@ function drawViewer() {
       <div class="kvs">
         ${row("Outcome", `<span style="color:${OUTCOMES[state].color}">${OUTCOMES[state].name}</span>`)}
         ${row("Cost", money(build.cost ?? NaN))}
+        ${build.mode ? row("Feedback", `${esc(build.mode)} ← ${esc(build.from ?? "")}`) : ""}
+        ${build.chainCost !== null ? row("Chain cost", money(build.chainCost)) : ""}
+        ${build.edits ? row("Edits", build.edits.wholeModule ? "Whole module" : `${build.edits.blocks} blocks · ${build.edits.failed.length} failed`) : ""}
+        ${build.critic?.model ? row("Critic", esc(model(build.critic.model).name)) : ""}
         ${row("Time", duration(build.wallMs / 1000))}
         ${row("Input", `${tokens(build.input ?? NaN)} <small>(${tokens(build.cached ?? 0)} cached)</small>`)}
         ${row("Output", `${tokens(build.output ?? NaN)} <small>${int(speed(build))} tok/s</small>`)}

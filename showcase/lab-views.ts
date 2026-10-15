@@ -439,6 +439,36 @@ export const PRESETS: Record<
   string,
   { name: string; lead: string; state: Partial<CompareState> & { pick: Record<Dim, string[]> } }
 > = {
+  heldout: {
+    name: "App vs agent · held-out",
+    lead: "12 unseen subjects: Sonnet and Sol, before and after two critique turns. Agent finals are in chapter 13's contact sheet.",
+    state: {
+      set: "r7",
+      rows: "subject",
+      cols: "round",
+      pick: { subject: [], round: ["r7", "r7c2", "r7sol", "r7solc2"], arm: ["auto"], level: ["rich"] },
+    },
+  },
+  critique: {
+    name: "Dev · Sonnet critique chain",
+    lead: "Craft first draft → three self-critique turns, on the 16 development briefs.",
+    state: {
+      set: "r5",
+      rows: "subject",
+      cols: "round",
+      pick: { subject: [], round: ["r6", "r6c1", "r6c2", "r6c3"], arm: ["craft"], level: ["rich"] },
+    },
+  },
+  solchain: {
+    name: "Dev · Sol critique chain",
+    lead: "Sol's craft2 first draft and two critique turns, on the same development briefs.",
+    state: {
+      set: "r5",
+      rows: "subject",
+      cols: "round",
+      pick: { subject: [], round: ["r9sol", "r9solc1", "r9solc2"], arm: ["craft2"], level: ["rich"] },
+    },
+  },
   models: {
     name: "Five models, one prompt",
     lead: "Round 4's pitches with the docs, SDK-first prompt: Sonnet and Astra and Sol at xhigh, Opus at high, Haiku at xhigh.",
@@ -544,14 +574,18 @@ function available(dim: Dim): string[] {
     return store.data.subjects.filter((subject) => subject.set === compare.set).map((subject) => subject.id);
   if (dim === "level") return ["terse", "rich"];
   const used = new Set(builds(rounds.map((round) => round.id)).map((build) => build.arm));
-  return store.data.arms.filter((arm) => used.has(arm.id)).map((arm) => arm.id);
+  const arms = store.data.arms.filter((arm) => used.has(arm.id)).map((arm) => arm.id);
+  // Some model pipelines use different arms (held-out Sonnet uses craft; Sol uses craft2).
+  if (compare.rows !== "arm" && compare.cols !== "arm") arms.push("auto");
+  return arms;
 }
 function dimLabel(dim: Dim, value: string, long = false) {
   if (dim === "round") {
     const round = store.rounds.get(value)!;
     return `${runnerChip(round)}${long ? ` <code>${value}</code>` : ""}`;
   }
-  if (dim === "arm") return `${armChip(value)} ${esc(store.arms.get(value)?.name ?? value)}`;
+  if (dim === "arm")
+    return value === "auto" ? "Each run's arm" : `${armChip(value)} ${esc(store.arms.get(value)?.name ?? value)}`;
   if (dim === "subject") return esc(title(value));
   return esc(title(value));
 }
@@ -572,6 +606,10 @@ export function renderCompare(root: HTMLElement, rerender: () => void) {
   const lookup = (rowValue: string, colValue: string) => {
     const v: Record<Dim, string> = { subject: "", round: "", arm: "", level: "" };
     for (const [dim] of DIMS) v[dim] = dim === compare.rows ? rowValue : dim === compare.cols ? colValue : fixed(dim);
+    if (v.arm === "auto")
+      return store.data.builds.find(
+        (build) => build.round === v.round && build.subject === v.subject && build.level === v.level,
+      );
     return find(v.round, v.subject, v.level, v.arm);
   };
   const blindCols = ui.blind && (compare.cols === "round" || compare.cols === "arm");
@@ -579,7 +617,7 @@ export function renderCompare(root: HTMLElement, rerender: () => void) {
     if (!compare.text) return "";
     const subjectId = compare.rows === "subject" ? rowValue : compare.cols === "subject" ? "" : fixed("subject");
     const level = compare.rows === "level" ? rowValue : compare.cols === "level" ? "" : fixed("level");
-    const subject = store.subjects.get(subjectId);
+    const subject = store.data.subjects.find((subject) => subject.id === subjectId && subject.set === compare.set);
     if (!subject) return "";
     if (!level)
       return `<p class="pitch-text"><b>Terse:</b> ${esc(subject.terse)}<br><b>Rich:</b> ${esc(subject.rich)}</p>`;
@@ -950,7 +988,7 @@ export function renderFailures(root: HTMLElement) {
 
 export function renderPitches(root: HTMLElement) {
   const sets = groupBy(store.data.subjects, (subject) => subject.set);
-  root.innerHTML = `${sectionHead("Pitches", `${store.data.subjects.length} subjects in four sets, each with a terse and a rich pitch of the same subject. The strip under each pitch is that pitch on the docs, SDK-first arm (C) in every run of its set; click the subject for every run × arm.`)}
+  root.innerHTML = `${sectionHead("Pitches", `${store.data.subjects.length} briefs in ${sets.size} sets. Rounds 1–4 pair terse and rich pitches; the gap study uses the agent's exact Category/Subject/Style brief. The strips show the docs SDK-first arm in the original rounds, craft on the development set and each held-out pipeline's arm.`)}
   ${[...sets]
     .map(([set, subjects]) => {
       const rounds = store.roundList.filter((round) => roundInfo(round.id).set === set && round.id !== "r1resdk");
@@ -962,7 +1000,20 @@ export function renderPitches(root: HTMLElement) {
           .map((subject) => {
             const strip = (level: "terse" | "rich") =>
               `<div class="pitch-strip nav-scope">${(ui.blind ? shuffled(rounds, subject.id + level) : rounds)
-                .map((round) => find(round.id, subject.id, level, "docs-sdk"))
+                .map((round) =>
+                  find(
+                    round.id,
+                    subject.id,
+                    level,
+                    set === "r5"
+                      ? "craft"
+                      : set === "r7"
+                        ? round.id.startsWith("r7sol")
+                          ? "craft2"
+                          : "craft"
+                        : "docs-sdk",
+                  ),
+                )
                 .filter((build): build is LabBuild => Boolean(build))
                 .map((build) => card(build, { caption: "none" }))
                 .join("")}</div>`;

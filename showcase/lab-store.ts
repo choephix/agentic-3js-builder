@@ -7,6 +7,7 @@ import {
   esc,
   model,
   outcome,
+  ROUND_INFO,
   roundInfo,
   runnerLabel,
   title,
@@ -29,9 +30,21 @@ export const store = {
 };
 
 export function load(data: LabData) {
+  // New study rounds carry their pitch set and SDK in the manifest. Keep the historical ordering intact.
+  data.rounds
+    .filter((round) => !ROUND_INFO[round.id])
+    .sort((a, b) => a.started.localeCompare(b.started))
+    .forEach((round, index) => {
+      ROUND_INFO[round.id] = {
+        set: round.set ?? round.id.slice(0, 2),
+        checkedOn: round.sdkCommit ?? "?",
+        order: 18 + index,
+        note: round.note,
+      };
+    });
   const order = (id: string) => roundInfo(id).order;
   data.rounds.sort((a, b) => order(a.id) - order(b.id));
-  const subjectOrder = new Map(data.subjects.map((subject, index) => [subject.id, index]));
+  const subjectOrder = new Map(data.subjects.map((subject, index) => [subject.id, index] as const).reverse());
   const armOrder = new Map(data.arms.map((arm, index) => [arm.id, index]));
   data.builds.sort(
     (a, b) =>
@@ -44,7 +57,8 @@ export function load(data: LabData) {
   store.bySlug = new Map(data.builds.map((build) => [build.slug, build]));
   store.rounds = new Map(data.rounds.map((round) => [round.id, round]));
   store.roundList = data.rounds;
-  store.subjects = new Map(data.subjects.map((subject) => [subject.id, subject]));
+  // Keep the original brief as the default for old chapters; compare chooses the brief within its set.
+  store.subjects = new Map([...data.subjects].reverse().map((subject) => [subject.id, subject]));
   store.arms = new Map(data.arms.map((arm) => [arm.id, arm]));
   store.cell = new Map(
     data.builds.map((build) => [`${build.round}|${build.subject}|${build.level}|${build.arm}`, build]),

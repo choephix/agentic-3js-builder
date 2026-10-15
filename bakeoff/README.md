@@ -4,6 +4,8 @@ How well does a model build from one system prompt and one pitch, with no tools 
 
 The showcase's `/lab` page tells the whole story of every round so far: what was tried in which order and why, with a scoreboard, a filterable gallery, a compare grid with presets, charts of time, tokens and cost, failures by message, the pitches and the method. It reads every round from `lab.json` (`showcase/lab-data.mjs`); its thumbnails come from `npm run lab-thumbs`, a cache outside git that `showcase:build` fills. `npm run lab-export` writes a static copy to webshare, http://axalon:8080/nilo/agentic-3js-builder/lab/, that needs no dev server and links nowhere outside itself. Its viewer shows each build's render sheet and its exported GLB in 3D, with turntable, wiggle, skeleton and wireframe.
 
+The last story chapter covers the one-shot vs agentic gap study (rounds 5–9): stronger style briefs, kits and craft prompts, repair/critique chains, and the fixed two-turn held-out results from `docs/STATUS.md`. Compare presets open the 12 held-out briefs and the Sonnet/Sol development critique chains. The held-out contact sheet is a bundled asset (`showcase/lab-heldout-grid.jpg`), so the exported chapter keeps its agent-final comparison; later rounds may appear in the data without changing that recorded table.
+
 ## Pieces
 
 - `arms.json`: each arm is a contract, an optional taste paragraph and a reference.

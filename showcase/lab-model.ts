@@ -21,6 +21,12 @@ export type LabBuild = {
   output: number | null;
   reasoningChars: number;
   cost: number | null;
+  /** Total API spend through this feedback turn; `cost` is this turn alone. */
+  chainCost: number | null;
+  mode: "repair" | "critique" | null;
+  from: string | null;
+  edits: { blocks: number; failed: string[]; wholeModule?: boolean } | null;
+  critic: { model?: string } | null;
   checked: boolean;
   typeErrors: number | null;
   typeErrorSample: string[];
@@ -54,12 +60,16 @@ export type LabRound = {
   sdkCommit?: string;
   promptsFrom?: string;
   note?: string;
+  set?: string;
+  refineFrom?: string;
+  modes?: Array<"repair" | "critique">;
+  critic?: string | null;
   maxTokens: number;
   pricing: { input: number; output: number; cacheRead: number; cacheWrite: number } | null;
   subjects: string[];
   prompts: Record<string, number | null>;
 };
-export type LabSubject = Subject & { set: string };
+export type LabSubject = Subject & { set: string; agent?: string };
 export type LabData = {
   generated: string;
   arms: Arm[];
@@ -89,6 +99,12 @@ export const ARM_COLORS: Record<string, string> = {
   "brief-sdk": "#51cf66",
   "brief-prim": "#9775fa",
   plain: "#adb5bd",
+  docs: "#4dabf7",
+  kits: "#9775fa",
+  kitsamb: "#e64980",
+  craft: "#51cf66",
+  craft2: "#22b8cf",
+  craft2plan: "#fd7e14",
 };
 
 /**
@@ -135,12 +151,15 @@ export const SETS: Record<string, string> = {
   r2: "Round 2 pitches",
   r3: "Round 3 pitches",
   r4: "Round 4 pitches",
+  r5: "Agent gap · dev briefs",
+  r7: "Agent gap · held-out briefs",
 };
 
 /** "Sonnet medium", "Haiku xhigh", "Sonnet medium (re-checked)": what a round ran, without its pitch set. */
 export function runnerLabel(round: LabRound) {
   const label = roundInfo(round.id).label;
-  return `${model(round.model).short} ${round.effort}${label ? ` (${label})` : ""}`;
+  const feedback = round.refineFrom ? ` · ${round.modes?.join("/") || "feedback"} ← ${round.refineFrom}` : "";
+  return `${model(round.model).short} ${round.effort}${label ? ` (${label})` : ""}${feedback}`;
 }
 
 // ── Outcomes ─────────────────────────────────────────────────────────────────────────────────────────────────────

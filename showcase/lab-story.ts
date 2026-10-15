@@ -22,6 +22,7 @@ import {
 } from "./lab-model";
 import { tokenScatter, galleryLink } from "./lab-views";
 import { armChip, builds, card, find, modelDot, original, runnerChip, shuffled, store } from "./lab-store";
+import heldoutGrid from "./lab-heldout-grid.jpg?url";
 
 const t = (round: string) => tally(builds([round]));
 const pool = (...rounds: string[]) => tally(builds(rounds));
@@ -157,7 +158,7 @@ const CHAPTERS: Chapter[] = [
     when: "Overview",
     title: "What was tested",
     body: () => `
-      <p class="lead"><b>agentic-3js-builder</b> is a TypeScript SDK that lets a language model build a rigged, low-poly three.js model from code: joints and chains for the skeleton, tubes, shells and surface placement for the body. An application using it sends the model one system prompt and the user's pitch (“A fennec fox.”) and runs the TypeScript module that comes back. The model has no tools, gets no second turn and never sees an error.</p>
+      <p class="lead"><b>agentic-3js-builder</b> is a TypeScript SDK that lets a language model build a rigged, low-poly three.js model from code: joints and chains for the skeleton, tubes, shells and surface placement for the body. The original bake-off tests an application that sends the model one system prompt and the user's pitch (“A fennec fox.”) and runs the TypeScript module that comes back. In those rounds the model has no tools, gets no second turn and never sees an error. <a href="#story/gap">Chapter 13</a> adds style briefs, kits and feedback turns, and asks whether that app can match an agentic session.</p>
       <p>This bake-off measures how well that single shot works, and what it depends on:</p>
       <ul class="rules">
         <li><b>Reference.</b> What the system prompt carries about the SDK: its whole source code, its docs, a short brief, or nothing (plain three.js).</li>
@@ -165,7 +166,7 @@ const CHAPTERS: Chapter[] = [
         <li><b>Pitch detail.</b> Every subject has a terse pitch (one line) and a rich one (colours, character, accessories), so the two can be compared directly.</li>
         <li><b>Model and effort.</b> Claude Sonnet, Opus and Haiku 5.5, GPT-6 Astra and GPT-6.1 Sol, at medium and maximum reasoning effort.</li>
       </ul>
-      <p>The subjects are mostly creatures, with a few props, one humanoid (an armoured knight) and one diorama per set, all in the SDK's default stylised look. Quality is not scored automatically: this page reports what built, what it cost and how long it took, and leaves visual judgement to the reader, with a gallery, side-by-side comparisons and a blind mode.</p>`,
+      <p>The original subjects are mostly creatures, with a few props, one humanoid (an armoured knight) and one diorama per set, all in the SDK's default stylised look. Rounds 1–4 report what built, what it cost and how long it took, leaving visual judgement to the reader. The later gap study adds blind vision judging on development and held-out briefs.</p>`,
   },
   {
     id: "setup",
@@ -186,6 +187,9 @@ const CHAPTERS: Chapter[] = [
       <p>Each system prompt variant is an <b>arm</b>: a reference crossed with a taste, plus a plain three.js control. All arms share one contract: reply with a single TypeScript module that default-exports a function returning the model.</p>
       <div class="arms-mini">
         ${store.data.arms
+          .filter((arm) =>
+            ["source-sdk", "source-prim", "docs-sdk", "docs-prim", "brief-sdk", "brief-prim", "plain"].includes(arm.id),
+          )
           .map(
             (arm) =>
               `<div class="arm-pill" style="--c:${ARM_COLORS[arm.id]}">${armChip(arm.id)}<span><b>${esc(arm.name)}</b><small>${esc(arm.idea)}</small><em>${size(arm.id)} input tokens per call</em></span></div>`,
@@ -443,7 +447,7 @@ const CHAPTERS: Chapter[] = [
         <li><b>The models trade price for reliability.</b> At medium: Opus ${pct(opusAll.rate)} at ${money(opusAll.costPer)} a build, Sonnet ${pct(sonnetAll.rate)} at ${money(sonnetAll.costPer)}, Haiku ${pct(haikuMedium.rate)} at ${money(haikuMedium.costPer)}.</li>
         <li><b>Rich pitches build more.</b> On Sonnet medium, the median rendered build has ${int(levels("terse"))} parts from a terse pitch and ${int(levels("rich"))} from a rich one.</li>
         <li><b>Time depends on load as much as on the model.</b> At medium effort the Claude models take 1–5 minutes a build; at xhigh, builds take 6–45 minutes, and a burst of requests to one account can slow a provider several-fold.</li>
-        <li><b>Not measured: quality.</b> The gallery, the compare presets and blind mode (B) are there to judge it by eye.</li>
+        <li><b>Not measured in rounds 1–4: quality.</b> The gallery, the compare presets and blind mode (B) are there to judge it by eye. <a href="#story/gap">The later gap study</a> adds blind vision judging.</li>
       </ol>`;
     },
   },
@@ -458,10 +462,70 @@ const CHAPTERS: Chapter[] = [
         <li><b>True latency.</b> A few builds per model at one request at a time, away from bursts.</li>
         <li><b>Opus at xhigh</b>, which this setup didn't offer.</li>
         <li><b>Round 2 at Haiku xhigh</b> is partial: ${t("r2haikux").n} of 280 builds.</li>
-        <li><b>A second turn.</b> Send the render report or the crash back once and let the model fix its build.</li>
+        <li><b>A second turn.</b> Send the render report or the crash back once and let the model fix its build. <a href="#story/gap">Tested in the next chapter.</a></li>
         <li><b>What still crashes after pass 2:</b> self-crossing outlines, zero-length directions, joints used as three.js objects, surfaces on empty joints.</li>
-        <li><b>Style kits</b> as another axis, and cheaper models not yet run.</li>
+        <li><b>Style kits</b> as another axis, and cheaper models not yet run. <a href="#story/gap">Kits join the next study.</a></li>
       </ul>`,
+  },
+  {
+    id: "gap",
+    num: "13",
+    when: "2026-10-15 · rounds 5–9",
+    title: "Can an app match an agentic session?",
+    body: () => {
+      const rounds = store.roundList.filter((round) => ["r5", "r7"].includes(roundInfo(round.id).set));
+      const rows = rounds
+        .map((round) => {
+          const own = builds([round.id]);
+          const chainCosts = own.map((build) => build.chainCost ?? NaN);
+          return `<tr><td><a href="${galleryLink({ rounds: round.id })}"><code>${esc(round.id)}</code></a></td><td>${runnerChip(round)}</td><td>${[...new Set(own.map((build) => build.arm))].map((id) => `${armChip(id)} ${esc(store.arms.get(id)?.name ?? id)}`).join("<br>")}</td><td class="n">${tally(own).rendered}/${own.length}</td><td class="n">${money(median(chainCosts))}</td></tr>`;
+        })
+        .join("");
+      return `
+      ${question("Can an app—prompt → module → run it → screenshot it → send feedback—match an agent that reads, builds, looks and edits?")}
+      <p class="lead">The agentic Sonnet sessions took a median <b>18 minutes and $3.75</b>. We reused their exact Category/Subject/Style briefs: <b>16 development subjects</b> to work out the prompt, then <b>12 held-out subjects</b> to test the pipelines. No tool-using agent is inside the app; it makes API calls and runs the code.</p>
+      <h3>H1 · The gap was the first draft</h3>
+      <p>Across 464 agentic builds, the first file write is a median <b>94% of the final file</b>. The original lab one-shots had no style, no kits and a short docs prompt. So round 5 supplied the agent's style brief, every kit's doc and source, the paint and texture source, and an ambition target: <b>180–340 parts, 5–12 textures, 700–1,100 lines and a staged base</b>.</p>
+      <div class="statrow">${stat("6.33", "docs-only · dev panel")}${stat("8.05", "kits + source + ambition · dev panel")}${stat("7.09", "agent first draft · same panel")}${stat("8.36", "agent final · same panel")}</div>
+      <p><b>Kits alone did nothing.</b> The stronger first-draft brief—not an invisible advantage from many rounds of editing—closed most of this panel's gap. The imported agent first drafts are browsable as <code>r5agent</code>; repairs are separate builds, not replacements.</p>
+      <h3>The craft prompt</h3>
+      <p>Comparing agent and one-shot code gave us construction habits, not just bigger counts: build the subject first, push its proportions with a scale constant per feature, settle the face first, spend the richest construction on its signature features, paint by place, and fit the setting to the subject. <code>craft.md</code> and <code>craft2.md</code> carry those habits. Craft beat the ambition-only arm <b>45/60</b> head-to-head judgments.</p>
+      <h3>Feedback turns · repair, then critique</h3>
+      <p><b>Repair</b> sends the failing module and its error back. It fixed 15 of 16 crashed agent drafts, and every crashed one-shot within two turns, for about $0.05. <b>Critique</b> sends four renders and measurements back and asks for SEARCH/REPLACE edits (or a whole module). Fewer than 1% failed; the first turn beat its input <b>51/64</b> and the second beat the first <b>47/64</b>, at $0.07–0.15 per turn. A build's viewer shows its source, feedback mode and cumulative chain cost.</p>
+      <p>Round 5 branches through repair and two critiques. Round 6 tries craft, critique v1 (<code>r6c1–c3</code>), v2 (<code>r6d1–d2</code>), v3 (<code>r6e1–e2</code>) and medium effort. Round 8 tests craft2, planning and self-critique against a GPT critic with a Sonnet editor (<code>r8k1–k2</code>). Round 9 puts Sol on the development set; round 7 keeps both builders on the held-out set.</p>
+      ${explore(["#compare?preset=critique", "Sonnet's dev critique chain"], ["#compare?preset=solchain", "Sol's dev critique chain"], [galleryLink({ rounds: "r8,r8fix,r8c1,r8c2,r8k1,r8k2,r8k2fix", group: "round" }), "Self-critique vs external critic"])}
+      <aside class="changed"><h4>What did not help</h4><ul>
+        <li><b>Medium effort:</b> 6.14 against 7.97; it wrote 15 KB instead of 27 KB.</li>
+        <li><b>Plan then build:</b> the planning arm lost to the plain craft2 arm 12/64.</li>
+        <li><b>GPT critic + Sonnet editor:</b> no gain, at 10× the turn cost. The priority-ordered critique v2 did not help either.</li>
+        <li><b>High effort can overthink:</b> Sonnet spends 50–90k completion tokens, mostly thinking. A 64k cap left about 5% with no code; 120k fixed it.</li>
+      </ul></aside>
+      <p>Sol writes leaner modules (about $0.26 and 5 minutes) and gains most from feedback: two turns beat its first draft <b>86/96</b> on the development comparisons.</p>
+      <h3>Held out · 12 unseen subjects</h3>
+      <div class="table-wrap"><table class="scores compact">
+        <thead><tr><th>Pipeline</th><th class="n">Overall</th><th class="n">Mean rank</th><th class="n">Beats agent final</th><th class="n">Median cost</th><th class="n">Median model time</th></tr></thead>
+        <tbody>
+          <tr><td>Agentic session (final)</td><td class="n">7.07</td><td class="n">2.79</td><td class="n">—</td><td class="n">$3.75</td><td class="n">18 min</td></tr>
+          <tr><td>Sonnet one-shot, craft</td><td class="n">6.85</td><td class="n">3.35</td><td class="n">31/72</td><td class="n">$0.64</td><td class="n">8 min</td></tr>
+          <tr><td>Sonnet + 2 critique turns</td><td class="n">7.14</td><td class="n">2.75</td><td class="n">35/72</td><td class="n">$1.02</td><td class="n">9 min</td></tr>
+          <tr><td>GPT-6.1 Sol one-shot, craft2</td><td class="n">6.79</td><td class="n">3.69</td><td class="n">26/72</td><td class="n">$0.26</td><td class="n">5 min</td></tr>
+          <tr><td><b>GPT-6.1 Sol + 2 critique turns</b></td><td class="n"><b>7.43</b></td><td class="n"><b>2.42</b></td><td class="n">37/72</td><td class="n">$0.55</td><td class="n">12 min</td></tr>
+        </tbody>
+      </table></div>
+      <p>Sol + two turns minus the agent final: <b>+0.36 overall</b> (bootstrap 95% CI 0.04–0.72); all three judges, Opus included, put it above the agent finals. Sonnet + two turns is at parity: +0.07 (CI −0.43–0.64). Picking the better Sonnet or Sol chain with a third judge helped on the dev set, but not reliably on the held-out set: judges disagree on the better builder.</p>
+      <figure class="study-sheet">
+        <div class="study-sheet-scroll"><div class="study-sheet-labels"><b>Agent final</b><b>Sonnet · craft</b><b>Sonnet · +2 turns</b><b>Sol · craft2</b><b>Sol · +2 turns</b></div><a href="${heldoutGrid}" target="_blank" rel="noopener"><img src="${heldoutGrid}" width="1530" height="3672" alt="Twelve held-out subjects, each with the agent final beside Sonnet and Sol first drafts and their two-turn critique pipelines" loading="lazy"></a></div>
+        <figcaption class="mm-note">Each row is one held-out subject, in pitch order. Agent finals are the original v02 renders. As in the judged panel, the one-shot columns include crash repairs where needed. Open the sheet for full-resolution details. The compare preset below keeps the raw r7 and r7sol rounds, so their original failures remain visible; the gallery also carries their repairs.</figcaption>
+      </figure>
+      ${explore(["#compare?preset=heldout", "Compare all four held-out pipelines"], [galleryLink({ rounds: "r7,r7fix,r7c1,r7c2,r7sol,r7solfix,r7solc1,r7solc2", group: "subject" }), "Held-out builds and repairs"])}
+      <h3>How this was judged—and what it does not prove</h3>
+      <p>Candidates were shown blind as a three-quarter plus front image, scored 1–10 for overall, subject, style and detail, with defects and a ranking. The dev panels used two or three vision judges (GPT-6.1 Sol, Gemini 3.8 Flash and Opus 5.5), each in two shuffled orders. The held-out panel used all three: 12 subjects × 3 judges × 2 orders = <b>72 judgments</b>. Scores compare only within a panel; wins count head-to-head rankings. The numbers above are the recorded study summary, not a fresh judgment of this page.</p>
+      <p><b>Caveats:</b> judges reward detail and staged bases (detail and overall correlate at 0.88). Every one-shot arm adds a base; several agent finals have none. GPT rates GPT builds highest. Model times exclude renders, which take seconds each. The study spent about $138 in API calls. This is evidence for a bounded pipeline on these briefs, not proof that every app can replace every agentic session.</p>
+      <details><summary>Every study round · sources, arms and chain costs</summary>
+        <p class="mm-note">Repair rounds contain the builds they repaired, not a complete replacement for the source. “Chain cost” is the median cumulative API spend recorded on a feedback build; a dash means no chain cost was recorded. Any later runs shown here are not part of the fixed two-turn held-out table above.</p>
+        <div class="table-wrap"><table class="scores compact"><tr><th>Round</th><th>Builder / source</th><th>Arms</th><th class="n">Rendered</th><th class="n">Median chain cost</th></tr>${rows}</table></div>
+      </details>`;
+    },
   },
 ];
 

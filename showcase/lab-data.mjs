@@ -13,12 +13,14 @@ const THUMB_VIEWS = ["front", "side", "back", "top"];
 
 const json = (path) => readFile(path, "utf8").then(JSON.parse, () => null);
 
-/** The pitch files, oldest first; a subject belongs to the first set that lists it. */
+/** Pitch sets, oldest first. An ID may recur with a different brief in a later study. */
 const PITCH_SETS = [
   ["r1", "pitches.json"],
   ["r2", "pitches-r2.json"],
   ["r3", "pitches-r3.json"],
   ["r4", "pitches-r4.json"],
+  ["r5", "pitches-r5.json"],
+  ["r7", "pitches-r7.json"],
 ];
 
 /** The first error line of a crash's stack, and where it was thrown: an SDK file, the build itself or the harness. */
@@ -63,13 +65,17 @@ export async function v01Renders(slug, root, url) {
 }
 
 export async function labData(renders) {
-  const arms = (await json(join(bakeoffDir, "arms.json"))).arms;
+  const arms = [];
+  const armIds = new Set();
+  const addArms = (list) => {
+    for (const arm of list ?? []) if (!armIds.has(arm.id)) (armIds.add(arm.id), arms.push(arm));
+  };
+  for (const file of ["arms.json", "arms-r5.json", "arms-r6.json", "arms-r8.json"])
+    addArms((await json(join(bakeoffDir, file)))?.arms);
   const subjects = [];
-  const seen = new Set();
   for (const [set, file] of PITCH_SETS) {
     const pitches = await json(join(bakeoffDir, file));
-    for (const subject of pitches?.subjects ?? [])
-      if (!seen.has(subject.id)) (seen.add(subject.id), subjects.push({ ...subject, set }));
+    for (const subject of pitches?.subjects ?? []) subjects.push({ ...subject, set });
   }
   const thumbs = new Set(await readdir(labThumbRoot).catch(() => []));
   const rounds = [];
@@ -85,8 +91,13 @@ export async function labData(renders) {
     const manifest = await json(join(bakeoffDir, "rounds", id, "round.json"));
     const data = await bakeoffRound(id, cached);
     if (!manifest || !data) continue;
-    const { arms: _arms, subjects: roundSubjects, ...rest } = manifest;
-    rounds.push({ ...rest, subjects: roundSubjects.map((subject) => subject.id), prompts: data.prompts });
+    const { arms: roundArms, subjects: roundSubjects, ...rest } = manifest;
+    addArms(roundArms);
+    const set = subjects.find(
+      (subject) => subject.id === roundSubjects[0]?.id && subject.agent === roundSubjects[0]?.agent,
+    )?.set;
+    const modes = [...new Set(data.builds.map((build) => build.mode).filter(Boolean))];
+    rounds.push({ ...rest, set, modes, subjects: roundSubjects.map((subject) => subject.id), prompts: data.prompts });
     for (const build of data.builds) {
       const check = build.check;
       const report = check?.report ?? null;
@@ -118,6 +129,11 @@ export async function labData(renders) {
         output: build.usage?.completion_tokens ?? null,
         reasoningChars: build.reasoningChars,
         cost: build.costUsd ?? null,
+        chainCost: build.chainCostUsd ?? null,
+        mode: build.mode ?? null,
+        from: build.from ?? null,
+        edits: build.edits ?? null,
+        critic: build.critic ?? null,
         checked: Boolean(check),
         typeErrors: check?.typeErrors ?? null,
         typeErrorSample: check?.typeErrorSample?.slice(0, 3) ?? [],
