@@ -1,0 +1,35 @@
+{
+  "id": 1,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3mzM5oGjFL39weq7hc7",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_01XECERdDBcifXLv3cK13fTL",
+        "name": "bash",
+        "input": {
+          "command": "cd ~/tmp-archive/sonnet-100/koalaSonnet && sed -n 1,34p src/builder.ts; grep -n \"Joint\" src/*.ts | grep -n \"export\" | head"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "input_transformations": [
+      {
+        "type": "thinking_dropped",
+        "path": "messages.5.content.0",
+        "reason": "prefix_binding_mismatch"
+      }
+    ],
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 115,
+      "cache_read_input_tokens": 69768,
+      "cache_creation_input_tokens": 26265
+    }
+  }
+}

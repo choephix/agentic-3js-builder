@@ -1,0 +1,32 @@
+{
+  "id": 20,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3ns8uzH2ZhEj5EeMe5e",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "text",
+        "text": "A koala sample already exists; let me look at it."
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01HR7fb69E1KgykoUEzZXMcn",
+        "name": "bash",
+        "input": {
+          "command": "wc -l samples/koala.ts; git log --oneline -3 -- samples/koala.ts; git status --short | head; sed -n 1,80p samples/koala.ts"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 119,
+      "cache_read_input_tokens": 159116,
+      "cache_creation_input_tokens": 307
+    }
+  }
+}

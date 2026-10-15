@@ -24,7 +24,7 @@
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
@@ -401,7 +401,9 @@ async function check(round: string, args: string[]) {
   let done = 0;
   await pool(builds, Number(option(args, "concurrency", "2")), async (slug) => {
     const file = join(dir, "builds", `${slug}.ts`);
-    const types = await capture(tsx, ["scripts/typecheck.ts", file], 180_000);
+    const types = args.includes("--skip-typecheck")
+      ? { stdout: "", stderr: "" }
+      : await capture(tsx, ["scripts/typecheck.ts", file], 180_000);
     // Unused names (TS6133) are style, not API mistakes.
     const typeErrors = [...`${types.stdout}\n${types.stderr}`.matchAll(/^.*error TS(?!6133)\d+:.*$/gm)].map(
       (m) => m[0],
@@ -422,7 +424,8 @@ async function check(round: string, args: string[]) {
     }
     writeJson(join(dir, "checks", `${slug}.json`), {
       slug,
-      typeErrors: typeErrors.length,
+      typeErrors: args.includes("--skip-typecheck") ? null : typeErrors.length,
+      typecheckSkipped: args.includes("--skip-typecheck"),
       typeErrorSample: typeErrors.slice(0, 8).map((line) => line.replace(`${ROOT}/`, "")),
       rendered: Boolean(report),
       lane: found?.lane ?? null,
@@ -548,6 +551,7 @@ async function refine(round: string, args: string[]) {
     views,
     critique,
     critic: criticModel || null,
+    systemPromptOverride: option(args, "system-prompt", "") || null,
     sdkCommit: (await capture("git", ["rev-parse", "--short", "HEAD"])).stdout.trim(),
   });
   const edits = read("bakeoff/prompts/refine-edits.md").trim();
@@ -557,7 +561,11 @@ async function refine(round: string, args: string[]) {
   await pool(todo, Number(option(args, "concurrency", "8")), async ({ src, slug, slugOut }) => {
     const previous = readJson<RunRecord>(join(src, "runs", `${slug}.json`));
     const checked = readJson<CheckRecord>(join(src, "checks", `${slug}.json`));
-    const system = readFileSync(join(src, "prompts", `${previous.arm}.md`), "utf8");
+    const override = option(args, "system-prompt", "");
+    const system = readFileSync(
+      override ? resolve(ROOT, override) : join(src, "prompts", `${previous.arm}.md`),
+      "utf8",
+    );
     mkdirSync(join(dir, "prompts"), { recursive: true });
     writeFileSync(join(dir, "prompts", `${previous.arm}.md`), system);
     const current = readFileSync(join(src, "builds", `${slug}.ts`), "utf8")
@@ -691,27 +699,31 @@ function results(round: string) {
   console.log(`results.json: ${entries.length} builds, $${total.toFixed(2)} estimated.`);
 }
 
-const [command, target, ...rest] = process.argv.slice(2);
-if (command === "prompt") {
-  const arm = arms().find((a) => a.id === target);
-  if (!arm)
-    throw new Error(
-      `No arm "${target}". Arms: ${arms()
-        .map((a) => a.id)
-        .join(", ")}`,
+export { gateway, ask, wireImports, results, capture, systemPrompt };
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const [command, target, ...rest] = process.argv.slice(2);
+  if (command === "prompt") {
+    const arm = arms().find((a) => a.id === target);
+    if (!arm)
+      throw new Error(
+        `No arm "${target}". Arms: ${arms()
+          .map((a) => a.id)
+          .join(", ")}`,
+      );
+    const text = systemPrompt(arm);
+    const out = join(ROOT, "scratch", "bakeoff", `${arm.id}.md`);
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, text);
+    console.log(`${out}: ${text.length} chars, about ${Math.round(text.length / 3.6 / 1000)}k tokens`);
+  } else if (command === "run" && target) await run(target, rest);
+  else if (command === "check" && target) await check(target, rest);
+  else if (command === "refine" && target) await refine(target, rest);
+  else if (command === "results" && target) results(target);
+  else {
+    console.error(
+      "Usage: npm run bakeoff -- prompt <arm> | run <round> [options] | check <round> | refine <round> --from <round> [options] | results <round>",
     );
-  const text = systemPrompt(arm);
-  const out = join(ROOT, "scratch", "bakeoff", `${arm.id}.md`);
-  mkdirSync(dirname(out), { recursive: true });
-  writeFileSync(out, text);
-  console.log(`${out}: ${text.length} chars, about ${Math.round(text.length / 3.6 / 1000)}k tokens`);
-} else if (command === "run" && target) await run(target, rest);
-else if (command === "check" && target) await check(target, rest);
-else if (command === "refine" && target) await refine(target, rest);
-else if (command === "results" && target) results(target);
-else {
-  console.error(
-    "Usage: npm run bakeoff -- prompt <arm> | run <round> [options] | check <round> | refine <round> --from <round> [options] | results <round>",
-  );
-  process.exit(2);
+    process.exit(2);
+  }
 }

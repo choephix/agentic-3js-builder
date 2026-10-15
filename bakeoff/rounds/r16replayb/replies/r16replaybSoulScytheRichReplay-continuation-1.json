@@ -1,0 +1,40 @@
+{
+  "id": 11,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3nXoi3oeREYAYVXTvMV",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "I should check whether to type joints using a derived return type or just import the `Joint` type directly from the skeleton module -- probably better to grep for how it's defined there.\n\n",
+        "signature": "CAQShAcKEAgSGAI4AUIIdGhpbmtpbmcSDPAGzSK68y98ID3Z1BoMNni4dBhY1RH+q1U1IjAd8bSRY0HYAzn0H+YWwpExnzh9noGRJgy6QiYMPVc5UkkgXNUqLtj3PKAem1NYH24qoQYNRx2tCGCFcTLBHjvybZu6o7ySaQLURe4B7DGmVetQ+Hb3tDXv7yG3X6RAAuvy3XK3kM56JyE/kAa/pgflJ7vSTIeXDmzlySEISfwbpDgboj6n7KRHhT+bpjnVA9bkei3iwuDySVSlcRKJGor4hE1kO4ky4ROGdLayYiTxtaECYEoATS8jaL98yKaqoYpjkioUOy9aOaaI7f1hYYiXaNNhwQymt1wFGBkXiwTUVClpI9TnGnkMIAsvv67yCkbzKZTd4n0Xln9l+Bpa8ehhMoOg0lE8vFfbtx2RTX80H3XfF1yqiGs9bbgQzVNUcegN1Unnk6hT+U0ESvSZ9yLhnfZOc91blIVXyYwBbN4dwSa6cyvL0btk+s4wSmokjd5sdAl+UrqojNptBbYfevy63jsGZ9NacM6DNZRw07YlvxB0Oltp5+Rr5SqQVgnvPK0JLeWf8LyHglpwMiLXr8USZ3lQFsS+WID1YTDANEwvQ/IglU8hLeasyYdFP9ck3SZjRnvrqp8i8n4FV//eZCwCZ2gNGyFtVFxmPXu4a3Yk4f4bojMRNk8HGQLOvD+gl/NqDtnFipS7bVIxbp2oxPdd3HmzMP6q1i5SOaXdhR0K0X+cipwZ4zwiC4oN6Fu81oCCH0ZMOQt5GoDfpjS2qdL9ZhwCRLyeUuNNxLQFmJazD40ghOcJTevPFOD4nToFGd+VxHq4KTjBipfaP58MPEuDyoViRxc+E6eUePU0cplB8rKFnD9vYNZc5FLQvt5z1Bduprg+7St4qKRys/Lk+zhqGrFOWOYIZlBctrSUoaKIHIadql9n6i7QKyTVjO9rjIZuZrjAMpWaasGo12a2h8AlIk2WCLi/1vOqRrt6uAeZh7kbMecAYZD7/6JA9TITcd4GFiHbhWtVpunCa9VXb50KoaUul9LPBivP53xNTNKZXkgadAEBEDEA5Vts96mlAdYM0lK/wmZ9xVJ64q0thPUIZIA29smnXeMKAIzy1xkY0Z9/ghqtVWGXS/g1ssiZJk+A2Q/5CS6Vfe8N1qDgpgipP5EnkFvkDRuoDEr0IGvdppsQQ7wYAQ=="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_016FraFmae9cTWtQ5FH1k2ZE",
+        "name": "bash",
+        "input": {
+          "command": "cd ~/tmp-archive/sonnet-100/soulScytheSonnet/ && grep -n \"export class Joint\\|export type Joint\" src/*.ts; sed -n 90,125p src/math.ts; grep -n \"flat\" src/parts.ts | head"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "input_transformations": [
+      {
+        "type": "thinking_dropped",
+        "path": "messages.7.content.0",
+        "reason": "prefix_binding_mismatch"
+      }
+    ],
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 200,
+      "cache_read_input_tokens": 65303,
+      "cache_creation_input_tokens": 29198
+    }
+  }
+}

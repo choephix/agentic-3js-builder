@@ -1,0 +1,38 @@
+{
+  "id": 15,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3nrdXu2DoJijSZYUJkh",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_012ixJW8Hr8Hvv6qJt1boVZF",
+        "name": "glob",
+        "input": {
+          "path": "samples/*.ts",
+          "limit": 5
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01TXK5Zij8voKw7iF8FeQZW1",
+        "name": "grep",
+        "input": {
+          "pattern": "agentic-3js-builder",
+          "path": "tsconfig.json;package.json"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 160,
+      "cache_read_input_tokens": 177896,
+      "cache_creation_input_tokens": 506
+    }
+  }
+}
