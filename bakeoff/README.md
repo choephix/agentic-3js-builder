@@ -14,7 +14,9 @@ The showcase's `/lab` page tells the whole story of every round so far: what was
     - `docs`: `docs/api.md` and `docs/conventions.md`, about 23k tokens.
     - `brief`: the top of `docs/api.md` up to "Frames" (helper map, cheat sheet, target, module), about 4k tokens.
     - `none`.
-- `pitches.json` (round 1) and `pitches-r2.json` (round 2): subjects (creatures, a humanoid, a prop, a diorama), each with a `terse` and a `rich` pitch of the same subject.
+  - **Optional fields:** `kits: true` adds every style kit's doc and source (importable as `agentic-3js-builder/kits/<name>`); `sources` adds named `src/` files verbatim; `extra` adds prompt files after the taste (`ambition.md`, `craft.md`, `craft2.md`); `plan` makes the model write a build sheet from that prompt file (medium effort) before the module, in the same conversation.
+- `pitches.json` (round 1), `pitches-r2.json` … `pitches-r4.json`: subjects (creatures, a humanoid, a prop, a diorama), each with a `terse` and a `rich` pitch of the same subject. `pitches-r5.json` (16 dev subjects) and `pitches-r7.json` (12 held-out subjects) carry the exact Category/Subject/Style briefs the agentic Sonnet builders got, so a one-shot can be compared with that sample.
+- Other arm sets: `arms-r5.json` (docs, kits, kitsamb), `arms-r6.json` (craft), `arms-r8.json` (craft2, craft2plan).
 - `rounds/<round>/`: one run of arms × subjects × levels:
   - `round.json`: model, effort, arms and pitches as run.
   - `prompts/`: the exact system prompts.
@@ -25,12 +27,26 @@ The showcase's `/lab` page tells the whole story of every round so far: what was
 
 The model's reply is one fenced TypeScript block. Its module imports `three` and `"agentic-3js-builder"`, which the runner points at `src/index.ts`. The module default-exports a no-argument function that returns the model.
 
+## Feedback turns
+
+`refine <round> --from <source>` gives every build of the source round one more turn, as an app would after running the module. The conversation is the arm's system prompt, the pitch, the current module as the model's own reply, and the feedback:
+
+- **Repair**, when the module failed: the error (`prompts/refine-repair.md`).
+- **Critique**, when it built: the snap's shots as images (`--views`) and its measurements (counts, size, issues, loose parts), with `prompts/refine-critique.md` or another `--critique` file. `--critic <model>` lets a second model write the change list from the renders and the code (`prompts/refine-critic.md`) and the builder makes it (`prompts/refine-apply.md`).
+
+The reply is SEARCH/REPLACE edits (`prompts/refine-edits.md`) or a whole module. The new round's slugs swap the round prefix (`r6RedPandaRichCraft` → `r6c1RedPandaRichCraft`); `chainCostUsd` sums the chain. `--from a,b` takes each build from the first listed round that has it, so a repair round can lead the round it repaired. A check that can't reach the shared browser leaves the build unchecked rather than recording a failure.
+
+## Judging
+
+`judge.py` scores rendered builds blind with vision models through the same gateway (usage in its docstring). `judging/<panel>-spec.json` lists each subject's candidates by snap prefix; `judging/<panel>-judged.json` holds every judgment (scores per candidate, defects, ranking). The panels of the one-shot vs agentic study (docs/STATUS.md, 2026-10-15) are there.
+
 ## Commands
 
 ```
 npm run bakeoff -- prompt <arm>            # write an arm's system prompt to scratch/bakeoff/ and print its size
 npm run bakeoff -- run <round> [--model anthropic/claude-sonnet-5-5] [--effort medium] [--arms a,b] [--subjects x,y] [--levels terse,rich] [--concurrency 8] [--arm-set arms.json] [--pitches pitches.json]
 npm run bakeoff -- check <round>           # typecheck and render (snap tag v01) every build without a check yet
+npm run bakeoff -- refine <round> --from <round>[,<round>] [--model …] [--views …] [--critique file.md] [--critic model] [--repair-only]
 npm run bakeoff -- results <round>         # rebuild results.json
 npm run lab-thumbs                         # thumbnails for the /lab page (missing or outdated ones only)
 npm run lab-export                         # static /lab copy on webshare (rerun after new rounds)

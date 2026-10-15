@@ -1,0 +1,34 @@
+{
+  "slug": "r8k2fixDwarfRiflemanRichCraft2",
+  "from": "r8k2DwarfRiflemanRichCraft2",
+  "mode": "repair",
+  "arm": "craft2",
+  "subject": "dwarfRifleman",
+  "level": "rich",
+  "pitch": "Category: Humanoid character.\nSubject: dwarf rifleman with braided beard and blunderbuss.\nStyle: Blizzard/Warcraft.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "high",
+  "started": "2026-10-14T23:48:13.568Z",
+  "wallMs": 6855,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 104682,
+    "completion_tokens": 616,
+    "total_tokens": 105298,
+    "prompt_tokens_details": {
+      "cached_tokens": 83781
+    }
+  },
+  "costUsd": 0.0563401,
+  "chainCostUsd": 2.3629369999999996,
+  "hasCode": true,
+  "edits": {
+    "blocks": 1,
+    "failed": [],
+    "wholeModule": false
+  },
+  "reasoning": "I'm tracking down the bug: `at.axis` is likely a Vector3 object rather than an array, so indexing it like `at.axis[0]` returns undefined, which propagates into NaN values during vector construction and ultimately produces the zero-vector error when normalizing.\n\nThe fix is to treat `at.axis` safely as a Vector3 using `.clone()` instead of array-indexing it, and add a guard to skip the frame if the resulting axis length is near zero.\n\n",
+  "critic": null
+}

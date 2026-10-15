@@ -1,16 +1,21 @@
 // Prompt bake-off: the same pitches through different system prompts (arms), one model reply each, as an app would
-// run it: one system prompt, one pitch, one TypeScript module back. Calls go through `omp auth-gateway stdio`, which
+// run it: one system prompt, one pitch, one TypeScript module back. `refine` adds the app's feedback turns: the error
+// when a module fails, its renders and measurements when it builds. Calls go through `omp auth-gateway stdio`, which
 // uses the stored omp logins and adds almost nothing to the prompt.
 //
 //   npm run bakeoff -- prompt <arm>                       write the arm's system prompt to scratch/ and print its size
 //   npm run bakeoff -- run <round> [options]              ask the model for every missing (arm, subject, level) build
 //   npm run bakeoff -- check <round>                      typecheck and render every build without a render yet
+//   npm run bakeoff -- refine <round> --from <round>[,…]  one feedback turn for every build of the source round(s)
 //   npm run bakeoff -- results <round>                    rebuild results.json from the run and check records
 //
 // run options: --model <provider/id> (anthropic/claude-sonnet-5-5) --effort <low|medium|high> (medium)
 //   --arms a,b --subjects x,y --levels terse,rich --concurrency 8 --max-tokens 64000
 //   --arm-set <file in bakeoff/> (arms.json) --pitches <file in bakeoff/> (pitches.json); `prompt` takes --arm-set too
 //   --prompts-from <round>: reuse that round's system prompts verbatim
+// refine options: --model, --effort (high), --max-tokens 64000, --arms, --concurrency 8
+//   --views three-quarter,front,side,low (snap shots sent as images) --critique <file in bakeoff/prompts/>
+//   (refine-critique.md) --critic <provider/id> (another model writes the change list) --repair-only (failed builds)
 //
 // Everything lands in bakeoff/rounds/<round>/: round.json (model, effort, arms, pitches as run), prompts/<arm>.md
 // (the exact system prompts), runs/<slug>.json (request, reply, usage, cost, timing), runs/<slug>.md (the reply),
@@ -20,6 +25,7 @@ import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, relative } from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -36,6 +42,14 @@ type Arm = {
   contract: string;
   context: "source" | "docs" | "brief" | "none";
   taste: string | null;
+  /** Prompt files from bakeoff/prompts/ appended after the taste. */
+  extra?: string[];
+  /** Every style kit (doc and source), importable as `agentic-3js-builder/kits/<name>`. */
+  kits?: boolean;
+  /** SDK source files (names in src/) appended verbatim after the reference. */
+  sources?: string[];
+  /** A prompt file in bakeoff/prompts/: the model first writes a build sheet from it, then the module. */
+  plan?: string;
 };
 type Subject = { id: string; kind: string; terse: string; rich: string };
 type Level = "terse" | "rich";
@@ -82,11 +96,41 @@ function context(kind: Arm["context"]) {
   return `# SDK reference\n\n${api.replace(/^# API\n\n/, "")}\n\n${cleanDoc(read("docs/conventions.md")).replace(/^# Conventions/, "## Conventions")}`;
 }
 
+/** Kit docs and sources as a model outside this repo reads them: kits import from `agentic-3js-builder/kits/<name>`. */
+function kitText(text: string) {
+  return cleanDoc(text)
+    .replace(/(["'])\.\.\/kits\/([a-z]+)\1/g, `"${SDK_NAME}/kits/$2"`)
+    .replace(/(["'])\.\.\/src\/[a-z]+\1/g, `"${SDK_NAME}"`)
+    .replace(/(["'])\.\/([a-z]+)\1/g, `"${SDK_NAME}/kits/$2"`);
+}
+
+function kitsContext() {
+  const names = readdirSync(join(ROOT, "kits"))
+    .filter((name) => name.endsWith(".ts"))
+    .map((name) => name.slice(0, -3))
+    .sort();
+  const body = names
+    .map(
+      (name) =>
+        `## Kit: ${name}\n\n${kitText(read(`kits/${name}.md`)).trim()}\n\n### Source: kits/${name}.ts\n\n\`\`\`ts\n${kitText(read(`kits/${name}.ts`)).trimEnd()}\n\`\`\``,
+    )
+    .join("\n\n");
+  return `# Style kits\n\nKits sit on top of the SDK and carry a look: their helpers are the tested way to get it. Import a kit from \`"${SDK_NAME}/kits/<name>"\`, e.g. \`import { cel, INK } from "${SDK_NAME}/kits/toon";\`. \`glow\` makes surfaces self-lit in any style.\n\n${body}`;
+}
+
+function sourcesContext(files: string[]) {
+  const body = files.map((name) => `## src/${name}\n\n\`\`\`ts\n${read(`src/${name}`).trimEnd()}\n\`\`\``).join("\n\n");
+  return `# Selected SDK source\n\nThese files are part of the module \`"${SDK_NAME}"\`.\n\n${body}`;
+}
+
 function systemPrompt(arm: Arm) {
   const parts = [read(`bakeoff/prompts/${arm.contract}`)];
   if (arm.taste) parts.push(read(`bakeoff/prompts/${arm.taste}`));
+  for (const file of arm.extra ?? []) parts.push(read(`bakeoff/prompts/${file}`));
   const ref = context(arm.context);
   if (ref) parts.push(ref);
+  if (arm.kits) parts.push(kitsContext());
+  if (arm.sources?.length) parts.push(sourcesContext(arm.sources));
   return `${parts.map((part) => part.trim()).join("\n\n")}\n`;
 }
 
@@ -94,8 +138,11 @@ function systemPrompt(arm: Arm) {
 // The gateway: one JSON request per line on stdin, one response per line on stdout, answered in completion order.
 
 type GatewayReply = { id: number; status: number; body: any };
+type Gateway = { send(path: string, body: unknown): Promise<GatewayReply>; close(): void };
+type Rates = { input: number; output: number; cacheRead: number; cacheWrite: number };
+type Pricing = (Rates & { longContext?: Rates & { inputThreshold: number } }) | undefined;
 
-function gateway() {
+function gateway(): Gateway {
   const child = spawn(OMP, ["auth-gateway", "stdio"], { stdio: ["pipe", "pipe", "pipe"] });
   const waiting = new Map<number, (reply: GatewayReply) => void>();
   let next = 1;
@@ -136,12 +183,36 @@ function gateway() {
   };
 }
 
-async function pricing(model: string) {
+async function pricing(model: string): Promise<Pricing> {
   const out = await capture(OMP, ["models", "--json"]);
-  const list = JSON.parse(out.stdout);
-  const found = (Array.isArray(list) ? list : list.models).find((entry: any) => entry.selector === model);
-  type Rates = { input: number; output: number; cacheRead: number; cacheWrite: number };
-  return found?.cost as (Rates & { longContext?: Rates & { inputThreshold: number } }) | undefined;
+  type Entry = { selector: string; cost?: Pricing };
+  const list: Entry[] | { models: Entry[] } = JSON.parse(out.stdout);
+  return (Array.isArray(list) ? list : list.models).find((entry) => entry.selector === model)?.cost;
+}
+
+/** One chat completion through the gateway, retried on overload, with its estimated cost. */
+async function ask(gw: Gateway, body: unknown, cost: Pricing) {
+  let reply: GatewayReply | undefined;
+  const started = Date.now();
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    reply = await gw.send("/v1/chat/completions", body);
+    if (reply.status === 200 || ![429, 500, 502, 503, 529, 599].includes(reply.status)) break;
+    await sleep(20_000 * attempt);
+  }
+  const message = reply?.body?.choices?.[0]?.message;
+  const usage = reply?.body?.usage ?? null;
+  const cached = usage?.prompt_tokens_details?.cached_tokens ?? 0;
+  // Some models bill the whole call at higher rates past an input threshold (`longContext`).
+  const rates = cost?.longContext && usage?.prompt_tokens > cost.longContext.inputThreshold ? cost.longContext : cost;
+  const costUsd =
+    usage && rates
+      ? ((usage.prompt_tokens - cached) * rates.input +
+          cached * rates.cacheRead +
+          usage.completion_tokens * rates.output) /
+        1e6
+      : null;
+  const text: string = message?.content ?? "";
+  return { reply, started, wallMs: Date.now() - started, message, text, usage, costUsd };
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -153,10 +224,12 @@ function extractCode(text: string) {
   return blocks.sort((a, b) => b.length - a.length)[0] ?? null;
 }
 
-/** Points the SDK import name (and any subpath) at this repo's src/index.ts, relative to the build file. */
+/** Points the SDK import name (and any subpath) at this repo's src/index.ts, and a kit subpath at kits/<name>. */
 function wireImports(code: string, buildFile: string) {
-  const index = relative(dirname(buildFile), join(ROOT, "src/index")).split("\\").join("/");
-  return code.replace(/(["'])agentic-3js-builder(?:\/[^"']*)?\1/g, `"${index}"`);
+  const to = (path: string) => relative(dirname(buildFile), join(ROOT, path)).split("\\").join("/");
+  return code
+    .replace(/(["'])agentic-3js-builder\/kits\/([a-z]+)(?:\.ts)?\1/g, (_, _q, name) => `"${to(`kits/${name}`)}"`)
+    .replace(/(["'])agentic-3js-builder(?:\/[^"']*)?\1/g, `"${to("src/index")}"`);
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -237,42 +310,32 @@ async function run(round: string, args: string[]) {
     if (existsSync(join(dir, "runs", `${job.slug}.json`))) return; // another runner got it first
     const system = readFileSync(join(dir, "prompts", `${job.arm.id}.md`), "utf8");
     const pitch = job.subject[job.level];
-    const body = {
-      model,
-      reasoning_effort: effort,
-      max_tokens: maxTokens,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: pitch },
-      ],
-    };
-    let reply: GatewayReply | undefined;
-    const started = Date.now();
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      reply = await gw.send("/v1/chat/completions", body);
-      if (reply.status === 200 || ![429, 500, 502, 503, 529, 599].includes(reply.status)) break;
-      await new Promise((resolve) => setTimeout(resolve, 20_000 * attempt));
+    const messages: { role: string; content: string }[] = [
+      { role: "system", content: system },
+      { role: "user", content: pitch },
+    ];
+    // A planning arm asks for the build sheet first (medium effort), then for the module in the same conversation.
+    let plan: { text: string; usage: unknown; costUsd: number | null; wallMs: number } | null = null;
+    if (job.arm.plan) {
+      messages[1].content = `${pitch}\n\n${read(`bakeoff/prompts/${job.arm.plan}`).trim()}`;
+      const planned = await ask(gw, { model, reasoning_effort: "medium", max_tokens: 32000, messages }, cost);
+      plan = { text: planned.text, usage: planned.usage, costUsd: planned.costUsd, wallMs: planned.wallMs };
+      messages.push(
+        { role: "assistant", content: planned.text },
+        { role: "user", content: "Now write the module that builds this sheet, as one ```ts block." },
+      );
     }
-    const wallMs = Date.now() - started;
-    const message = reply?.body?.choices?.[0]?.message;
-    const text: string = message?.content ?? "";
-    const usage = reply?.body?.usage ?? null;
+    const body = { model, reasoning_effort: effort, max_tokens: maxTokens, messages };
+    const built = await ask(gw, body, cost);
+    const { reply, started, message, text, usage } = built;
+    const wallMs = built.wallMs + (plan?.wallMs ?? 0);
+    const costUsd = built.costUsd == null ? null : built.costUsd + (plan?.costUsd ?? 0);
     const code = text ? extractCode(text) : null;
     const buildFile = join(dir, "builds", `${job.slug}.ts`);
     if (code) {
       mkdirSync(dirname(buildFile), { recursive: true });
       writeFileSync(buildFile, wireImports(code, buildFile));
     }
-    const cached = usage?.prompt_tokens_details?.cached_tokens ?? 0;
-    // Some models bill the whole call at higher rates past an input threshold (`longContext`).
-    const rates = cost?.longContext && usage?.prompt_tokens > cost.longContext.inputThreshold ? cost.longContext : cost;
-    const costUsd =
-      usage && rates
-        ? ((usage.prompt_tokens - cached) * rates.input +
-            cached * rates.cacheRead +
-            usage.completion_tokens * rates.output) /
-          1e6
-        : null;
     writeJson(join(dir, "runs", `${job.slug}.json`), {
       slug: job.slug,
       arm: job.arm.id,
@@ -290,6 +353,7 @@ async function run(round: string, args: string[]) {
       costUsd,
       hasCode: Boolean(code),
       reasoning: message?.reasoning_content ?? null,
+      plan,
     });
     writeFileSync(join(dir, "runs", `${job.slug}.md`), text);
     done++;
@@ -345,12 +409,17 @@ async function check(round: string, args: string[]) {
     let render = await capture(tsx, ["scripts/snap.ts", file, "v01"]);
     // A dropped connection to the shared browser is not the build's fault: try once more.
     if (/do not launch your own browser/.test(render.stdout + render.stderr)) {
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await sleep(5000);
       render = await capture(tsx, ["scripts/snap.ts", file, "v01"]);
     }
     const found = findReport(slug);
     const output = `${render.stdout}\n${render.stderr}`;
     const report = found ? readJson<any>(found.path) : null;
+    // Still no browser: leave the build unchecked so the next `check` renders it, instead of recording a failure.
+    if (!report && /do not launch your own browser/.test(output)) {
+      console.log(`${slug}: shared browser unreachable, left unchecked`);
+      return;
+    }
     writeJson(join(dir, "checks", `${slug}.json`), {
       slug,
       typeErrors: typeErrors.length,
@@ -374,6 +443,235 @@ async function check(round: string, args: string[]) {
       `[${done}/${builds.length}] ${slug}: ${typeErrors.length} type errors, ${report ? `rendered (${report.triangles} tris)` : "RENDER FAILED"}`,
     );
   });
+  results(round);
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Refine: one more turn per build of an earlier round, as an app would run it. The conversation is the arm's system
+// prompt, the pitch, the current module as the model's own reply, and the app's feedback: the error if the module
+// failed, otherwise its renders and measurements. The reply's SEARCH/REPLACE edits (or a whole module) make the build.
+
+type SnapReport = {
+  parts: number;
+  triangles: number;
+  textures: number;
+  size: number[];
+  issues: { level: string; message: string }[];
+  loose?: { clusters: { label: string; gap: number; nearest?: { name: string } }[] };
+};
+type CheckRecord = { rendered: boolean; lane: string | null; renderError: string | null };
+type RunRecord = {
+  arm: string;
+  subject: string;
+  level: Level;
+  pitch: string;
+  costUsd: number | null;
+  chainCostUsd?: number;
+};
+
+/** Applies SEARCH/REPLACE blocks in order; a block whose SEARCH is missing or not unique is skipped. */
+function applyEdits(code: string, text: string) {
+  const blocks = [...text.matchAll(/<{7} SEARCH\n([\s\S]*?)\n?={7}\n([\s\S]*?)\n?>{7} REPLACE/g)];
+  const failed: string[] = [];
+  for (const [, search, replace] of blocks) {
+    const at = code.indexOf(search);
+    if (!search || at < 0 || code.indexOf(search, at + 1) >= 0) {
+      failed.push(search.split("\n")[0].trim());
+      continue;
+    }
+    code = code.slice(0, at) + replace + code.slice(at + search.length);
+  }
+  return { code, blocks: blocks.length, failed };
+}
+
+function reportText(report: SnapReport) {
+  const lines = [
+    `Parts ${report.parts}, triangles ${report.triangles}, textures ${report.textures}, size ${report.size.map((v) => v.toFixed(2)).join(" × ")} m (x, y, z).`,
+    report.issues.length
+      ? `Issues:\n${report.issues.map((issue) => `- ${issue.level}: ${issue.message}`).join("\n")}`
+      : "Issues: none.",
+  ];
+  const loose = report.loose?.clusters ?? [];
+  if (loose.length)
+    lines.push(
+      `Loose parts, touching nothing near the main body (information: change them only where the render shows a fault):\n${loose
+        .slice(0, 6)
+        .map((c) => `- ${c.label}, ${Math.round(c.gap * 1000)} mm from ${c.nearest?.name ?? "the body"}`)
+        .join("\n")}`,
+    );
+  return lines.join("\n\n");
+}
+
+async function refine(round: string, args: string[]) {
+  // `--from a,b`: each build continues from the first listed round that has it, so a repair round can lead its source.
+  const froms = list(option(args, "from", ""));
+  if (!/^[A-Za-z0-9]+$/.test(round) || !froms.length) throw new Error("Usage: refine <round> --from <round>[,<round>]");
+  const dir = join(BAKEOFF, "rounds", round);
+  const model = option(args, "model", "anthropic/claude-sonnet-5-5");
+  const effort = option(args, "effort", "high");
+  const maxTokens = Number(option(args, "max-tokens", "64000"));
+  const views = list(option(args, "views", "three-quarter,front,side,low"));
+  const critique = option(args, "critique", "refine-critique.md");
+  const criticModel = option(args, "critic", "");
+  const only = list(option(args, "arms", ""));
+  const sources = new Map<string, { from: string; src: string; slug: string }>();
+  for (const from of froms) {
+    const src = join(BAKEOFF, "rounds", from);
+    for (const name of readdirSync(join(src, "checks"))) {
+      const slug = name.slice(0, -5);
+      const suffix = slug.slice(from.length);
+      if (!name.endsWith(".json") || sources.has(suffix)) continue;
+      if (existsSync(join(src, "runs", `${slug}.json`)) && existsSync(join(src, "builds", `${slug}.ts`)))
+        sources.set(suffix, { from, src, slug });
+    }
+  }
+  const todo = [...sources.entries()]
+    .map(([suffix, source]) => ({ ...source, slugOut: `${round}${suffix}` }))
+    .filter(
+      ({ src, slug }) => !only.length || only.includes(readJson<RunRecord>(join(src, "runs", `${slug}.json`)).arm),
+    )
+    .filter(
+      ({ src, slug }) =>
+        !args.includes("--repair-only") || !readJson<CheckRecord>(join(src, "checks", `${slug}.json`)).rendered,
+    )
+    .filter(({ slugOut }) => !existsSync(join(dir, "runs", `${slugOut}.json`)));
+  const cost = await pricing(model);
+  const criticCost = criticModel ? await pricing(criticModel) : undefined;
+  const sourceManifest = readJson<Record<string, unknown>>(join(BAKEOFF, "rounds", froms.at(-1)!, "round.json"));
+  writeJson(join(dir, "round.json"), {
+    ...sourceManifest,
+    id: round,
+    refineFrom: froms.join(","),
+    model,
+    effort,
+    maxTokens,
+    views,
+    critique,
+    critic: criticModel || null,
+    sdkCommit: (await capture("git", ["rev-parse", "--short", "HEAD"])).stdout.trim(),
+  });
+  const edits = read("bakeoff/prompts/refine-edits.md").trim();
+  console.log(`${todo.length} builds to refine from ${froms.join(", ")} with ${model} (${effort}).`);
+  const gw = gateway();
+  let done = 0;
+  await pool(todo, Number(option(args, "concurrency", "8")), async ({ src, slug, slugOut }) => {
+    const previous = readJson<RunRecord>(join(src, "runs", `${slug}.json`));
+    const checked = readJson<CheckRecord>(join(src, "checks", `${slug}.json`));
+    const system = readFileSync(join(src, "prompts", `${previous.arm}.md`), "utf8");
+    mkdirSync(join(dir, "prompts"), { recursive: true });
+    writeFileSync(join(dir, "prompts", `${previous.arm}.md`), system);
+    const current = readFileSync(join(src, "builds", `${slug}.ts`), "utf8")
+      .replace(/(["'])(?:\.\.\/)+kits\/([a-z]+)\1/g, `"${SDK_NAME}/kits/$2"`)
+      .replace(/(["'])(?:\.\.\/)+src\/index\1/g, `"${SDK_NAME}"`);
+    const snaps = checked.lane && join(SNAPS, slug, checked.lane, "snaps");
+    const mode = checked.rendered && snaps ? "critique" : "repair";
+    // Props have no head close-up: send the views this build's snap wrote.
+    const shown = snaps ? views.filter((view) => existsSync(join(snaps, `v01-${view}.png`))) : [];
+    const images = shown.flatMap((view) => [
+      { type: "text", text: `Render: ${view}` },
+      {
+        type: "image_url",
+        image_url: { url: `data:image/png;base64,${readFileSync(join(snaps!, `v01-${view}.png`)).toString("base64")}` },
+      },
+    ]);
+    const report = mode === "critique" ? reportText(readJson<SnapReport>(join(snaps!, "v01-report.json"))) : "";
+    // `--critic <model>`: another model looks at the renders and writes the change list; the builder makes it.
+    let critic: { model: string; text: string; usage: unknown; costUsd: number | null; wallMs: number } | null = null;
+    if (criticModel && mode === "critique") {
+      const prompt = read("bakeoff/prompts/refine-critic.md")
+        .replace("{brief}", previous.pitch)
+        .replace("{views}", shown.join(", "))
+        .replace("{report}", report)
+        .replace("{code}", current.trimEnd());
+      const asked = await ask(
+        gw,
+        {
+          model: criticModel,
+          reasoning_effort: effort,
+          max_tokens: 32000,
+          messages: [{ role: "user", content: [...images, { type: "text", text: prompt }] }],
+        },
+        criticCost,
+      );
+      critic = {
+        model: criticModel,
+        text: asked.text,
+        usage: asked.usage,
+        costUsd: asked.costUsd,
+        wallMs: asked.wallMs,
+      };
+    }
+    const feedback =
+      mode === "critique"
+        ? [
+            ...images,
+            {
+              type: "text",
+              text: `${(critic
+                ? read("bakeoff/prompts/refine-apply.md").replace("{critique}", critic.text.trim())
+                : read(`bakeoff/prompts/${critique}`)
+              )
+                .replace("{views}", shown.join(", "))
+                .replace("{report}", report)
+                .trim()}\n\n${edits}`,
+            },
+          ]
+        : `${read("bakeoff/prompts/refine-repair.md")
+            .replace("{error}", (checked.renderError ?? "no render").replace(`${ROOT}/`, ""))
+            .trim()}\n\n${edits}`;
+    const body = {
+      model,
+      reasoning_effort: effort,
+      max_tokens: maxTokens,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: previous.pitch },
+        { role: "assistant", content: `\`\`\`ts\n${current.trimEnd()}\n\`\`\`` },
+        { role: "user", content: feedback },
+      ],
+    };
+    const built = await ask(gw, body, cost);
+    const { reply, started, message, text, usage } = built;
+    const wallMs = built.wallMs + (critic?.wallMs ?? 0);
+    const costUsd = built.costUsd == null ? null : built.costUsd + (critic?.costUsd ?? 0);
+    const edited = applyEdits(current, text);
+    const whole = edited.blocks ? null : extractCode(text);
+    const code = whole ?? edited.code;
+    const buildFile = join(dir, "builds", `${slugOut}.ts`);
+    mkdirSync(dirname(buildFile), { recursive: true });
+    writeFileSync(buildFile, wireImports(code, buildFile));
+    writeJson(join(dir, "runs", `${slugOut}.json`), {
+      slug: slugOut,
+      from: slug,
+      mode,
+      arm: previous.arm,
+      subject: previous.subject,
+      level: previous.level,
+      pitch: previous.pitch,
+      model,
+      effort,
+      started: new Date(started).toISOString(),
+      wallMs,
+      status: reply?.status ?? null,
+      error: reply?.status === 200 ? null : JSON.stringify(reply?.body).slice(0, 2000),
+      finishReason: reply?.body?.choices?.[0]?.finish_reason ?? null,
+      usage,
+      costUsd,
+      chainCostUsd: (previous.chainCostUsd ?? previous.costUsd ?? 0) + (costUsd ?? 0),
+      hasCode: true,
+      edits: { blocks: edited.blocks, failed: edited.failed, wholeModule: Boolean(whole) },
+      reasoning: message?.reasoning_content ?? null,
+      critic,
+    });
+    writeFileSync(join(dir, "runs", `${slugOut}.md`), text);
+    done++;
+    console.log(
+      `[${done}/${todo.length}] ${slugOut} (${mode}): ${reply?.status}, ${whole ? "whole module" : `${edited.blocks - edited.failed.length}/${edited.blocks} edits`}, ` +
+        `${usage ? `${usage.prompt_tokens} in / ${usage.completion_tokens} out` : "no usage"}, ${(wallMs / 1000).toFixed(0)} s` +
+        `${costUsd != null ? `, $${costUsd.toFixed(3)}` : ""}`,
+    );
+  });
+  gw.close();
   results(round);
 }
 
@@ -409,8 +707,11 @@ if (command === "prompt") {
   console.log(`${out}: ${text.length} chars, about ${Math.round(text.length / 3.6 / 1000)}k tokens`);
 } else if (command === "run" && target) await run(target, rest);
 else if (command === "check" && target) await check(target, rest);
+else if (command === "refine" && target) await refine(target, rest);
 else if (command === "results" && target) results(target);
 else {
-  console.error("Usage: npm run bakeoff -- prompt <arm> | run <round> [options] | check <round> | results <round>");
+  console.error(
+    "Usage: npm run bakeoff -- prompt <arm> | run <round> [options] | check <round> | refine <round> --from <round> [options] | results <round>",
+  );
   process.exit(2);
 }

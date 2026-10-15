@@ -2,6 +2,31 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## One-shot vs agentic gap, 2026-10-15
+
+Question: how close can an app (API calls only: prompt → module → run it, screenshot it, send feedback) get to the agentic builds (an agent reads docs, writes, renders, looks, edits; median 18 min, $3.75)? Briefs were the exact Category/Subject/Style lines the 100 agentic Sonnet samples got: 16 dev subjects (`bakeoff/pitches-r5.json`) and 12 held-out ones (`pitches-r7.json`). Judging was blind: each candidate as a three-quarter + front image, scored 1–10 by two or three vision judges (GPT-6.1 Sol, Gemini 3.8 Flash, Opus 5.5) in two shuffled orders (`bakeoff/judge.py`; every panel's spec and judgments in `bakeoff/judging/`). Scores compare only within one panel; wins are head-to-head rankings.
+
+- **The gap was the first draft, not iteration.** Across 464 agentic builds the first file write is a median 94% of the final file. The lab's one-shots had no style, no kits and a short docs prompt. With the agent's brief, every kit's doc and source, `src/paint.ts` + `src/texture.ts` and a target profile (`prompts/ambition.md`: 180–340 parts, 5–12 textures, 700–1,100 lines, a staged base), a Sonnet one-shot scored 8.05 against the agent's first draft 7.09 and final 8.36; the docs-only prompt scored 6.33. Kits alone did nothing.
+- **Craft habits** (`prompts/craft.md`, `craft2.md`), distilled by comparing agent and one-shot code (subject first with pushed proportions and a scale constant per feature, the face settled first, richest construction on signature features, paint by place, a setting fitted to the subject) beat the ambition-only arm 45/60.
+- **Feedback turns** (`npm run bakeoff -- refine`, see `bakeoff/README.md`): a repair turn fixed 15 of 16 crashed agent drafts and every crashed one-shot within two turns (~$0.05). A critique turn (4 renders + measurements → SEARCH/REPLACE edits, <1% failing) beat its input 51/64 and a second one beat the first 47/64, at $0.07–0.15 a turn.
+- **Did not help:** medium effort (6.14 vs 7.97: it writes 15 KB instead of 27 KB), plan-then-build (lost to the plain arm 12/64), a GPT critic with Sonnet applying its list (no gain, 10× the turn cost), the priority-ordered critique v2.
+- **High effort overthinks:** Sonnet spends 50–90k completion tokens, mostly thinking; at `--max-tokens 64000` about 5% end with no code. 120k fixes it.
+- **GPT-6.1 Sol as builder** writes leaner modules ($0.26, 5 min) and gains most from critique turns (2 turns beat its one-shot 86/96).
+
+Held-out result (12 subjects, three judges, 72 judgments):
+
+| Pipeline                                | Overall | Mean rank | Beats agent final | Median cost | Median model time |
+| --------------------------------------- | ------: | --------: | ----------------: | ----------: | ----------------: |
+| Agentic session (final)                 |    7.07 |      2.79 |                 — |       $3.75 |            18 min |
+| Sonnet one-shot, craft prompt           |    6.85 |      3.35 |             31/72 |       $0.64 |             8 min |
+| Sonnet one-shot + 2 critique turns      |    7.14 |      2.75 |             35/72 |       $1.02 |             9 min |
+| GPT-6.1 Sol one-shot, craft2 prompt     |    6.79 |      3.69 |             26/72 |       $0.26 |             5 min |
+| GPT-6.1 Sol one-shot + 2 critique turns |    7.43 |      2.42 |             37/72 |       $0.55 |            12 min |
+
+Sol + 2 turns minus agent final: +0.36 overall (bootstrap 95% CI 0.04–0.72); every judge, Opus included, put it above the agent finals. Sonnet + 2 turns is at parity (+0.07, CI −0.43–0.64). Picking the better of the Sonnet and Sol chains with a third judge helped on the dev set but not reliably on the held-out set, because the judges disagree on which builder is better. Contact sheets: `~/tmp/public/nilo/agentic-3js-builder/gap/` (`r5-grid.jpg`, `heldout-grid.jpg`). The study spent about $138 in API calls.
+
+Caveats: the judges reward detail and staged bases (detail and overall correlate at 0.88), every one-shot arm builds a base where several agent finals have none, and GPT rates GPT builds highest. Wall times exclude renders, which take seconds each.
+
 ## Showcase: samples ghost in, 2026-10-15
 
 Opening a different sample now uses `/assemble-loading`'s ghost style instead of pop (rise was tried first and dropped). Once the textures are in and the arrival's shaders are compiled, the whole sample shows as a sparse blue-grey stipple, then each part grows solid out of its bone with a pale rim at the front, in the same build-order schedule within the same 1.2 s. `main.ts` hands `Viewer.show` an `Arrival` of each part's per-vertex growth order (`growth()`, cards along their strip) and its front over time (`riseProgress()`); the starts come from `arrivalStarts()` (was `popStarts`). `showcase/ghost.ts` holds the shader: while the arrival runs, `paint()` dresses every part in a ghosting copy of the material it picks, and a matching `customDepthMaterial` keeps the shadow to the solid part. A part whose material cannot ghost (not Standard, Lambert, Phong or Basic) stays hidden until its start. Parts no longer scale, so the detached-bind switch below is gone.

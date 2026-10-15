@@ -1,0 +1,1162 @@
+[
+  {
+    "slug": "r8k1BarnstormerBiplaneRichCraft2",
+    "from": "r8BarnstormerBiplaneRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "barnstormerBiplane",
+    "level": "rich",
+    "pitch": "Category: Vehicle.\nSubject: barnstormer biplane.\nStyle: whimsical.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:43.544Z",
+    "wallMs": 667307,
+    "status": 200,
+    "error": null,
+    "finishReason": "length",
+    "usage": {
+      "prompt_tokens": 107028,
+      "completion_tokens": 80384,
+      "total_tokens": 187412,
+      "prompt_tokens_details": {
+        "cached_tokens": 83761
+      }
+    },
+    "costUsd": 0.9155821,
+    "chainCostUsd": 1.8173521,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": false
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Uncover the pilot—the character is currently lost behind the upper wing.** Move `wingDefs.U.zc` from `0.75` to about `1.1`, and replace its uninterrupted trailing edge with a shallow cockpit cutout: between `x = ±0.48`, bring the trailing edge forward to `z ≈ 0.95`, with rounded shoulders. Move the upper cabane/interplane attachment points and roundels with the wing. Raise the entire pilot head assembly about `0.12 m`, including `pilotHead`, and extend the neck to meet it.  \n   **Next render:** the goggles, nose and moustache should read in the three-quarter view; the head close-up must show an actual face rather than a cream wing filling the image.\n\n2. **Make the pilot sit in a cockpit, not on a solid red deck.** The dark cylinders in `coaming()` are buried beneath the loft surface, so they do not create convincing openings. Split or locally rebuild the upper fuselage around the rear cockpit as an approximately `0.58 × 0.72 m` opening, centred at `z = -0.7`. Add a dark recessed well about `0.22 m` deep, a visible seat back and a coaming following the opening’s perimeter. Reconnect the torso, shoulders and neck inside this opening; keep the hands visibly holding the stick. Give the forward mail cockpit a similarly recessed, smaller opening.  \n   **Next render:** a clear leather-edged cockpit with the pilot emerging from inside it, rather than a figure perched above the fuselage.\n\n3. **Replace the thick wing slabs and overlapping ailerons with lighter, intentional construction.** Reduce upper-wing `th` from `[0.07, 0.26]` to roughly `[0.04, 0.13]`, and lower-wing `th` from `[0.06, 0.24]` to `[0.035, 0.12]`. Retain a rounded leading edge and taper the trailing edge. Cut the aileron regions out of the main wing polygons instead of laying `rectPlan()` extrusions over intact wings; leave a `0.015–0.02 m` hinge seam. After changing thickness and stagger, place every strut and wire endpoint on the new wing surfaces, with small brass attachment shoes.  \n   **Next render:** two light fabric-covered wings, distinct movable ailerons and cleanly seated supports—not heavy red-edged shelves.\n\n4. **Give the propeller and radial engine a stronger, less obstructive silhouette.** Rotate the propeller assembly about its Z axis by approximately `25°`; its vertical blade currently stacks directly over the engine centre and pilot. Widen the outer blade sections from `0.30 m` to about `0.36 m`, with a gently swept outline and short yellow tips. Rework the nine engine cylinders so their long axes point radially outward in the XY plane, rather than all pointing forward along Z; add two or three simple cooling-fin bands per cylinder. Keep their front faces behind the propeller plane.  \n   **Next render:** a recognizable diagonal wooden propeller, a legible nine-cylinder radial inside the cowl, and less visual blockage through the aircraft’s centre.\n\n5. **Let the aircraft—not the airfield—determine the composition.** Reduce `baseDisc` from roughly `4.95 m` radius to an oval footprint around `4.5 m` across X and `4.15 m` across Z; shorten the runway from `8.6 m` to about `7.5 m`. Reduce grass and flower density by approximately half, and remove the runway-border stones. Keep the drums, crate and windsock as a compact supporting cluster, clear of the wing and tail silhouettes. Frame the aircraft bounds with modest margins rather than framing the entire decorated base.  \n   **Next render:** the biplane fills the image, with a quieter airfield beneath it and no incidental props competing with its outline.\n\n6. **Replace the pebbly copper and gold finish with broad, designed material shapes.** The cowl and spinner currently resemble rough stone or crumpled foil. Replace `metal(\"copper\", { polish: 0.5, verdigris: 0.15 })` with smooth warm copper using restrained roughness and little or no fine mottling. Separate the cowl into a copper body, a narrow polished front lip and a darker recessed engine interior. Give the spinner a clean brass finish; retain the existing faceting and rivets rather than adding surface noise.  \n   **Next render:** readable metallic highlights and a crisp copper nose that contrasts with the matte red fuselage and cream fabric wings.\n\n7. **Turn the scarf into one readable ribbon flourish.** `scarfA` and `scarfB` are nearly edge-on in the side view, and the zero-length `b.spike()` calls do not provide dependable pointed ends. Roll the box sections about `30–40°`, widen the main tail to approximately `0.22 m`, and introduce a broader rise-and-fall wave with at least `0.08 m` clearance from the turtle deck. Build tapered triangular ends from distinct start/end points, and limit the pattern to a few broad cream/teal bands.  \n   **Next render:** a clearly attached, flowing scarf visible from both side and three-quarter views, adding whimsy without becoming another thin line among the rigging.",
+      "usage": {
+        "prompt_tokens": 17546,
+        "completion_tokens": 2174,
+        "total_tokens": 19720,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1034
+        }
+      },
+      "costUsd": 0.056832,
+      "wallMs": 61504
+    },
+    "check": {
+      "slug": "r8k1BarnstormerBiplaneRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 268,
+        "triangles": 18694,
+        "colors": 29,
+        "textures": 9,
+        "joints": 19,
+        "size": [
+          9.77,
+          2.933,
+          9.92
+        ],
+        "issues": [],
+        "fine": 71
+      }
+    }
+  },
+  {
+    "slug": "r8k1ChopperMotorbikeRichCraft2",
+    "from": "r8ChopperMotorbikeRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "chopperMotorbike",
+    "level": "rich",
+    "pitch": "Category: Vehicle.\nSubject: custom chopper motorbike.\nStyle: Overwatch.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:49.200Z",
+    "wallMs": 336696,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 108814,
+      "completion_tokens": 40465,
+      "total_tokens": 149279,
+      "prompt_tokens_details": {
+        "cached_tokens": 83763
+      }
+    },
+    "costUsd": 0.5276483,
+    "chainCostUsd": 1.5881222999999998,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Give the tank and V-twin more hero-scale mass.** The chopper silhouette already reads, but the mechanical center feels light compared with the wheels and tall handlebars. Widen the tank approximately 18% across **x**, retaining its length and tapered rear; reproject `TANK_TEX` afterward. Increase the cylinder-fin radius from `0.078` to about `0.09`, and widen the rocker boxes from `0.17` to `0.20`. Keep the engine height, low saddle, wheelbase and rake unchanged, preserving clearance beneath the tank. **Next render:** a substantial, powerful center beneath the tank, without losing the long, low chopper profile.\n\n2. **Make the front assembly feel engineered rather than wire-built.** Increase the handlebar sweep radius from `0.014` to `0.019`, mirror stalks from `0.01` to `0.013`, and lower fork-leg radii from `[0.034, 0.028]` to approximately `[0.042, 0.033]`. Enlarge the fork collars to match, but leave the spring gaps open. Give the existing headlight brow a thicker, beveled leading edge rather than adding more lights or graphics. **Next render:** a confident front “face”—one prominent cyan lamp beneath an armored brow—with handlebars and forks that carry the same visual weight as the bodywork.\n\n3. **Resolve the hovering kickstand.** In the side render, the stand terminates well above the deck and reads as an unsupported dangling rod. For the parked pose, retain the hinge at `[0.15, 0.33, 0.1]`, extend the stand to approximately `[0.30, 0.095, -0.06]`, and place its foot at `y = 0.088`, with its underside touching the deck at roughly `0.082`. Attach the foot squarely to the rod. **Next render:** an unmistakably deployed stand with a visible contact shadow, not a foot suspended under the engine.\n\n4. **Rebuild the belt as a flat band seated on its pulleys.** The current `0.009` circular sweep reads like a cable, and the loop radii leave it outside the sprocket teeth. Replace it with a rectangular-section closed band, approximately **25–30 mm wide across x and 6 mm thick**, centered on the existing `x = 0.22` drive plane. Derive its path from the actual outer radii of the two `gearGeometry` meshes, using straight tangent runs and wrapped pulley sections rather than a smoothed convex hull. Add a short outer pulley flange if needed to make the seating legible. **Next render:** a broad, taut drive belt visibly engaging both pulleys, with daylight separating it from the frame stays.\n\n5. **Finish the rear-facing functional details: exhaust openings and plate.** Both exhaust outlets currently read as solid gray caps. Replace the final 50–70 mm of each pipe with an open annular sleeve, aligned to that pipe’s endpoint tangent; use roughly `0.052/0.039` outer/inner radii for the lower outlet and `0.055/0.042` for the upper. Recess a dark disk 15–20 mm inside each opening. For `PLATE`, give the backing and textured face the same orientation, then offset the face 1–2 mm outward along their shared rearward normal—the current backing appears to obscure the lettering. **Next render:** two clearly hollow exhaust mouths and a fully readable `HX-76` plate.\n\n6. **Let the motorcycle own the composition.** Remove the front bollards, holo pillar, toolbox and wrench from the vehicle presentation. The holo overlaps the bike in front and back views, while the stage’s hazard borders compete with the tires and fork. Keep `P` and the wheel contact heights, but replace the decorated stage with a simple beveled plinth about **0.85 × 2.9 m**, with no luminous perimeter. Reframe around the motorcycle, leaving modest clearance above the mirrors and around both tires. **Next render:** a larger, unobstructed bike in every view; no prop should resemble part of its silhouette.\n\n7. **Move cyan off the rubber and restore a material hierarchy.** Remove the cyan shoulder condition from `TIRE`; its segmented bright rings make the tires look illuminated and compete with the headlight. Keep the rubber dark with restrained broad tread variation. If a wheel accent is needed, use a thin, non-emissive cyan line on the metal rim instead. Replace the mottled `CHROME` treatment with cleaner, broad cool-gray value bands and bright edge highlights, especially on the exhausts, bars and sissy bar. **Next render:** rubber reads as rubber, metal reads as clean stylized metal, and the headlamp and energy core are the principal luminous features.\n\n8. **Simplify the repeated branding into a deliberate focal hierarchy.** Keep the tank emblem and flame treatment as the main identity graphic. Remove the repeated central emblem from `AIR`, retaining its vent ring and a plain recessed center; simplify `COVER` to an orange perimeter, navy center and a few large fasteners. Reduce the tank flames from three densely nested tongues to two broader shapes with fewer internal cyan strokes. **Next render:** the tank graphic reads immediately at thumbnail size, while the engine covers support the design through shape and material rather than competing badges.",
+      "usage": {
+        "prompt_tokens": 18040,
+        "completion_tokens": 2844,
+        "total_tokens": 20884,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1708
+        }
+      },
+      "costUsd": 0.06452,
+      "wallMs": 67158
+    },
+    "check": {
+      "slug": "r8k1ChopperMotorbikeRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 171,
+        "triangles": 13746,
+        "colors": 7,
+        "textures": 9,
+        "joints": 5,
+        "size": [
+          0.881,
+          1.551,
+          3.004
+        ],
+        "issues": [],
+        "fine": 12
+      }
+    }
+  },
+  {
+    "slug": "r8k1DesertOasisDioramaRichCraft2",
+    "from": "r8DesertOasisDioramaRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "desertOasisDiorama",
+    "level": "rich",
+    "pitch": "Category: Diorama.\nSubject: desert oasis with palms, tents and camels.\nStyle: low-poly whimsical mix.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:35.785Z",
+    "wallMs": 371709,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 112526,
+      "completion_tokens": 45562,
+      "total_tokens": 158088,
+      "prompt_tokens_details": {
+        "cached_tokens": 83772
+      }
+    },
+    "costUsd": 0.5866312,
+    "chainCostUsd": 1.3052519,
+    "hasCode": true,
+    "edits": {
+      "blocks": 20,
+      "failed": [],
+      "wholeModule": false
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Give the palms fuller, more dimensional crowns.** In `palm()`, the two `mk()` layers currently read as thin, nearly horizontal feather stacks, particularly in the front and side views. Replace the large SVG cards with 8–10 curved, tapered frond meshes per mature palm, each with a central rib and paired low-poly leaflets. Use lengths of 0.45–0.65 m, widths of 0.14–0.20 m, and tips drooping 0.15–0.25 m below the crown; retain two or three shorter upright fronds. **The next render should show distinct, arching palm silhouettes with substantial leaves from every view, rather than flat green shelves.**\n\n2. **Make the camels’ humps read as anatomy beneath cloth, not striped containers.** In `camel()`, replace the rounded hump sphere and hemispherical blanket cap with a tapered, slightly rearward-leaning hump: approximately `0.075 × 0.12 × 0.09` m in local radii before applying `k`. Let its lower third merge into the back. Replace the blanket dome with a thin saddle cloth draped over the hump and down both flanks, leaving some coat visible near the crest; remove the three upward gold spikes and retain only small hanging tassels. **The next render should show unmistakable single-humped camels, with textile following the body rather than resembling a separate lidded object.**\n\n3. **Soften the faces and distinguish ears from horns.** The head close-up shows pointed ear spikes, projecting eyebrow bars, and large black eyes that give both camels a slightly severe expression. Replace the paired ear `b.spike()` calls with flattened, rounded leaf-shaped meshes about `0.045 × 0.022 × 0.010` m, scaled by `hk`, angled outward and backward. Recess the pink inner ears into their front faces. Reduce eye dimensions by roughly 20%, and replace each thick brow capsule with a shallow curved brow about half its current thickness, seated against the skull. Preserve the long muzzle and calf’s larger head ratio. **The next close-up should show two friendly, alert faces with readable ears, soft brows, and eyes embedded in the head rather than hanging beneath a ledge.**\n\n4. **Seat the pond into the landscape instead of presenting it as a raised platter.** Replace the pond’s green cylinder with an irregular shoreline annulus, using roughly 20 vertices and modest radial variation. Slope its outer edge down to `G + 0.001` and its inner edge to approximately `G + 0.008`; keep the green coverage narrower and interrupted by sand and rocks. Set the water surface near `G + 0.006`, eliminating the exposed cyan vertical wall. Lower `RIPPLE`, pads, and lotus together by approximately 0.029 m so they remain seated on the new surface. **The next render should show water nestled into a sandy, planted depression, with no conspicuous stacked green-and-blue discs.**\n\n5. **Make the small suspended objects visibly supported.** Refactor `lantern()` to accept an explicit attachment point and connect that point to the roof tip at `[x, y + 0.065, z]`; the current short `hang` values leave the suspension visually ambiguous. Add a narrow crossbar between the awning’s two front posts and hang its lantern directly from that bar. Connect the standing lantern to the actual endpoint of `post`. For the cooking pot, add a vertical semicircular bail handle, approximately 0.03 m radius, and terminate the tripod chain at its top rather than inside the pot. **The next detail render should make every lantern and the pot’s load path immediately understandable. Leave the floating fire sparks intact—they read correctly as airborne embers.**\n\n6. **Open the central sightline and separate the two camel silhouettes.** Remove the juvenile palm at `palm(0.22, 0.45, ...)`: its crown competes directly with the adult’s neck and saddle, while its trunk adds clutter beside the fire. Move the calf from `(-0.1, 0.9)` to approximately `(-0.25, 0.96)`, retaining its current yaw and scale. Keep the adult’s position. **The next front and three-quarter renders should show both faces against cleaner backgrounds, a clear gap between their bodies, and a more continuous view of the pond and campfire.**\n\n7. **Quiet the procedural surface patterns so the forms and textile accents lead.** In `sand`, reduce the pale ripple blend from `0.6` to approximately `0.18` and the dark blend from `0.25` to `0.08`; soften their threshold transitions. In `TRUNK`, reduce stripe contrast and let the existing torus rings provide most of the segmentation. Simplify `baseP` to two or three broad, subdued strata instead of many narrow, jagged bands. Keep the tents and rugs crisp, but use a darker, less fluorescent shoreline green. **The next render should retain the warm, playful palette while reading as a composed miniature landscape—not a collection of equally loud surface patterns.**",
+      "usage": {
+        "prompt_tokens": 21958,
+        "completion_tokens": 2121,
+        "total_tokens": 24079,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1034
+        }
+      },
+      "costUsd": 0.065126,
+      "wallMs": 53739
+    },
+    "check": {
+      "slug": "r8k1DesertOasisDioramaRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 389,
+        "triangles": 23204,
+        "colors": 25,
+        "textures": 8,
+        "joints": 57,
+        "size": [
+          2.811,
+          1.596,
+          2.882
+        ],
+        "issues": [],
+        "fine": 122
+      }
+    }
+  },
+  {
+    "slug": "r8k1DwarfRiflemanRichCraft2",
+    "from": "r8DwarfRiflemanRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "dwarfRifleman",
+    "level": "rich",
+    "pitch": "Category: Humanoid character.\nSubject: dwarf rifleman with braided beard and blunderbuss.\nStyle: Blizzard/Warcraft.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:55.626Z",
+    "wallMs": 579322,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 108894,
+      "completion_tokens": 69017,
+      "total_tokens": 177911,
+      "prompt_tokens_details": {
+        "cached_tokens": 83781
+      }
+    },
+    "costUsd": 0.8113101,
+    "chainCostUsd": 1.5167688,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Make the silhouette unmistakably dwarven: broader, shorter, and planted.**  \n   The current narrow torso, long thighs, and close-set feet read more like a compact human beneath oversized shoulder pads. Shorten the character’s lower body by approximately **0.10 m**: introduce a character-only coordinate helper that maps `y ≤ 0.5` to `0.8*y`, and subtracts `0.10` above that; apply it consistently to character geometry, joints, and the gun frame—not the scenery. Increase the torso loft widths from `0.34–0.52` to approximately `0.43–0.64`, with depths increased 15%. Move shoulder roots to `x = ±0.30`, pauldron centres to `±0.35`, and ankles to `±0.155`. Widen the soles to `0.21 m` and enlarge the boot bodies correspondingly. Increase `skull` radii to approximately `[0.17, 0.16, 0.16]`.  \n   **Next render:** a broad barrel-chested dwarf with substantial feet and short, powerful legs—not merely a taller figure wearing large armour.\n\n2. **Open up the face; the eyes must survive the helmet, brows, and whiskers.**  \n   In the head render, the eyes are tiny slivers between a heavy brow and swollen cheek hair. Reduce the skin brow `rod` radius from `0.034` to **0.021**, raise its endpoints about **0.015 m**, and reduce the eyebrow sweep’s starting radius from `0.03` to `0.021`. Lower the cheek blobs approximately `0.018 m` and reduce their radius from `0.058` to `0.048`; keep side whiskers below the outer eye corners. Increase the eye decal size to about `[0.072, 0.050]`, positioning each against the enlarged skull surface rather than leaving it at the old projection depth. Raise `HY` by `0.02 m` and reduce the outermost brim radius from `0.255` to approximately `0.235`. Keep the large rosy nose and upward moustache curl.  \n   **Next render:** two clearly visible, stern blue eyes, a distinct brow–nose–moustache hierarchy, and an appealing expression readable without zooming in.\n\n3. **Give him a convincing rifleman pose and expose the weapon’s length.**  \n   The front view presents almost only the muzzle, while the other hand hangs beside the lantern. Rebuild `GB`/`GM` so the blunderbuss runs diagonally across the waist rather than straight toward the front camera. Before the height remapping above, use roughly `GB = P(-0.32, 0.55, 0.16)` and `GM = P(0.53, 0.70, 0.46)`, then regenerate `GA`, `GS`, `GU`, and all `gp()` placements. Keep the right wrist at `GRIP`; move the left wrist to approximately `gp(0.60, -0.07)`. Replace the hanging left fingers with a palm beneath the forestock, four bent fingers wrapping its side, and a thumb over its opposite edge. Adjust both elbow bends so they stay outside the torso and below the pauldrons. Maintain at least **20 mm** between the gun and beard tips.  \n   **Next render:** a stable two-handed low-ready pose, with stock, lock, barrel, and flared muzzle all legible in front and three-quarter views.\n\n4. **Replace the shredded beard surface and bead-like braids with deliberate hair masses.**  \n   The `HAIR` cards currently form a ragged curtain of thin triangular strips; the two braids appear to begin separately beneath it. Remove the 60-card scatter, retaining at most **8–12 short, closely embedded accents** along the outer beard silhouette. Build the main beard as three overlapping tapered volumes, broad under the jaw and narrowing toward the chest. Start each `braid()` around `P(±0.065, 1.08, 0.25)`, visibly embedded in those volumes, rather than at `y = 0.98`. Replace the row of individual blobs with **two continuous intertwining sweeps per braid**, radius approximately `0.018–0.022 m`, around a `0.02 m` centreline radius; keep the gold bindings and tapered ends. Move the bindings with the new paths.  \n   **Next render:** a clean copper beard silhouette, uninterrupted roots, and unmistakably interwoven braids instead of dangling faceted beads and hair ribbons.\n\n5. **Make the blunderbuss muzzle an actual hollow bell.**  \n   `BELL` closes across its mouth, and the black `CircleGeometry` sits beyond that cap, producing a flat black endplate. Replace the profile’s final centre point with an inner return wall: an outer lip near radius `0.092`, inner lip near `0.074`, then an inner taper returning toward the barrel. Place the dark bore disk **35–50 mm behind the lip**, facing outward, and resize/reposition the gilt rim to meet the bell’s actual mouth. Keep a substantial **8–12 mm** lip thickness rather than a detached-looking trim ring.  \n   **Next render:** visible interior wall depth and a recessed dark bore, especially in the front and three-quarter views.\n\n6. **Reduce the scenic footprint so the character—not the lawn and cargo—owns the frame.**  \n   The base occupies substantial image area, and the barrel/lantern crowds the free-hand silhouette. Reduce `BASE` and `TURF` radial dimensions by roughly **18%**, move the keg to about `(0.34, -0.23)` in the ground plane, and reduce the crate stack by approximately **20%**, shifting it inward behind the boots. Regenerate the rock and grass placements for the smaller perimeter; avoid grass crossing the boot outlines. Preserve visible boot-to-ground contact. After shortening the figure, tighten the full-body framing to leave approximately **5–7% margin**; make the `head` render a genuine helmet-and-face close-up rather than another waist-up view.  \n   **Next render:** the dwarf fills the image, both feet remain readable, and the props act as secondary context without crowding the hands or silhouette.\n\n7. **Finish with controlled colour blocks and broad highlights, not mottled noise.**  \n   The helmet, pauldrons, beard, and ground currently have similarly busy surface variation. Reduce the contrast of `BEARD`/`BEARD_HI` grain and the `BLUE`, `WOOD`, and `MOSS` mottles by approximately **50–65%**. Adjust `STEEL` so the armour reads as cool grey with broad light upper facets and darker undersides, rather than cloudy white marble. Use darker copper at beard roots and overlaps, reserving golden orange for outward-facing ridges. Retain bright brass primarily on armour rims, braid bindings, and the muzzle lip. On the backpack, bevel the main box edges by approximately `0.015 m` and add two substantial leather straps connecting the bedroll bindings to the pack body; the rear currently reads as an almost unbroken rectangular slab.  \n   **Next render:** clear blue, copper, steel, and brass masses at thumbnail scale, with restrained surface variation and purposeful highlights supporting the sculpted forms.",
+      "usage": {
+        "prompt_tokens": 18303,
+        "completion_tokens": 2593,
+        "total_tokens": 20896,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1034
+        }
+      },
+      "costUsd": 0.062536,
+      "wallMs": 73575
+    },
+    "check": {
+      "slug": "r8k1DwarfRiflemanRichCraft2",
+      "typeErrors": 6,
+      "typeErrorSample": [
+        "bakeoff/rounds/r8k1/builds/r8k1DwarfRiflemanRichCraft2.ts(186,75): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'.",
+        "bakeoff/rounds/r8k1/builds/r8k1DwarfRiflemanRichCraft2.ts(201,62): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'.",
+        "bakeoff/rounds/r8k1/builds/r8k1DwarfRiflemanRichCraft2.ts(209,60): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'.",
+        "bakeoff/rounds/r8k1/builds/r8k1DwarfRiflemanRichCraft2.ts(216,54): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'.",
+        "bakeoff/rounds/r8k1/builds/r8k1DwarfRiflemanRichCraft2.ts(218,22): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'.",
+        "bakeoff/rounds/r8k1/builds/r8k1DwarfRiflemanRichCraft2.ts(438,82): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'."
+      ],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 255,
+        "triangles": 15386,
+        "colors": 3,
+        "textures": 7,
+        "joints": 35,
+        "size": [
+          1.167,
+          1.666,
+          1.069
+        ],
+        "issues": [],
+        "fine": 7
+      }
+    }
+  },
+  {
+    "slug": "r8k1FrostAxeRichCraft2",
+    "from": "r8fixFrostAxeRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "frostAxe",
+    "level": "rich",
+    "pitch": "Category: Fantasy weapon.\nSubject: frost-forged battle axe.\nStyle: League of Legends.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:24:00.587Z",
+    "wallMs": 536270,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 102432,
+      "completion_tokens": 64294,
+      "total_tokens": 166726,
+      "prompt_tokens_details": {
+        "cached_tokens": 83766
+      }
+    },
+    "costUsd": 0.7400165999999999,
+    "chainCostUsd": 1.1998479,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Give the oversized head a handle that can convincingly wield it.** Keep the asymmetric crescent-and-pick silhouette, but lengthen the exposed haft by **0.30 m** and increase its radius from roughly **0.03 to 0.043–0.047 m**. Set `HC = 1.6`; extend `haft` to **y = 1.88**. Raise the hard-coded socket, spear, fur, and ribbon assemblies by the same 0.30 m; the parts already positioned relative to `HC` will follow automatically. Extend `gripWrap` from **y = 0.42 to approximately 1.16**, using a spiral radius around **0.05 m**, and resize its bands to fit.  \n   **Next render:** a heavy, usable battle axe rather than a huge ornamental head on a short, delicate stick; preserve the existing broad crescent and rising pick.\n\n2. **Make the head look forged, not cut from sheet metal.** The side render exposes how thin `bladeMain`, `pick`, and `spearBlade` are. Give `bladeMain` a **0.075–0.085 m thick inner body**, tapering through a broad bevel to an approximately **0.008 m cutting edge**. Make `bladePlate` about **0.09 m thick overall**, with a shallow beveled transition rather than a sharp stacked-sheet step. Thicken the pick root to **0.07–0.08 m**, tapering toward its existing fine point; increase `spearBlade` to approximately **0.045 m** at its base. Reposition face decorations just outside the revised surfaces.  \n   **Next render:** a substantial wedge-shaped weapon in side and three-quarter views, with sharp edges but a convincing load-bearing spine.\n\n3. **Root the hanging ice shards and restore a clean cutting arc.** Two pick shards visibly hang below the metal without a convincing connection: change the `bladeShard(-1, 0.3, 0.06, …)` base to approximately **`(0.3, 0.115)`**, and the `bladeShard(-1, 0.1, -0.1, …)` base to **`(0.1, -0.045)`**. Embed each crystal base **0.015–0.025 m** into its supporting metal. Apply that overlap to the other perimeter shards too. Remove the eight outward-facing shards generated by the “frost ridges along the cutting edge” loop, or replace them with tiny, surface-bound ice facets no longer than **0.025 m**.  \n   **Next render:** every growing crystal has an unmistakable root, and the crescent has one uninterrupted, dangerous cutting silhouette instead of a row of icicle teeth.\n\n4. **Turn the fur and ribbons into attached, readable accessories.** The fur currently resembles a curtain of fine straight strips. In the fur `b.cards` calls, reduce the combined count from **30 to about 16–18**, shorten the cards from **0.17 to 0.10–0.12 m**, and widen them to approximately **0.075 m**. Sink their roots into the fur toruses and add a few solid, tapered low-poly tufts so the collar retains volume from the side. Shorten each `ribbon` to **0.26–0.29 m**, keep its top fastened beneath the collar, and flare its lower end outward by **0.04–0.06 m** rather than laying both ribbons directly over the grip. Move the end studs onto the actual ribbon tips.  \n   **Next render:** a compact, chunky fur collar and two distinct hanging cloth tails, with the leather grip clearly visible and no bead suspended beside a notch.\n\n5. **Reduce the display’s competition with the weapon.** Scale the plinth, foot, rocks, rune planes, and cluster base positions together to approximately **75% in X/Z**. Reduce the tallest ground crystals to **0.25–0.30 m**, concentrating them toward the rear and sides; keep the front-center sector low and open. Replace the fourteen scattered `SPARK` cards with **four to six** small sparks close to the head, within roughly **0.10 m of its silhouette**, rather than extending the scene’s bounds above and beside it. Reframe using the revised weapon and pedestal bounds.  \n   **Next render:** the axe fills the image and commands attention; the smaller frozen base supports it without becoming a second subject or concealing the lower handle.\n\n6. **Give `heartCrystal` a bezel that actually fits it.** The small round torus only surrounds the crystal’s middle, leaving its elongated tips looking unseated. Replace each circular bezel with a beveled, elongated hexagonal or diamond-shaped frame approximately **0.16 m wide × 0.34 m high**, seated against the hub face. Let `heartCrystal` project **0.035–0.045 m** beyond that frame on each face, with its perimeter tucked behind the metal lip. Retain the outer `hubTrim`, but enlarge the hub’s width by about **10%** if needed to leave a clear dark border between the two frames.  \n   **Next render:** the central crystal becomes the weapon’s deliberate focal point—a securely mounted magical core, not a gem crossing a circular ring.\n\n7. **Make the frost inlay feel embedded rather than pasted on at full brightness.** Keep the fern motif, but reduce its card dimensions from **0.5 × 0.8 m to roughly 0.42 × 0.64 m**, repositioning it entirely within the dark `bladePlate`. In `frostSvg()`, reduce the cyan stroke from **6 to about 4** and the white core from **2.4 to 1.2–1.5**; lower its glow from **1.15 to approximately 0.45–0.6**. Similarly restrain `PICK_RUNE` and `pickGlint`, allowing the heart crystal to remain the strongest luminous accent. Set the cards only **0.001–0.002 m above** their supporting faces.  \n   **Next render:** a legible icy engraving with visible dark metal between its branches, rather than a bright graphic that overwhelms the blade.\n\n8. **Replace cloudy surface noise with intentional large-scale material shapes.** In `BLADE`, substantially reduce the high-frequency white frost contribution and reserve pale silver for the cutting bevel. In `PLATE` and `HUB`, reduce noise contrast so they read as deep blue forged steel, with a few broad blue highlights rather than mottled camouflage. Keep the gold restrained to bezels, fastening points, and narrow trim; give the ice crystals distinct darker cyan sides and pale tips instead of uniformly bright faces.  \n   **Next render:** clean, readable material separation—dark structural steel, a bright sharpened edge, faceted ice, and selective gold—with the bold shape and controlled value hierarchy expected of a League-style hero weapon.",
+      "usage": {
+        "prompt_tokens": 13164,
+        "completion_tokens": 2504,
+        "total_tokens": 15668,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1034
+        }
+      },
+      "costUsd": 0.051368,
+      "wallMs": 78551
+    },
+    "check": {
+      "slug": "r8k1FrostAxeRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 153,
+        "triangles": 6480,
+        "colors": 17,
+        "textures": 8,
+        "joints": 1,
+        "size": [
+          1.466,
+          2.415,
+          0.866
+        ],
+        "issues": [],
+        "fine": 1
+      }
+    }
+  },
+  {
+    "slug": "r8k1GnomeTinkererRichCraft2",
+    "from": "r8GnomeTinkererRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "gnomeTinkerer",
+    "level": "rich",
+    "pitch": "Category: Humanoid character.\nSubject: gnome tinkerer with a backpack of gadgets.\nStyle: whimsical low-poly mix.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:39.215Z",
+    "wallMs": 468383,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 111092,
+      "completion_tokens": 61510,
+      "total_tokens": 172602,
+      "prompt_tokens_details": {
+        "cached_tokens": 83778
+      }
+    },
+    "costUsd": 0.7403538000000001,
+    "chainCostUsd": 1.6715765,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Give the face more space and a warmer expression.** The gnome reads immediately, but the small, stern face is squeezed between the cuff and beard. Increase `R` from `0.12` to about `0.134`, spread the eyes to `x = ±0.054`, and enlarge the `EYE` decals from `0.046` to `0.053`. Reposition the cheeks, nose, ears and sideburn roots using the revised `hz`; reduce the spherical blush cheeks to roughly `0.023` radius. Raise the inner brow ends slightly and lift one brow another `0.006 m`. Shorten the hat above `y = 0.9` by about 12%, retaining its hooked tip. **Next render:** an open, curious face that competes successfully with the hat and gadgets, without losing the gnome silhouette.\n\n2. **Rebuild the beard as a few substantial locks rather than overlapping blades.** The current `lock()` extrusions and `WISP` cards make the signature beard look like stacked ivory shingles, particularly in profile. Keep the `bp` core, but widen its middle by roughly 15% and replace the five lock rows with 6–8 tapered, six-sided sweeps. Embed each root `0.01–0.015 m` into the core; give the locks rounded triangular cross-sections and stagger their tips between `y = 0.43` and `0.50`. Remove most or all of `b.cards(bh, WISP, ...)`. Keep two clear moustache lobes and leave a small smiling mouth gap beneath them. **Next render:** one generous white beard silhouette, with readable sculpted locks and no paper-thin strips separating from it.\n\n3. **Replace the symmetrical display pose and flat hands with a working gesture.** Both arms currently spread outward, while the extended fingers merge into long flat shapes from the front. Adjust the `armL`/`armR` chains so one wrist sits around `[0.29, 0.45, 0.10]` and the other around `[-0.30, 0.40, 0.08]`, preserving natural elbow bends. On the raised hand, put a short screwdriver handle at the computed `palm` position and curve the finger chains around its `0.012–0.015 m` radius; bring the thumb across the handle. Give the other hand softly curled fingers, shortening the current combined finger lengths by about 20%. **Next render:** a tinkerer caught considering a repair, with distinct thumbs, believable grips and a less mannequin-like silhouette.\n\n4. **Make the upper backpack gadgets readable and visibly mounted.** The `rotor` blades are almost edge-on, forming a gold line across the hat area. Move the hub outward to approximately `[-0.23, 0.82, -0.25]`, shorten each blade to `0.11–0.12 m`, and tilt the rotor plane about 30° toward the front. Replace its straight mast with a bracket running from the pack lid to the hub, plus a small bearing collar. Check clearance against the telescope and keep at least `0.015 m` between unrelated surfaces. Add short leather attachment tails from the bedroll bands onto the pack’s bottom frame. **Next render:** a recognizable propeller in front/three-quarter views, a clean gap around the hat, and gadgets that look carried rather than merely arranged nearby.\n\n5. **Let the character, not the display platform, determine the framing.** The broad plinth, bright floor graphic and grass occupy too much visual attention. Reduce `base` radius from `0.60` to about `0.46 m`, bringing the crate, mushrooms, loose gears and beetle inward to suit. Reduce grass scatter from 70 to roughly 30 clumps, keeping the boot fronts and beetle clear. Reduce `FLOOR` to about `0.70 m` across and lower its gold contrast substantially. **Next render:** larger face and torso at the same image size, with the ground props forming a supporting border rather than a competing subject.\n\n6. **Fix the opaque “glowing jar” and separate the material families.** The white outer cylinder currently hides the smaller green cylinder, so the jar reads as a white canister. Replace that outer cylinder with a transparent, lightly green-tinted shell, or an open brass cage with three narrow vertical ribs and the existing end rings. Keep the luminous core visibly exposed. Reduce the goggles’ glow so their cyan glass retains a darker edge and clear reflection. **Next render:** an unmistakable green invention jar, cyan optical glass and an amber lantern—three distinct effects, with the face still the focal point.\n\n7. **Simplify surface noise, then add a few intentional handmade details.** The pack, crate and tank all carry dense, similarly scaled panel/rivet patterns, while the advertised patchwork hat is mainly striped. Remove `panelled()` from `CANVAS`, retaining broad mottled canvas, leather edging and a few actual fasteners. Keep the tank’s copper panel treatment, but reduce verdigris to roughly `0.2–0.25` so it remains distinct from brass. Add one irregular teal fabric patch, about `0.055 × 0.07 m`, to the hat’s side using a surface decal, with a restrained stitched border. **Next render:** broad, calm material areas punctuated by selected crafted details—not an evenly distributed layer of small marks.",
+      "usage": {
+        "prompt_tokens": 20214,
+        "completion_tokens": 2182,
+        "total_tokens": 22396,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1034
+        }
+      },
+      "costUsd": 0.062248,
+      "wallMs": 57158
+    },
+    "check": {
+      "slug": "r8k1GnomeTinkererRichCraft2",
+      "typeErrors": 3,
+      "typeErrorSample": [
+        "bakeoff/rounds/r8k1/builds/r8k1GnomeTinkererRichCraft2.ts(104,17): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'.",
+        "bakeoff/rounds/r8k1/builds/r8k1GnomeTinkererRichCraft2.ts(576,7): error TS2769: No overload matches this call.",
+        "bakeoff/rounds/r8k1/builds/r8k1GnomeTinkererRichCraft2.ts(855,45): error TS2322: Type 'ColorInput' is not assignable to type 'Fill | undefined'."
+      ],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 249,
+        "triangles": 15296,
+        "colors": 19,
+        "textures": 11,
+        "joints": 45,
+        "size": [
+          0.934,
+          1.253,
+          0.922
+        ],
+        "issues": [],
+        "fine": 14
+      }
+    }
+  },
+  {
+    "slug": "r8k1GrayWolfRichCraft2",
+    "from": "r8GrayWolfRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "grayWolf",
+    "level": "rich",
+    "pitch": "Category: Animal.\nSubject: gray wolf standing alert.\nStyle: Blizzard/Warcraft.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:45.954Z",
+    "wallMs": 398652,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 106162,
+      "completion_tokens": 49028,
+      "total_tokens": 155190,
+      "prompt_tokens_details": {
+        "cached_tokens": 83767
+      }
+    },
+    "costUsd": 0.5978587,
+    "chainCostUsd": 1.3753707,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Correct the head silhouette: shorter, broader ears and a tapered wolf muzzle.** The tall ears and long rectangular snout currently lean toward a jackal rather than a Warcraft gray wolf.\n   - In `EARO`/`EARN`, retain the notch but scale the current ear width by approximately **1.05** and height by **0.65** instead of scaling both with `EK`. Target an exposed ear height of **0.17–0.18 m**. Lower the bases to `hp(±0.085, 0.075, -0.02)` so they emerge securely from the skull.\n   - Increase `skull.scale` to approximately `[0.15, 0.13, 0.155]`.\n   - Shorten the muzzle endpoint from forward `0.40` to **0.34 m**, moving the nose and front teeth with it. Replace the perfectly rectangular muzzle section with a bevelled, six-sided section: broad at the cheek junction, narrower toward the nose, with sloping upper corners.\n   - **Next render:** compact triangular ears, a strong forehead, and a substantial but unmistakably canine muzzle—not a long cream box.\n\n2. **Uncover the eyes and turn the toothy expression into an alert, appealing face.**\n   - The brow boxes and cheek cards almost conceal the amber eyes. Replace each `BoxGeometry(0.09, 0.024, 0.06)` brow with a tapered wedge about **0.075 × 0.016 × 0.035 m**. Seat its underside just above the eye rather than across it.\n   - Reproject `EYE` onto the enlarged skull around `hp(±0.105, 0.045, 0.105)`, with normals approximately `[±0.7, 0.15, 0.7]`; adjust projection until both eyes are clearly visible from the front. Keep the amber iris and dark rim, but reduce `glow` to **0.15–0.25**.\n   - Move the upper cheek tufts down and back by **20–30 mm**, clearing the outer eye corners.\n   - Remove the six-degree jaw opening. Raise and shorten the lower jaw with the muzzle, leaving only a **5–8 mm dark mouth seam**. Hide the tongue and most teeth; retain at most a small canine glimpse.\n   - **Next render:** two readable amber eyes beneath sculpted brows, with an attentive expression rather than a mechanical grin.\n\n3. **Replace the exposed “ball joints” with integrated shoulder and haunch anatomy, and straighten the forelegs.**\n   - The shoulder and hip blobs read as separate armor plates. Move their centers inward from `x=±0.175/±0.17` to approximately **±0.135**, and reduce their forward/backward radii: shoulders to roughly `[0.105, 0.18, 0.145]`, haunches to `[0.11, 0.20, 0.17]`. Embed them deeply into the torso and upper-leg sweeps.\n   - Make the front third of `bodySweep` slightly deeper and wider, targeting section radii around **[0.235, 0.27]** at the chest, with a restrained abdominal tuck behind it.\n   - Replace the foreleg `limb(...)` result with explicit control points near `P(±0.15, 0.68, 0.40)`, `P(±0.16, 0.40, 0.38)`, `P(±0.16, 0.10, 0.47)`, and `P(±0.16, 0.05, 0.49)`. Keep the hind-leg hock bend; do not straighten all four legs.\n   - Enlarge the entire `paw` assembly by about **15%**, including toe spacing, while retaining snow contact.\n   - **Next render:** a powerful front-loaded wolf with continuous muscle masses, nearly upright forelegs, angular hind hocks, and paws large enough to carry its weight.\n\n4. **Rebuild the fur as a few coherent clumps instead of an all-over crown of blades.** In the side view, many blades become thin rods; in the close-up, the layered cards resemble outlined leaves.\n   - Reduce `ruffHits` from **60 to about 24**, `bodyHits` from **46 to about 14**, and `tailHits` from **24 to about 10**. Remove cards from the face and shoulder centers; concentrate them along the neck’s rear edge, chest underside, and tail silhouette.\n   - Shorten the mane-ring blades from `0.20–0.25` to **0.10–0.15 m**, and the back ridge from `0.15` to **0.06–0.08 m**. Aim them backward along the coat rather than steeply away from the body.\n   - For silhouette clumps, modify `blade` to create a shallow triangular-prism or wedge section **20–30 mm thick**, not a nearly flat plate. Recess roots **15–25 mm** into the supporting sweep.\n   - Remove the heavy black SVG perimeter and most interior strokes from `TUFT_G`/`TUFT_C`; merge nearby blades into two- or three-tip clumps.\n   - **Next render:** a broad, flowing neck ruff and bushy tail, with no picket-like spikes along the back and no visible sheet edges through the mane.\n\n5. **Fix visible support gaps and the below-ground base without disturbing sound decorative layering.**\n   - The banner’s lower gold ornaments visibly hover beneath the cloth. Add short cords from the cloth corners around `FLOOR + 0.41` down to the cone tops around `FLOOR + 0.385`, with **3–4 mm radius**, or raise the cones until their tops meet the corners.\n   - Extend the banner pole into the spearhead by **15–20 mm**, eliminating the small gap beneath its gold tip.\n   - Replace the two separated banner planes with one thin, double-sided cloth surface, or join them with a narrow perimeter thickness. Attach its top edge to the crossbar with two visible loops.\n   - Resolve the **−33 mm** minimum at the rock base: truncate low rim-stone vertices at `y=0` or raise those stones individually. Keep the paws on the existing snow height.\n   - **Next render:** attached banner hardware and a clean ground contact, with no floating tassels or buried rim stones. Leave the pine’s layered snow cones alone unless their separation remains visibly faulty.\n\n6. **Make the wolf—not the miniature scenery—own the composition.**\n   - Reduce the `OUT` footprint by approximately **20% along z** and **10% along x**, then reposition rim stones to match while preserving support beneath all paws.\n   - Remove the pine sapling: it interrupts the tail in the side view and adds a competing animal-sized silhouette.\n   - Reduce the rune stone and crystal group to about **65%** of their current heights. Keep them outside the projected leg silhouettes.\n   - Reduce the banner to roughly **75%** of its current size and place it behind and laterally clear of the torso; its crossbar should not appear to sprout from the wolf’s back.\n   - Frame the revised model with modest margins, keeping the full ears, paws, and tail visible.\n   - **Next render:** the wolf dominates every full-body view, with an unobstructed tail and readable leg spacing; the Frostwolf setting remains a secondary accent.\n\n7. **Replace the cloudy coat texture with deliberate Warcraft-style color masses.**\n   - In `FUR`, greatly reduce the high-frequency `streak` contribution and remove scattered bright snow patches from the animal.\n   - Establish a continuous charcoal saddle along the back and upper neck, cool medium-gray flanks, and a connected pale region beneath the jaw, down the throat, and onto the chest. Keep warm fawn largely confined to the lower legs.\n   - In `HEAD_FUR`, soften the abrupt cream muzzle-side boundary and use gray to carry the cheek into the muzzle root. Keep the nose dark and the eyes as the strongest small color accents.\n   - Match blade-root colors to the surfaces beneath them; reserve pale tips for a few large ruff clumps rather than alternating every blade.\n   - **Next render:** clean, intentional coat markings that explain the anatomy at thumbnail size, with the amber-eyed face as the focal point.",
+      "usage": {
+        "prompt_tokens": 15681,
+        "completion_tokens": 2305,
+        "total_tokens": 17986,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 516
+        }
+      },
+      "costUsd": 0.054412,
+      "wallMs": 63894
+    },
+    "check": {
+      "slug": "r8k1GrayWolfRichCraft2",
+      "typeErrors": 2,
+      "typeErrorSample": [
+        "bakeoff/rounds/r8k1/builds/r8k1GrayWolfRichCraft2.ts(198,7): error TS2322: Type 'ColorInput' is not assignable to type 'Fill | undefined'.",
+        "bakeoff/rounds/r8k1/builds/r8k1GrayWolfRichCraft2.ts(244,47): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'."
+      ],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 156,
+        "triangles": 7746,
+        "colors": 11,
+        "textures": 6,
+        "joints": 30,
+        "size": [
+          1.314,
+          1.46,
+          2.397
+        ],
+        "issues": [],
+        "fine": 4
+      }
+    }
+  },
+  {
+    "slug": "r8k1KoalaRichCraft2",
+    "from": "r8KoalaRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "koala",
+    "level": "rich",
+    "pitch": "Category: Animal.\nSubject: koala gripping a eucalyptus branch stand.\nStyle: pixel art.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:31.409Z",
+    "wallMs": 356296,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 102538,
+      "completion_tokens": 43767,
+      "total_tokens": 146305,
+      "prompt_tokens_details": {
+        "cached_tokens": 83767
+      }
+    },
+    "costUsd": 0.5333347,
+    "chainCostUsd": 1.2405667,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Replace the square, whiskered head silhouette with a broad, stepped koala head.**  \n   The large rectangular cream cheeks, striped side tufts, and tall crown currently suggest a stern cat more than a koala. Replace the two main head boxes with a stepped, chamfered volume approximately **0.40 m wide × 0.25 m tall × 0.28 m deep**, centered near `[0, 1.0, 0.03]`; inset the top and bottom two rows by 0.02–0.04 m. Remove the crown extrusion and the alternating cheek-tuft extrusions. Move the ear centers from `s * 0.18` to approximately `s * 0.235`, retaining their circular stepped outlines but reducing their yaw from `0.45` to about `0.25` radians. Keep cream fringe broad and make the pink cores about 25% smaller.  \n   **Next render:** a wide, soft-looking head with two clearly exposed round ears, without whisker-like stripes or a central crest.\n\n2. **Make the face gentle and give it the characteristic tall koala nose.**  \n   Change the broad cream `CHEEK` treatment to gray fur; reserve pale coloring for two small stepped cheek patches and the muzzle. Reduce the muzzle from `0.15 × 0.10 × 0.10` to approximately **`0.14 × 0.065 × 0.055`**, with its front near `z = 0.22`. Rebuild the nose as a vertical stepped shape roughly **0.09 m wide × 0.125 m high × 0.04 m deep**, spanning approximately `y = 0.93–1.055`, with a rounded top and narrower bottom. Remove the angled black brows and the duplicate lower-jaw mouth line; use one short, shallow mouth beneath the nose. Retain the small eye highlights, but reduce each eye plane to about `0.044 m` square.  \n   **Next render:** the nose is the unmistakable focal feature, the eyes look calm rather than angry, and the muzzle no longer resembles a protruding square snout.\n\n3. **Turn the stacked torso and angular limb masses into a compact, seated animal.**  \n   Rebuild the three torso boxes as one overlapping stepped barrel: approximately **0.40 m wide at the haunches, 0.36 m through the belly, and 0.29 m at the shoulders**, spanning `y = 0.45–0.86`. Add 0.02 m corner setbacks instead of full-width horizontal ledges. Make the cream bib one contiguous tapered patch rather than separately outlined bands. The current arm and leg `b.sweep(... section: \"box\")` results look like twisted, triangulated armor; replace these visible limb sections with short, overlapping oriented boxes or stepped extrusions, about `0.08–0.10 m` thick. Bury their ends inside the shoulders and haunches.  \n   **Next render:** a plump seated koala with tucked knees and continuous fur masses—not a narrow upright torso wearing shoulder pads and boots.\n\n4. **Stage the trunk beside the koala so the embrace is visible from the front.**  \n   At present, both hands grip behind the body, making the defining action disappear in the primary views. Move the main trunk from `[0, …, -0.22]` to approximately **`[0.30, …, -0.02]`**, reduce its radius to roughly `0.07–0.08 m`, and terminate the thick trunk near `y = 0.88`; use thinner twigs above that. Rebuild the seat branch to run from this trunk toward `[-0.16, 0.40, 0.08]`, with its upper surface supporting the rump near `y = 0.45`. Route one arm across the front of the chest to the near side of the trunk and the other around its outside. Put the hands at slightly different heights, around `y = 0.72` and `0.78`, and construct their fingers along the actual bark surface. Reposition the feet onto the new seat branch, with toes curling around its sides and claws ending at the wood rather than crossing through one another.  \n   **Next render:** front and three-quarter views clearly show two arms embracing a eucalyptus trunk and both feet holding the supporting branch; the side view confirms weight-bearing contact.\n\n5. **Separate the eucalyptus foliage from the ears and expose recognizable leaf faces.**  \n   Replace the two symmetric `twig(...)` arches behind the head with an asymmetric cluster growing outward from the relocated trunk. Keep the main leafy spray to the koala’s right, with a smaller upper spray; leave at least **0.04 m of projected clearance** around the ears and face in the front view. In `twig`, stop using crossed cards for every leaf: use individually oriented, double-sided cards with varied yaw, keeping several broad faces visible in both front and three-quarter views. Retain the narrow eucalyptus proportions, with leaves about `0.05–0.07 m` wide and `0.15–0.20 m` long. Attach their narrow ends visibly to the twigs.  \n   **Next render:** foliage reads as hanging eucalyptus leaves rather than a symmetrical fringe growing out of the koala’s ears, and no cluster covers the cheek or gripping hands.\n\n6. **Reduce the display stand’s visual weight so the animal dominates.**  \n   Shrink the current `0.94 × 0.90 m` lower plinth to approximately **`0.78 × 0.64 m`**, adjusting the upper tier and turf to match while preserving a sound footprint under the revised trunk. Reduce the corner blocks to about `0.045 m` and remove one of the two heavy wood tiers. Keep only a few ground accents—one rock group, two gumnuts, and three grass tufts—positioned away from the silhouette of the feet and trunk root. Scale the plaque down with the base.  \n   **Next render:** the koala occupies more of the image, with a modest supporting stand instead of a large fenced-looking diorama competing for attention.\n\n7. **Finish with controlled pixel clusters rather than equal-strength noise everywhere.**  \n   In `furTone`, halve the random bright/dark outlier frequency and narrow the main fur range toward the middle four `FUR` colors. Use larger coherent shadow and highlight patches, retaining the `0.02 m` texel scale; reserve `FINE` for eyes, nose, and small grip details. Shift `CREAM` slightly cooler and less yellow, and soften the black-to-white contrast of the ear fringe. Simplify `barkTone` to longer vertical patches of pale gray-green, cream, and muted warm peel; reduce turf contrast and saturation so it remains subordinate.  \n   **Next render:** crisp pixel-art texture supports the forms, with the face and hands carrying the highest contrast rather than every surface appearing equally mottled.",
+      "usage": {
+        "prompt_tokens": 13713,
+        "completion_tokens": 2232,
+        "total_tokens": 15945,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 758
+        }
+      },
+      "costUsd": 0.049746,
+      "wallMs": 49345
+    },
+    "check": {
+      "slug": "r8k1KoalaRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 116,
+        "triangles": 2360,
+        "colors": 5,
+        "textures": 8,
+        "joints": 62,
+        "size": [
+          1.095,
+          1.256,
+          0.641
+        ],
+        "issues": [],
+        "fine": 0
+      }
+    }
+  },
+  {
+    "slug": "r8k1LanternShrineRichCraft2",
+    "from": "r8LanternShrineRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "lanternShrine",
+    "level": "rich",
+    "pitch": "Category: Prop group.\nSubject: roadside shrine with lanterns, offerings and torii.\nStyle: Genshin Impact.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:40.754Z",
+    "wallMs": 473629,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 108773,
+      "completion_tokens": 60286,
+      "total_tokens": 169059,
+      "prompt_tokens_details": {
+        "cached_tokens": 83773
+      }
+    },
+    "costUsd": 0.7221393,
+    "chainCostUsd": 1.467922,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Make the hokora opening the clear focal point inside the torii.** The gateway reads immediately, but the shrine itself is visually subordinate to its roof, foreground props, and bright purple interior panel. In the hokora block, raise `PT` by roughly **0.18 m**, deepen the stone plinth accordingly, and rebuild the steps as three connected treads with **0.12–0.15 m rises**. Widen the central opening from **0.72 to about 0.86 m**, moving its posts and door hinges outward together. Replace the luminous rear plane with dark plum, and enlarge the altar crystal to approximately **0.26 m wide × 0.48 m high**, seated on its stand. **Next render:** an unmistakable little sanctuary framed by the torii, with a dark opening, readable open doors, and one concentrated Electro focal point—not a purple rectangle.\n\n2. **Close the hokora’s roof-to-frame gaps and give the roof a believable underside.** The roof extrusion starts above the wall plates, leaving the blue mass looking insufficiently supported in side views. Add continuous **0.10–0.12 m-deep eave beams** above the existing vermilion headers, extending up to the roof’s underside; add triangular end infill beneath the pitched profile and a **0.05 m-thick dark timber soffit** beneath the overhangs. Connect both porch `chochin` cords to explicit underside hooks, calculating `len` from the actual attachment height. **Next render:** the roof visibly bears on timber at both ends, with a shaded underside and lanterns genuinely hanging from it.\n\n3. **Make the base read as a roadside site rather than a sealed ornamental platter, and resolve the ground datum.** Break the outer stone `lathe` ring into arc sections, leaving a **1.2–1.4 m-wide opening toward +z**, aligned with the torii. Continue the paving through that opening; make the sigil an inset in the approach rather than an isolated circular pad separated from the path. Keep all stones seated in the grass. After geometry changes, measure the final bounds and translate the **whole assembly**, not individual props, so its lowest solid surface is at **y = 0**; investigate any cards extending below that first. **Next render:** a continuous walk-in route from the roadside to the altar, an intentional entrance in the edging, and no below-ground geometry.\n\n4. **Unblock the shrine and separate the foreground silhouettes.** The right `toro`, basin, torii post, and barrels merge into one busy stack in the three-quarter view. Move the two `toro` centers to approximately **x = ±2.2, z = 1.25**, and reduce their roof radii from **0.70 to 0.55 m**, scaling the roof profiles consistently. Move the basin to about **[1.55, GY, 2.4]**. Shift the barrel group roughly **0.2 m backward**, retaining real contact between the upper barrel and both lower barrels. **Next render:** separate lantern, basin, and barrel silhouettes, with the shrine doorway and offering tabletop visible between them; retain the current generous framing rather than zooming out.\n\n5. **Bring both kitsune faces out from behind the torii posts.** Move `fox(±1.0, -0.1, …)` inward to approximately **x = ±0.78**, keeping their plinths clear of the central steps. Increase each head by about **15%**, broaden the ear bases slightly, and move the eye accents onto the visible forward cheek surfaces rather than letting them disappear into the head. Keep the muzzle long and tapered, but make the nose a crisp dark wedge instead of a round bead. Preserve the red bibs and paired offerings. **Next render:** two clearly seated fox guardians with readable ears, eyes, and snouts in the front view, rather than small faces touching the post silhouettes.\n\n6. **Replace the sakura’s stack of pink balls with a designed branching canopy.** Rework `CLUMPS` into **three main, flattened, overlapping blossom masses**, with smaller transition clumps around them; use approximately **0.55–0.80 vertical scale** rather than near-spherical crowns. Extend the existing branches into each outer mass, especially the unsupported-looking outer-left clumps. Keep a few deliberate gaps between masses and clear the shrine roof and ema-rack roof silhouettes. Reduce the scattered canopy petal cards from **140 to about 70–90**, concentrating them around mass edges. **Next render:** a windswept sacred sakura with visible branching and a graceful silhouette, not a cluster of faceted pink balloons.\n\n7. **Replace the high-frequency camouflage with broad, controlled material variation.** `STONE` currently puts similarly strong green patches on the curb, plinths, lantern roofs, and basin; `VERM` and `BARK` also read as noisy rather than painted. Restrict stone moss to selected upward-facing ledges and ground-contact crevices, covering roughly **10–20%** of the visible stone, with much subtler lavender-gray variation elsewhere. Reduce the contrast of the vermilion grain and bark grain substantially, then add a few broad edge highlights and shadow bands. Darken `GRASS_TOP` slightly so the red gate and cream shrine face lead. **Next render:** clean, painterly color masses with selective weathering, while the primitive facets remain intentional and legible.\n\n8. **Finish the sacred details at a readable scale, with fewer competing effects.** On `ropeP`, replace seven tiny `SHIDE` cards with **five folded, shallow-extruded paper strips**, approximately **0.12 × 0.30 m**, attached directly at their upper folds and facing the front/three-quarter views. On the ema rack, match each textured face to its wooden pentagon and place it just beyond the wood surface to eliminate edge mismatch or z-fighting. Reduce free Electro motes from **12 to 4–6**, keeping them near the altar and crystal clusters; leave intentional floating petals alone. Reduce lantern and sigil glow until their painted designs remain visible. **Next render:** crisp hanging paper, readable votive plaques, warm lanterns, and restrained violet magic supporting—not competing with—the shrine.",
+      "usage": {
+        "prompt_tokens": 18941,
+        "completion_tokens": 2302,
+        "total_tokens": 21243,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 983
+        }
+      },
+      "costUsd": 0.060902,
+      "wallMs": 58686
+    },
+    "check": {
+      "slug": "r8k1LanternShrineRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 344,
+        "triangles": 15076,
+        "colors": 21,
+        "textures": 10,
+        "joints": 1,
+        "size": [
+          7.447,
+          3.739,
+          7.351
+        ],
+        "issues": [],
+        "fine": 32
+      }
+    }
+  },
+  {
+    "slug": "r8k1LavaGolemRichCraft2",
+    "from": "r8LavaGolemRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "lavaGolem",
+    "level": "rich",
+    "pitch": "Category: Monster.\nSubject: lava golem of basalt plates and molten seams.\nStyle: Genshin Impact.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:48.806Z",
+    "wallMs": 455421,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 106851,
+      "completion_tokens": 54499,
+      "total_tokens": 161350,
+      "prompt_tokens_details": {
+        "cached_tokens": 83769
+      }
+    },
+    "costUsd": 0.6566809,
+    "chainCostUsd": 1.2349256,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Give it a heavyweight golem silhouette rather than an armored humanoid silhouette.** The narrow torso, slim legs, and long fingers currently make the basalt feel worn rather than structural. Widen the upper `rings` to approximately **1.45 m overall**, deepen the chest to **0.8–0.9 m**, and enlarge the shoulder masses by about **20%**. Move `hipP`, `kneeP`, and `ankP` outward to approximately `s * 0.40`, `s * 0.45`, and `s * 0.46`; increase leg-plate widths to **0.46–0.52 m** and feet to **0.60 m**. Increase palm depth from `0.17` to **0.28 m**, thicken fingers by **25%**, and shorten their segment lengths by **25–30%**. Update all attached plates, toes, and joints with these changes. **Next render:** a broad, weight-bearing rock monster with powerful hands and planted feet, not a thin figure beneath bulky shoulder decorations.\n\n2. **Make the face larger, simpler, and less dominated by the muzzle and crest.** Enlarge the main `head` block from `[0.56, 0.4, 0.46]` to roughly **`[0.70, 0.50, 0.54]`**, recentering cheeks, brows, horns, and jaw around it. Increase each eye to approximately **0.24 × 0.12 m**, keeping the planes just **3–5 mm outside** the new front surface. Shorten the projecting muzzle by **0.06–0.08 m** and form one clear dark mouth opening, about **0.40 × 0.09 m**, between solid upper and lower rock lips. Replace the competing upper fangs and lower tusks with **two stout upper corner fangs**, embedded into the lip. **Next render:** the eyes and mouth read immediately at full-body scale, with a fierce, deliberate expression rather than a cluster of blocks and teeth.\n\n3. **Seat the pointed attachments and make every major joint visibly supported.** Several shoulder crystals look suspended above the shoulder rocks in the close-up; the near shoulder is particularly noticeable. For each shoulder `crystal()` call, place its base on the actual shoulder surface and bury its lower **0.04–0.06 m** in a small basalt collar approximately **0.16–0.20 m wide**. Likewise, sink shoulder-spike roots into their parent plate rather than letting them emerge between separate chunks. After enlarging the body, keep visible limb gaps around **0.025–0.04 m**, with the existing lava rods and joint orbs spanning the entire opening. Seat fang roots inside rock, not only against the glowing lip. **Next render:** crystals, spikes, teeth, and limb segments all have unambiguous attachment points in front, side, and close-up views.\n\n4. **Replace the rectangular back slab with a designed basalt shell.** The chest box at `[0, 2.12, -0.3]`, size `[1.0, 0.74, 0.34]`, currently reads as a flat backpack. Replace it with **two broad, clipped-corner scapular plates**, each around **0.52 × 0.60 × 0.20 m**, slightly angled around the torso, plus a smaller lower-back plate. Leave **0.025–0.04 m** branching seams over a continuous dark-red core. Embed the existing five dorsal `dode` chunks into that shell by roughly **0.04 m**. Give the back vents socket collars and align each flame base with its vent opening. **Next render:** the back has the same layered volcanic anatomy as the front, with no large featureless rectangle or loosely perched spinal stones.\n\n5. **Rebuild the flames so they work from the side and back, and reduce the oversized crest.** The current `flame()` slabs become thin spikes in profile and mostly solid red silhouettes from behind because the yellow layers sit on only one face. Reduce the central crest height from **1.0 m to about 0.58 m**, with adjacent flames around **0.42 and 0.30 m**. Replace each prominent flame with a tapered, irregular **four- or five-sided volume**, about **0.10–0.16 m deep**, or put the orange/yellow inset shapes on both sides of the slabs and add a substantial perpendicular flame. Keep back-vent flames around **0.35–0.40 m high**. **Next render:** a compact, sculpted fire crown with readable hot centers from all five views—not a tall paper fan that overwhelms the head.\n\n6. **Quiet the platform and airborne clutter so the creature owns the frame.** The wide luminous base and large floating octahedra compete with the face, especially in the side and head renders. Reduce the platform radius from **1.52 to approximately 1.30 m**, remapping its rim stones and floor graphics accordingly. Lower rear platform spikes to **0.25–0.40 m**. In the “Floating shards” loop, remove the large dark shards flanking the head and shoulders; retain only **two or three small, deliberately airborne fragments** below shoulder height. Reduce the ember count from **18 to 8–10**, keeping them away from the eyes. **Next render:** the body and face dominate the composition, the feet remain visible, and atmospheric debris no longer reads as competing silhouettes.\n\n7. **Turn the basalt into clean, authored plates instead of mottled purple boxes.** In `basaltPaint()`, reduce the dark-fleck contribution from `0.4` to about **0.10–0.15**, and replace the lavender-heavy palette with charcoal-blue rock: roughly **`#30323f` shadows, `#4b5060` midtones, and `#737b88` upper faces**. Add a `plate()` helper with clipped corners and **0.02–0.035 m bevels** for the chest, forearms, knees, and feet; leave selected smaller chunks sharply faceted. Use large, controlled color planes rather than dense surface noise. **Next render:** crisp cel-shaded highlights describe heavy basalt forms, with the polished visual clarity expected of a stylized fantasy elite monster.\n\n8. **Concentrate the gold and lava into a clear focal hierarchy.** Keep the central pyro medallion, but replace the bright gold shoulder rings, elbow rings, shin panels, and most belt trim with basalt or subdued bronze. Reduce the remaining gold coverage by roughly **two-thirds**. Preserve thin orange seams, but add a few **branching fissures 0.015–0.03 m wide** across selected chest, forearm, and shin plates rather than relying almost entirely on horizontal stripes. Use dark red around the fissures, orange inside, and pale yellow only at the eyes, medallion center, and a few hottest junctions. **Next render:** the eye travels first to the face, then the molten chest core; gold supports that hierarchy, and the body reads as cracked basalt containing lava rather than a gold-trimmed suit.",
+      "usage": {
+        "prompt_tokens": 16775,
+        "completion_tokens": 2360,
+        "total_tokens": 19135,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 843
+        }
+      },
+      "costUsd": 0.05715,
+      "wallMs": 66734
+    },
+    "check": {
+      "slug": "r8k1LavaGolemRichCraft2",
+      "typeErrors": 4,
+      "typeErrorSample": [
+        "bakeoff/rounds/r8k1/builds/r8k1LavaGolemRichCraft2.ts(169,25): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'.",
+        "bakeoff/rounds/r8k1/builds/r8k1LavaGolemRichCraft2.ts(194,104): error TS2322: Type 'ColorInput' is not assignable to type 'Fill | undefined'.",
+        "bakeoff/rounds/r8k1/builds/r8k1LavaGolemRichCraft2.ts(203,32): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'.",
+        "bakeoff/rounds/r8k1/builds/r8k1LavaGolemRichCraft2.ts(236,104): error TS2322: Type 'ColorInput' is not assignable to type 'Fill | undefined'."
+      ],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 299,
+        "triangles": 8166,
+        "colors": 10,
+        "textures": 8,
+        "joints": 64,
+        "size": [
+          2.922,
+          3.76,
+          2.802
+        ],
+        "issues": [],
+        "fine": 0
+      }
+    }
+  },
+  {
+    "slug": "r8k1NineTailedKitsuneRichCraft2",
+    "from": "r8NineTailedKitsuneRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "nineTailedKitsune",
+    "level": "rich",
+    "pitch": "Category: Fantastical creature.\nSubject: nine-tailed kitsune fox with spirit flames.\nStyle: high-fantasy anime.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:44.692Z",
+    "wallMs": 377829,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 106034,
+      "completion_tokens": 44583,
+      "total_tokens": 150617,
+      "prompt_tokens_details": {
+        "cached_tokens": 83777
+      }
+    },
+    "costUsd": 0.5551977,
+    "chainCostUsd": 1.3754597,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Make the face read as a fox rather than a round head on a long, open muzzle.** Shorten the muzzle sweep from `hp(0.26, -0.065)` to approximately `hp(0.21, -0.055)`, move the nose to `hp(0.225, -0.05)`, and bring the lower jaw up to leave only a narrow mouth seam. Reshape the skull to approximately `[0.125*H, 0.095*H, 0.11*H]`; reduce the separate jowl ellipsoids by 25% and bury them farther into it. Change the eye decals from tall ovals to roughly `[0.07*H, 0.058*H]`, with a stronger outer-corner lift and less exposed white. Shorten the whiskers to about half their current length and taper them.\n   **Next render:** a compact, wedge-shaped fox face with alert golden eyes and a composed expression; no conspicuous lavender lower-jaw shelf or stick-like whiskers.\n\n2. **Give the nine tails flowing individual silhouettes instead of a rigid, nearly planar starburst.** In the `nine tails` loop, retain the nine-tip fan but give each `tailChain` a distinct curved path: an initial backward run of 0.12–0.18 m, a rounded outward belly, then a gently hooked tip. Alternate tip depth by about 0.12–0.18 m rather than placing almost every tail in the same rear plane. Offset the roots within a roughly 0.10 m-wide patch embedded in the rump, rather than starting all nine at exactly `TR`. Reduce the maximum sweep radius from approximately 0.10 to 0.08–0.085 m where neighboring tails merge, maintaining visible gaps through their outer halves. Place each gold band perpendicular to its own tail after that tail has separated.\n   **Next render:** nine countable, substantial fox tails from the back, with graceful curves and depth from the side; the bands read as nine individual collars, not a connected gold web.\n\n3. **Integrate the limbs into a leaner fox body.** The shoulder and hip ellipsoids currently read as attached balls, while the torso is quite barrel-like. Reduce the shoulder ellipsoids from `[0.075, 0.12, 0.11]` to about `[0.06, 0.10, 0.085]` and bury their inner halves in the body. Do the same at the hips, keeping more volume toward the upper thigh. Reduce the body sweep’s belly depth by roughly 12%, with a slight abdominal tuck toward the hind legs. Preserve the planted paws and digitigrade hocks; stagger one forepaw and its corresponding leg by approximately 0.04 m in depth.\n   **Next render:** a continuous shoulder–ribcage–hip silhouette, slender fox legs, and a lightly poised stance rather than a collection of spherical joints.\n\n4. **Replace the porcupine-like fur treatment with a few deliberate fur masses.** Remove the scattered `TUFTTEX` cards from the body and cut the tail scatter from 15 cards per tail to at most 3–4 carefully positioned tufts. Prefer short, swept-back blades attached partly inside the tail surface. Reduce the cheek-ruff blades from `0.17*H` to approximately `0.10*H`, broaden their bases, and overlap them into the cheeks and neck. Replace the two complete rings of neck spikes with a tapered chest bib and a few side tufts; avoid blades projecting across the mouth silhouette.\n   **Next render:** soft, directional fox fur expressed through clean silhouette breaks—not dozens of detached-looking triangular fins or a horizontal collar of knives.\n\n5. **Make the shrine accessories visibly supported and legible.** After reducing the ruff, expose the front of the `ropePath` collar. Place the bell directly beneath it with a small gold suspension loop, and anchor each `shide` by its top edge to a visible point on the rope; let the papers hang 0.01–0.02 m clear of the chest. Replace the `TASSELTEX` cards with small three-dimensional tassels: a gold cap and 4–5 tapered red strands, approximately 0.06–0.08 m long, with 0.003–0.004 m strand thickness.\n   **Next render:** an understandable collar, bell, papers, and earrings in both front and three-quarter views, without disappearing red hairlines or paper buried inside the fur.\n\n6. **Clean up the flame construction before adding more effects.** Each tail currently receives two overlapping `flame()` calls at the same position, and several flames show striped interference. Use one flame assembly per tail, with one crossed-card pair and the nested colors already supplied by `flameSvg`; remove the second coincident call. Keep any additional core geometry physically separated from the outer cards. Reduce tail flames to roughly 0.12 × 0.23 m so they crown rather than overwhelm the tips. Remove the floating orb at `[0.1, 0.35, 0.92]`, which hides a foreleg, and retain only 2–3 free foxfires outside the creature’s silhouette.\n   **Next render:** nine clean, uninterrupted tail flames, no striped overlaps, and no foreground flame blocking paws or competing with the face.\n\n7. **Let the creature dominate the presentation rather than the shrine set.** Reduce the plinth radius from 1.15 to approximately 0.95 m and scale the seal, rim rings, rocks, and grass distribution accordingly—without scaling down the fox. Move the lanterns behind the foreleg line, around `[±0.72, F, -0.12]`, and reduce their height by about 25%. Cut the rim grass count roughly in half and vary it in small clusters rather than a continuous fence.\n   **Next render:** the face, chest, legs, and tail fan remain unobstructed; the shrine forms a restrained pedestal, and the creature occupies substantially more of the frame.\n\n8. **Unify the finish around ivory fur, restrained lavender shadows, and luminous cyan accents.** Lighten the tail shader’s darkest purple tones and give `tipPaint` an explicit pale lavender shadow color so the rear view does not become a dark purple fan with brown-looking roots. Reduce the contrast and tooth amplitude of the body’s `furEdge` transition, especially the conspicuous dorsal lavender stripe. Keep vermilion markings crisp, gold bands warm but subordinate to the eyes, and flame cores the brightest elements.\n   **Next render:** an ivory spirit fox with coherent soft shadowing, readable red-and-gold facial accents, and controlled magical light—not a patchwork of competing material transitions.",
+      "usage": {
+        "prompt_tokens": 15983,
+        "completion_tokens": 2451,
+        "total_tokens": 18434,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1034
+        }
+      },
+      "costUsd": 0.056476,
+      "wallMs": 62615
+    },
+    "check": {
+      "slug": "r8k1NineTailedKitsuneRichCraft2",
+      "typeErrors": 1,
+      "typeErrorSample": [
+        "bakeoff/rounds/r8k1/builds/r8k1NineTailedKitsuneRichCraft2.ts(392,7): error TS2769: No overload matches this call."
+      ],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 210,
+        "triangles": 15516,
+        "colors": 8,
+        "textures": 11,
+        "joints": 62,
+        "size": [
+          1.905,
+          1.54,
+          1.905
+        ],
+        "issues": [],
+        "fine": 27
+      }
+    }
+  },
+  {
+    "slug": "r8k1PhoenixRichCraft2",
+    "from": "r8PhoenixRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "phoenix",
+    "level": "rich",
+    "pitch": "Category: Fantastical creature.\nSubject: phoenix with flame plumage, wings spread.\nStyle: Genshin Impact.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:31.109Z",
+    "wallMs": 310589,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 106320,
+      "completion_tokens": 39179,
+      "total_tokens": 145499,
+      "prompt_tokens_details": {
+        "cached_tokens": 83773
+      }
+    },
+    "costUsd": 0.4967833,
+    "chainCostUsd": 1.4638873,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Make the wings broad, raised feather masses rather than narrow fans on long rods.** In the wing block, change `AL` from 20° to about 30° and `BETA` from 35° to 65°; this turns the feather faces toward the front instead of mostly upward. Give `armPath` a clearer elbow–wrist bend: keep the shoulder, move the elbow slightly forward, and raise the wrist approximately 0.10 m. Increase secondary widths from `0.115` to `0.16–0.18` and lengths from roughly `0.6` to `0.72–0.82`, overlapping them into a continuous inner-wing surface. Spread primary roots over `armPath.at(0.99 - 0.30 * u)` rather than the current tightly clustered range. **Next render:** a majestic rising silhouette, with broad inner wings flowing into separated outer fingers—not two decorated sticks ending in fans.\n\n2. **Give the bird a more commanding head and graceful neck.** The small skull, straight thin neck, and long open beak currently lean toward an ornamental chicken. Set `HS` to approximately `1.3`, enlarge the skull especially upward, and shorten the upper beak’s endpoint from `hl(0.3, -0.055)` to about `hl(0.25, -0.045)`. Reduce the jaw pose from 6° to 2–3°. Rebuild the neck curve with a fuller base and a subtle S-bend, ending approximately 0.08 m higher; taper its sweep from `0.12` to `0.075`. Keep the eyes visible on both sides of the enlarged face, add a short swept brow above each, and move the cheek tufts backward so they do not jut out like whiskers. **Next render:** a proud, alert phoenix face that remains legible in the full-body front view, with a clean hooked beak and an elegant throat.\n\n3. **Replace the horn-like crest streamers with a swept flame crown.** The two long `CRESTP` ribbons dominate the head silhouette as floppy horns and cross the wing detail in three-quarter view. Shorten their backward reach from `hl(-1.0, …)` to approximately `hl(-0.55, …)`, reduce lateral spread from `±0.38` to `±0.16`, and keep the tips above the shoulder line. Arrange the `crestBlade` pieces as a graduated crown: one central blade around 0.38 m long, flanked by 0.28 m and 0.20 m blades sweeping upward and backward. Give the central blade a broad face visible from the front, rather than presenting its thin edge. **Next render:** a recognizable flame-shaped crown framing the eyes, with no large horn silhouette competing with the wings.\n\n4. **Make the tail substantial and visible from more than the back.** In the side render, the seven tail ribbons collapse into wires because every ribbon uses `side: v3(1, 0, 0)`. Extend `ribbon()` to project its width vector perpendicular to the path tangent and twist that vector gradually along the path. Rotate different tail widths 30–60° out of the horizontal plane, increase the main three widths to `0.13–0.16`, and give them a shallow central fold or roughly 0.02 m thickness. Raise the central tail endpoints from `y = 0.5` to around `0.85`, with outer tips around `1.1–1.25`, so the fan clears the dais and braziers visually. **Next render:** several flowing, broad flame feathers in side and three-quarter views, with a coherent layered tail fan in back view rather than scattered strings and flame stickers.\n\n5. **Build convincing shoulder coverage and seated feather layers.** After changing the wings, cover the exposed shoulder-to-elbow tubes with two overlapping rows of short extruded feathers, approximately `0.18–0.28` m long, rooted inside the body/arm surfaces. Replace the flat `coverRow()` cards with shallow blades where practical, and reduce their normal lifts from `0.05–0.08` to roughly `0.015–0.035`; each row should overlap the next and hide its roots. Move primary gold bands to the actual feather roots and fit them to the blade thickness rather than leaving them as separate little blocks. **Next render:** continuous plumage from chest to wingtip, with no hovering covert rows, exposed attachment rods, or detached-looking ornaments.\n\n6. **Remove the stage elements that compete with the creature.** Delete the two front braziers at `az = ±70`, and reduce the remaining rear shafts from 0.30 m to about 0.18 m. Simplify the dais to two low tiers with one gold rim; reduce the contrast and line density of `EMBLEM`. Cut floating embers from 44 to roughly 12–16, keeping them away from the face and wing contours. Fit the full-body views to the revised creature bounds, with approximately 8% margin, rather than allowing peripheral sparks to determine the framing. **Next render:** the phoenix owns the composition; its feet, lower chest, and tail are unobstructed, and the pedestal reads as support rather than a second subject.\n\n7. **Unify the flame language instead of attaching identical flames everywhere.** Remove most `tipFrames`, `tailFlames`, and arm-scatter flame cards. Let `bladeOutline()` carry the fire identity through tapered, slightly curling silhouettes with occasional asymmetric split tips. Reserve actual flame cards for three or four major wing tips and the longest tail tips, seating their bases inside the feather ends and varying their sizes. **Next render:** the plumage itself appears to burn, rather than looking like ordinary feathers decorated with a repeated row of candle flames.\n\n8. **Finish with clean stylized colour blocks and restrained ornament.** Replace the mottled `BODY` and `HEADP` scale paints with broad crimson upper surfaces, warm orange transition bands, and a pale gold throat; retain only sparse, larger feather-shaped markings. Keep deep burgundy at wing roots, orange through the middle layers, and cream-gold at selected outer tips. Reduce the chest cards to about 12–16 deliberately layered feathers instead of the dense hanging bib. Keep the collar, chest jewel, and one bracer per wing, but remove the repeated feather-root gold blocks and most small gems. **Next render:** crisp, intentional colour grouping and a clear focal path from eyes to chest jewel to wing tips—a refined Genshin-like creature rather than a uniformly busy red-and-gold ornament.",
+      "usage": {
+        "prompt_tokens": 16226,
+        "completion_tokens": 1907,
+        "total_tokens": 18133,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 516
+        }
+      },
+      "costUsd": 0.051522,
+      "wallMs": 49027
+    },
+    "check": {
+      "slug": "r8k1PhoenixRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 169,
+        "triangles": 29184,
+        "colors": 6,
+        "textures": 9,
+        "joints": 30,
+        "size": [
+          4.309,
+          2.487,
+          4.008
+        ],
+        "issues": [],
+        "fine": 82
+      }
+    }
+  },
+  {
+    "slug": "r8k1PixelDungeonPropsRichCraft2",
+    "from": "r8PixelDungeonPropsRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "pixelDungeonProps",
+    "level": "rich",
+    "pitch": "Category: Prop group.\nSubject: dungeon props: chest, torches, barrels, bones, spike trap.\nStyle: pixel art.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:45.160Z",
+    "wallMs": 207221,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 105521,
+      "completion_tokens": 21734,
+      "total_tokens": 127255,
+      "prompt_tokens_details": {
+        "cached_tokens": 83775
+      }
+    },
+    "costUsd": 0.3277715,
+    "chainCostUsd": 1.0579182,
+    "hasCode": true,
+    "edits": {
+      "blocks": 15,
+      "failed": [],
+      "wholeModule": false
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Make the loose skull read as a skull, rather than a blank bone-colored cube.**  \n   Change the last `skull(rig(1.28, FY, 0.75, -150, -10), 0.9)` to face approximately `yaw: 20`, with no pitch, and seat its jaw on the slab. In `skull()`, replace the single rectangular cranium with a broad central block and a narrower crown, stepping the upper corners inward by about `0.02 * s`. Retain the projecting jaw and fit `SKULLFACE` to the front without stretching its eye sockets. Apply this silhouette improvement to the other skulls as well.  \n   **Next render:** the foreground skull has visible sockets, nose, and teeth in both front and three-quarter views; the skulls have recognizable crowns and jaws even without their face textures.\n\n2. **Lift the horizontal barrel out of the paving and give its chocks convincing contact.**  \n   The lowest hoops on barrel C disappear into the floor. Increase `CBY` from `FY + 0.31` to approximately `FY + 0.35`. Increase the two supporting blocks from `0.05` to roughly `0.08` high, with their centers at half that height; adjust their lateral spacing slightly if needed so their upper edges meet the barrel’s lower facets. Move the barrel body and all four hoops together.  \n   **Next render:** a complete lower hoop silhouette is visible, with the barrel resting on two wooden supports rather than intersecting the flagstones.\n\n3. **Bring the slime up to the open barrel’s mouth.**  \n   In barrel B, raise the slime cylinder from local height `0.715` to approximately `0.775`, reduce its radius to about `0.205`, and keep its upper surface just below the `0.8` rim. Move the three bubble blocks upward with it, seating their lower halves in the liquid.  \n   **Next render:** the poison barrel presents an unmistakable green liquid surface in the front view, not a large dark opening with green visible only from above. Keep the wooden rim visible around it.\n\n4. **Compress the torch height so the chest becomes the compositional center.**  \n   The tall posts create a large empty band above the main props, while the flames command more attention than the treasure. In `torch()`, shorten the post from `1.0` to `0.78`, keeping its bottom at local `0.18`. Lower the bowl, rim, coals, both flame-card origins, and embers by `0.22`. Move the upper bands and support-rod endpoints down to match; leave the stone bases and flame sizes unchanged.  \n   **Next render:** the torches still frame the group, but their flames sit closer to the chest-and-barrel silhouette, producing a denser, more deliberate vignette.\n\n5. **Quiet the paving so the bones, coins, and trap are not competing with texture noise.**  \n   Rework `STONE`: reduce the high-frequency variation by roughly half, replace most single-texel dithering with connected `2–4` texel clusters, and reserve the darkest colors for joints and a few deliberate cracks. Give most tile interiors a narrow middle-value range. Reduce scattered moss to a few patches around the slab perimeter.  \n   **Next render:** the paving reads first as large flagstones; the skeleton’s thin bones and individual spilled coins remain clear at thumbnail size.\n\n6. **Replace the chest’s stacked gold bricks with an irregular, supported coin mound.**  \n   The three `heap` boxes currently read as stepped bullion blocks. Keep a low textured fill inside the chest, but replace the upper two rectangular tiers with roughly `18–24` eight-sided coin cylinders, radii `0.025–0.04` and thicknesses `0.008–0.012`. Arrange them in overlapping, uneven stacks, with only a few tilted coins and all gems visibly resting on the pile. Extend a short coin trail across the front rim into the existing floor spill.  \n   **Next render:** the chest contains a rounded, glinting heap rather than a miniature staircase, and the treasure visibly connects the open chest to the floor.\n\n7. **Give the dark iron readable facets and make glow selective.**  \n   The torch bowls and several bands collapse into nearly black, noisy masses. In `IRONP`, lift upward-facing and exposed outer facets one palette step, using broad face-level changes rather than more random speckles. Add a restrained warm edge on the bowl rims nearest the flames. Reduce the gold heap’s uniform glow and omit the optional glowing eyes from the floor skeleton and barrel-top skull, retaining the tiny torch-trophy eyes if desired.  \n   **Next render:** bowls, straps, and hoops remain dark iron but have clear thickness and construction; flames, slime, and a few treasure highlights form the intentional luminous accents.",
+      "usage": {
+        "prompt_tokens": 16376,
+        "completion_tokens": 2581,
+        "total_tokens": 18957,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1552
+        }
+      },
+      "costUsd": 0.058562,
+      "wallMs": 63076
+    },
+    "check": {
+      "slug": "r8k1PixelDungeonPropsRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 338,
+        "triangles": 6080,
+        "colors": 25,
+        "textures": 19,
+        "joints": 1,
+        "size": [
+          3.217,
+          2.034,
+          2.607
+        ],
+        "issues": [],
+        "fine": 11
+      }
+    }
+  },
+  {
+    "slug": "r8k1RedPandaRichCraft2",
+    "from": "r8RedPandaRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "redPanda",
+    "level": "rich",
+    "pitch": "Category: Animal.\nSubject: red panda balancing on a mossy stone.\nStyle: Genshin Impact.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:49.032Z",
+    "wallMs": 508095,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 105705,
+      "completion_tokens": 61333,
+      "total_tokens": 167038,
+      "prompt_tokens_details": {
+        "cached_tokens": 83767
+      }
+    },
+    "costUsd": 0.7222427,
+    "chainCostUsd": 1.5132447,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Rebuild the head silhouette and markings so it reads as a red panda, not a mouse-like fantasy cat.**  \n   Change `skull` from `[0.11, 0.088, 0.095]` to approximately `[0.13, 0.10, 0.09]`. Broaden and shorten `muzzle` to `[0.052, 0.032, 0.034]`, move its center to `forward: 0.13`, and bring `nose` and the mouth forward positions back by about 25 mm. Reproject the eyes and mouth onto these revised surfaces. In `headCoat`, replace the rectangular cream forehead-to-nose panel with a small cream muzzle and two broad cream cheek patches; give each eye a distinct rust-brown tear marking running downward and outward. Replace the circular `ear` cylinders with shallow, rounded triangular forms, approximately 80 mm wide × 85 mm tall, embedded into the skull by 15–20 mm. Remove the projecting cream ear spikes.  \n   **Next render:** a broad, fluffy red-panda face with short snout, white-edged triangular ears, and unmistakable facial markings—even without the scarf or tail.\n\n2. **Make the animal stockier and give “balancing” an actual pose.**  \n   The side render currently reads as a long, level-bodied animal standing normally on a large platform. Shorten the hips-to-chest distance by about 12%, increase the `body` sweep’s vertical radius by 10–15%, and blend the separate shoulder and haunch spheres more deeply into it. Raise `neckEnd` by roughly 20 mm for an alert head carriage. Keep three paws planted, but move the visible front paw approximately 50 mm forward and 35–40 mm upward, bending its wrist slightly downward. Extend `makePaw` to accept a per-paw height instead of always using `FL`. Keep the torso’s projected center within the three supporting paws.  \n   **Next render:** a compact, appealing red panda cautiously testing its footing, with a clear lifted paw and believable weight over the planted legs.\n\n3. **Turn the tail into a readable counterbalance rather than a vertical mast.**  \n   Revise `tailPath` so its last three control points arc sideways by approximately 0.10, 0.18, and 0.22 m, with the tip around `BY + 0.24` rather than `BY + 0.33`. Choose the lateral direction that exposes the tail beside the head in the front view. Increase the middle radius of `tailTube` to about 0.09 m, then taper smoothly to a rounded 25–30 mm tip instead of ending at a nearly constant 50 mm radius. Use six or seven broad, complete alternating warm-orange and deep-russet bands in `tailPaint`.  \n   **Next render:** a plush, clearly ringed tail sweeping away from the body, supporting the balancing gesture and no longer appearing to grow vertically from the forehead in front view.\n\n4. **Remove the hard spikes and paper-like fur treatment.**  \n   The `TUFT` cards on `body`, legs, and `tailTube` currently read as scattered triangular plates, with brown backs and sharp protrusions breaking the animal’s silhouette. Remove most of these cards, especially those crossing tail bands. Replace them with a few embedded, low-poly fur wedges: roughly 8–12 mm deep at shoulders and elbows, and 15–20 mm along the outer tail curve. Reshape `cheekRuff` into a shallow, convex three-lobed tuft per side, about 65 mm tall, overlapping the skull by at least 15 mm; the present large flat stars should not remain.  \n   **Next render:** clean, rounded fur masses with a handful of intentional pointed accents—not a spiny tail, armored cheeks, or loose triangular flakes.\n\n5. **Resolve seating, intersections, and the below-ground bounds before adding detail.**  \n   Sample the actual `stone` surface beneath each planted paw and set its underside 1–2 mm into that surface rather than assuming every location is exactly `FL`. Exclude grass and moss scatter within 55–65 mm of those contacts. For ground vegetation, replace `groundFrames()`’s nearest query against `b.root` with sampling of the saved `ground` mesh’s upward-facing surface; the current query can select sides or unrelated scenery. Inspect the meshes responsible for the reported −48 mm minimum, reposition or trim those below the pedestal, and verify the completed base rests at `y = 0`. The detached octahedra are visibly intentional glowing motes; retain them.  \n   **Next render:** visible, solid paw contacts, no vegetation piercing feet, no stray geometry below the pedestal, and only the deliberate motes floating.\n\n6. **Reduce the diorama footprint so the panda—not the garden—fills the image.**  \n   Reduce `ground`’s maximum radius from 0.70 m to about 0.47 m and `stone`’s from 0.52 m to approximately 0.36–0.38 m, keeping its standing height. Update scenery coordinates and scatter radii to match rather than scaling the animal. Halve the ground grass count, reduce the crystal cluster to three crystals at about 60% of their present height, and move it beside—not behind—the readable leg silhouette. Leave a quiet mossy area around the animal.  \n   **Next render:** a red panda balancing on a modest stone, with the tail allowed to overhang; the animal occupies substantially more of the front and three-quarter frames instead of sitting atop a broad display garden.\n\n7. **Fit the scarf like cloth and expose its focal ornament.**  \n   Reduce the `scarf` sweep radius from 26 mm to approximately 17–19 mm and its surface lift from 12 mm to about 4–6 mm. Replace the two widely separated `scarfTrim` hoops with narrow gold edging attached to the scarf’s actual boundaries. Position `pendant` just ahead of the scarf tails, with `emblem` facing forward and fully visible; currently it is largely lost between the tails. Keep the tails short enough to clear the lifted foreleg and give them one gentle fold rather than rigid flat rectangles.  \n   **Next render:** one fitted teal accessory with readable gold construction and a small leaf emblem—not several thick hoops crowding the cheeks and neck.\n\n8. **Finish with controlled color and facial emphasis rather than more scenery effects.**  \n   Shift the bright orange body toward richer red-russet, reserving `RUST_LT` for upper-facing accents. Replace the near-black scalloped `furEdge` transition with a few larger, deliberately shaped boundaries at the shoulders, belly, and upper legs. Lower moss saturation and brightness by roughly 20%, and reduce crystal, rune, and mushroom glow so none competes with the face. Keep the turquoise eyes, but shrink the white brow spheres into shallow cream markings and use a thin upper eyelid for expression.  \n   **Next render:** a polished anime-fantasy creature with warm fur, soft cream facial structure, expressive eyes, and restrained teal-and-gold accents; the brightest visual attention stays on the panda.",
+      "usage": {
+        "prompt_tokens": 15595,
+        "completion_tokens": 2547,
+        "total_tokens": 18142,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1034
+        }
+      },
+      "costUsd": 0.05666,
+      "wallMs": 66944
+    },
+    "check": {
+      "slug": "r8k1RedPandaRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 152,
+        "triangles": 9904,
+        "colors": 14,
+        "textures": 8,
+        "joints": 26,
+        "size": [
+          0.942,
+          0.703,
+          1.122
+        ],
+        "issues": [],
+        "fine": 13
+      }
+    }
+  },
+  {
+    "slug": "r8k1SwampTrollRichCraft2",
+    "from": "r8SwampTrollRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "swampTroll",
+    "level": "rich",
+    "pitch": "Category: Monster.\nSubject: swamp troll with tusks, mohawk and bone fetishes.\nStyle: Blizzard/Warcraft.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:58.793Z",
+    "wallMs": 564553,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 113062,
+      "completion_tokens": 73371,
+      "total_tokens": 186433,
+      "prompt_tokens_details": {
+        "cached_tokens": 83779
+      }
+    },
+    "costUsd": 0.8695599,
+    "chainCostUsd": 1.7585446,
+    "hasCode": true,
+    "edits": {
+      "blocks": 48,
+      "failed": [],
+      "wholeModule": false
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Make the face and tusks the unmistakable focal point.** The troll reads, but the tusks are small hooks beside a very dominant nose and crest. Increase `skullP` to roughly `[0.18, 0.18, 0.19]`, widen the lower jaw to about 0.24 m, and blend the boxy muzzle into the cheeks with overlapping, faceted skin volumes. Rebuild each tusk from `hc(s*0.095, -0.135, 0.14)`, through `hc(s*0.18, -0.15, 0.30)`, to `hc(s*0.16, 0.10, 0.32)`, tapering from 0.04 m to a sharp tip. Keep the tips outside the eye silhouettes. Shorten the nose’s forward projection by about 15%, expose a continuous dark mouth opening, and move the eyes/lids forward to suit the larger skull. **Next render:** a broad, expressive troll face with two substantial upward tusks, readable eyes, and a deliberate sneer—not a nose surrounded by disconnected blocks.\n\n2. **Turn the mohawk into a substantial ridge rather than a stack of parallel fins.** It is spectacular from the side but almost disappears into three needles from the front. In `stations`, reduce the 13 closely packed stations to about eight; retain the highest blades over the crown, but taper the neck/back stations to 40–55% of their present height. Replace the three parallel extrusions at each station with a central tapered wedge and two shorter blades splayed outward by approximately 20°. Give the central roots 0.05–0.065 m of width across X, tapering toward the tips, and bury their bases 0.015 m into the scalp. Keep the foremost root behind the brow instead of extending toward the nose. **Next render:** a clear red-orange crest in front view and a single rhythmic, swept-back silhouette in profile, without the current second “sail” over the shoulders.\n\n3. **Unify the shoulder girdle and hump before adding more anatomy.** In the back view, `hump` reads as a separate round cap sitting above the torso. Move its center from `[0, 1.62, 0.08]` to approximately `[0, 1.57, 0.10]` and reshape it to `[0.30, 0.15, 0.22]`. Broaden the upper `torso` sweep to roughly `[0.33, 0.24]`, then extend `trapL`/`trapR` into that mass. Move `shP` inward from `s*0.37` to about `s*0.34`, ensuring the shoulder blobs overlap the torso by 0.025–0.04 m. Re-seat `pauldron()` on the revised shoulders rather than leaving it at its old center. **Next render:** one continuous, powerful hunch flowing into both arms, with no perched hump or abrupt shoulder junctions.\n\n4. **Give the hands a more distinctive, chunky Warcraft-troll construction.** The four narrow fingers plus thumb currently read as generic humanoid hands. In `hand()`, replace the four-finger loop with two broad fingers plus the thumb: use lateral offsets around ±0.045 m, root radii of 0.038–0.042 m, and combined segment lengths around 0.17 m. Increase the palm’s thickness from 0.052 to about 0.065 m, and sink the finger roots into its lower edge by 0.02 m. Keep a visible gap between the two fingertips and angle the thumb outward. **Next render:** large, weighty, three-digit troll hands with clean knuckle-to-palm connections and readable claw silhouettes.\n\n5. **Replace the rigid loincloth cards with attached, weighted cloth.** The front and rear `CLOTH` cards look like flat signs, particularly from the side. Build each as a thin, two- or three-section textured mesh, approximately 0.30–0.34 m wide and 0.42–0.46 m long. Put the entire top edge beneath the belt, not just a central card anchor; let the middle bow outward by 0.035–0.05 m and the bottom return slightly toward the thighs. Preserve the painted pattern, but give the hem a physical ragged outline and roughly 0.008 m thickness. Ensure the front panel clears the thighs in the rest pose. **Next render:** cloth visibly suspended from the belt, with a modest fold and a weighted hem—not a floating rectangular placard.\n\n6. **Make every worn fetish visibly supported, and present the feathers broadside.** Add a short leather loop from `collar.at(0)` to the crown of the necklace skull; its current forward/downward offset leaves the attachment unclear. Re-anchor the two waist `fetish()` calls to actual belt surface points, with their cord starts embedded in the belt. For the earrings, add a small skin lobe extending about 0.035 m below the ear outline, then pass each gold ring through it. In `feathers()`, explicitly orient the feather faces toward +Z for chest and belt ornaments, with a 20–30° yaw spread; several currently read as thin orange slivers. **Next render:** a traceable chain of support from skin or leather to every ornament, and recognizable feather shapes in front and three-quarter views. Leave the intentional floating wisps alone; the loose-part report is not evidence that those effects need attachment.\n\n7. **Reduce the setting’s competition and restore unobstructed character views.** The totem nearly matches the troll’s height and overlaps its arm in the front view; reeds obscure hands and lower legs in the side and back views. Scale the complete totem assembly to about 70% around its ground contact and move it farther behind the troll, leaving a visible gap beside the arm. Reduce the cauldron to approximately 80%. Cut `reedFrames` from 36 to about 14–18, lower their height to 0.35–0.45 m, and keep clear corridors around the hands and feet in all main views. Reduce the ground rune’s glow from `1.2` to roughly `0.4`. Reframe around the troll so crest-to-feet occupies about 85% of image height. **Next render:** the character dominates immediately; props establish the swamp without interrupting its silhouette.\n\n8. **Finish with larger, quieter color masses on the troll itself.** The dense dark mottling and scattered warts compete with the face and break up the muscular forms. Reduce the skin `spots()` amount from `0.3` to about `0.12–0.15`, concentrating stronger marks on the back and outer limbs. Use the warm `BELLY` treatment primarily on the throat, chest, abdomen, palms, and inner limbs rather than letting it fragment into unrelated patches. Reduce body warts from 20 to about eight, keeping them away from the eyes, brows, and central chest glyph. Keep bone warm ivory, leather dark and relatively calm, and reserve the strongest orange for the crest tips; lower the tiny fetish-eye glow so it does not rival the amber eyes. **Next render:** broad green and warm olive forms read first, the face and mohawk command attention, and bone fetishes provide crisp secondary accents.",
+      "usage": {
+        "prompt_tokens": 21508,
+        "completion_tokens": 2589,
+        "total_tokens": 24097,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1034
+        }
+      },
+      "costUsd": 0.068906,
+      "wallMs": 76701
+    },
+    "check": {
+      "slug": "r8k1SwampTrollRichCraft2",
+      "typeErrors": 0,
+      "typeErrorSample": [],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 484,
+        "triangles": 23220,
+        "colors": 23,
+        "textures": 11,
+        "joints": 34,
+        "size": [
+          2.645,
+          2.247,
+          2.729
+        ],
+        "issues": [],
+        "fine": 126
+      }
+    }
+  },
+  {
+    "slug": "r8k1WizardBookshelfRichCraft2",
+    "from": "r8WizardBookshelfRichCraft2",
+    "mode": "critique",
+    "arm": "craft2",
+    "subject": "wizardBookshelf",
+    "level": "rich",
+    "pitch": "Category: Prop group.\nSubject: wizard's bookshelf with tomes, scrolls, orbs and candles.\nStyle: high-fantasy anime.",
+    "model": "anthropic/claude-sonnet-5-5",
+    "effort": "high",
+    "started": "2026-10-14T23:23:38.467Z",
+    "wallMs": 375239,
+    "status": 200,
+    "error": null,
+    "finishReason": "stop",
+    "usage": {
+      "prompt_tokens": 107375,
+      "completion_tokens": 47466,
+      "total_tokens": 154841,
+      "prompt_tokens_details": {
+        "cached_tokens": 83781
+      }
+    },
+    "costUsd": 0.5871021,
+    "chainCostUsd": 1.3565721,
+    "hasCode": true,
+    "edits": {
+      "blocks": 0,
+      "failed": [],
+      "wholeModule": true
+    },
+    "critic": {
+      "model": "openai-codex/gpt-6.1-sol",
+      "text": "1. **Resolve the floor-prop collisions and small support gaps first.**  \n   The right-hand book pile intersects the bookcase’s lower corner. In the floor-prop `lying()` calls, move all three books and their orb together to approximately **x = 0.65, z = 0.40**, keeping the existing stack heights. Leave at least **15 mm** between their rotated bounds and the plinth; reposition the nearby crystals if necessary. Give the two small left floor candles their own shallow dishes resting on the dais rather than starting their wax 12 mm above it. Repack the five `scrollLying()` rolls as three touching bottom rolls and two nested above: radius **0.026 m**, bottom center spacing **0.052 m**, upper centers **0.045 m** higher.  \n   **Next render:** distinct, grounded floor clusters with no books disappearing into the cabinet and no visibly suspended scrolls or candles.\n\n2. **Unhide the cornice candles and give the crest a more distinctive fantasy silhouette.**  \n   In front view, the broad crest conceals most of the cornice candle clusters, leaving disconnected-looking flame tips. Move those clusters toward **x = ±0.59**, with their tallest candles outermost; arrange their heights so the dishes and meaningful lengths of wax are visible above the crest shoulders. Replace the nearly straight roof slopes in `arch()` with a gently curved gothic profile: retain the **0.69 m half-width**, but lower the shoulders and concentrate the rise around the central **0.20–0.25 m**. Keep the moon cradle as the highest solid feature.  \n   **Next render:** a graceful moon-crowned bookcase rather than a triangular roof, with candles visibly belonging to its cornice.\n\n3. **Replace the noisy purple striping with broad, controlled wood shading.**  \n   `WOOD_V`, `WOOD_H`, and the crest fill currently produce high-contrast streaking across nearly every wooden surface. Narrow their grain colour range substantially—for example, deep plum **#30203f** to **#3b294f**—and make the grain much less prominent. Use broad face-to-face value changes and a restrained lighter bevel instead of relying on texture for shape. Reduce the bright green coverage in `PLAT` to a few irregular patches at stone seams and outer corners.  \n   **Next render:** clean anime-style colour masses, clearly readable wooden construction, and a quiet stone base rather than competing purple and green patterns.\n\n4. **Make the celestial backing support the objects instead of competing with them.**  \n   The stars from `makeMural()` read as large, flat graphics immediately behind the orbs and books. Reduce the largest star sizes by approximately **60%**, lower their brightness and saturation, and reduce the count from **48 to about 24**. Keep only two or three modest gold accents in deliberately empty shelf spaces; render the rest as fine blue-violet pinpoints and subtle constellation lines.  \n   **Next render:** stronger silhouettes for the tomes, armillary, and crystal balls, with the starfield reading as atmospheric depth rather than another layer of foreground props.\n\n5. **Give the books a clearer size rhythm and more convincing construction.**  \n   The current `row()` output is a procession of similarly narrow, uniformly decorated blocks. Introduce several deliberate groups: **two or three substantial tomes 0.07–0.09 m wide**, clusters of thinner books, and small breathing spaces beside the showcase objects. In `placeBook()`, retain the decorated front spine but add slightly projecting cover lips and a recessed pale page block visible from above and oblique views. Make perhaps **one in four** spines relatively plain; reserve gems and elaborate gold motifs for the important volumes.  \n   **Next render:** recognizable leather-bound tomes with varied age and weight, not an evenly patterned fence of colourful bars.\n\n6. **Make the magical objects the visual focal points, not just bright painted balls.**  \n   In `orb()`, the blue and violet spheres currently read as opaque glossy beads. Rework `orbTex()` around a darker coloured rim, a luminous cloudy interior, and one controlled highlight; replace the repeated white dots and obvious wavy bands with a softer internal swirl. Give the blue orb the strongest treatment, with the violet orb and armillary slightly quieter. Add a restrained cyan reflection to the blue orb’s cup and the shelf immediately beneath it using localized colour painting. Preserve the existing intentional floating sparkles.  \n   **Next render:** one compelling magical focal point, supported by secondary enchanted objects, with light visibly relating to nearby materials.\n\n7. **Bring the plaque onto the surface and make its lettering readable.**  \n   The front nameplate appears blank because the `PLAQUE` plane at **z = 0.2235** is behind the front of its backing box, which reaches **z = 0.228**. Move the plane to approximately **z = 0.2295**, or reduce the backing depth and place the graphic just beyond its front face. Enlarge the lettering within the SVG and ease the letter spacing so “ARCANUM” survives at the full-object render scale.  \n   **Next render:** a crisp inset-looking title plate, not a pale empty rectangle.\n\n8. **Finish the exposed side and back as constructed furniture, without adding more clutter.**  \n   The side is a large uninterrupted purple slab, while the back reveals thin shelf-height lines without a clear joinery scheme. Add a restrained recessed panel to each side: an inset approximately **0.26 m deep × 1.45 m high**, framed by **20–30 mm** wooden rails, with the sconce mounted visibly onto a small solid backplate. On the rear, add a perimeter frame and divide the backing into a few broad vertical boards; keep it mostly wood rather than gold.  \n   **Next render:** the three-quarter, side, and back views all feel intentionally finished, while the colourful shelf contents remain the star.",
+      "usage": {
+        "prompt_tokens": 17498,
+        "completion_tokens": 2188,
+        "total_tokens": 19686,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 944
+        }
+      },
+      "costUsd": 0.056876,
+      "wallMs": 56372
+    },
+    "check": {
+      "slug": "r8k1WizardBookshelfRichCraft2",
+      "typeErrors": 2,
+      "typeErrorSample": [
+        "bakeoff/rounds/r8k1/builds/r8k1WizardBookshelfRichCraft2.ts(280,17): error TS2345: Argument of type 'ColorInput' is not assignable to parameter of type 'Fill'.",
+        "bakeoff/rounds/r8k1/builds/r8k1WizardBookshelfRichCraft2.ts(288,28): error TS2322: Type 'ColorInput' is not assignable to type 'Fill | undefined'."
+      ],
+      "rendered": true,
+      "lane": "B",
+      "renderError": null,
+      "report": {
+        "parts": 626,
+        "triangles": 22816,
+        "colors": 42,
+        "textures": 15,
+        "joints": 1,
+        "size": [
+          1.87,
+          2.584,
+          0.975
+        ],
+        "issues": [],
+        "fine": 90
+      }
+    }
+  }
+]
