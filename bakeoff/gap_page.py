@@ -66,7 +66,8 @@ COLUMNS = [
     ("gem-two", "Gemini", "two", "Gemini · after 2 feedback turns", "Gemini 3.8 Flash, same pipeline, plus two feedback turns."),
     ("haiku-agent", "Haiku", "agentic", "Haiku · agentic session (final)", "Haiku agentic session, latest archived render; model identity checked against its build record."),
 ]
-MODELS = ["Agent", "Sonnet", "Sol", "Astra", "Gemini", "Haiku", "Old lab prompt"]
+MODELS = ["Agent", "Sonnet", "Sol", "Astra", "Gemini", "Old lab prompt"]
+AGENTIC = ["Sonnet", "Astra", "Haiku"]
 MODEL_IDS = {"Sonnet": "anthropic/claude-sonnet-5-5", "Astra": "openai-codex/gpt-6-astra", "Haiku": "anthropic/claude-haiku-5-5"}
 
 
@@ -230,10 +231,10 @@ SCRIPT = """
 const setBar=()=>document.documentElement.style.setProperty('--bar',document.querySelector('.bar').offsetHeight+'px');
 const filters=[...document.querySelectorAll('input[data-filter]')];
 const applyFilters=()=>{
- const models=new Set(filters.filter(i=>i.dataset.filter==='model'&&i.checked).map(i=>i.value));
- const stages=new Set(filters.filter(i=>i.dataset.filter==='stage'&&i.checked).map(i=>i.value));
+ const pick=f=>new Set(filters.filter(i=>i.dataset.filter===f&&i.checked).map(i=>i.value));
+ const models=pick('model'),stages=pick('stage'),agentic=pick('agentic');
  document.querySelectorAll('th[data-model],td[data-model]').forEach(cell=>{
-  cell.hidden=!models.has(cell.dataset.model)||(cell.dataset.stage!=='agentic'&&!stages.has(cell.dataset.stage));
+  cell.hidden=cell.dataset.stage==='agentic'?!agentic.has(cell.dataset.model):(!models.has(cell.dataset.model)||!stages.has(cell.dataset.stage));
  });
  setBar();
 };
@@ -256,11 +257,15 @@ def main():
            '<div class="bar">View: ']
     for view, label in [("three-quarter", "three-quarter"), ("front", "front"), ("side", "side"), ("back", "back"), ("low", "low"), ("head", "head close-up")]:
         out.append(f'<button data-v="{view}" class="{"on" if view == "three-quarter" else ""}">{label}</button>')
-    out.append('<label><input type="checkbox" id="showj"> show judge scores</label><div class="filters">Builders: ')
+    out.append('<label><input type="checkbox" id="showj"> show judge scores</label><div class="filters">Agentic sessions (final): ')
+    for model in AGENTIC:
+        enabled = "checked" if model == "Sonnet" else ""
+        out.append(f'<label><input type="checkbox" data-filter="agentic" value="{model}" {enabled}> {model} agentic</label>')
+    out.append('</div><div class="filters">API builders: ')
     for model in MODELS:
-        enabled = "checked" if model not in ["Haiku", "Old lab prompt"] else ""
+        enabled = "checked" if model != "Old lab prompt" else ""
         out.append(f'<label><input type="checkbox" data-filter="model" value="{model}" {enabled}> {model}</label>')
-    out.append('</div><div class="filters">API stages: <label><input type="checkbox" data-filter="stage" value="one" checked> one-shot / first draft</label><label><input type="checkbox" data-filter="stage" value="two" checked> +2 turns</label> <span class="meta">Agentic finals remain visible at either stage. Reload to see newly completed rounds.</span></div></div>')
+    out.append('</div><div class="filters">API stages: <label><input type="checkbox" data-filter="stage" value="one" checked> one-shot / first draft</label><label><input type="checkbox" data-filter="stage" value="two" checked> +2 turns</label> <span class="meta">"Agent" is the Sonnet session\'s first draft. Reload to see newly completed rounds.</span></div></div>')
     sections = [("pitches-r7.json", "r10", "Held-out set: 12 briefs never used while tuning the prompts", "These are the honest test. The one-shot prompts were written while looking at the development set below, never at these."),
                 ("pitches-r5.json", "r11", "Development set: 16 briefs the prompts were tuned on", "Includes the old lab prompt column, to show where the one-shots started (off by default).")]
     for pitches, prefix, heading, intro in sections:
