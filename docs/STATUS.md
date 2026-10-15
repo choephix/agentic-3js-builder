@@ -57,6 +57,12 @@ A third Sol turn (`r7solc3`, panel `heldout-turn3`) beat the second only 41/72 a
 
 Caveats: the judges reward detail and staged bases (detail and overall correlate at 0.88), every one-shot arm builds a base where several agent finals have none, and GPT rates GPT builds highest. Wall times exclude renders, which take seconds each.
 
+## Atlas charts at the resolution their paint needs, packed with MaxRects, 2026-10-15
+
+`harness/atlas.ts` now halves each paint chart while every texel the model samples stays within 2/255 of the full bake (a flat chart becomes one texel), and packs all tiles with MaxRects, turned a quarter where that fits better, trying three sort orders by three placement rules per atlas shape. The sampled texels come from the painted triangles on the sheet, which `harness/assemble.ts` hands over; turned tiles map through `tileUv` and show `rotated` in the report. The showcase's in-browser GLB downloads use the same code. Docs: `docs/conventions.md` "Paint sheet and atlas", `docs/api.md` "Budget"; reasons and numbers in `docs/DESIGN.md`, "Charts at the resolution their paint needs, packed with MaxRects".
+
+Against the previous commit: cargoDockCratesSonnet 4096 × 2048 → 2048 × 2048, artDecoFalcon 4096 × 2048 → 2048 × 2048, juniperBonsai 2048 × 1024 → 1024 × 1024, streetCornerSet 1024 × 1024 → 512 × 256; every view of seven full renders differs in at most 0.51% of pixels. 40 random samples: atlas texels 109M → 88M (298M before charts were tiles), same issues. A first try marked only texel centres inside triangles, so sub-texel charts counted as unsampled and collapsed to black (orc war camp poles and bolts); corners and centres are marked now, and a chart with no sampled texel is left as it is.
+
 ## The atlas packs paint charts one by one, 2026-10-15
 
 The exported atlas no longer carries the paint sheet as one tile: `bakeSheet` records each chart's padded rectangle (`texture.userData.charts`), and `harness/atlas.ts` packs every chart as its own tile beside the drawings and the colour block, in the smallest power-of-two square or 2:1 rectangle. `harness/assemble.ts` moves painted UVs from the sheet into the chart tiles. The report's atlas gives `width` and `height` (was `size`) and `layout.charts`; the showcase's Textures panel reads both and older reports. Builders and their docs change only in the atlas paragraphs (`docs/conventions.md`, `docs/api.md` "Budget"). Reasons and numbers: `docs/DESIGN.md`, "The atlas packs paint charts, not the paint sheet".

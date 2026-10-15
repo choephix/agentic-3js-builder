@@ -24,7 +24,7 @@ import {
 } from "three";
 import type { Texture } from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
-import { buildAtlas } from "./atlas";
+import { buildAtlas, tileUv } from "./atlas";
 import type { Placed, TileSource } from "./atlas";
 
 export type Issue = { level: "error" | "warning"; message: string };
@@ -354,13 +354,16 @@ export async function assemble(root: Object3D, rigged: boolean): Promise<Assembl
       texture = textureNames.indexOf(name);
       if (texture < 0) texture = textureNames.push(name) - 1;
       const key = `${look.texture.uuid}|${color}`;
+      const rects = look.texture.userData.charts as Placed[] | undefined;
       if (!tileSources.has(key))
-        tileSources.set(key, {
-          key,
-          texture: look.texture,
-          tint: color,
-          rects: look.texture.userData.charts as Placed[] | undefined,
-        });
+        tileSources.set(key, { key, texture: look.texture, tint: color, ...(rects ? { rects, triangles: [] } : {}) });
+      // A painted part's triangles on the sheet: which texels of its charts a renderer can sample.
+      const triangles = tileSources.get(key)!.triangles;
+      if (triangles) {
+        const uv = mesh.geometry.getAttribute("uv");
+        const ids = mesh.geometry.index?.array ?? Array.from({ length: uv.count }, (_, i) => i);
+        for (const id of ids) triangles.push(uv.getX(id), uv.getY(id));
+      }
     } else if (!colorSeen.has(color)) {
       colorSeen.add(color);
       colorList.push(color);
@@ -469,19 +472,17 @@ export async function assemble(root: Object3D, rigged: boolean): Promise<Assembl
             continue;
           }
           const rect = rects[chart];
-          const tile = tiles[chart];
-          uv[i * 2] = (tile.x + ((x - rect.x) * tile.w) / rect.w) / atlas.width;
-          uv[i * 2 + 1] = (tile.y + ((y - rect.y) * tile.h) / rect.h) / atlas.height;
+          uv.set(tileUv(tiles[chart], (x - rect.x) / rect.w, (y - rect.y) / rect.h, atlas.width, atlas.height), i * 2);
         }
       } else {
-        const tile = tiles[0];
         for (let i = 0; i < count; i++) {
           const u = own.getX(i);
           const v = own.getY(i);
           if (u < -WRAP_SLACK || u > 1 + WRAP_SLACK || v < -WRAP_SLACK || v > 1 + WRAP_SLACK)
             wrapped.add(labels[index]);
-          uv[i * 2] = (tile.x + Math.min(Math.max(u, 0), 1) * tile.w) / atlas.width;
-          uv[i * 2 + 1] = (tile.y + Math.min(Math.max(v, 0), 1) * tile.h) / atlas.height;
+          const fu = Math.min(Math.max(u, 0), 1);
+          const fv = Math.min(Math.max(v, 0), 1);
+          uv.set(tileUv(tiles[0], fu, fv, atlas.width, atlas.height), i * 2);
         }
       }
     } else {
