@@ -1,0 +1,52 @@
+{
+  "conclusion": "Accepted HTTP 200, but not an enforceable cap: gateway drops the numeric budget for Sonnet 5.5's adaptive-thinking mode.",
+  "effectiveControl": "adaptive thinking + effort low",
+  "hardCapAvailableViaGateway": false,
+  "sourceEvidence": [
+    "pi-ai/src/auth-gateway/server.ts:81-84: passthrough removed; every request takes translate path.",
+    "pi-ai/src/auth-gateway/server.ts:177-187: requested budget mapped to per-effort thinkingBudgets.",
+    "pi-ai/src/stream.ts:2061-2070: anthropic-adaptive branch forwards thinkingEnabled and effort but not thinkingBudgetTokens.",
+    "pi-ai/src/providers/anthropic.ts:4412-4424: upstream thinking = {type: adaptive}; output effort forwarded."
+  ],
+  "request": {
+    "model": "anthropic/claude-sonnet-5-5",
+    "max_tokens": 11000,
+    "thinking": {
+      "type": "enabled",
+      "budget_tokens": 10000
+    },
+    "output_config": {
+      "effort": "low"
+    },
+    "messages": [
+      {
+        "role": "user",
+        "content": "Return only the word OK."
+      }
+    ]
+  },
+  "response": {
+    "id": 1,
+    "status": 200,
+    "body": {
+      "id": "msg_011Cg4mmSnFaYCbZPgwyT5F8",
+      "type": "message",
+      "role": "assistant",
+      "model": "anthropic/claude-sonnet-5-5",
+      "content": [
+        {
+          "type": "text",
+          "text": "OK"
+        }
+      ],
+      "stop_reason": "end_turn",
+      "stop_sequence": null,
+      "usage": {
+        "input_tokens": 40,
+        "output_tokens": 4,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+      }
+    }
+  }
+}

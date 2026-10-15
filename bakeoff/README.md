@@ -55,6 +55,24 @@ The model's reply is one fenced TypeScript block. Its module imports `three` and
 
 `--single --ref --effort low` runs `r21reflow`: the frozen `r19single` framing and unchanged brief, with one extra prefilled `read` of `<sandbox>/refs/<slug>.png` returning a base64 PNG image block before the final complete-write instruction. The selected neutral/styled sheet is recorded per subject in `round.json` and `r21reflow-inputs/report.json`; the model is asked to match its silhouette, proportions, palette and signature features while retaining the brief's staging. There is no craft read; adaptive thinking, the 120k cap, one no-write redraw and up to two crash repairs are unchanged. The full run uses `--workers 16` (increased from the original eight at the orchestrator's request). The arm has a separate $40 recorded-spend cap including repairs and pauses above 50% Anthropic 5 Hour usage; requests interrupted before returning usage are listed separately in the report. Pilot with `--subjects koala,treasureHoard --generation-only` before the full 28 subjects; the `gap2/` reference-low column links a thumbnail of each sheet alongside its build caption and preserves existing verdicts.
 
+### Gap3: asset framing and static models
+
+`replay.ts --single --craft --effort low --round <round> --workers 12` supports these request ablations while leaving the existing r19/r20 flags unchanged:
+
+| Round        | Extra flags                                                               |
+| ------------ | ------------------------------------------------------------------------- |
+| `r22asset`   | `--prompt-file bakeoff/prompts/asset.md`                                  |
+| `r22norig`   | `--no-rig`                                                                |
+| `r22lean`    | `--prompt-file bakeoff/prompts/asset.md --no-rig`                         |
+| `r22cap`     | `--prompt-file bakeoff/prompts/asset.md --no-rig --thinking-budget 10000` |
+| `r22nothink` | `--prompt-file bakeoff/prompts/asset.md --no-rig --no-thinking`           |
+
+The prompt-file flag replaces only the craft pre-read slot, preserving the assistant-read/tool-result shape. `--no-rig` deterministically removes skeleton/answer-key/posing sections, rig options and guidance from every system, assignment and prefilled read; SDK implementation reads become compiler-emitted public declarations with rig members removed. The exact request-only views and removed-section ledger are in `norig-inputs/`; the SDK files are not stripped. A final positive instruction requests a static asset in model space with no joints. The SDK supports these models under an untagged root, exporting zero joints.
+
+Gap3 uses the 25 app briefs other than elvenArcher, cyborgMedic and gnomeTinkerer. `--only koala,treasureHoard --generation-only` selects pilots; `--prepare-only` recreates inputs without model calls; `--check-only` runs render checks and up to two crash-repair rounds without generating new initial modules. Gap3 repairs reuse their arm's exact sanitized reads and thinking settings and request a complete corrected write, rather than the older generic refinement prompt. `--thinking-budget N` sends `thinking: {type: "enabled", budget_tokens: N}` with the chosen effort. The gateway accepts this but drops the budget for adaptive Sonnet 5.5: `r22cap` is honestly labelled a second draw of C (adaptive + low effort), not a hard-capped arm. `--no-thinking` requests disabled thinking; the gateway instead omits the thinking parameter and pins effort low, so the API default applies. `r22nothink` measures that behaviour without claiming zero reasoning. Both saved probes include source evidence; every build records thinking-block presence, billed output tokens and estimated code tokens.
+
+All five Gap3 arms share a $70 spend guard, including repairs, probes and discarded pilot accounting, with cross-process in-flight reservations. Anthropic 5-hour usage above 50% stops new requests. Saved requests/replies and build records retain timing, output tokens, cost and module bytes. `uv run --with tiktoken==0.14.0 python bakeoff/gap3_report.py` writes each `r22*-inputs/report.json` and fills per-build code-token estimates using the same o200k estimator as earlier rounds; the non-code residual includes tokenizer mismatch and is not an exact reasoning-token count. `gap3-request-audit.json` records the 25-subject and no-rig/prompt-slot evidence.
+
 ## Feedback turns
 
 `refine <round> --from <source>` gives every build of the source round one more turn, as an app would after running the module. The conversation is the arm's system prompt, the pitch, the current module as the model's own reply, and the feedback:

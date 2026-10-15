@@ -10,6 +10,7 @@ import { homedir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { gateway, wireImports, results, capture, systemPrompt } from "../scripts/bakeoff.ts";
 import { AppSandbox } from "./app-sandbox.ts";
+import { staticContext } from "./norig.ts";
 
 const ROOT = resolve(import.meta.dir, "..");
 const BASE = join(ROOT, "bakeoff");
@@ -25,16 +26,32 @@ const SINGLE_WORKERS = process.argv.includes("--workers")
   ? Number(process.argv[process.argv.indexOf("--workers") + 1])
   : 16;
 if (SINGLE && !(SINGLE_WORKERS >= 1 && SINGLE_WORKERS <= 64)) throw Error("--workers must be 1–64");
-const SINGLE_ROUND = SINGLE_REF
-  ? "r21ref" + SINGLE_EFFORT
-  : (SINGLE_EFFORT === "high" ? "r19" : "r20" + (SINGLE_EFFORT === "medium" ? "med" : "low")) + SINGLE_ARM;
-const SINGLE_CAP = SINGLE_REF ? 40 : SINGLE_EFFORT === "high" ? 60 : 90;
+const singleOption = (flag: string) =>
+  process.argv.includes(flag) ? process.argv[process.argv.indexOf(flag) + 1] : undefined;
+const SINGLE_PROMPT = singleOption("--prompt-file");
+const SINGLE_NORIG = process.argv.includes("--no-rig");
+const SINGLE_NO_THINKING = process.argv.includes("--no-thinking");
+const SINGLE_THINKING_BUDGET = Number(singleOption("--thinking-budget") ?? 0);
+if (
+  singleOption("--thinking-budget") !== undefined &&
+  (!Number.isInteger(SINGLE_THINKING_BUDGET) || SINGLE_THINKING_BUDGET < 1024 || SINGLE_THINKING_BUDGET >= 120000)
+)
+  throw Error("--thinking-budget must be an integer from 1024 through 119999");
+if (SINGLE_THINKING_BUDGET)
+  console.warn(
+    "Sonnet 5.5's gateway normalizes explicit thinking budgets to adaptive thinking; the numeric budget is not enforced.",
+  );
+const SINGLE_ROUND =
+  singleOption("--round") ??
+  (SINGLE_REF
+    ? "r21ref" + SINGLE_EFFORT
+    : (SINGLE_EFFORT === "high" ? "r19" : "r20" + (SINGLE_EFFORT === "medium" ? "med" : "low")) + SINGLE_ARM);
+const GAP3 = /^r22(asset|norig|lean|cap|nothink)$/.test(SINGLE_ROUND);
+const SINGLE_CAP = GAP3 ? 70 : SINGLE_REF ? 40 : SINGLE_EFFORT === "high" ? 60 : 90;
 const APP_ROUND = process.argv.includes("--app-round")
   ? process.argv[process.argv.indexOf("--app-round") + 1]
   : "r18app";
-const APP_SUBJECTS = process.argv.includes("--subjects")
-  ? process.argv[process.argv.indexOf("--subjects") + 1].split(",")
-  : [];
+const APP_SUBJECTS = (singleOption("--only") ?? singleOption("--subjects"))?.split(",") ?? [];
 const INPUT = join(
   BASE,
   SINGLE
@@ -385,7 +402,11 @@ function anthropicRequest(context: any) {
     model: MODEL,
     max_tokens: 120000,
     stream: false,
-    thinking: { type: "adaptive" },
+    thinking: SINGLE_NO_THINKING
+      ? { type: "disabled" }
+      : SINGLE_THINKING_BUDGET
+        ? { type: "enabled", budget_tokens: SINGLE_THINKING_BUDGET }
+        : { type: "adaptive" },
     output_config: { effort: SINGLE ? SINGLE_EFFORT : "high" },
     system: context.systemPrompt.map((t) => ({ type: "text", text: t })),
     messages,
@@ -689,10 +710,13 @@ async function checkedAndRepaired(round: string) {
         ? json(join(BASE, "rounds", r, "results.json"))
         : [])
         if (!latest.has(e.subject)) latest.set(e.subject, e);
-    if (![...latest.values()].some((e) => e.hasCode && e.check?.rendered === false)) break;
+    const failed = [...latest.values()].filter((entry) =>
+      GAP3 ? !entry.hasCode || entry.check?.rendered === false : entry.hasCode && entry.check?.rendered === false,
+    );
+    if (!failed.length) break;
     if (!(await guard(round + " repair " + turn))) return false;
     if (SINGLE) {
-      const crashes = [...latest.values()].filter((entry) => entry.hasCode && entry.check?.rendered === false).length;
+      const crashes = failed.length;
       if (singleSpend() + crashes * 1.8 > SINGLE_CAP) {
         save(join(INPUT, "stopped.json"), {
           reason: "$" + SINGLE_CAP + " repair budget guard",
@@ -702,6 +726,12 @@ async function checkedAndRepaired(round: string) {
         });
         return false;
       }
+    }
+    if (GAP3) {
+      const next = round + (turn === 1 ? "fix" : "fix2");
+      await repairGap3(round, next, sources, failed);
+      await cmd(["check", next, "--skip-typecheck", "--concurrency", "2"]);
+      continue;
     }
     const next = round + (turn === 1 ? "fix" : "fix2");
     await cmd([
@@ -717,7 +747,7 @@ async function checkedAndRepaired(round: string) {
       "--concurrency",
       "2",
       "--system-prompt",
-      "scratch/bakeoff/craft3.md",
+      GAP3 ? relative(ROOT, join(BASE, "rounds", round, "prompts", SINGLE_ARM + ".md")) : "scratch/bakeoff/craft3.md",
     ]);
     await cmd(["check", next, "--skip-typecheck", "--concurrency", "2"]);
   }
@@ -837,6 +867,50 @@ async function prepareApp() {
 
 /** Reuse the frozen app prefix verbatim, then prefill the lookups its live loop usually makes. */
 async function prepareSingle() {
+  if (SINGLE_PROMPT || SINGLE_NORIG || GAP3) {
+    const source = join(BASE, "r19" + SINGLE_ARM + "-inputs");
+    const manifest = json(join(source, "manifest.json"));
+    const dropped = ["elvenArcher", "cyborgMedic", "gnomeTinkerer"];
+    const subjects = manifest.subjects.filter((s: { id: string }) => !GAP3 || !dropped.includes(s.id));
+    for (const subject of subjects) {
+      let input = json(join(source, subject.id + ".json"));
+      if (SINGLE_PROMPT) {
+        const slot = input.context.messages.find((m) => m.role === "toolResult" && m.toolCallId === "single_read_8");
+        if (!slot) throw Error("--prompt-file requires the --craft prefilled slot");
+        slot.content[0].text = readFileSync(resolve(ROOT, SINGLE_PROMPT), "utf8");
+        for (const message of input.context.messages)
+          for (const block of message.content)
+            if (block.type === "toolCall" && block.id === "single_read_8") block.arguments.path = SINGLE_PROMPT;
+        input.files = input.files.map((p: string) => (p === "bakeoff/prompts/craft3.md" ? SINGLE_PROMPT : p));
+      }
+      if (SINGLE_NORIG) input = staticContext(ROOT, input);
+      save(join(INPUT, subject.id + ".json"), input);
+    }
+    const first = json(join(INPUT, subjects[0].id + ".json"));
+    save(join(INPUT, "manifest.json"), {
+      ...manifest,
+      subjects,
+      effort: SINGLE_EFFORT,
+      promptFile: SINGLE_PROMPT ?? "bakeoff/prompts/craft3.md",
+      noRig: SINGLE_NORIG,
+      thinkingBudget: SINGLE_THINKING_BUDGET || null,
+      systemPrompt: first.context.systemPrompt,
+      thinkingNotRequested: SINGLE_NO_THINKING,
+      effectiveThinking: SINGLE_NO_THINKING
+        ? "thinking not requested (gateway omits the thinking param, effort pinned low; API default applies)"
+        : "adaptive + effort " + SINGLE_EFFORT,
+      label:
+        SINGLE_ROUND === "r22cap"
+          ? "C, second draw (adaptive + effort low, budget dropped by gateway)"
+          : SINGLE_NO_THINKING
+            ? "thinking not requested (gateway omits the thinking param, effort pinned low; API default applies)"
+            : SINGLE_ROUND,
+      lookups: manifest.lookups.map((p: string) => (p === "bakeoff/prompts/craft3.md" ? (SINGLE_PROMPT ?? p) : p)),
+      source: "bakeoff/app-inputs via frozen r19 prefix",
+    });
+    save(join(INPUT, "pitches.json"), { subjects });
+    return;
+  }
   if (SINGLE_REF || SINGLE_EFFORT !== "high") {
     const frozen = join(BASE, "r19" + SINGLE_ARM + "-inputs");
     const manifest = json(join(frozen, "manifest.json"));
@@ -989,13 +1063,22 @@ async function prepareSingle() {
 }
 
 function singleSpend() {
+  const probeSpend = GAP3
+    ? ["r22cap-inputs/thinking-probe.json", "r22nothink-inputs/thinking-disabled-probe.json"].reduce((sum, path) => {
+        if (!existsSync(join(BASE, path))) return sum;
+        const used = json(join(BASE, path)).response.body?.usage ?? {};
+        return sum + ((used.input_tokens ?? 0) * 2 + (used.output_tokens ?? 0) * 10) / 1e6;
+      }, 0)
+    : 0;
   return readdirSync(join(BASE, "rounds"))
     .filter((name) =>
-      (SINGLE_REF
-        ? /^r21ref(low|medium|high)(fix2?)?$/
-        : SINGLE_EFFORT === "high"
-          ? /^r19(single|craft)(fix2?)?$/
-          : /^r20(med|low)(single|craft)(fix2?)?$/
+      (GAP3
+        ? /^r22(asset|norig|lean|cap|nothink)(fix2?)?$/
+        : SINGLE_REF
+          ? /^r21ref(low|medium|high)(fix2?)?$/
+          : SINGLE_EFFORT === "high"
+            ? /^r19(single|craft)(fix2?)?$/
+            : /^r20(med|low)(single|craft)(fix2?)?$/
       ).test(name),
     )
     .flatMap((round) => {
@@ -1006,7 +1089,148 @@ function singleSpend() {
             .map((name) => json(join(runs, name)).costUsd ?? 0)
         : [];
     })
-    .reduce((sum, amount) => sum + amount, 0);
+    .reduce(
+      (sum, amount) => sum + amount,
+      GAP3
+        ? (existsSync(join(BASE, "r22lean-inputs/discarded-pilot.json"))
+            ? json(join(BASE, "r22lean-inputs/discarded-pilot.json")).costUsd
+            : 0) + probeSpend
+        : 0,
+    );
+}
+
+async function reserveGap3(slug: string) {
+  const budget = join(BASE, "gap3-budget");
+  mkdirSync(budget, { recursive: true });
+  const lock = join(budget, "lock");
+  while (true) {
+    try {
+      mkdirSync(lock);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+      await Bun.sleep(50);
+      continue;
+    }
+    let pending = 0;
+    try {
+      pending = readdirSync(budget).filter((name) => name.endsWith(".json")).length;
+      if (singleSpend() + (pending + 1) * 1.6 <= SINGLE_CAP - 2) {
+        const reservation = join(budget, slug + ".json");
+        save(reservation, { reservedUsd: 1.6, at: new Date().toISOString() });
+        return reservation;
+      }
+      if (!pending) return null;
+    } finally {
+      rmSync(lock, { recursive: true });
+    }
+    await Bun.sleep(1000);
+  }
+}
+
+type Gap3Entry = {
+  slug: string;
+  from?: string;
+  subject: string;
+  arm: string;
+  pitch: string;
+  error?: string;
+  costUsd?: number;
+  chainCostUsd?: number;
+  check?: { renderError?: string };
+};
+
+async function repairGap3(round: string, next: string, sources: string[], entries: Gap3Entry[]) {
+  const dir = join(BASE, "rounds", next);
+  save(join(dir, "round.json"), {
+    ...json(join(BASE, "rounds", round, "round.json")),
+    id: next,
+    refineFrom: sources.join(","),
+  });
+  mkdirSync(join(dir, "builds"), { recursive: true });
+  mkdirSync(join(dir, "checks"), { recursive: true });
+  const gw = gateway();
+  try {
+    for (const entry of entries) {
+      const slug = next + entry.slug.slice(sources.find((source) => entry.slug.startsWith(source))!.length);
+      if (existsSync(join(dir, "runs", slug + ".json"))) continue;
+      if (!(await guard(next + " " + entry.subject + " repair"))) break;
+      let sourceSlug = entry.slug;
+      let source = sources.find((source) => existsSync(join(BASE, "rounds", source, "builds", sourceSlug + ".ts")));
+      if (!source && entry.from) {
+        sourceSlug = entry.from;
+        source = sources.find((source) => existsSync(join(BASE, "rounds", source, "builds", sourceSlug + ".ts")));
+      }
+      if (!source) throw Error("Repair has no prior module: " + entry.slug);
+      const current = readFileSync(join(BASE, "rounds", source, "builds", sourceSlug + ".ts"), "utf8");
+      const checked = json(join(BASE, "rounds", source, "checks", sourceSlug + ".json"));
+      const input = json(join(INPUT, entry.subject + ".json"));
+      input.context.messages.at(-1).content[0].text +=
+        "\nRepair only this module's render crash, preserving its design. Write the complete corrected module in one write call.\nError:\n" +
+        (entry.check?.renderError ?? checked.renderError ?? entry.error ?? "render failed") +
+        (sourceSlug !== entry.slug
+          ? "\nThe previous repair requested inspection tools instead of writing. No tool results will be returned; use the supplied signatures and write the entire corrected module."
+          : "") +
+        "\nCurrent module:\n```ts\n" +
+        current +
+        "\n```";
+      const body = anthropicRequest(input.context);
+      const reservation = await reserveGap3(slug);
+      if (!reservation) break;
+      save(join(dir, "requests", slug + "-1.json"), body);
+      const started = Date.now();
+      const reply = await gw.send("/v1/messages", body);
+      save(join(dir, "replies", slug + "-1.json"), reply);
+      const used = reply.body?.usage ?? {};
+      const costUsd =
+        ((used.input_tokens ?? 0) * 2 +
+          (used.cache_read_input_tokens ?? 0) * 0.1 +
+          (used.cache_creation_input_tokens ?? 0) * 2.5 +
+          (used.output_tokens ?? 0) * 10) /
+        1e6;
+      const write = singleTools(reply.body?.content)
+        .filter(
+          (block) =>
+            block.name === "write" &&
+            typeof block.input.content === "string" &&
+            typeof block.input.path === "string" &&
+            block.input.path.endsWith("/" + entry.subject + ".ts"),
+        )
+        .at(-1);
+      const code = typeof write?.input.content === "string" ? write.input.content : null;
+      save(join(dir, "runs", slug + ".json"), {
+        slug,
+        from: entry.slug,
+        mode: "repair",
+        arm: entry.arm,
+        subject: entry.subject,
+        level: "rich",
+        pitch: entry.pitch,
+        model: MODEL,
+        effort: SINGLE_EFFORT,
+        thinkingBudget: SINGLE_THINKING_BUDGET || null,
+        started: new Date(started).toISOString(),
+        wallMs: Date.now() - started,
+        status: reply.status,
+        generationSeconds: (Date.now() - started) / 1000,
+        replyHadThinkingBlock: (reply.body?.content ?? []).some(
+          (block) => block.type === "thinking" || block.type === "redacted_thinking",
+        ),
+        usage: { ...used, completion_tokens: used.output_tokens },
+        costUsd,
+        chainCostUsd: (entry.chainCostUsd ?? entry.costUsd ?? 0) + costUsd,
+        hasCode: Boolean(code),
+        moduleBytes: code ? Buffer.byteLength(code) : 0,
+        error: code ? null : JSON.stringify(reply.body),
+        modelCalls: 1,
+      });
+      if (code) text(join(dir, "builds", slug + ".ts"), wireArchived(code, join(dir, "builds", slug + ".ts")));
+      rmSync(reservation);
+      console.log(slug, code ? "repaired module" : "NO WRITE", "$" + costUsd.toFixed(3));
+    }
+  } finally {
+    gw.close();
+  }
+  results(next);
 }
 
 type SingleAttempt = {
@@ -1061,11 +1285,20 @@ async function runSingle() {
         ...craft,
         id: SINGLE_ARM,
         name:
-          SINGLE_ARM === "craft" ? "Sonnet · agent framing + craft, single-run" : "Sonnet · agent framing, single-run",
+          manifest.label ??
+          (SINGLE_ARM === "craft"
+            ? "Sonnet · agent framing + craft, single-run"
+            : "Sonnet · agent framing, single-run"),
       },
     ],
     source: manifest.source,
     lookups: manifest.lookups,
+    promptFile: manifest.promptFile,
+    noRig: manifest.noRig,
+    thinkingBudget: manifest.thinkingBudget,
+    label: manifest.label,
+    thinkingNotRequested: manifest.thinkingNotRequested,
+    effectiveThinking: manifest.effectiveThinking,
     ...(SINGLE_REF ? { references: manifest.references } : {}),
     toolPolicy: manifest.toolPolicy,
   });
@@ -1076,22 +1309,24 @@ async function runSingle() {
   let active = 0,
     paused = "";
   const budgetWaiters: (() => void)[] = [];
-  const queue = allPitches.filter(
-    (subject) =>
-      !existsSync(
-        join(
-          dir,
-          "runs",
-          round +
-            subject.id[0].toUpperCase() +
-            subject.id.slice(1) +
-            "Rich" +
-            SINGLE_ARM[0].toUpperCase() +
-            SINGLE_ARM.slice(1) +
-            ".json",
+  const queue = allPitches
+    .filter((subject) => manifest.subjects.some((s: { id: string }) => s.id === subject.id))
+    .filter(
+      (subject) =>
+        !existsSync(
+          join(
+            dir,
+            "runs",
+            round +
+              subject.id[0].toUpperCase() +
+              subject.id.slice(1) +
+              "Rich" +
+              SINGLE_ARM[0].toUpperCase() +
+              SINGLE_ARM.slice(1) +
+              ".json",
+          ),
         ),
-      ),
-  );
+    );
   async function build(subject: (typeof allPitches)[number]) {
     const slug =
       round +
@@ -1113,9 +1348,10 @@ async function runSingle() {
         paused = "Anthropic 5 Hour above 50%";
         break;
       }
-      while (!paused && active > 0 && singleSpend() + (active + 1) * 1.8 > SINGLE_CAP - 2)
+      const reservation = GAP3 ? await reserveGap3(slug) : undefined;
+      while (!GAP3 && !paused && active > 0 && singleSpend() + (active + 1) * 1.8 > SINGLE_CAP - 2)
         await new Promise<void>((resolve) => budgetWaiters.push(resolve));
-      if (paused || singleSpend() + (active + 1) * 1.8 > SINGLE_CAP - 2) {
+      if (paused || (GAP3 ? reservation === null : singleSpend() + (active + 1) * 1.8 > SINGLE_CAP - 2)) {
         paused ||= "Budget guard: $" + SINGLE_CAP + " total cap, including repair reserve";
         break;
       }
@@ -1173,6 +1409,11 @@ async function runSingle() {
         effort: SINGLE_EFFORT,
         started: new Date(started).toISOString(),
         wallMs: Date.now() - started,
+        generationSeconds: (Date.now() - started) / 1000,
+        moduleBytes: code ? Buffer.byteLength(code) : 0,
+        replyHadThinkingBlock: (reply.body?.content ?? []).some(
+          (block) => block.type === "thinking" || block.type === "redacted_thinking",
+        ),
         status: reply.status,
         hasCode: Boolean(code),
         error: attempts.at(-1).error,
@@ -1190,6 +1431,7 @@ async function runSingle() {
           completion_tokens: usage.output_tokens,
         },
       });
+      if (reservation) rmSync(reservation);
       active--;
       for (const resume of budgetWaiters.splice(0)) resume();
       if (code) {
@@ -1587,7 +1829,8 @@ async function runApp() {
 const args = process.argv.slice(2);
 if (SINGLE) {
   if (!existsSync(join(INPUT, "manifest.json")) || args.includes("--prepare-only")) await prepareSingle();
-  if (!args.includes("--prepare-only")) await runSingle();
+  if (args.includes("--check-only")) await checkedAndRepaired(SINGLE_ROUND);
+  else if (!args.includes("--prepare-only")) await runSingle();
 } else if (APP) {
   if (!existsSync(join(INPUT, "manifest.json")) || args.includes("--prepare-only")) await prepareApp();
   if (!args.includes("--prepare-only")) await runApp();

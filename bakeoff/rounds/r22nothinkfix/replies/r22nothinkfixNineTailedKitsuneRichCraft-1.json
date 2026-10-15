@@ -1,0 +1,41 @@
+{
+  "id": 10,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg4qbBe7AvWp5bYwSpJev",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "text",
+        "text": "I need the `along` callback signature to fix the crash, so I'll check `distribute.ts` first."
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01NfGbGg7dxwGk2KCMT4Dsn2",
+        "name": "grep",
+        "input": {
+          "pattern": "export (declare )?(function along|type AlongItem|type AlongOptions)|along\\(",
+          "path": "src/distribute.ts"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01NXPd5CyXxAm12dL6SMFnk9",
+        "name": "bash",
+        "input": {
+          "command": "cat src/distribute.d.ts 2>/dev/null | head -80; ls src | head -50"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 4,
+      "output_tokens": 213,
+      "cache_read_input_tokens": 53278,
+      "cache_creation_input_tokens": 11960
+    }
+  }
+}

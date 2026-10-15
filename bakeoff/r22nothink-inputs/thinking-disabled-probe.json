@@ -1,0 +1,53 @@
+{
+  "conclusion": "No thinking block in this reply, but gateway does not send thinking disabled upstream: it omits thinking, pins effort low, and API default applies. Running empirical not-requested arm per orchestrator decision; not claiming zero reasoning.",
+  "effectiveControl": "thinking not requested (gateway omits the thinking param, effort pinned low; API default applies)",
+  "estimatedCodeTokens": 3445,
+  "outputTokens": 4403,
+  "outputToEstimatedCodeRatio": 1.2780841799709723,
+  "tokenEstimator": "tiktoken 0.14.0 o200k_base; tokenizer mismatch and output overhead mean residual is not exact hidden reasoning",
+  "sourceEvidence": [
+    "pi-ai/src/providers/anthropic-messages-server.ts:409-410: thinking.disabled maps to disableReasoning true.",
+    "pi-ai/src/stream.ts:2030-2038: disableReasoning maps to thinkingEnabled false.",
+    "pi-ai/src/providers/anthropic.ts:4433-4442: adaptive-only branch omits thinking, pins effort low; API defaults adaptive."
+  ],
+  "request": {
+    "model": "anthropic/claude-sonnet-5-5",
+    "max_tokens": 6000,
+    "thinking": {
+      "type": "disabled"
+    },
+    "output_config": {
+      "effort": "low"
+    },
+    "messages": [
+      {
+        "role": "user",
+        "content": "Return only a complete TypeScript module for a detailed low-poly three.js koala gripping a eucalyptus branch stand. Import * as THREE from \"three\". Default-export a zero-argument function returning THREE.Group, export meta with name and description. Use plain static meshes in meters, ground y=0. Include species-correct proportions, fluffy ears, dark nose, gripping paws, eyes, claws, leaves, bark markings and a stable branch stand. No external assets, no prose. About 1000-1500 code tokens; make the module self-contained and deterministic."
+      }
+    ]
+  },
+  "response": {
+    "id": 1,
+    "status": 200,
+    "body": {
+      "id": "msg_011Cg4oXjD3wYpi9Zz1eWZcA",
+      "type": "message",
+      "role": "assistant",
+      "model": "anthropic/claude-sonnet-5-5",
+      "content": [
+        {
+          "type": "text",
+          "text": "```ts\nimport * as THREE from \"three\";\n\nexport const meta = {\n  name: \"Koala on Eucalyptus Stand\",\n  description:\n    \"A low-poly koala clinging to a vertical eucalyptus branch mounted on a weighted base, with fluffy ears, dark nose, gripping paws, claws, leaves and bark markings.\",\n};\n\nexport default function createKoala(): THREE.Group {\n  const root = new THREE.Group();\n  root.name = \"KoalaOnStand\";\n\n  const mat = (color: number, rough = 0.9) =>\n    new THREE.MeshStandardMaterial({ color, roughness: rough, flatShading: true });\n\n  const fur = mat(0x8d9096);\n  const furLight = mat(0xc9c9c4);\n  const furDark = mat(0x5f6368);\n  const nose = mat(0x1b1b1d, 0.5);\n  const clawM = mat(0x2b2623, 0.6);\n  const bark = mat(0x8a6a4c);\n  const barkDark = mat(0x5b4430);\n  const leafM = mat(0x5f8a5a);\n  const leafM2 = mat(0x7aa36b);\n  const baseM = mat(0x4a3b2e);\n  const eyeM = mat(0x0c0c0c, 0.3);\n\n  const add = (\n    geo: THREE.BufferGeometry,\n    m: THREE.Material,\n    pos: [number, number, number],\n    scale: [number, number, number] = [1, 1, 1],\n    rot: [number, number, number] = [0, 0, 0],\n    parent: THREE.Object3D = root\n  ) => {\n    const mesh = new THREE.Mesh(geo, m);\n    mesh.position.set(...pos);\n    mesh.scale.set(...scale);\n    mesh.rotation.set(...rot);\n    mesh.castShadow = true;\n    mesh.receiveShadow = true;\n    parent.add(mesh);\n    return mesh;\n  };\n\n  // ---- Stand base ----\n  add(new THREE.CylinderGeometry(0.32, 0.38, 0.06, 8), baseM, [0, 0.03, 0]);\n  add(new THREE.CylinderGeometry(0.26, 0.3, 0.05, 8), barkDark, [0, 0.085, 0]);\n  // Support feet (weighted)\n  for (let i = 0; i < 4; i++) {\n    const a = (i / 4) * Math.PI * 2 + Math.PI / 4;\n    add(new THREE.BoxGeometry(0.1, 0.03, 0.1), barkDark, [Math.cos(a) * 0.3, 0.015, Math.sin(a) * 0.3], [1, 1, 1], [0, -a, 0]);\n  }\n\n  // ---- Eucalyptus trunk (vertical branch) ----\n  const trunkH = 1.5;\n  const trunk = add(new THREE.CylinderGeometry(0.05, 0.065, trunkH, 7), bark, [0, 0.11 + trunkH / 2, 0]);\n  trunk.name = \"Trunk\";\n  // Bark markings: peeling strips and knots\n  for (let i = 0; i < 9; i++) {\n    const a = i * 2.1;\n    const y = 0.3 + i * 0.15;\n    add(new THREE.BoxGeometry(0.015, 0.16, 0.012), barkDark, [Math.cos(a) * 0.058, y, Math.sin(a) * 0.058], [1, 1, 1], [0, -a, (i % 2 ? 0.1 : -0.1)]);\n  }\n  for (let i = 0; i < 4; i++) {\n    const a = i * 1.7 + 0.5;\n    add(new THREE.SphereGeometry(0.02, 5, 4), barkDark, [Math.cos(a) * 0.055, 0.45 + i * 0.35, Math.sin(a) * 0.055]);\n  }\n\n  // Side branches with leaves\n  const leafGeo = new THREE.SphereGeometry(0.06, 5, 3);\n  const branchDefs: [number, number, number][] = [\n    [1.45, 0.5, 0.3],\n    [1.2, 2.6, -0.4],\n    [1.62, 4.1, 0.5],\n    [0.55, 3.4, -0.3],\n  ];\n  branchDefs.forEach(([y, a, tilt], bi) => {\n    const len = 0.32;\n    const br = new THREE.Group();\n    br.position.set(0, y, 0);\n    br.rotation.y = a;\n    root.add(br);\n    add(new THREE.CylinderGeometry(0.008, 0.016, len, 5), bark, [len / 2 * Math.cos(tilt), len / 2 * Math.sin(tilt), 0], [1, 1, 1], [0, 0, Math.PI / 2 + tilt], br);\n    for (let k = 0; k < 4; k++) {\n      const t = 0.3 + k * 0.22;\n      const lx = len * t * 1.4;\n      const ly = Math.sin(tilt) * lx;\n      const side = k % 2 ? 1 : -1;\n      add(leafGeo, k % 2 ? leafM : leafM2, [lx, ly - 0.02, side * 0.04], [1.9, 0.18, 0.7], [side * 0.3, 0, tilt - 0.4 * side], br);\n    }\n    add(leafGeo, leafM, [len * 1.35, Math.sin(tilt) * len * 1.35, 0], [2.2, 0.18, 0.8], [0, 0, tilt - 0.3], br);\n    if (bi === 0) {\n      // crown leaves at the top\n      add(leafGeo, leafM2, [0, 0.12, 0.02], [0.4, 3, 0.7], [0.2, 0, 0.3], br);\n    }\n  });\n  // Top crown\n  for (let i = 0; i < 5; i++) {\n    const a = (i / 5) * Math.PI * 2;\n    add(leafGeo, i % 2 ? leafM : leafM2, [Math.cos(a) * 0.08, 1.64, Math.sin(a) * 0.08], [0.4, 3.2, 0.7], [Math.sin(a) * 0.5, a, Math.cos(a) * 0.5]);\n  }\n\n  // ---- Koala ----\n  const koala = new THREE.Group();\n  koala.name = \"Koala\";\n  // Clings on the +z side of the trunk, hugging it, facing +z\n  koala.position.set(0, 0.62, 0.0);\n  root.add(koala);\n\n  const sph = (r: number) => new THREE.SphereGeometry(r, 8, 6);\n  const trunkR = 0.06;\n\n  // Body: stout, upright, pear-shaped\n  add(sph(0.15), fur, [0, 0.2, trunkR + 0.12], [1, 1.35, 0.9], [-0.08, 0, 0], koala);\n  add(sph(0.13), furLight, [0, 0.17, trunkR + 0.24], [0.85, 1.1, 0.35], [0, 0, 0], koala); // belly\n  add(sph(0.16), furDark, [0, 0.0, trunkR + 0.12], [1.05, 0.8, 0.95], [0, 0, 0], koala); // rump\n\n  // Head: large, broad\n  const head = new THREE.Group();\n  head.position.set(0, 0.5, trunkR + 0.2);\n  head.rotation.x = 0.1;\n  koala.add(head);\n  add(sph(0.12), fur, [0, 0, 0], [1.15, 1, 1], [0, 0, 0], head);\n  add(sph(0.07), furLight, [0, -0.04, 0.075], [1.1, 0.8, 0.8], [0, 0, 0], head); // muzzle\n  // Big dark nose\n  add(sph(0.036), nose, [0, 0.0, 0.135], [1.2, 1.5, 0.8], [0, 0, 0], head);\n  // Mouth line\n  add(new THREE.BoxGeometry(0.05, 0.006, 0.01), furDark, [0, -0.07, 0.125], [1, 1, 1], [0, 0, 0], head);\n  // Eyes (small, close-set)\n  for (const s of [-1, 1]) {\n    add(sph(0.014), eyeM, [s * 0.055, 0.03, 0.105], [1, 1.1, 0.7], [0, 0, 0], head);\n    add(sph(0.004), furLight, [s * 0.053, 0.036, 0.116], [1, 1, 1], [0, 0, 0], head);\n    // Fluffy round ears\n    add(sph(0.075), fur, [s * 0.12, 0.09, -0.01], [1, 1.1, 0.5], [0, s * 0.5, s * 0.2], head);\n    add(sph(0.058), furLight, [s * 0.125, 0.09, 0.015], [1, 1.1, 0.4], [0, s * 0.5, s * 0.2], head);\n    add(sph(0.03), furLight, [s * 0.1, 0.17, -0.005], [1, 1, 0.6], [0, s * 0.4, 0], head); // tuft\n  }\n\n  // ---- Limbs gripping the trunk ----\n  const limb = (\n    shoulder: [number, number, number],\n    paw: [number, number, number],\n    r: number,\n    m: THREE.Material\n  ) => {\n    const a = new THREE.Vector3(...shoulder);\n    const b = new THREE.Vector3(...paw);\n    const d = b.clone().sub(a);\n    const len = d.length();\n    const mid = a.clone().add(b).multiplyScalar(0.5);\n    const mesh = add(new THREE.CylinderGeometry(r * 0.8, r, len, 6), m, [mid.x, mid.y, mid.z], [1, 1, 1], [0, 0, 0], koala);\n    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());\n    add(sph(r * 1.1), m, shoulder, [1, 1, 1], [0, 0, 0], koala);\n  };\n\n  const paw = (pos: [number, number, number], s: number, up: boolean) => {\n    add(sph(0.04), furDark, pos, [1.1, 0.8, 1], [0, 0, 0], koala);\n    // Claws wrap around trunk, two opposed digit groups\n    for (let i = 0; i < 3; i++) {\n      const dx = (i - 1) * 0.022;\n      add(new THREE.ConeGeometry(0.008, 0.045, 4), clawM, [pos[0] + dx + s * 0.03, pos[1] + (up ? 0.02 : -0.02), pos[2] - 0.045], [1, 1, 1], [-Math.PI / 2, 0, s * 0.5], koala);\n    }\n    for (let i = 0; i < 2; i++) {\n      add(new THREE.ConeGeometry(0.007, 0.04, 4), clawM, [pos[0] - s * 0.045 + (i - 0.5) * 0.02, pos[1], pos[2] - 0.05], [1, 1, 1], [-Math.PI / 2, 0, -s * 0.6], koala);\n    }\n  };\n\n  for (const s of [-1, 1]) {\n    // Forelimbs reach up around the trunk\n    const sh: [number, number, number] = [s * 0.14, 0.38, trunkR + 0.14];\n    const fp: [number, number, number] = [s * 0.05, 0.5, trunkR + 0.01];\n    limb(sh, fp, 0.04, fur);\n    paw(fp, s, true);\n    // Hind legs bent, feet gripping lower\n    const hh: [number, number, number] = [s * 0.14, 0.0, trunkR + 0.14];\n    const hk: [number, number, number] = [s * 0.17, -0.08, trunkR + 0.2];\n    const hf: [number, number, number] = [s * 0.05, -0.12, trunkR + 0.01];\n    limb(hh, hk, 0.05, furDark);\n    limb(hk, hf, 0.04, furDark);\n    paw(hf, s, false);\n  }\n\n  // Small stub tail tuft\n  add(sph(0.04), furLight, [0, -0.08, trunkR + 0.3], [1, 0.8, 1], [0, 0, 0], koala);\n\n  // Chest fur ruffles\n  for (let i = 0; i < 4; i++) {\n    add(new THREE.ConeGeometry(0.03, 0.06, 4), furLight, [(i - 1.5) * 0.05, 0.42, trunkR + 0.25], [1, 1, 1], [Math.PI / 2 + 0.3, 0, 0], koala);\n  }\n\n  return root;\n}\n```"
+        }
+      ],
+      "stop_reason": "end_turn",
+      "stop_sequence": null,
+      "usage": {
+        "input_tokens": 216,
+        "output_tokens": 4403,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+      }
+    }
+  }
+}

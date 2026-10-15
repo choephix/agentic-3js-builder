@@ -22,7 +22,8 @@ import type { Painted } from "./bake";
 import type { Frame } from "./frame";
 import { Paint } from "./paint";
 import type { RigRecord } from "./rig";
-import type { Chain, Joint } from "./skeleton";
+import { Joint } from "./skeleton";
+import type { Chain } from "./skeleton";
 
 /** What every `color` option takes: a colour string, or a Paint baked into a texture over the surface. */
 export type Fill = string | Paint;
@@ -181,6 +182,12 @@ export class Ctx {
   readonly root = new Group();
   readonly joints = new Map<string, Joint>();
   rootJoint: Joint | null = null;
+  /** Untagged model-space owner for static geometry; not a registered or exported joint. */
+  private staticOwner: Joint | null = null;
+
+  modelSpaceOwner() {
+    return (this.staticOwner ??= new Joint(this.root.name, this.root, null, this));
+  }
   readonly meshes = new Map<Joint, Mesh[]>();
   readonly owner = new Map<Mesh, Joint>();
   /** The fill of every mesh the SDK made, in build order: the default colour of a shape without one. */
@@ -285,8 +292,7 @@ export function nearestJoint(ctx: Ctx, p: Vector3) {
     consider(joint, at, at);
     if (joint.parent) consider(joint.parent, joint.parent.at, at);
   }
-  if (!best) throw new Error("No joints yet: create the root joint with b.joint(name, { at }) first");
-  return best as Joint;
+  return best ?? ctx.modelSpaceOwner();
 }
 
 /** The weights of an input that came from something built (a frame, a sweep, a path made from frames), else null. */
@@ -350,8 +356,7 @@ export function describe(x: unknown): string {
  */
 export function resolveJoint(ctx: Ctx, ref?: JointRef, where = "bone"): Joint {
   if (ref === undefined) {
-    if (!ctx.rootJoint) throw new Error("No root joint yet: create one with b.joint(name, { at }) first");
-    return ctx.rootJoint;
+    return ctx.rootJoint ?? ctx.modelSpaceOwner();
   }
   const named = (name: unknown) => (typeof name === "string" ? ctx.joints.get(name) : undefined);
   if (typeof ref === "string") {
