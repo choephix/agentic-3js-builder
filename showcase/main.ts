@@ -60,6 +60,7 @@ type Entry = { slug: string; path: string; name: string; failed: boolean };
 type Loaded = {
   slug: string;
   meta: SampleModule["meta"];
+  make: (() => Object3D) | null;
   source: string | null;
   info: Inspection | null;
   error: unknown;
@@ -358,12 +359,13 @@ async function run(keepCamera: boolean) {
   const next: Loaded = {
     slug,
     meta: undefined,
+    make: null,
     source: null,
     info: null,
     error: null,
     phase: null,
     ms: null,
-    snaps: snapshotsBySlug.get(slug) ?? { tags: [], downloads: [] },
+    snaps: snapshotsBySlug.get(slug) ?? { tags: [] },
     build: undefined,
   };
   const [module, source, snaps, build] = await Promise.allSettled([
@@ -406,6 +408,7 @@ async function run(keepCamera: boolean) {
       next.ms = performance.now() - started;
       if (recording) starts = arrivalStarts(recording);
       next.info = inspect(root);
+      next.make = make;
     } catch (reason) {
       root = null;
       next.error = reason;
@@ -435,6 +438,7 @@ async function run(keepCamera: boolean) {
     next.error = reason;
     next.phase = "build";
     next.info = null;
+    next.make = null;
   }
   viewer.pose(state.bend ?? 0, state.seed);
   viewer.wiggle(state.wiggle && viewer.rigged);
@@ -694,11 +698,18 @@ function renderPanel() {
             ? codePanel(loaded)
             : panel === "textures"
               ? (texturesView?.element ?? missing("Nothing built."))
-              : versionsPanel(loaded.slug, loaded.snaps, loaded.build?.versions ?? [], state.tag, {
-                  select: (tag) => set({ tag }),
-                  compare: (from, to) => set({ panel: "code", compare: `${from}..${to}` }),
-                  lightbox: (items, index) => lightbox.show(items, index),
-                });
+              : versionsPanel(
+                  loaded.slug,
+                  loaded.snaps,
+                  loaded.build?.versions ?? [],
+                  state.tag,
+                  { make: loaded.make, rigged: Boolean(loaded.info?.joints.length), meta: loaded.meta },
+                  {
+                    select: (tag) => set({ tag }),
+                    compare: (from, to) => set({ panel: "code", compare: `${from}..${to}` }),
+                    lightbox: (items, index) => lightbox.show(items, index),
+                  },
+                );
   const same = body.dataset.panel === `${panel}:${loaded.slug}`;
   body.dataset.panel = `${panel}:${loaded.slug}`;
   body.replaceChildren(content);

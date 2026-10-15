@@ -2,7 +2,7 @@
 // Evaluates a bundled creature module, bakes it with assemble(), renders the
 // review shots, composes the contact sheet and exports the GLB downloads.
 import * as THREE from "three";
-import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
+import { exportGlb } from "./glb";
 import { assemble, createSkinnedMesh, createStaticMesh, surfaceOf } from "./assemble";
 import type { Assembly } from "./assemble";
 import { looseClusters, measureIndex } from "./measure";
@@ -214,77 +214,6 @@ function toBase64(buffer: ArrayBuffer) {
   let binary = "";
   for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
   return btoa(binary);
-}
-
-const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
-  let c = n;
-  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-  return c >>> 0;
-});
-
-/**
- * RGBA PNG of a data texture's rows as stored (row 0 on top, which is v = 0 in both three with flipY off and glTF).
- * Written by hand because a canvas premultiplies alpha and so blanks the colour of transparent texels, which the
- * atlas fills on purpose so filtered cut-out edges keep their colour.
- */
-async function encodePng(image: { data: ArrayLike<number>; width: number; height: number }) {
-  const { data, width, height } = image;
-  const stride = width * 4 + 1;
-  const raw = new Uint8Array(stride * height);
-  for (let y = 0; y < height; y++)
-    raw.set(
-      Uint8Array.from({ length: width * 4 }, (_, i) => data[y * width * 4 + i]),
-      y * stride + 1,
-    );
-  const deflated = new Uint8Array(
-    await new Response(new Blob([raw]).stream().pipeThrough(new CompressionStream("deflate"))).arrayBuffer(),
-  );
-  const chunk = (type: string, body: Uint8Array) => {
-    const out = new Uint8Array(12 + body.length);
-    const view = new DataView(out.buffer);
-    view.setUint32(0, body.length);
-    for (let i = 0; i < 4; i++) out[4 + i] = type.charCodeAt(i);
-    out.set(body, 8);
-    let crc = 0xffffffff;
-    for (let i = 4; i < 8 + body.length; i++) crc = CRC_TABLE[(crc ^ out[i]) & 255] ^ (crc >>> 8);
-    view.setUint32(8 + body.length, (crc ^ 0xffffffff) >>> 0);
-    return out;
-  };
-  const header = new Uint8Array(13);
-  new DataView(header.buffer).setUint32(0, width);
-  new DataView(header.buffer).setUint32(4, height);
-  header.set([8, 6, 0, 0, 0], 8);
-  const parts = [
-    new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]),
-    chunk("IHDR", header),
-    chunk("IDAT", deflated),
-    chunk("IEND", new Uint8Array(0)),
-  ];
-  return new Blob(parts, { type: "image/png" });
-}
-
-/** The exporter's internals this harness reaches into to hand it the atlas PNG (three 0.185). */
-type Writer = {
-  json: { images?: Array<{ mimeType: string; bufferView?: number }> };
-  cache: { images: Map<unknown, Record<string, number>> };
-  pending: Array<Promise<unknown>>;
-  processBufferViewImage(blob: Blob): Promise<number>;
-};
-
-async function exportGlb(object: THREE.Object3D, atlas: THREE.DataTexture) {
-  const png = await encodePng(atlas.image as { data: Uint8Array; width: number; height: number });
-  const exporter = new GLTFExporter().register((writer) => ({
-    beforeParse() {
-      const w = writer as unknown as Writer;
-      const imageDef: { mimeType: string; bufferView?: number } = { mimeType: "image/png" };
-      w.pending.push(w.processBufferViewImage(png).then((index) => (imageDef.bufferView = index)));
-      w.json.images ??= [];
-      w.cache.images.set(atlas.image, { [`image/png:flipY/${atlas.flipY}`]: w.json.images.push(imageDef) - 1 });
-    },
-  }));
-  const result = await exporter.parseAsync(object, { binary: true });
-  if (!(result instanceof ArrayBuffer)) throw new Error("GLB export did not produce a binary buffer");
-  return toBase64(result);
 }
 
 type RunOptions = { code: string; arm: Arm; slug: string; tag: string; reportOnly: boolean; renderOnError?: boolean };
@@ -609,40 +538,10 @@ async function run({ code, arm, slug, tag, reportOnly, renderOnError }: RunOptio
   atlasCanvas.getContext("2d")!.putImageData(pixels, 0, 0);
   const atlasPng = atlasCanvas.toDataURL("image/png");
 
-  const extras = {
-    creatureLab: {
-      slug,
-      arm,
-      tag,
-      meta: report.meta,
-      parts: assembly.parts.map(({ index, name, group, bone, color, texture }) => ({
-        index,
-        name,
-        group,
-        bone,
-        color,
-        texture,
-      })),
-      textures: assembly.textures,
-      groups: assembly.groups,
-      note: "Vertex attribute _PART holds the index into parts[].",
-    },
-  };
+  const glbLabel = { slug, arm, tag, meta: report.meta, rig: report.rig };
   const glb: Record<string, string> = {};
-  const staticMesh = createStaticMesh(assembly, slug);
-  staticMesh.userData = extras;
-  glb[rigged ? `${slug}-mesh.glb` : `${slug}.glb`] = await exportGlb(staticMesh, atlas);
-  if (skinned) {
-    model.userData = {
-      ...extras,
-      creatureLab: {
-        ...extras.creatureLab,
-        joints: assembly.joints.map(({ name, parent }) => ({ name, parent })),
-        rig: report.rig,
-      },
-    };
-    glb[`${slug}-rigged.glb`] = await exportGlb(model, atlas);
-  }
+  glb[rigged ? `${slug}-mesh.glb` : `${slug}.glb`] = toBase64(await exportGlb(assembly, false, glbLabel));
+  if (skinned) glb[`${slug}-rigged.glb`] = toBase64(await exportGlb(assembly, true, glbLabel));
   return {
     report,
     shots: images.map(({ name, caption, png }) => ({ name, caption, png })),

@@ -1298,11 +1298,17 @@ details.build .chip {
   border: 1px solid #cecece;
   border-radius: 2px;
   color: var(--fg);
+  background: transparent;
+  font: inherit;
   font-size: 12px;
   text-decoration: none;
 }
-.download:hover {
+.download:hover:not(:disabled) {
   background: var(--hover);
+}
+.download:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 .download .glyph {
   color: var(--accent);

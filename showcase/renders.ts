@@ -1,5 +1,7 @@
 // Harness renders (`npm run snap`): the per-sample index from the dev server, the reports it points at, the
 // Versions panel and the image lightbox.
+import type { Object3D } from "three";
+import type { Assembly } from "../harness/assemble";
 import { duration, tokens as tokenText } from "./builds";
 import type { Version } from "./builds";
 import { h } from "./dom";
@@ -15,8 +17,7 @@ export type Snapshot = {
   source: string | null;
   shots: Shot[];
 };
-export type Download = { name: string; arm: "A" | "B"; bytes: number; url: string };
-export type Snapshots = { tags: Snapshot[]; downloads: Download[] };
+export type Snapshots = { tags: Snapshot[] };
 export type Issue = { level: "error" | "warning"; message: string };
 export type Placed = { x: number; y: number; w: number; h: number };
 export type Report = {
@@ -66,7 +67,7 @@ const SHOT_ORDER = [
   "flex-a",
   "flex-b",
 ];
-const NONE: Snapshots = { tags: [], downloads: [] };
+const NONE: Snapshots = { tags: [] };
 
 export async function loadSnapshots(slug: string): Promise<Snapshots> {
   try {
@@ -145,49 +146,105 @@ export type VersionsActions = {
   lightbox(items: Array<{ url: string; caption: string }>, index: number): void;
 };
 
+type LiveGlb = { make: (() => Object3D) | null; rigged: boolean; meta: unknown };
+/** One bake per live build, shared by both buttons; a failed bake is dropped so a retry starts over. */
+const assemblies = new WeakMap<() => Object3D, Promise<{ root: Object3D; assembly: Assembly }>>();
+
 /**
- * The Versions panel: GLB downloads, every tag with its numbers and the model that rendered it (`versions`, from the
- * build record), and the selected tag's sheet, shots and report.
+ * The live GLB downloads. Each click rebuilds untouched source once per live build (viewer poses and display
+ * materials must not enter the bake), then bakes and exports it like `npm run snap`. The export modules load only on
+ * click: static imports would put the atlas bake and GLTFExporter in the viewer bundle.
+ */
+function glbSection(slug: string, make: () => Object3D, rigged: boolean, meta: unknown) {
+  const error = h("p", { class: "muted", role: "alert", hidden: true });
+  const buttons = [true, false].map((skeleton) => {
+    const filename = skeleton ? `${slug}-rigged.glb` : rigged ? `${slug}-mesh.glb` : `${slug}.glb`;
+    const status = h("span", { class: "muted" }, ".glb");
+    const button = h(
+      "button",
+      {
+        type: "button",
+        class: "download",
+        disabled: skeleton && !rigged,
+        "data-tip":
+          skeleton && !rigged
+            ? "This model has no joints."
+            : `Download ${filename}, built from the live code in this browser.`,
+        onclick: async () => {
+          button.disabled = true;
+          status.textContent = "building…";
+          error.hidden = true;
+          try {
+            let pending = assemblies.get(make);
+            if (!pending) {
+              pending = (async () => {
+                const { assemble } = await import("../harness/assemble");
+                const root = make();
+                return { root, assembly: await assemble(root, rigged) };
+              })();
+              pending.catch(() => assemblies.delete(make));
+              assemblies.set(make, pending);
+            }
+            const [{ root, assembly }, { exportGlb }] = await Promise.all([pending, import("../harness/glb")]);
+            const buffer = await exportGlb(assembly, skeleton, {
+              slug,
+              arm: rigged ? "B" : "A",
+              tag: "live",
+              meta,
+              rig: root.userData.rig,
+            });
+            const url = URL.createObjectURL(new Blob([buffer], { type: "model/gltf-binary" }));
+            const link = h("a", { href: url, download: filename });
+            document.body.append(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            status.textContent = `.glb · ${bytes(buffer.byteLength)}`;
+          } catch (reason) {
+            status.textContent = ".glb";
+            error.textContent = reason instanceof Error ? reason.message : String(reason);
+            error.hidden = false;
+          } finally {
+            button.disabled = false;
+          }
+        },
+      },
+      h("span", { class: "glyph" }, "↓"),
+      skeleton ? "with skeleton" : "without skeleton",
+      status,
+    );
+    return button;
+  });
+  return h("section", null, h("h3", null, "Download GLB"), h("div", { class: "downloads" }, buttons), error);
+}
+
+/**
+ * The Versions panel: live browser-built GLBs, every tag with its numbers and the model that rendered it (`versions`,
+ * from the build record), and the selected tag's sheet, shots and report. Downloads need no harness renders.
  */
 export function versionsPanel(
   slug: string,
   snapshots: Snapshots,
   versions: Version[],
   selected: string | null,
+  glb: LiveGlb,
   actions: VersionsActions,
 ) {
-  if (!snapshots.tags.length)
-    return h(
-      "div",
-      { class: "empty-state" },
-      h("p", null, "No harness renders yet."),
-      h("code", null, `npm run snap -- ${slug} v01`),
-      h("p", { class: "muted" }, "Sheets, reports, per-version source and GLBs appear here."),
-    );
-  const current = snapshots.tags.find((tag) => tag.tag === selected) ?? snapshots.tags[0];
   const body = h("div", { class: "versions" });
-
-  if (snapshots.downloads.length)
+  if (glb.make) body.append(glbSection(slug, glb.make, glb.rigged, glb.meta));
+  if (!snapshots.tags.length) {
     body.append(
       h(
-        "section",
-        null,
-        h("h3", null, "Latest export"),
-        h(
-          "div",
-          { class: "downloads" },
-          ...snapshots.downloads.map((file) =>
-            h(
-              "a",
-              { class: "download", href: file.url, download: file.name, "data-tip": `Download ${file.name}` },
-              h("span", { class: "glyph" }, "↓"),
-              file.name.replace(`${slug}-`, "").replace(".glb", ""),
-              h("span", { class: "muted" }, `.glb · ${bytes(file.bytes)}`),
-            ),
-          ),
-        ),
+        "div",
+        { class: "empty-state" },
+        h("p", null, "No harness renders yet."),
+        h("code", null, `npm run snap -- ${slug} v01`),
+        h("p", { class: "muted" }, "Sheets, reports and per-version source appear here."),
       ),
     );
+    return body;
+  }
+  const current = snapshots.tags.find((tag) => tag.tag === selected) ?? snapshots.tags[0];
 
   const table = h(
     "div",
