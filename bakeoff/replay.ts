@@ -15,6 +15,9 @@ const ROOT = resolve(import.meta.dir, "..");
 const BASE = join(ROOT, "bakeoff");
 const EXPERIMENT2 = process.argv.includes("--experiment2");
 const APP = process.argv.includes("--app");
+const SINGLE = process.argv.includes("--single");
+const SINGLE_ARM = process.argv.includes("--craft") ? "craft" : "single";
+const SINGLE_ROUND = "r19" + SINGLE_ARM;
 const APP_ROUND = process.argv.includes("--app-round")
   ? process.argv[process.argv.indexOf("--app-round") + 1]
   : "r18app";
@@ -23,13 +26,15 @@ const APP_SUBJECTS = process.argv.includes("--subjects")
   : [];
 const INPUT = join(
   BASE,
-  APP
-    ? APP_ROUND === "r18app"
-      ? "app-inputs"
-      : APP_ROUND + "-inputs"
-    : EXPERIMENT2
-      ? "replay2-inputs"
-      : "replay-inputs",
+  SINGLE
+    ? SINGLE_ROUND + "-inputs"
+    : APP
+      ? APP_ROUND === "r18app"
+        ? "app-inputs"
+        : APP_ROUND + "-inputs"
+      : EXPERIMENT2
+        ? "replay2-inputs"
+        : "replay-inputs",
 );
 const MODEL = "anthropic/claude-sonnet-5-5";
 const SUBJECTS = ["africanElephant", "capybara", "koala", "redPanda", "treasureHoard", "soulScythe"];
@@ -44,7 +49,7 @@ const text = (path: string, value: string) => {
 };
 const allPitches = ["pitches-r7.json", "pitches-r5.json"]
   .flatMap((p) => json(join(BASE, p)).subjects)
-  .filter((s) => (APP ? !APP_SUBJECTS.length || APP_SUBJECTS.includes(s.id) : SUBJECTS.includes(s.id)));
+  .filter((s) => (APP || SINGLE ? !APP_SUBJECTS.length || APP_SUBJECTS.includes(s.id) : SUBJECTS.includes(s.id)));
 const craft = json(join(BASE, "arms-r12.json")).arms.find((a) => a.id === "craft3");
 const shapedSystem = systemPrompt(craft);
 const caveat =
@@ -675,6 +680,13 @@ async function checkedAndRepaired(round: string) {
         if (!latest.has(e.subject)) latest.set(e.subject, e);
     if (![...latest.values()].some((e) => e.hasCode && e.check?.rendered === false)) break;
     if (!(await guard(round + " repair " + turn))) return false;
+    if (SINGLE) {
+      const crashes = [...latest.values()].filter((entry) => entry.hasCode && entry.check?.rendered === false).length;
+      if (singleSpend() + crashes * 1.8 > 60) {
+        save(join(INPUT, "stopped.json"), { reason: "$60 repair budget guard", round, turn, spent: singleSpend() });
+        return false;
+      }
+    }
     const next = round + (turn === 1 ? "fix" : "fix2");
     await cmd([
       "refine",
@@ -805,6 +817,326 @@ async function prepareApp() {
   console.log(
     "Prepared one fixed campaign template and current-repo synthetic reads for " + allPitches.length + " app briefs.",
   );
+}
+
+/** Reuse the frozen app prefix verbatim, then prefill the lookups its live loop usually makes. */
+async function prepareSingle() {
+  const source = join(BASE, "app-inputs");
+  const manifest = json(join(source, "manifest.json"));
+  const lookups = [
+    "src/index.ts",
+    "src/sweep.ts",
+    "src/parts.ts",
+    "src/cards.ts",
+    "src/sugar.ts",
+    "src/builder.ts",
+    "kits/glow.md",
+    "kits/glow.ts",
+    ...(SINGLE_ARM === "craft" ? ["bakeoff/prompts/craft3.md"] : []),
+  ];
+  save(join(INPUT, "manifest.json"), {
+    ...manifest,
+    arm: SINGLE_ARM,
+    source: "bakeoff/app-inputs",
+    maxExtraCalls: 0,
+    lookups,
+    toolPolicy:
+      "One request and reply; automatic tool choice; extract the complete sample write; no returned tool results. One fresh redraw permitted after a reply without a sample write.",
+  });
+  save(join(INPUT, "pitches.json"), { subjects: manifest.subjects });
+  text(join(ROOT, "scratch/bakeoff/craft3.md"), shapedSystem);
+  for (const subject of manifest.subjects) {
+    const input = json(join(source, subject.id + ".json"));
+    const calls = [
+      { type: "toolCall", id: "single_pwd", name: "bash", arguments: { command: "pwd" } },
+      { type: "toolCall", id: "single_ls", name: "bash", arguments: { command: "ls" } },
+      ...lookups.map((path, i) => ({
+        type: "toolCall",
+        id: "single_read_" + i,
+        name: "read",
+        arguments: { path },
+      })),
+    ];
+    input.context.messages.push(
+      { role: "assistant", content: calls, timestamp: 0 },
+      ...calls.map((call) => ({
+        role: "toolResult",
+        toolCallId: call.id,
+        toolName: call.name,
+        isError: false,
+        timestamp: 0,
+        content: [
+          {
+            type: "text",
+            text:
+              call.name === "read"
+                ? readFileSync(
+                    join(
+                      ROOT,
+                      "path" in call.arguments && typeof call.arguments.path === "string" ? call.arguments.path : "",
+                    ),
+                    "utf8",
+                  )
+                : call.id === "single_pwd"
+                  ? input.workspace + "\n"
+                  : readdirSync(ROOT)
+                      .filter((name) => !name.startsWith("."))
+                      .sort()
+                      .join("\n") + "\n",
+          },
+        ],
+      })),
+      {
+        role: "user",
+        timestamp: 0,
+        content: [
+          {
+            type: "text",
+            text:
+              "All orientation and SDK lookups are already provided above. This is a single-run environment: there will be exactly one reply, and no tool results or further turns will be returned. In this reply, use write to write the entire finished module to samples/" +
+              subject.id +
+              ".ts. Put the complete file content in that write, not a starter to extend later. Rendering, typechecking and any crash repairs happen separately after your reply; do not request them here. This environment constraint replaces the assignment's two-render requirement; all other subject, style and quality requirements are unchanged.",
+          },
+        ],
+      },
+    );
+    input.files.push(...lookups);
+    save(join(INPUT, subject.id + ".json"), input);
+  }
+  console.log("Prepared " + manifest.subjects.length + " " + SINGLE_ARM + " single-run inputs.");
+}
+
+function singleSpend() {
+  return readdirSync(join(BASE, "rounds"))
+    .filter((name) => /^r19(single|craft)(fix2?)?$/.test(name))
+    .flatMap((round) => {
+      const runs = join(BASE, "rounds", round, "runs");
+      return existsSync(runs)
+        ? readdirSync(runs)
+            .filter((name) => name.endsWith(".json"))
+            .map((name) => json(join(runs, name)).costUsd ?? 0)
+        : [];
+    })
+    .reduce((sum, amount) => sum + amount, 0);
+}
+
+type SingleAttempt = {
+  request: number;
+  kind: string;
+  status: number;
+  wallMs: number;
+  costUsd: number;
+  hasCode: boolean;
+  finishReason: string | null;
+  error: string | null;
+  returnedTools: { name: string; path: unknown }[];
+};
+
+function singleTools(content: unknown): AppCall[] {
+  if (!Array.isArray(content)) return [];
+  return content.flatMap((block: unknown) => {
+    if (
+      !block ||
+      typeof block !== "object" ||
+      !("type" in block) ||
+      block.type !== "tool_use" ||
+      !("name" in block) ||
+      typeof block.name !== "string" ||
+      !("id" in block) ||
+      typeof block.id !== "string" ||
+      !("input" in block) ||
+      !block.input ||
+      typeof block.input !== "object" ||
+      Array.isArray(block.input)
+    )
+      return [];
+    return [{ id: block.id, name: block.name, input: Object.fromEntries(Object.entries(block.input)) }];
+  });
+}
+
+async function runSingle() {
+  if (!(await guard(SINGLE_ROUND + " single-run arm"))) return;
+  const round = SINGLE_ROUND,
+    dir = join(BASE, "rounds", round);
+  const manifest = json(join(INPUT, "manifest.json"));
+  save(join(dir, "round.json"), {
+    id: round,
+    started: existsSync(join(dir, "round.json")) ? json(join(dir, "round.json")).started : new Date().toISOString(),
+    model: MODEL,
+    effort: "high",
+    maxTokens: 120000,
+    maxExtraCalls: 0,
+    subjects: manifest.subjects,
+    arms: [
+      {
+        ...craft,
+        id: SINGLE_ARM,
+        name:
+          SINGLE_ARM === "craft" ? "Sonnet · agent framing + craft, single-run" : "Sonnet · agent framing, single-run",
+      },
+    ],
+    source: manifest.source,
+    lookups: manifest.lookups,
+    toolPolicy: manifest.toolPolicy,
+  });
+  text(join(dir, "prompts", SINGLE_ARM + ".md"), manifest.systemPrompt.join("\n\n"));
+  mkdirSync(join(dir, "builds"), { recursive: true });
+  mkdirSync(join(dir, "checks"), { recursive: true });
+  const gw = gateway();
+  let active = 0,
+    paused = "";
+  const budgetWaiters: (() => void)[] = [];
+  const queue = allPitches.filter(
+    (subject) =>
+      !existsSync(
+        join(
+          dir,
+          "runs",
+          round +
+            subject.id[0].toUpperCase() +
+            subject.id.slice(1) +
+            "Rich" +
+            SINGLE_ARM[0].toUpperCase() +
+            SINGLE_ARM.slice(1) +
+            ".json",
+        ),
+      ),
+  );
+  async function build(subject: (typeof allPitches)[number]) {
+    const slug =
+      round +
+      subject.id[0].toUpperCase() +
+      subject.id.slice(1) +
+      "Rich" +
+      SINGLE_ARM[0].toUpperCase() +
+      SINGLE_ARM.slice(1);
+    const input = json(join(INPUT, subject.id + ".json"));
+    const body = anthropicRequest(input.context);
+    const started = Date.now();
+    const attempts: SingleAttempt[] = [];
+    const usage = { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
+    let code: string | null = null,
+      costUsd = 0;
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      // Reserve output plus input headroom, keeping $2 for separate crash repairs.
+      if (!(await guard(slug + (attempt === 1 ? " generation" : " fresh redraw")))) {
+        paused = "Anthropic 5 Hour above 50%";
+        break;
+      }
+      while (!paused && active > 0 && singleSpend() + (active + 1) * 1.8 > 58)
+        await new Promise<void>((resolve) => budgetWaiters.push(resolve));
+      if (paused || singleSpend() + (active + 1) * 1.8 > 58) {
+        paused ||= "Budget guard: $60 total cap, including repair reserve";
+        break;
+      }
+      const sent = Date.now();
+      save(join(dir, "requests", slug + "-" + attempt + ".json"), body);
+      active++;
+      const reply = await gw.send("/v1/messages", body);
+      save(join(dir, "replies", slug + "-" + attempt + ".json"), reply);
+      const used = reply.body?.usage ?? {};
+      for (const key of [
+        "input_tokens",
+        "output_tokens",
+        "cache_read_input_tokens",
+        "cache_creation_input_tokens",
+      ] as const)
+        usage[key] += used[key] ?? 0;
+      const amount =
+        ((used.input_tokens ?? 0) * 2 +
+          (used.cache_read_input_tokens ?? 0) * 0.1 +
+          (used.cache_creation_input_tokens ?? 0) * 2.5 +
+          (used.output_tokens ?? 0) * 10) /
+        1e6;
+      costUsd += amount;
+      const calls = singleTools(reply.body?.content);
+      const write = calls
+        .filter(
+          (block) =>
+            block.name === "write" &&
+            typeof block.input.path === "string" &&
+            /(?:^|\/)samples\/[^/]+\.ts$/.test(block.input.path) &&
+            block.input.path.endsWith("/" + subject.id + ".ts") &&
+            typeof block.input.content === "string",
+        )
+        .at(-1);
+      code = typeof write?.input.content === "string" ? write.input.content : null;
+      attempts.push({
+        request: attempt,
+        kind: attempt === 1 ? "generation" : "redraw",
+        status: reply.status,
+        wallMs: Date.now() - sent,
+        costUsd: amount,
+        hasCode: Boolean(code),
+        finishReason: reply.body?.stop_reason ?? null,
+        error: reply.status === 200 ? (code ? null : "Reply contained no sample write") : JSON.stringify(reply.body),
+        returnedTools: calls.map((block) => ({ name: block.name, path: block.input.path })),
+      });
+      // Persist accounting before another worker reserves its next request.
+      save(join(dir, "runs", slug + ".json"), {
+        slug,
+        arm: SINGLE_ARM,
+        subject: subject.id,
+        level: "rich",
+        pitch: subject.rich,
+        model: MODEL,
+        effort: "high",
+        started: new Date(started).toISOString(),
+        wallMs: Date.now() - started,
+        status: reply.status,
+        hasCode: Boolean(code),
+        error: attempts.at(-1).error,
+        stopReason: reply.body?.stop_reason ?? null,
+        finishReason: reply.body?.stop_reason ?? null,
+        modelCalls: attempts.length,
+        generationCalls: 1,
+        redrawCalls: attempts.length - 1,
+        noWriteReplies: attempts.filter((item) => !item.hasCode).length,
+        attempts,
+        costUsd,
+        usage: {
+          ...usage,
+          prompt_tokens: usage.input_tokens + usage.cache_read_input_tokens + usage.cache_creation_input_tokens,
+          completion_tokens: usage.output_tokens,
+        },
+      });
+      active--;
+      for (const resume of budgetWaiters.splice(0)) resume();
+      if (code) {
+        const file = join(dir, "builds", slug + ".ts");
+        text(file, wireArchived(code, file));
+        break;
+      }
+    }
+    console.log(
+      slug,
+      code ? Buffer.byteLength(code) + " bytes" : "FAILED",
+      attempts.length + " requests",
+      "$" + costUsd.toFixed(3),
+    );
+  }
+  try {
+    await Promise.all(
+      Array.from({ length: 8 }, async () => {
+        while (queue.length && !paused) {
+          const subject = queue.shift();
+          if (subject) await build(subject);
+        }
+      }),
+    );
+  } finally {
+    gw.close();
+  }
+  results(round);
+  if (paused) {
+    save(join(INPUT, "stopped.json"), { reason: paused, spent: singleSpend(), at: new Date().toISOString() });
+    console.log("PAUSED: " + paused);
+    return;
+  }
+  if (!process.argv.includes("--generation-only")) {
+    await checkedAndRepaired(round);
+    console.log("Single-run total including repairs: $" + singleSpend().toFixed(3));
+  }
 }
 
 async function runApp() {
@@ -1163,7 +1495,10 @@ async function runApp() {
 }
 
 const args = process.argv.slice(2);
-if (APP) {
+if (SINGLE) {
+  if (!existsSync(join(INPUT, "manifest.json")) || args.includes("--prepare-only")) await prepareSingle();
+  if (!args.includes("--prepare-only")) await runSingle();
+} else if (APP) {
   if (!existsSync(join(INPUT, "manifest.json")) || args.includes("--prepare-only")) await prepareApp();
   if (!args.includes("--prepare-only")) await runApp();
 } else {

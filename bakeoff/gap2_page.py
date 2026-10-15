@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish the human-verdict comparison, including the agent-framed app arm; no model calls."""
+"""Publish the human-verdict comparison, including agent-framed multi-call and single-run arms; no model calls."""
 
 import html
 import json
@@ -18,8 +18,10 @@ VIEWS = [("three-quarter", "three-quarter"), ("front", "front"), ("side", "side"
          ("back", "back"), ("low", "low"), ("head", "head close-up")]
 COLUMNS = [("final", "Sonnet agent · final"), ("draft", "Sonnet agent · first draft"),
            ("sonnet", "Sonnet · single-run"), ("astra", "Astra · single-run"), ("haiku", "Haiku · single-run"),
-           ("app", "Sonnet · agent framing (app, multi-call · ~17 calls)")]
-API_MODELS = ["sonnet", "astra", "haiku", "app"]
+           ("app", "Sonnet · agent framing (app, multi-call · ~17 calls)"),
+           ("single", "Sonnet · agent framing, single-run"),
+           ("craft", "Sonnet · agent framing + craft, single-run")]
+API_MODELS = ["sonnet", "astra", "haiku", "app", "single", "craft"]
 ISSUES = ["face/eyes", "floating/broken parts", "bland colour", "too little detail", "goofy"]
 GRADES = ["as good", "a bit worse", "far worse"]
 
@@ -82,6 +84,10 @@ def pipeline_caption(entry, api=False):
     if entry.get("arm") == "app" and history:
         initial = history[-1]
         turns += f" · {initial.get('modelCalls', 0) + repairs} model calls · {initial.get('stopReason', 'unknown stop')}"
+    if history and history[-1].get("generationCalls") is not None:
+        initial = history[-1]
+        redraws = initial.get("redrawCalls", 0)
+        turns = f" · {initial['generationCalls']} generation request · {redraws} redraw request{'s' if redraws != 1 else ''} · {repairs} repair call{'s' if repairs != 1 else ''}"
     return f"{money} · {timing}{turns}"
 
 
@@ -121,8 +127,10 @@ def tile_data(subject, column, base):
             return data
         return {"prefix": prefix, "meta": "cost unavailable · model time unavailable",
                 "source": ROUNDS / round_for_slug(slug) / "builds" / f"{slug}.ts"}
-    round_bases = ("r18appb", "r18app") if column == "app" else (base + ("" if column == "sonnet" else column),)
-    arm = "app" if column == "app" else "craft3"
+    round_bases = (("r18appb", "r18app") if column == "app"
+                   else ("r19" + column,) if column in ("single", "craft")
+                   else (base + ("" if column == "sonnet" else column),))
+    arm = column if column in ("app", "single", "craft") else "craft3"
     for round_base in round_bases:
         for suffix in ("fix2", "fix", ""):
             entry = next((item for item in entries(round_base + suffix)
@@ -180,7 +188,7 @@ const storageKey='agentic-3js-builder-gap2-verdicts-v1';
 const rows=[...document.querySelectorAll('.comparison-row')];
 const grades=['as good','a bit worse','far worse'];
 const issues=['face/eyes','floating/broken parts','bland colour','too little detail','goofy'];
-const models=['sonnet','astra','haiku','app'];
+const models=['sonnet','astra','haiku','app','single','craft'];
 const empty=()=>({...Object.fromEntries(models.map(model=>[model,{grade:null,issues:[]}])),better:null});
 let stored={},verdicts={};
 const notice=document.getElementById('save-status');
@@ -192,7 +200,7 @@ for(const row of rows){
    if(grades.includes(saved[model]?.grade))value[model].grade=saved[model].grade;
    if(Array.isArray(saved[model]?.issues))value[model].issues=issues.filter(issue=>saved[model].issues.includes(issue));
   }
-  if(['Sonnet','Astra','Haiku','App','same'].includes(saved.better))value.better=saved.better;
+  if(['Sonnet','Astra','Haiku','App','Single','Craft','same'].includes(saved.better))value.better=saved.better;
  }
  verdicts[row.dataset.subject]=value;
 }
@@ -275,9 +283,9 @@ def main(publish=None):
     output.parent.mkdir(parents=True, exist_ok=True)
     out = ['<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
            '<title>Agent vs single-run and multi-call · phase 2</title><style>', STYLE, f'</style></head><body data-view-ext="{SITE["view"]}">',
-           '<main><div class="eyebrow">The single-run gap / phase 2</div><h1>Same briefs. Six builds. Your verdict.</h1>',
-           '<p class="intro"><strong>Sonnet agent · final</strong> is the finished sample from the agentic session (green outline). <strong>Sonnet agent · first draft</strong> is that session’s first file write, with crash repairs where needed. <strong>Sonnet · single-run</strong>, <strong>Astra · single-run</strong> and <strong>Haiku · single-run</strong> each use one API request and one reply, with no tools. <strong>Sonnet · agent framing (app, multi-call · ~17 calls)</strong> is Sonnet 5.5 given one fixed agent system/brief template and synthetic current-doc reads; it can write, edit and typecheck in a tool conversation, without renders. Untick columns under the view buttons to hide them; the choice is remembered.</p>',
-           '<p class="intro">There are <strong>no visual feedback turns</strong>: up to two separate repair calls only send back the crash error and do not change a single-run build’s label. App framing used 17 model calls per draw before repairs, including real requested typechecks and harmless scratch operations. Captions count repair calls separately and include the entire generation/tool loop and repairs’ cost/time; agent finals show session time. First-draft generation cost/time were not recorded. Click a picture for its contact sheet. Refresh to see newly completed builds.</p></main>',
+           '<main><div class="eyebrow">The single-run gap / phase 2</div><h1>Same briefs. Eight builds. Your verdict.</h1>',
+           '<p class="intro"><strong>Sonnet agent · final</strong> is the finished sample from the agentic session (green outline). <strong>Sonnet agent · first draft</strong> is that session’s first file write, with crash repairs where needed. <strong>Sonnet · single-run</strong>, <strong>Astra · single-run</strong> and <strong>Haiku · single-run</strong> each use one API request and one reply, with no tools. <strong>Sonnet · agent framing (app, multi-call · ~17 calls)</strong> uses an agent system/brief template and synthetic current-doc reads, with a write/edit/typecheck loop. <strong>Sonnet · agent framing, single-run</strong> uses that same frozen prefix plus prefilled orientation and SDK lookups, and extracts the complete write from one reply without returning tool results. <strong>Sonnet · agent framing + craft, single-run</strong> adds craft guidance as another pre-read file. Untick columns to hide them; the choice is remembered.</p>',
+           '<p class="intro">There are <strong>no visual feedback turns</strong>: up to two separate repair calls only send back the crash error and do not change a single-run build’s label. Replies without a file write are failed single runs; at most one fresh redraw is allowed. Captions distinguish generation, redraw and repair requests and include their entire cost/time; agent finals show session time. First-draft generation cost/time were not recorded. Click a picture for its contact sheet. Refresh to see newly completed builds.</p></main>',
            '<div class="bar"><div class="bar-inner"><div class="views" role="group" aria-label="Image view"><span class="view-label">View</span>']
     for view, label in VIEWS:
         out.append(f'<button type="button" data-view="{view}" aria-pressed="{str(view == "three-quarter").lower()}">{label}</button>')
@@ -293,9 +301,9 @@ def main(publish=None):
         for subject in load(ROOT / "bakeoff" / pitches)["subjects"]:
             subject_id = subject["id"]
             brief = "".join(f'<span>{html.escape(line)}</span>' for line in subject["rich"].splitlines())
-            out.append(f'<article class="comparison-row" data-subject="{subject_id}"><div class="row-heading"><h3>{subject_id}</h3><div class="brief">{brief}</div></div><p class="scroll-hint">Swipe the builds left to compare all six →</p><div class="tiles">')
+            out.append(f'<article class="comparison-row" data-subject="{subject_id}"><div class="row-heading"><h3>{subject_id}</h3><div class="brief">{brief}</div></div><p class="scroll-hint">Swipe the builds left to compare all eight →</p><div class="tiles">')
             out.extend(cell(subject_id, column, title, base) for column, title in COLUMNS)
-            out.append('</div><div class="better" role="group" aria-label="Better API build"><span class="better-label">Better API build:</span>' + buttons(["Sonnet", "Astra", "Haiku", "App", "same"], "data-better") + '</div></article>')
+            out.append('</div><div class="better" role="group" aria-label="Better API build"><span class="better-label">Better API build:</span>' + buttons(["Sonnet", "Astra", "Haiku", "App", "Single", "Craft", "same"], "data-better") + '</div></article>')
         out.append('</section>')
     out.extend(['</main><script>', SCRIPT, '</script></body></html>'])
     with tempfile.NamedTemporaryFile(mode="w", dir=output.parent, suffix=".html", delete=False) as handle:

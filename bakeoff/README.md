@@ -49,6 +49,8 @@ Requests, replies, tool results, writes/edits/typecheck/refusal counts, stop rea
 
 The model's reply is one fenced TypeScript block. Its module imports `three` and `"agentic-3js-builder"`, which the runner points at `src/index.ts`. The module default-exports a no-argument function that returns the model.
 
+`bun bakeoff/replay.ts --single` runs `r19single`; add `--craft` for `r19craft` with `prompts/craft3.md` as another pre-read file. Both reuse the frozen app framing, prefill orientation and SDK/glow lookups, and extract the complete `write` from one high-effort Sonnet 5.5 reply (120k cap, automatic tool choice, no tool results returned). Eight workers resume existing runs; `--subjects koala,treasureHoard --generation-only` selects a pilot. A missing write permits one fresh redraw; render crashes permit two separate repair calls (`fix`, `fix2`). `gap2/` captions separate generation, redraw and repair counts. Requests, replies and accounting are retained. The arms share a $60 cap including repairs and pause above 50% Anthropic 5 Hour usage.
+
 ## Feedback turns
 
 `refine <round> --from <source>` gives every build of the source round one more turn, as an app would after running the module. The conversation is the arm's system prompt, the pitch, the current module as the model's own reply, and the feedback:
