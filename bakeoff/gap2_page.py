@@ -3,6 +3,7 @@
 
 import html
 import json
+import shutil
 import tempfile
 from functools import lru_cache
 from pathlib import Path
@@ -12,8 +13,10 @@ from gap_page import LEGACY, PUBLIC, ROOT, round_for_slug
 ROUNDS = ROOT / "bakeoff/rounds"
 OUTPUT = PUBLIC / "gap2/index.html"
 # The local page reads the harness renders beside it (`../snaps/…png`). The published page (`--publish DIR`, run by the
-# showcase build) reads the WebP copies the build ships under `/renders/`, and main() prints the sources it used.
-SITE = {"root": "../snaps/", "view": ".png", "sheet": ".jpg", "images": None}
+# showcase build) reads the WebP copies the build ships under `/renders/`, copies reference PNGs under `/refs/`,
+# and main() prints the render sources it used.
+SITE = {"root": "../snaps/", "view": ".png", "sheet": ".jpg", "images": None,
+        "refs": "http://axalon:8080/nilo/agentic-3js-builder/refs/"}
 VIEWS = [("three-quarter", "three-quarter"), ("front", "front"), ("side", "side"),
          ("back", "back"), ("low", "low"), ("head", "head close-up")]
 COLUMNS = [("final", "Sonnet agent · final"), ("draft", "Sonnet agent · first draft"),
@@ -183,7 +186,7 @@ def cell(subject, column, title, base):
         ref_round = "r21reflow" if column == "ref-low" else "r21refmedium"
         ref = load(ROUNDS / ref_round / "round.json", {}).get("references", {}).get(subject)
         if ref:
-            url = html.escape("http://axalon:8080/nilo/agentic-3js-builder/refs/" + ref["file"], quote=True)
+            url = html.escape(SITE["refs"] + ref["file"], quote=True)
             reference = (f'<a class="reference" href="{url}" target="_blank" rel="noopener">'
                          f'<img loading="lazy" src="{url}" alt="{html.escape(subject, quote=True)} reference sheet">'
                          f'Reference · {html.escape(ref["variant"])}</a>')
@@ -326,11 +329,16 @@ saveColumns();
 
 def main(publish=None):
     """Write the local page; with `publish` (a build directory) write `<publish>/gap2/index.html` for the showcase
-    build instead, reading its renders from /renders/, and print the JSON list of source images it needs."""
+    build instead, reading renders from /renders/ and copied reference PNGs from ../refs/.
+    Print the JSON list of render source images the showcase build needs."""
     output = OUTPUT
     if publish:
         output = Path(publish) / "gap2/index.html"
-        SITE.update(root="/renders/", view=".webp", sheet=".webp", images=set())
+        SITE.update(root="/renders/", view=".webp", sheet=".webp", images=set(), refs="../refs/")
+        references = Path(publish) / "refs"
+        references.mkdir(parents=True, exist_ok=True)
+        for source in (PUBLIC / "refs").glob("*.png"):
+            shutil.copyfile(source, references / source.name)
     output.parent.mkdir(parents=True, exist_ok=True)
     out = ['<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
            '<title>Agent vs single-run and multi-call · phase 2</title><style>', STYLE, f'</style></head><body data-view-ext="{SITE["view"]}">',
