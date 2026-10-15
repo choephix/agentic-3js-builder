@@ -25,9 +25,10 @@ COLUMNS = [("final", "Sonnet agent · final"), ("draft", "Sonnet agent · first 
            ("craft-med", "Sonnet · agent framing + craft, single-run · medium"),
            ("single-low", "Sonnet · agent framing, single-run · low"),
            ("craft-low", "Sonnet · agent framing + craft, single-run · low"),
-           ("ref-low", "Sonnet · agent framing + reference image, single-run · low")]
+           ("ref-low", "Sonnet · agent framing + reference image, single-run · low"),
+           ("ref-med", "Sonnet · agent framing + reference image, single-run · medium")]
 API_MODELS = ["sonnet", "astra", "haiku", "app", "single", "craft",
-              "single-med", "craft-med", "single-low", "craft-low", "ref-low"]
+              "single-med", "craft-med", "single-low", "craft-low", "ref-low", "ref-med"]
 ISSUES = ["face/eyes", "floating/broken parts", "bland colour", "too little detail", "goofy"]
 GRADES = ["as good", "a bit worse", "far worse"]
 
@@ -134,12 +135,13 @@ def tile_data(subject, column, base):
         return {"prefix": prefix, "meta": "cost unavailable · model time unavailable",
                 "source": ROUNDS / round_for_slug(slug) / "builds" / f"{slug}.ts"}
     effort_rounds = {"single-med": "r20medsingle", "craft-med": "r20medcraft",
-                     "single-low": "r20lowsingle", "craft-low": "r20lowcraft", "ref-low": "r21reflow"}
+                     "single-low": "r20lowsingle", "craft-low": "r20lowcraft", "ref-low": "r21reflow",
+                     "ref-med": "r21refmedium"}
     round_bases = (("r18appb", "r18app") if column == "app"
                    else ("r19" + column,) if column in ("single", "craft")
                    else (effort_rounds[column],) if column in effort_rounds
                    else (base + ("" if column == "sonnet" else column),))
-    arm = "single" if column == "ref-low" else column.split("-")[0] if column in effort_rounds else column if column in ("app", "single", "craft") else "craft3"
+    arm = "single" if column in ("ref-low", "ref-med") else column.split("-")[0] if column in effort_rounds else column if column in ("app", "single", "craft") else "craft3"
     for round_base in round_bases:
         for suffix in ("fix2", "fix", ""):
             entry = next((item for item in entries(round_base + suffix)
@@ -177,8 +179,9 @@ def cell(subject, column, title, base):
         picture = f'<div class="picture empty {status}"><strong>{status}</strong>{detail}</div>'
     meta = data["meta"] + " · " + (module_caption(data["source"]) if data.get("source") else "module size unavailable")
     reference = ""
-    if column == "ref-low":
-        ref = load(ROOT / "bakeoff/r21reflow-inputs/manifest.json", {}).get("references", {}).get(subject)
+    if column in ("ref-low", "ref-med"):
+        ref_round = "r21reflow" if column == "ref-low" else "r21refmedium"
+        ref = load(ROUNDS / ref_round / "round.json", {}).get("references", {}).get(subject)
         if ref:
             url = html.escape("http://axalon:8080/nilo/agentic-3js-builder/refs/" + ref["file"], quote=True)
             reference = (f'<a class="reference" href="{url}" target="_blank" rel="noopener">'
@@ -224,7 +227,7 @@ const storageKey='agentic-3js-builder-gap2-verdicts-v1';
 const rows=[...document.querySelectorAll('.comparison-row')];
 const grades=['as good','a bit worse','far worse'];
 const issues=['face/eyes','floating/broken parts','bland colour','too little detail','goofy'];
-const models=['sonnet','astra','haiku','app','single','craft','single-med','craft-med','single-low','craft-low','ref-low'];
+const models=['sonnet','astra','haiku','app','single','craft','single-med','craft-med','single-low','craft-low','ref-low','ref-med'];
 const empty=()=>({...Object.fromEntries(models.map(model=>[model,{grade:null,issues:[]}])),better:null});
 let stored={},verdicts={};
 const notice=document.getElementById('save-status');
