@@ -254,9 +254,20 @@ document.getElementById('copy').addEventListener('click',async()=>{
  }
 });
 const columnKey='agentic-3js-builder-gap2-columns-v1';
-let hiddenColumns=[];
-try{hiddenColumns=JSON.parse(localStorage.getItem(columnKey)||'[]')||[];}catch(error){}
 const columnBoxes=[...document.querySelectorAll('[data-toggle-column]')];
+const allColumns=columnBoxes.map(box=>box.dataset.toggleColumn);
+// ?cols=final,app,single lists the visible columns; a shared link wins over this browser's saved choice.
+const urlColumns=new URLSearchParams(location.search).get('cols');
+let hiddenColumns=[];
+if(urlColumns!==null){const shown=urlColumns.split(',');hiddenColumns=allColumns.filter(column=>!shown.includes(column));}
+else{try{hiddenColumns=JSON.parse(localStorage.getItem(columnKey)||'[]')||[];}catch(error){}}
+const saveColumns=()=>{
+ try{localStorage.setItem(columnKey,JSON.stringify(hiddenColumns));}catch(error){}
+ const url=new URL(location.href);
+ if(hiddenColumns.length)url.searchParams.set('cols',allColumns.filter(column=>!hiddenColumns.includes(column)).join(','));
+ else url.searchParams.delete('cols');
+ history.replaceState(null,'',url.toString().replace(/%2C/g,','));
+};
 const applyColumns=()=>{
  for(const box of columnBoxes){
   box.checked=!hiddenColumns.includes(box.dataset.toggleColumn);
@@ -266,10 +277,11 @@ const applyColumns=()=>{
 };
 columnBoxes.forEach(box=>box.addEventListener('change',()=>{
  hiddenColumns=columnBoxes.filter(other=>!other.checked).map(other=>other.dataset.toggleColumn);
- try{localStorage.setItem(columnKey,JSON.stringify(hiddenColumns));}catch(error){}
+ saveColumns();
  applyColumns();
 }));
 applyColumns();
+saveColumns();
 """
 
 
