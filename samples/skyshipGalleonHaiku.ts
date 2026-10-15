@@ -234,7 +234,7 @@ export default function build() {
       [-0.35, -1.25],
       [0.0, -0.6],
     ],
-    { at: rudder, thickness: 0.16, bevel: 0.04, color: CRIMSON_C, bone: rudder },
+    { x: [0, 0, 1], at: rudder, thickness: 0.16, bevel: 0.04, color: CRIMSON_C, bone: rudder },
   );
 
   // Tailplanes: swept navy fins.
@@ -489,7 +489,7 @@ export default function build() {
         [len * 0.85, -0.45],
         [0, -0.7],
       ],
-      { at: [0, y, z], thickness: 0.035, bevel: 0.01, color: CRIMSON_C, bone: root },
+      { x: [0, 0, 1], at: [0, y, z], thickness: 0.035, bevel: 0.01, color: CRIMSON_C, bone: root },
     );
   }
   for (const s of [1, -1]) {

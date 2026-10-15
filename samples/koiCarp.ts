@@ -635,6 +635,7 @@ export default function build() {
     [0.012, -0.024],
   ];
   b.extrude(tailOutline, {
+    x: [0, 0, 1],
     at: tailAt,
     bone: caudal,
     thickness: 0.004,

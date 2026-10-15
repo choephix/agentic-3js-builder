@@ -158,6 +158,7 @@ export default function build() {
     bone: head, at: head.local({ forward: 0.132, down: 0.006 }), scale: [0.064, 0.043, 0.057], flat: true, name: "nasalBridge",
   });
   b.extrude([[0, 0.025], [0.06, 0.025], [0.085, 0.008], [0.079, -0.018], [0.061, -0.004], [0, -0.006]], {
+    x: [0, 0, 1],
     at: head.local({ forward: 0.100, down: 0.024 }), bone: head, thickness: 0.108, bevel: 0.004, detail: 0.4, color: horn, name: "hookedUpperBeak",
   });
   b.part(new THREE.SphereGeometry(1, 8, 4), skinLight, {

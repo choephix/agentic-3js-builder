@@ -352,6 +352,7 @@ export default function build() {
     outline.push([...toLocal(rays[rays.length - 1].foot), "sharp"]);
     const vs = outline.map((p) => p[1]);
     const sail = b.extrude(outline, {
+      x: [0, 0, 1],
       at: piece.joint,
       bone: piece.joint,
       thickness: [sailThickness(Math.min(...vs)), sailThickness(Math.max(...vs))],
@@ -559,6 +560,7 @@ export default function build() {
       [-0.125, -0.07],
     ],
     {
+      x: [0, 0, 1],
       at: tail1,
       bone: tail1,
       thickness: [0.002, 0.009],
@@ -580,6 +582,7 @@ export default function build() {
         [-0.065, d * 0.022],
       ],
       {
+        x: [0, 0, 1],
         at: tail3,
         bone: tail3,
         thickness: d > 0 ? [0.007, 0.002] : [0.002, 0.007],
@@ -615,6 +618,7 @@ export default function build() {
     [-0.045, -0.028],
   ];
   const upper = b.extrude(upperLobe, {
+    x: [0, 0, 1],
     at: caudal,
     bone: caudal,
     thickness: [0.013, 0.002],
@@ -631,6 +635,7 @@ export default function build() {
     [-0.09, 0.005, -0.135, 0.085],
   ]);
   const lower = b.extrude(lowerLobe, {
+    x: [0, 0, 1],
     at: caudal,
     bone: caudal,
     thickness: [0.002, 0.012],

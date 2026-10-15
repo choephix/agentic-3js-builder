@@ -193,7 +193,7 @@ export default function build() {
       [-0.12, 0.58],
       [-0.18, 0.5],
     ],
-    { at: [0, 0, 0], thickness: 0.18, bevel: 0.02, color: DEEP, bone: frame },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.18, bevel: 0.02, color: DEEP, bone: frame },
   );
   // Crankcase side bolts, four a side.
   for (const s of [1, -1]) {
@@ -262,7 +262,7 @@ export default function build() {
       [-0.2, 0.5],
       [-0.45, 0.52],
     ],
-    { at: [0.17, 0, 0], thickness: 0.02, bevel: 0.006, color: PANEL, bone: frame },
+    { x: [0, 0, 1], at: [0.17, 0, 0], thickness: 0.02, bevel: 0.006, color: PANEL, bone: frame },
   );
   // Solo seat: bevelled graphite pad, and a tall sissy bar with a cross bar.
   b.extrude(
@@ -276,7 +276,7 @@ export default function build() {
       [-0.7, 0.76],
       [-0.8, 0.76],
     ],
-    { at: [0, 0, 0], thickness: 0.14, bevel: 0.03, smoothing: 1, color: SEAT, bone: frame },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.14, bevel: 0.03, smoothing: 1, color: SEAT, bone: frame },
   );
   for (const s of [1, -1]) {
     b.sweep(
@@ -349,6 +349,7 @@ export default function build() {
 
   // Front fender: one bevelled arch over the front tyre.
   b.extrude(arch(1.05, 0.28, 0.345, 0.31, 15, 165, 12), {
+    x: [0, 0, 1],
     at: [0, 0, 0],
     thickness: 0.03,
     bevel: 0.008,
@@ -362,6 +363,7 @@ export default function build() {
   // Rear fender: a bevelled arch on each side, rivets along it, and a tail light at its tip.
   for (const s of [1, -1]) {
     b.extrude(arch(-0.85, 0.32, 0.4, 0.37, 25, 155, 12), {
+      x: [0, 0, 1],
       at: [s * 0.175, 0, 0],
       thickness: 0.03,
       bevel: 0.008,

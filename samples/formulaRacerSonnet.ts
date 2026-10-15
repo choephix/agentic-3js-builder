@@ -232,7 +232,7 @@ export default function build() {
       [-1.0, 0.58],
       [-0.62, 0.66],
     ],
-    { at: [0, 0, 0], thickness: 0.025, bevel: 0.004, color: BLUE, bone: chassis, name: "fin" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.025, bevel: 0.004, color: BLUE, bone: chassis, name: "fin" },
   );
   b.extrude(
     [
@@ -245,7 +245,7 @@ export default function build() {
       [-1.0, 0.75],
       [-0.62, 0.75],
     ],
-    { at: [0, 0, 0], thickness: 0.032, bevel: 0.002, color: ORANGE, bone: chassis, name: "finTrim" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.032, bevel: 0.002, color: ORANGE, bone: chassis, name: "finTrim" },
   );
 
   // sidepods
@@ -328,7 +328,7 @@ export default function build() {
         [-2.0, 0.2],
         [-1.35, 0.016],
       ],
-      { at: [x, 0, 0], thickness: 0.012, color: CARBON, bone: chassis, name: "diffFin" },
+      { x: [0, 0, 1], at: [x, 0, 0], thickness: 0.012, color: CARBON, bone: chassis, name: "diffFin" },
     );
 
   // bargeboards + floor fences
@@ -346,7 +346,7 @@ export default function build() {
           [p.z0 - 0.5, p.top - 0.02],
           [p.z0 - 0.62, 0.06],
         ],
-        { at: [s * p.x, 0, 0], thickness: 0.014, bevel: 0.003, color: i === 0 ? ORANGE : CARBON, bone: chassis, name: `barge${s > 0 ? "L" : "R"}${i}` },
+        { x: [0, 0, 1], at: [s * p.x, 0, 0], thickness: 0.014, bevel: 0.003, color: i === 0 ? ORANGE : CARBON, bone: chassis, name: `barge${s > 0 ? "L" : "R"}${i}` },
       );
     });
     for (let i = 0; i < 5; i++)
@@ -357,7 +357,7 @@ export default function build() {
           [0.52 - i * 0.28, 0.1],
           [0.5 - i * 0.28, 0.06],
         ],
-        { at: [s * 0.775, 0, 0], thickness: 0.012, color: i % 2 ? CARBON : WHITE, bone: chassis, name: "fence" },
+        { x: [0, 0, 1], at: [s * 0.775, 0, 0], thickness: 0.012, color: i % 2 ? CARBON : WHITE, bone: chassis, name: "fence" },
       );
   }
 
@@ -520,7 +520,7 @@ export default function build() {
         [2.95, 0.05],
         [2.75, 0.03],
       ],
-      { at: [s * 0.94, 0, 0], thickness: 0.02, bevel: 0.005, color: wingPaint, bone: chassis, name: "fwEndplate" },
+      { x: [0, 0, 1], at: [s * 0.94, 0, 0], thickness: 0.02, bevel: 0.005, color: wingPaint, bone: chassis, name: "fwEndplate" },
     );
     plate(m([[0.9, 0], [1.02, 0.03], [1.02, 0.38], [0.9, 0.4]]), [0, 0.035, 2.55], 0, 0.012, CARBON, { name: "fwFoot" });
     // pylon
@@ -532,7 +532,7 @@ export default function build() {
         [2.6, 0.078],
         [2.42, 0.1],
       ],
-      { at: [s * 0.09, 0, 0], thickness: 0.026, bevel: 0.004, color: CARBON, bone: chassis, name: "fwPylon" },
+      { x: [0, 0, 1], at: [s * 0.09, 0, 0], thickness: 0.026, bevel: 0.004, color: CARBON, bone: chassis, name: "fwPylon" },
     );
     // dive-plane strakes
     plate(m([[0.1, 0], [0.34, 0.01], [0.34, 0.1], [0.1, 0.11]]), [0, 0.125, 2.72], -12, 0.01, YELLOW, { name: "fwStrake" });
@@ -549,7 +549,7 @@ export default function build() {
         [-2.64, 0.5],
         [-2.4, 0.46],
       ],
-      { at: [s * 0.525, 0, 0], thickness: 0.022, bevel: 0.005, color: wingPaint, bone: chassis, name: "rwEndplate" },
+      { x: [0, 0, 1], at: [s * 0.525, 0, 0], thickness: 0.022, bevel: 0.005, color: wingPaint, bone: chassis, name: "rwEndplate" },
     );
     b.part(new THREE.PlaneGeometry(0.2, 0.06), WHITE, {
       bone: chassis,
@@ -563,10 +563,11 @@ export default function build() {
     rod([s * 0.07, 0.36, -2.02], [s * 0.22, 0.65, -2.33], 0.016, CARBON, { name: "rwStrut" });
     rod([s * 0.45, 0.5, -2.2], [s * 0.45, 0.62, -2.3], 0.012, CARBON, { name: "rwBeamStrut", sides: 4 });
   }
-  b.extrude(foil(-2.2, 0.28, 0.5, 8, 0.03), { at: [0, 0, 0], thickness: 1.0, bevel: 0.004, color: CARBON, bone: chassis, name: "beamWing" });
-  b.extrude(foil(-2.22, 0.3, 0.6, 14, 0.036), { at: [0, 0, 0], thickness: 1.02, bevel: 0.005, color: BLUE, bone: chassis, name: "rwLower" });
-  b.extrude(foil(-2.3, 0.28, 0.72, 20, 0.032), { at: [0, 0, 0], thickness: 1.02, bevel: 0.005, color: WHITE, bone: chassis, name: "rwMid" });
+  b.extrude(foil(-2.2, 0.28, 0.5, 8, 0.03), { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.0, bevel: 0.004, color: CARBON, bone: chassis, name: "beamWing" });
+  b.extrude(foil(-2.22, 0.3, 0.6, 14, 0.036), { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.02, bevel: 0.005, color: BLUE, bone: chassis, name: "rwLower" });
+  b.extrude(foil(-2.3, 0.28, 0.72, 20, 0.032), { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.02, bevel: 0.005, color: WHITE, bone: chassis, name: "rwMid" });
   b.extrude(foil(-2.36, 0.27, 0.84, 26, 0.028), {
+    x: [0, 0, 1],
     at: [0, 0, 0],
     thickness: 1.02,
     bevel: 0.005,
@@ -584,7 +585,7 @@ export default function build() {
       [-2.14, 0.56],
       [-2.0, 0.5],
     ],
-    { at: [0, 0, 0], thickness: 0.04, bevel: 0.005, color: CARBON, bone: chassis, name: "rwPylon" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.04, bevel: 0.005, color: CARBON, bone: chassis, name: "rwPylon" },
   );
   // T-wing and monkey seat
   plate([[-0.3, 0], [0.3, 0], [0.26, 0.13], [-0.26, 0.13]], [0, 0.57, -1.9], -10, 0.012, WHITE, { name: "tWing" });
@@ -745,7 +746,7 @@ export default function build() {
           [0.62, 0.53],
           [0.5, 0.46],
         ],
-        { at: [s * x, 0.0, 0], thickness: 0.012, bevel: 0.003, color: i ? ORANGE : CARBON, bone: chassis, name: "vane" },
+        { x: [0, 0, 1], at: [s * x, 0.0, 0], thickness: 0.012, bevel: 0.003, color: i ? ORANGE : CARBON, bone: chassis, name: "vane" },
       ),
     );
     // wheel tethers

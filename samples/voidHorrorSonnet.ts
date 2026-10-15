@@ -615,7 +615,7 @@ export default function build() {
         [0.3, 0.3],
         [-0.3, 0.26],
       ],
-      { at: [s * 0.64, 1.88, 0.8], thickness: 0.12, bevel: 0.03, color: HC(210), bone: head, smoothing: 1 },
+      { x: [0, 0, 1], at: [s * 0.64, 1.88, 0.8], thickness: 0.12, bevel: 0.03, color: HC(210), bone: head, smoothing: 1 },
     );
     b.spike([s * 0.72, 1.95, 0.72], [s * 1, 0.1, -0.2], 0.4, 0.08, { color: BONE_DARK, bone: head, sides: 6 });
   }

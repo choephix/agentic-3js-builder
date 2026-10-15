@@ -111,7 +111,7 @@ export default function build() {
       [0, H, "sharp"],
       [-W / 2, H * 0.3],
     ];
-    b.extrude(pts, { at: on, thickness: 0.06 + 0.05 * k, bevel: 0.012, color: BLADE });
+    b.extrude(pts, { x: [0, 0, 1], at: on, thickness: 0.06 + 0.05 * k, bevel: 0.012, color: BLADE });
   };
 
   /** Frost crystals scattered over a surface: small cones standing along the surface normal. */

@@ -393,7 +393,7 @@ export default function build() {
   for (let i = 0; i < 7; i++) bx(hull, GRAPH, 0.34, 0.03, 0.07, 0, 3.15 - i * 0.012, -1.4 - i * 0.28);
   bx(hull, GRAPH, 0.5, 0.05, 0.22, 0, 3.0, -4.75);
   b.extrude([[0, 0], [0.34, 0], [0.16, 0.34], [0.06, 0.34]], { at: [0, 3.05, -2.3], x: [0, 0, -1], thickness: 0.03, bevel: 0.008, color: WHITE, bone: hull, name: "antennaDorsal" });
-  b.extrude([[0, 0], [0.3, 0], [0.12, 0.28], [0.04, 0.28]], { at: [0, 1.36, 0.3], y: [0, -1, 0], thickness: 0.03, bevel: 0.008, color: GREY, bone: hull, name: "antennaBelly" });
+  b.extrude([[0, 0], [0.3, 0], [0.12, 0.28], [0.04, 0.28]], { x: [0, 0, 1], at: [0, 1.36, 0.3], y: [0, -1, 0], thickness: 0.03, bevel: 0.008, color: GREY, bone: hull, name: "antennaBelly" });
   glow(b.part(new THREE.SphereGeometry(0.06, 8, 6), RED, { bone: hull, at: [0, 3.15, -0.15], name: "beacon" }), 1.4);
   glow(b.part(new THREE.SphereGeometry(0.05, 8, 6), RED, { bone: hull, at: [0, 1.32, -1.0], name: "beaconBelly" }), 1.4);
 

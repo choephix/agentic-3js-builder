@@ -243,6 +243,7 @@ export default function build() {
 
   // Fins.
   b.extrude(DORSAL, {
+    x: [0, 0, 1],
     at: [0, YC + 0.33, -0.1],
     thickness: [0.08, 0.02],
     bevel: 0.012,
@@ -251,6 +252,7 @@ export default function build() {
     bone: spine.joints[2],
   });
   b.extrude(DORSAL2, {
+    x: [0, 0, 1],
     at: [0, YC + 0.27, -1.15],
     thickness: [0.05, 0.015],
     bevel: 0.01,
@@ -259,6 +261,7 @@ export default function build() {
     bone: spine.joints[1],
   });
   b.extrude(ANAL, {
+    x: [0, 0, 1],
     at: [0, YC - 0.3, -1.65],
     thickness: 0.04,
     bevel: 0.008,
@@ -266,6 +269,7 @@ export default function build() {
     bone: spine.joints[0],
   });
   b.extrude(CAUDAL, {
+    x: [0, 0, 1],
     at: [0, YC, -1.8],
     thickness: 0.05,
     bevel: 0.012,

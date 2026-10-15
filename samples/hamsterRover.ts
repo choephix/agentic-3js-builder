@@ -296,7 +296,7 @@ export default function build() {
       [0.64, 0.34],
       [-0.62, 0.34],
     ],
-    { at: [0, 0, 0], thickness: 0.66, bevel: 0.03, detail: 0.34, color: MINT, bone: chassis, name: "hull" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.66, bevel: 0.03, detail: 0.34, color: MINT, bone: chassis, name: "hull" },
   );
   b.extrude(
     [
@@ -308,7 +308,7 @@ export default function build() {
       [0.69, 0.35],
       [0.66, 0.33],
     ],
-    { at: [0, 0, 0], thickness: 0.64, bevel: 0.03, detail: 0.34, color: BUTTER, bone: chassis, name: "hood" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.64, bevel: 0.03, detail: 0.34, color: BUTTER, bone: chassis, name: "hood" },
   );
   b.extrude(
     [
@@ -319,7 +319,7 @@ export default function build() {
       [-0.66, 0.58],
       [-0.66, 0.3],
     ],
-    { at: [0, 0, 0], thickness: 0.64, bevel: 0.03, detail: 0.34, color: MINT_D, bone: chassis, name: "cowl" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.64, bevel: 0.03, detail: 0.34, color: MINT_D, bone: chassis, name: "cowl" },
   );
   // seat cushion and the cockpit rim
   b.part(new THREE.BoxGeometry(0.5, 0.06, 0.5), CORAL, {

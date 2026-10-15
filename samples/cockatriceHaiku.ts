@@ -153,7 +153,7 @@ export default function build() {
     [0.055, 0.035],
     [0.065, 0],
   ];
-  b.extrude(comb, { at: [0, 0.8, 0.34], thickness: 0.04, bevel: 0.008, color: RED, bone: head });
+  b.extrude(comb, { x: [0, 0, 1], at: [0, 0.8, 0.34], thickness: 0.04, bevel: 0.008, color: RED, bone: head });
   // Beak: upper half on the skull, lower half on the jaw so it opens.
   b.sweep(bezier([0, 0.78, 0.4], [0, 0.79, 0.47], [0, 0.765, 0.53]), [0.03, 0.006], {
     bone: head,

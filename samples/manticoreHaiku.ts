@@ -204,7 +204,7 @@ export default function build() {
     [-0.09, 0.08],
   ];
   for (const s of [1, -1]) {
-    b.extrude(EAR, { at: [s * 0.16, 1.63, 1.0], thickness: 0.04, bevel: 0.008, smoothing: 1, color: MANE });
+    b.extrude(EAR, { x: [0, 0, 1], at: [s * 0.16, 1.63, 1.0], thickness: 0.04, bevel: 0.008, smoothing: 1, color: MANE });
   }
   // Mane: two rings of flame tufts, one round the head and one round the neck base, sweeping back.
   const maneHead = b.ring(head, { count: 30, radius: 0.36, tilt: -25 }).items;

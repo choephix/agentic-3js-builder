@@ -563,7 +563,7 @@ export default function build() {
       for (const x of [-0.7, -0.35, 0, 0.35, 0.7])
         b.extrude(
           [[0, 0], [0.17, 0], [0.17, -0.014], [0.07, -0.045], [0.025, -0.11], [0, -0.11]],
-          { at: [x, y - 0.0175, -0.4], thickness: 0.03, bevel: 0.004, smoothing: 1, color: W_D.x, bone: cur },
+          { x: [0, 0, 1], at: [x, y - 0.0175, -0.4], thickness: 0.03, bevel: 0.004, smoothing: 1, color: W_D.x, bone: cur },
         );
     }
     // cornice

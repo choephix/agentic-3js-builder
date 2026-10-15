@@ -679,7 +679,7 @@ export default function build() {
     [-4.3, 4.28, "sharp"],
     [-4.3, 2.9, "sharp"],
   ];
-  const finPart = b.extrude(fin, { at: [0, 0, 0], thickness: 0.11, bevel: 0.025, smoothing: 1, color: TEAL, bone: hull, name: "fin" });
+  const finPart = b.extrude(fin, { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.11, bevel: 0.025, smoothing: 1, color: TEAL, bone: hull, name: "fin" });
   const rudderJoint = b.joint("rudder", { parent: hull, at: [0, 3.6, -4.3], dir: [0, 1, 0], role: "hinge" });
   const rudderOut: OutlinePoint[] = [
     [-4.3, 4.28, "sharp"],
@@ -690,7 +690,7 @@ export default function build() {
     [-4.3, 3.04, "sharp"],
   ];
   const rudderPaint = paint((p) => (p.z < -4.97 || p.z > -4.36 ? GOLD : CREAM));
-  const rudder = b.extrude(rudderOut, { at: [0, 0, 0], thickness: [0.09, 0.05], bevel: 0.02, smoothing: 1, color: rudderPaint, bone: rudderJoint, name: "rudder" });
+  const rudder = b.extrude(rudderOut, { x: [0, 0, 1], at: [0, 0, 0], thickness: [0.09, 0.05], bevel: 0.02, smoothing: 1, color: rudderPaint, bone: rudderJoint, name: "rudder" });
   b.rod([0, 3.12, -4.3], [0, 4.2, -4.3], 0.02, { color: STEEL, bone: rudderJoint, sides: 5 });
   // fin gold leading edge strip, crests on fin and rudder
   b.sweep(polyline([[0, 2.97, -2.27], [0, 3.52, -2.72], [0, 3.97, -3.19], [0, 4.21, -3.59]]), 0.035, { color: GOLD, bone: hull, sides: 6, caps: "round", name: "finLeadingEdge" });
@@ -850,7 +850,7 @@ export default function build() {
         [-0.12, -0.0],
         [0.04, 0.05, "sharp"],
       ],
-      { at: [fx, 0, -2.98], thickness: 0.04, bevel: 0.008, smoothing: 1, color: CREAM, bone: wr, name: `waterRudderBlade${sideTag}` },
+      { x: [0, 0, 1], at: [fx, 0, -2.98], thickness: 0.04, bevel: 0.008, smoothing: 1, color: CREAM, bone: wr, name: `waterRudderBlade${sideTag}` },
     );
     b.rod([fx, 0.62, -2.98], [fx, 0.1, -2.98], 0.02, { color: STEEL, bone: wr, sides: 5 });
     // strut sets
@@ -907,7 +907,7 @@ export default function build() {
       [0.1, 0.2],
       [0, 0.08],
     ],
-    { at: [0, CY + 0.62, 3.12], thickness: 0.3, bevel: 0.03, smoothing: 1, color: TEAL, bone: hull, name: "cowlScoop" },
+    { x: [0, 0, 1], at: [0, CY + 0.62, 3.12], thickness: 0.3, bevel: 0.03, smoothing: 1, color: TEAL, bone: hull, name: "cowlScoop" },
   );
   b.part(box(0.22, 0.1, 0.03), DARK, { bone: hull, at: [0, CY + 0.7, 3.64], name: "scoopMouth" });
   b.part(box(0.28, 0.025, 0.06), GOLD, { bone: hull, at: [0, CY + 0.76, 3.64], name: "scoopBrow" });

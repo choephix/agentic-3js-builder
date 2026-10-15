@@ -206,10 +206,10 @@ export default function build() {
   // Shell: lower body, greenhouse, windscreen and side glass.
   b.loft(BODY, { section: "box", caps: "flat", bone: root, color: bodyPaint });
   b.loft(CABIN, { section: "box", caps: "flat", bone: root, color: cabinPaint });
-  b.extrude(WINDSCREEN, { at: [0, 0, 0], thickness: 1.36, color: glassPaint, bone: root });
+  b.extrude(WINDSCREEN, { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.36, color: glassPaint, bone: root });
   for (const s of [1, -1]) {
-    b.extrude(FRONT_WIN, { at: [s * 0.765, 0, 0], thickness: 0.02, color: glassPaint, bone: root });
-    b.extrude(REAR_WIN, { at: [s * 0.765, 0, 0], thickness: 0.02, color: glassPaint, bone: root });
+    b.extrude(FRONT_WIN, { x: [0, 0, 1], at: [s * 0.765, 0, 0], thickness: 0.02, color: glassPaint, bone: root });
+    b.extrude(REAR_WIN, { x: [0, 0, 1], at: [s * 0.765, 0, 0], thickness: 0.02, color: glassPaint, bone: root });
     b.rod([s * 0.745, 1.36, 0.14], [s * 0.735, 1.36, -0.92], 0.013, { bone: root, color: GOLD });
   }
 
@@ -225,14 +225,14 @@ export default function build() {
   }
 
   const hatch = b.joint("hatch", { parent: root, at: [0, 1.36, -0.98], dir: [0, -0.5, -1], role: "hinge" });
-  b.extrude(REAR_GLASS, { at: [0, 0, 0], thickness: 1.3, color: glassPaint, bone: hatch });
+  b.extrude(REAR_GLASS, { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.3, color: glassPaint, bone: hatch });
   b.rod([-0.66, 1.36, -1.0], [0.66, 1.36, -1.0], 0.02, { bone: hatch, color: GOLD });
 
   // Wheel-arch flares with gold lips.
   for (const z of [AXF, AXR]) {
     for (const s of [1, -1]) {
-      b.extrude(arch(z, 0.46, 0.37), { at: [s * 0.86, 0, 0], thickness: 0.18, bevel: 0.02, color: TRIM, bone: root });
-      b.extrude(arch(z, 0.48, 0.46), { at: [s * 0.955, 0, 0], thickness: 0.02, bevel: 0.005, color: GOLD, bone: root });
+      b.extrude(arch(z, 0.46, 0.37), { x: [0, 0, 1], at: [s * 0.86, 0, 0], thickness: 0.18, bevel: 0.02, color: TRIM, bone: root });
+      b.extrude(arch(z, 0.48, 0.46), { x: [0, 0, 1], at: [s * 0.955, 0, 0], thickness: 0.02, bevel: 0.005, color: GOLD, bone: root });
     }
   }
 
@@ -370,9 +370,9 @@ export default function build() {
   }
 
   // Rear wing on uprights, with endplates.
-  b.extrude(WING, { at: [0, 0, 0], thickness: 1.56, color: wingPaint, bone: root });
+  b.extrude(WING, { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.56, color: wingPaint, bone: root });
   for (const s of [1, -1]) {
-    b.extrude(WING_PLATE, { at: [s * 0.78, 0, 0], thickness: 0.02, color: TRIM, bone: root });
+    b.extrude(WING_PLATE, { x: [0, 0, 1], at: [s * 0.78, 0, 0], thickness: 0.02, color: TRIM, bone: root });
     b.rod([s * 0.5, 0.94, -1.84], [s * 0.5, 1.03, -1.84], 0.022, { bone: root, color: TRIM });
   }
 
@@ -398,7 +398,7 @@ export default function build() {
       [-0.78, 1.5],
       [-0.62, 1.5],
     ],
-    { at: [0, 0, 0], thickness: 0.03, color: TRIM, bone: root },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.03, color: TRIM, bone: root },
   );
   b.part(new THREE.BoxGeometry(1.36, 0.024, 0.03), GOLD, { bone: root, at: [0, 0.31, -2.0] });
   b.part(new THREE.BoxGeometry(1.5, 0.024, 0.03), GOLD, { bone: root, at: [0, 0.36, 2.0] });

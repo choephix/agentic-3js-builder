@@ -36,7 +36,7 @@ export default function build() {
   const bolt = (name: string, p: number[], dir: number[], bone: Joint = root) => b.part(new THREE.CylinderGeometry(0.022, 0.022, 0.012, 6), pale, { name, at: p, dir, bone });
 
   box("armoredFloor", [0, 0.43, 0], [1.6, 0.18, 3.42], dark);
-  b.extrude([[-1.87, 0.55], [-1.84, 0.99], [-1.33, 1.1], [0.95, 1.11], [1.82, 0.93], [1.91, 0.59]], { at: [0, 0, 0], thickness: 1.6, color: lacquer, bone: root, name: "hatchbackBody", bevel: 0.045 });
+  b.extrude([[-1.87, 0.55], [-1.84, 0.99], [-1.33, 1.1], [0.95, 1.11], [1.82, 0.93], [1.91, 0.59]], { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.6, color: lacquer, bone: root, name: "hatchbackBody", bevel: 0.045 });
   box("frontSplitter", [0, 0.4, 1.84], [1.87, 0.1, 0.32], navy);
   box("rearSkid", [0, 0.43, -1.87], [1.79, 0.12, 0.22], navy);
   box("frontGrille", [0, 0.68, 1.91], [1.25, 0.31, 0.05], dark);

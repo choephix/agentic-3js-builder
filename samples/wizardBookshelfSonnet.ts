@@ -710,7 +710,7 @@ export default function build() {
     [0.26, 0.17, 0.02],
     [-0.26, 0.17, 0.02],
   ] as const) {
-    glow(b.extrude(starOutline(sr), { at: [sx, 1.95 + sy, -0.142], thickness: 0.01, color: "#ffe27a", bone: base, name: "crownStar" }), 1);
+    glow(b.extrude(starOutline(sr), { x: [0, 0, 1], at: [sx, 1.95 + sy, -0.142], thickness: 0.01, color: "#ffe27a", bone: base, name: "crownStar" }), 1);
   }
   // crescent finial with a star in its horns
   const crescent: Array<[number, number] | [number, number, "sharp"]> = [];
@@ -733,9 +733,9 @@ export default function build() {
       crescent.push([x, y]);
     }
   }
-  b.extrude(crescent, { at: [0, 2.545, -0.17], thickness: 0.03, bevel: 0.006, color: GOLD, bone: base, name: "finialMoon" });
+  b.extrude(crescent, { x: [0, 0, 1], at: [0, 2.545, -0.17], thickness: 0.03, bevel: 0.006, color: GOLD, bone: base, name: "finialMoon" });
   put("finialBall", GOLD, ball(0.026, [0, 2.46, -0.17], [1, 1, 1], 8, 6));
-  glow(b.extrude(starOutline(0.032), { at: [0, 2.57, -0.17], thickness: 0.016, color: "#fff0a0", bone: base, name: "finialStar" }), 1.4);
+  glow(b.extrude(starOutline(0.032), { x: [0, 0, 1], at: [0, 2.57, -0.17], thickness: 0.016, color: "#fff0a0", bone: base, name: "finialStar" }), 1.4);
 
   // =============================================================================================================
   // CABINET DOORS (hinged)
@@ -773,7 +773,7 @@ export default function build() {
     // knob and star back-plate
     put("knob", GOLD, ball(0.02, [s * 0.05, 0.36, 0.285], [1, 1, 1], 8, 6), { bone: door });
     put("knob", GOLD, cyl(0.008, 0.008, 0.02, 6, [s * 0.05, 0.36, 0.272], [90, 0, 0]), { bone: door });
-    glow(b.extrude(starOutline(0.036), { at: [s * 0.05, 0.36, 0.2605], thickness: 0.006, color: "#ffe27a", bone: door, name: s > 0 ? "knobStarL" : "knobStarR" }), 0.7);
+    glow(b.extrude(starOutline(0.036), { x: [0, 0, 1], at: [s * 0.05, 0.36, 0.2605], thickness: 0.006, color: "#ffe27a", bone: door, name: s > 0 ? "knobStarL" : "knobStarR" }), 0.7);
   }
 
   // =============================================================================================================

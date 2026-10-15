@@ -412,12 +412,12 @@ export default function build() {
   for (const s of [1, -1]) {
     const side = s > 0 ? "L" : "R";
     const px = s * 0.7;
-    b.extrude(sideOutline(-1.74, -0.46, 0.34, 1.3, ZR), { at: [px, 0, 0], thickness: 0.07, bevel: 0.018, color: panelPaint, bone: chassis, name: `quarter${side}` });
-    b.extrude(sideOutline(0.44, 1.82, 0.34, 1.14, ZF), { at: [px, 0, 0], thickness: 0.07, bevel: 0.018, color: panelPaint, bone: chassis, name: `fenderPanel${side}` });
+    b.extrude(sideOutline(-1.74, -0.46, 0.34, 1.3, ZR), { x: [0, 0, 1], at: [px, 0, 0], thickness: 0.07, bevel: 0.018, color: panelPaint, bone: chassis, name: `quarter${side}` });
+    b.extrude(sideOutline(0.44, 1.82, 0.34, 1.14, ZF), { x: [0, 0, 1], at: [px, 0, 0], thickness: 0.07, bevel: 0.018, color: panelPaint, bone: chassis, name: `fenderPanel${side}` });
     for (const zc of [ZF, ZR]) {
       const outer = arcPts(zc, 0.64, -22, 202, 14);
       const inner = arcPts(zc, 0.555, 202, -22, 14);
-      b.extrude([...outer, ...inner], { at: [s * 0.82, 0, 0], thickness: 0.42, bevel: 0.05, color: flarePaint, bone: chassis, name: `flare${side}${zc > 0 ? "F" : "R"}` });
+      b.extrude([...outer, ...inner], { x: [0, 0, 1], at: [s * 0.82, 0, 0], thickness: 0.42, bevel: 0.05, color: flarePaint, bone: chassis, name: `flare${side}${zc > 0 ? "F" : "R"}` });
       // rivet ring on the flare lip
       for (let i = 0; i < 9; i++) {
         const a = (-8 + (i / 8) * 196) * D;

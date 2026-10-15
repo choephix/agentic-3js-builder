@@ -273,6 +273,7 @@ export default function build() {
   for (const s of [1, -1]) {
     const ear = s > 0 ? ears[0] : ears[1];
     b.extrude(earOutline, {
+      x: [0, 0, 1],
       at: [s * 0.62, 2.6, 1.02],
       thickness: 0.06,
       smoothing: 1,
@@ -280,6 +281,7 @@ export default function build() {
       bone: ear,
     });
     b.extrude(flapOutline, {
+      x: [0, 0, 1],
       at: [s * 0.7, 2.58, 1.02],
       thickness: 0.025,
       smoothing: 1,
@@ -325,7 +327,7 @@ export default function build() {
           [0.35, 0.25],
           [-0.35, 0.25],
         ],
-        { at: [s * 0.95, 2.6, 0.75], thickness: 0.05, smoothing: 0, color: HULL, bone: chest },
+        { x: [0, 0, 1], at: [s * 0.95, 2.6, 0.75], thickness: 0.05, smoothing: 0, color: HULL, bone: chest },
       ),
     );
     b.decal(skirts[skirts.length - 1], insignia, {

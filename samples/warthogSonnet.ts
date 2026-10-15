@@ -276,7 +276,7 @@ export default function build() {
           aim: [tx, 0, foot.z + 0.045],
           role: "digit",
         });
-        b.extrude(toeShape, { at: [tx, foot.y, foot.z], thickness: 0.031, bevel: 0.005, color: HOOF, bone: toe, name: "hoof" });
+        b.extrude(toeShape, { x: [0, 0, 1], at: [tx, foot.y, foot.z], thickness: 0.031, bevel: 0.005, color: HOOF, bone: toe, name: "hoof" });
       }
       b.part(new THREE.SphereGeometry(0.012, 5, 4), HOOF, {
         bone: hoofBone,

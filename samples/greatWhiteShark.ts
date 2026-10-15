@@ -94,17 +94,17 @@ export default function build() {
       at: f.pelvic, x: [s, -0.17, 0], y: [0, 0, 1], thickness: 0.04, bevel: 0.013, color: finPaint, bone: f.pelvic, name: `pelvicSkin${f.side}`,
     });
   }
-  b.extrude([[0.42, -0.03], [0.26, 0.18], [-0.08, 0.85, "sharp"], [-0.15, 0.48], [-0.30, 0.13], [-0.52, 0.01, "sharp"]], { at: dorsalJoint, thickness: [0.10, 0.008], bevel: 0.025, color: finPaint, bone: dorsalJoint, name: "primaryDorsal" });
+  b.extrude([[0.42, -0.03], [0.26, 0.18], [-0.08, 0.85, "sharp"], [-0.15, 0.48], [-0.30, 0.13], [-0.52, 0.01, "sharp"]], { x: [0, 0, 1], at: dorsalJoint, thickness: [0.10, 0.008], bevel: 0.025, color: finPaint, bone: dorsalJoint, name: "primaryDorsal" });
   for (const s of [-1, 1]) {
-    b.extrude([[0.19, 0.16], [-0.055, 0.69, "sharp"], [-0.09, 0.50], [0.05, 0.20]], { at: [s * 0.036, 1.64, 0.15], thickness: 0.005, color: C.cyan, bone: dorsalJoint, name: `dorsalStripe${s}` });
+    b.extrude([[0.19, 0.16], [-0.055, 0.69, "sharp"], [-0.09, 0.50], [0.05, 0.20]], { x: [0, 0, 1], at: [s * 0.036, 1.64, 0.15], thickness: 0.005, color: C.cyan, bone: dorsalJoint, name: `dorsalStripe${s}` });
   }
-  b.extrude([[0.15, 0], [0.04, 0.22, "sharp"], [-0.05, 0.08], [-0.20, 0]], { at: secondary, thickness: [0.055, 0.008], bevel: 0.015, color: finPaint, bone: secondary, name: "secondaryDorsalSkin" });
-  b.extrude([[0.13, 0], [-0.04, -0.22, "sharp"], [-0.21, -0.06], [-0.1, 0]], { at: anal, thickness: 0.038, bevel: 0.011, color: C.belly, bone: anal, name: "analFinSkin" });
+  b.extrude([[0.15, 0], [0.04, 0.22, "sharp"], [-0.05, 0.08], [-0.20, 0]], { x: [0, 0, 1], at: secondary, thickness: [0.055, 0.008], bevel: 0.015, color: finPaint, bone: secondary, name: "secondaryDorsalSkin" });
+  b.extrude([[0.13, 0], [-0.04, -0.22, "sharp"], [-0.21, -0.06], [-0.1, 0]], { x: [0, 0, 1], at: anal, thickness: 0.038, bevel: 0.011, color: C.belly, bone: anal, name: "analFinSkin" });
   // Heterocercal caudal fin: larger upper lobe, both swept aft, never a horizontal whale fluke.
-  b.extrude([[0.07, -0.05], [-0.08, 0.20], [-0.62, 1.04, "sharp"], [-0.54, 0.59], [-0.29, 0.16], [-0.36, 0], [-0.12, -0.08]], { at: caudalTop, thickness: [0.095, 0.008], bevel: 0.026, color: finPaint, bone: caudalTop, name: "caudalUpperSkin" });
-  b.extrude([[0.05, 0.06], [-0.12, -0.16], [-0.53, -0.85, "sharp"], [-0.43, -0.42], [-0.27, -0.07], [-0.36, 0]], { at: caudalBottom, thickness: 0.056, bevel: 0.019, color: finPaint, bone: caudalBottom, name: "caudalLowerSkin" });
+  b.extrude([[0.07, -0.05], [-0.08, 0.20], [-0.62, 1.04, "sharp"], [-0.54, 0.59], [-0.29, 0.16], [-0.36, 0], [-0.12, -0.08]], { x: [0, 0, 1], at: caudalTop, thickness: [0.095, 0.008], bevel: 0.026, color: finPaint, bone: caudalTop, name: "caudalUpperSkin" });
+  b.extrude([[0.05, 0.06], [-0.12, -0.16], [-0.53, -0.85, "sharp"], [-0.43, -0.42], [-0.27, -0.07], [-0.36, 0]], { x: [0, 0, 1], at: caudalBottom, thickness: 0.056, bevel: 0.019, color: finPaint, bone: caudalBottom, name: "caudalLowerSkin" });
   for (const s of [-1, 1]) {
-    b.extrude([[-0.17, 0.20], [-0.53, 0.84, "sharp"], [-0.43, 0.55], [-0.22, 0.18]], { at: [s * 0.025, 1.25, -2.03], thickness: 0.005, color: C.cyan, bone: caudalTop, name: `caudalStripe${s}` });
+    b.extrude([[-0.17, 0.20], [-0.53, 0.84, "sharp"], [-0.43, 0.55], [-0.22, 0.18]], { x: [0, 0, 1], at: [s * 0.025, 1.25, -2.03], thickness: 0.005, color: C.cyan, bone: caudalTop, name: `caudalStripe${s}` });
   }
   // Five deep gill slits and their bevel-like light lips follow the actual curved body.
   for (const s of [-1, 1]) {

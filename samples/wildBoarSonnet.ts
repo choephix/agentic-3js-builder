@@ -420,6 +420,7 @@ export default function build() {
           [-0.024, 0.04],
         ],
         {
+          x: [0, 0, 1],
           at: [foot[0] + k * 0.03, 0, foot[2] - 0.055],
           thickness: 0.056,
           bevel: 0.005,

@@ -381,6 +381,7 @@ export default function build() {
       [0.1, -0.05],
     ],
     {
+      x: [0, 0, 1],
       at: hl(0.08, 0.17),
       thickness: 0.06,
       bevel: 0.01,

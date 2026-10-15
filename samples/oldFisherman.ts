@@ -585,7 +585,7 @@ export default function build() {
         [0.318, 0.028],
         [-0.095, 0.03],
       ],
-      { at: [x0, 0, 0], thickness: 0.136, bevel: 0.004, bone: ankle, color: SOLE },
+      { x: [0, 0, 1], at: [x0, 0, 0], thickness: 0.136, bevel: 0.004, bone: ankle, color: SOLE },
     );
     const foot = b.extrude(
       [
@@ -598,7 +598,7 @@ export default function build() {
         [-0.07, 0.175],
         [-0.087, 0.09],
       ],
-      { at: [x0, 0, 0], thickness: 0.13, bevel: 0.012, bone: ankle, color: BOOT },
+      { x: [0, 0, 1], at: [x0, 0, 0], thickness: 0.13, bevel: 0.012, bone: ankle, color: BOOT },
     );
     b.decal(foot, T.grime, {
       at: [x0 + s * 0.2, 0.07, 0.11],

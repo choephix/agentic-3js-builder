@@ -357,7 +357,7 @@ export default function build() {
     ...archPoints(RZ),
   ];
   for (const { s, k } of sides)
-    X(sheet, { at: [s * 0.75, 0, 0], thickness: 0.18, bevel: 0.035, color: bodyPaint, name: `sheet${k}` });
+    X(sheet, { x: [0, 0, 1], at: [s * 0.75, 0, 0], thickness: 0.18, bevel: 0.035, color: bodyPaint, name: `sheet${k}` });
 
   // wheel-well back walls
   for (const { s, k } of sides)
@@ -366,6 +366,7 @@ export default function build() {
       [RZ, "R"],
     ] as const)
       X([...archPoints(zz), [zz - 0.52, ARCH_YB - 0.02], [zz + 0.52, ARCH_YB - 0.02]], {
+        x: [0, 0, 1],
         at: [s * 0.625, 0, 0],
         thickness: 0.04,
         color: NAVY,
@@ -407,7 +408,7 @@ export default function build() {
       [1.8, 0.78],
       [1.8, 0.3],
     ],
-    { at: [0, 0, 0], thickness: 1.24, color: NAVY, name: "engineBay" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.24, color: NAVY, name: "engineBay" },
   );
   X(
     [
@@ -416,7 +417,7 @@ export default function build() {
       [-1.45, 0.8],
       [-1.45, 0.3],
     ],
-    { at: [0, 0, 0], thickness: 1.3, bevel: 0.03, color: bodyPaint, name: "tail" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.3, bevel: 0.03, color: bodyPaint, name: "tail" },
   );
   // dash
   X(
@@ -427,7 +428,7 @@ export default function build() {
       [0.3, 0.7],
       [0.32, 0.4],
     ],
-    { at: [0, 0, 0], thickness: 1.28, bevel: 0.02, color: NAVY_L, name: "dash" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.28, bevel: 0.02, color: NAVY_L, name: "dash" },
   );
   X(
     [
@@ -436,7 +437,7 @@ export default function build() {
       [0.42, 1.08],
       [0.4, 0.94],
     ],
-    { at: [0.37, 0, 0], thickness: 0.36, bevel: 0.01, color: NAVY, name: "binnacle" },
+    { x: [0, 0, 1], at: [0.37, 0, 0], thickness: 0.36, bevel: 0.01, color: NAVY, name: "binnacle" },
   );
   P(new THREE.PlaneGeometry(0.2, 0.2), "#ffffff", {
     at: [0.37, 1.0, 0.425],
@@ -466,7 +467,7 @@ export default function build() {
       [-0.5, 0.56],
       [-0.5, 0.38],
     ],
-    { at: [0, 0, 0], thickness: 0.2, bevel: 0.02, color: NAVY, name: "tunnel" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 0.2, bevel: 0.02, color: NAVY, name: "tunnel" },
   );
   R([0, 0.6, 0.0], [0, 0.68, -0.12], 0.012, GOLD_D);
   P(new THREE.SphereGeometry(0.03, 6, 5), GOLD, { at: [0, 0.7, -0.14], name: "shiftKnob" });
@@ -652,6 +653,7 @@ export default function build() {
       }
       band[0] = [band[0][0], band[0][1], "sharp"];
       X(band as Pt[], {
+        x: [0, 0, 1],
         at: [s * 0.9, 0, 0],
         thickness: 0.14,
         bevel: 0.025,
@@ -864,7 +866,7 @@ export default function build() {
       [0, 0.085, "sharp"],
       [0, 0],
     ],
-    { at: [0, ROOF + 0.02, -0.5], thickness: [0.34, 0.28], bevel: 0.008, color: NAVY_L, name: "roofScoop" },
+    { x: [0, 0, 1], at: [0, ROOF + 0.02, -0.5], thickness: [0.34, 0.28], bevel: 0.008, color: NAVY_L, name: "roofScoop" },
   );
   glow(P(box(0.24, 0.04, 0.012), CYAN, { at: [0, ROOF + 0.06, -0.495], name: "scoopGlow" }), 1.4);
   P(new THREE.PlaneGeometry(0.34, 0.34), "#ffffff", {
@@ -993,7 +995,7 @@ export default function build() {
       [0.0, 0.1, "sharp"],
       [0.0, 0],
     ],
-    { bone: hood, at: [0, 0.94, 1.52], thickness: [0.3, 0.22], bevel: 0.008, color: NAVY_L, name: "hoodScoop" },
+    { x: [0, 0, 1], bone: hood, at: [0, 0.94, 1.52], thickness: [0.3, 0.22], bevel: 0.008, color: NAVY_L, name: "hoodScoop" },
   );
   glow(b.part(box(0.2, 0.05, 0.014), CYAN, { bone: hood, at: [0, 0.975, 1.53], name: "hoodInlet" }), 1.4);
   // hood vents: louvres each side
@@ -1032,7 +1034,7 @@ export default function build() {
         [-0.54, 1.03],
         [-0.5, 0.42],
       ],
-      { bone: dj, at: [xo, 0, 0], thickness: 0.06, bevel: 0.015, color: bodyPaint, name: `door${k}` },
+      { x: [0, 0, 1], bone: dj, at: [xo, 0, 0], thickness: 0.06, bevel: 0.015, color: bodyPaint, name: `door${k}` },
     );
     // belt trim and window frame rail
     b.rod([s * 0.9, 1.035, 0.54], [s * 0.9, 1.04, -0.53], 0.016, { bone: dj, color: GOLD });
@@ -1060,7 +1062,7 @@ export default function build() {
         [-0.52, 0.08, "sharp"],
         [0.4, 0.06],
       ],
-      { bone: dj, at: [s * 0.9, 0.38, 0], thickness: 0.03, bevel: 0.006, color: NAVY, name: "skirt" },
+      { x: [0, 0, 1], bone: dj, at: [s * 0.9, 0.38, 0], thickness: 0.03, bevel: 0.006, color: NAVY, name: "skirt" },
     );
     glow(b.rod([s * 0.92, 0.395, 0.45], [s * 0.92, 0.395, -0.4], 0.01, { bone: dj, color: CYAN }), 1.4);
     // mirror
@@ -1169,7 +1171,7 @@ export default function build() {
         [-1.94, 1.5],
         [-1.84, 1.5],
       ],
-      { at: [s * 0.62, 0, 0], thickness: 0.055, bevel: 0.01, color: GOLD, name: "pylon" },
+      { x: [0, 0, 1], at: [s * 0.62, 0, 0], thickness: 0.055, bevel: 0.01, color: GOLD, name: "pylon" },
     );
   X(
     [
@@ -1180,7 +1182,7 @@ export default function build() {
       [-0.1, -0.015],
       [0.12, -0.02],
     ],
-    { at: [0, WING.y, WING.z], thickness: 1.92, bevel: 0.006, color: wingPaint, name: "wingPlane" },
+    { x: [0, 0, 1], at: [0, WING.y, WING.z], thickness: 1.92, bevel: 0.006, color: wingPaint, name: "wingPlane" },
   );
   b.extrude(
     [
@@ -1189,7 +1191,7 @@ export default function build() {
       [-0.22, -0.06],
       [0.0, -0.075],
     ],
-    { bone: wingFlap, at: [0, WING.y + 0.065, WING.z - 0.1], thickness: 1.92, bevel: 0.004, color: wingPaint, name: "wingFlap" },
+    { x: [0, 0, 1], bone: wingFlap, at: [0, WING.y + 0.065, WING.z - 0.1], thickness: 1.92, bevel: 0.004, color: wingPaint, name: "wingFlap" },
   );
   for (const { s } of sides) {
     X(
@@ -1202,7 +1204,7 @@ export default function build() {
         [-0.34, 0.0],
         [-0.26, -0.14],
       ],
-      { at: [s * 0.97, WING.y, WING.z], thickness: 0.03, bevel: 0.008, color: paint((_p, n, c) => (Math.abs(n.x) < 0.5 ? GOLD : c[0] < -0.1 && c[1] > 0.08 ? MAG : c[1] < -0.05 ? NAVY : BLUE)), name: "endBlade" },
+      { x: [0, 0, 1], at: [s * 0.97, WING.y, WING.z], thickness: 0.03, bevel: 0.008, color: paint((_p, n, c) => (Math.abs(n.x) < 0.5 ? GOLD : c[0] < -0.1 && c[1] > 0.08 ? MAG : c[1] < -0.05 ? NAVY : BLUE)), name: "endBlade" },
     );
     glow(R([s * 0.99, WING.y + 0.1, WING.z + 0.1], [s * 0.99, WING.y + 0.27, WING.z - 0.2], 0.01, CYAN), 1.5);
     glow(R([s * 0.99, WING.y - 0.02, WING.z + 0.33], [s * 0.99, WING.y + 0.08, WING.z + 0.15], 0.01, CYAN), 1.3);
@@ -1251,7 +1253,7 @@ export default function build() {
         [0.92, 1.02],
         [1.2, 0.98],
       ],
-      { at: [s * 0.8, 0, 0], thickness: 0.03, bevel: 0.006, color: GOLD, name: "fenderBlade" },
+      { x: [0, 0, 1], at: [s * 0.8, 0, 0], thickness: 0.03, bevel: 0.006, color: GOLD, name: "fenderBlade" },
     );
     glow(R([s * 0.8, 1.045, 1.24], [s * 0.8, 1.25, 0.74], 0.008, CYAN), 1.4);
     P(new THREE.PlaneGeometry(0.22, 0.22), "#ffffff", { at: [s * 0.847, 0.66, -1.84], dir: [s, 0, 0], axis: "z", texture: VENT, name: "quarterVent" });

@@ -529,6 +529,7 @@ export default function build() {
   ];
   for (const s of [1, -1])
     b.extrude(wing, {
+      x: [0, 0, 1],
       bone,
       at: A(bx + s * 0.07, 1.12, bz),
       thickness: 0.012,

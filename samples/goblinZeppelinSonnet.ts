@@ -509,17 +509,19 @@ export default function build() {
   // fixed fins
   b.extrude(
     [[-3.3, 1.1], [-4.4, 3.0], [-5.2, 3.5], [-5.75, 3.5], [-5.75, 0.35], [-5.0, 0.55], [-4.0, 0.9]],
-    { at: [0, ENV_Y, 0], thickness: finThick, bevel: 0.02, color: finPaint, bone: hull, name: "finTop" },
+    { x: [0, 0, 1], at: [0, ENV_Y, 0], thickness: finThick, bevel: 0.02, color: finPaint, bone: hull, name: "finTop" },
   );
   b.extrude(
     [[-3.3, -1.0], [-4.3, -2.2], [-5.2, -2.55], [-5.75, -2.55], [-5.75, -0.35], [-4.4, -0.6]],
-    { at: [0, ENV_Y, 0], thickness: finThick, bevel: 0.02, color: finPaint, bone: hull, name: "finBottom" },
+    { x: [0, 0, 1], at: [0, ENV_Y, 0], thickness: finThick, bevel: 0.02, color: finPaint, bone: hull, name: "finBottom" },
   );
   // rudder
   b.extrude([[-5.75, 3.5], [-6.45, 3.4], [-6.7, 2.4], [-6.6, 0.9], [-5.75, 0.35]], {
+    x: [0, 0, 1],
     at: [0, ENV_Y, 0], thickness: 0.08, bevel: 0.02, color: finPaint, bone: rudder, name: "rudderTop",
   });
   b.extrude([[-5.75, -2.55], [-6.45, -2.4], [-6.6, -1.6], [-6.4, -0.6], [-5.75, -0.35]], {
+    x: [0, 0, 1],
     at: [0, ENV_Y, 0], thickness: 0.08, bevel: 0.02, color: finPaint, bone: rudder, name: "rudderBottom",
   });
   for (const [a, c] of [

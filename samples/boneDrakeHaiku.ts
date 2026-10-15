@@ -137,6 +137,7 @@ export default function build() {
   ] as const) {
     const p = spine.at(t).at;
     b.extrude(plate(k), {
+      x: [0, 0, 1],
       at: [p.x, p.y + bodyR(t)[1] * 0.5, p.z],
       thickness: 0.07,
       bevel: 0.015,
@@ -303,7 +304,7 @@ export default function build() {
     const cuffLoop = b.surface(armTube).loop(wing.joints[1], { lift: 0.02 });
     const cuff = b.sweep(cuffLoop, 0.03, { color: IRON });
     rivets(cuffLoop, b.surface(cuff), 10, 0.02);
-    b.extrude(plate(0.8), { at: [s * 0.75, 3.1, 0.9], thickness: 0.07, bevel: 0.015, smoothing: 1, color: plateP });
+    b.extrude(plate(0.8), { x: [0, 0, 1], at: [s * 0.75, 3.1, 0.9], thickness: 0.07, bevel: 0.015, smoothing: 1, color: plateP });
 
     const f2 = b.chain(
       "finger2" + L,
@@ -429,6 +430,7 @@ export default function build() {
     [0.06, -0.12],
   ];
   b.extrude(blade, {
+    x: [0, 0, 1],
     at: [0, 0.62, -5.65],
     thickness: 0.08,
     bevel: 0.02,

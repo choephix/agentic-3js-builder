@@ -268,6 +268,7 @@ export default function build() {
   // side panels: extruded profile, ink outline, gold trims, filigree decal
   for (const s of [1, -1]) {
     const panel = b.extrude(PANEL, {
+      x: [0, 0, 1],
       at: [s * 0.2, 0, 0],
       thickness: 0.06,
       bevel: 0.015,

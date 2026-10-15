@@ -314,6 +314,7 @@ export default function build() {
       role: "wing",
     });
     b.extrude(WING, {
+      x: [0, 0, 1],
       at: [s * 0.036, 0.74, 0.53],
       thickness: 0.012,
       bevel: 0.004,
@@ -323,7 +324,7 @@ export default function build() {
     });
   }
   const birdTail = b.joint("birdTail", { parent: birdSpine.joints[0], at: [0, 0.7, 0.44], dir: [0, 0.2, -1], role: "tail" });
-  b.extrude(TAIL, { at: [0, 0.7, 0.44], thickness: 0.01, bevel: 0.003, smoothing: 1, color: birdTailPaint, bone: birdTail });
+  b.extrude(TAIL, { x: [0, 0, 1], at: [0, 0.7, 0.44], thickness: 0.01, bevel: 0.003, smoothing: 1, color: birdTailPaint, bone: birdTail });
 
   // Bird feet stand on the head surface: each ankle and toe is the first hit straight down.
   const surfaceY = (x: number, z: number) => {

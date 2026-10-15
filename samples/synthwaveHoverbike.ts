@@ -212,7 +212,7 @@ export default function build(): THREE.Object3D {
         [0.03, 0.16, "sharp"],
         [-0.03, 0.16, "sharp"],
       ],
-      { at: [s * 0.14, 0.9, -1.02], thickness: 0.02, color: BLACK, bone: f },
+      { x: [0, 0, 1], at: [s * 0.14, 0.9, -1.02], thickness: 0.02, color: BLACK, bone: f },
     );
   }
 
@@ -225,7 +225,7 @@ export default function build(): THREE.Object3D {
         [-0.42, 0.3, "sharp"],
         [-0.1, 0.12],
       ],
-      { at: [s * 0.16, 0.92, -0.68], thickness: 0.025, bevel: 0.005, color: BLACK, bone: chassis },
+      { x: [0, 0, 1], at: [s * 0.16, 0.92, -0.68], thickness: 0.025, bevel: 0.005, color: BLACK, bone: chassis },
     );
     glow(b.rod([s * 0.16, 0.96, -1.0], [s * 0.16, 1.2, -1.07], 0.01, { bone: chassis, color: CYAN }), 1.8);
   }

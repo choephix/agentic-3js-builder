@@ -513,6 +513,7 @@ export default function build() {
     ] as OutlinePoint[]
   ).map((pt) => (pt.length === 3 ? [pt[0] * 1.3, pt[1] * 1.3, pt[2]] : [pt[0] * 1.3, pt[1] * 1.3]) as OutlinePoint);
   b.extrude(dorsalOutline, {
+    x: [0, 0, 1],
     at: [0, dorsalTop - 0.05, dorsalZ],
     thickness: 0.15,
     bevel: 0.03,

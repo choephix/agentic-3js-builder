@@ -23,8 +23,11 @@ export type ExtrudeOptions = Tags & {
   color?: Fill;
   /** Outline origin in model space. Default bone: `at`'s bones when it came from something built, else the nearest joint. */
   at: PointInput;
-  /** Model-space direction of the outline's +x (default [0, 0, 1], forward: a side-view drawing). */
-  x?: DirectionInput;
+  /**
+   * Model-space direction of the outline's +x. Required: name the way the drawing runs, e.g. [0, 0, 1] for a side view
+   * drawn front-to-back, [1, 0, 0] for a front view drawn across the model's left.
+   */
+  x: DirectionInput;
   /** Model-space direction of the outline's +y, made square to `x` (default [0, 1, 0], up). */
   y?: DirectionInput;
   /**
@@ -274,6 +277,10 @@ function toWorld(local: number[], at: Vector3, quat: Quaternion) {
  */
 export function extrude(ctx: Ctx, points: OutlineInput, options: ExtrudeOptions) {
   const outline = prepare("extrude()", checked("extrude()", points), options.smoothing);
+  if (options.x === undefined)
+    throw new Error(
+      "extrude(): x is required: the model-space direction the outline's +x runs along, e.g. [0, 0, 1] (forward, a side-view drawing) or [1, 0, 0] (the model's left, a front-view drawing)",
+    );
   const given = options.thickness ?? options.depth;
   if (typeof given !== "number" && !(Array.isArray(given) && given.length === 2))
     throw new Error(
@@ -338,7 +345,7 @@ export function extrude(ctx: Ctx, points: OutlineInput, options: ExtrudeOptions)
   }
 
   const at = toPoint(options.at, "extrude()");
-  const xDir = toDirection(options.x ?? [0, 0, 1], "extrude()").normalize();
+  const xDir = toDirection(options.x, "extrude()").normalize();
   const yRaw = toDirection(options.y ?? [0, 1, 0], "extrude()");
   const yDir = yRaw.addScaledVector(xDir, -yRaw.dot(xDir));
   if (yDir.length() < 1e-6) throw new Error("extrude(): x and y point the same way");

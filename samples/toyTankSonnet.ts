@@ -212,6 +212,7 @@ const hullOutline: OutlinePoint[] = [
   [-1.7, 0.98],
 ];
 const hullBody = b.extrude(hullOutline, {
+  x: [0, 0, 1],
   at: [0, 0, 0],
   thickness: 1.56,
   bevel: 0.05,
@@ -354,6 +355,7 @@ for (const s of [1, -1]) {
 
   // fender
   b.extrude(fenderOutline, {
+    x: [0, 0, 1],
     at: [s * 1.02, 0, 0],
     thickness: 0.62,
     bevel: 0.02,
@@ -373,6 +375,7 @@ for (const s of [1, -1]) {
   ];
   for (let i = 0; i <= 16; i++) valance.push([1.1 - 0.1 - i * 0.175, i % 2 === 0 ? 1.03 : 0.93]);
   b.extrude(valance, {
+    x: [0, 0, 1],
     at: [s * 1.31, 0, 0],
     thickness: 0.04,
     bevel: 0.01,

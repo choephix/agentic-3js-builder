@@ -385,6 +385,7 @@ export default function build() {
       [-0.16, 0],
     ],
     {
+      x: [0, 0, 1],
       at: [0, Y0 + 0.02, -0.9],
       bone: tail1,
       thickness: [0.03, 0.006],

@@ -128,7 +128,7 @@ export default function build() {
       [-2.3, 0.7],
       [-2.36, 0.3],
     ],
-    { at: [0, 0, 0], thickness: [1.92, 1.66], bevel: 0.05, smoothing: 1, color: bodyPaint, bone: hull, name: "hull" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: [1.92, 1.66], bevel: 0.05, smoothing: 1, color: bodyPaint, bone: hull, name: "hull" },
   );
 
   // Greenhouse: fastback glass with a body-coloured roof and pillars.
@@ -142,7 +142,7 @@ export default function build() {
       [-1.62, 0.84],
       [-1.64, 0.7],
     ],
-    { at: [0, 0, 0], thickness: [1.66, 1.2], bevel: 0.035, smoothing: 1, color: cabinPaint, bone: hull, name: "cabin" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: [1.66, 1.2], bevel: 0.035, smoothing: 1, color: cabinPaint, bone: hull, name: "cabin" },
   );
   for (const s of [1, -1]) {
     b.part(new THREE.BoxGeometry(0.025, 0.02, 0.8).translate(s * 0.58, 1.3, -0.2), TRIM, { bone: hull, at: [0, 0, 0] });
@@ -159,7 +159,7 @@ export default function build() {
         [-2.22, 0.86],
         [-0.85, 0.86],
       ],
-      { at: [s * 0.95, 0, 0], thickness: 0.1, bevel: 0.03, smoothing: 1, color: bodyPaint, bone: hull, name: `haunchRear${side}` },
+      { x: [0, 0, 1], at: [s * 0.95, 0, 0], thickness: 0.1, bevel: 0.03, smoothing: 1, color: bodyPaint, bone: hull, name: `haunchRear${side}` },
     );
     b.extrude(
       [
@@ -169,7 +169,7 @@ export default function build() {
         [2.05, 0.82],
         [1.0, 0.82],
       ],
-      { at: [s * 0.93, 0, 0], thickness: 0.1, bevel: 0.03, smoothing: 1, color: bodyPaint, bone: hull, name: `haunchFront${side}` },
+      { x: [0, 0, 1], at: [s * 0.93, 0, 0], thickness: 0.1, bevel: 0.03, smoothing: 1, color: bodyPaint, bone: hull, name: `haunchFront${side}` },
     );
     glow(b.part(new THREE.BoxGeometry(0.025, 0.05, 0.07).translate(s * 0.99, 0.6, 2.12), ORANGE, { bone: hull, at: [0, 0, 0] }), 1.2);
     glow(b.part(new THREE.BoxGeometry(0.025, 0.05, 0.07).translate(s * 1.01, 0.6, -2.2), RED, { bone: hull, at: [0, 0, 0] }), 1.2);
@@ -187,7 +187,7 @@ export default function build() {
         [-0.22, 0.8],
         [0.86, 0.8],
       ],
-      { at: [s * 0.93, 0, 0], thickness: 0.06, bevel: 0.012, smoothing: 1, color: bodyPaint, bone: j, name: `door${side}` },
+      { x: [0, 0, 1], at: [s * 0.93, 0, 0], thickness: 0.06, bevel: 0.012, smoothing: 1, color: bodyPaint, bone: j, name: `door${side}` },
     );
     b.decal(door, sigil, { at: [s * 0.97, 0.66, 0.3], dir: [s, 0, 0], size: [0.22, 0.22] });
     b.part(new THREE.BoxGeometry(0.03, 0.025, 0.14).translate(s * 0.975, 0.62, -0.06), DARK, { bone: j, at: [0, 0, 0] });
@@ -234,7 +234,7 @@ export default function build() {
       [1.0, 0.84],
       [1.0, 0.72],
     ],
-    { at: [0, 0, 0], thickness: 1.46, bevel: 0.02, smoothing: 1, color: hoodPaint, bone: hood, name: "hood" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.46, bevel: 0.02, smoothing: 1, color: hoodPaint, bone: hood, name: "hood" },
   );
   b.frustumBox([0, 0.83, 1.9], [0, 0.83, 1.46], [0.5, 0.1], [0.42, 0.08], { bone: hood, color: DARK });
   b.part(new THREE.BoxGeometry(0.46, 0.02, 0.03).translate(0, 0.885, 1.9), TRIM, { bone: hood, at: [0, 0, 0] });
@@ -247,7 +247,7 @@ export default function build() {
       [-2.3, 1.04],
       [-1.92, 1.08],
     ],
-    { at: [0, 0, 0], thickness: 1.3, bevel: 0.01, color: DARK, bone: wing, name: "wing" },
+    { x: [0, 0, 1], at: [0, 0, 0], thickness: 1.3, bevel: 0.01, color: DARK, bone: wing, name: "wing" },
   );
   for (const s of [1, -1]) {
     b.part(new THREE.BoxGeometry(0.05, 0.22, 0.08).translate(s * 0.42, 0.9, -2.05), DARK, { bone: wing, at: [0, 0, 0] });
