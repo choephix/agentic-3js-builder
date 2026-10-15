@@ -16,8 +16,19 @@ const BASE = join(ROOT, "bakeoff");
 const EXPERIMENT2 = process.argv.includes("--experiment2");
 const APP = process.argv.includes("--app");
 const SINGLE = process.argv.includes("--single");
+const SINGLE_REF = process.argv.includes("--ref");
+if (SINGLE_REF && (!SINGLE || process.argv.includes("--craft"))) throw Error("--ref requires --single without --craft");
 const SINGLE_ARM = process.argv.includes("--craft") ? "craft" : "single";
-const SINGLE_ROUND = "r19" + SINGLE_ARM;
+const SINGLE_EFFORT = process.argv.includes("--effort") ? process.argv[process.argv.indexOf("--effort") + 1] : "high";
+if (SINGLE && !["low", "medium", "high"].includes(SINGLE_EFFORT)) throw Error("--effort must be low, medium or high");
+const SINGLE_WORKERS = process.argv.includes("--workers")
+  ? Number(process.argv[process.argv.indexOf("--workers") + 1])
+  : 16;
+if (SINGLE && !(SINGLE_WORKERS >= 1 && SINGLE_WORKERS <= 64)) throw Error("--workers must be 1–64");
+const SINGLE_ROUND = SINGLE_REF
+  ? "r21ref" + SINGLE_EFFORT
+  : (SINGLE_EFFORT === "high" ? "r19" : "r20" + (SINGLE_EFFORT === "medium" ? "med" : "low")) + SINGLE_ARM;
+const SINGLE_CAP = SINGLE_REF ? 40 : SINGLE_EFFORT === "high" ? 60 : 90;
 const APP_ROUND = process.argv.includes("--app-round")
   ? process.argv[process.argv.indexOf("--app-round") + 1]
   : "r18app";
@@ -375,7 +386,7 @@ function anthropicRequest(context: any) {
     max_tokens: 120000,
     stream: false,
     thinking: { type: "adaptive" },
-    output_config: { effort: "high" },
+    output_config: { effort: SINGLE ? SINGLE_EFFORT : "high" },
     system: context.systemPrompt.map((t) => ({ type: "text", text: t })),
     messages,
     tools: context.tools.map((t) => ({ name: t.name, description: t.description, input_schema: t.parameters })),
@@ -682,8 +693,13 @@ async function checkedAndRepaired(round: string) {
     if (!(await guard(round + " repair " + turn))) return false;
     if (SINGLE) {
       const crashes = [...latest.values()].filter((entry) => entry.hasCode && entry.check?.rendered === false).length;
-      if (singleSpend() + crashes * 1.8 > 60) {
-        save(join(INPUT, "stopped.json"), { reason: "$60 repair budget guard", round, turn, spent: singleSpend() });
+      if (singleSpend() + crashes * 1.8 > SINGLE_CAP) {
+        save(join(INPUT, "stopped.json"), {
+          reason: "$" + SINGLE_CAP + " repair budget guard",
+          round,
+          turn,
+          spent: singleSpend(),
+        });
         return false;
       }
     }
@@ -697,7 +713,7 @@ async function checkedAndRepaired(round: string) {
       "--max-tokens",
       "120000",
       "--effort",
-      "high",
+      SINGLE ? SINGLE_EFFORT : "high",
       "--concurrency",
       "2",
       "--system-prompt",
@@ -821,6 +837,72 @@ async function prepareApp() {
 
 /** Reuse the frozen app prefix verbatim, then prefill the lookups its live loop usually makes. */
 async function prepareSingle() {
+  if (SINGLE_REF || SINGLE_EFFORT !== "high") {
+    const frozen = join(BASE, "r19" + SINGLE_ARM + "-inputs");
+    const manifest = json(join(frozen, "manifest.json"));
+    for (const name of [
+      "manifest.json",
+      "pitches.json",
+      ...manifest.subjects.map((subject: { id: string }) => subject.id + ".json"),
+    ])
+      save(join(INPUT, name), json(join(frozen, name)));
+    const references: Record<string, { variant: string; file: string; path: string; sandboxPath: string }> = {};
+    if (SINGLE_REF) {
+      const neutral: Record<string, true> = {
+        wizardBookshelf: true,
+        grayWolf: true,
+        phoenix: true,
+        chopperMotorbike: true,
+        frostAxe: true,
+        dwarfRifleman: true,
+        desertOasisDiorama: true,
+        pixelDungeonProps: true,
+        africanElephant: true,
+        floatingIslandDiorama: true,
+        qilin: true,
+      };
+      const refs = json(join(BASE, "refs-manifest.json"));
+      for (const subject of manifest.subjects) {
+        const input = json(join(INPUT, subject.id + ".json"));
+        const variant = neutral[subject.id] ? "neutral" : "styled";
+        const image = refs.entries.find((entry: { slug: string }) => entry.slug === subject.id)[variant];
+        const sandboxPath = input.workspace + "/refs/" + subject.id + ".png";
+        references[subject.id] = { variant, file: image.file, path: image.path, sandboxPath };
+        const final = input.context.messages.pop();
+        input.context.messages.push(
+          {
+            role: "assistant",
+            timestamp: 0,
+            content: [{ type: "toolCall", id: "single_reference", name: "read", arguments: { path: sandboxPath } }],
+          },
+          {
+            role: "toolResult",
+            timestamp: 0,
+            toolCallId: "single_reference",
+            toolName: "read",
+            isError: false,
+            content: [
+              { type: "text", text: "Reference sheet for this build." },
+              {
+                type: "image",
+                source: { type: "base64", media_type: "image/png", data: readFileSync(image.path).toString("base64") },
+              },
+            ],
+          },
+          final,
+        );
+        final.content[0].text +=
+          " The reference sheet shows the intended design: match its silhouette, proportions, palette and signature features; the brief's staging still applies.";
+        input.files.push(sandboxPath);
+        input.reference = references[subject.id];
+        save(join(INPUT, subject.id + ".json"), input);
+      }
+    }
+    save(join(INPUT, "manifest.json"), { ...manifest, effort: SINGLE_EFFORT, ...(SINGLE_REF ? { references } : {}) });
+    text(join(ROOT, "scratch/bakeoff/craft3.md"), shapedSystem);
+    console.log("Reused " + manifest.subjects.length + " frozen r19 " + SINGLE_ARM + " single-run inputs.");
+    return;
+  }
   const source = join(BASE, "app-inputs");
   const manifest = json(join(source, "manifest.json"));
   const lookups = [
@@ -908,7 +990,14 @@ async function prepareSingle() {
 
 function singleSpend() {
   return readdirSync(join(BASE, "rounds"))
-    .filter((name) => /^r19(single|craft)(fix2?)?$/.test(name))
+    .filter((name) =>
+      (SINGLE_REF
+        ? /^r21ref(low|medium|high)(fix2?)?$/
+        : SINGLE_EFFORT === "high"
+          ? /^r19(single|craft)(fix2?)?$/
+          : /^r20(med|low)(single|craft)(fix2?)?$/
+      ).test(name),
+    )
     .flatMap((round) => {
       const runs = join(BASE, "rounds", round, "runs");
       return existsSync(runs)
@@ -963,7 +1052,7 @@ async function runSingle() {
     id: round,
     started: existsSync(join(dir, "round.json")) ? json(join(dir, "round.json")).started : new Date().toISOString(),
     model: MODEL,
-    effort: "high",
+    effort: SINGLE_EFFORT,
     maxTokens: 120000,
     maxExtraCalls: 0,
     subjects: manifest.subjects,
@@ -977,6 +1066,7 @@ async function runSingle() {
     ],
     source: manifest.source,
     lookups: manifest.lookups,
+    ...(SINGLE_REF ? { references: manifest.references } : {}),
     toolPolicy: manifest.toolPolicy,
   });
   text(join(dir, "prompts", SINGLE_ARM + ".md"), manifest.systemPrompt.join("\n\n"));
@@ -1023,10 +1113,10 @@ async function runSingle() {
         paused = "Anthropic 5 Hour above 50%";
         break;
       }
-      while (!paused && active > 0 && singleSpend() + (active + 1) * 1.8 > 58)
+      while (!paused && active > 0 && singleSpend() + (active + 1) * 1.8 > SINGLE_CAP - 2)
         await new Promise<void>((resolve) => budgetWaiters.push(resolve));
-      if (paused || singleSpend() + (active + 1) * 1.8 > 58) {
-        paused ||= "Budget guard: $60 total cap, including repair reserve";
+      if (paused || singleSpend() + (active + 1) * 1.8 > SINGLE_CAP - 2) {
+        paused ||= "Budget guard: $" + SINGLE_CAP + " total cap, including repair reserve";
         break;
       }
       const sent = Date.now();
@@ -1080,7 +1170,7 @@ async function runSingle() {
         level: "rich",
         pitch: subject.rich,
         model: MODEL,
-        effort: "high",
+        effort: SINGLE_EFFORT,
         started: new Date(started).toISOString(),
         wallMs: Date.now() - started,
         status: reply.status,
@@ -1117,7 +1207,7 @@ async function runSingle() {
   }
   try {
     await Promise.all(
-      Array.from({ length: 8 }, async () => {
+      Array.from({ length: SINGLE_WORKERS }, async () => {
         while (queue.length && !paused) {
           const subject = queue.shift();
           if (subject) await build(subject);

@@ -20,8 +20,14 @@ COLUMNS = [("final", "Sonnet agent · final"), ("draft", "Sonnet agent · first 
            ("sonnet", "Sonnet · single-run"), ("astra", "Astra · single-run"), ("haiku", "Haiku · single-run"),
            ("app", "Sonnet · agent framing (app, multi-call · ~17 calls)"),
            ("single", "Sonnet · agent framing, single-run"),
-           ("craft", "Sonnet · agent framing + craft, single-run")]
-API_MODELS = ["sonnet", "astra", "haiku", "app", "single", "craft"]
+           ("craft", "Sonnet · agent framing + craft, single-run"),
+           ("single-med", "Sonnet · agent framing, single-run · medium"),
+           ("craft-med", "Sonnet · agent framing + craft, single-run · medium"),
+           ("single-low", "Sonnet · agent framing, single-run · low"),
+           ("craft-low", "Sonnet · agent framing + craft, single-run · low"),
+           ("ref-low", "Sonnet · agent framing + reference image, single-run · low")]
+API_MODELS = ["sonnet", "astra", "haiku", "app", "single", "craft",
+              "single-med", "craft-med", "single-low", "craft-low", "ref-low"]
 ISSUES = ["face/eyes", "floating/broken parts", "bland colour", "too little detail", "goofy"]
 GRADES = ["as good", "a bit worse", "far worse"]
 
@@ -127,10 +133,13 @@ def tile_data(subject, column, base):
             return data
         return {"prefix": prefix, "meta": "cost unavailable · model time unavailable",
                 "source": ROUNDS / round_for_slug(slug) / "builds" / f"{slug}.ts"}
+    effort_rounds = {"single-med": "r20medsingle", "craft-med": "r20medcraft",
+                     "single-low": "r20lowsingle", "craft-low": "r20lowcraft", "ref-low": "r21reflow"}
     round_bases = (("r18appb", "r18app") if column == "app"
                    else ("r19" + column,) if column in ("single", "craft")
+                   else (effort_rounds[column],) if column in effort_rounds
                    else (base + ("" if column == "sonnet" else column),))
-    arm = column if column in ("app", "single", "craft") else "craft3"
+    arm = "single" if column == "ref-low" else column.split("-")[0] if column in effort_rounds else column if column in ("app", "single", "craft") else "craft3"
     for round_base in round_bases:
         for suffix in ("fix2", "fix", ""):
             entry = next((item for item in entries(round_base + suffix)
@@ -167,20 +176,47 @@ def cell(subject, column, title, base):
         detail = f'<span class="error">{html.escape(error[0])}</span>' if error else ""
         picture = f'<div class="picture empty {status}"><strong>{status}</strong>{detail}</div>'
     meta = data["meta"] + " · " + (module_caption(data["source"]) if data.get("source") else "module size unavailable")
+    reference = ""
+    if column == "ref-low":
+        ref = load(ROOT / "bakeoff/r21reflow-inputs/manifest.json", {}).get("references", {}).get(subject)
+        if ref:
+            url = html.escape("http://axalon:8080/nilo/agentic-3js-builder/refs/" + ref["file"], quote=True)
+            reference = (f'<a class="reference" href="{url}" target="_blank" rel="noopener">'
+                         f'<img loading="lazy" src="{url}" alt="{html.escape(subject, quote=True)} reference sheet">'
+                         f'Reference · {html.escape(ref["variant"])}</a>')
     verdict = ""
     if column in API_MODELS:
-        verdict = (f'<div class="verdict" data-model="{column}"><div class="control-label">Compared with the agent final</div>'
-                   f'<div class="grades" role="group" aria-label="{title} grade">{buttons(GRADES, "data-grade")}</div>'
-                   f'<div class="control-label issue-label">Issues <span>(optional)</span></div>'
-                   f'<div class="issues" role="group" aria-label="{title} issues">{buttons(ISSUES, "data-issue")}</div></div>')
-    return f'<div class="tile {column}" data-column="{column}"><h4>{title}</h4>{picture}<p class="meta">{html.escape(meta)}</p>{verdict}</div>'
+        verdict = (f'<div class="verdict" data-model="{column}">'
+                   f'<div class="grades" role="group" aria-label="{title} compared with the agent final" title="Compared with the agent final">{buttons(GRADES, "data-grade")}</div>'
+                   f'<div class="issues" role="group" aria-label="{title} issues" title="Issues (optional)">{buttons(ISSUES, "data-issue")}</div></div>')
+    return f'<div class="tile {column}" data-column="{column}"><h4 title="{html.escape(title, quote=True)}">{title}</h4>{picture}<p class="meta">{html.escape(meta)}{reference}</p>{verdict}</div>'
 
 
 STYLE = """
-:root{color-scheme:light}*{box-sizing:border-box}body{margin:0;background:#f5f6f3;color:#202b29;font:14px/1.5 system-ui,sans-serif}main,.bar-inner{max-width:1600px;margin:auto;padding:20px 24px}h1{font-size:28px;line-height:1.2;margin:6px 0 14px;letter-spacing:-.6px}.intro{max-width:1000px;color:#56615c;margin:10px 0}strong{color:#253b31}.eyebrow{text-transform:uppercase;letter-spacing:1.8px;font-size:11px;color:#60776c;font-weight:700}button{font:inherit;cursor:pointer;border:1px solid #c9d1cb;background:#fff;color:#34483e;border-radius:7px;padding:8px 12px;min-height:42px;line-height:1.2}button:hover{border-color:#688e79;background:#edf4ef}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid #267a54;outline-offset:3px}button[aria-pressed=true]{background:#245d42;color:white;border-color:#245d42}.bar{position:sticky;top:0;background:#f5f6f3f5;backdrop-filter:blur(12px);z-index:5;border-bottom:1px solid #d7ded6}.bar-inner{padding-top:10px;padding-bottom:10px;display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center}.views{display:flex;flex-wrap:wrap;gap:5px;align-items:center}.view-label{font-size:12px;font-weight:700;margin-right:3px}.save-tools{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}#verdict-count{font-size:12px;color:#526258}#copy{font-weight:650;background:#e5eee8;border-color:#b2c7b9}#save-status{width:100%;font-size:12px;color:#8c382f}#save-status:empty{display:none}#export{width:100%;padding:10px;border:1px solid #b6c9ba;border-radius:8px;background:#fff}#export p{margin:0 0 6px}textarea{width:100%;min-height:160px;font:12px/1.5 ui-monospace,monospace;padding:10px;border:1px solid #9aae9c;border-radius:4px}h2{font-size:22px;letter-spacing:-.3px;margin:36px 0 0}.section-note{color:#637067;margin:5px 0 20px}.comparison-row{border-top:1px solid #d4dcd3;padding:22px 0 28px}.row-heading{margin-bottom:14px;display:flex;gap:10px 20px;align-items:baseline;flex-wrap:wrap}h3{font-size:17px;margin:0}.brief{font-size:12px;color:#5a685e;display:flex;gap:4px 18px;flex-wrap:wrap}.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}.tile{min-width:0}h4{margin:0 0 9px;font-size:13px;font-weight:650;color:#415749}.picture{display:block;width:100%;aspect-ratio:1;background:#e2e5e5;border-radius:9px;overflow:hidden}.picture img{display:block;width:100%;height:100%;object-fit:contain}.final .picture{outline:3px solid #339064;outline-offset:0}.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;text-align:center;color:#84908c;gap:10px}.empty strong{font-weight:500;color:inherit;font-size:20px}.empty.crashed{color:#916059;background:#ece5e3}.error{font-size:12px;overflow-wrap:anywhere;max-width:100%}.meta{font-size:11px;color:#647267;min-height:34px;margin:9px 0 13px;overflow-wrap:anywhere}.control-label{font-size:11px;font-weight:650;color:#526456;margin:0 0 7px}.grades,.issues{display:flex;flex-wrap:wrap;gap:5px}.grades button{font-size:12px;padding:8px 10px}.issues button{font-size:11px;min-height:36px;padding:7px 10px;border-radius:20px}.issue-label{margin-top:12px}.issue-label span{font-weight:400;color:#78857c}.better{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin:18px 0 0;font-size:12px}.better-label{font-weight:650;margin-right:2px}.better button{min-height:38px;font-size:12px}.scroll-hint{display:none}[hidden]{display:none!important}
-@media(max-width:950px){.tiles{gap:12px}.grades button{padding:8px}.save-tools{margin-left:0}}
-@media(max-width:700px){main,.bar-inner{padding-left:14px;padding-right:14px}h1{font-size:25px}.bar-inner{gap:9px}.views{gap:4px}.views button{font-size:11px;padding:8px;min-height:38px}.view-label{display:none}.save-tools{width:100%;justify-content:space-between;gap:5px}.save-tools button{font-size:12px;min-height:38px}.tiles{display:flex;overflow-x:auto;scroll-snap-type:x proximity;gap:14px;padding:4px 4px 14px;margin:0 -4px}.tile{flex:0 0 285px;scroll-snap-align:start}.row-heading{gap:5px}.brief{gap:3px}.scroll-hint{display:block;color:#738477;font-size:11px;margin:0 0 10px}.better{justify-content:flex-start}.comparison-row{padding-top:18px}h2{font-size:20px}.intro{font-size:13px}.meta{min-height:34px}.issues button{min-height:40px}}
-.columns{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;width:100%}.columns label{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;min-height:32px}.columns input{width:17px;height:17px;accent-color:#267a54}.tile.off{display:none}
+:root{color-scheme:light dark;--bg:#f6f5f2;--bg2:#fbfbf9;--fg:#23282a;--muted:#6b7370;--faint:#99a19d;--line:#dfe1dc;--btn:#fff;--btn-fg:#3b4440;--btn-hover:#eef1ec;--accent:#2a7a53;--accent-fg:#fff;--final:#39a06e;--tile:#e7e8e4;--bad:#8e3b31;--bad-bg:#f1e7e4}
+@media(prefers-color-scheme:dark){:root{--bg:#191b1a;--bg2:#202322;--fg:#e4e6e2;--muted:#9aa29d;--faint:#6d7571;--line:#2f3432;--btn:#262a29;--btn-fg:#cfd5d0;--btn-hover:#303634;--accent:#49a878;--accent-fg:#0f1a14;--final:#4cbd84;--tile:#2a2e2c;--bad:#e09a8f;--bad-bg:#3a2724}}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;background:var(--bg);color:var(--fg);font:13px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+main,.bar-inner{max-width:1680px;margin:auto;padding:10px 18px}.eyebrow{text-transform:uppercase;letter-spacing:1.4px;font-size:10px;color:var(--muted);font-weight:700}h1{font-size:20px;line-height:1.2;margin:2px 0 6px;letter-spacing:-.4px}
+details.intro{max-width:1000px;color:var(--muted);font-size:12px;margin:0 0 6px}details.intro summary{cursor:pointer;color:var(--fg);font-weight:600;font-size:12px;list-style:none;display:inline-flex;align-items:center;gap:6px}details.intro summary::-webkit-details-marker{display:none}details.intro summary::before{content:"";width:0;height:0;border:4px solid transparent;border-left:6px solid var(--muted);transition:transform .12s}details.intro[open] summary::before{transform:rotate(90deg)}details.intro p{margin:6px 0}strong{color:var(--fg);font-weight:600}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--btn);color:var(--btn-fg);border-radius:5px;padding:0 9px;height:26px;line-height:1;white-space:nowrap}button:hover{border-color:var(--accent);background:var(--btn-hover)}button:focus-visible,a:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}button[aria-pressed=true]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.bar{position:sticky;top:0;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);z-index:5;border-bottom:1px solid var(--line)}.bar-inner{padding:6px 18px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}.views{display:flex;flex-wrap:wrap;gap:3px;align-items:center}.view-label{font-size:11px;font-weight:700;color:var(--muted);margin-right:4px;text-transform:uppercase;letter-spacing:.6px}.views button{font-size:12px}
+.columns{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;flex:1 1 auto}.columns label{display:inline-flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;height:24px;color:var(--btn-fg)}.columns input{width:14px;height:14px;margin:0;accent-color:var(--accent)}.tile.off{display:none}
+.save-tools{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}#verdict-count{font-size:11px;color:var(--muted)}#copy{font-weight:600;border-color:var(--accent);color:var(--accent)}#save-status{width:100%;font-size:11px;color:var(--bad)}#save-status:empty{display:none}#export{width:100%;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg2)}#export p{margin:0 0 6px}textarea{width:100%;min-height:140px;font:11px/1.5 ui-monospace,monospace;padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--fg)}
+h2{font-size:15px;letter-spacing:-.2px;margin:18px 0 0}.section-note{color:var(--muted);font-size:12px;margin:1px 0 6px}
+.comparison-row{border-top:1px solid var(--line);padding:10px 0 12px}.row-heading{margin-bottom:6px;display:flex;gap:4px 14px;align-items:baseline;flex-wrap:wrap}h3{font-size:14px;margin:0;font-weight:650}.brief{font-size:11.5px;color:var(--muted);display:flex;gap:2px 12px;flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.tile{min-width:0;display:grid;grid-row:span 4;grid-template-rows:subgrid;row-gap:5px;align-content:start}
+h4{margin:0;font-size:11px;line-height:1.25;font-weight:600;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;align-self:end}.final h4{color:var(--final)}
+.picture{display:block;width:100%;aspect-ratio:1;background:var(--tile);border-radius:6px;overflow:hidden}.picture img{display:block;width:100%;height:100%;object-fit:contain}a.picture:hover{box-shadow:0 0 0 2px var(--accent)}.final .picture{box-shadow:0 0 0 2px var(--final)}.final .picture:hover{box-shadow:0 0 0 2px var(--final),0 0 0 4px color-mix(in srgb,var(--final) 35%,transparent)}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;text-align:center;color:var(--faint);gap:6px}.empty strong{font-weight:500;color:inherit;font-size:14px}.empty.crashed{color:var(--bad);background:var(--bad-bg)}.error{font-size:10.5px;overflow-wrap:anywhere;max-width:100%;line-height:1.3}
+.meta{font-size:10.5px;line-height:1.35;color:var(--muted);margin:0;overflow-wrap:anywhere}
+.reference{display:flex;align-items:center;gap:6px;margin-top:5px;color:var(--muted);text-decoration:none}.reference img{width:48px;height:48px;object-fit:contain;border-radius:4px;background:var(--tile)}.reference:hover{color:var(--accent)}
+.verdict{display:flex;flex-direction:column;gap:4px;container-type:inline-size}.grades{display:grid;grid-template-columns:repeat(3,1fr)}.grades button{font-size:10.5px;padding:0 2px;height:24px;border-radius:0;overflow:hidden;text-overflow:ellipsis;margin-left:-1px}.grades button:first-child{border-radius:5px 0 0 5px;margin-left:0}.grades button:last-child{border-radius:0 5px 5px 0}.grades button[aria-pressed=true]{position:relative;z-index:1}
+@container (max-width:190px){.grades{grid-template-columns:1fr}.grades button{margin:-1px 0 0;height:22px}.grades button:first-child{border-radius:5px 5px 0 0;margin-top:0}.grades button:last-child{border-radius:0 0 5px 5px}}
+.issues{display:flex;flex-wrap:wrap;gap:3px}.issues button{font-size:10px;height:20px;padding:0 7px;border-radius:10px;color:var(--muted)}.issues button[aria-pressed=true]{color:var(--accent-fg)}
+.better{display:flex;gap:4px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin:8px 0 0;font-size:11px}.better-label{font-weight:600;color:var(--muted);margin-right:4px}.better button{font-size:11px;height:24px}
+.scroll-hint{display:none}[hidden]{display:none!important}
+@media(max-width:1100px){.tiles{gap:6px}.grades button{font-size:10px}.issues button{padding:0 5px}}
+@media(max-width:700px){main,.bar-inner{padding-left:10px;padding-right:10px}h1{font-size:18px}.bar-inner{gap:5px 10px}.views button{font-size:11px;padding:0 7px}.view-label{display:none}.columns{flex-wrap:nowrap;overflow-x:auto;width:100%;gap:0 12px;padding-bottom:2px}.columns label{font-size:11px;height:22px;white-space:nowrap;flex:0 0 auto}.save-tools{width:100%;justify-content:space-between;gap:5px}.tiles{display:flex;overflow-x:auto;scroll-snap-type:x proximity;gap:8px;padding:2px 2px 8px;margin:0 -2px}.tile{flex:0 0 240px;scroll-snap-align:start;display:flex;flex-direction:column;gap:5px}h4{align-self:stretch}.row-heading{gap:3px 10px}.scroll-hint{display:block;color:var(--faint);font-size:10.5px;margin:0 0 4px}.better{justify-content:flex-start}h2{font-size:14px}.grades button{height:28px}.issues button{height:24px}}
 """.replace("repeat(5,", f"repeat(var(--cols,{len(COLUMNS)}),")
 
 SCRIPT = """
@@ -188,7 +224,7 @@ const storageKey='agentic-3js-builder-gap2-verdicts-v1';
 const rows=[...document.querySelectorAll('.comparison-row')];
 const grades=['as good','a bit worse','far worse'];
 const issues=['face/eyes','floating/broken parts','bland colour','too little detail','goofy'];
-const models=['sonnet','astra','haiku','app','single','craft'];
+const models=['sonnet','astra','haiku','app','single','craft','single-med','craft-med','single-low','craft-low','ref-low'];
 const empty=()=>({...Object.fromEntries(models.map(model=>[model,{grade:null,issues:[]}])),better:null});
 let stored={},verdicts={};
 const notice=document.getElementById('save-status');
@@ -200,7 +236,7 @@ for(const row of rows){
    if(grades.includes(saved[model]?.grade))value[model].grade=saved[model].grade;
    if(Array.isArray(saved[model]?.issues))value[model].issues=issues.filter(issue=>saved[model].issues.includes(issue));
   }
-  if(['Sonnet','Astra','Haiku','App','Single','Craft','same'].includes(saved.better))value.better=saved.better;
+  if(['Sonnet','Astra','Haiku','App','Single','Craft','Single medium','Craft medium','Single low','Craft low','Ref low','same'].includes(saved.better))value.better=saved.better;
  }
  verdicts[row.dataset.subject]=value;
 }
@@ -295,9 +331,10 @@ def main(publish=None):
     output.parent.mkdir(parents=True, exist_ok=True)
     out = ['<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
            '<title>Agent vs single-run and multi-call · phase 2</title><style>', STYLE, f'</style></head><body data-view-ext="{SITE["view"]}">',
-           '<main><div class="eyebrow">The single-run gap / phase 2</div><h1>Same briefs. Eight builds. Your verdict.</h1>',
-           '<p class="intro"><strong>Sonnet agent · final</strong> is the finished sample from the agentic session (green outline). <strong>Sonnet agent · first draft</strong> is that session’s first file write, with crash repairs where needed. <strong>Sonnet · single-run</strong>, <strong>Astra · single-run</strong> and <strong>Haiku · single-run</strong> each use one API request and one reply, with no tools. <strong>Sonnet · agent framing (app, multi-call · ~17 calls)</strong> uses an agent system/brief template and synthetic current-doc reads, with a write/edit/typecheck loop. <strong>Sonnet · agent framing, single-run</strong> uses that same frozen prefix plus prefilled orientation and SDK lookups, and extracts the complete write from one reply without returning tool results. <strong>Sonnet · agent framing + craft, single-run</strong> adds craft guidance as another pre-read file. Untick columns to hide them; the choice is remembered.</p>',
-           '<p class="intro">There are <strong>no visual feedback turns</strong>: up to two separate repair calls only send back the crash error and do not change a single-run build’s label. Replies without a file write are failed single runs; at most one fresh redraw is allowed. Captions distinguish generation, redraw and repair requests and include their entire cost/time; agent finals show session time. First-draft generation cost/time were not recorded. Click a picture for its contact sheet. Refresh to see newly completed builds.</p></main>',
+           '<main><div class="eyebrow">The single-run gap / phase 2</div><h1>Same briefs. Thirteen builds. Your verdict.</h1>',
+           '<details class="intro"><summary>What the columns are</summary><p><strong>Sonnet agent · final</strong> is the finished sample from the agentic session (green outline). <strong>Sonnet agent · first draft</strong> is that session’s first file write, with crash repairs where needed. <strong>Sonnet · single-run</strong>, <strong>Astra · single-run</strong> and <strong>Haiku · single-run</strong> each use one API request and one reply, with no tools. <strong>Sonnet · agent framing (app, multi-call · ~17 calls)</strong> uses an agent system/brief template and synthetic current-doc reads, with a write/edit/typecheck loop. <strong>Sonnet · agent framing, single-run</strong> uses that same frozen prefix plus prefilled orientation and SDK lookups, and extracts the complete write from one reply without returning tool results. <strong>Sonnet · agent framing + craft, single-run</strong> adds craft guidance as another pre-read file. These original two columns use high effort; the four following columns repeat their frozen inputs at medium and low effort, with no other request changes. Untick columns to hide them; the choice is remembered.</p>',
+           '<p><strong>Sonnet · agent framing + reference image, single-run · low</strong> keeps the frozen plain single-run framing and brief, adds a prefilled reference-image read, and asks the model to match that design while retaining the brief’s staging. Its caption thumbnail links to the exact neutral/styled sheet the model received.</p>',
+           '<p>There are <strong>no visual feedback turns</strong>: up to two separate repair calls only send back the crash error and do not change a single-run build’s label. Replies without a file write are failed single runs; at most one fresh redraw is allowed. Captions distinguish generation, redraw and repair requests and include their entire cost/time; agent finals show session time. First-draft generation cost/time were not recorded. Under each API build, the three buttons grade it against the agent final; the chips tag issues (optional). Click a picture for its contact sheet. Refresh to see newly completed builds.</p></details></main>',
            '<div class="bar"><div class="bar-inner"><div class="views" role="group" aria-label="Image view"><span class="view-label">View</span>']
     for view, label in VIEWS:
         out.append(f'<button type="button" data-view="{view}" aria-pressed="{str(view == "three-quarter").lower()}">{label}</button>')
@@ -313,9 +350,9 @@ def main(publish=None):
         for subject in load(ROOT / "bakeoff" / pitches)["subjects"]:
             subject_id = subject["id"]
             brief = "".join(f'<span>{html.escape(line)}</span>' for line in subject["rich"].splitlines())
-            out.append(f'<article class="comparison-row" data-subject="{subject_id}"><div class="row-heading"><h3>{subject_id}</h3><div class="brief">{brief}</div></div><p class="scroll-hint">Swipe the builds left to compare all eight →</p><div class="tiles">')
+            out.append(f'<article class="comparison-row" data-subject="{subject_id}"><div class="row-heading"><h3>{subject_id}</h3><div class="brief">{brief}</div></div><p class="scroll-hint">Swipe the builds left to compare all thirteen →</p><div class="tiles">')
             out.extend(cell(subject_id, column, title, base) for column, title in COLUMNS)
-            out.append('</div><div class="better" role="group" aria-label="Better API build"><span class="better-label">Better API build:</span>' + buttons(["Sonnet", "Astra", "Haiku", "App", "Single", "Craft", "same"], "data-better") + '</div></article>')
+            out.append('</div><div class="better" role="group" aria-label="Better API build"><span class="better-label">Better API build:</span>' + buttons(["Sonnet", "Astra", "Haiku", "App", "Single", "Craft", "Single medium", "Craft medium", "Single low", "Craft low", "Ref low", "same"], "data-better") + '</div></article>')
         out.append('</section>')
     out.extend(['</main><script>', SCRIPT, '</script></body></html>'])
     with tempfile.NamedTemporaryFile(mode="w", dir=output.parent, suffix=".html", delete=False) as handle:

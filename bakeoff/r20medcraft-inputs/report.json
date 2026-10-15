@@ -1,0 +1,139 @@
+{
+  "arm": {
+    "arm": "craft",
+    "effort": "medium",
+    "round": "r20medcraft",
+    "builds": 28,
+    "generation_requests": 28,
+    "redraws": 0,
+    "no_write_replies": 0,
+    "successful_replies_without_write": 0,
+    "api_errors": [],
+    "median_bytes": 21029.0,
+    "median_final_module_bytes": 21029.0,
+    "median_code_kib": 20.5361328125,
+    "median_final_module_kb": 20.5361328125,
+    "median_output_tokens": 43234.5,
+    "median_estimated_code_tokens": 9383.5,
+    "median_estimated_reasoning_share": 0.7995578413787878,
+    "median_generation_cost_usd": 0.66126185,
+    "median_generation_seconds": 328.067,
+    "initial_crashes": [
+      "monsterTruck"
+    ],
+    "repair_calls": 1,
+    "rendered": 28,
+    "failed": [],
+    "generation_spend_usd": 19.1794893,
+    "repair_spend_usd": 0.036158,
+    "total_spend_usd": 19.2156473,
+    "median_pipeline_cost_usd": 0.66126185,
+    "median_pipeline_seconds": 328.067,
+    "token_estimation": "Code tokens estimated with tiktoken 0.14.0 o200k_base on each initial generated import-wired module; reasoning/non-code share = 1 - estimated code tokens / recorded generation output tokens, per subject. The residual includes non-code output/overhead and is not an exact provider reasoning-token count. Output/time include fresh redraws; pipeline costs include repairs. Comparison module bytes/KB use the final selected module (KB = 1024 bytes). Same estimator applied to r19 baselines."
+  },
+  "packaging": {
+    "source": "bakeoff/app-inputs/<subject>.json, unchanged system/brief/original pre-read messages and tool definitions",
+    "prefilled_orientation": [
+      "bash pwd",
+      "bash ls"
+    ],
+    "prefilled_reads": [
+      "src/index.ts",
+      "src/sweep.ts",
+      "src/parts.ts",
+      "src/cards.ts",
+      "src/sugar.ts",
+      "src/builder.ts",
+      "kits/glow.md",
+      "kits/glow.ts"
+    ],
+    "craft_only_read": "bakeoff/prompts/craft3.md",
+    "added_user_message": "One reply only; write complete samples/<subject>.ts; no tool results, rendering or typechecks in generation; replaces two-render requirement only.",
+    "settings": {
+      "model": "anthropic/claude-sonnet-5-5",
+      "effort": "medium",
+      "thinking": "adaptive",
+      "max_tokens": 120000,
+      "tool_choice": "automatic (not forced)"
+    },
+    "extraction": "Last write tool_use with the exact samples/<subject>.ts suffix and string content; imports rewired as app/replay builds. No tools executed and no continuation request.",
+    "frozen_input_copy": "bakeoff/r19craft-inputs/<subject>.json"
+  },
+  "request_parity": {
+    "subjects": 28,
+    "requests": 28,
+    "differences_other_than_effort": []
+  },
+  "pilot": "Low effort both-arm koala/treasureHoard generation-only pilots completed before this round.",
+  "execution": {
+    "initial_workers": 16,
+    "resumed_workers": null,
+    "original_four_arm_spend_cap_usd": 70,
+    "orchestrator_revised_four_arm_spend_cap_usd": 90,
+    "usage_pause_above_percent": 50,
+    "max_observed_five_hour_usage_percent": 24,
+    "usage_checks_recorded": 131,
+    "render_check": "npm run bakeoff -- check <round> --skip-typecheck --concurrency 2",
+    "repairs": "At most two repair-only calls per crashed subject, same effort; all needed only fix, no fix2."
+  },
+  "browser": {
+    "url": "http://axalon:8080/nilo/agentic-3js-builder/gap2/",
+    "shared_chrome": "127.0.0.1:9333",
+    "rows": 28,
+    "columns": 13,
+    "images_loaded": 391,
+    "broken_images": 0,
+    "effort_column_images_loaded": 112,
+    "each_effort_column_images_loaded": 28,
+    "page_errors": 0,
+    "console_errors": 0,
+    "saved_verdicts_unchanged": true
+  },
+  "four_arms_recorded_total_spend_usd": 68.1294248,
+  "baseline_same_estimator": {
+    "arm": "craft",
+    "effort": "high",
+    "round": "r19craft",
+    "builds": 28,
+    "generation_requests": 28,
+    "redraws": 2,
+    "no_write_replies": 2,
+    "successful_replies_without_write": 0,
+    "api_errors": [
+      {
+        "subject": "desertOasisDiorama",
+        "request": 1,
+        "status": 502,
+        "error": "{\"type\":\"error\",\"error\":{\"type\":\"upstream_error\",\"message\":\"Anthropic stream error (overloaded_error): Overloaded\"}}"
+      },
+      {
+        "subject": "pixelDungeonProps",
+        "request": 1,
+        "status": 502,
+        "error": "{\"type\":\"error\",\"error\":{\"type\":\"upstream_error\",\"message\":\"Anthropic stream error (overloaded_error): Overloaded\"}}"
+      }
+    ],
+    "median_bytes": 28745.5,
+    "median_final_module_bytes": 28692.5,
+    "median_code_kib": 28.07177734375,
+    "median_final_module_kb": 28.02001953125,
+    "median_output_tokens": 76113.5,
+    "median_estimated_code_tokens": 11991.5,
+    "median_estimated_reasoning_share": 0.8442689990279114,
+    "median_generation_cost_usd": 0.9761077,
+    "median_generation_seconds": 578.308,
+    "initial_crashes": [
+      "alchemistWorkbench",
+      "desertOasisDiorama"
+    ],
+    "repair_calls": 2,
+    "rendered": 28,
+    "failed": [],
+    "generation_spend_usd": 27.3521645,
+    "repair_spend_usd": 0.4425,
+    "total_spend_usd": 27.7946645,
+    "median_pipeline_cost_usd": 0.99564935,
+    "median_pipeline_seconds": 578.308,
+    "token_estimation": "Code tokens estimated with tiktoken 0.14.0 o200k_base on each initial generated import-wired module; reasoning/non-code share = 1 - estimated code tokens / recorded generation output tokens, per subject. The residual includes non-code output/overhead and is not an exact provider reasoning-token count. Output/time include fresh redraws; pipeline costs include repairs. Comparison module bytes/KB use the final selected module (KB = 1024 bytes). Same estimator applied to r19 baselines."
+  }
+}
