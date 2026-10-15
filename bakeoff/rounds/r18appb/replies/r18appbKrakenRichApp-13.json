@@ -1,0 +1,33 @@
+{
+  "id": 13,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg46s1wteE7ZYex9nyJNY",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "Since rendering isn't available, I'll try verifying the build logic itself by running a quick script that imports the sample, calls build, and checks part counts and bounds without needing a browser.\n\n",
+        "signature": "CAQSpAgKEAgSGAI4AUIIdGhpbmtpbmcSDHAiyxndaTUsFVVSnBoM9nclIAgmFlH5hMYxIjCrbkGWcmuUguT3otmVKDL9qo+tfwGz0vp9po8QNy4zKlZd+Ebae+PKqkxQBc5tXYcqwQefHHdrNgkDKPMPm6kitu7DL/XRTEhs18PveU+f3Xa7RjY8Isoh75jGnGolTZXg2XU9QBF850SqXlg299FP/7m5fcY4BjMPxVJsv5GSVmSXgd+3QoNRBcVniqBjcoM83VvC4rN2NyxCmmkDjMAFfPsPjWocNCBupAmEa6f5Xs/dvz5j+PGsaU8FXJh++rzMhiO/Lbj61THywIYQyy6k2VQRXd8TYbgWUxEGwpAnLooBUaYsxya6e9hFRlZa+yBttZYJJ1dwtWk1C6QYgCKIiD99AyL3h1A2ALpXbV80eQF8A6TzAZWutYPUb3bso3TZz4o7kdQMUqgaFDUIIHIEfPkwoB/JvOOx2vyl0RbnlyI7Kz9r7r4mZLlOxlqbprH9+yiMacBW4gI8+oZEBHQRtoFUZHy2GNeV5aXxy/ZNJNa3xy7Tk6Fs+Sz+zMYtEaPKc/0dAaX3Idj2SKeNzacw9501Z67QFkTzE9N/Or75InTKO9/ws9KinDda6xqskq18UK3xeoKJ+0cv77Q3PYh6NCcH4MDMPTDsMbVCdQ9h2urLeRzTxaF+sM/NPQ/QTsyn4jIJkXI3BQ7EizWkpJ5r005+RS2MOkR/xTLFpAShMmPOh7m9xvSdvNfyy7QafDabGlYBfpF7IbylGCHy782ycJulGS/dJ6fmU/A4GnLShFkUQPA7h8G7KsXpvcK2y7gaOS71+ZCTKUUhzJnxh/5A1NL05xLDXqU1GOV8CpQBm4aCObC+Zsew8F6lG5Ox1Feq1YfkXUjcpctdWXa5qcEwPcjstEktnt8j+Pf7SSdCxBoyHjYpKlN8rFn9X1j5T5lV5W3VreMayCQNInarNl5yUhLfAxtyi16cOpobVg0GK15NxPRi40tHmlzd38o8GGqbUIPwJBh69Xq/lKXG+/SH7q3dzo3ebggD1P7yMG8cT5bJHQhdwHBTyUAVuzGe9BwB0AOggzxHjboptyl+QTezuYZEq+FW9b7foNeVFL4Fo0aRx7D+BTcYI2OlCdIN8B+SasU2gc/WFvJaNj/qMjrTEznKh5nSw2a/m2TjgdkWnRTty6+mjDuMoRdDKZT+Z0eRRs1kgo4oqKDK4GH0wzLTYlgMLQc7JVGLZRW21X1k4Vjjng1/bYs0wmPW93ouf6fb2HcX6v5SbqTSoFmlaA33E4PH//cVSP6mlGygqK1fvNy2TuyXEXyh3+DTyYsruA6MuJhgOesVNCVY3GlQmh+fKlTFT2hO0DNJciew0JGMmJizETNt8u36zbK+NUplIcgc2q90GAE="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01JWGTuZymszfb3o4r56MSHa",
+        "name": "bash",
+        "input": {
+          "command": "mkdir -p scratch/kraken && cat > scratch/kraken/run.ts <<'EOF'\nimport * as THREE from \"three\";\nimport build from \"../../samples/kraken\";\nconst root = build();\nconst box = new THREE.Box3().setFromObject(root, true);\nlet meshes = 0, tris = 0, joints = 0;\nroot.traverse((o: any) => { if (o.isMesh) { meshes++; const g = o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count) / 3; } if (o.isBone || o.userData?.joint) joints++; });\nconsole.log(\"meshes\", meshes, \"tris\", Math.round(tris), \"box\", box.min.toArray().map(v=>v.toFixed(2)), box.max.toArray().map(v=>v.toFixed(2)));\nconsole.log(\"rig chains\", (root.userData.rig?.chains ?? []).length, \"joints\", (root.userData.rig?.joints ?? []).length);\nEOF\nbun run scratch/kraken/run.ts 2>&1 | tail -30"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 490,
+      "cache_read_input_tokens": 127933,
+      "cache_creation_input_tokens": 162
+    }
+  }
+}

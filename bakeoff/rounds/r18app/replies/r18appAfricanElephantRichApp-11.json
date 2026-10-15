@@ -1,0 +1,42 @@
+{
+  "id": 24,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3yVefK59FgtLpzqrPRT",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "The heredoc didn't go through and mkdir wasn't needed either. I'll try using the eval tool for the probe instead, or write the file separately and run npx tsx on it afterward.\n\n",
+        "signature": "CAQSwQcKEAgSGAI4AUIIdGhpbmtpbmcSDDk4/81RKvwH3g6yvBoMGHfVcWtvCAsoUVvMIjBP7rvq9ouT58M+DxmQVZccJE+Yii6mYYu3ztmc+KGMIUCqJxZTyR/FocCV8yDuXHwq3gaa0yAM7i/CUiekCAScylpFMWPWg5gY9tjayVPqPamaz/dQq4PQA4tBnp3MKAacan6So45IKwFY3Zsm2220nxPqXe8sT/v96ceJauYD4ijRv8C5zoYmkoTbsKTQJgspSU8baruXz4zdTle0jJEe3RfT5T4JW2T7SZPMAS6qs/bGxvjypmEi98NKHMtKkuYtsB8T16RJfWEedt/J57TbHIIO/U/owv+ET6IuTBaEosMnfxClRVjXlXp312VciZS9qxwe/bkVp7UATi99paNuWtgwJ1qmOy5FVAGcOFnrtsKECg0wEdXuPnTmNKCQ27Ezg0GkePvNM0vKZM56gNPhxz1mIXO8pfZsE7tAno8CnkoU+MN8eCYLqgwjS/ef69pf7g53v1Q7Zt5mtmemLrxVMmTIQ5+uvsjgYc/wI/am3xTjR9gVjzZ+BrGa9l8D2X2X4rhjtzYHz1Xnjy4AY3veo1/Y2wSPQdnKLhxvQyLdvPQbBVOOUH+xkyZ6idxo7j9CN1Gqt6EBoEwDJrILmAUxX73m8FNlZdhaGYDZCvSCRUIu2VOZz5NZXTTfghb/deRP5ygnRXC/1vmlM5m0skeALEy8DUBXnUVL3r22MXuiUHDoc839VpVa52REUOEGTlRiqrHFUNIdgYZOAs3Zr68GFrOeD0B1pSrU6PWnKcJvuYR9jpzMlPLrikNEADxmi+stbVgXzFoZM1St6LldJjhYdxE+rKzDYJLiOaC9drS/yP+OHDUPEiAsw7ipyxextBoYzBrGlzpSpvaeBXf19ZEdFsXfSCAWFu4RTMfd49tBe2CSEp3y0Pof7icgH6RP5dzG7InZb+hNYn7dv2+oowNSlnwFrn2KXZBHorOcfcaGxo5O7BA0ooukV+5UbCq83m3KKXBHdCL48sGI2m9EzMJoieSuDRugRag7S8e8ac/++s9ZYvMtVcenAR8vqq6rdjBIjAOgl0z2Nquop2EoUcbyqOWq41hlVhfKKdOk+pgCWYN82tUSva4lHqaI2/pXTjYH40jPqQC6srqZCTdsWyEqHTu6vS8WmTpEhvo/J+degY50oto6wrxKO4KHg0ucHMHSmQEAxSPftSJvla+IQVevkwCcGj3RpY5PX/MLctawmVLWiYzUyIn9eFkH3TbOa4YnGAE="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_0185SYpc9ARHHa7VAk4Kohr4",
+        "name": "write",
+        "input": {
+          "path": "scratch/africanElephant/probe.ts",
+          "content": "import * as THREE from \"three\";\nimport build from \"../../samples/africanElephant\";\nconst root = build();\nconst box = new THREE.Box3().setFromObject(root, true);\nconsole.log(\"min\", box.min.toArray().map((v) => +v.toFixed(3)), \"max\", box.max.toArray().map((v) => +v.toFixed(3)));\nlet parts = 0;\nlet tris = 0;\nroot.traverse((o) => {\n  const m = o as THREE.Mesh;\n  if (m.isMesh) {\n    parts++;\n    const g = m.geometry;\n    tris += (g.index ? g.index.count : g.attributes.position.count) / 3;\n  }\n});\nconsole.log({ parts, tris });\n"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01GGSpKUnG3jtAY8G7upR2aC",
+        "name": "bash",
+        "input": {
+          "command": "npx tsx scratch/africanElephant/probe.ts 2>&1 | tail -30"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 453,
+      "cache_read_input_tokens": 117345,
+      "cache_creation_input_tokens": 164
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": 451,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg44QzKwt6iushxB8xoEq",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "I need to check where PartOptions and Fill types are exported from, likely in src/parts.\n\n",
+        "signature": "CAQSngcKEAgSGAI4AUIIdGhpbmtpbmcSDKVRPTDWQvF4rYm2BxoMhD9wZ9RByZueYULlIjC/wLE3FYU6jK4x/yUh+ye3DX/ImlmOruKyyqOfwivjhbHhbow0GdNs8XiECVTjKisquwaJk9dTjBlCyvH2LpKsXNT6ws0XOFODkhog4uwFg7ZeI+jPF54ZfofxXW1OY5m/km9GvUnPsmXuazODYwtAqYwq1ksEowcMwLCutnz9jy7Phk+rgN4aYn8Gf34LIH/6Nx3ZawO5b/xu2MUp50qF3TKwRTyh/RWtd4sjOv7MIKs/k00+FYNVIsG/q5MeKiKdyoHDd7HNWTwFUZMSWTjbn/rPi3C6QUSoxfOqUbES63kbxbuShy1KSd4c1Ty1x/oaVDfm4Tw0c3VTF5gjNUhGsEdBlXwoprDalfrBjw8sP8AYXxIFeSP43IEXiRVTju+hA9IyFCPNivLSyrvpOOwGuhm+Wh1GfJTjDttmhHhPi0E+9cSRaZ5Hn/SDS5Zvgi1ZQHC9VJAt5hrI0/cK50yAMNTsBfpsCXmqXEjaqHffMYuqVPodP6z2bubEOMjLhD9ENtoDEksW4Pl5w1SCcClqb+4TYxaECdgzY/kDTkEc/noxKSUF/n8jmYQZwE99ELX45PJO7A9O3wQK3E22lGr6WmZnuNisvgLqlkaoR2oNuym2K9XPYj0MDVxwAPjbIck7LebLtlMhKuzKmF0WE6cNR6yH6mmYM9y9chaRlKdEcTp5jUZeV9MjrWyHiDSp8OmrnFipt+5WgcqcffiStRDBiW8aOgBtcfb3GUnwvAp3Btzoq+XVX0cpMtdJEQ6glcF61kZDeZvurNcEP+XylpqcA42s2ib22rsjocpojtmyY5q+8QbFHWUYkf75KlQciiV0/bDzfFafP++FfVvmGQKy+mkSbkUTePndXIdHh5DMN6x22u7dzexjatJzHpisbADIYQbeChbHr6XB8Cv5q3eqrvpMMXhEQ5kGt65ZtzFTHr89a5KX9CVN8U/9LoYfXDWdjYrSKlSpJV1dDXga18+J/2dQCrFGUAULJK5R1auG6GCsOBnJ1Yu/1qdSt8N603oFsWbKnYu85CSNuAZc7LFonMu2Cs0/MH4cwSJ03EjYQk0LfsmoJa5UF2FDaiKhKbE2ExjGHy+eTVLo/4ZqGjMUexd6rVyLvqmlYr8G7fFRrHIzMEZ4lcbiOrUrFFR+dyDBl/cjAPXa+vfItaIcpBgB"
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01HroHEMUFmQCy9Es1AJ5YAi",
+        "name": "bash",
+        "input": {
+          "command": "grep -n \"export type Fill\" src/*.ts; sed -n 663,690p src/surface.ts; grep -n \"export type Texture\\|export function svg\" src/texture.ts; grep -n \"export\" kits/glow.ts"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 180,
+      "cache_read_input_tokens": 104243,
+      "cache_creation_input_tokens": 2264
+    }
+  }
+}

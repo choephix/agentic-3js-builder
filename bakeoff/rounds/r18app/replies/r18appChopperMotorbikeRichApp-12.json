@@ -1,0 +1,33 @@
+{
+  "id": 359,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg43BBzuyUX6VxkGCCqTW",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "Good news is the build runs headless since `document` being undefined just returns a texture fallback. I'm writing a scratch script to run with tsx that builds the model and reports bounds, part count, triangle counts, and per-part boundaries.\n\n",
+        "signature": "CAQSwAcKEAgSGAI4AUIIdGhpbmtpbmcSDI5Pg+NSMzVwjVmYdBoMug6h57vsqOZwj4AWIjBrwWArq2YtqrxBMOryRBn4Heb7PRD0odyuZsfmfySyBDYUYZ+4Sz8D0o7/cX5CFDQq3QbN3heRI2KDMSqI6jw4xAJga3cShxLp/fPo096hhuZgNzb1SW1RZvWCICu2RdBo0gEvSwy6v5NrhIDqlXxQ0jU1bX2vx6Rb7yqwnGKf62M1d+GTbJWhaZjfsRZQ+fkkxw0jCtzV8YVCcPv/UZserkDLtH9HQY1YHjU8x5E2oyQd6JMPetcIXBAeKbktjTLzhAUIW4qd1ekanOfHzrlOs+CYNkb6cjoiw7OaYmKCj800LQUBnwkYV7ZGgnO55EddrTusq9lk1qNJyH/Cc0esGfmlKeDk5YuHqF4Bb+PaQeicO/qlpFTI8vfT7A5DDa9DXOmY4/RxrqSxl6oCAffliWAWINewOGizmV6vbhZDy+9Zf4wztCD4hthT5L5oPl4muxzFmCAmTZk4SIqew8rqLYtAmqNwQXLRLVXzSt6yDAj7RL2+t+9DZ9eQMDdFXkDGtvUCp8mxAswRKcVigJiUP/tpPt8ShIenszwiAfdoGUnIzQmQKjAKMIw+mcn8/UOfkhsJqeSi5Y8P3nOa35eytnuhenxn8mPs18UmiComhlODsVXRzFDCLKGQflXFpY+sVvcZjD53ANbowCQlAqM3oN8GoatccigjWqPjCZ8xoJCBTLipdTIulXfCXT8CgQ9OdJFejnbRpFsB2h3lp6bqp+8uUhLhZvalliEbzaIVFVBEAo5ToIatrZsSpfvucgnNZPe5arn4OD1zYugB4bE6+698yX3DNOnXKnfmRJRDFRpEaGzs1MySVtupEUECrHcgOUM1AMZT0Uev6GUPdYp4I8Poy55+4Bl5D1ecpblzJZKKqZ0i137Ocf3e93PyUYuOnoE/kM3gyC0LRerxsQQTvvERvlB9mkqaprd1v9FYx6KmGdwoVgkL6GzD4Aldms/bxRIgb4dl/AjMnElJ5VCm8UTo8JL9efQhvVge5dttHd34xILbOb+tvSDGhNWLHklni97W0utnp0maSiAlmJENBsZ9WqcktXn+AhcS8bl4Qeu2ujBcuardD4rOJqdDrkr/NVzAOATbcDkM3+9ner29ZC1g+/WX1t40UtBLSjLZAN2mQ2x/hEE1bCxdiwPmYxcjLKhrddwdousweiFNAYrA1H/Y+I6zZ9mSkY6FFS5p6EovL8EsljvuD4xHRmdZusgYAQ=="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_012e8ApkjNVmvJRpJdMpPPpc",
+        "name": "bash",
+        "input": {
+          "command": "mkdir -p scratch/chopperMotorbike && cat > scratch/chopperMotorbike/probe.ts <<'EOF'\nimport * as THREE from \"three\";\nimport build from \"../../samples/chopperMotorbike\";\nconst root = build();\nconst box = new THREE.Box3().setFromObject(root, true);\nlet parts = 0, tris = 0;\nconst joints: string[] = [];\nroot.traverse((o) => {\n  if ((o as THREE.Mesh).isMesh) { parts++; const g = (o as THREE.Mesh).geometry; tris += (g.index ? g.index.count : g.attributes.position.count) / 3; }\n  if (o.type === \"Group\" || (o as any).isBone) joints.push(o.name);\n});\nconsole.log(\"parts\", parts, \"tris\", tris, \"box\", box.min.toArray().map(n=>n.toFixed(3)), box.max.toArray().map(n=>n.toFixed(3)));\nconsole.log(\"joints\", joints.length, joints.join(\",\"));\nEOF\nnpx tsx scratch/chopperMotorbike/probe.ts 2>&1 | tail -30"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 485,
+      "cache_read_input_tokens": 162089,
+      "cache_creation_input_tokens": 542
+    }
+  }
+}

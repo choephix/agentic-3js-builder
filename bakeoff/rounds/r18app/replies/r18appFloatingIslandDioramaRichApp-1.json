@@ -1,0 +1,42 @@
+{
+  "id": 48,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3yeubkMRjd57eLHyDQC",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "Since this is a diorama with plain objects, I'm wondering whether it even needs a root joint, since joints should only exist where something moves. I want to check whether the builder automatically creates a root joint by default, so I'm going to grep the builder source for how it handles the root.\n\n",
+        "signature": "CAQS8QcKEAgSGAI4AUIIdGhpbmtpbmcSDNfH7Tzazb9SC62FMxoMeXyx521kCvspZhPGIjBZt7UJTIbpRUH18ZiWTFnCwOsdECO9AwYLU71qzDONDSOXkPDjlvq63tpP5lAQr+IqjgcgomT0iT6Ef+e3x28WJewatVaKvXBat97DPEQs+Uctt7WsNcdFbfmNerl5KPhqg+IEKRZB6lC8LAio3TNf+9/2dcqD/CLFsNCg5yJpFl8GH4eTNEE5AF+l1TENvR5H59FobfxZCVEgK2WU5N9QQzX3qp7s1rNuNFouVMr1z+aNLj2dGxCw2sDn6mWCkR/H8Zl2SwOUfCdeEgQ0SJejHReNjWiV9AErPcW0TM9BkXIR4Nm85EX1lMPQNleoox7Dy+ejRl7PqG3dTwbu/bDdzocFqhMjVpKhdwcmdBz06p9XVa1KHfdqOb90aYTaMv4uebIbbdnfl8EkLo01/OBoudgx3lZwXhNInDci98G4H4o9phtzot+F4OpUyusNzEneRPTWdaY6FZ60esWAjtoHnn1ArNpPsDX00UlDa7jUBkrOPLe6wHeuSQWAyWYdPieCo1nauvIxF5jKA/om2W1tc+0HxIwxelANY8I9OAI1NTcr5583cdfUso7Ux7viAGi4JiRqTVyewllgPNdwGSAzkgfn26PbPNOUuXbAscbVzsb3lF2ofseL6wEc8cm9ECkPDJZiq8To8pOqDhB1A6x5dxdtxyh78EwdFTc3nGN5o06zSUhF5BjrR+Ac7/tmflz3fDFi+SkLPyjFsoeGlIOBn78f3XlnRm9CvaHHWh4V2ew+AN6hT5WxQE3l5Cjh8KPbGy0OH2AouEDsk5seey1b4tFfA+H8yBfbN0ziqvqKYDjOCxeGNxerVZ0DdGy4uzI7WGu1uMKPbT5KW0C1QgC1tqMhil0vnmA+qKGAJA2vCm64ognFoUCRbIUSozXAmrNVMQvcPz1dqFzvSi9yKnTOKVZhhJtYR8uFIOk/FaCS4JVWIF0C2TksP9pg2bBRAod2cWzgAFvNGA05BYoVXa6MjBA1YUnSgcv9tEf8K7cYVWVcl/0prSSCtHh7NCjwkLGm6eGcvcNDVxSR2K4nned96hNMNyfR3IHs/BV6n6sonRtCDqg7HWjXmxzdYr7xFK1hMkEuxWSd+UvbGDQMF/hxMWVIWhcACmoJAMod616kuv0goXxftcLfLgkp4Znjm8kHZ9++qxnkTC8U4gz9dQ16qsSrADWZnbWgvLFuJb/2av0w+6akGo+4os+/ktv6mlFE5UxAFWzxyl52OCz6/+b5NsQP/cv3I7hMP+7COp4jBXO05qMshtTWTAvZsP9f97zOGAE="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_013fN9fqAEdTFhJTm2i9tBBu",
+        "name": "grep",
+        "input": {
+          "pattern": "get root|root\\b.*=|no joint|plain object",
+          "path": "src/builder.ts"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_015j5DWFf7KUVfM6QhKBVSgH",
+        "name": "glob",
+        "input": {
+          "path": "samples/*"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 251,
+      "cache_read_input_tokens": 22226,
+      "cache_creation_input_tokens": 53868
+    }
+  }
+}

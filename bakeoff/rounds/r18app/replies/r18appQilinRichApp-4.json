@@ -1,0 +1,34 @@
+{
+  "id": 137,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg411TCC8MjNvedU5snYS",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "The file came out longer than I expected. I'm noticing a typecheck error from a funky path, so I need to remove the unused ColorInput import and stop assigning the unused lowerJaw variable.\n\n",
+        "signature": "CAQSiAcKEAgSGAI4AUIIdGhpbmtpbmcSDLQt7gXVs6XvE5XJYhoMKIXsRZMY9k5D5+FdIjCXoor93EUI8DPVUyLaHhsZjhAGDkGyRAWSouilsNUx+bBx5yy2RcxiX3J7nnXscXMqpQZ0wFYYICXUi3OXFy/tL262Ae6jmLpFLlXGZwBwnIZlpocVSWDB6v/6bSZONLGCDGkmcWYgVd4DglAKfmlH7+DuMcHVvzDBANW9XzSEblOlKN61kKZJmpBV+trf7Vt/Ep4GghBUHhK3V9skQ6Yz8I75cRazoUxTeuNFoSDTFkU7/JT+LcWUFmzl0pMBcMid3EMDzGNkgYsU5T0o1s/OYaR49M+PgAJb0Ffe3GqMjE6CSORfMDp0bSs6Mox7/ptJZFArASQFtgYk18NXwu41THU1xENsFFaQ0QLcTbXuNa0vRgnRQKNxbVhVByiEQn/3XQpTI8DZoXFgrmqpR1COTiDdXnIcfdBnxlOLkss+HWbQCmX6VCptQEDik+4OFe0Ptx5saMhfWSfHa4idKesMyK0HXyE+9J1uHCZyGsHb7uQO0RRpqGuyw934+t9S9qtteTbm2UJsg//YP+K8VQXcSrWgoA5PDcxJtMGsyrN8kTY/SrKLVgEnYEdnT/JXdW8PQcmwpZzD/hgOJPqyRFKSuSB24OK90K+8oS21msivj+jvc9WdzduK6p2ixS5uKNvfskjlyTwdEhmp5qRz2NABehmZks4sD4xUki81UWF71yR9ophB+8GUgDavXkCGI8N/IrB66zcQ6NHaQL3TBLKSkFibhalvTcvVqCJ2bjhWnMcIBOSyjKrZGi3eEVlnR/VGQZWZHfs+hSEk/QbAHZvfZD5z+NxKyAXJo73ZgP5U0n1FrbLZSDGcCKn62Ik992x2HZbdYQtAns6y97120pm3Zpns/Wj9Pz1AdxiTWQoIqtH+4uOlHSYfzGXNIzUuvJV7FgbEWgW9+WPOsAI1bMB27DIs7zajcxaAJ+5QEIetIz0sqaJk6mNv5hAASmv5Sl2zXoQFnMy7BzWPnqL+v05AjaoHIYqg3Zs2g1kYmZPHIxKGpFUVEYmI8Dom+1T1oFGNp7/RGMb1TnTTzho27qC4ndF9zLUWBHn6yofTBRR7sCk/Lmqng9dmenWMGHW/YdZ0y3rv8qePBsw00vdpItpQ7E7wO+RRfRIbXCf7EQiSo2e71QmBwwYFGAE="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_019DuLzjRZWzDsoQFmvD3Y25",
+        "name": "bash",
+        "input": {
+          "command": "sed -i '/^import type { ColorInput }/d; s/^  const lowerJaw = b.loft(/  b.loft(/' samples/qilin.ts && npm run typecheck -- qilin 2>&1 | tail -20 && npm run preview -- qilin --shot 2>&1 | tail -60",
+          "cwd": "/home/cx/noodlespace/agentic-3js-builder/scratch/replay-app/qilin"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 275,
+      "cache_read_input_tokens": 133270,
+      "cache_creation_input_tokens": 234
+    }
+  }
+}

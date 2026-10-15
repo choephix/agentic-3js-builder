@@ -1,0 +1,32 @@
+{
+  "id": 435,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg44FpPedNesopw2NuonJ",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "text",
+        "text": "Simplest: define a local `Fill = string | Paint`."
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01Ts9bkE9xZucQRfgBLu4gGS",
+        "name": "bash",
+        "input": {
+          "command": "cd samples && sed -i 's|^import type { ColorInput } from \"../src/paint\";|import type { Paint } from \"../src/paint\";|; s/ColorInput/Fill/g' lanternShrine.ts && sed -i 's|^type Pt = \\[number, number, number\\];|type Fill = string \\| Paint;\\ntype Pt = [number, number, number];|' lanternShrine.ts && sed -i '/const PINK = cel/d; /const CERAMIC = cel/d' lanternShrine.ts && cd .. && npm run typecheck -- lanternShrine 2>&1 | tail -40"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 272,
+      "cache_read_input_tokens": 184519,
+      "cache_creation_input_tokens": 162
+    }
+  }
+}

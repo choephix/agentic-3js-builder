@@ -1,0 +1,219 @@
+[
+  {
+    "call": {
+      "id": "toolu_01GvqAbYmzK5ArKLoNHqfMNU",
+      "name": "grep",
+      "input": {
+        "pattern": "^export (class|type|interface|function) (Sweep|Part|Joint|Chain|Builder|Hit)\\b",
+        "path": "src"
+      }
+    },
+    "text": "src/surface.ts:16:export class Hit extends Spot {\nsrc/sweep.ts:449:export class Sweep {\nsrc/builder.ts:38:export class Builder {\nsrc/skeleton.ts:18:export class Joint extends Frame {\nsrc/skeleton.ts:232:export class Chain {\nsrc/parts.ts:31:export class Part extends Spot {\n",
+    "isError": false
+  },
+  {
+    "call": {
+      "id": "toolu_01PAmhEzSjxs5cRE1vPf3D9h",
+      "name": "bash",
+      "input": {
+        "command": "ls samples scratch 2>/dev/null | head -50; cat package.json | head -30"
+      }
+    },
+    "text": "No such file or directory: scratch",
+    "isError": true
+  },
+  {
+    "call": {
+      "id": "toolu_01X1Dqevus2ZEptDH3Satvxo",
+      "name": "bash",
+      "input": {
+        "command": "pwd; ls; ls samples | head; grep -n \"export\" src/builder.ts | head -30"
+      }
+    },
+    "text": "/home/cx/noodlespace/agentic-3js-builder/scratch/replay-app/kraken\ndocs\nGUIDE.md\nkits\npackage.json\nsamples\nscripts\nsrc\ntsconfig.json\ntsconfig.tools.json\n33:export type { OutlinePoint } from \"./outline\";\n38:export class Builder {\n254:export function createBuilder(options: { name?: string; detail?: number; paintSize?: number } = {}) {\n",
+    "isError": false
+  },
+  {
+    "call": {
+      "id": "toolu_01JthBgQ5RtMuk1iVfz1vRZJ",
+      "name": "write",
+      "input": {
+        "path": "samples/kraken.ts",
+        "content": "import * as THREE from \"three\";\nimport { mergeGeometries } from \"three/addons/utils/BufferGeometryUtils.js\";\nimport { createBuilder } from \"../src/builder\";\nimport { glow } from \"../kits/glow\";\nimport { rng } from \"../src/math\";\nimport { bezier, catmull } from \"../src/path\";\nimport { mix, noise, paint, smoothstep } from \"../src/paint\";\nimport type { Sweep } from \"../src/sweep\";\nimport { svg } from \"../src/texture\";\n\nexport const meta = {\n  name: \"Kraken\",\n  description:\n    \"A towering kraken heaving itself out of the sea on eight armoured arms, two raised clubbed tentacles, glowing orange panel lines and a crowned head.\",\n  style: \"Overwatch\",\n  commit: \"88fc1f0\",\n};\n\n// Palette: cobalt body with a cream belly, graphite armour, one strong orange accent.\nconst INDIGO = \"#1f2c78\";\nconst BLUE = \"#2f66d0\";\nconst SKY = \"#63a8f2\";\nconst CREAM = \"#f3e9d6\";\nconst GRAPH = \"#2a2f3c\";\nconst STEEL = \"#7c88a0\";\nconst ORANGE = \"#ff7b1c\";\nconst BONE = \"#eadcb8\";\nconst FOAM = \"#eaf8ff\";\nconst WATER = \"#17658a\";\nconst WATER2 = \"#2a9cc0\";\nconst SUCK = \"#f7dcc9\";\nconst SUCKIN = \"#c8685a\";\nconst MOUTH = \"#4a1d38\";\n\nconst WATER_TOP = 0.06;\n\nconst cap = (x: number) => ((x % 360) + 360) % 360;\nconst clockDist = (deg: number) => {\n  const d = cap(deg);\n  return Math.min(d, 360 - d);\n};\nconst keyed = (keys: number[], t: number) => {\n  const x = Math.min(Math.max(t, 0), 1) * (keys.length - 1);\n  const i = Math.min(Math.floor(x), keys.length - 2);\n  return keys[i] + (keys[i + 1] - keys[i]) * (x - i);\n};\n\n// Skin paints -----------------------------------------------------------------------------------------------------\nconst bodyCoat = paint((p, _n, s) => {\n  const t = s[0];\n  const dd = clockDist(s[1]);\n  const wob = noise(p, 0.7, 3);\n  if (Math.abs(dd - 118) < 2.4) return ORANGE;\n  if (Math.abs(dd - 58) < 1.6) return CREAM;\n  if (dd < 58) {\n    const seam = Math.abs(((t * 24) % 1) - 0.5) > 0.485;\n    if (seam) return INDIGO;\n    return mix(INDIGO, BLUE, smoothstep(0.05, 0.6, t) * 0.8 + wob * 0.25);\n  }\n  if (dd < 118) return mix(BLUE, SKY, smoothstep(58, 118, dd) * 0.85 + wob * 0.15);\n  return mix(CREAM, \"#ead7bd\", wob * 0.6);\n});\n\nconst armCoat = paint((p, _n, s) => {\n  const t = s[0];\n  const dd = clockDist(s[1]);\n  const wob = noise(p, 0.5, 9);\n  if (Math.abs(dd - 74) < 2.2) return INDIGO;\n  if (dd > 74) return mix(CREAM, \"#ead7bd\", wob * 0.6);\n  const dash = dd < 11 && (t * 28) % 1 < 0.4 && t > 0.32 && t < 0.97;\n  if (dash) return ORANGE;\n  const base = mix(BLUE, SKY, smoothstep(10, 70, dd) * 0.6 + wob * 0.2);\n  return mix(base, ORANGE, smoothstep(0.82, 0.98, t));\n});\n\nconst sleeveCoat = paint((p, _n, s) => {\n  const t = s[0];\n  const dd = clockDist(s[1]);\n  for (const g of [0.15, 0.2, 0.25]) if (Math.abs(t - g) < 0.0045) return INDIGO;\n  if (dd < 20) return STEEL;\n  return mix(GRAPH, \"#3a4152\", noise(p, 0.3, 4));\n});\n\nconst suckerCoat = paint((_p, _n, s) => (s[1] > 0.82 ? SUCKIN : SUCK));\n\nconst finCoat = paint((_p, n, s) => {\n  if (Math.abs(n.y) < 0.4 && Math.abs(n.x) < 0.4 && Math.abs(n.z) > 0.4 && false) return GRAPH;\n  const u = s[0];\n  const v = s[1];\n  if (u > 1.95) return ORANGE;\n  if (Math.abs(((v / 0.3) % 1) - 0.5 * Math.sign(v) - 0.5 * (v < 0 ? 0 : 0)) < 0.06) return CREAM;\n  return mix(INDIGO, BLUE, smoothstep(0, 1.9, u));\n});\n\nconst crestCoat = paint((_p, _n, s) => (s[1] > 0.86 ? ORANGE : mix(GRAPH, INDIGO, s[1])));\n\n// Eye drawing -------------------------------------------------------------------------------------------------------\nconst EYE = svg(\n  `<svg viewBox=\"0 0 100 100\">\n    <defs>\n      <radialGradient id=\"ir\" cx=\"50%\" cy=\"46%\" r=\"52%\">\n        <stop offset=\"0\" stop-color=\"#fff2a0\"/>\n        <stop offset=\"0.45\" stop-color=\"#ffb02a\"/>\n        <stop offset=\"0.85\" stop-color=\"#ff6a14\"/>\n        <stop offset=\"1\" stop-color=\"#a83a08\"/>\n      </radialGradient>\n    </defs>\n    <circle cx=\"50\" cy=\"50\" r=\"48\" fill=\"#1b1018\"/>\n    <circle cx=\"50\" cy=\"50\" r=\"43\" fill=\"url(#ir)\"/>\n    <path d=\"M12 38 Q50 10 88 38\" stroke=\"#a83a08\" stroke-width=\"3\" fill=\"none\" opacity=\"0.7\"/>\n    <rect x=\"17\" y=\"40\" width=\"66\" height=\"21\" rx=\"10.5\" fill=\"#150a14\"/>\n    <ellipse cx=\"34\" cy=\"35\" rx=\"9\" ry=\"6\" fill=\"#ffffff\" transform=\"rotate(-25 34 35)\"/>\n    <circle cx=\"66\" cy=\"66\" r=\"3.6\" fill=\"#ffffff\"/>\n  </svg>`,\n  { size: 256 },\n);\n\n// Sucker cup profile (units of cup radius): buried base, outer wall, rim, inner wall, floor.\nconst CUP: [number, number][] = [\n  [1.05, -0.45],\n  [0.98, 0.2],\n  [0.8, 0.52],\n  [0.55, 0.46],\n  [0.42, 0.0],\n  [0.0, 0.0],\n];\nconst cupGeo = (r: number) =>\n  new THREE.LatheGeometry(\n    CUP.map(([x, y]) => new THREE.Vector2(x * r, y * r)),\n    7,\n  );\n\nexport default function build() {\n  const b = createBuilder({ name: \"kraken\", paintSize: 2048 });\n  const R = rng(17);\n\n  // ---- Skeleton: core, mantle chain up and back, head chain forward and down -------------------------------------\n  const core = b.joint(\"core\", { at: [0, 3.7, -0.5], role: \"spine\" });\n  const bodyPath = catmull([\n    [0, 6.75, -2.8],\n    [0, 5.9, -2.1],\n    [0, 4.9, -1.3],\n    [0, 3.7, -0.5],\n    [0, 3.3, 0.35],\n    [0, 2.85, 1.15],\n  ]);\n  const rootT = bodyPath.closestT(core.at);\n  const mantle = b.chain(\"mantle\", bodyPath.slice(rootT, 0), { parent: core, count: 5, role: \"spine\" });\n  const front = b.chain(\"front\", bodyPath.slice(rootT, 1), { parent: core, count: 2, role: \"spine\" });\n  const headAt = bodyPath.at(rootT + (1 - rootT) * 0.62);\n  const head = b.joint(\"head\", {\n    parent: front.joints[1],\n    at: headAt,\n    aim: bodyPath.at(1),\n    role: \"head\",\n  });\n  const jaw = b.joint(\"jaw\", { parent: head, at: [0, 2.34, 0.95], aim: [0, 1.72, 1.4], role: \"jaw\" });\n\n  // ---- Water base ---------------------------------------------------------------------------------------------------\n  b.lathe(\n    [\n      [0, -0.14],\n      [8.7, -0.14],\n      [8.7, 0.02],\n      [8.35, WATER_TOP],\n      [0, WATER_TOP],\n    ],\n    { at: [0, 0, 0], bone: core, segments: 28, color: WATER, name: \"water\" },\n  );\n  for (const [r0, r1] of [\n    [1.9, 2.15],\n    [3.3, 3.5],\n    [5.6, 5.85],\n    [7.3, 7.5],\n  ])\n    b.lathe(\n      [\n        [r0, WATER_TOP - 0.02],\n        [r1, WATER_TOP - 0.02],\n        [r1, WATER_TOP + 0.03],\n        [r0, WATER_TOP + 0.03],\n      ],\n      { at: [0, 0, 0], bone: core, segments: 28, color: WATER2, name: \"wave\" },\n    );\n  {\n    const blobs: THREE.BufferGeometry[] = [];\n    for (let i = 0; i < 44; i++) {\n      const a = R() * Math.PI * 2;\n      const rr = 2.2 + R() * 6;\n      const s = 0.1 + R() * 0.22;\n      blobs.push(\n        new THREE.SphereGeometry(s, 6, 4)\n          .scale(1.5, 0.28, 1)\n          .rotateY(R() * 3)\n          .translate(Math.sin(a) * rr, WATER_TOP + 0.01, Math.cos(a) * rr),\n      );\n    }\n    b.part(mergeGeometries(blobs)!, FOAM, { bone: core, at: [0, 0, 0], name: \"foamBlobs\" });\n  }\n  for (const [rad, h] of [\n    [4.6, 0.11],\n    [6.4, 0.09],\n  ]) {\n    const pts: number[][] = [];\n    for (let i = 0; i < 14; i++) {\n      const a = (i / 14) * Math.PI * 2;\n      const rr = rad + Math.sin(i * 2.3) * 0.22;\n      pts.push([Math.sin(a) * rr, WATER_TOP + h * 0.5, Math.cos(a) * rr]);\n    }\n    b.sweep(catmull(pts, { closed: true }), [0.13, 0.05], { bone: core, color: FOAM, sides: 5, name: \"foamRing\" });\n  }\n\n  // ---- Body: one skinned tube over mantle, core and neck ------------------------------------------------------------\n  const radii = [0.05, 0.55, 0.95, 1.2, 1.3, 1.22, 1.1, 0.95, 0.66];\n  const body = b.sweep(bodyPath, radii, {\n    bone: [mantle, core, front, head],\n    color: bodyCoat,\n    sides: 14,\n    name: \"body\",\n  });\n  const skin = b.surface(body);\n\n  // Collar rings at the neck: graphite band with glowing inner seam.\n  const collarT = 0.66;\n  const collarLoop = skin.loop(bodyPath.at(collarT), { dir: bodyPath.tangentAt(collarT), lift: 0.04 });\n  b.sweep(collarLoop, [0.11, 0.07], { color: GRAPH, sides: 6, name: \"collar\" });\n  const collarB = skin.loop(bodyPath.at(collarT - 0.035), { dir: bodyPath.tangentAt(collarT - 0.035), lift: 0.02 });\n  glow(b.sweep(collarB, 0.04, { color: ORANGE, sides: 5, name: \"collarGlow\" }), 1.3);\n\n  // Glowing rings round the mantle.\n  for (const t of [0.14, 0.22, 0.3, 0.38, 0.46]) {\n    const loop = skin.loop(bodyPath.at(t), { dir: bodyPath.tangentAt(t), lift: 0.015 });\n    glow(b.sweep(loop, 0.028, { color: ORANGE, sides: 4, name: \"mantleRing\" }), 1.2);\n  }\n\n  // Armour plates along both flanks of the mantle.\n  for (const t of [0.11, 0.18, 0.25, 0.32, 0.39, 0.46, 0.53]) {\n    for (const deg of [76, 284]) {\n      const at = body.at(t, deg);\n      const rad = Math.max(at.radius * 0.5, 0.1);\n      b.stick(new THREE.CylinderGeometry(rad, rad * 1.1, 0.13, 6), GRAPH, at, { embed: 0.45, flat: true });\n      glow(\n        b.stick(new THREE.CylinderGeometry(rad * 0.5, rad * 0.55, 0.15, 6), ORANGE, at, { embed: 0.42, flat: true }),\n        1.1,\n      );\n    }\n  }\n\n  // Dorsal crest down the mantle.\n  {\n    const lows: number[][] = [];\n    const highs: number[][] = [];\n    const N = 9;\n    for (let i = 0; i <= N; i++) {\n      const t = 0.07 + (rootT - 0.1) * (i / N);\n      const h = 0.15 + 0.85 * Math.sin((Math.PI * (i + 0.5)) / (N + 1));\n      lows.push(body.at(t, 0, -0.06).at.toArray());\n      highs.push(body.at(t, 0, h).at.toArray());\n    }\n    b.membrane(lows, highs, { color: crestCoat, thickness: 0.07, bone: mantle, name: \"crest\", rows: 3 });\n    glow(b.sweep(highs, 0.035, { bone: mantle, color: ORANGE, sides: 4, name: \"crestGlow\" }), 1.2);\n  }\n\n  // Wing fins at the back of the mantle.\n  for (const s of [1, -1]) {\n    const t = 0.2;\n    const at = bodyPath.at(t);\n    const T = bodyPath.tangentAt(t);\n    const out = [s, 0.18, 0];\n    const along: [number, number, number] = [-T.x, -T.y, -T.z];\n    b.extrude(\n      [\n        [0.5, -0.8],\n        [1.5, -0.55],\n        [2.35, 0.05, \"sharp\"],\n        [1.85, 0.95],\n        [0.9, 1.25],\n        [0.5, 0.9],\n      ],\n      { at, x: out, y: along, thickness: [0.1, 0.03], bevel: 0.025, smoothing: 1, color: finCoat, bone: mantle, name: \"fin\" },\n    );\n  }\n\n  // ---- Head ---------------------------------------------------------------------------------------------------------\n  const hc = bodyPath.at(0.8);\n  // Soft skirt where the arms root.\n  b.part(new THREE.SphereGeometry(1, 12, 8), mix(SKY, BLUE, 0.4) as unknown as string, {\n    at: [0, 2.38, 0.55],\n    scale: [1.3, 0.55, 1.3],\n    bone: front.joints[1],\n    name: \"skirt\",\n  });\n\n  // Eyes.\n  for (const s of [1, -1]) {\n    const hit = skin.around(hc).at(s * 62, 6)!;\n    const eyeAt = hit.at.clone().addScaledVector(hit.n, 0.13);\n    const ball = b.stick(new THREE.SphereGeometry(0.44, 10, 8), CREAM, hit, { embed: 0.35, name: \"eyeball\" });\n    b.stick(new THREE.TorusGeometry(0.47, 0.07, 5, 10).rotateX(Math.PI / 2), GRAPH, hit, { embed: 0.15, name: \"eyeRim\" });\n    glow(\n      b.decal(ball, EYE, {\n        at: eyeAt.clone().addScaledVector(hit.n, 0.44),\n        dir: hit.n.toArray(),\n        size: [0.64, 0.64],\n        segments: 8,\n        name: \"iris\",\n      }),\n      1.2,\n    );\n    // Brow plate with a glowing strip.\n    const browHit = skin.around(hc).at(s * 56, 38)!;\n    const plate = b.stick(new THREE.BoxGeometry(0.42, 0.14, 0.9), GRAPH, browHit, { embed: 0.3, flow: [0, 0, 1], name: \"brow\" });\n    glow(\n      b.stick(new THREE.BoxGeometry(0.07, 0.06, 0.74), ORANGE, plate.moved([0, 0.08, 0]), { embed: 0.4, name: \"browGlow\" }),\n      1.2,\n    );\n  }\n\n  // Crown horns.\n  for (const s of [1, -1]) {\n    for (const [az, el, h, f] of [\n      [26, 70, 1.35, 0.55],\n      [48, 50, 0.85, 0.3],\n    ]) {\n      const hit = skin.around(hc).at(s * az, el)!;\n      const base = hit.at;\n      const tip = [base.x + s * 0.5, base.y + h, base.z + f + 0.2];\n      const ctrl = [base.x + s * 0.2, base.y + h * 0.7, base.z - 0.1];\n      b.sweep(bezier(hit, ctrl, tip), [0.17 * (h / 1.3) + 0.04, 0], {\n        color: BONE,\n        bands: [\n          [0.6, BONE],\n          [1, ORANGE],\n        ],\n        caps: { start: \"flat\", end: \"point\" },\n        sides: 6,\n        name: \"horn\",\n      });\n    }\n  }\n\n  // Mouth and beak.\n  b.part(new THREE.SphereGeometry(1, 8, 6), MOUTH, { at: [0, 2.12, 0.85], scale: [0.55, 0.3, 0.55], bone: head, name: \"mouth\" });\n  b.sweep(bezier([0, 2.5, 0.8], [0, 2.2, 1.45], [0, 1.55, 1.25]), (t) => [0.3 * (1 - t) + 0.03, 0.24 * (1 - t) + 0.03], {\n    bone: head,\n    color: GRAPH,\n    caps: { start: \"flat\", end: \"point\" },\n    sides: 6,\n    name: \"beakUpper\",\n  });\n  b.sweep(bezier([0, 2.3, 1.0], [0, 1.95, 1.55], [0, 1.75, 1.45]), (t) => [0.22 * (1 - t) + 0.03, 0.17 * (1 - t) + 0.03], {\n    bone: jaw,\n    color: STEEL,\n    caps: { start: \"flat\", end: \"point\" },\n    sides: 6,\n    name: \"beakLower\",\n  });\n\n  // ---- Arms and tentacles --------------------------------------------------------------------------------------------\n  const CA = new THREE.Vector3(0, 2.4, 0.55);\n  const armKeys = [0.42, 0.36, 0.3, 0.24, 0.19, 0.14, 0.1, 0.065, 0.03];\n  const tentKeys = [0.34, 0.26, 0.19, 0.14, 0.11, 0.1, 0.16, 0.22, 0.14];\n  const armTable = [\n    [0.45, 2.4],\n    [1.4, 2.1],\n    [2.4, 1.45],\n    [3.5, 0.8],\n    [4.6, 0.38],\n    [5.7, 0.12],\n    [6.7, 0.3],\n    [7.3, 0.85],\n  ];\n  const tentTable = [\n    [0.5, 2.7],\n    [1.6, 2.8],\n    [2.8, 3.3],\n    [3.7, 4.2],\n    [4.4, 5.2],\n    [4.6, 6.1],\n    [4.2, 6.8],\n    [3.6, 7.0],\n  ];\n\n  function dress(\n    name: string,\n    chain: ReturnType<typeof b.chain>,\n    rfn: (t: number) => number,\n    ts: number[],\n    mainSweep: Sweep,\n    sleeve: [number, number],\n  ) {\n    // Gauntlet sleeve plus glowing end rings.\n    b.sweep(chain, (t) => rfn(t) + 0.05, { from: sleeve[0], to: sleeve[1], caps: \"flat\", color: sleeveCoat, sides: 8, name: `${name}Sleeve` });\n    for (const t0 of [sleeve[0], sleeve[1] - 0.015])\n      glow(\n        b.sweep(chain, (t) => rfn(t) + 0.075, { from: t0, to: t0 + 0.015, caps: \"flat\", color: ORANGE, sides: 8, name: `${name}Ring` }),\n        1.2,\n      );\n    // Two staggered rows of suckers on the flanks.\n    ts.forEach((t, i) => {\n      for (const deg of [112, 248]) {\n        const tt = deg === 112 ? t : Math.min(t + 0.03, 0.97);\n        const at = mainSweep.at(tt, deg);\n        const rc = Math.max(rfn(tt) * 0.66, 0.03);\n        b.stick(cupGeo(rc), suckerCoat, at, { embed: 0, flat: true, name: `${name}Sucker` });\n        void i;\n      }\n    });\n  }\n\n  type Spec = { name: string; side: number; theta: number; len: number; wob: number; phase: number; curl: number };\n  const specs: Spec[] = [];\n  const thetas = [28, 62, 126, 160];\n  const lens = [1.0, 1.02, 0.94, 0.88];\n  const wobs = [0.55, -0.7, 0.8, -0.5];\n  const curls = [1.15, 0.75, 1.0, 1.5];\n  for (const side of [1, -1])\n    thetas.forEach((th, i) =>\n      specs.push({\n        name: `arm${side > 0 ? \"L\" : \"R\"}${i + 1}`,\n        side,\n        theta: th,\n        len: lens[i] * (side > 0 ? 1 : 0.96),\n        wob: wobs[i] * (side > 0 ? 1 : -0.85),\n        phase: i * 1.3 + (side > 0 ? 0 : 2),\n        curl: curls[i] * (side > 0 ? 1 : 0.9),\n      }),\n    );\n\n  for (const sp of specs) {\n    const th = (sp.side * sp.theta * Math.PI) / 180;\n    const d = new THREE.Vector3(Math.sin(th), 0, Math.cos(th));\n    const perp = new THREE.Vector3(Math.cos(th), 0, -Math.sin(th));\n    const rfn = (t: number) => keyed(armKeys, t);\n    const raw = armTable.map(([rho, y], i) => {\n      const r = 0.45 + (rho - 0.45) * sp.len;\n      const lat = sp.wob * Math.sin(i * 0.85 + sp.phase) * smoothstep(0.15, 1, r / 7);\n      const p = CA.clone().addScaledVector(d, r).addScaledVector(perp, lat);\n      p.y = i >= armTable.length - 2 ? y * sp.curl : y;\n      return p;\n    });\n    // Keep the arm lying on the water: raise y to the tube's own radius there.\n    const lens3 = [0];\n    for (let i = 1; i < raw.length; i++) lens3.push(lens3[i - 1] + raw[i].distanceTo(raw[i - 1]));\n    raw.forEach((p, i) => {\n      if (i >= 3) p.y = Math.max(p.y, rfn(lens3[i] / lens3[lens3.length - 1]) + WATER_TOP + 0.005);\n    });\n    const chain = b.chain(sp.name, catmull(raw), {\n      parent: front.joints[1],\n      names: (i) => `${sp.name}_${i + 1}`,\n      role: \"tentacle\",\n    });\n    const sw = b.sweep(chain, rfn, { color: armCoat, sides: 8, name: sp.name });\n    const ts: number[] = [];\n    for (let k = 0; k < 9; k++) ts.push(0.36 + k * 0.065);\n    dress(sp.name, chain, rfn, ts, sw, [0.1, 0.3]);\n  }\n\n  // Raised feeding tentacles with clubs.\n  for (const side of [1, -1]) {\n    const name = `tentacle${side > 0 ? \"L\" : \"R\"}`;\n    const th = (side * 92 * Math.PI) / 180;\n    const d = new THREE.Vector3(Math.sin(th), 0, Math.cos(th));\n    const perp = new THREE.Vector3(Math.cos(th), 0, -Math.sin(th));\n    const pts = tentTable.map(([rho, y], i) => {\n      const lat = 0.35 * Math.sin(i * 0.9 + (side > 0 ? 0 : 2.1)) * smoothstep(0.15, 1, rho / 4.5);\n      return CA.clone().addScaledVector(d, rho).addScaledVector(perp, lat).setY(y);\n    });\n    const rfn = (t: number) => keyed(tentKeys, t);\n    const chain = b.chain(name, catmull(pts), {\n      parent: front.joints[1],\n      names: (i) => `${name}_${i + 1}`,\n      role: \"tentacle\",\n    });\n    const sw = b.sweep(chain, rfn, { color: armCoat, sides: 8, name });\n    const ts: number[] = [];\n    for (let k = 0; k < 6; k++) ts.push(0.34 + k * 0.06);\n    for (let k = 0; k < 3; k++) ts.push(0.7 + k * 0.08);\n    dress(name, chain, rfn, ts, sw, [0.08, 0.26]);\n    // Barbs on the club tip.\n    for (const deg of [60, 180, 300]) b.spike(sw.at(0.98, deg), sw.at(0.98, deg), 0.28, 0.05, { color: BONE, name: `${name}Barb` });\n  }\n\n  return b.root;\n}\n"
+      }
+    },
+    "text": "Wrote 485 lines\n[samples/kraken.ts#57F9]",
+    "isError": false
+  },
+  {
+    "call": {
+      "id": "toolu_01QNAm2P1X2fc3wNMiBgEHYA",
+      "name": "edit",
+      "input": {
+        "input": "[kraken.ts#57F9]\n"
+      }
+    },
+    "text": "Tool error: Error: Edits may only target samples/kraken.ts using its read snapshot.",
+    "isError": true
+  },
+  {
+    "call": {
+      "id": "toolu_01Whvn57cHUK7cG9obW2e1gX",
+      "name": "grep",
+      "input": {
+        "pattern": "finCoat = paint|as unknown as string",
+        "path": "samples/kraken.ts"
+      }
+    },
+    "text": "86:const finCoat = paint((_p, n, s) => {\n287:  b.part(new THREE.SphereGeometry(1, 12, 8), mix(SKY, BLUE, 0.4) as unknown as string, {\n",
+    "isError": false
+  },
+  {
+    "call": {
+      "id": "toolu_01KgzM2ty7eaoENNPXKgfFmM",
+      "name": "read",
+      "input": {
+        "path": "samples/kraken.ts:84-98"
+      }
+    },
+    "text": "[samples/kraken.ts#57F9]\n83:\n84:const suckerCoat = paint((_p, _n, s) => (s[1] > 0.82 ? SUCKIN : SUCK));\n85:\n86:const finCoat = paint((_p, n, s) => {\n87:  if (Math.abs(n.y) < 0.4 && Math.abs(n.x) < 0.4 && Math.abs(n.z) > 0.4 && false) return GRAPH;\n88:  const u = s[0];\n89:  const v = s[1];\n90:  if (u > 1.95) return ORANGE;\n91:  if (Math.abs(((v / 0.3) % 1) - 0.5 * Math.sign(v) - 0.5 * (v < 0 ? 0 : 0)) < 0.06) return CREAM;\n92:  return mix(INDIGO, BLUE, smoothstep(0, 1.9, u));\n93:});\n94:\n95:const crestCoat = paint((_p, _n, s) => (s[1] > 0.86 ? ORANGE : mix(GRAPH, INDIGO, s[1])));\n96:\n97:// Eye drawing -------------------------------------------------------------------------------------------------------\n98:const EYE = svg(\n99:  `<svg viewBox=\"0 0 100 100\">\n100:    <defs>\n101:      <radialGradient id=\"ir\" cx=\"50%\" cy=\"46%\" r=\"52%\">\n…\n114:  </svg>`,\n…\n116:);",
+    "isError": false
+  },
+  {
+    "call": {
+      "id": "toolu_01DXHFhyPdSN52FdGbTyedg5",
+      "name": "edit",
+      "input": {
+        "input": "[samples/kraken.ts#57F9]\nPUT 86.=93:\n+const finCoat = paint((_p, _n, s) => {\n+  const u = s[0];\n+  const v = s[1];\n+  if (u > 1.95) return ORANGE;\n+  if (Math.abs((((v / 0.3) % 1) + 1) % 1 - 0.5) < 0.05) return CREAM;\n+  return mix(INDIGO, BLUE, smoothstep(0, 1.9, u));\n+});\nPUT 287.=287:\n+  b.part(new THREE.SphereGeometry(1, 12, 8), mix(SKY, BLUE, 0.4), {"
+      }
+    },
+    "text": "[samples/kraken.ts#40C1]\n84:const suckerCoat = paint((_p, _n, s) => (s[1] > 0.82 ? SUCKIN : SUCK));\n85:\n86:const finCoat = paint((_p, _n, s) => {\n87:  const u = s[0];\n88:  const v = s[1];\n89:  if (u > 1.95) return ORANGE;\n90:  if (Math.abs((((v / 0.3) % 1) + 1) % 1 - 0.5) < 0.05) return CREAM;\n91:  return mix(INDIGO, BLUE, smoothstep(0, 1.9, u));\n92:});\n284:  const hc = bodyPath.at(0.8);\n285:  // Soft skirt where the arms root.\n286:  b.part(new THREE.SphereGeometry(1, 12, 8), mix(SKY, BLUE, 0.4), {\n287:    at: [0, 2.38, 0.55],\n288:    scale: [1.3, 0.55, 1.3],\n\n291:  });",
+    "isError": false
+  },
+  {
+    "call": {
+      "id": "toolu_01Q7yYUeVnBApKq9UnCvwsnP",
+      "name": "bash",
+      "input": {
+        "command": "npm run typecheck -- kraken 2>&1 | tail -40"
+      }
+    },
+    "text": "scratch/replay-app/kraken/typecheck.ts(286,46): error TS2345: Argument of type 'Rgb' is not assignable to parameter of type 'Fill'.\n  Type 'readonly [number, number, number]' is not assignable to type 'Paint'.\n",
+    "isError": true
+  },
+  {
+    "call": {
+      "id": "toolu_01XfcK4bLbynpV5KjNoF1vJR",
+      "name": "edit",
+      "input": {
+        "input": "[samples/kraken.ts#40C1]\nPUT 286.=286:\n+  b.part(new THREE.SphereGeometry(1, 12, 8), \"#4781de\", {"
+      }
+    },
+    "text": "[samples/kraken.ts#B6ED]\n284:  const hc = bodyPath.at(0.8);\n285:  // Soft skirt where the arms root.\n286:  b.part(new THREE.SphereGeometry(1, 12, 8), \"#4781de\", {\n287:    at: [0, 2.38, 0.55],\n288:    scale: [1.3, 0.55, 1.3],\n\n291:  });",
+    "isError": false
+  },
+  {
+    "call": {
+      "id": "toolu_01X32t8K1NYAKbpLQKmFtwvK",
+      "name": "bash",
+      "input": {
+        "command": "npm run typecheck -- kraken 2>&1 | tail -40"
+      }
+    },
+    "text": "No type errors in samples/kraken.ts.\n",
+    "isError": false
+  },
+  {
+    "call": {
+      "id": "toolu_019bhsKMf4ETUZJwWrq1ZT9R",
+      "name": "bash",
+      "input": {
+        "command": "npm run preview -- kraken --shot 2>&1 | tail -60"
+      }
+    },
+    "text": "Renders are unavailable in this environment. Finish the file; it is rendered after you end your turn.",
+    "isError": true,
+    "renderRefused": true
+  },
+  {
+    "call": {
+      "id": "toolu_01XMDixCbhYCdTTLyL34PZsV",
+      "name": "bash",
+      "input": {
+        "command": "npm run preview -- kraken 2>&1 | tail -80"
+      }
+    },
+    "text": "Renders are unavailable in this environment. Finish the file; it is rendered after you end your turn.",
+    "isError": true,
+    "renderRefused": true
+  },
+  {
+    "call": {
+      "id": "toolu_01ANLhZynn9aYonVECgszmzk",
+      "name": "bash",
+      "input": {
+        "command": "npm run snap -- kraken --report-only 2>&1 | tail -80; cat package.json | grep -A12 scripts"
+      }
+    },
+    "text": "Renders are unavailable in this environment. Finish the file; it is rendered after you end your turn.\nRendering is impossible in this environment. If the file is complete, end your turn with a one-line summary.",
+    "isError": true,
+    "renderRefused": true
+  },
+  {
+    "call": {
+      "id": "toolu_01JWGTuZymszfb3o4r56MSHa",
+      "name": "bash",
+      "input": {
+        "command": "mkdir -p scratch/kraken && cat > scratch/kraken/run.ts <<'EOF'\nimport * as THREE from \"three\";\nimport build from \"../../samples/kraken\";\nconst root = build();\nconst box = new THREE.Box3().setFromObject(root, true);\nlet meshes = 0, tris = 0, joints = 0;\nroot.traverse((o: any) => { if (o.isMesh) { meshes++; const g = o.geometry; tris += (g.index ? g.index.count : g.attributes.position.count) / 3; } if (o.isBone || o.userData?.joint) joints++; });\nconsole.log(\"meshes\", meshes, \"tris\", Math.round(tris), \"box\", box.min.toArray().map(v=>v.toFixed(2)), box.max.toArray().map(v=>v.toFixed(2)));\nconsole.log(\"rig chains\", (root.userData.rig?.chains ?? []).length, \"joints\", (root.userData.rig?.joints ?? []).length);\nEOF\nbun run scratch/kraken/run.ts 2>&1 | tail -30"
+      }
+    },
+    "text": "Renders are unavailable in this environment. Finish the file; it is rendered after you end your turn.",
+    "isError": true,
+    "renderRefused": false
+  },
+  {
+    "call": {
+      "id": "toolu_018tB6GkPrfUpZqu3rK9k1kR",
+      "name": "bash",
+      "input": {
+        "command": "echo hi; which bun node npx"
+      }
+    },
+    "text": "hi\n/home/cx/.vite-plus/bin/node\n/home/cx/.vite-plus/bin/npx\n",
+    "isError": true
+  },
+  {
+    "call": {
+      "id": "toolu_016DJTofYE1d5ZnYtzhyZHLq",
+      "name": "bash",
+      "input": {
+        "command": "ls node_modules/.bin 2>/dev/null | head -30; ls scripts; sed -n 1,40p package.json"
+      }
+    },
+    "text": "No such file or directory: node_modules/.bin",
+    "isError": true
+  },
+  {
+    "call": {
+      "id": "toolu_01WHtjzAUfox9ZP7pN3WB14V",
+      "name": "bash",
+      "input": {
+        "command": "ls scripts; cat package.json"
+      }
+    },
+    "text": "bakeoff.ts\nlab-export.ts\nlab-thumbs.ts\npreview-page.ts\npreview.ts\nprovenance.ts\nsession-stats.ts\nsheet.ts\nsnap.ts\nthumbs.ts\ntypecheck.ts\n{\n  \"name\": \"agentic-3js-builder\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"description\": \"Helper SDK for LLMs writing primitive-built, skeleton-rigged three.js creatures, with a sample library and a local showcase.\",\n  \"scripts\": {\n    \"typecheck\": \"tsx scripts/typecheck.ts\",\n    \"showcase\": \"vite showcase\",\n    \"showcase:build\": \"npm run thumbs && npm run lab-thumbs && vite build showcase\",\n    \"thumbs\": \"tsx scripts/thumbs.ts\",\n    \"snap\": \"tsx scripts/snap.ts\",\n    \"provenance\": \"tsx scripts/provenance.ts\",\n    \"preview\": \"tsx scripts/preview.ts\",\n    \"sheet\": \"tsx scripts/sheet.ts\",\n    \"bakeoff\": \"tsx scripts/bakeoff.ts\",\n    \"lab-thumbs\": \"tsx scripts/lab-thumbs.ts\",\n    \"lab-export\": \"tsx scripts/lab-export.ts\"\n  },\n  \"dependencies\": {\n    \"marked\": \"^18.0.14\",\n    \"three\": \"0.185.1\"\n  },\n  \"devDependencies\": {\n    \"@types/node\": \"^26.6.3\",\n    \"@types/three\": \"0.185.1\",\n    \"esbuild\": \"^0.28.2\",\n    \"playwright-core\": \"1.54.1\",\n    \"tsx\": \"^4.23.15\",\n    \"typescript\": \"^7.0.2\",\n    \"vite\": \"^8.3.1\"\n  }\n}\n",
+    "isError": false
+  },
+  {
+    "call": {
+      "id": "toolu_017ZQD4SnpGMTADR4dsmrkwi",
+      "name": "bash",
+      "input": {
+        "command": "npx tsx scratch/kraken/run.ts 2>&1 | tail -30"
+      }
+    },
+    "text": "Renders are unavailable in this environment. Finish the file; it is rendered after you end your turn.\nRendering is impossible in this environment. If the file is complete, end your turn with a one-line summary.",
+    "isError": true,
+    "renderRefused": true
+  }
+]

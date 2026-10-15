@@ -1,0 +1,28 @@
+{
+  "id": 363,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg43BrnXhe8uF6MzP8hp6",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_01MKG68enn3gy1mD1DLFnVhT",
+        "name": "edit",
+        "input": {
+          "input": "[samples/lavaGolem.ts#B3C2]\nPUT 250.=261:\n+  const wrap = (center: (t: number) => THREE.Vector3, t0: number, t1: number, az0: number, az1: number, r: number) => {\n+    const n = Math.max(4, Math.round(Math.abs(t1 - t0) * 22));\n+    return Array.from({ length: n + 1 }, (_, i) => {\n+      const t = i / n;\n+      const jit = i > 0 && i < n ? (R() - 0.5) * 0.4 : 0;\n+      const az = ((az0 + (az1 - az0) * t) * Math.PI) / 180 + jit;\n+      const tt = t0 + (t1 - t0) * t + (i > 0 && i < n ? (R() - 0.5) * 0.03 : 0);\n+      return center(tt).add(V(Math.sin(az) * r, 0, Math.cos(az) * r));\n+    });\n+  };\nPUT 233.=242:\nPUT 492.=492:\n+      const h = surf.around(mid1).at(az, 0);\nPUT 559.=559:\n+      const h = surf.around(up1).at(s * 90 + az * -s, 0);\nPUT 601.=601:\n+      collar(c, da, t.r * 0.9, t.r * 1.03, 0.04, shoulder, GOLD, 6);\n"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 511,
+      "cache_read_input_tokens": 143339,
+      "cache_creation_input_tokens": 430
+    }
+  }
+}

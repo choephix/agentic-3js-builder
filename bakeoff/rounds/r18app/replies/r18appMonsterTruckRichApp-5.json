@@ -1,0 +1,42 @@
+{
+  "id": 101,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3zNf5YGjSigy68SwHn7",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "The samples directory seems empty but scratch/monsterTruck exists, so I'll try typechecking a minimal file to see which commands actually work.\n\n",
+        "signature": "CAQS7gYKEAgSGAI4AUIIdGhpbmtpbmcSDKA9hYIhGNbC7740JBoM6F+STEOHTLZY+LHFIjAZ3l+8x8aaXKIAEywNKXfRn3NzB01953N1aIRyzas80h05VzTxNf5e10qXdlue7l8qiwb4F4CnDjTWJWpr3JItm+KARK5u8158NYRwFZFF2/y2PRz+iGyv9fZG/Vb1zMAFtoJKsYuF6Qf6MMNYZypRoXirnOymGPHanA7Jr0uMTg4umLmVW1LqkVQQN95zai5+TuQfpQ43Sz7L/uCfvOw7zzwQt6zVICkWSxVNZdVL4Ucz5W+0QjRLamAXQd4Hulae5a7zgwsv08DOOCABFvdHEUWlDdKn6uJqESjn0+sl7wtzGCu068Y742ML4NKsXsHxhyGbqoQSS+uUB3vZ3wPpXZaB3sVBQmX+Ksw2RxIUqd4c3y/Jd91k9RwD9AYii78yGXcfkgSPZPRMi0LRRKaMcdxDVdAJINL80/jMM8TM+yUNDr88F4B/5nXdtrzQ/gTyu92lsAlf1DzjhFpar8r07yiMk7IFrWs51ja7z0X/kshxueciP5dsxvbtRhHOMYi/idqHVKUqLZozCGym3S6f8HK9xl7Q4sd86lY5tgh9Mji1+sqcV66xCcFwvgmH/HXLEYxwNN1iPaWYKlVeZcT/QQ1StYzoWhKeXwozO3tX2kkgf689151a05XTlLKV3dNfh8sL2R0DxwMgLCfWCuQRiTAXh08UQSzSAdHRZE5XYNFQ8vPyqy1rcplkp4yucIVLi5s211+4R45cYP5F2PHhJOShTG4C1BKLJXcCfsvG9ONX8AxrPua51CZx/bXF4T2vvtJlD2pP0JdavwzqHt53XB2JYK8EGDBhwHhl0r0yzvXnkYF+Z7kAxmTRuOakRNsqWkpB4wTCFuGvlBLmelqEqnafD9Trru5v1L1Wyb+o6LILlemQ/2lLGmx7PIc+LR55uxCRyZykcf5tDaCz5Wb6oEOn5P0zDKKzBvaebrNNIjttFys9FA2SC85tcbQl7d63cEyCGgGOORORuZEZSHtiNiynZzDsF4+yRUq/CuzWWCF7R9wHz4uNon+noUYEIqqPiVMwLsTC90ALdpmUXNB+IZuv2k3uF7mSeUkYTj/epPG7D7JsJBVSkxFK0zwpwUkMkdKhwu6IYt/H6jk43hgB"
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01LtD9mmWpPS6X1XKUZ6VJct",
+        "name": "write",
+        "input": {
+          "path": "samples/monsterTruck.ts",
+          "content": "import * as THREE from \"three\";\nimport { createBuilder } from \"../src/builder\";\n\nexport const meta = { name: \"stub\", description: \"stub\", style: \"pixel art\", commit: \"88fc1f0\" };\n\nexport default function build() {\n  const b = createBuilder({ name: \"stub\" });\n  b.joint(\"root\", { at: [0, 0.5, 0] });\n  b.part(new THREE.BoxGeometry(1, 1, 1), \"#ff0000\", { at: [0, 0.5, 0] });\n  return b.root;\n}\n"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_015y2VMP8UqkZABg9qCnEeAK",
+        "name": "bash",
+        "input": {
+          "command": "npm run typecheck -- monsterTruck 2>&1 | tail -15"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 363,
+      "cache_read_input_tokens": 120758,
+      "cache_creation_input_tokens": 332
+    }
+  }
+}

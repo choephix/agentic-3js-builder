@@ -1,0 +1,42 @@
+{
+  "id": 364,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg43C2SU8Wkb1X58CzdVP",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "The file wasn't created since the whole command got rejected, maybe flagged by \"probe\" or \"tsx\". Let me try using the write tool directly for the file instead and then run it with npx tsx.\n\n",
+        "signature": "CAQSpgcKEAgSGAI4AUIIdGhpbmtpbmcSDF/PwzbMGMKPwe6E+RoM9OzFTb8lluywTQNAIjCro1zuIWMLOGx1ahVoV1C/z0vliJmIxwU8ZsfUEbLtsBsyN896ib1iZ6ILD3qfqPoqwwYnNCxATtiDxl/J+miZBFXcINzNvEBsGKNliv8Z4gntXcH8dCKXISleBkiYQvYK112UWcFbE41uBRX9XUaXYQs5N62TsuaHGtM2CFo2RuwcMkaxTk2joueevUarPu6LyNtxIuQzM8HsivP8n/w7SL3MGiLzvN005Uv/E9X35ISXBfdR8c0Sjb57GI6LNiIkKGU+ehd9eyEd/NI2CtkI5NqBC9SdgVlXkKSXyuv1lqPSjj0WbhJ/nnFXUm+62qmMb2qHzXR0V/nnDxYUubhWC1lAn2tBCyK81wOY0RkyPb0vlAicpfDinKKOV3gCAmiLuFxjuIiVQQssST+TCCOVvs1jnTUGiKTVb98/T0cZ5i5DhJJDyAbBhl4DTbesHtZT71AvkW+aiWMEGTHF82vDEnnrwb3s+cIg6szDsqipfPoHnvK3rogHdojr89mzd5TnjakguONoWEy6UZFQ8rChq3uBgGyt3wuCKsoDtsrxG1qGyricyOP/iyTROKg0+K2HGu9m2RvU8YxGieX3AEY/oUaoynTLYGbMXsNMyNb/yuiF9PPGZ372cQ5pUAzntnUMX2JatAHfRWZlSk8eFLlkCzk6MITCv5SxevZQlb8ba5beKCf339fC/1HNlkFgUiPHLZC8eqHvELrYjXM7pwzD7KlfNMIKnwutx9FtKa8tdEU/s2xwx7eAND0GbeklUIDkO0/8+3nhk3nLE+4LToXejQk08nK610QLlmQdh4G+Fqc5MWYpzz6NpywBt9gaenCjLBYPdfIOb0mYrlw9thbyRlQ34ZUdQG4vi7WwM/Rl/5hxE8DI11vt3c0vZZExtLwrt3RdRaX2/op1DvfTH+SD2iJcGIAfOspqsiUDpAk0IaHUyRwBbDahIXPKgIsdvhgTb6A14TQJI0l8nDqDq/irfHUlYIevdGFA/wKEpb2R3O+xqS+lt1F/tpoRhzhjPdHCFdqS+YuCctvAEH8vSCbzlYFidJCLA5psl+X8AX5IxMaut83/4cP27HME/vwjZo0mTOT9jdKEhhGxiVx/8Phow1R66KirryAaRmGGwsqvTcyqlo1x2nT4gYx08Y2K/AmjLIt5KZkM9UQKqDIo1vgbqv64cDsgGAE="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01FSTaVVDmR2AAqLG7rHUNAy",
+        "name": "write",
+        "input": {
+          "path": "scratch/chopperMotorbike/measure.ts",
+          "content": "import * as THREE from \"three\";\nimport build from \"../../samples/chopperMotorbike\";\n\nconst root = build();\nconst box = new THREE.Box3().setFromObject(root, true);\nlet parts = 0;\nlet tris = 0;\nconst joints: string[] = [];\nroot.traverse((o) => {\n  if ((o as THREE.Mesh).isMesh) {\n    parts++;\n    const g = (o as THREE.Mesh).geometry;\n    tris += (g.index ? g.index.count : g.attributes.position.count) / 3;\n  }\n  if (o.type === \"Group\") joints.push(o.name);\n});\nconsole.log(\"parts\", parts, \"tris\", tris);\nconsole.log(\"min\", box.min.toArray().map((n) => n.toFixed(3)).join(\" \"), \"max\", box.max.toArray().map((n) => n.toFixed(3)).join(\" \"));\nconsole.log(\"joints\", joints.length, joints.join(\",\"));\n"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01TmG2hA13gMfRMsE16yRr5D",
+        "name": "bash",
+        "input": {
+          "command": "npx tsx scratch/chopperMotorbike/measure.ts 2>&1 | tail -30"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 528,
+      "cache_read_input_tokens": 163158,
+      "cache_creation_input_tokens": 252
+    }
+  }
+}

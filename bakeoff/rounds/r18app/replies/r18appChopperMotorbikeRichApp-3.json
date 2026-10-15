@@ -1,0 +1,33 @@
+{
+  "id": 317,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg42ixybWEstVEYqZMPM7",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "I need to find where the Joint type is defined, likely in the frame or skeleton source files, so I'll search for the exported Joint class.\n\n",
+        "signature": "CAQStQYKEAgSGAI4AUIIdGhpbmtpbmcSDN6FksFQnAThrs1EuRoMwC/1mr8ZMbmsOaK5IjBbHt09uKYn5WezAQjtugrRxBQYAy3hmEShbFOPRtk2TTgh7KTP4VRTscIHCRBddTcq0gX1OLsgSs7yIx4Mpeq/UcUu9+KVTI7YKXkf5rHS5ZpnubRkpaZdXbAI6MALC38DQTgkvgt4dxbWlVMMOSEayUCeASTDo3b+4gjEmcSkeAEj+iNWlLYqCvELLQFnLUwWS9dmsRzVQrjR2FVUXawUApcqQwsISy7edelRurDp0NeVWqQvxXUzISyqLHBvHPaaT68uEHkuL20Ge4qrPg0/BBvGhMrgG2bASAMnn+3bOBfnL0xPkjxIFvR7MNcr6Bc8WeNZsklOb6zd/1Tuq1nByOdbyo8rXliA6ekaVzK+nafumImhHUssDpA7vRuvpbzStugBsw47RRtQbOpzmL2kSh7sdqG/9TWn/yO47D+5axhIf3RD/1jOF+4USyNhgbaAGbU+SIy72TZcI3ZN8BOlmxsj0ZqnUPxPizpLliVXV/rGtt22yaEmCPUoO6O56ZIuTn5CBZ0rF/p7vkxkV588wT/jAMy4v5VkvNT1LDQHxVfs+Yetl8I4uBxyWMp7+YntsMJJYI3lQpYC+CsWd2RTbRdG08+HeN+P75ySng6Tt2bffGNsuZD/tAD2iGfX9U3jn5b58BeIQJl/TJ0A4GG0Fq9v3f1d19h2J/93Hn7VEvRy+R8lpARPp6bheeF6HzpO1QrfPE4McU+bsbMy8gEffq1hR4VSMI+1oZWou0GimdKCDgoePwfW0bQjDO+kZYVGzYApIJUxJGUrjV3FdyM+dp9pCdggdbFmqnrymL8ZHUmCuYPicReao0Z5gb/Prnkq02IbT72yXg6Osdwabayj7svgefuNQDyyQ+70gQ+Sv3CvnffkH4TxneoJeccvvJWyCdSGAolQHCKKHpUNdslsrmZqAP9aLY6fH0tQ+e9++dasZrAm+Vb7TvqJRS2/NtuoasOU4MNsAvj0iuP+EkN8LznJNqyLibDGUVDmF7qrfSfz4TKpsB/b1OdKJ4kq9G7AV7izNhgB"
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_011RqsCDwDaaH7M325r4sPTV",
+        "name": "bash",
+        "input": {
+          "command": "grep -n \"export class Joint\\|export type JointRef\\|export type JointOptions\" -A12 src/skeleton.ts src/context.ts | head -60; sed -n 1,40p src/decal.ts"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 142,
+      "cache_read_input_tokens": 106997,
+      "cache_creation_input_tokens": 1466
+    }
+  }
+}

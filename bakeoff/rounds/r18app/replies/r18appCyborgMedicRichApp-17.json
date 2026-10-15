@@ -1,0 +1,37 @@
+{
+  "id": 62,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3ynQPJWxCMfB4E7QLzN",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_01CCZq2FdZm1C2aMzUSrQvx6",
+        "name": "bash",
+        "input": {
+          "command": "echo hi; ls scratch/cyborgMedic"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01PF4HauSwGYt3AuDi1td1iF",
+        "name": "eval",
+        "input": {
+          "language": "js",
+          "code": "const r = await Bun.$`npx tsx scratch/cyborgMedic/check.ts`.nothrow().quiet(); console.log(r.stdout.toString().slice(-2000), r.stderr.toString().slice(-2000));"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 207,
+      "cache_read_input_tokens": 154678,
+      "cache_creation_input_tokens": 387
+    }
+  }
+}

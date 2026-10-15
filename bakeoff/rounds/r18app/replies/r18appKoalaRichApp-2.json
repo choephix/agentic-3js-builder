@@ -1,0 +1,36 @@
+{
+  "id": 187,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg41PvtSRDa7ob4zFTqyA",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_015wCZUjCRHNjGRbXz3MWFfi",
+        "name": "read",
+        "input": {
+          "path": "src/builder.ts:150-240"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_011J1fr4SfKw9ju8qMnRmx4R",
+        "name": "bash",
+        "input": {
+          "command": "ls; ls samples scratch 2>&1 | head; grep -n \"interface Station\" -A12 src/*.ts | head -30"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 142,
+      "cache_read_input_tokens": 81364,
+      "cache_creation_input_tokens": 11389
+    }
+  }
+}

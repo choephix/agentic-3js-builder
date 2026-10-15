@@ -1,0 +1,32 @@
+{
+  "id": 199,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg41XgWUZsNG6hUZhXbVw",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "text",
+        "text": "Replace the clumsy bone typing."
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01XLPhG8ypDnBW3JGLHvN286",
+        "name": "bash",
+        "input": {
+          "command": "python3 - <<'E'\np='samples/capybara.ts'\ns=open(p).read()\ns=s.replace('bone: Parameters<typeof b.part>[2] extends infer O ? (O extends { bone?: infer B } ? B : never) : never,','bone: Joint,')\ns=s.replace('bone: Parameters<typeof ell>[3]) =>','bone: Joint) =>')\ns=s.replace('import { limb } from \"../src/ik\";','import { limb } from \"../src/ik\";\\nimport type { Joint } from \"../src/skeleton\";')\nopen(p,'w').write(s)\nE\nnpm run typecheck -- capybara 2>&1 | tail -30"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 288,
+      "cache_read_input_tokens": 108300,
+      "cache_creation_input_tokens": 134
+    }
+  }
+}

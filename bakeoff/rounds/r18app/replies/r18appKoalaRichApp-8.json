@@ -1,0 +1,33 @@
+{
+  "id": 230,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg41kczFd2Z8Wc5wPQZuQ",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "These are just unused variable warnings, so I just need to remove the unnecessary baseLow assignment, drop the unused nose variable, and fix the rGrip parameter path.\n\n",
+        "signature": "CAQSgQcKEAgSGAI4AUIIdGhpbmtpbmcSDLVuPc77e/82k/WkdhoMUSQGa7DKAofjABqDIjAzho6NWMMYBXffxMNERojQbZWAlImpDe5UL/eiUVNh7qEXMrCWVKqPcKXN91Mr4Ncqngaxj86NjFnacFNaw1Lq0OTMhVDlO3wxGPmnVUalb5qSdlSUlm3FeFRW1ljquOwQVQ/XdVAfGsPiJwzXSVTp1MC2xn3kR9KA0QFEnxg4O6CZ7HSD26p/S9kGnzqt/zHRvAk/rerXPGAZHLf3/1PlO6aGkUDL4hji2NyQOckRn/dNC68KkgfzgMs806Mjk1LyLNZpOeL+0Q2PqNXFyq0gZGXlIa4gXsYxZLB35ZHapPynqOxmQ/FX4ltsdYEWhmIhHandf3tFwdv2woX17x8ldxvlXLjdwGz9uAGCIQm5XLTTkH0xBvJHnSE5AQtIf8z+RuBRGTmqxxK+pBXyzwDLSmyqL2rXOe3RM1myUz6YuZAv41M07wIxec1e1i8B2q1Daja6nmKWh3Oqx1EMvi7nMUrj5nbu1UpvoroeGs0QD6OGF5PZdlTS5c3YmgvVwhzFyOzplUS+JPzysNj3UWFZGsZBUl/h7ZnvAbatFgrtpy4y2rDM5znIKDbIGDZo2HxOAzw4u9l3OhA6wZnq6o2lbj0/rj/xoCuRYK3HMqf5NMevcPWQpAvo8d/Y3FP0mc5RanewkqDmAd0kOrpbgLNvEM7Q2AaXVHk9BfaFpEqOug5ts9p1rEzxIOKOdsATUOxR0oy2Fym/CS4xVZ4cNyoVMy0b+yjtUHTgA/cw63+dNLtUy8jZEkLz6PblvtQyNH6XZRsxbqRXtL4WznAy6ndOwwJLGqJ87e9NI9N+NC3H8i/P1T1/E+5BuPWAKueaNYXmIUXHBRBY2iuEQ54jFPToF2Jvg3mK0qrQXHZ1MXOrxoJco/i09dX1OxeJWgRXAMyNNdJXY+by0W3wfZ6tteAHddcNJXqyCGnQAMvLA7CZdYp/tR3wdmOV6xDAqZO8bOVxpxT1tKZPpypcoz0HB9H8DE0IyNdvNkOk3wqN5XC2R4zz72s8HrVE+1PeMw2IRW/KeJzX506fc0OLnashYtzv/3DeSnpTSX61mhn6lMq5JJHrMgN8yk4BmbQJOTG0ueqAT8nwpwcl1GhaLoHGHbZ4tAEl/2MBApXZH+6jh54WtaMYAQ=="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01NZah5uDUSAyPCRt8g2v51F",
+        "name": "bash",
+        "input": {
+          "command": "cd samples && sed -i 's/const baseLow = b.part(/b.part(/; s/const nose = b.part(/b.part(/; s/const rGrip = (path: ReturnType<typeof catmull>, t: number) => branchR(t) + 0.0;/const rGrip = (t: number) => branchR(t);/; s/const Rb = rGrip(path, t);/const Rb = rGrip(t);/' koala.ts && cd .. && npm run typecheck -- koala 2>&1 | tail -20 && npm run preview -- koala --shot --box '#0' 2>&1 | tail -40"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 299,
+      "cache_read_input_tokens": 135399,
+      "cache_creation_input_tokens": 218
+    }
+  }
+}

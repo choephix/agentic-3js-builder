@@ -1,0 +1,42 @@
+{
+  "id": 376,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg43DaBhX2BrgmKcUoxE6",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "I should check how the builder handles parts without joints, especially the root which has no position at all. The root joint is likely auto-created, so I want to search for where ctx.root gets set up.\n\n",
+        "signature": "CAQSuAcKEAgSGAI4AUIIdGhpbmtpbmcSDNlzRlSJjCWRLsYY3xoMOOoY4YW2cBUMaj/KIjD8rCTuvh6mbRhSRS7o6887Lb4Pfybu75sf5MoE0Vgcq/FQ06K31QIrtw84QZFU2ioq1QYn6dD0KpNd0pwUyfwtKRhGLmBjrBQ6RRvKB1hJPxUcPY5tHBF21k22V5Rzue8Y7huSJQ1yDZP5lLVzl9cSfebjbi7tHfiSYOALZ8bI67rvmNeLq+BGpX7MCjWsF8nmgyAUs8agS4tEfzc0udsWAHANzSdoACq91lH1ofnXs9xlN19kz7cquGfR6EQuO2GTnBorZSRf8K5NIar60CpK2eVQ+14Ovb4ylANWBcfEl/lo1KGToouxuAdzf1Byb+LhsoLyKXSc4kzKenJOseOh/YkBp55mCLJ9luPVH6tumu+bo3FHCaaaJrE90+F1VBmy+yKKfRytAzge+6s3cu4vCp6rrxoAroZAzZ3g1ZcXxtnIQfgui3o8cAToUhCy3x8PTX2K4GGU8lYnkAaYw7MpWh6UuG4rix6LvmSC/aA4IEJsNW7FDb6VKcxPKvxr7A9mNC+jmEZzZdyS8bgbuT73g7qNaCUFt4jSeRM+iqx22eSj/ZvWrdyk0dtDuHByqi34V5Blj9ERaoXS/PVGMRDPxKRuXkUHa3ynWXehn/AtgUwo3iX1RiueinMe3wajVZcO34rEjjyEqMbMMhZPg3R+uwu5O2kJvLkqRAvQkZr44zlLQp4FHWjiXABNZwDf/pssky7In0yRuKyj1RbCF45t+yGihkvFZI4a1Yf1roZLWslaUdgIA1ASuZP6QKCsMsomUT6MRGcvKUTWzqkl2uOUFb16yoxQaRlW61L3x0iBlhC3NhbDfAFXrXs+gz4kvEBqfDeKna0PtHyHDMlnggHGNTY3bXMIzxFdU3fOjBq6Pu7bw1ZLmSpzcY2Nwgqt9XUpxSMXMGXsS0hAze5Z8q5SXZnD2esClcaUGoe12oecMdCvPOufdCkJ1oAw0w9hc2TcdSVgmOYbRUQEQFqdbZWSk8TCagkyCw0DL2mcS1aVEIBJxJBmDaXqJ28Q5REJxbSBfCnkNSyaWb1Ok93kUEWdV1nRbS4ppFSCXz8Mb6Ceo5mekxtjU2/PUmzcRHUzi9LXknKfLgKLC145tb6lIfZjg55QAx3lg5iBYZmMLqVzHHTEHEh7GxxVI6cNVBBnBISVL2MH6rWtJr4feCs75B6Gniyx6baMLwU7PNzUKLToKWyVrp0cOfD3GAE="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01RfVQkCksRAXQKoqZTHQAWd",
+        "name": "grep",
+        "input": {
+          "pattern": "root",
+          "path": "src/context.ts"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01CDVV6rftfuRd7Rb1pQ1cEx",
+        "name": "bash",
+        "input": {
+          "command": "ls src; grep -n \"export\" kits/glow.ts | head"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 201,
+      "cache_read_input_tokens": 76685,
+      "cache_creation_input_tokens": 554
+    }
+  }
+}

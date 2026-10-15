@@ -5,15 +5,19 @@
  * R's archived tools are NAMES ONLY: definitions are recovered from installed OMP,
  * with find/wait reconstructed below. This limitation is recorded, never called exact replay.
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { gateway, wireImports, results, capture, systemPrompt } from "../scripts/bakeoff.ts";
+import { AppSandbox } from "./app-sandbox.ts";
 
 const ROOT = resolve(import.meta.dir, "..");
 const BASE = join(ROOT, "bakeoff");
 const EXPERIMENT2 = process.argv.includes("--experiment2");
-const INPUT = join(BASE, EXPERIMENT2 ? "replay2-inputs" : "replay-inputs");
+const APP = process.argv.includes("--app");
+const APP_ROUND = process.argv.includes("--app-round") ? process.argv[process.argv.indexOf("--app-round") + 1] : "r18app";
+const APP_SUBJECTS = process.argv.includes("--subjects") ? process.argv[process.argv.indexOf("--subjects") + 1].split(",") : [];
+const INPUT = join(BASE, APP ? APP_ROUND === "r18app" ? "app-inputs" : APP_ROUND + "-inputs" : EXPERIMENT2 ? "replay2-inputs" : "replay-inputs");
 const MODEL = "anthropic/claude-sonnet-5-5";
 const SUBJECTS = ["africanElephant", "capybara", "koala", "redPanda", "treasureHoard", "soulScythe"];
 const json = (path: string) => JSON.parse(readFileSync(path, "utf8"));
@@ -27,7 +31,7 @@ const text = (path: string, value: string) => {
 };
 const allPitches = ["pitches-r7.json", "pitches-r5.json"]
   .flatMap((p) => json(join(BASE, p)).subjects)
-  .filter((s) => SUBJECTS.includes(s.id));
+  .filter((s) => APP ? !APP_SUBJECTS.length || APP_SUBJECTS.includes(s.id) : SUBJECTS.includes(s.id));
 const craft = json(join(BASE, "arms-r12.json")).arms.find((a) => a.id === "craft3");
 const shapedSystem = systemPrompt(craft);
 const caveat =
@@ -362,18 +366,18 @@ function anthropicRequest(context: any) {
 
 const HISTORICAL = join(homedir(), "tmp-archive/replay-sdk-88fc1f0");
 
-async function readOnlyCall(call: any) {
+async function readOnlyCall(call: any, repository = HISTORICAL) {
   const args = call.input ?? {};
   const remap = (value: string) =>
     value
-      .replace(/(?:~|\/home\/cx)\/tmp-archive\/sonnet-100\/[A-Za-z0-9_-]+/g, HISTORICAL)
-      .replaceAll(ROOT, HISTORICAL);
+      .replace(/(?:~|\/home\/cx)\/tmp-archive\/sonnet-100\/[A-Za-z0-9_-]+/g, repository)
+      .replaceAll(ROOT, repository);
   try {
     if (call.name === "read") {
       const original = remap(String(args.path));
       const match = original.match(/^(.*?)(?::(\d+)(?:-(\d+))?)?$/)!;
-      const path = resolve(HISTORICAL, match[1]);
-      if (!path.startsWith(HISTORICAL + "/")) throw Error("Only historical repository files may be read");
+      const path = resolve(repository, match[1]);
+      if (!path.startsWith(repository + "/")) throw Error("Only repository files may be read");
       const content = readFileSync(path, "utf8").split("\n");
       const start = match[2] ? Number(match[2]) : 1,
         end = match[3] ? Number(match[3]) : match[2] ? Number(match[2]) + 299 : content.length;
@@ -386,15 +390,15 @@ async function readOnlyCall(call: any) {
       };
     }
     if (call.name === "grep") {
-      const path = resolve(HISTORICAL, remap(String(args.path ?? ".")).replace(/:\d.*$/, ""));
-      if (!path.startsWith(HISTORICAL)) throw Error("Only historical repository files may be searched");
+      const path = resolve(repository, remap(String(args.path ?? ".")).replace(/:\d.*$/, ""));
+      if (!path.startsWith(repository)) throw Error("Only repository files may be searched");
       const out = await capture("grep", ["-R", "-n", "-E", "--", String(args.pattern), path], 60000);
       return { text: out.stdout + out.stderr || "(no matches)", isError: out.status !== 0 && out.status !== 1 };
     }
     if (call.name === "glob") {
-      const pattern = remap(String(args.path ?? "**/*")).replace(HISTORICAL + "/", "");
+      const pattern = remap(String(args.path ?? "**/*")).replace(repository + "/", "");
       const paths = [];
-      for await (const p of new Bun.Glob(pattern).scan({ cwd: HISTORICAL, dot: false })) paths.push(p);
+      for await (const p of new Bun.Glob(pattern).scan({ cwd: repository, dot: false })) paths.push(p);
       return { text: paths.join("\n") || "(no matches)", isError: false };
     }
     if (call.name === "bash") {
@@ -419,8 +423,8 @@ async function readOnlyCall(call: any) {
         if (words[0] === "git" && !/^(?:show|ls-tree|log|rev-parse|diff|status)$/.test(words[1] ?? ""))
           throw Error("Only read-only git queries are allowed");
       }
-      const cwd = resolve(HISTORICAL, remap(String(args.cwd ?? ".")));
-      if (!cwd.startsWith(HISTORICAL)) throw Error("Only historical repository cwd is allowed");
+      const cwd = resolve(repository, remap(String(args.cwd ?? ".")));
+      if (!cwd.startsWith(repository)) throw Error("Only repository cwd is allowed");
       const out = await capture("bash", ["-lc", "cd " + JSON.stringify(cwd) + " && " + command], 60000);
       return { text: out.stdout + out.stderr || "(no output)", isError: out.status !== 0 };
     }
@@ -679,7 +683,233 @@ async function checkedAndRepaired(round: string) {
   return true;
 }
 
+const APP_STYLE_KITS: Record<string, string[]> = {
+  "pixel art": ["pixel"],
+  "Genshin Impact": ["toon", "glow"],
+  "high-fantasy anime": ["toon", "glow"],
+  "League of Legends": ["toon", "glow"],
+  "Overwatch": ["toon", "glow"],
+  "Blizzard/Warcraft": ["toon", "glow"],
+  "whimsical": ["toon"],
+  "low-poly": [],
+};
+const APP_UNAVAILABLE = "Renders are unavailable in this environment. Finish the file; it is rendered after you end your turn.";
+type AppCall = { id: string; name: string; input: Record<string, unknown> };
+
+async function prepareApp() {
+  const wizard = archived("wizardBookshelf");
+  const original = wizard.messages.find((message) => message.role === "user").content.find((block) => block.type === "text").text;
+  const template = original.replaceAll("wizardBookshelfSonnet", "{slug}")
+    .replaceAll("~/tmp-archive/sonnet-100/{slug}/", "{sandbox}")
+    .replace(/^Category:.*$/m, "Category: {category}")
+    .replace(/^Subject:.*$/m, "Subject: {subject}")
+    .replace(/^Style:.*$/m, "Style: {style}.")
+    .replaceAll('"high-fantasy anime"', '"{style}"');
+  const tools = json(join(BASE, "replay-inputs/tools.json")).map(({ schemaSource, ...tool }) => tool);
+  const manifest = {
+    model: MODEL, effort: "high", maxTokens: 120000, maxExtraCalls: 16, subjects: allPitches,
+    systemSource: wizard.sessionFile, systemPrompt: wizard.init.systemPrompt, briefTemplate: template, tools,
+    styleKitMapping: APP_STYLE_KITS,
+    additionalKits: {
+      clockwork: "Style or subject contains steampunk, clockwork, gears, brass: add clockwork doc and source.",
+      glow: "Fantasy/anime/game styles map above; also add glow for magic, fire/flame, light/lantern/candle, crystal/orb, neon, molten/lava, rune or spirit features.",
+    },
+    toolPolicy: "Current repo reads; virtual sample writes and native hashline edits; harmless scratch commands succeed; real targeted typecheck; no rendering; continue until natural/yield or 17 total calls.",
+    caveat,
+  };
+  save(join(INPUT, "manifest.json"), manifest);
+  save(join(INPUT, "pitches.json"), { subjects: allPitches });
+  text(join(ROOT, "scratch/bakeoff/craft3.md"), shapedSystem);
+  for (const subject of allPitches) {
+    const field = (name: string) => subject.rich.match(new RegExp("^" + name + ":\\s*(.*)$", "m"))[1];
+    const style = field("Style").replace(/\.$/, "");
+    const workspace = join(ROOT, "scratch/replay-app", subject.id);
+    const brief = template.replaceAll("{slug}", subject.id).replaceAll("{sandbox}", workspace + "/")
+      .replaceAll("{category}", field("Category")).replaceAll("{subject}", field("Subject")).replaceAll("{style}", style);
+    const kits = new Set(APP_STYLE_KITS[style] ?? []);
+    if (/steampunk|clockwork|gears?|brass/i.test(subject.rich)) kits.add("clockwork");
+    if (/magic|fire|flame|light|lantern|candle|crystal|orb|neon|molten|lava|rune|spirit/i.test(subject.rich)) kits.add("glow");
+    const files = ["GUIDE.md", "docs/api.md", "docs/conventions.md", ...[...kits].flatMap((kit) => kit === "glow" ? ["kits/glow.md"] : ["kits/" + kit + ".md", "kits/" + kit + ".ts"]), "src/paint.ts", "src/math.ts"];
+    const calls = files.map((path, i) => ({ type: "toolCall", id: "app_read_" + i, name: "read", arguments: { path } }));
+    const messages = [
+      { role: "user", content: [{ type: "text", text: brief }], timestamp: 0 },
+      { role: "assistant", api: "anthropic-messages", provider: "anthropic", model: "claude-sonnet-5-5", content: calls, stopReason: "toolUse", timestamp: 0 },
+      ...calls.map((call) => ({ role: "toolResult", toolCallId: call.id, toolName: "read", content: [{ type: "text", text: readFileSync(join(ROOT, call.arguments.path), "utf8") }], isError: false, timestamp: 0 })),
+    ];
+    save(join(INPUT, subject.id + ".json"), { context: { systemPrompt: wizard.init.systemPrompt, messages, tools }, files, kits: [...kits], workspace });
+  }
+  console.log("Prepared one fixed campaign template and current-repo synthetic reads for " + allPitches.length + " app briefs.");
+}
+
+async function runApp() {
+  if (!/^r18app[a-z0-9]*$/.test(APP_ROUND)) throw Error("Invalid app round: " + APP_ROUND);
+  const round = APP_ROUND, dir = join(BASE, "rounds", round), manifest = json(join(INPUT, "manifest.json"));
+  save(join(dir, "round.json"), {
+    id: round, started: existsSync(join(dir, "round.json")) ? json(join(dir, "round.json")).started ?? new Date().toISOString() : new Date().toISOString(),
+    model: MODEL, effort: "high", maxTokens: 120000, maxExtraCalls: 16, subjects: allPitches,
+    arms: [{ ...craft, id: "app", name: "Agent framing (app)", idea: "Fixed campaign template, current docs, virtual write/edit/typecheck loop, no renders." }],
+    styleKitMapping: manifest.styleKitMapping, additionalKits: manifest.additionalKits, briefTemplate: manifest.briefTemplate,
+    toolPolicy: manifest.toolPolicy, systemSource: manifest.systemSource,
+    visiblePaths: ["src/", "kits/", "docs/", "scripts/", "GUIDE.md", "package.json", "tsconfig*.json", "samples/<own-slug>.ts only"],
+    renderRefusalNudgeAfter: 3,
+  });
+  text(join(dir, "prompts/app.md"), manifest.systemPrompt.join("\n\n"));
+  mkdirSync(join(dir, "builds"), { recursive: true });
+  mkdirSync(join(dir, "checks"), { recursive: true });
+  // OMP's native editor is platform-local. Using it preserves the reconstructed hashline schema's exact semantics.
+  const lib = join(homedir(), ".bun/install/global/node_modules/@oh-my-pi/pi-coding-agent/src");
+  const { ReadTool, EditTool } = await import(join(lib, "tools/index.ts"));
+  const { Settings } = await import(join(lib, "config/settings.ts"));
+  const { getEditStore } = await import(join(lib, "edit/store.ts"));
+  const settings = await Settings.loadReadOnly({ cwd: ROOT });
+  settings.override("edit.autoRepair.enabled", false);
+  let spent = readdirSync(join(BASE, "rounds")).filter((name) => name.startsWith("r18app")).flatMap((r) => existsSync(join(BASE, "rounds", r, "runs")) ? readdirSync(join(BASE, "rounds", r, "runs")).filter((name) => name.endsWith(".json")).map((name) => json(join(BASE, "rounds", r, "runs", name)).costUsd ?? 0) : []).reduce((a, b) => a + b, 0);
+  let activeRequests = 0, paused = "";
+  const gw = gateway();
+  const queue = allPitches.filter((subject) => !existsSync(join(dir, "runs", round + subject.id[0].toUpperCase() + subject.id.slice(1) + "RichApp.json")));
+  async function build(subject: typeof allPitches[number]) {
+    const slug = round + subject.id[0].toUpperCase() + subject.id.slice(1) + "RichApp";
+    const input = json(join(INPUT, subject.id + ".json")), workspace = input.workspace;
+    const sandbox = new AppSandbox(ROOT, workspace, subject.id);
+    const logicalSample = sandbox.logicalSample, sample = sandbox.sample;
+    const session = { cwd: workspace, settings, enableLsp: false, hasEditTool: true, taskDepth: 1, enableIrc: false,
+      getSessionId: () => slug, getSessionFile: () => undefined, getSessionSpawns: () => "*" };
+    const reader = new ReadTool(session), editor = new EditTool(session, "hashline"), store = getEditStore(session);
+    const counts = { writes: 0, edits: 0, editCalls: 0, failedEdits: 0, typecheckCalls: 0, refusedCalls: 0, renderRefusals: 0, scratchCalls: 0 };
+    const toolLog: { call: AppCall; text: string; isError: boolean }[] = [];
+    const body = anthropicRequest(input.context);
+    const started = Date.now(), usage = { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
+    let costUsd = 0, modelCalls = 0, stopReason = "cap", status = 200, error: string | null = null;
+    const ownFile = (path: string) => sandbox.isSample(path);
+    async function handle(call: AppCall): Promise<{ text: string; isError: boolean; renderRefused?: boolean }> {
+      const args = call.input;
+      try {
+        if (call.name === "yield") return { text: "", isError: false };
+        if (call.name === "write") {
+          if (!ownFile(String(args.path ?? ""))) { counts.refusedCalls++; return { text: String(args.path ?? "").includes("scratch/") ? APP_UNAVAILABLE : "No such file or directory: " + String(args.path ?? ""), isError: true, renderRefused: String(args.path ?? "").includes("scratch/") }; }
+          const content = String(args.content ?? "");
+          text(sample, content); counts.writes++;
+          const lines = content ? content.split("\n").length - (content.endsWith("\n") ? 1 : 0) : 0;
+          const tag = store.recordSnapshot(sample, content, Array.from({ length: lines }, (_, i) => i + 1));
+          return { text: "Wrote " + lines + " lines" + (tag ? "\n[" + logicalSample + "#" + tag + "]" : ""), isError: false };
+        }
+        if (call.name === "edit") {
+          counts.editCalls++;
+          const patch = String(args.input ?? "");
+          const headers = [...patch.matchAll(/^\[([^\]\n]+)#([A-Fa-f0-9]{4})\]\s*$/gm)];
+          if (!headers.length || headers.some((header) => !ownFile(header[1]))) throw Error("Edits may only target " + logicalSample + " using its read snapshot.");
+          for (const move of patch.matchAll(/^MV\s+(.+)$/gm)) if (!ownFile(move[1].replace(/^['"]|['"]$/g, ""))) throw Error("The sample may not be moved outside its delivery path.");
+          const mapped = patch.replace(/^\[([^\]\n]+)#([A-Fa-f0-9]{4})\]\s*$/gm, (_match, _path, tag) => "[" + sample + "#" + tag + "]").replace(/^MV\s+.+$/gm, "MV " + sample);
+          const result = await editor.execute(call.id, { input: mapped });
+          const output = result.content.filter((block) => block.type === "text").map((block) => block.text).join("\n").replaceAll(sample, logicalSample);
+          if (result.isError) counts.failedEdits++; else counts.edits++;
+          return { text: output, isError: result.isError === true };
+        }
+        if (call.name === "read") {
+          const raw = String(args.path ?? "");
+          const selector = raw.match(/:(?:\d|-|raw|img|conflicts).*$/)?.[0] ?? "", base = selector ? raw.slice(0, -selector.length) : raw;
+          const physical = sandbox.path(base);
+          const result = await reader.execute(call.id, { path: physical + selector });
+          return { text: result.content.filter((block) => block.type === "text").map((block) => block.text).join("\n").replaceAll(sample, logicalSample), isError: result.isError === true };
+        }
+        if (call.name === "glob") {
+          const files = await sandbox.glob(String(args.path ?? "*"));
+          return { text: files.join("\n") || "(no matches)", isError: false };
+        }
+        if (call.name === "grep") {
+          const path = sandbox.path(String(args.path ?? ".").replace(/:\d.*$/, ""));
+          const result = await capture("grep", ["-R", "-n", "-E", "--", String(args.pattern ?? ""), path], 60000);
+          return { text: (result.stdout + result.stderr).replaceAll(workspace + "/", "") || "(no matches)", isError: result.status !== 0 && result.status !== 1 };
+        }
+        if (call.name === "bash") {
+          const inspection = await sandbox.inspect(String(args.command ?? ""), typeof args.cwd === "string" ? args.cwd : undefined);
+          if (inspection.kind === "typecheck") {
+            counts.typecheckCalls++;
+            if (!existsSync(sample)) return { text: "No stored sample exists yet: " + logicalSample, isError: true };
+            const temporary = join(workspace, "typecheck.ts");
+            text(temporary, wireArchived(readFileSync(sample, "utf8"), temporary));
+            const result = await capture(join(ROOT, "node_modules/.bin/tsx"), ["scripts/typecheck.ts", temporary], 180000);
+            rmSync(temporary, { force: true });
+            const output = (result.stdout + result.stderr).replaceAll(temporary, logicalSample).replaceAll(relative(ROOT, temporary), logicalSample);
+            if (inspection.renderRequested) { counts.refusedCalls++; return { text: output + "\n" + APP_UNAVAILABLE, isError: true, renderRefused: true }; }
+            return { text: output, isError: result.status !== 0 };
+          }
+          if (inspection.kind === "unavailable") { counts.refusedCalls++; return { text: APP_UNAVAILABLE, isError: true, renderRefused: inspection.renderRequested === true }; }
+          if (inspection.kind === "scratch") counts.scratchCalls++;
+          return { text: inspection.text, isError: inspection.isError };
+        }
+        counts.refusedCalls++;
+        return { text: APP_UNAVAILABLE, isError: true, renderRefused: true };
+      } catch (failure) {
+        if (call.name === "edit") counts.failedEdits++;
+        return { text: "Tool error: " + String(failure), isError: true };
+      }
+    }
+    try {
+      for (let turn = 0; turn <= 16; turn++) {
+        if (paused) { stopReason = paused; break; }
+        if (spent + (activeRequests + 1) * 1.6 > 87) {
+          paused = "spend guard: approaching $90 including repair reserve";
+          save(join(INPUT, "stopped.json"), { reason: paused, spent, slug, at: new Date().toISOString() }); stopReason = paused; break;
+        }
+        if (!(await guard(slug + " model call " + (turn + 1)))) { paused = "usage guard"; stopReason = paused; break; }
+        save(join(dir, "requests", slug + "-" + (turn + 1) + ".json"), body);
+        activeRequests++;
+        const reply = await gw.send("/v1/messages", body);
+        activeRequests--; modelCalls++; status = reply.status;
+        save(join(dir, "replies", slug + "-" + (turn + 1) + ".json"), reply);
+        const used = reply.body?.usage ?? {};
+        for (const key of Object.keys(usage)) usage[key] += used[key] ?? 0;
+        const amount = ((used.input_tokens ?? 0) * 2 + (used.cache_read_input_tokens ?? 0) * 0.1 + (used.cache_creation_input_tokens ?? 0) * 2.5 + (used.output_tokens ?? 0) * 10) / 1e6;
+        spent += amount; costUsd += amount;
+        save(join(INPUT, "spend.json"), { spent, at: new Date().toISOString() });
+        if (reply.status !== 200) { error = JSON.stringify(reply.body); stopReason = "API error"; break; }
+        const calls: AppCall[] = (reply.body.content ?? []).filter((block) => block.type === "tool_use").map((block) => ({ id: block.id, name: block.name, input: block.input ?? {} }));
+        if (!calls.length) { stopReason = "natural"; break; }
+        const toolResults = [];
+        for (const call of calls) {
+          const result = await handle(call);
+          if (result.renderRefused) {
+            counts.renderRefusals++;
+            if (counts.renderRefusals >= 3) result.text += "\nRendering is impossible in this environment. If the file is complete, end your turn with a one-line summary.";
+          }
+          toolLog.push({ call, ...result });
+          toolResults.push({ type: "tool_result", tool_use_id: call.id, content: result.text, is_error: result.isError });
+        }
+        save(join(dir, "tools", slug + ".json"), toolLog);
+        if (calls.some((call) => call.name === "yield")) { stopReason = "yield"; break; }
+        body.messages.push({ role: "assistant", content: reply.body.content }, { role: "user", content: toolResults });
+      }
+      const code = existsSync(sample) ? readFileSync(sample, "utf8") : null;
+      const buildFile = join(dir, "builds", slug + ".ts");
+      if (code) text(buildFile, wireArchived(code, buildFile));
+      save(join(dir, "runs", slug + ".json"), {
+        slug, arm: "app", subject: subject.id, level: "rich", pitch: subject.rich, model: MODEL, effort: "high",
+        started: new Date(started).toISOString(), wallMs: Date.now() - started, status, error: error ?? (code ? null : "No stored sample at end of turn"),
+        hasCode: Boolean(code), stopReason, modelCalls, extraCalls: Math.max(0, modelCalls - 1), ...counts, costUsd,
+        usage: { ...usage, prompt_tokens: usage.input_tokens + usage.cache_read_input_tokens + usage.cache_creation_input_tokens, completion_tokens: usage.output_tokens },
+      });
+      console.log(slug, stopReason, modelCalls + " calls", counts.writes + "/" + counts.edits + " writes/edits", code ? Buffer.byteLength(code) + " bytes" : "NO CODE", "$" + costUsd.toFixed(3));
+    } finally { rmSync(workspace, { recursive: true, force: true }); }
+  }
+  try {
+    await Promise.all(Array.from({ length: 4 }, async () => {
+      while (queue.length && !paused) { const subject = queue.shift(); if (subject) await build(subject); }
+    }));
+  } finally { gw.close(); }
+  results(round);
+  if (!paused) await checkedAndRepaired(round);
+  else {
+    await cmd(["check", round, "--skip-typecheck", "--concurrency", "2"]);
+    console.log("PAUSED: " + paused + ", spent $" + spent.toFixed(3));
+  }
+}
+
 const args = process.argv.slice(2);
+if (APP) {
+  if (!existsSync(join(INPUT, "manifest.json")) || args.includes("--prepare-only")) await prepareApp();
+  if (!args.includes("--prepare-only")) await runApp();
+} else {
 if (args.includes("--backfill-started")) {
   for (const name of readdirSync(join(BASE, "rounds")).filter((name) => name.startsWith(EXPERIMENT2 ? "r17" : "r16"))) {
     const dir = join(BASE, "rounds", name),
@@ -743,4 +973,5 @@ if (!args.includes("--prepare-only") && !args.includes("--backfill-started")) {
     } else round = await conversationBatch(batch);
     if (!(await checkedAndRepaired(round))) break;
   }
+}
 }

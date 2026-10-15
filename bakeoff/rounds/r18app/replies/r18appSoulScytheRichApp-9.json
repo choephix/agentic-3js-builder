@@ -1,0 +1,33 @@
+{
+  "id": 161,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg41AMVekzuoqiT4dqHYK",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "I should use a union type allowing either a string or a Paint object, so I'll need to import the Paint type as well.\n\n",
+        "signature": "CAQS1gYKEAgSGAI4AUIIdGhpbmtpbmcSDLMXN2Zr2ks6R+5PTRoMUuaIF0/wdHq13WRIIjCkMRaiAAUH4pukqPb60NbVZr5WwEZ1vMZWPeWPUuUxMsCda7TTdafmjvSnQ9AWgDsq8wWhb3UlN5g9vbRKa7cLT4KlbzyhPIjY/KweXeOxd3OD1KWkOycxtQXZwPLi0trCAozQL0eDRpU83Tfy96kARr5+P7Hv7Qd6BPHHloCbuz3LIwVznllCKKPvkoG4dHvoB0VmOVTf3roaCta/dMPIjdG+jfusaVf5scKp7m4KFkM/0ocwyuAz8ei0gXNQuVsMImZmjzAmUJC79GUd1geRK3QQrIMsmtqxpP/Dj6tBHXQ8MklSY4OhrgH1q7sHH7JJRlDPNAfbFeMDixITUF4OLWpm3FduNCqcDieMVSCGW8lKEPtVq0ZTuEidaN5A7dYPaTfRd6YCgtfjuORULZJNJv5f80vmj4hM3rA1Ast68OTSbso+dS2lyNhRiMJq6A9qjNgAIWlONxhQENHLuJhn3Ac4mi7uu1f72OvmZ+08YqzjNwbPUYFsYnxklwBAqtUATKUqQ4War31dm9Ust7+zmHAKtGjLT5ItW/weTp0/1E7TK4RpySY/V2PzSllo/WsSNYdjH1dwQN4kIHXTLaosJCINlETjq1x/jJgxjMNqfT7TzPPwOCrhtHr4jZt60nEzghUeJHRdOADzTLLo3KVTWNSFCs+SPyJfndZucn6HPOr0e3YjDajgGjZIyVvkfa/y0WrjfYKAqCu+YQxudlrqfRj01bquPYXMyadKa1alGA4cGFKs1ie2D8qR+efxVvVdjo7+IZ9Jk6SF/uxzWI5t3lV3TtK7gpUue0FgHuVOSlcah6IYbmVWme5SR5gUfRocBm7LPpt2WvzDdNxlWtlJUn5bJG9cbaI16Dq6MEczravtsZsQp3riM+TCgjdEePSIn1G9wo15yB0Ryc/hXAa6+GZeEWWF9jz+eJG8RogSTYGeLlVM3wo89oRbh6exiRepDN0Wps/1bhVoaAaxJZ9dbDXTeUaR7jCioO4/VSHLa3bcS2B4kAI7tX1sh4z5solrRzGDTtwk5NK13zm+EkMn41o7BSbVj1AXfdljDnNBZJuUlIzEFxgB"
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01W1Hj6PLXpHy7WyLgKR2uBi",
+        "name": "bash",
+        "input": {
+          "command": "sed -i 's/import type { ColorInput } from \"..\\/src\\/paint\";/import type { Paint } from \"..\\/src\\/paint\";\\ntype ColorInput = string | Paint;/' samples/soulScythe.ts && npm run typecheck -- soulScythe 2>&1 | tail -20 && npm run preview -- soulScythe --shot 2>&1 | tail -40"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 196,
+      "cache_read_input_tokens": 133868,
+      "cache_creation_input_tokens": 777
+    }
+  }
+}

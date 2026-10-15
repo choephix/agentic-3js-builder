@@ -1,0 +1,36 @@
+{
+  "id": 15,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3yNfiNmwHZVX7V21BJH",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_01RL2bv27PQTpbGDBuNpxghk",
+        "name": "read",
+        "input": {
+          "path": "src/parts.ts:40:96"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01PMeudPcvFPrgdGUHxc7aR5",
+        "name": "bash",
+        "input": {
+          "command": "grep -n \"Fill\" src/context.ts | head -5; grep -n \"export\" src/texture.ts src/frame.ts | head -30"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 144,
+      "cache_read_input_tokens": 77669,
+      "cache_creation_input_tokens": 27184
+    }
+  }
+}
