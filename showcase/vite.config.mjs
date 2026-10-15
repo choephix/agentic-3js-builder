@@ -381,6 +381,12 @@ const showcaseData = {
       await json(`__snapshots/${slug}`, indexed.get(slug));
       for (const [route, path] of assets) await copy(path, route);
     }
+    // The phase-2 one-shot gap page (bakeoff/gap2_page.py) is static HTML reading WebP renders shipped here.
+    const gap = await runFile("python3", ["bakeoff/gap2_page.py", "--publish", buildDirectory]);
+    for (const path of JSON.parse(gap.stdout)) {
+      const route = `renders/${relative(snapshotRoot, path).split(sep).join("/").replace(RENDER_IMAGE, ".webp")}`;
+      images.set(route, { source: path, args: webpArgs(path, warned) });
+    }
     await shipWebp(images, copy);
     for (const id of bakeoffIds)
       await json(`__bakeoff/${id}`, await bakeoffRound(id, (slug) => indexed.get(slug) ?? { tags: [], downloads: [] }));

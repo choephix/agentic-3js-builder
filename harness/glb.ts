@@ -1,7 +1,7 @@
 import type { DataTexture } from "three";
 import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
-import { createSkinnedMesh, createStaticMesh } from "./assemble";
-import type { Assembly } from "./assemble";
+import { createSkinnedMesh, createStaticMesh } from "../src/pack";
+import type { Assembly } from "../src/pack";
 
 const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
   let c = n;

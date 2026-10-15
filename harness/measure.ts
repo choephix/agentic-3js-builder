@@ -1,4 +1,4 @@
-import type { Assembly } from "./assemble";
+import type { Assembly } from "../src/pack";
 
 export type Vec3 = [number, number, number];
 export type Gap = {

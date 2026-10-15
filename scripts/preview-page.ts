@@ -1,8 +1,8 @@
 // Runs inside the shared headless Chromium, driven by scripts/preview.ts. Builds a bundled sample, bakes it with the
-// render harness's assemble() (so bounds, triangles and textures match what `npm run snap` reports) and returns
+// SDK's assemble() (so bounds, triangles and textures match what `npm run snap` reports) and returns
 // its textures, per-part table and, on request, two lit shots.
 import * as THREE from "three";
-import { assemble, createStaticMesh } from "../harness/assemble";
+import { assemble, createStaticMesh } from "../src/pack";
 import { gap, measureIndex } from "../harness/measure";
 import { bonesOf } from "../harness/weights";
 

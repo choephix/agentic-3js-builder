@@ -1,3 +1,4 @@
+// Atlas for the SDK's pack step, used by apps, the harness and GLB export.
 // The one texture of an assembled creature, packed like a sprite sheet: a block of flat colour cells (flat parts
 // point every UV at their cell's centre), every texture the builder used, each tinted by its material colour, and
 // the paint sheet's charts one by one rather than the sheet as a whole. Textures get their edge pixels repeated into

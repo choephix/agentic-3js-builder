@@ -1,6 +1,7 @@
+// SDK pack step for apps, the harness and GLB export.
 // Turns a builder's Object3D tree into ONE mesh with one material, the same
 // way Nilo bakes a puppet: every part is baked into model space, and every
-// colour and texture lives in one atlas packed like a sprite sheet (harness/atlas.ts):
+// colour and texture lives in one atlas packed like a sprite sheet (src/atlas.ts):
 // flat parts point their UVs at their colour's cell, textured parts keep their
 // own UVs mapped into their tile, painted parts map each chart of the paint sheet
 // into that chart's own tile, and transparent texels are cut away. In the
@@ -28,6 +29,17 @@ import { buildAtlas, tileUv } from "./atlas";
 import type { Placed, TileSource } from "./atlas";
 
 export type Issue = { level: "error" | "warning"; message: string };
+
+export type Packed = {
+  /** SkinnedMesh bound to fresh bones named after the joints (rigged), else a static Mesh. One atlas material, plus one glowing copy per emissive strength (geometry groups). */
+  object: Mesh | SkinnedMesh;
+  /** The bones, root first; empty when static. */
+  bones: Bone[];
+  /** Warnings from assembly (errors throw). */
+  issues: Issue[];
+  /** Frees the merged geometry, the materials and the atlas texture. */
+  dispose(): void;
+};
 
 export type PartRecord = {
   index: number;
@@ -690,4 +702,49 @@ export function createSkinnedMesh(assembly: Assembly, name: string) {
   mesh.updateMatrixWorld(true);
   mesh.bind(new Skeleton(bones));
   return { mesh, bones };
+}
+
+/**
+ * Pack without touching the tree's own meshes. Pose with `b.pose()` before packing;
+ * the result animates by rotating `bones`.
+ */
+export async function pack(root: Object3D, options?: { rigged?: boolean; name?: string }): Promise<Packed> {
+  let rigged = options?.rigged;
+  if (rigged === undefined) {
+    rigged = false;
+    root.traverse((object) => {
+      if (typeof object.userData.joint === "string") rigged = true;
+    });
+  }
+  const name = options?.name ?? (root.name || "model");
+  const assembly = await assemble(root, rigged);
+  const errors = assembly.issues.filter((issue) => issue.level === "error");
+  if (errors.length) {
+    const shown = errors.slice(0, 3).map((issue) => issue.message);
+    if (errors.length > shown.length) shown.push(`… ${errors.length - shown.length} more`);
+    throw new Error(`Assembly has ${errors.length} error(s): ${shown.join("; ")}`);
+  }
+  let object: Mesh | SkinnedMesh;
+  let bones: Bone[] = [];
+  if (rigged) {
+    const skinned = createSkinnedMesh(assembly, name);
+    object = skinned.mesh;
+    bones = skinned.bones;
+  } else {
+    assembly.geometry.deleteAttribute("skinIndex");
+    assembly.geometry.deleteAttribute("skinWeight");
+    object = new Mesh(assembly.geometry, surfaceOf(assembly));
+    object.name = name;
+  }
+  return {
+    object,
+    bones,
+    issues: assembly.issues.filter((issue) => issue.level === "warning"),
+    dispose() {
+      assembly.geometry.dispose();
+      assembly.material.dispose();
+      for (const material of assembly.glowMaterials) material.dispose();
+      assembly.material.map?.dispose();
+    },
+  };
 }

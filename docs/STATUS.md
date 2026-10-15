@@ -2,6 +2,25 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## `pack()`: one mesh and atlas for apps, 2026-10-15
+
+The harness's bake (`harness/assemble.ts`, `harness/atlas.ts`) moved to `src/pack.ts` and `src/atlas.ts` unchanged, and `pack(root)` returns its result as an app object: a SkinnedMesh on fresh bones named after the joints (a Mesh without joints), one atlas material plus a glowing copy per emissive strength, the warnings and `dispose()`. It is the object the GLB is exported from; live `default()` output is plain meshes whose smooth bodies deform only under `b.pose()`, so an app that animates bones needs it. The harness, preview and the showcase's GLB downloads call the same code; seven samples' GLBs (binary chunks) and atlases are byte-identical before and after. Packed and live renders of five samples look the same; the crane beacon on cargoDockCratesSonnet glows packed (as in snaps) and not in that plain live render.
+
+`npm run pack-bench` (RTX 3060, all 496 samples, none fail):
+
+| Per model                    | p50 | p90 |   max |
+| ---------------------------- | --: | --: | ----: |
+| Draw calls, live             | 131 | 333 |   885 |
+| Draw calls, packed           |   1 |   6 |    13 |
+| Build ms (`default()`, bake) | 145 | 553 | 1,562 |
+| Pack ms                      |  80 | 313 | 1,033 |
+
+A shadow-casting light doubles both draw-call rows. Pack time follows the atlas's texels: median 4 ms at 256², 65 ms at 1024², 243 ms at 2048², 513 ms at 4096 × 2048.
+
+World of 43 (picked evenly across the library, 1.27 M triangles, render + `gl.finish()`, 120 frames): draw calls 15,542 → 262, geometries 7,646 → 43, textures 288 → 89, frame median 60.3 → 2.8 ms, p95 80.8 → 3.8 ms. Building the 43 took 10.0 s and packing them 5.6 s, both on the main thread.
+
+No worker yet: packing costs about half of building and blocks the same thread, so a pack-only worker would leave most of the stall. The place for it is the `async` branch's build pool (builds and paint already run there): pack in the worker and post back the merged buffers and atlas; SVG drawings still rasterise on the main thread (Chrome decodes no SVG in workers) and cross as pixels.
+
 ## Low-poly game asset round, 2026-10-15
 
 Ten Opus 5.5 (high) builders, run as one pool, each got `GUIDE.md`, one subject and a shared style brief: game assets rather than dioramas, low-poly as the look (faceted, each detail on the fewest triangles that read, many details), flat colours only (value from lighter and darker parts, hard-edged SVG patterns and cut-outs, `kits/glow` for lights), named joints on moving parts, at most 6 snaps. Stefan asked afterwards for no iteration rounds (first pass only); the message reached only the last builder, which stopped at v03. All ten pass typecheck with 0 errors and 0 warnings; each final snap is of the final file. Total $89.22, 19–30 min each (wizard tower 57 min). Collage: `~/tmp/public/nilo/agentic-3js-builder/showcase/lowpoly-round.jpg`.

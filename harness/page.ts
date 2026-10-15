@@ -3,8 +3,8 @@
 // review shots, composes the contact sheet and exports the GLB downloads.
 import * as THREE from "three";
 import { exportGlb } from "./glb";
-import { assemble, createSkinnedMesh, createStaticMesh, surfaceOf } from "./assemble";
-import type { Assembly } from "./assemble";
+import { assemble, createSkinnedMesh, createStaticMesh, surfaceOf } from "../src/pack";
+import type { Assembly } from "../src/pack";
 import { looseClusters, measureIndex } from "./measure";
 import { stiffParts } from "./weights";
 

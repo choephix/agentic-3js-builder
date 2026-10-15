@@ -11,6 +11,9 @@ from gap_page import LEGACY, PUBLIC, ROOT, round_for_slug
 
 ROUNDS = ROOT / "bakeoff/rounds"
 OUTPUT = PUBLIC / "gap2/index.html"
+# The local page reads the harness renders beside it (`../snaps/…png`). The published page (`--publish DIR`, run by the
+# showcase build) reads the WebP copies the build ships under `/renders/`, and main() prints the sources it used.
+SITE = {"root": "../snaps/", "view": ".png", "sheet": ".jpg", "images": None}
 VIEWS = [("three-quarter", "three-quarter"), ("front", "front"), ("side", "side"),
          ("back", "back"), ("low", "low"), ("head", "head close-up")]
 COLUMNS = [("final", "Sonnet agent · final"), ("draft", "Sonnet agent · first draft"),
@@ -142,10 +145,14 @@ def cell(subject, column, title, base):
     if prefix and not (OUTPUT.parent / (prefix + "-three-quarter.png")).exists():
         prefix = None
     if prefix:
-        shot = html.escape(prefix, quote=True)
-        available = ",".join(view for view, _ in VIEWS if (OUTPUT.parent / (prefix + "-" + view + ".png")).exists())
-        picture = (f'<a class="picture" href="{shot}-sheet.jpg" target="_blank" rel="noopener" aria-label="Open {html.escape(subject + ": " + title, quote=True)} contact sheet">'
-                   f'<img loading="lazy" alt="{html.escape(subject + ": " + title, quote=True)}" data-prefix="{shot}" data-views="{available}" src="{shot}-three-quarter.png"></a>')
+        shot = html.escape(SITE["root"] + prefix.removeprefix("../snaps/"), quote=True)
+        available = [view for view, _ in VIEWS if (OUTPUT.parent / (prefix + "-" + view + ".png")).exists()]
+        if SITE["images"] is not None:
+            sources = [prefix + "-" + view + ".png" for view in available] + [prefix + "-sheet.jpg"]
+            SITE["images"].update(str((OUTPUT.parent / source).resolve()) for source in sources
+                                  if (OUTPUT.parent / source).exists())
+        picture = (f'<a class="picture" href="{shot}-sheet{SITE["sheet"]}" target="_blank" rel="noopener" aria-label="Open {html.escape(subject + ": " + title, quote=True)} contact sheet">'
+                   f'<img loading="lazy" alt="{html.escape(subject + ": " + title, quote=True)}" data-prefix="{shot}" data-views="{",".join(available)}" src="{shot}-three-quarter{SITE["view"]}"></a>')
     else:
         status = data.get("status", "pending")
         error = str(data.get("error") or "").strip().splitlines()
@@ -224,7 +231,7 @@ document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener
  document.querySelectorAll('[data-view]').forEach(other=>other.setAttribute('aria-pressed',other===button));
  document.querySelectorAll('img[data-prefix]').forEach(image=>{
   const view=image.dataset.views.split(',').includes(button.dataset.view)?button.dataset.view:'three-quarter';
-  image.src=image.dataset.prefix+'-'+view+'.png';
+  image.src=image.dataset.prefix+'-'+view+document.body.dataset.viewExt;
  });
 }));
 document.getElementById('copy').addEventListener('click',async()=>{
@@ -240,10 +247,16 @@ document.getElementById('copy').addEventListener('click',async()=>{
 """
 
 
-def main():
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+def main(publish=None):
+    """Write the local page; with `publish` (a build directory) write `<publish>/gap2/index.html` for the showcase
+    build instead, reading its renders from /renders/, and print the JSON list of source images it needs."""
+    output = OUTPUT
+    if publish:
+        output = Path(publish) / "gap2/index.html"
+        SITE.update(root="/renders/", view=".webp", sheet=".webp", images=set())
+    output.parent.mkdir(parents=True, exist_ok=True)
     out = ['<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
-           '<title>Agent vs one-shot · phase 2</title><style>', STYLE, '</style></head><body>',
+           '<title>Agent vs one-shot · phase 2</title><style>', STYLE, f'</style></head><body data-view-ext="{SITE["view"]}">',
            '<main><div class="eyebrow">The one-shot gap / phase 2</div><h1>Same briefs. Six builds. Your verdict.</h1>',
            '<p class="intro"><strong>Sonnet agent · final</strong> is the finished sample from the agentic session (green outline). <strong>Sonnet agent · first draft</strong> is that session’s first file write, with crash repairs where needed. <strong>Sonnet · one-shot</strong>, <strong>Astra · one-shot</strong> and <strong>Haiku · one-shot</strong> each start with one API call. <strong>One-shot: agent framing (app)</strong> uses one fixed agent system/brief template and synthetic current-doc reads; it can write, edit and typecheck until it ends its turn, without renders.</p>',
            '<p class="intro">There are <strong>no visual feedback turns</strong>: up to two repairs only send back the crash error. App framing permits at most 17 model calls before those repairs, including real requested typechecks and harmless scratch operations. Captions include the entire generation/tool loop and repairs’ cost/time; agent finals show session time. First-draft generation cost/time were not recorded. Click a picture for its contact sheet. Refresh to see newly completed builds.</p></main>',
@@ -264,13 +277,15 @@ def main():
             out.append('</div><div class="better" role="group" aria-label="Better one-shot"><span class="better-label">Better one-shot:</span>' + buttons(["Sonnet", "Astra", "Haiku", "App", "same"], "data-better") + '</div></article>')
         out.append('</section>')
     out.extend(['</main><script>', SCRIPT, '</script></body></html>'])
-    with tempfile.NamedTemporaryFile(mode="w", dir=OUTPUT.parent, suffix=".html", delete=False) as handle:
+    with tempfile.NamedTemporaryFile(mode="w", dir=output.parent, suffix=".html", delete=False) as handle:
         handle.write("\n".join(out))
         temporary = Path(handle.name)
     temporary.chmod(0o644)
-    temporary.replace(OUTPUT)
-    print(OUTPUT)
+    temporary.replace(output)
+    print(json.dumps(sorted(SITE["images"])) if publish else output)
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    main(sys.argv[sys.argv.index("--publish") + 1] if "--publish" in sys.argv else None)

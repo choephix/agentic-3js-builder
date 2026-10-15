@@ -4,15 +4,15 @@ A TypeScript SDK for writing primitive-built, skeleton-rigged three.js models in
 
 ## Layout
 
-| Path        | What it is                                                                                                                                  |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/`      | The generic SDK: skeleton, shapes, surfaces, paint, textures, cards, decals, rig answer key. Style-neutral.                                 |
-| `kits/`     | Opinionated style kits built on top of `src/` (`pixel`, `toon`, `clockwork`). `src/` never imports a kit; a model imports the one it wants. |
-| `samples/`  | The sample library: one script per model, each with a build record (`<slug>.build.json`).                                                   |
-| `showcase/` | The local and published viewer for the samples.                                                                                             |
-| `harness/`  | The render harness: bakes a model into one mesh and atlas, checks it, renders the review shots and exports the GLBs.                        |
-| `scripts/`  | `snap` (harness render), `preview` (quick inspection), `provenance` (build records), `typecheck`, `sheet`.                                  |
-| `docs/`     | Agent guidance (`api.md`, `conventions.md`), design notes (`DESIGN.md`) and project status (`STATUS.md`).                                   |
+| Path        | What it is                                                                                                                                                |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/`      | The generic SDK: skeleton, shapes, surfaces, paint, textures, cards, decals, rig answer key, and `pack.ts` (one mesh and atlas, for apps). Style-neutral. |
+| `kits/`     | Opinionated style kits built on top of `src/` (`pixel`, `toon`, `clockwork`). `src/` never imports a kit; a model imports the one it wants.               |
+| `samples/`  | The sample library: one script per model, each with a build record (`<slug>.build.json`).                                                                 |
+| `showcase/` | The local and published viewer for the samples.                                                                                                           |
+| `harness/`  | The render harness: packs a model with `src/pack.ts`, checks it, renders the review shots and exports the GLBs.                                           |
+| `scripts/`  | `snap` (harness render), `preview` (quick inspection), `pack-bench` (packed vs live cost), `provenance` (build records), `typecheck`, `sheet`.            |
+| `docs/`     | Agent guidance (`api.md`, `conventions.md`), design notes (`DESIGN.md`) and project status (`STATUS.md`).                                                 |
 
 ## Documentation
 
@@ -26,6 +26,20 @@ Agents get the guidance docs, not this README:
 For people: [`docs/DESIGN.md`](docs/DESIGN.md) explains why each helper exists, with the evidence from the builds that shaped it; [`docs/STATUS.md`](docs/STATUS.md) is the project history and to-do list.
 
 A production app with its own agent setup hands its agents `docs/api.md`, `docs/conventions.md` and any kit docs it uses, plus its own brief in place of `GUIDE.md`.
+
+## Running a model in an app
+
+A module's `default()` returns one mesh per part, which is right for the showcase (hover, inspection, the arrival animation) but costs a draw call per part, and smooth bodies deform only under `b.pose()`. An app packs the tree first:
+
+```ts
+import { pack } from "../src/pack"; // not in src/index.ts, so viewers that don't pack don't load the atlas code
+const model = await pack(root); // rigged when the tree has joints; { rigged, name } override
+scene.add(model.object); // SkinnedMesh on fresh bones named after the joints, else a Mesh
+model.bones; // rotate these to animate; set the rest pose with b.pose() before packing
+model.dispose(); // frees the merged geometry, the materials and the atlas
+```
+
+This is the object the GLB is exported from: one atlas material plus one glowing copy per emissive strength, so 1–13 draw calls per model (median 1). Errors throw; `model.issues` holds the warnings. `npm run pack-bench` measures it on the shared Chromium; numbers are in `docs/STATUS.md`.
 
 ## Development
 
@@ -42,6 +56,7 @@ npm run preview -- <slug | path.ts> [--bones <A>]...      # which bones move a p
 npm run preview -- <slug | path.ts> [--box <A>]...        # world bounds, size and centre of a part, group or bone
 npm run sheet -- <slug | slug@tag> ... [--view three-quarter]   # collage of rendered shots (samples or versions)
 npm run provenance       # rewrite samples/*.build.json from the session logs
+npm run pack-bench -- [--world N] [slug ...]   # build and pack time, draw calls, frame time of an N-model world (default 43)
 ```
 
 `snap` renders on the shared NVIDIA Chromium (port 9333) and writes the contact sheet, shots, report and GLBs to `~/tmp/public/nilo/agentic-3js-builder/snaps/<slug>/` (arm B with joints, A for plain objects). It needs `~/workspace/nilo-creature-lab` checked out; its `harness/snap.ts` reads `CREATURE_LAB_DIR` for the output folder.

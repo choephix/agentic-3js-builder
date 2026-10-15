@@ -1,4 +1,4 @@
-import type { Assembly } from "./assemble";
+import type { Assembly } from "../src/pack";
 const LARGE_PART_DIAGONAL = 0.2;
 const DOMINANT_BONE_SHARE = 0.9;
 const MOVING_BONE_SHARE = 0.05;
