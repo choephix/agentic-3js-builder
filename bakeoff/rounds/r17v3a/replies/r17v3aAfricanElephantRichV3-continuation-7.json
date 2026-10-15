@@ -1,0 +1,28 @@
+{
+  "id": 19,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3tawLxoWqbZJnZE28nD",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "tool_use",
+        "id": "toolu_011EiLhVcNWjJwJpk6n3At9q",
+        "name": "yield",
+        "input": {
+          "error": "Blocked: the environment is a read-only replay, so I could not build or render anything. No `samples/africanElephantSonnet.ts` exists, and the typecheck, preview and v01/v02 snap renders were not run.\n\nWhat I found and tried:\n- `~/tmp-archive/sonnet-100/africanElephantSonnet/` does not exist. `glob` on `~/tmp-archive/sonnet-100/*` returns nothing, and `read` of that path fails with \"Only historical repository files may be read\".\n- The shell's working directory resolves to `/home/cx/tmp-archive/replay-sdk-88fc1f0`. That is a different SDK copy, and its `samples/` already holds other models, including an `africanElephant.ts`. I did not open any of them.\n- `write` is refused with \"Read-only replay only executes read, grep, glob and safe inspection bash; writes, renders and other tools are refused\". `eval` gets the same refusal.\n- `bash` runs only inspection commands. `mkdir` and `npm run typecheck -- africanElephantSonnet` were both refused (\"Read-only replay refuses command\").\n\nI read GUIDE.md, docs/api.md, docs/conventions.md, `src/paint.ts`, `src/builder.ts` and `src/sugar.ts`. I had settled a design but could not save it. It is about 3.3 m tall and 6.6 m long with tusks: a faceted `ngon` loft body on hips, spine and neck chains; four columnar `limb` legs with feet and toenails; a head loft with separate jaw; and a trunk chain with sawtooth ring wrinkles. It also has ear extrudes with painted veins, curved tusks, eyes with lashes, a tail with a hair tuft, and cracked-skin paint fading to dust at the legs.\n\nTo finish, I need a sandbox with write and command access at the stated path. I would then write the file and run typecheck, preview, and the v01 and v02 snaps."
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 696,
+      "cache_read_input_tokens": 97448,
+      "cache_creation_input_tokens": 299
+    }
+  }
+}

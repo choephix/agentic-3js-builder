@@ -1,0 +1,8 @@
+I couldn't build the elephant. This session only allows read, grep, glob and safe inspection commands, so I couldn't write files or run `npm`, and no render exists.
+
+- **Tools refused:** `mkdir`, `npm run typecheck`, `write`, and shell calls through `eval` all returned "Read-only replay only executes read, grep, glob and safe inspection bash; writes, renders and other tools are refused".
+- **Sandbox:** `~/tmp-archive/sonnet-100/africanElephantSonnet/` exists (checked with glob), but I can't write into it.
+- **Not delivered:** nothing was written, so there is no `samples/africanElephantSonnet.ts`, no `scratch/` folder to delete, and no v01 or v02.
+- **Work done:** I read `GUIDE.md`, `docs/api.md`, `docs/conventions.md` and the SDK's `src/paint.ts`, `src/builder.ts` and `src/sugar.ts`, and had planned the full model. The plan is a faceted 3.2 m shoulder-height bull with a loft body on a spine, neck and head chain, an articulated trunk, and a jawed head with tusks. It also has hinged ears, four leg chains with ringed toe joints, a tailed tuft, and patch-crackle skin paint with a dust gradient.
+
+Run it in a session that can write files and run `npm`. The first step would be writing `samples/africanElephantSonnet.ts` with `meta.style` set to `"low-poly"` and `meta.commit` set to `"88fc1f0"`, then `npm run snap -- africanElephantSonnet v01` and `v02`. I will build it if you re-dispatch me with write and execute access.

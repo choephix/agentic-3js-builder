@@ -1,0 +1,43 @@
+{
+  "id": 22,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3tfjsJP4p95bFCAj5u2",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "That's strange, it seems the environment is in read-only replay mode and refuses the mkdir command. Let me check what types of operations are actually permitted here.\n\n",
+        "signature": "CAQStgYKEAgSGAI4AUIIdGhpbmtpbmcSDD8uF0vt3+xv+IMdVxoMyWnXCEyFxvkmOzLjIjBCyO6uJ5QC4a9NIf/5HtiZEaF7lpAYtUTI3aZCC5i8vo1er9Ui4NomQvbmpPeCFzYq0wVAB1VowH2AQdF6i9wadvgytb3U7Ez18y7vcAomS8fKqZEazkKMQw9MbAELMpXTUOhVroHKBzp5eXMsLAfU5MJnPHa26IErCYj4loVAICqMkROxRWXmXiwiiRDNhJGbf1Nm3O0sRtPeegbHzdXmg6idpNDYP8/F1OF8MIktyVvW7e+rvDAG4bpCxbHLh0vRMD71RJbeTJ1RpbINX05wPISbolZclmxpliHcs5IM+yqlmbnLRpgz0u+StzxWhG87w4UPSloLRUHmD+QK1Q86stEk+NQIRu4UGYOOjquiS7i/O+l7SX7eFmBKYNQF3x2FAKjEU1SFo2QC0AzoEmW5H3vB1oERJ3BYXYQhl+Fst6YXhbXc/xBa5qZAQZhU/4+MvOprQg7aHoSJMowC98hfdrstyjo6zHLLE5DZXdxBjqYZaAR0Z7Q322YQtUe8L7gh7B+0yk04FXlGylRQYQsqsf7EPnOt5s2g/Y4hmmIrd4j+Jj1gSnahOWj1ixOdZnpJkJhoUZuYXj1VlMAgKY5iRtyCJR8muZyLNUrtdKMKLjWvSY272trP9uh6h0MibFAOB7OAyNQKeJTiWUbjSDA9MXxYP8bxG5MIguSECXJUTreRjyEvowY1rt4EbjgaFX/5bo1851KCtwSZVnTQKwXxQgAfm/HAxun3c+agct5XZDDugJeUvI1BJdWNMBiJJyHGqpEOdG4ScVmW/iqFIKBREBwR6GUsrHI5nve3QA6yEJzVoX1JI/zH5XVeNtdK7emu02tqRuwkqlh6IP0nn3pKYbyaE7OyP9+Rt2P63KsmoI1aCFOCn6tAqosAYtKXfwWj2MytYswn45yl2ULR9xhMA+HsYjzo3Is5KTfEYWEa59OUDXLe7MTHaX6iRBugqgJ6eNWq5lZPx+uEMwWZ1Rmp9qmtU6ZGekT4UM0vA9Y1oawX8kHR6rQRqkwt4iaRToDsLbaz4jYYAQ=="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01YW5Te9W6pKJquCKoN6YsgY",
+        "name": "grep",
+        "input": {
+          "pattern": "scale\\??:|quat\\??:|flat\\??:|texture\\??:",
+          "path": "src"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01VcHnJd61gYGtWmBS7mYXTS",
+        "name": "glob",
+        "input": {
+          "path": "samples/*",
+          "limit": 3
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 208,
+      "cache_read_input_tokens": 66005,
+      "cache_creation_input_tokens": 33007
+    }
+  }
+}

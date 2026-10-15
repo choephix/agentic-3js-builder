@@ -1,18 +1,19 @@
 #!/usr/bin/env bun
 /** Reproduce the pre-first-write context, an app-shaped imitation, and fresh craft3 controls.
- * Run: bun bakeoff/replay.ts [--prepare-only] [--batch ra|rb|sa|sb|ca|cb]
+ * Run: bun bakeoff/replay.ts [--experiment2] [--prepare-only] [--batches v1a,v1b,v2a,v2b,v3a,v3b]
  * Every API batch (including crash repairs) is gated by omp's Anthropic 5-hour usage.
  * R's archived tools are NAMES ONLY: definitions are recovered from installed OMP,
  * with find/wait reconstructed below. This limitation is recorded, never called exact replay.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { gateway, wireImports, results, capture, systemPrompt } from "../scripts/bakeoff.ts";
 
 const ROOT = resolve(import.meta.dir, "..");
 const BASE = join(ROOT, "bakeoff");
-const INPUT = join(BASE, "replay-inputs");
+const EXPERIMENT2 = process.argv.includes("--experiment2");
+const INPUT = join(BASE, EXPERIMENT2 ? "replay2-inputs" : "replay-inputs");
 const MODEL = "anthropic/claude-sonnet-5-5";
 const SUBJECTS = ["africanElephant", "capybara", "koala", "redPanda", "treasureHoard", "soulScythe"];
 const json = (path: string) => JSON.parse(readFileSync(path, "utf8"));
@@ -243,6 +244,66 @@ async function prepare() {
   console.log("Prepared archived/synthetic conversations; " + caveat);
 }
 
+async function prepareAblations() {
+  const original = join(BASE, "replay-inputs");
+  const originalManifest = json(join(original, "manifest.json"));
+  const wizard = archived("wizardBookshelf");
+  const tools = json(join(original, "tools.json"));
+  const active =
+    wizard.messages.filter((m) => m.role === "assistant").at(-1)?.requestControls?.tools?.active ?? wizard.init.tools;
+  const wizardTools = tools.filter((t) => active.includes(t.name)).map(({ schemaSource, ...t }) => t);
+  const strippedWizard = structuredClone(wizard.messages);
+  for (const message of strippedWizard)
+    if (message.role === "assistant")
+      message.content = message.content.filter((block) => !["thinking", "redactedThinking"].includes(block.type));
+  const manifest = {
+    ...originalManifest,
+    created: new Date().toISOString(),
+    experiment: "replay2",
+    cannedSession: wizard.sessionFile,
+    variants: {
+      V1: "Own archived prefix from R with every prior thinking/redactedThinking block removed.",
+      V2: "One fixed wizardBookshelf system and pre-write tool conversation, thinking removed; only first user message replaced verbatim by subject's own archived first user message.",
+      V3: "S synthetic full-file reads, wizardBookshelf system, subject's own archived first user message verbatim.",
+    },
+    thinkingFallback:
+      "On a thinking/signature rejection, retain the verbatim error and retry the same request with thinking.type=disabled; never fabricate historical thinking.",
+  };
+  save(join(INPUT, "manifest.json"), manifest);
+  save(join(INPUT, "pitches.json"), json(join(original, "pitches.json")));
+  save(join(INPUT, "tools.json"), tools);
+  save(join(INPUT, "wizard-prefix-without-thinking.json"), {
+    systemPrompt: wizard.init.systemPrompt,
+    messages: strippedWizard,
+    tools: wizardTools,
+  });
+  for (const subject of SUBJECTS) {
+    const own = archived(subject);
+    const firstUser = own.messages.find((message) => message.role === "user");
+    const V1 = json(join(original, subject + "-R.json"));
+    for (const message of V1.context.messages)
+      if (message.role === "assistant")
+        message.content = message.content.filter((block) => !["thinking", "redactedThinking"].includes(block.type));
+    const V2 = structuredClone(V1);
+    V2.context = {
+      systemPrompt: wizard.init.systemPrompt,
+      messages: structuredClone(strippedWizard),
+      tools: wizardTools,
+    };
+    V2.context.messages[V2.context.messages.findIndex((message) => message.role === "user")] =
+      structuredClone(firstUser);
+    const V3 = json(join(original, subject + "-S.json"));
+    V3.context.systemPrompt = wizard.init.systemPrompt;
+    V3.context.messages[V3.context.messages.findIndex((message) => message.role === "user")] =
+      structuredClone(firstUser);
+    for (const [variant, input] of Object.entries({ V1, V2, V3 }))
+      save(join(INPUT, subject + "-" + variant + ".json"), input);
+    text(join(INPUT, subject + "-agent-first.ts"), own.firstDraft);
+  }
+  text(join(ROOT, "scratch/bakeoff/craft3.md"), shapedSystem);
+  console.log("Prepared V1/V2/V3 ablations; historical tool-definition caveat remains unchanged.");
+}
+
 async function guard(label: string) {
   const u = await capture(join(homedir(), ".local/bin/omp"), ["usage", "-p", "anthropic"], 60000);
   console.log(u.stdout);
@@ -372,21 +433,24 @@ async function readOnlyCall(call: any) {
 }
 
 async function conversationBatch(batch: string) {
-  const variant = batch[0] === "r" ? "R" : "S",
-    arm = variant === "R" ? "replay" : "shaped";
+  const variant = EXPERIMENT2 ? batch.slice(0, 2).toUpperCase() : batch[0] === "r" ? "R" : "S",
+    arm = EXPERIMENT2 ? variant.toLowerCase() : variant === "R" ? "replay" : "shaped";
   if (!existsSync(join(HISTORICAL, "GUIDE.md"))) {
     const worktree = await capture("git", ["worktree", "add", "--detach", HISTORICAL, "88fc1f0"], 120000);
     if (worktree.status !== 0) throw Error(worktree.stderr || worktree.stdout);
   }
-  const round = "r16" + (variant === "R" ? "replay" : "shaped") + batch[1],
+  const round = EXPERIMENT2 ? "r17" + batch : "r16" + (variant === "R" ? "replay" : "shaped") + batch[1],
     dir = join(BASE, "rounds", round);
   const manifest = json(join(INPUT, "manifest.json"));
   save(join(dir, "round.json"), {
     id: round,
+    started: existsSync(join(dir, "round.json"))
+      ? (json(join(dir, "round.json")).started ?? new Date().toISOString())
+      : new Date().toISOString(),
     model: MODEL,
     effort: "high",
     maxTokens: 120000,
-    arms: [{ ...craft, id: arm }],
+    arms: [{ ...craft, id: arm, name: EXPERIMENT2 ? manifest.variants[variant] : arm }],
     subjects: allPitches,
     replayEncoding: manifest.encoding,
     replayCaveat: caveat,
@@ -412,8 +476,10 @@ async function conversationBatch(batch: string) {
         const input = json(join(INPUT, subject + "-" + variant + ".json"));
         let body = anthropicRequest(input.context);
         text(join(dir, "prompts", arm + ".md"), input.context.systemPrompt.join("\n\n"));
-        let thinkingPassed = variant === "R" && manifest.subjectsMetadata[subject].thinkingBlocks > 0,
+        let thinkingPassed = !EXPERIMENT2 && variant === "R" && manifest.subjectsMetadata[subject].thinkingBlocks > 0,
           extraCalls = 0;
+        let thinkingDisabledFallback = false;
+        const apiRejections: { stage: string; status: number; body: unknown }[] = [];
         const responses: any[] = [];
         let reply: any;
         const started = previous?.status === 200 ? Date.parse(previous.started) : Date.now();
@@ -425,13 +491,28 @@ async function conversationBatch(batch: string) {
           reply = await gw.send("/v1/messages", body);
           save(join(dir, "replies", slug + "-initial.json"), reply);
         }
-        if (reply.status !== 200 && thinkingPassed && /thinking|signature/i.test(JSON.stringify(reply.body))) {
-          for (const m of body.messages)
-            if (m.role === "assistant") m.content = m.content.filter((c) => c.type !== "thinking");
-          thinkingPassed = false;
-          save(join(dir, "requests", slug + "-without-thinking.json"), body);
-          reply = await gw.send("/v1/messages", body);
-          save(join(dir, "replies", slug + "-without-thinking.json"), reply);
+        if (reply.status !== 200) apiRejections.push({ stage: "initial", status: reply.status, body: reply.body });
+        if (
+          reply.status !== 200 &&
+          /thinking|signature/i.test(JSON.stringify(reply.body)) &&
+          (thinkingPassed || EXPERIMENT2)
+        ) {
+          if (EXPERIMENT2) {
+            body.thinking = { type: "disabled" };
+            thinkingDisabledFallback = true;
+            save(join(dir, "requests", slug + "-thinking-disabled.json"), body);
+            reply = await gw.send("/v1/messages", body);
+            save(join(dir, "replies", slug + "-thinking-disabled.json"), reply);
+          } else {
+            for (const m of body.messages)
+              if (m.role === "assistant") m.content = m.content.filter((c) => c.type !== "thinking");
+            thinkingPassed = false;
+            save(join(dir, "requests", slug + "-without-thinking.json"), body);
+            reply = await gw.send("/v1/messages", body);
+            save(join(dir, "replies", slug + "-without-thinking.json"), reply);
+          }
+          if (reply.status !== 200)
+            apiRejections.push({ stage: "thinking fallback", status: reply.status, body: reply.body });
         }
         responses.push(reply);
         while (existsSync(join(dir, "replies", slug + "-continuation-" + (extraCalls + 1) + ".json"))) {
@@ -440,7 +521,7 @@ async function conversationBatch(batch: string) {
           reply = json(join(dir, "replies", slug + "-continuation-" + extraCalls + ".json"));
           responses.push(reply);
         }
-        const expected = variant === "R" ? subject + "Sonnet.ts" : subject + ".ts";
+        const expected = EXPERIMENT2 || variant === "R" ? subject + "Sonnet.ts" : subject + ".ts";
         let write = reply.body?.content?.find(
           (c) => c.type === "tool_use" && c.name === "write" && String(c.input?.path ?? "").endsWith(expected),
         );
@@ -470,6 +551,8 @@ async function conversationBatch(batch: string) {
           save(join(dir, "requests", slug + "-continuation-" + extraCalls + ".json"), body);
           reply = await gw.send("/v1/messages", body);
           save(join(dir, "replies", slug + "-continuation-" + extraCalls + ".json"), reply);
+          if (reply.status !== 200)
+            apiRejections.push({ stage: "continuation " + extraCalls, status: reply.status, body: reply.body });
           responses.push(reply);
           write = reply.body?.content?.find(
             (c) => c.type === "tool_use" && c.name === "write" && String(c.input?.path ?? "").endsWith(expected),
@@ -515,12 +598,14 @@ async function conversationBatch(batch: string) {
           costUsd,
           hasCode: Boolean(code),
           thinkingPassed,
-          thinkingBlocksBefore: manifest.subjectsMetadata[subject].thinkingBlocks,
+          thinkingBlocksBefore: EXPERIMENT2 ? 0 : manifest.subjectsMetadata[subject].thinkingBlocks,
+          thinkingDisabledFallback,
+          apiRejections,
           replayCaveat: caveat,
           encoding: manifest.encoding,
           extraCalls,
           sdkCommit: "88fc1f0",
-          finalWriteUsage: reply.body?.usage ?? null,
+          finalWriteUsage: code ? (reply.body?.usage ?? null) : null,
           returnedTools: blocks
             .filter((c) => c.type === "tool_use")
             .map((c) => ({ name: c.name, path: c.input?.path })),
@@ -595,15 +680,42 @@ async function checkedAndRepaired(round: string) {
 }
 
 const args = process.argv.slice(2);
-if (!existsSync(join(INPUT, "manifest.json")) || args.includes("--prepare-only")) await prepare();
-if (!args.includes("--prepare-only")) {
+if (args.includes("--backfill-started")) {
+  for (const name of readdirSync(join(BASE, "rounds")).filter((name) => name.startsWith(EXPERIMENT2 ? "r17" : "r16"))) {
+    const dir = join(BASE, "rounds", name),
+      path = join(dir, "round.json");
+    if (!existsSync(path)) continue;
+    const timestamps = existsSync(join(dir, "runs"))
+      ? readdirSync(join(dir, "runs"))
+          .filter((file) => file.endsWith(".json"))
+          .map((file) => json(join(dir, "runs", file)).started)
+          .filter((value) => typeof value === "string")
+          .sort()
+      : [];
+    const started = timestamps[0] ?? new Date(statSync(path).mtimeMs).toISOString();
+    save(path, { ...json(path), started });
+    console.log(
+      name + ": started " + started + (timestamps.length ? " (earliest run)" : " (pending round; manifest timestamp)"),
+    );
+  }
+}
+if (
+  !args.includes("--backfill-started") &&
+  (!existsSync(join(INPUT, "manifest.json")) || args.includes("--prepare-only"))
+) {
+  if (EXPERIMENT2) await prepareAblations();
+  else await prepare();
+}
+if (!args.includes("--prepare-only") && !args.includes("--backfill-started")) {
   const selected = args.includes("--batches")
     ? args[args.indexOf("--batches") + 1].split(",")
     : args.includes("--batch")
       ? [args[args.indexOf("--batch") + 1]]
-      : ["ra", "rb", "sa", "sb", "ca", "cb"];
+      : EXPERIMENT2
+        ? ["v1a", "v1b", "v2a", "v2b", "v3a", "v3b"]
+        : ["ra", "rb", "sa", "sb", "ca", "cb"];
   for (const batch of selected) {
-    if (!/^[rsc][ab]$/.test(batch)) throw Error("Unknown batch " + batch);
+    if (!(EXPERIMENT2 ? /^v[123][ab]$/ : /^[rsc][ab]$/).test(batch)) throw Error("Unknown batch " + batch);
     if (!(await guard(batch))) break;
     let round: string;
     if (batch[0] === "c") {

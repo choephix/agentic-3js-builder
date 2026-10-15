@@ -1,0 +1,43 @@
+{
+  "id": 17,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3uMCbiTMZGWfZrwHiFj",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "The path resolution is behaving oddly relative to something—might be a semicolon issue, so I'll just split it into two separate grep commands instead.\n\n",
+        "signature": "CAQStwYKEAgSGAI4AUIIdGhpbmtpbmcSDOJyv1CDBPlrZEapfBoMqnemY8yRZzbhxN66IjDNI55pT8lxjoHmgUq93mcXZYKY0yORPktETX3GZ8jj/2IRaT0/aZZcSUvDPx4r8ZMq1AVycU89jO6CuEMYto8rHWOmtzdvUjPCXqiL0ywS7SMEo1xCboEWQB+yagLg3OBD69IpERNG/Ip/M6/GneOOAMwW4zWjjWPEuTurjeXzeh5KLA1skQBBssCXI3iWsiuZ7hI3de3cHwCM3XCP5iwm7sHoZAGES4UfOTrt8LIS78aoStetJ1Gg1ngY08yTabLNqIOc+D6ZGuAptyYhTfZjJMiUjX91m8wOduhEAq/2Rs1kn3MeKIqMOIEY4lUq/tIBNM8WiZuIOZCtQePfCvWnDH999R3PAexIbAoojmGsXEsno7OXkEjiTd2fdo+2twvy3nMn1lgoBLo/f82c4wT6WdpGdaAe6WArVfMMEhdmWkkWmtNmTBlw0NCbYnkcDfxrmQZWAsygLxvH/olzT+ZdR56PfQIoQ1ppweT7npAfpmZ4B93i753s3eX1fUnv1jebjwJ0lBiUP8XQbKu4Pvgkmcy1ql+wdV6BPV+L/vDDR2G9KIiK1CK32ZrE5t+xD6vJLmfLacQPCDd9XuFp7z3Px85B790FbXEEIUk3XeKBcfZ08QHistGkaVhdmst7Szf9QfhXNwyein1nnGx6RAcEVi0sthLOXrc5KQ6bXJxP+jeM1iP1ISg2K+G1kcC1m43Q8LPdPu7IzdynUVdw6ltQPKcveJNOXeFaLZJQYnqacfkZZxJyZ4ZpxkCglwKqLekVLLPXmvg9ZMMOJxZK7pc19lDbBlwuBLFXaA1T+VAvE79xGLPMXvpEWrEYcsB5+8VB164G+lGeq9WIN7PIJ8NiwY8p22eMFOkmtRteyNjC3YOfjRfm4Ip0YFpvZC9iNgVtpJPCmBU1pztMoiOMZaPfiTm1sLDYyHEax3kdDSjh844Ho9Dlt3I0fOcfIOCcR509nvcNTMgKBF2V14EKamWzzWMMzC2mV92ZbvGg3dFfPc6mFd7pcxd1sfgAyMUtqFweevB/PHvRGAE="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01HyRtTeg8WmJXTnr8bK4N6J",
+        "name": "grep",
+        "input": {
+          "pattern": "export (function|const|class) (rng|frame|line|bezier|catmull|spiral|polyline|arc|svg|glow)\\b",
+          "path": "/home/cx/tmp-archive/sonnet-100/soulScytheSonnet/src"
+        }
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01WhsVPzQB1EbQSXASP76QJw",
+        "name": "bash",
+        "input": {
+          "command": "grep -n \"export function rng\" -A8 src/math.ts; grep -n \"tangentAt\\|  at(\" src/path.ts | head; ls kits",
+          "cwd": "/home/cx/tmp-archive/sonnet-100/soulScytheSonnet"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 318,
+      "cache_read_input_tokens": 95175,
+      "cache_creation_input_tokens": 317
+    }
+  }
+}

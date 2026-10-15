@@ -1,0 +1,33 @@
+{
+  "id": 17,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3rqSnwJQr2TpLEyFGvt",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "I notice soulScytheSonnet is actually a symlink pointing into the replay-sdk repo itself, which contains other samples I was told not to open. This feels like a strange setup—there's talk of a \"read-only replay\" environment refusing diff commands, and my working directory sits inside this tmp-archive replay-sdk folder, so I need to be careful about what I'm actually touching here.\n\nI'll steer clear of opening soulScythe.ts since it counts as another sample, even though it shares a slug with my own soulScytheSonnet work. I'm not fully sure whether this is a read-only replay environment given the diff refusal, so I should just test directly whether writing files and running npm actually work inside this directory before assuming anything.\n\n",
+        "signature": "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"
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01Bcunj5cwFjEYqK1vTiQCPh",
+        "name": "bash",
+        "input": {
+          "command": "cd ~/tmp-archive/sonnet-100/soulScytheSonnet && ls -la ~/tmp-archive/sonnet-100/ | grep -i -E \"soul|wizard\"; ls -la . | head -5; ls scratch/main | head -3"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 516,
+      "cache_read_input_tokens": 77719,
+      "cache_creation_input_tokens": 6752
+    }
+  }
+}

@@ -544,6 +544,9 @@ async function refine(round: string, args: string[]) {
   writeJson(join(dir, "round.json"), {
     ...sourceManifest,
     id: round,
+    started: existsSync(join(dir, "round.json"))
+      ? (readJson<{ started?: string }>(join(dir, "round.json")).started ?? new Date().toISOString())
+      : new Date().toISOString(),
     refineFrom: froms.join(","),
     model,
     effort,

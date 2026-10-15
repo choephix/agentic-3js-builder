@@ -1,0 +1,33 @@
+{
+  "id": 24,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3uPVEu5sHszDNGDdoPE",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "Interesting — the actual pwd resolves to a different path, a \"replay-sdk-88fc1f0\" copy rather than the expected project directory. This suggests my session's working directory might be remapped or aliased to this archive copy, which explains why the earlier relative read of GUIDE.md resolved the way it did.\n\nThe sandbox at the capybaraSonnet path has its own `.git` and scratch files distinct from this replay-sdk copy, so I shouldn't assume they're interchangeable — I'll use absolute paths for all file operations to avoid confusion, and test by writing to the absolute sandbox path directly to confirm where things actually land.\n\n",
+        "signature": "CAQS0Q0KEAgSGAI4AUIIdGhpbmtpbmcSDO7UJ9zomQy55nX8bxoMDPKryzNiwWh91Wj/IjAYk8DzpGeufenM4LFzkjyOtyhdqb5BfTUGqysailh5U5cb/UwVzQDfozUxuvoJ7XQq7gwtbYqSHzkJB873kt8BwrmwCbJVwD7QnDcza9J9+wRE71izJK475l1e0s0z1/FNeKUYv/YZCPGPuNYfh4gM6TMzzm6WhWjpFgLO6Z9npBjU89OucpQq98DZarF+h9B0Ke+WtsRsaRXpcLNQrg4WWnx5EKu+6rExXVcV1C0c69i78dFPruJyMMwCybtPsAw1Qoe31LP1KYtgc1in1O+Ilj36zJSWJ+rqckYWsKjng6Yzjw9CRytom8BiQNIZPG4zK8xxJQizM9xi5gv85iAkJalbGh+IYigkIGHFUJepji0dLsLhDD7ZAwDZzUDZPY8JB6I2w3TJV3JoKcdYolbnkwSd7SO4uGJR/vmtkLNpBVuZ1k4lbNE4+sTj+cS5/yxGxkC0+9ei4lb5jECVOyO2TMS1Vq+yhMFC7CDHcoji4hO9tKxabTHd4RFL9ABULmYn5N2h2z9Vj4iI8kjxv9O53FmcHcnRrSs3nR9jjnd5pps0Cn8qJjLdZgYhxk7QQvUbPDixhhJPXFLLbBigduNvqogOJXuChZFsqfVWElf0Ph4c8/YL+1IXRWE3uIN7TMrdPM9Wh/HGcKTPInugYw6OYAx01nB4WvcTLalZNUFVws8ARCFXJTxLRLJqzIod80nYA/vKWFFpEcvs6FWgc+mO4+hNe+fIhinf5odxqzDDGsDwcszg4gRs+cSe2HZ687FFURve1oIz7hvmGfVUdP14J+GENMM4qviwNyFtTIfsVJvTDB4P8mzuiA/Mq9lwhZ24NfarYeGNfewLtr/dSqT9m46cZeKujhVEAkf0AWq5F2BRxC/ifYCRD0E3OZ1EXqId+l9NA2xm3oQN4qpu19mc49dyEj3nQCLcA5GhMY4aC9QYQtiDyIlUx+38Y/M/HiEcj5qkVSWlTU/F0MDvdoJE5sqcMldXnT8XIiyyzFzW56+NetpUwBC5Yxd5wJw2hUA8Ve5Ih4+VuK1qjXPh4jyYB2uUKOClYRbLRzoIy98n3XAFPbsmCni3/m3PBWHiGRUj2Uvst38zBMmU3aOfHLZdTobirCnxe3s1zlIY2GV1pWwy5j/wBjEmJNJ4GVjIKXwT0KM8z1d/ivIDAu8IzVxGr8jqp0+yUpeD5Ssl3z5Vpa4gy4G4hfF6T5oM1IhIJp8D9YiJvUjfNZuxvOZ1cDliMu7IK222TTY2ILBjn4WnQKvMUCadN6zPidNw4UsJZo3Kl5P2jAUgd89DMZN/UBhhfj+n0ZMYmQOwc7Z+DaBudPJmhj6UHD+oFoo1V9m8sfxhjrzoH6ADlVMjVlCHnE+ILB7jw/Ap0MECKfYjlR24Lj+3sA/DSZMy8qSlW9FX2QfeWteGe4CQuWiWg9Sppuy/9zz1TyYN1hyGajqcZrz+8dXCbUsDChVy8BKmw8QxBQgBX00kYpXc+ZpYEhhkLz5STnEnWN3343xHDCXK+YJRHXv+BaTdbassfHVtjqPIOE9OqS9oMQZ8gWejjOxpWL64O8M9xM6nXc81X5vmU1e/INmbIZ1MReDu3+E93J/9OMZw7l0aHaEqobLRDqI++8fQA16uEUtqyIVF+x4My1m5pOFqCnvhvMFOrbIYH4i8FXC5tJxFFLzH6H6GTlmCkQivo1PFWaGRTmqRFhavKmP7pvG04ZGWBadltquBlm+KwXdSs6My07KDFUAmHa5IEI8JppeWnPCjZDJB7qokEMJJ2unfJ67KRD/4oVeux8rWw3ThlLoIBd6T74rTIIfuwqDZJxemOIzJ+RyM8wcRpmwAxZshvGmNTGXGf9XvGeC6LpCXvqofeWaKTLW2XEYYGBFnNyMQAxHYUKoppia+5xTZF8meisLw4w1FJzglDTaIGxYcOS6hO8LRbk1FkyfbouEr7J+UP6tTRcOETcQOJgLWVgXSTeh5vdOc8yLaIFdLGzHk+lCxn5TJCGf4gZJcjj009d9Ai5WD7uj1Ec9f55nJQuFrNBIBwa0m0cM3VCjC4FPW+gVCpzD/tO4XFtRRKBOTnqzVkPUZuTI3+WULnapA9sQkCzP2LuuuEjk5KhFRGzv3meLKzf8sQrRuaYkPdYkoe1z+DZsPm++EbgRkdyZhxh37AE7gpR2md5vWaUVKg8K9afFGsDmdVuPpKxqBHBDHIkpil4u/XH+H3HTqD3YmgMR9sfdsFGW5bE5tZjitQUHRkfOKKpT9C96pwxO+WFCJBhgB"
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01RF8pcxPAe77PqQ6RTAKHUY",
+        "name": "bash",
+        "input": {
+          "command": "ls -la /home/cx/tmp-archive/sonnet-100/capybaraSonnet/samples | grep -i capy; ls /home/cx/tmp-archive/replay-sdk-88fc1f0/samples | grep -i capy; ls -la /home/cx/tmp-archive/ | head -20"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 530,
+      "cache_read_input_tokens": 106063,
+      "cache_creation_input_tokens": 894
+    }
+  }
+}

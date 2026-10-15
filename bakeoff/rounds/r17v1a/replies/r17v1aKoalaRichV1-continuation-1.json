@@ -1,0 +1,33 @@
+{
+  "id": 10,
+  "status": 200,
+  "body": {
+    "id": "msg_011Cg3qigDWH5krLy3JetV4f",
+    "type": "message",
+    "role": "assistant",
+    "model": "anthropic/claude-sonnet-5-5",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "I should check what scale type the part is using.\n\n",
+        "signature": "CAQSiQYKEAgSGAI4AUIIdGhpbmtpbmcSDF2O52BXKQBoPBPFdhoMNfZwsV4pxvnpxp97IjDa3RNfskrLzjuykmVVGG3/P5WhVBhxsoQjY6/61WePBubQEXkJPBP3yTsTdVDY6bEqpgX+GeV7XmgVfKSTn8UhwhcbA23ii/4qRr3mz1U+14FxjENCOvIJfrDIE1KGjwqYC7MI7kRjaYHfXYX65uBZk6uE3zDSVN0LbIccohP0PUeKE4a00qf/Qsykk6BqS3P+wArvh7RpcSW/F2c5lfQjGb/TSMFLsAyGdB12eRVuG8gba9e4MyllyfNmm9DdDrhtr0MZmf7fSSsuvoIOd4ecq381i/hhGlN9hW7nyGyXxiJaLUXpDogJLb9845dqtVZRsZnFzocpDYNjPwQIJEptXTF5rlNaATYhIC8FYnYR2SCi12lOuRkG9/nTEE4ZM/65/mdgMWLtWt0Eu8OCbA0hAi9cj5iLBRSV5Ufk8FSjZ6YCoGceo/XLIEifCPgeLEVE6vh9Uta26ptb5+wIaw8yX9ZVU8NYnlDDVB8e+VwsYQeAvdwrzDzcFVIrDPJhRJsUcCLd3bCq5EhRnzF7nSXeD8lppnCxpEwu0V19pQArEdNKnf53xjADR3jdwu8UKppwg6bHmurjoDLOae7qkzIR7NB2pvAQy10EduaIiJDk2+DUlOv8g9WzWqRV2B/T+THw60u3AjXj3EdevSZryomD/asyze+hPD2ZfYNyh18xHokXjBlyjd3auhuxgrSznX0n5MqdHoJDK72HOcsFYTkZ38vrK7OIokdkfygUrEou29M+vLrRxwRvdDvJAeQ6mJSJ1YPNjRZC4vo617kZV2GIn587lf5nnjij0XsfK8+Jh5H8a26ISKlOnS/ajlZ9K9cIItewEjr1FOpLWMc9O/9kwc3H8LJC5fYQr0lbzMw/3qUiZRulx7VN/9nj+QHFhBWyO/cISLezfMKPBGGHh1CgV1d34wH5BFg3+/sHARRBiO/ik4DPPKO5+vDqeJyAdz8t/fTAof2JeWQYAQ=="
+      },
+      {
+        "type": "tool_use",
+        "id": "toolu_01UBJ1izHW5csY4uGHsGhVEj",
+        "name": "bash",
+        "input": {
+          "command": "cd ~/tmp-archive/sonnet-100/koalaSonnet && grep -rn \"scale?\" src/*.ts | head; grep -n \"export function frame\\|export function line\" -A6 src/frame.ts | head -30"
+        }
+      }
+    ],
+    "stop_reason": "tool_use",
+    "stop_sequence": null,
+    "usage": {
+      "input_tokens": 2,
+      "output_tokens": 132,
+      "cache_read_input_tokens": 69768,
+      "cache_creation_input_tokens": 33511
+    }
+  }
+}

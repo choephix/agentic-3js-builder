@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Publish the replay experiment and its measured table; no model calls or judging."""
+import argparse
 import csv
 import html
 import json
+import re
+import statistics
 import tempfile
 from pathlib import Path
 
@@ -17,6 +20,25 @@ COLUMNS = [('final', 'Agent · final'), ('draft', 'Agent · first draft'),
            ('r1', 'R · draw 1'), ('r2', 'R · draw 2'), ('s1', 'S · draw 1'), ('s2', 'S · draw 2')]
 ROUND_BY_COLUMN = {'c2': 'r16ca', 'c3': 'r16cb', 'r1': 'r16replaya', 'r2': 'r16replayb',
                    's1': 'r16shapeda', 's2': 'r16shapedb'}
+EXPERIMENT = 'replay'
+ROUND_PATTERN = 'r16*'
+
+
+def configure(experiment):
+    global EXPERIMENT, OUTPUT, INPUT, COLUMNS, ROUND_BY_COLUMN, ROUND_PATTERN
+    EXPERIMENT = experiment
+    if experiment == 'replay2':
+        OUTPUT = PUBLIC / 'replay2/index.html'
+        INPUT = ROOT / 'bakeoff/replay2-inputs'
+        ROUND_PATTERN = 'r17*'
+        COLUMNS = [('final', 'Agent · final'), ('draft', 'Agent · first draft'),
+                   ('c1', 'C · existing r12/r13'), ('r1', 'R · draw a'), ('r2', 'R · draw b'),
+                   ('v1a', 'V1 · no thinking · a'), ('v1b', 'V1 · no thinking · b'),
+                   ('v2a', 'V2 · canned prefix · a'), ('v2b', 'V2 · canned prefix · b'),
+                   ('v3a', 'V3 · agent costume · a'), ('v3b', 'V3 · agent costume · b')]
+        ROUND_BY_COLUMN = {'r1': 'r16replaya', 'r2': 'r16replayb',
+                           **{f'v{v}{draw}': f'r17v{v}{draw}' for v in (1, 2, 3) for draw in ('a', 'b')}}
+
 SCRIPT = """
 document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>{
  document.querySelectorAll('[data-view]').forEach(other=>other.setAttribute('aria-pressed',other===button));
@@ -49,7 +71,7 @@ def tile(subject, column):
     entry = latest_entry(subject, base if column == 'c1' else ROUND_BY_COLUMN[column])
     if entry:
         data = {**checked_tile(entry, api=True), 'entry': entry}
-        if column in ('r1', 'r2', 's1', 's2'):
+        if column not in ('c1', 'c2', 'c3'):
             from gap2_page import chain
             history = list(chain(entry))
             cost = sum(item.get('costUsd') or 0 for item in history)
@@ -94,6 +116,14 @@ def metric(subject, column, title):
         source = INPUT / (subject + '-agent-first.ts')
     content = source.read_bytes() if source and source.exists() else None
     check = None
+    initial_error = None
+    if first:
+        from gap_page import round_for_slug
+        initial_check = load(ROUNDS / round_for_slug(first['slug']) / 'checks' / (first['slug'] + '.json'), {})
+        if initial_check and initial_check.get('rendered') is False:
+            error = initial_check.get('renderError') or ''
+            match = re.search(r'^[A-Za-z]*Error: (.+)$', error, re.MULTILINE)
+            initial_error = match.group(1) if match else error.splitlines()[0] if error else 'Render failed'
     if entry:
         from gap_page import round_for_slug
         check = load(ROUNDS / round_for_slug(entry['slug']) / 'checks' / (entry['slug'] + '.json'), entry.get('check'))
@@ -141,6 +171,8 @@ def metric(subject, column, title):
             'thinkingPassed': first.get('thinkingPassed'),
             'extraCalls': first.get('extraCalls', 0) if entry else None,
             'finalWriteOutputTokens': (first.get('finalWriteUsage') or {}).get('output_tokens') if first.get('hasCode') else None,
+            'initialCrashError': initial_error,
+            'initialCrashExtrudeX': bool(initial_error and initial_error.startswith('extrude(): x is required:')),
             'initialModuleKB': None, 'initialLines': None}
 
 
@@ -158,15 +190,34 @@ def main():
                 code = path.read_bytes()
                 row['initialModuleKB'] = round(len(code) / 1024, 2)
                 row['initialLines'] = len(code.splitlines())
-    runs = [p for d in ROUNDS.glob('r16*') for p in (d / 'runs').glob('*.json')]
+    runs = [p for d in ROUNDS.glob(ROUND_PATTERN) for p in (d / 'runs').glob('*.json')]
     records = [load(p, {}) for p in runs]
     total = sum(r.get('costUsd') or 0 for r in records)
     initial_calls = sum(not r.get('from') and r.get('status') == 200 for r in records)
     failed_calls = sum(not r.get('from') and r.get('status') != 200 for r in records)
     repair_calls = sum(bool(r.get('from')) for r in records)
     continuation_calls = sum(r.get('extraCalls', 0) for r in records if not r.get('from'))
+    rejections = [{'slug': r['slug'], **rejection} for r in records for rejection in r.get('apiRejections', [])]
+    median_groups = ({'Agent first draft': ['draft'], 'C existing': ['c1'], 'R': ['r1', 'r2'],
+                      **{f'V{v}': [f'v{v}a', f'v{v}b'] for v in (1, 2, 3)}} if EXPERIMENT == 'replay2'
+                     else {'Agent first draft': ['draft'], 'C fresh': ['c2', 'c3'],
+                           'R': ['r1', 'r2'], 'S': ['s1', 's2']})
+    medians = {}
+    for variant, columns in median_groups.items():
+        included = [row for row in rows if row['column'] in columns]
+        sizes = [row['initialModuleKB'] if row['initialModuleKB'] is not None else row['moduleKB'] for row in included]
+        sizes = [size for size in sizes if size is not None]
+        medians[variant] = {'moduleKB': statistics.median(sizes) if sizes else None,
+                            'modules': len(sizes), 'planned': len(included),
+                            'initialCrashes': sum(row['initialCrashError'] is not None for row in included) if any(row['slug'] for row in included) else None,
+                            'extrudeXCrashes': sum(row['initialCrashExtrudeX'] for row in included) if any(row['slug'] for row in included) else None}
+        for field in ('lines', 'parts', 'textures', 'outputTokens', 'extraCalls', 'costUsd'):
+            values = [(row['initialLines'] if field == 'lines' and row['initialLines'] is not None else row[field]) for row in included]
+            values = [value for value in values if value is not None]
+            medians[variant][field] = statistics.median(values) if values else None
     evidence = {'initialCalls': initial_calls, 'plannedCalls': 36, 'failedCalls': failed_calls, 'repairCalls': repair_calls,
-                'continuationCalls': continuation_calls, 'totalSpendUsd': total, 'stopped': stopped, 'manifest': manifest, 'rows': rows}
+                'continuationCalls': continuation_calls, 'totalSpendUsd': total, 'stopped': stopped,
+                'apiRejections': rejections, 'medians': medians, 'manifest': manifest, 'rows': rows}
     (OUTPUT.parent / 'results.json').write_text(json.dumps(evidence, indent=2) + '\n')
     (INPUT / 'results.json').write_text(json.dumps(evidence, indent=2) + '\n')
     with (OUTPUT.parent / 'table.csv').open('w') as handle:
@@ -175,15 +226,33 @@ def main():
         writer.writerows(rows)
     out = ['<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
            '<title>Before the first write · Sonnet replay</title><style>', STYLE,
-           'main,.bar-inner{max-width:2100px}.tiles{display:grid;grid-template-columns:repeat(9,minmax(205px,1fr));overflow-x:auto;padding:4px 4px 14px}.tile{min-width:205px}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border-bottom:1px solid #d4dcd3;padding:8px;text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}.notice{border-left:4px solid #b18a3c;padding:10px 16px;background:#f8f0dc}.brief{max-width:1400px}.stats{font-size:16px}.tile h4{white-space:nowrap}',
+           'main,.bar-inner{max-width:2100px}.tiles{display:grid;grid-template-columns:repeat(9,minmax(205px,1fr));overflow-x:auto;padding:4px 4px 14px}.tile{min-width:205px}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border-bottom:1px solid #d4dcd3;padding:8px;text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}.notice{border-left:4px solid #b18a3c;padding:10px 16px;background:#f8f0dc}.brief{max-width:1400px}.stats{font-size:16px}.tile h4{white-space:nowrap}'.replace('repeat(9,', f'repeat({len(COLUMNS)},'),
            '</style></head><body><main><div class="eyebrow">The one-shot gap / conversation replay</div>',
            '<h1>What comes before the first write?</h1>',
-           '<p class="intro"><strong>C</strong>: craft3 one-shot. <strong>R</strong>: archived agent conversation immediately before its first sample write. <strong>S</strong>: craft3 plus a fixed synthetic doc-reading conversation with current file contents. Same Sonnet 5.5, high effort, 120,000 max output tokens. Two fresh draws per variant; the existing C draw is also shown. When R/S request more reading, execute read-only tools against SDK commit 88fc1f0 and continue for at most eight extra API calls. Writes and renders are refused until the sample write is returned. No critiques; at most two crash repairs, using the app-style craft3 system.</p>',
+           ('<p class="intro"><strong>C</strong>: existing craft3 control. <strong>R</strong>: prior agent conversation replay, including signed thinking. <strong>V1</strong>: each subject’s R prefix with earlier thinking removed. <strong>V2</strong>: one wizardBookshelf agent system/tool prefix for every subject, thinking removed, replacing only the first user message with the subject’s own archived brief verbatim. <strong>V3</strong>: S synthetic full-file reads, but wizardBookshelf agent system and the subject’s archived brief verbatim. Two fresh draws per V variant. Same Sonnet 5.5, high effort, 120,000 max output tokens; up to eight read-only continuations against SDK 88fc1f0 and at most two craft3-system crash repairs. Thinking/signature rejections are retained verbatim and retried with thinking disabled, never fabricated.</p>'
+            if EXPERIMENT == 'replay2' else
+            '<p class="intro"><strong>C</strong>: craft3 one-shot. <strong>R</strong>: archived agent conversation immediately before its first sample write. <strong>S</strong>: craft3 plus a fixed synthetic doc-reading conversation with current file contents. Same Sonnet 5.5, high effort, 120,000 max output tokens. Two fresh draws per variant; the existing C draw is also shown. When R/S request more reading, execute read-only tools against SDK commit 88fc1f0 and continue for at most eight extra API calls. Writes and renders are refused until the sample write is returned. No critiques; at most two crash repairs, using the app-style craft3 system.</p>'),
            f'<p class="notice">{html.escape(manifest.get("caveat", "Inputs not yet prepared"))}</p>',
            f'<p class="stats"><strong>{initial_calls}/36 started draws completed</strong> · {continuation_calls} continuation calls · {failed_calls} failed request records · {repair_calls} repair calls · <strong>${total:.3f}</strong> new spend</p>',
-           '<p class="intro">Captions and the main table describe the module actually rendered, including crash repairs. The exact archived first draft is measured in its table row; its image reuses the existing first-draft comparison and may include crash repair. Initial module sizes are retained in the downloadable JSON/CSV. Output-token splits are shown only when reported; “—” means unavailable, not zero. Anthropic output tokens combine thinking and tool arguments. Agent-final cost/tokens cover its entire session; draft cost/tokens cover its first-write generation only. Costs of C/R/S include any repairs.</p>',
-           '<p class="intro"><strong>Repair exception:</strong> R draw 1 capybara used the archived agent-style system for its two repair attempts before the craft3 override was introduced. Both replies contained tool markup, not edits; it remains crashed at the two-repair cap. R draw 2 capybara was repaired with craft3. S draw 1 koala did not emit a sample write within eight extra calls and has no module to render.</p>',
+           ('<p class="intro">Captions measure the module actually rendered. Table sizes and line counts measure the initial module, before repairs; parts/textures describe the retained render. Output-token splits are unavailable unless reported. API pipeline costs include continuations and repairs. R17 renders use the current SDK, where extrude now requires x; those initial crash errors are counted separately below. Earlier rounds are archived references and were not re-checked.</p>'
+            if EXPERIMENT == 'replay2' else
+            '<p class="intro">Captions and the main table describe the module actually rendered, including crash repairs. The exact archived first draft is measured in its table row; its image reuses the existing first-draft comparison and may include crash repair. Initial module sizes are retained in the downloadable JSON/CSV. Output-token splits are shown only when reported; “—” means unavailable, not zero. Anthropic output tokens combine thinking and tool arguments. Agent-final cost/tokens cover its entire session; draft cost/tokens cover its first-write generation only. Costs of API pipelines include any repairs.</p>'),
+           ('<p class="intro">Only the new r17 V1/V2/V3 runs count toward the spend and call totals above. Agent, C and R columns are references from earlier rounds.</p>'
+            if EXPERIMENT == 'replay2' else
+            '<p class="intro"><strong>Repair exception:</strong> R draw 1 capybara used the archived agent-style system for its two repair attempts before the craft3 override was introduced. Both replies contained tool markup, not edits; it remains crashed at the two-repair cap. R draw 2 capybara was repaired with craft3. S draw 1 koala did not emit a sample write within eight extra calls and has no module to render.</p>'),
            '<p><a href="results.json">Full results JSON</a> · <a href="table.csv">Download table CSV</a></p>']
+    out.append('<h2>Median initial module size</h2><table><thead><tr><th>Variant</th><th>Median KB</th><th>Median lines</th><th>Modules / planned</th><th>Initial crashes</th><th>Extrude x crashes</th></tr></thead><tbody>')
+    for variant, values in medians.items():
+        size = f"{values['moduleKB']:.2f}" if values['moduleKB'] is not None else '—'
+        lines = values['lines'] if values['lines'] is not None else '—'
+        crashes = values['initialCrashes'] if values['initialCrashes'] is not None else '—'
+        extrude = values['extrudeXCrashes'] if values['extrudeXCrashes'] is not None else '—'
+        out.append(f"<tr><td>{html.escape(variant)}</td><td>{size}</td><td>{lines}</td><td>{values['modules']} / {values['planned']}</td><td>{crashes}</td><td>{extrude}</td></tr>")
+    out.append('</tbody></table>')
+    if rejections:
+        out.append('<details><summary>API rejections, verbatim</summary><pre>' + html.escape(json.dumps(rejections, indent=2)) + '</pre></details>')
+    else:
+        out.append('<p class="intro">API rejections: none recorded.</p>')
     if stopped:
         out.append('<p class="notice">Stopped before ' + html.escape(stopped['label']) + ': Anthropic 5 Hour usage ' + html.escape(str(stopped['values'])) + '% (above 50%). Unmade calls are marked not run.</p>')
     out.append('</main><div class="bar"><div class="bar-inner"><div class="views" role="group" aria-label="Image view"><span class="view-label">View</span>')
@@ -193,11 +262,14 @@ def main():
     pitches = {p['id']: p['rich'] for p in load(INPUT / 'pitches.json', {'subjects': []})['subjects']}
     for subject in SUBJECTS:
         brief = ''.join(f'<span>{html.escape(line)}</span>' for line in pitches.get(subject, '').splitlines())
-        out.append(f'<article class="comparison-row" data-subject="{subject}"><div class="row-heading"><h3>{subject}</h3><div class="brief">{brief}</div></div><p class="section-note">Scroll horizontally to compare all nine builds →</p><div class="tiles">')
+        out.append(f'<article class="comparison-row" data-subject="{subject}"><div class="row-heading"><h3>{subject}</h3><div class="brief">{brief}</div></div><p class="section-note">Scroll horizontally to compare all {len(COLUMNS)} builds →</p><div class="tiles">')
         out.extend(cell(subject, column, title) for column, title in COLUMNS)
-        out.append('</div><div class="table-wrap"><table><thead><tr><th>Variant</th><th>Module KB</th><th>Lines</th><th>Parts</th><th>Textures</th><th>Output tokens</th><th>Thinking</th><th>Text</th><th>Extra calls</th><th>Cost</th><th>Status</th></tr></thead><tbody>')
+        size_label = 'Initial KB' if EXPERIMENT == 'replay2' else 'Module KB'
+        out.append(f'</div><div class="table-wrap"><table><thead><tr><th>Variant</th><th>{size_label}</th><th>Lines</th><th>Parts</th><th>Textures</th><th>Output tokens</th><th>Thinking</th><th>Text</th><th>Extra calls</th><th>Cost</th><th>Status</th></tr></thead><tbody>')
         for row in [r for r in rows if r['subject'] == subject]:
-            values = [row['variant'], row['moduleKB'], row['lines'], row['parts'], row['textures'], row['outputTokens'], row['thinkingTokens'], row['textTokens'], row['extraCalls'], f"${row['costUsd']:.3f}" if row['costUsd'] is not None else None, row['crashedRepaired']]
+            size = row['initialModuleKB'] if EXPERIMENT == 'replay2' and row['initialModuleKB'] is not None else row['moduleKB']
+            lines = row['initialLines'] if EXPERIMENT == 'replay2' and row['initialLines'] is not None else row['lines']
+            values = [row['variant'], size, lines, row['parts'], row['textures'], row['outputTokens'], row['thinkingTokens'], row['textTokens'], row['extraCalls'], f"${row['costUsd']:.3f}" if row['costUsd'] is not None else None, row['crashedRepaired']]
             out.append('<tr>' + ''.join('<td>' + html.escape(str(v) if v is not None else '—') + '</td>' for v in values) + '</tr>')
         out.append('</tbody></table></div></article>')
     out.extend(['</main><script>', SCRIPT, '</script></body></html>'])
@@ -210,4 +282,7 @@ def main():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--experiment', choices=('replay', 'replay2'), default='replay')
+    configure(parser.parse_args().experiment)
     main()
