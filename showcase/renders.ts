@@ -1,7 +1,7 @@
 // Harness renders (`npm run snap`): the per-sample index from the dev server, the reports it points at, the
 // Versions panel and the image lightbox.
 import type { Object3D } from "three";
-import type { Assembly } from "../harness/assemble";
+import type { Assembly } from "../src/pack";
 import { duration, tokens as tokenText } from "./builds";
 import type { Version } from "./builds";
 import { h } from "./dom";
@@ -142,23 +142,27 @@ export function delta(now: number, before: number | undefined) {
 
 export type VersionsActions = {
   select(tag: string): void;
+  /** Flip between the selected tag and the live sample in the viewer. */
+  toggleInViewer(): void;
   compare(from: string, to: string): void;
   lightbox(items: Array<{ url: string; caption: string }>, index: number): void;
 };
 
-type LiveGlb = { make: (() => Object3D) | null; rigged: boolean; meta: unknown };
-/** One bake per live build, shared by both buttons; a failed bake is dropped so a retry starts over. */
+/** The build on stage: the live sample, or the saved version `tag` while the panel shows it in the viewer. */
+type StagedBuild = { make: (() => Object3D) | null; rigged: boolean; meta: unknown; tag: string | null };
+/** One bake per build, shared by both buttons; a failed bake is dropped so a retry starts over. */
 const assemblies = new WeakMap<() => Object3D, Promise<{ root: Object3D; assembly: Assembly }>>();
 
 /**
- * The live GLB downloads. Each click rebuilds untouched source once per live build (viewer poses and display
- * materials must not enter the bake), then bakes and exports it like `npm run snap`. The export modules load only on
- * click: static imports would put the atlas bake and GLTFExporter in the viewer bundle.
+ * The GLB downloads of the build on stage. Each click rebuilds untouched source once per build (viewer poses and
+ * display materials must not enter the bake), then bakes and exports it like `npm run snap`. The export modules load
+ * only on click: static imports would put the atlas bake and GLTFExporter in the viewer bundle.
  */
-function glbSection(slug: string, make: () => Object3D, rigged: boolean, meta: unknown) {
+function glbSection(slug: string, { make, rigged, meta, tag }: StagedBuild & { make: () => Object3D }) {
   const error = h("p", { class: "muted", role: "alert", hidden: true });
   const buttons = [true, false].map((skeleton) => {
-    const filename = skeleton ? `${slug}-rigged.glb` : rigged ? `${slug}-mesh.glb` : `${slug}.glb`;
+    const base = tag ? `${slug}-${tag}` : slug;
+    const filename = skeleton ? `${base}-rigged.glb` : rigged ? `${base}-mesh.glb` : `${base}.glb`;
     const status = h("span", { class: "muted" }, ".glb");
     const button = h(
       "button",
@@ -169,7 +173,7 @@ function glbSection(slug: string, make: () => Object3D, rigged: boolean, meta: u
         "data-tip":
           skeleton && !rigged
             ? "This model has no joints."
-            : `Download ${filename}, built from the live code in this browser.`,
+            : `Download ${filename}, built from the ${tag ? `${tag} source` : "live code"} in this browser.`,
         onclick: async () => {
           button.disabled = true;
           status.textContent = "building…";
@@ -178,7 +182,8 @@ function glbSection(slug: string, make: () => Object3D, rigged: boolean, meta: u
             let pending = assemblies.get(make);
             if (!pending) {
               pending = (async () => {
-                const { assemble } = await import("../harness/assemble");
+                // Lazy-load packing so its atlas code stays out of the initial showcase bundle.
+                const { assemble } = await import("../src/pack");
                 const root = make();
                 return { root, assembly: await assemble(root, rigged) };
               })();
@@ -189,7 +194,7 @@ function glbSection(slug: string, make: () => Object3D, rigged: boolean, meta: u
             const buffer = await exportGlb(assembly, skeleton, {
               slug,
               arm: rigged ? "B" : "A",
-              tag: "live",
+              tag: tag ?? "live",
               meta,
               rig: root.userData.rig,
             });
@@ -215,23 +220,31 @@ function glbSection(slug: string, make: () => Object3D, rigged: boolean, meta: u
     );
     return button;
   });
-  return h("section", null, h("h3", null, "Download GLB"), h("div", { class: "downloads" }, buttons), error);
+  return h(
+    "section",
+    null,
+    h("h3", null, tag ? `Download GLB · ${tag}` : "Download GLB"),
+    h("div", { class: "downloads" }, buttons),
+    error,
+  );
 }
 
 /**
- * The Versions panel: live browser-built GLBs, every tag with its numbers and the model that rendered it (`versions`,
- * from the build record), and the selected tag's sheet, shots and report. Downloads need no harness renders.
+ * The Versions panel: GLBs of the build on stage, every tag with its numbers and the model that rendered it
+ * (`versions`, from the build record), and the selected tag's sheet, shots and report. Downloads need no harness
+ * renders. With `inViewer`, the main page stages the selected tag's saved source instead of the live sample.
  */
 export function versionsPanel(
   slug: string,
   snapshots: Snapshots,
   versions: Version[],
   selected: string | null,
-  glb: LiveGlb,
+  glb: StagedBuild,
+  inViewer: boolean,
   actions: VersionsActions,
 ) {
   const body = h("div", { class: "versions" });
-  if (glb.make) body.append(glbSection(slug, glb.make, glb.rigged, glb.meta));
+  if (glb.make) body.append(glbSection(slug, { ...glb, make: glb.make }));
   if (!snapshots.tags.length) {
     body.append(
       h(
@@ -260,7 +273,27 @@ export function versionsPanel(
     ),
   );
   body.append(
-    h("section", null, h("h3", null, `${snapshots.tags.length} version${snapshots.tags.length > 1 ? "s" : ""}`), table),
+    h(
+      "section",
+      null,
+      h(
+        "h3",
+        null,
+        `${snapshots.tags.length} version${snapshots.tags.length > 1 ? "s" : ""}`,
+        h(
+          "button",
+          {
+            class: "link toggle",
+            onclick: actions.toggleInViewer,
+            "data-tip": inViewer
+              ? "The viewer shows the version you pick, rebuilt from its saved source with today's SDK. Click to always show the latest."
+              : "The viewer always shows the latest. Click to show the version you pick.",
+          },
+          inViewer ? "viewer: picked" : "viewer: latest",
+        ),
+      ),
+      table,
+    ),
   );
   if (versions.some((version) => version.spent)) {
     const spend = h(

@@ -535,25 +535,32 @@ const showcaseData = {
   },
 };
 
-// A bake-off build is one unedited model reply: it may not parse or may import a module that doesn't exist. Either
-// becomes a module that throws when the bakeoff page imports it, so the page shows the failure and the static build
-// still succeeds (a missing named export: `shimMissingExports` below).
+// A bake-off build is one unedited model reply: it may not parse or may import a module that doesn't exist. A saved
+// version (`<tag>-creature.ts` from `npm run snap`) is a sample as it was, run against today's SDK, which may have
+// dropped something it imports. Either failure becomes a module that throws when its page imports it, so the page
+// shows the failure and the static build still succeeds (a missing named export: `shimMissingExports` below).
 const BAKEOFF_BUILD = /[\\/]bakeoff[\\/]rounds[\\/][^\\/]+[\\/]builds[\\/][^\\/]+\.ts$/;
-const MISSING = "\0bakeoff-missing:";
+const VERSION_SOURCE = /[\\/][AB][\\/]snaps[\\/][^\\/]+-creature\.ts$/;
+const isVersionSource = (id) => id.startsWith(`${snapshotRoot}${sep}`) && VERSION_SOURCE.test(id);
+const MISSING = "\0missing-import:";
 const thrower = (message) => `throw new Error(${JSON.stringify(message)});\nexport default undefined;\n`;
 
-const bakeoffGuard = {
-  name: "bakeoff-guard",
+const untrustedGuard = {
+  name: "untrusted-guard",
   enforce: "pre",
   resolveId(source, importer) {
-    if (!importer || !BAKEOFF_BUILD.test(importer)) return null;
-    return this.resolve(source, importer, { skipSelf: true }).then((found) => found ?? `${MISSING}${source}`);
+    if (!importer) return null;
+    const version = isVersionSource(importer);
+    if (!version && !BAKEOFF_BUILD.test(importer)) return null;
+    // A saved version's imports (`../src/…`, `three`) resolve from samples/, where it was written.
+    const from = version ? join(sampleRoot, basename(importer)) : importer;
+    return this.resolve(source, from, { skipSelf: true }).then((found) => found ?? `${MISSING}${source}`);
   },
   load(id) {
     if (id.startsWith(MISSING)) return thrower(`Cannot find module "${id.slice(MISSING.length)}".`);
   },
   async transform(code, id) {
-    if (!BAKEOFF_BUILD.test(id)) return null;
+    if (!BAKEOFF_BUILD.test(id) && !isVersionSource(id)) return null;
     try {
       await transformWithOxc(code, id);
       return null;
@@ -561,6 +568,47 @@ const bakeoffGuard = {
       // oxc's message is coloured for a terminal.
       return thrower(String(error?.message ?? error).replace(/\x1b\[[0-9;]*m/g, ""));
     }
+  },
+};
+
+const VERSION_MODULES = "virtual:version-modules";
+let serving = false;
+
+/**
+ * `versionModule(slug, arm, tag)`: a sample's module as saved at one render, for the Versions panel's viewer. The dev
+ * server imports any saved source through `/@fs/`; the static build bundles every sample's saved sources, each its
+ * own chunk, loaded on demand.
+ */
+const versionModules = {
+  name: "version-modules",
+  configResolved(config) {
+    serving = config.command === "serve";
+  },
+  resolveId(source, importer) {
+    if (source === VERSION_MODULES) return `\0${VERSION_MODULES}`;
+    if (importer === `\0${VERSION_MODULES}` && isVersionSource(source)) return source;
+  },
+  async load(id) {
+    if (id !== `\0${VERSION_MODULES}`) return null;
+    if (serving)
+      return `export const versionModule = (slug, arm, tag) =>\n  import(/* @vite-ignore */ \`/@fs${snapshotRoot}/\${slug}/\${arm}/snaps/\${tag}-creature.ts\`);\n`;
+    const entries = [];
+    for (const file of (await list(sampleRoot)).filter((name) => name.endsWith(".ts"))) {
+      const slug = basename(file, ".ts");
+      for (const arm of ["A", "B"]) {
+        const directory = join(snapshotRoot, slug, arm, "snaps");
+        for (const name of (await list(directory)).filter((item) => item.endsWith("-creature.ts"))) {
+          const key = `${slug}/${arm}/${name.slice(0, -"-creature.ts".length)}`;
+          entries.push(`  ${JSON.stringify(key)}: () => import(${JSON.stringify(join(directory, name))}),`);
+        }
+      }
+    }
+    return [
+      `const modules = {\n${entries.join("\n")}\n};`,
+      "export const versionModule = (slug, arm, tag) =>",
+      "  modules[`${slug}/${arm}/${tag}`]?.() ?? Promise.reject(new Error(`No saved source for ${slug} ${tag}.`));",
+      "",
+    ].join("\n");
   },
 };
 
@@ -590,10 +638,10 @@ export default defineConfig({
         assemble: resolve("showcase/assemble.html"),
         "assemble-loading": resolve("showcase/assemble-loading.html"),
       },
-      // A bake-off build may import a name its module doesn't export: undefined at run time, as the page shows it,
-      // instead of failing the whole build. Samples are typechecked, so they never rely on this.
+      // A bake-off build or a saved version may import a name its module no longer exports: undefined at run time,
+      // as the page shows it, instead of failing the whole build. Samples are typechecked, so they never rely on this.
       shimMissingExports: true,
     },
   },
-  plugins: [bakeoffGuard, showcaseData],
+  plugins: [untrustedGuard, versionModules, showcaseData],
 });

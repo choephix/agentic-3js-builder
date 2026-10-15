@@ -59,6 +59,8 @@ type State = {
 type Entry = { slug: string; path: string; name: string; failed: boolean };
 type Loaded = {
   slug: string;
+  /** The Versions panel's tag the stage shows, built from its saved source; null for the live sample. */
+  tag: string | null;
   meta: SampleModule["meta"];
   make: (() => Object3D) | null;
   source: string | null;
@@ -83,6 +85,30 @@ let liveBend = 0;
 const snapshotsBySlug = new Map<string, Snapshots>();
 /** The open Textures panel, which draws the focused part's UVs. */
 let texturesView: TexturesView | null = null;
+
+const IN_VIEWER_KEY = "versions-in-viewer";
+/** The Versions panel's toggle: the selected tag in the viewer, or always the live sample. */
+let versionsInViewer = localStorage.getItem(IN_VIEWER_KEY) !== "0";
+
+/** The tag the stage should show: the Versions panel's pick while that panel is open, the toggle is on and the tag
+ * has saved source. */
+function stagedSnapshot(snaps: Snapshots) {
+  if (!versionsInViewer || state.panel !== "versions" || !state.tag) return null;
+  return snaps.tags.find((snapshot) => snapshot.tag === state.tag && snapshot.source) ?? null;
+}
+
+/** Rebuild the current sample when the stage should now show a different version. */
+function restage() {
+  if (loaded && loaded.slug === state.slug && (stagedSnapshot(loaded.snaps)?.tag ?? null) !== loaded.tag)
+    void run(true);
+}
+
+function toggleVersionsInViewer() {
+  versionsInViewer = !versionsInViewer;
+  localStorage.setItem(IN_VIEWER_KEY, versionsInViewer ? "1" : "0");
+  renderPanel();
+  restage();
+}
 
 const viewer = new Viewer($("viewport"));
 const lightbox = new Lightbox();
@@ -148,6 +174,7 @@ function set(patch: Partial<State>) {
   }
   if (state.wiggle !== before.wiggle) viewer.wiggle(state.wiggle);
   if (state.bend !== before.bend || state.seed !== before.seed) viewer.pose(state.bend ?? 0, state.seed);
+  restage();
   if (state.panel !== before.panel) document.body.classList.toggle("with-panel", state.panel !== null);
   const panelChanged =
     state.panel !== before.panel ||
@@ -358,6 +385,7 @@ async function run(keepCamera: boolean) {
   renderList();
   const next: Loaded = {
     slug,
+    tag: null,
     meta: undefined,
     make: null,
     source: null,
@@ -387,17 +415,28 @@ async function run(keepCamera: boolean) {
     snapshotsBySlug.set(slug, snaps.value);
   }
   if (build.status === "fulfilled") next.build = build.value;
+  // A version picked in the Versions panel replaces the live module on stage; the table of saved versions loads with
+  // the first one picked.
+  const staged = stagedSnapshot(next.snaps);
+  const [chosen] = staged
+    ? await Promise.allSettled([
+        import("virtual:version-modules").then((versions) => versions.versionModule(slug, staged.arm, staged.tag)),
+      ])
+    : [module];
+  if (token !== loading) return;
+  next.tag = staged?.tag ?? null;
+  const file = next.tag ? `samples/${slug}.ts as saved at ${next.tag}` : `samples/${slug}.ts`;
   let root = null;
   let recording: Recording | null = null;
   let starts: Map<Object3D, number> | null = null;
-  if (module.status === "rejected") {
-    next.error = module.reason;
+  if (chosen.status === "rejected") {
+    next.error = chosen.reason;
     next.phase = "import";
   } else {
-    next.meta = module.value.meta;
+    next.meta = chosen.value.meta;
     const make = () => {
-      const built = module.value.default();
-      if (!built?.isObject3D) throw new Error(`samples/${slug}.ts: the default export must return a THREE.Object3D.`);
+      const built = chosen.value.default();
+      if (!built?.isObject3D) throw new Error(`${file}: the default export must return a THREE.Object3D.`);
       return built;
     };
     try {
@@ -415,7 +454,7 @@ async function run(keepCamera: boolean) {
       next.phase = "build";
     }
   }
-  if (entry) entry.failed = next.error !== null;
+  if (entry && !next.tag) entry.failed = next.error !== null;
   const sameSample = !fresh;
   loaded = next;
   let arrival: Arrival | null = null;
@@ -495,7 +534,7 @@ function syncViewer() {
 
 function renderHeader() {
   const meta = loaded?.meta;
-  $("name").textContent = meta?.name ?? state.slug;
+  $("name").textContent = `${meta?.name ?? state.slug}${loaded?.tag ? ` · ${loaded.tag}` : ""}`;
   $("desc").textContent = meta?.description ?? "";
   const by = builtBy(loaded?.build) ?? meta?.builtBy;
   $("by").textContent = by ? `by ${by}` : "";
@@ -651,11 +690,17 @@ function renderError() {
         "div",
         { class: "error-head" },
         h("strong", null, loaded.phase === "import" ? "Failed to load" : "Threw while building"),
-        h("span", { class: "muted" }, `samples/${loaded.slug}.ts`),
+        h("span", { class: "muted" }, `samples/${loaded.slug}.ts${loaded.tag ? ` as saved at ${loaded.tag}` : ""}`),
       ),
       h("pre", { class: "message" }, message),
       frames.length ? h("ol", { class: "frames" }, ...frames) : null,
-      h("p", { class: "muted" }, "Fix the sample and save: it reloads here. Other samples are unaffected."),
+      h(
+        "p",
+        { class: "muted" },
+        loaded.tag
+          ? "This saved version no longer builds against today's SDK. Pick another version, or show the latest."
+          : "Fix the sample and save: it reloads here. Other samples are unaffected.",
+      ),
     ),
   );
 }
@@ -703,9 +748,16 @@ function renderPanel() {
                   loaded.snaps,
                   loaded.build?.versions ?? [],
                   state.tag,
-                  { make: loaded.make, rigged: Boolean(loaded.info?.joints.length), meta: loaded.meta },
+                  {
+                    make: loaded.make,
+                    rigged: Boolean(loaded.info?.joints.length),
+                    meta: loaded.meta,
+                    tag: loaded.tag,
+                  },
+                  versionsInViewer,
                   {
                     select: (tag) => set({ tag }),
+                    toggleInViewer: toggleVersionsInViewer,
                     compare: (from, to) => set({ panel: "code", compare: `${from}..${to}` }),
                     lightbox: (items, index) => lightbox.show(items, index),
                   },
