@@ -25,7 +25,7 @@ const REPO = join(dirname(fileURLToPath(import.meta.url)), "..");
 const LAB = process.env.SNAPS_DIR ?? join(homedir(), "tmp/public/nilo/agentic-3js-builder/snaps");
 /** Shared with the Creature Lab and `npm run preview`: every render on this GPU takes a slot here. */
 const GPU_SLOT_DIR = join(homedir(), "tmp/public/nilo/creature-lab/.gpu-slots");
-const CDP_URL = "http://127.0.0.1:9333";
+const CDP_URL = process.env.CDP_URL ?? "http://127.0.0.1:9333";
 const ARMS = ["A", "B", "C"];
 
 function usage(message: string): never {

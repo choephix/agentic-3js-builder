@@ -2,6 +2,26 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Low-poly game asset round, 2026-10-15
+
+Ten Opus 5.5 (high) builders, run as one pool, each got `GUIDE.md`, one subject and a shared style brief: game assets rather than dioramas, low-poly as the look (faceted, each detail on the fewest triangles that read, many details), flat colours only (value from lighter and darker parts, hard-edged SVG patterns and cut-outs, `kits/glow` for lights), named joints on moving parts, at most 6 snaps. Stefan asked afterwards for no iteration rounds (first pass only); the message reached only the last builder, which stopped at v03. All ten pass typecheck with 0 errors and 0 warnings; each final snap is of the final file. Total $89.22, 19–30 min each (wizard tower 57 min). Collage: `~/tmp/public/nilo/agentic-3js-builder/showcase/lowpoly-round.jpg`.
+
+| Sample               | Subject                                 | Final |   Cost | Parts | Triangles | Joints |
+| -------------------- | --------------------------------------- | ----- | -----: | ----: | --------: | -----: |
+| lowPolyArenaBackdrop | fighting-game stage, mountain shrine    | v03   | $10.13 |   257 |     58.1k |     29 |
+| lowPolyBattleArena   | playable octagonal fortress arena       | v05   | $12.98 |   234 |     54.5k |     42 |
+| lowPolyColosseum     | gladiatorial amphitheatre, ¾ ring       | v03   | $10.81 |   141 |     59.5k |     37 |
+| lowPolyTreehouseTree | 28 m tree, five treehouses              | v03   |  $7.04 |   321 |     58.3k |     55 |
+| lowPolyStarCruiser   | 123 m capital ship, 10 turrets          | v04   |  $8.55 |   357 |     28.6k |     52 |
+| lowPolyFireTruck     | aerial ladder truck                     | v03   |  $6.97 |   280 |     40.4k |     39 |
+| lowPolyChimera       | lion, goat and serpent heads, bat wings | v06   |  $8.89 |   753 |     30.4k |    104 |
+| lowPolyLaserRifle    | sci-fi laser rifle                      | v05   |  $8.02 |   163 |     13.5k |      8 |
+| lowPolyBattleMech    | 9 m bipedal walker, rotary cannon       | v04   |  $7.62 |   280 |     21.4k |     35 |
+| lowPolyWizardTower   | crooked tower, orbiting rune rings      | v03   |  $8.20 |   250 |     29.6k |     23 |
+
+- The shared Chromium on :9333 stopped creating WebGL contexts midway (another session's ~25 open pages), so `snap` failed with `window.lab` undefined. The round moved to its own NVIDIA Chromium on :9334; `harness/snap.ts`, `scripts/preview.ts` and `scripts/thumbs.ts` now read `CDP_URL` (default `http://127.0.0.1:9333`).
+- The three place-type assets (backdrop, battle arena, colosseum) and the tree ran into the 60k soft triangle budget; the colosseum's v01 was at 92k and was thinned to fit.
+
 ## One-shot vs agentic gap, 2026-10-15
 
 Question: how close can an app (API calls only: prompt → module → run it, screenshot it, send feedback) get to the agentic builds (an agent reads docs, writes, renders, looks, edits; median 18 min, $3.75)? Briefs were the exact Category/Subject/Style lines the 100 agentic Sonnet samples got: 16 dev subjects (`bakeoff/pitches-r5.json`) and 12 held-out ones (`pitches-r7.json`). Judging was blind: each candidate as a three-quarter + front image, scored 1–10 by two or three vision judges (GPT-6.1 Sol, Gemini 3.8 Flash, Opus 5.5) in two shuffled orders (`bakeoff/judge.py`; every panel's spec and judgments in `bakeoff/judging/`). Scores compare only within one panel; wins are head-to-head rankings.

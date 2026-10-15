@@ -19,7 +19,7 @@ import type { PreviewResult } from "./preview-page";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = join(homedir(), "tmp/public/nilo/agentic-3js-builder/preview");
-const CDP_URL = "http://127.0.0.1:9333";
+const CDP_URL = process.env.CDP_URL ?? "http://127.0.0.1:9333";
 const USAGE =
   "Usage: npm run preview -- <slug | path/to/file.ts> [--shot] [--gap <A> <B>]... [--bones <A>]... [--box <A>]...";
 

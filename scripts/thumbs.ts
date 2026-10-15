@@ -14,7 +14,7 @@ import { setTimeout } from "node:timers/promises";
 import { chromium } from "playwright-core";
 import { createServer } from "vite";
 
-const CDP_URL = "http://127.0.0.1:9333";
+const CDP_URL = process.env.CDP_URL ?? "http://127.0.0.1:9333";
 /** Give up on the rest once no thumbnail has arrived for this long (a heavy sample builds in a few seconds). */
 const QUIET_MS = 45_000;
 
