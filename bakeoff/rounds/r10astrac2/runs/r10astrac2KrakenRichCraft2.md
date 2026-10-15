@@ -1,0 +1,1103 @@
+```ts
+import * as THREE from "three";
+import {
+  createBuilder,
+  catmull,
+  bezier,
+  arc,
+  rng,
+  paint,
+  mix,
+  noise,
+  svg,
+} from "agentic-3js-builder";
+import type { Joint, Paint } from "agentic-3js-builder";
+import { glow } from "agentic-3js-builder/kits/glow";
+
+export const meta = {
+  name: "UNDERTOW — Abyssal Vanguard",
+  description:
+    "A heroic armored kraken breaching a curling tidal surge. Eight independently rigged tentacles, hooked terminal gestures, porcelain suction cups, rescue-orange armor and luminous abyssal eyes.",
+};
+
+/*
+1. Change the repeated upright hooks into broad, tiered curling gestures.
+   The rear pair now frames the mantle; the front pair reaches toward the viewer.
+2. Space the suction cups by their size and separate the two proximal rows.
+   Eliminate the crowded, overlapping cups around the front bends.
+3. Strengthen the face with lower inward brows, larger orbital drawings,
+   a deeper hooked beak, and a broader mantle-to-head transition.
+4. Replace the conical water pedestal and thin triangular splashes with
+   circumferential curling wave sheets, broad foam ribbons and connected wash.
+5. Give the armor a clearer large/medium/small hierarchy: fewer root fasteners,
+   directional orange inlays, seated rear plates and one coherent crest motif.
+*/
+
+export default function build(): THREE.Object3D {
+  const b = createBuilder({
+    name: "Undertow",
+    detail: 0.8,
+    paintSize: 2048,
+  });
+  const random = rng(4317);
+  const TAU = Math.PI * 2;
+  const DEG = Math.PI / 180;
+
+  const C = {
+    ink: "#102636",
+    deep: "#123c4b",
+    turquoise: "#47b3b0",
+    pale: "#c3e6dc",
+    orange: "#f29a3c",
+    gold: "#ffd27a",
+    steel: "#6c939f",
+    plum: "#352f52",
+    aqua: "#65fff0",
+    foam: "#c2f1e6",
+  };
+
+  const hide = paint((p, n) => {
+    const shade = Math.max(0, Math.min(1, 0.47 + n.y * 0.32 + n.z * 0.12));
+    return mix(
+      mix("#164657", "#40989b", shade),
+      "#63b8ad",
+      Math.max(0, noise(p, 0.31, 7) - 0.56) * 0.36,
+    );
+  });
+
+  const mantlePaint = paint((p, n) => {
+    const width = 0.12 + Math.max(0, p.y - 4.85) * 0.045;
+    if (Math.abs(p.x) < width && p.z > 0.08 && n.z > 0.18) {
+      return n.y > 0.1 ? "#f2b653" : "#cf7133";
+    }
+    return mix(
+      "#153a51",
+      "#398b91",
+      Math.max(0, Math.min(1, 0.46 + n.y * 0.30 + n.z * 0.22)),
+    );
+  });
+
+  const armorPaint = paint((p, n) =>
+    mix(
+      n.y > 0.28 ? "#467c87" : "#1a4358",
+      "#5c969b",
+      Math.max(0, noise(p, 0.18, 18) - 0.5) * 0.35,
+    ),
+  );
+
+  const orangePaint = paint((p, n) =>
+    mix(
+      "#bf592d",
+      "#f8ac48",
+      Math.max(0, Math.min(1, 0.58 + 0.29 * n.y + noise(p, 0.2, 8) * 0.12)),
+    ),
+  );
+
+  const ivoryPaint = paint((_p, n) =>
+    mix("#78a6a7", "#e0f0dc", Math.max(0, Math.min(1, 0.66 + 0.30 * n.y))),
+  );
+
+  const oralPaint = paint((p, n) => {
+    const base = mix(
+      "#83acac",
+      "#cbded0",
+      Math.max(0, Math.min(1, 0.65 + n.y * 0.28)),
+    );
+    return mix(base, "#aaa0b3", Math.max(0, noise(p, 0.34, 24) - 0.40) * 0.24);
+  });
+
+  const waterPaint = paint((p, n) => {
+    const distance = Math.hypot(p.x, p.z);
+    const ripple = Math.sin(distance * 8.1 + noise(p, 0.6, 4) * 2);
+    const wake = Math.max(0, 1 - Math.abs(distance - 2.25) / 1.6);
+    return mix(
+      "#102e47",
+      "#347d8c",
+      Math.max(0, Math.min(1, 0.14 + 0.12 * ripple + 0.17 * n.y + wake * 0.21)),
+    );
+  });
+
+  const wavePaint = paint((p, n) =>
+    mix(
+      "#22556f",
+      "#61b4bc",
+      Math.max(0, Math.min(1, p.y * 0.55 + n.y * 0.18)),
+    ),
+  );
+
+  const eyeTexture = svg(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 112">
+      <path d="M8 29 L50 16 L163 28 L232 52 L207 91 L70 101 L24 75Z"
+        fill="#081d2e" stroke="#79b8bb" stroke-width="5"/>
+      <path d="M24 38 L57 30 L157 41 L215 55 L192 77 L74 86 L39 68Z"
+        fill="#32c5c3"/>
+      <path d="M40 43 L78 36 L159 46 L201 57 L184 67 L81 75 L51 63Z"
+        fill="#b3ffe7"/>
+      <path d="M113 37 L130 40 L141 76 L125 80 L111 63Z" fill="#092c42"/>
+      <path d="M55 41 L90 40 L98 47 L62 49Z" fill="#f5fff2"/>
+      <path d="M161 67 L184 61 L176 70 L164 73Z" fill="#ffffff"/>
+      <path d="M8 29 L50 16 L163 28 L232 52" fill="none"
+        stroke="#071722" stroke-width="11" stroke-linejoin="round"/>
+    </svg>`,
+    { size: 512 },
+  );
+
+  const cupTexture = svg(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+      <circle cx="64" cy="64" r="63" fill="#243846"/>
+      <circle cx="64" cy="64" r="54" fill="#71678a"/>
+      <circle cx="64" cy="64" r="47" fill="#413b5b"/>
+      <circle cx="64" cy="64" r="41" fill="none" stroke="#a4b6ba"
+        stroke-width="7" stroke-dasharray="3.5 9"/>
+      <circle cx="64" cy="64" r="29" fill="#152f3e"/>
+      <circle cx="64" cy="64" r="22" fill="#102432"/>
+      <path d="M43 42 Q62 30 81 43" fill="none" stroke="#4c7c87"
+        stroke-width="5" stroke-linecap="round"/>
+      <path d="M35 83 Q63 104 92 78" fill="none" stroke="#a4c3c0"
+        stroke-width="3" stroke-linecap="round"/>
+    </svg>`,
+    { size: 192 },
+  );
+
+  const emblemTexture = svg(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+      <path d="M80 6 L143 40 L143 112 L80 151 L17 112 L17 40Z"
+        fill="#163b50" stroke="#f8c673" stroke-width="7"/>
+      <path d="M80 28 L94 54 L87 54 L87 91 L109 77 L109 49 L122 60
+        L122 88 L88 110 L88 129 L72 129 L72 110 L38 88 L38 60
+        L51 49 L51 77 L73 91 L73 54 L66 54Z"
+        fill="#f8d58a"/>
+      <path d="M38 119 L58 131 M102 131 L122 119"
+        stroke="#55d8ce" stroke-width="6" stroke-linecap="round"/>
+    </svg>`,
+    { size: 256 },
+  );
+
+  const serialTexture = svg(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 112">
+      <rect width="320" height="112" rx="9" fill="#122f42"/>
+      <path d="M12 12H308V100H12Z" fill="none" stroke="#64959d" stroke-width="3"/>
+      <path d="M23 22 L41 22 L27 47 L18 47Z M49 22 L67 22 L53 47 L35 47Z"
+        fill="#f6b64f"/>
+      <text x="80" y="49" font-family="sans-serif" font-weight="900"
+        font-size="34" fill="#e2efe2">ABYSS / 09</text>
+      <text x="22" y="84" font-family="sans-serif" font-weight="bold"
+        font-size="16" letter-spacing="4" fill="#7ab6ba">DEEP RESPONSE</text>
+      <path d="M248 72h7v13h-7z M260 72h3v13h-3z M269 72h6v13h-6z
+        M280 72h3v13h-3z M289 72h10v13h-10z" fill="#cce1d8"/>
+    </svg>`,
+    { size: 512 },
+  );
+
+  const finTexture = svg(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 256">
+      <path d="M17 232 L33 110 L93 19 L110 13 L83 106 L44 238Z"
+        fill="#efab52"/>
+      <path d="M36 214 L50 117 L84 63" fill="none"
+        stroke="#ffe2a0" stroke-width="6"/>
+      <path d="M62 144 L94 118 M56 170 L83 148 M49 196 L73 177"
+        fill="none" stroke="#173e51" stroke-width="7"/>
+    </svg>`,
+    { size: 256 },
+  );
+
+  const gillTexture = svg(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 96">
+      <path d="M7 76 L30 16 L179 8 L155 76Z" fill="#0b2639"/>
+      <path d="M30 65 L44 28 L57 26 L43 64Z
+        M62 63 L75 25 L88 23 L75 62Z
+        M94 61 L107 22 L120 20 L107 60Z
+        M126 59 L139 18 L152 16 L139 58Z" fill="#50d8cd"/>
+      <path d="M34 65 L44 37 M66 63 L76 34 M98 61 L108 31 M130 59 L140 28"
+        stroke="#bdfff0" stroke-width="4"/>
+    </svg>`,
+    { size: 256 },
+  );
+
+  // Skeleton: every limb is separated in its resting spread.
+  const root = b.joint("root", {
+    at: [0, 0.2, 0],
+    dir: [0, 1, 0],
+    role: "spine",
+  });
+
+  const core = b.chain(
+    "spine",
+    [[0, 0.25, 0], [0, 1.25, 0], [0, 2.45, 0], [0, 3.35, 0.22]],
+    {
+      parent: root,
+      names: ["pelvis", "spineLower", "chest", "neck"],
+      role: "spine",
+    },
+  );
+
+  const head = b.joint("head", {
+    parent: core.tip!,
+    at: [0, 3.54, 0.34],
+    dir: [0, 0, 1],
+    role: "head",
+  });
+
+  const jaw = b.joint("jaw", {
+    parent: head,
+    at: [0, 2.86, 0.91],
+    dir: [0, 0, 1],
+    role: "jaw",
+  });
+
+  const mantle = b.chain(
+    "mantle",
+    [
+      [0, 3.95, -0.05],
+      [0, 4.76, -0.20],
+      [0, 5.55, -0.40],
+      [0, 6.23, -0.49],
+      [0, 6.78, -0.30],
+    ],
+    {
+      parent: head,
+      names: ["mantleBase", "mantleMiddle", "mantleCrown", "mantleTip"],
+      role: "spine",
+    },
+  );
+
+  const armAngles = [-148, -108, -66, -27, 27, 66, 108, 148];
+  const arms = armAngles.map((degrees, i) => {
+    const a = degrees * DEG;
+    const side = degrees > 0 ? 1 : -1;
+    const angle = Math.abs(degrees);
+    const rear = angle > 125;
+    const midBack = angle > 90 && !rear;
+    const lateral = angle > 45 && angle < 90;
+    const tipHeight = rear ? 4.54 : midBack ? 3.37 : lateral ? 2.49 : 1.76;
+    const reach = rear ? 4.03 : midBack ? 4.72 : lateral ? 4.92 : 4.55;
+    const trough = rear ? 1.86 : midBack ? 1.34 : lateral ? 0.91 : 0.66;
+    const bend = rear ? 0.70 : lateral ? 0.34 : 0.46;
+
+    const point = (r: number, y: number, turn = 0): number[] => [
+      Math.sin(a) * r + side * turn * Math.cos(a),
+      y,
+      Math.cos(a) * r - side * turn * Math.sin(a),
+    ];
+
+    const points = [
+      point(0.70, 2.33),
+      point(1.38, 2.05),
+      point(2.24, trough + 0.38),
+      point(3.20, trough, 0.08),
+      point(reach - 0.22, trough + (tipHeight - trough) * 0.30, bend * 0.5),
+      point(reach, tipHeight - 0.53, bend),
+      point(reach - 0.20, tipHeight, bend + 0.16),
+      point(reach - (rear ? 0.75 : 0.59), tipHeight + 0.08, bend + 0.27),
+      point(reach - (rear ? 0.91 : 0.73), tipHeight - 0.20, bend + 0.34),
+    ];
+
+    const chain = b.chain(`tentacle${i + 1}`, catmull(points), {
+      parent: core.joints[2],
+      count: 9,
+      role: "tentacle",
+      names: (j) => `tentacle${i + 1}_${j + 1}`,
+    });
+
+    return { chain, side, degrees, index: i };
+  });
+
+  type Fill = string | Paint;
+
+  const box = (
+    name: string,
+    at: number[] | THREE.Vector3,
+    size: number[],
+    color: Fill,
+    bone: Joint = root,
+    rotation: number[] = [0, 0, 0],
+  ) =>
+    b.part(new THREE.BoxGeometry(size[0], size[1], size[2]), color, {
+      at, bone, rotation, name,
+    });
+
+  const ellipsoid = (
+    name: string,
+    at: number[] | THREE.Vector3,
+    scale: number[],
+    color: Fill,
+    bone: Joint,
+    segments = 12,
+  ) =>
+    b.part(new THREE.SphereGeometry(1, segments, 8), color, {
+      at, scale, bone, flat: true, name,
+    });
+
+  const bolt = (
+    at: number[] | THREE.Vector3,
+    normal: number[] | THREE.Vector3,
+    radius: number,
+    bone: Joint,
+    color = C.steel,
+  ) =>
+    b.part(new THREE.CylinderGeometry(radius, radius, radius * 0.46, 6), color, {
+      at, dir: normal, bone, name: "hexFastener",
+    });
+
+  const drawing = (
+    texture: THREE.Texture,
+    at: number[] | THREE.Vector3,
+    size: number[],
+    bone: Joint,
+    normal: number[] | THREE.Vector3 = [0, 0, 1],
+  ) =>
+    b.part(new THREE.PlaneGeometry(size[0], size[1]), "#ffffff", {
+      at, dir: normal, axis: "z", texture, bone, name: "printedInlay",
+    });
+
+  b.sweep(core, (t) => {
+    const r = 0.78 + Math.sin(t * Math.PI * 0.86) * 0.38;
+    return [r, r * 0.90];
+  }, {
+    color: hide,
+    sides: 10,
+    caps: "flat",
+    name: "emergingBody",
+  });
+
+  const mantleTube = b.sweep(
+    mantle,
+    [1.01, 1.31, 1.14, 0.66, 0.025],
+    {
+      color: mantlePaint,
+      sides: 12,
+      smooth: false,
+      caps: { start: "round", end: "point" },
+      name: "arrowheadMantle",
+    },
+  );
+
+  const skull = ellipsoid(
+    "broadFacetedSkull",
+    [0, 3.57, 0.40],
+    [1.39, 1.05, 1.02],
+    hide,
+    head,
+    16,
+  );
+
+  // A broad dark orbital silhouette holds the bright eyes.
+  for (const s of [-1, 1]) {
+    const orbit = b.extrude(
+      [
+        [-0.52, -0.15], [-0.39, -0.36], [0.30, -0.28],
+        [0.54, 0.06], [0.22, 0.26], [-0.37, 0.24],
+      ],
+      {
+        at: [s * 0.68, 3.72, 1.12],
+        x: [s, 0, -0.17],
+        y: [0, 1, 0],
+        thickness: 0.24,
+        bevel: 0.045,
+        color: C.ink,
+        bone: head,
+        name: `orbitalSocket${s > 0 ? "L" : "R"}`,
+      },
+    );
+
+    glow(b.decal(orbit, eyeTexture, {
+      at: [s * 0.67, 3.72, 1.29],
+      dir: [s * 0.12, 0, 1],
+      size: [1.04, 0.45],
+      mirror: s > 0,
+      segments: 8,
+      lift: 0.008,
+      bone: head,
+      name: `eye${s > 0 ? "L" : "R"}`,
+    }), 0.55);
+
+    b.extrude(
+      [
+        [-0.57, -0.015], [-0.32, 0.18], [0.31, 0.28],
+        [0.64, 0.07], [0.55, -0.09], [0.16, 0.065], [-0.37, -0.105],
+      ],
+      {
+        at: [s * 0.65, 4.02, 1.12],
+        x: [s, 0, -0.16],
+        y: [0, 1, 0],
+        thickness: 0.29,
+        bevel: 0.04,
+        color: armorPaint,
+        bone: head,
+        name: "heavyInwardBrowCarapace",
+      },
+    );
+
+    b.extrude(
+      [
+        [-0.42, -0.035], [-0.25, 0.065], [0.24, 0.135],
+        [0.46, 0.00], [0.15, 0.055], [-0.29, -0.085],
+      ],
+      {
+        at: [s * 0.68, 4.15, 1.29],
+        x: [s, 0, -0.16],
+        y: [0, 1, 0],
+        thickness: 0.035,
+        color: orangePaint,
+        bone: head,
+        name: "orangeBrowEdge",
+      },
+    );
+
+    const cheek = b.extrude(
+      [
+        [-0.06, 0.28], [0.36, 0.37], [0.57, 0.08],
+        [0.34, -0.45], [0.10, -0.57], [-0.10, -0.20],
+      ],
+      {
+        at: [s * 0.94, 3.17, 0.87],
+        x: [s, 0, -0.33],
+        y: [0, 1, 0],
+        thickness: 0.22,
+        bevel: 0.04,
+        color: armorPaint,
+        bone: head,
+        name: "cheekGuard",
+      },
+    );
+
+    const guardSurface = b.surface(cheek);
+    b.stick(
+      new THREE.CylinderGeometry(0.067, 0.067, 0.035, 6),
+      C.steel,
+      guardSurface.nearest([s * 1.25, 3.35, 1.1]),
+      { embed: 0.25, name: "seatedCheekFastener" },
+    );
+
+    b.sweep(
+      guardSurface.drape(
+        [
+          [s * 1.03, 3.32, 1.06],
+          [s * 1.19, 3.14, 1.03],
+          [s * 1.17, 2.93, 1.00],
+        ],
+        { lift: 0.024 },
+      ),
+      0.043,
+      {
+        color: C.orange,
+        bone: head,
+        sides: 5,
+        caps: "flat",
+        name: "cheekOrangePiping",
+      },
+    );
+  }
+
+  b.extrude(
+    [[-0.20, 0.29], [0, 0.43], [0.20, 0.29], [0.14, -0.24], [0, -0.34], [-0.14, -0.24]],
+    {
+      at: [0, 3.78, 1.31],
+      x: [1, 0, 0],
+      y: [0, 1, 0],
+      thickness: 0.19,
+      bevel: 0.025,
+      color: orangePaint,
+      bone: head,
+      name: "centralNasalShield",
+    },
+  );
+
+  ellipsoid("mouthRecess", [0, 2.98, 1.16], [0.60, 0.50, 0.29], C.ink, head);
+  ellipsoid("innerMouth", [0, 2.95, 1.39], [0.35, 0.30, 0.08], C.plum, head);
+
+  // Side profile supplies the hooked beak depth that a single flat slab lacks.
+  b.sweep(
+    bezier(
+      [0, 3.30, 1.36],
+      [0, 3.33, 1.90],
+      [0, 2.76, 1.76],
+    ),
+    (t) => [0.29 * (1 - t) + 0.025, 0.22 * (1 - t) + 0.01],
+    {
+      color: ivoryPaint,
+      bone: head,
+      sides: 6,
+      smooth: false,
+      caps: { start: "flat", end: "point" },
+      name: "hookedUpperBeakCore",
+    },
+  );
+
+  b.extrude(
+    [
+      [-0.38, 0.20], [-0.25, 0.40], [0, 0.47], [0.25, 0.40], [0.38, 0.20],
+      [0.24, 0.04], [0.09, -0.30], [0, -0.37], [-0.09, -0.30], [-0.24, 0.04],
+    ],
+    {
+      at: [0, 3.04, 1.49],
+      x: [1, 0, 0],
+      y: [0, 1, 0],
+      thickness: 0.30,
+      bevel: 0.045,
+      color: ivoryPaint,
+      bone: head,
+      name: "upperBeakShield",
+    },
+  );
+
+  b.extrude(
+    [[-0.16, 0.23], [0, 0.34], [0.16, 0.23], [0.10, -0.04], [0, -0.24], [-0.10, -0.04]],
+    {
+      at: [0, 3.07, 1.785],
+      x: [1, 0, 0],
+      y: [0, 1, -0.15],
+      thickness: 0.035,
+      color: C.gold,
+      bone: head,
+      name: "beakKeel",
+    },
+  );
+
+  b.extrude(
+    [
+      [-0.40, 0.15], [-0.25, 0.18], [0, -0.01], [0.25, 0.18],
+      [0.40, 0.15], [0.30, -0.18], [0, -0.34], [-0.30, -0.18],
+    ],
+    {
+      at: [0, 2.60, 1.34],
+      x: [1, 0, 0],
+      y: [0, 1, 0],
+      thickness: 0.29,
+      bevel: 0.04,
+      color: orangePaint,
+      bone: jaw,
+      name: "lowerBeak",
+    },
+  );
+
+  for (const s of [-1, 1]) {
+    b.spike(
+      [s * 0.30, 2.72, 1.46],
+      [s * 0.25, 2.92, 1.50],
+      null,
+      0.09,
+      { color: ivoryPaint, bone: jaw, sides: 5, name: "lowerBeakPoint" },
+    );
+    bolt([s * 0.48, 2.85, 1.23], [s * 0.4, 0, 1], 0.10, jaw, C.orange);
+  }
+
+  b.extrude(
+    [
+      [-0.57, -0.32], [-0.69, 0.11], [-0.37, 0.45],
+      [0.37, 0.45], [0.69, 0.11], [0.57, -0.32], [0, -0.49],
+    ],
+    {
+      at: [0, 4.57, 1.005],
+      x: [1, 0, 0],
+      y: [0, 1, 0],
+      thickness: 0.23,
+      bevel: 0.05,
+      color: orangePaint,
+      bone: mantle.joints[0],
+      name: "commandCrest",
+    },
+  );
+  drawing(emblemTexture, [0, 4.58, 1.128], [0.58, 0.60], mantle.joints[0]);
+
+  for (const s of [-1, 1]) {
+    bolt([s * 0.47, 4.55, 1.132], [0, 0, 1], 0.055, mantle.joints[0]);
+
+    const fin = b.extrude(
+      [
+        [0.03, -0.59], [0.43, -0.39], [0.91, 0.13],
+        [1.14, 1.12], [0.89, 1.72], [0.63, 1.02], [0.18, 0.45],
+      ],
+      {
+        at: [s * 0.77, 4.52, -0.38],
+        x: [s, 0, -0.08],
+        y: [0, 1, -0.12],
+        thickness: [0.24, 0.08],
+        bevel: 0.025,
+        color: armorPaint,
+        bone: mantle.joints[1],
+        name: `mantleFin${s > 0 ? "L" : "R"}`,
+      },
+    );
+
+    b.extrude(
+      [
+        [0.37, -0.18], [0.76, 0.20], [1.01, 1.10],
+        [0.85, 1.44], [0.71, 0.87], [0.48, 0.39],
+      ],
+      {
+        at: [s * 0.77, 4.52, -0.20],
+        x: [s, 0, -0.08],
+        y: [0, 1, -0.12],
+        thickness: 0.035,
+        color: orangePaint,
+        bone: mantle.joints[1],
+        name: "finOrangeInset",
+      },
+    );
+
+    b.decal(fin, finTexture, {
+      at: [s * 1.35, 5.07, -0.19],
+      dir: [0, 0, 1],
+      size: [0.51, 1.16],
+      mirror: s < 0,
+      segments: 6,
+      lift: 0.008,
+      bone: mantle.joints[1],
+      name: "finStencil",
+    });
+
+    b.sweep(
+      [
+        [s * 1.22, 4.39, -0.12],
+        [s * 1.61, 4.95, -0.22],
+        [s * 1.84, 5.62, -0.31],
+        [s * 1.68, 6.11, -0.39],
+      ],
+      [0.055, 0.036],
+      {
+        color: C.pale,
+        bone: mantle.joints[1],
+        sides: 5,
+        caps: "flat",
+        name: "finLeadingEdge",
+      },
+    );
+
+    for (let k = 0; k < 3; k++) {
+      const t = 0.32 + k * 0.135;
+      const hit = b.surface(mantleTube).around(mantle.at(t)).at(s * 32, 0);
+      const housing = b.stick(
+        new THREE.BoxGeometry(0.47 - k * 0.04, 0.065, 0.22),
+        C.ink,
+        hit,
+        { embed: 0.55, flow: [0, 1, 0], name: "recessedGillHousing" },
+      );
+      glow(b.decal(housing, gillTexture, {
+        at: hit.at.clone().addScaledVector(hit.n, 0.08),
+        dir: hit.n,
+        size: [0.43 - k * 0.04, 0.19],
+        segments: 3,
+        mirror: s < 0,
+        lift: 0.005,
+        bone: hit.bone!,
+        name: "bioluminousGill",
+      }), 0.60);
+    }
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const t = 0.14 + i * 0.19;
+    const hit = b.surface(mantleTube).around(mantle.at(t)).at(180, 0);
+    const plate = b.stick(
+      new THREE.BoxGeometry(0.73 - i * 0.11, 0.14, 0.46),
+      armorPaint,
+      hit,
+      {
+        flow: [0, 1, 0],
+        embed: 0.42,
+        name: "dorsalMantlePlate",
+      },
+    );
+    const stripeHit = b.surface(plate).nearest(
+      hit.at.clone().addScaledVector(hit.n, 0.20),
+    );
+    b.stick(
+      new THREE.BoxGeometry(0.35 - i * 0.045, 0.025, 0.065),
+      orangePaint,
+      stripeHit,
+      { embed: 0.35, flow: [0, 1, 0], name: "rearArmorIdentificationBar" },
+    );
+  }
+
+  const rearHit = b.surface(skull).around([0, 3.57, 0.4]).at(180, 4);
+  const rearPanel = b.stick(
+    new THREE.BoxGeometry(0.89, 0.07, 0.34),
+    C.ink,
+    rearHit,
+    { embed: 0.4, flow: [0, 1, 0], name: "rearSerialPanel" },
+  );
+  b.decal(rearPanel, serialTexture, {
+    at: rearHit.at.clone().addScaledVector(rearHit.n, 0.08),
+    dir: rearHit.n,
+    size: [0.81, 0.28],
+    lift: 0.005,
+    bone: head,
+    name: "rearSerialGraphic",
+  });
+
+  for (const s of [-1, 1]) {
+    const hit = b.surface(skull).around([0, 3.57, 0.4]).at(s * 100, -8);
+    b.stick(
+      new THREE.CylinderGeometry(0.38, 0.43, 0.12, 8),
+      orangePaint,
+      hit,
+      { embed: 0.40, name: "sideOperculum" },
+    );
+
+    const center = hit.at.clone().addScaledVector(hit.n, 0.09);
+    b.part(new THREE.CylinderGeometry(0.245, 0.245, 0.035, 8), armorPaint, {
+      at: center,
+      dir: hit.n,
+      bone: head,
+      name: "operculumInset",
+    });
+    glow(b.part(new THREE.CylinderGeometry(0.115, 0.115, 0.042, 6), C.aqua, {
+      at: center.clone().addScaledVector(hit.n, 0.023),
+      dir: hit.n,
+      bone: head,
+      name: "operculumLight",
+    }), 0.65);
+  }
+
+  const armRadius = (t: number) =>
+    0.49 * Math.pow(1 - t, 1.07) + 0.018;
+
+  arms.forEach(({ chain, side, index }) => {
+    const tube = b.sweep(
+      chain,
+      (t) => [armRadius(t), armRadius(t) * 0.96],
+      {
+        color: hide,
+        sides: 10,
+        smooth: false,
+        caps: { start: "round", end: "point" },
+        sectors: [
+          [-57, 57, oralPaint],
+          [126, 234, C.deep],
+        ],
+        name: `tentacle${index + 1}Skin`,
+      },
+    );
+
+    b.sweep(tube.line(side * 72, 0.007).slice(0.13, 0.94), [0.034, 0.009], {
+      color: C.turquoise,
+      bone: chain,
+      sides: 5,
+      caps: "flat",
+      name: "tentacleLateralRidge",
+    });
+
+    for (let j = 0; j < 3; j++) {
+      const t = 0.075 + j * 0.105;
+      const hit = tube.at(t, side * 97);
+      const rr = armRadius(t);
+      const guard = b.stick(
+        new THREE.BoxGeometry(rr * 1.18, 0.13, 0.45 - j * 0.045),
+        j === 0 ? orangePaint : armorPaint,
+        hit,
+        {
+          embed: 0.55,
+          flow: chain.at(t).tangent,
+          name: `tentacleRootGuard${index}_${j}`,
+        },
+      );
+      const outer = b.surface(guard).nearest(
+        hit.at.clone().addScaledVector(hit.n, 0.16),
+      );
+      if (j === 1) {
+        b.stick(
+          new THREE.BoxGeometry(rr * 0.83, 0.025, 0.045),
+          orangePaint,
+          outer,
+          { embed: 0.25, flow: chain.at(t).tangent, name: "rootArmorOrangeBar" },
+        );
+      } else {
+        b.stick(
+          new THREE.CylinderGeometry(0.047 - j * 0.006, 0.047 - j * 0.006, 0.026, 6),
+          C.steel,
+          outer,
+          { embed: 0.25, name: "rootGuardFastener" },
+        );
+      }
+    }
+
+    const cup = (t: number, clock: number, size: number, name: string) => {
+      const hit = tube.at(t, clock);
+      const r = armRadius(t) * size;
+      const h = r * 0.56;
+      b.lathe(
+        [
+          [0, -h * 0.18],
+          [r * 0.60, -h * 0.18],
+          [r * 0.82, h * 0.16],
+          [r, h * 0.73],
+          [r * 0.97, h],
+          [r * 0.77, h * 1.03],
+          [r * 0.62, h * 0.55],
+          [0, h * 0.34],
+        ],
+        {
+          at: hit,
+          axis: hit.n,
+          segments: 10,
+          color: ivoryPaint,
+          bone: hit.bone!,
+          name,
+        },
+      );
+      b.part(new THREE.CircleGeometry(r * 0.65, 12), "#ffffff", {
+        at: hit.at.clone().addScaledVector(hit.n, h * 0.48),
+        dir: hit.n,
+        axis: "z",
+        up: chain.at(t).tangent,
+        texture: cupTexture,
+        bone: hit.bone!,
+        name: "recessedCupInterior",
+      });
+    };
+
+    // Proximal cups are paired, but do not overlap across the narrow oral strip.
+    for (let j = 0; j < 5; j++) {
+      const t = 0.14 + j * 0.079;
+      cup(t, 30, 0.35, `suctionCup${index + 1}L${j + 1}`);
+      cup(t + 0.025, -30, 0.35, `suctionCup${index + 1}R${j + 1}`);
+    }
+
+    // A single spaced row follows the taper and stops before the curled tip.
+    for (let j = 0; j < 7; j++) {
+      const t = 0.55 + j * 0.049;
+      cup(t, (j % 2 ? -1 : 1) * 9, 0.46,
+        `distalCup${index + 1}_${j + 1}`);
+    }
+
+    for (let j = 0; j < 3; j++) {
+      const hit = tube.at(0.77 + j * 0.067, side * 85);
+      glow(b.stick(
+        new THREE.SphereGeometry(0.033 - j * 0.007, 6, 4),
+        C.aqua,
+        hit,
+        { embed: 0.45, name: "terminalSensoryPit" },
+      ), 0.65);
+    }
+  });
+
+  arms.forEach(({ degrees, chain }, i) => {
+    const a = degrees * DEG;
+    const normal = new THREE.Vector3(Math.sin(a), 0.20, Math.cos(a)).normalize();
+    const at = new THREE.Vector3(Math.sin(a) * 1.03, 2.48, Math.cos(a) * 1.03);
+    b.part(new THREE.BoxGeometry(0.62, 0.45, 0.22), armorPaint, {
+      at,
+      dir: normal,
+      axis: "z",
+      bone: chain.joints[0],
+      name: `radialCollar${i + 1}`,
+    });
+    bolt(at.clone().addScaledVector(normal, 0.12), normal, 0.072, chain.joints[0], C.orange);
+  });
+
+  // A shallow, tightly framed ocean stage.
+  b.part(new THREE.CylinderGeometry(5.22, 5.12, 0.18, 48), C.ink, {
+    at: [0, 0.09, 0],
+    bone: root,
+    name: "oceanStageEdge",
+  });
+  b.part(new THREE.CylinderGeometry(5.15, 5.18, 0.08, 48), waterPaint, {
+    at: [0, 0.19, 0],
+    bone: root,
+    name: "facetedOceanSurface",
+  });
+
+  // Low, spreading displaced volume: no straight conical water pedestal.
+  b.lathe(
+    [
+      [0.64, 0.00],
+      [2.65, 0.00],
+      [2.59, 0.08],
+      [2.26, 0.19],
+      [1.92, 0.37],
+      [1.66, 0.60],
+      [1.38, 0.76],
+      [1.13, 0.77],
+      [0.91, 0.66],
+      [0.72, 0.40],
+    ],
+    {
+      at: [0, 0.21, 0],
+      axis: [0, 1, 0],
+      segments: 24,
+      color: wavePaint,
+      bone: root,
+      name: "displacedWaterShoulder",
+    },
+  );
+
+  const polar = (r: number, y: number, angle: number) => [
+    Math.sin(angle) * r,
+    y,
+    Math.cos(angle) * r,
+  ];
+
+  // Each wave extends around the body rather than pointing out like a blade.
+  for (let i = 0; i < 6; i++) {
+    const a = i * TAU / 6 + 0.19;
+    const width = 0.39 + (i % 2) * 0.035;
+    const height = 0.96 + (i % 3) * 0.13;
+    const foot: number[][] = [];
+    const crest: number[][] = [];
+    const curl: number[][] = [];
+    const foamOuter: number[][] = [];
+
+    for (let j = 0; j < 7; j++) {
+      const u = j / 6;
+      const angle = a + (u * 2 - 1) * width;
+      const swell = Math.pow(Math.sin(Math.PI * u), 0.68);
+      foot.push(polar(1.70 + 0.16 * swell, 0.29, angle));
+      crest.push(polar(1.64 + 0.34 * swell, 0.36 + height * swell, angle));
+      curl.push(polar(1.88 + 0.40 * swell, 0.33 + height * swell * 0.82, angle));
+      foamOuter.push(polar(1.92 + 0.45 * swell, 0.33 + height * swell * 0.77, angle));
+    }
+
+    const footPath = catmull(foot);
+    const crestPath = catmull(crest);
+    const curlPath = catmull(curl);
+    const outerPath = catmull(foamOuter);
+
+    b.membrane(footPath, crestPath, {
+      color: wavePaint,
+      thickness: 0.075,
+      rows: 3,
+      cols: 10,
+      bone: root,
+      name: "curvingWaveWall",
+    });
+    b.membrane(crestPath, curlPath, {
+      color: wavePaint,
+      thickness: 0.065,
+      rows: 3,
+      cols: 10,
+      bone: root,
+      name: "overturningWaveLip",
+    });
+    b.membrane(curlPath, outerPath, {
+      color: C.foam,
+      thickness: 0.038,
+      rows: 1,
+      cols: 10,
+      bone: root,
+      name: "broadFoamRibbon",
+    });
+    b.sweep(curlPath, [0.025, 0.075, 0.085, 0.06, 0.022], {
+      color: C.foam,
+      bone: root,
+      sides: 6,
+      caps: "round",
+      name: "roundedFoamCrest",
+    });
+
+    for (let j = 0; j < 4; j++) {
+      const t = 0.24 + j * 0.17;
+      ellipsoid(
+        "waveFoamLobe",
+        curlPath.at(t),
+        [0.12 + j * 0.009, 0.07, 0.12],
+        j % 2 ? "#a2dcd7" : C.foam,
+        root,
+        8,
+      );
+    }
+
+    // Broad tapered foam streaks connect the crest to the surrounding wash.
+    const spreadA: number[][] = [];
+    const spreadB: number[][] = [];
+    for (let j = 0; j < 5; j++) {
+      const t = j / 4;
+      const angle = a - 0.28 + t * 0.80;
+      const r = 2.18 + t * 0.81;
+      const w = 0.02 + Math.sin(Math.PI * t) * 0.075;
+      spreadA.push(polar(r - w, 0.252, angle));
+      spreadB.push(polar(r + w, 0.252, angle));
+    }
+    b.membrane(catmull(spreadA), catmull(spreadB), {
+      color: "#7ab8c0",
+      thickness: 0.012,
+      rows: 1,
+      cols: 7,
+      bone: root,
+      name: "flatSpreadingFoamWash",
+    });
+  }
+
+  // Flat broken wavelets avoid the old raised-stick appearance.
+  for (let i = 0; i < 12; i++) {
+    const r = 3.00 + (i % 4) * 0.51;
+    const a = i * 2.399 + 0.2;
+    const sweepAngle = (15 + random() * 15) * DEG;
+    const inner: number[][] = [];
+    const outer: number[][] = [];
+    for (let j = 0; j < 6; j++) {
+      const t = j / 5;
+      const angle = a + sweepAngle * t;
+      const width = 0.006 + Math.sin(Math.PI * t) * (0.018 + (i % 3) * 0.009);
+      inner.push(polar(r - width, 0.239, angle));
+      outer.push(polar(r + width, 0.239, angle));
+    }
+    b.membrane(catmull(inner), catmull(outer), {
+      color: i % 4 === 0 ? "#76afb8" : "#3c7b8b",
+      thickness: 0.008,
+      rows: 1,
+      cols: 6,
+      bone: root,
+      name: "taperedOceanRipple",
+    });
+  }
+
+  // Connected miniature foam clusters, kept below the tentacles.
+  for (let i = 0; i < 16; i++) {
+    const a = i * 2.399;
+    const r = 2.02 + random() * 0.73;
+    const size = 0.045 + random() * 0.035;
+    ellipsoid(
+      "surfaceFoamIsland",
+      polar(r, 0.249, a),
+      [size * 1.7, 0.018, size],
+      i % 3 ? "#75b4bd" : "#a6d9d5",
+      root,
+      8,
+    );
+  }
+
+  // Two restrained curling sprays are rooted in the wave wall.
+  for (const a of [-1.08, 2.16]) {
+    const p0 = new THREE.Vector3(...polar(1.72, 0.64, a) as [number, number, number]);
+    const p1 = new THREE.Vector3(...polar(1.92, 1.43, a + 0.07) as [number, number, number]);
+    const p2 = new THREE.Vector3(...polar(2.35, 1.02, a + 0.14) as [number, number, number]);
+    b.sweep(bezier(p0, p1, p2), [0.14, 0.10, 0.02], {
+      color: wavePaint,
+      bone: root,
+      sides: 6,
+      caps: "round",
+      name: "curledWaterTongue",
+    });
+    ellipsoid("sprayTipFoam", p2, [0.055, 0.045, 0.06], C.foam, root, 8);
+  }
+
+  // A low-profile identification plate, subordinate to the creature.
+  box("stagePlaque", [0, 0.16, 5.12], [1.18, 0.24, 0.055], C.ink);
+  drawing(serialTexture, [0, 0.17, 5.152], [1.11, 0.21], root);
+  bolt([-0.51, 0.16, 5.165], [0, 0, 1], 0.025, root, C.orange);
+  bolt([0.51, 0.16, 5.165], [0, 0, 1], 0.025, root, C.orange);
+
+  // Thin inlaid rim reinforces the stage without making it the subject.
+  b.sweep(
+    arc([0, 0.19, 0], [0, 0.19, -5.17], [0, 1, 0], 290),
+    0.012,
+    {
+      color: "#326779",
+      bone: root,
+      sides: 4,
+      caps: "flat",
+      name: "oceanStageRimInlay",
+    },
+  );
+
+  const result = b.root;
+  result.userData.character = {
+    class: "Abyssal Vanguard",
+    palette: "petrol teal / porcelain / rescue orange",
+    rigNotes:
+      "Eight separated nine-joint tentacle chains, flexible mantle and independent lower beak. Neutral tiered radial spread with relaxed curled tips.",
+  };
+  return result;
+}
+```
