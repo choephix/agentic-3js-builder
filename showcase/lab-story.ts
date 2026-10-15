@@ -534,7 +534,8 @@ export function renderStory(root: HTMLElement) {
   const clean = all.filter((build) => build.thumb && build.rendered);
   const mosaic = shuffled(clean, "hero").slice(0, 84);
   const spent = sum(all.map((build) => build.cost ?? 0));
-  const hours = sum(all.map((build) => build.wallMs)) / 3600e3;
+  // Agentic builds (r5agent, r7agent) carry no wall time.
+  const hours = sum(all.map((build) => build.wallMs ?? 0)) / 3600e3;
   const models = new Set(all.map((build) => build.model));
   root.innerHTML = `
     <section class="hero">
