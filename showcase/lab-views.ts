@@ -956,7 +956,7 @@ export function renderFailures(root: HTMLElement) {
     (a, b) => b[1].length - a[1].length,
   );
   root.innerHTML = `
-    ${sectionHead("Failures", `Of ${all.length} builds (without the re-check), <b>${crashed.length}</b> crashed, <b>${nocode.length}</b> ran out of tokens before writing code, and <b>${rigless.length}</b> rendered but failed the rig check. A single-shot build never sees its error, so every crash is a lost build: these lists drove the two SDK passes.`)}
+    ${sectionHead("Failures", `Of ${all.length} builds (without the re-check), <b>${crashed.length}</b> crashed, <b>${nocode.length}</b> ran out of tokens before writing code, and <b>${rigless.length}</b> rendered but failed the rig check. A single-run build never sees its error, so every crash is a lost build: these lists drove the two SDK passes.`)}
     <section class="chart-box"><h3>Per round</h3>${stacks(
       perRound.map(({ round, t }) => ({
         label: runnerLabel(round),
@@ -1053,7 +1053,7 @@ export function renderMethod(root: HTMLElement) {
         <div><b>Render</b><small><code>npm run snap</code> on the RTX 3060 Chromium: shots, report, GLB</small></div>
       </div>
       <ul class="facts">
-        <li><b>One shot.</b> Each build is one request and one reply. On an API error (429, 5xx) the runner resends the identical request up to 3 times; nothing the model wrote is ever fed back.</li>
+        <li><b>Single-run builds.</b> The original rounds use one API request and one reply, with no tool calls. On an API error (429, 5xx) the runner resends the identical request up to 3 times; nothing the model wrote is fed back within that run. Later feedback chains and tool-using rounds are separate experiments.</li>
         <li><b>Rendered</b> means the module built a model and the harness rendered it. A model that fails the rig check (some meshes on no bone, say) still renders, as a static mesh when its skeleton fails, the way an app would show it: that is “rendered, rig rejected”.</li>
         <li><b>Out of tokens</b>: the reply hit its cap (64k at medium, 128k at xhigh) with no code block.</li>
         <li><b>Cost</b> is estimated from list prices for uncached input, cached input and output. Cache writes aren't reported, so they're priced as plain input. Calls over a long-context threshold (Haiku: 100k) are priced at the long-context rates.</li>

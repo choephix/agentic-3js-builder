@@ -17,7 +17,8 @@ INPUT = ROOT / 'bakeoff/replay-inputs'
 SUBJECTS = ['africanElephant', 'capybara', 'koala', 'redPanda', 'treasureHoard', 'soulScythe']
 COLUMNS = [('final', 'Agent · final'), ('draft', 'Agent · first draft'),
            ('c1', 'C · draw 1 (existing)'), ('c2', 'C · draw 2'), ('c3', 'C · draw 3'),
-           ('r1', 'R · draw 1'), ('r2', 'R · draw 2'), ('s1', 'S · draw 1'), ('s2', 'S · draw 2')]
+           ('r1', 'R · tool conversation · draw 1'), ('r2', 'R · tool conversation · draw 2'),
+           ('s1', 'S · multi-call · draw 1'), ('s2', 'S · multi-call · draw 2')]
 ROUND_BY_COLUMN = {'c2': 'r16ca', 'c3': 'r16cb', 'r1': 'r16replaya', 'r2': 'r16replayb',
                    's1': 'r16shapeda', 's2': 'r16shapedb'}
 EXPERIMENT = 'replay'
@@ -32,10 +33,10 @@ def configure(experiment):
         INPUT = ROOT / 'bakeoff/replay2-inputs'
         ROUND_PATTERN = 'r17*'
         COLUMNS = [('final', 'Agent · final'), ('draft', 'Agent · first draft'),
-                   ('c1', 'C · existing r12/r13'), ('r1', 'R · draw a'), ('r2', 'R · draw b'),
-                   ('v1a', 'V1 · no thinking · a'), ('v1b', 'V1 · no thinking · b'),
-                   ('v2a', 'V2 · canned prefix · a'), ('v2b', 'V2 · canned prefix · b'),
-                   ('v3a', 'V3 · agent costume · a'), ('v3b', 'V3 · agent costume · b')]
+                   ('c1', 'C · existing r12/r13'), ('r1', 'R · tool conversation · draw a'), ('r2', 'R · tool conversation · draw b'),
+                   ('v1a', 'V1 · tool conversation · no thinking · a'), ('v1b', 'V1 · tool conversation · no thinking · b'),
+                   ('v2a', 'V2 · multi-call · canned prefix · a'), ('v2b', 'V2 · multi-call · canned prefix · b'),
+                   ('v3a', 'V3 · multi-call · agent costume · a'), ('v3b', 'V3 · multi-call · agent costume · b')]
         ROUND_BY_COLUMN = {'r1': 'r16replaya', 'r2': 'r16replayb',
                            **{f'v{v}{draw}': f'r17v{v}{draw}' for v in (1, 2, 3) for draw in ('a', 'b')}}
 
@@ -77,7 +78,7 @@ def tile(subject, column):
             cost = sum(item.get('costUsd') or 0 for item in history)
             repairs = sum(item.get('mode') == 'repair' for item in history)
             extra = raw_entry(entry).get('extraCalls', 0)
-            data['meta'] = f'${cost:.2f} · {extra} extra read-only calls · {repairs} repair turns'
+            data['meta'] = f'${cost:.2f} · tool conversation · {1 + extra} model calls · {repairs} separate repair calls'
         if entry.get('hasCode') is False:
             data['status'] = 'no draft'
         return data
@@ -227,16 +228,16 @@ def main():
     out = ['<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
            '<title>Before the first write · Sonnet replay</title><style>', STYLE,
            'main,.bar-inner{max-width:2100px}.tiles{display:grid;grid-template-columns:repeat(9,minmax(205px,1fr));overflow-x:auto;padding:4px 4px 14px}.tile{min-width:205px}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border-bottom:1px solid #d4dcd3;padding:8px;text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}.notice{border-left:4px solid #b18a3c;padding:10px 16px;background:#f8f0dc}.brief{max-width:1400px}.stats{font-size:16px}.tile h4{white-space:nowrap}'.replace('repeat(9,', f'repeat({len(COLUMNS)},'),
-           '</style></head><body><main><div class="eyebrow">The one-shot gap / conversation replay</div>',
+           '</style></head><body><main><div class="eyebrow">The single-run gap / conversation replay</div>',
            '<h1>What comes before the first write?</h1>',
-           ('<p class="intro"><strong>C</strong>: existing craft3 control. <strong>R</strong>: prior agent conversation replay, including signed thinking. <strong>V1</strong>: each subject’s R prefix with earlier thinking removed. <strong>V2</strong>: one wizardBookshelf agent system/tool prefix for every subject, thinking removed, replacing only the first user message with the subject’s own archived brief verbatim. <strong>V3</strong>: S synthetic full-file reads, but wizardBookshelf agent system and the subject’s archived brief verbatim. Two fresh draws per V variant. Same Sonnet 5.5, high effort, 120,000 max output tokens; up to eight read-only continuations against SDK 88fc1f0 and at most two craft3-system crash repairs. Thinking/signature rejections are retained verbatim and retried with thinking disabled, never fabricated.</p>'
+           ('<p class="intro"><strong>C</strong>: existing craft3 single-run control. <strong>R</strong>: prior agent tool conversation replay, including signed thinking (1–4 model calls per draw). <strong>V1</strong>: each subject’s R prefix with earlier thinking removed (1–3 calls). <strong>V2</strong>: one wizardBookshelf agent system/tool prefix for every subject, thinking removed, replacing only the first user message with the subject’s own archived brief verbatim (multi-call, 4–9 calls). <strong>V3</strong>: S synthetic full-file reads, but wizardBookshelf agent system and the subject’s archived brief verbatim (multi-call, 2–9 calls). R and V1 are tool conversations, not single-run builds, even when they return a sample write in the first reply. Two fresh draws per V variant. Same Sonnet 5.5, high effort, 120,000 max output tokens; up to eight read-only continuations against SDK 88fc1f0 and at most two craft3-system crash repairs. Thinking/signature rejections are retained verbatim and retried with thinking disabled, never fabricated.</p>'
             if EXPERIMENT == 'replay2' else
-            '<p class="intro"><strong>C</strong>: craft3 one-shot. <strong>R</strong>: archived agent conversation immediately before its first sample write. <strong>S</strong>: craft3 plus a fixed synthetic doc-reading conversation with current file contents. Same Sonnet 5.5, high effort, 120,000 max output tokens. Two fresh draws per variant; the existing C draw is also shown. When R/S request more reading, execute read-only tools against SDK commit 88fc1f0 and continue for at most eight extra API calls. Writes and renders are refused until the sample write is returned. No critiques; at most two crash repairs, using the app-style craft3 system.</p>'),
+            '<p class="intro"><strong>C</strong>: craft3 single-run build (one request and one reply, no tools). <strong>R</strong>: archived agent tool conversation immediately before its first sample write (1–4 model calls per draw). <strong>S</strong>: craft3 plus a fixed synthetic doc-reading conversation with current file contents (multi-call, 2–9 calls). R and S are tool conversations, not single-run builds, even when a sample write arrives in the first reply. Same Sonnet 5.5, high effort, 120,000 max output tokens. Two fresh draws per variant; the existing C draw is also shown. When R/S request more reading, execute read-only tools against SDK commit 88fc1f0 and continue for at most eight extra API calls. Writes and renders are refused until the sample write is returned. No critiques; at most two separate crash-repair calls, using the app-style craft3 system.</p>'),
            f'<p class="notice">{html.escape(manifest.get("caveat", "Inputs not yet prepared"))}</p>',
            f'<p class="stats"><strong>{initial_calls}/36 started draws completed</strong> · {continuation_calls} continuation calls · {failed_calls} failed request records · {repair_calls} repair calls · <strong>${total:.3f}</strong> new spend</p>',
-           ('<p class="intro">Captions measure the module actually rendered. Table sizes and line counts measure the initial module, before repairs; parts/textures describe the retained render. Output-token splits are unavailable unless reported. API pipeline costs include continuations and repairs. R17 renders use the current SDK, where extrude now requires x; those initial crash errors are counted separately below. Earlier rounds are archived references and were not re-checked.</p>'
+           ('<p class="intro">Captions measure the module actually rendered. Table sizes and line counts measure the initial module, before repairs; parts/textures describe the retained render. Output-token splits are unavailable unless reported. API pipeline costs include continuations and separate repair calls; a crash repair does not change the single-run control’s label. R17 renders use the current SDK, where extrude now requires x; those initial crash errors are counted separately below. Earlier rounds are archived references and were not re-checked.</p>'
             if EXPERIMENT == 'replay2' else
-            '<p class="intro">Captions and the main table describe the module actually rendered, including crash repairs. The exact archived first draft is measured in its table row; its image reuses the existing first-draft comparison and may include crash repair. Initial module sizes are retained in the downloadable JSON/CSV. Output-token splits are shown only when reported; “—” means unavailable, not zero. Anthropic output tokens combine thinking and tool arguments. Agent-final cost/tokens cover its entire session; draft cost/tokens cover its first-write generation only. Costs of API pipelines include any repairs.</p>'),
+            '<p class="intro">Captions and the main table describe the module actually rendered, including crash repairs. The exact archived first draft is measured in its table row; its image reuses the existing first-draft comparison and may include crash repair. Initial module sizes are retained in the downloadable JSON/CSV. Output-token splits are shown only when reported; “—” means unavailable, not zero. Anthropic output tokens combine thinking and tool arguments. Agent-final cost/tokens cover its entire session; draft cost/tokens cover its first-write generation only. Costs of API pipelines include continuations and separate repair calls; a crash repair does not change the single-run control’s label.</p>'),
            ('<p class="intro">Only the new r17 V1/V2/V3 runs count toward the spend and call totals above. Agent, C and R columns are references from earlier rounds.</p>'
             if EXPERIMENT == 'replay2' else
             '<p class="intro"><strong>Repair exception:</strong> R draw 1 capybara used the archived agent-style system for its two repair attempts before the craft3 override was introduced. Both replies contained tool markup, not edits; it remains crashed at the two-repair cap. R draw 2 capybara was repaired with craft3. S draw 1 koala did not emit a sample write within eight extra calls and has no module to render.</p>'),

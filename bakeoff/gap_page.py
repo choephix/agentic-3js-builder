@@ -55,14 +55,14 @@ COLUMNS = [
     ("sonnet-agent", "Sonnet", "agentic", "Sonnet · agentic session (final)", "The agentic session's finished model (~18 min, many turns, renders and looks at itself)."),
     ("agent-draft", "Agent", "one", "Agent · first draft", "The same Sonnet session's first file write, before it saw any render. One generation; repaired when necessary."),
     ("oldlab", "Old lab prompt", "one", "Sonnet · old lab prompt", "The original docs-only lab prompt; development set only."),
-    ("sonnet-one", "Sonnet", "one", "Sonnet · one-shot", "One call, new prompt (style kits + paint source + detail target + craft habits); repaired when necessary."),
-    ("sonnet-two", "Sonnet", "two", "Sonnet · after 2 feedback turns", "The one-shot plus two screenshot-and-measurement feedback turns."),
-    ("sol-one", "Sol", "one", "Sol · one-shot", "GPT-6.1 Sol, high effort, craft2 prompt; repaired when necessary."),
+    ("sonnet-one", "Sonnet", "one", "Sonnet · single-run", "One call, new prompt (style kits + paint source + detail target + craft habits); repaired by separate calls when necessary."),
+    ("sonnet-two", "Sonnet", "two", "Sonnet · after 2 feedback turns", "The single-run build plus two screenshot-and-measurement feedback turns."),
+    ("sol-one", "Sol", "one", "Sol · single-run", "GPT-6.1 Sol, high effort, craft2 prompt; repaired by separate calls when necessary."),
     ("sol-two", "Sol", "two", "Sol · after 2 feedback turns", "GPT-6.1 Sol, same pipeline, plus two feedback turns."),
     ("astra-agent", "Astra", "agentic", "Astra · agentic session (final)", "GPT-6 Astra agentic session, latest archived render; model identity checked against its build record."),
-    ("astra-one", "Astra", "one", "Astra · one-shot", "GPT-6 Astra, high effort, craft2 prompt; up to two repair turns when necessary."),
+    ("astra-one", "Astra", "one", "Astra · single-run", "GPT-6 Astra, high effort, craft2 prompt; up to two separate repair calls when necessary."),
     ("astra-two", "Astra", "two", "Astra · after 2 feedback turns", "GPT-6 Astra, same pipeline, plus two feedback turns."),
-    ("gem-one", "Gemini", "one", "Gemini · one-shot", "Gemini 3.8 Flash via google-antigravity, high effort, craft2 prompt; up to two repair turns."),
+    ("gem-one", "Gemini", "one", "Gemini · single-run", "Gemini 3.8 Flash via google-antigravity, high effort, craft2 prompt; up to two separate repair calls."),
     ("gem-two", "Gemini", "two", "Gemini · after 2 feedback turns", "Gemini 3.8 Flash, same pipeline, plus two feedback turns."),
     ("haiku-agent", "Haiku", "agentic", "Haiku · agentic session (final)", "Haiku agentic session, latest archived render; model identity checked against its build record."),
 ]
@@ -251,9 +251,9 @@ document.getElementById('showj').onchange=e=>document.body.classList.toggle('sho
 
 
 def main():
-    out = ['<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent vs one-shot</title><style>', STYLE, '</style></head><body>',
-           '<h1>Agentic sessions vs one-shot pipelines, same briefs</h1>',
-           '<p class="intro">Every row is one brief, exactly as the agentic builder got it. <b>The first column (green outline) is the baseline</b>: the model the Sonnet agentic session finished. Agentic-session columns show archived agent builds; first drafts and plain API pipelines show how they compare. Click any picture for that build\'s full contact sheet (12 views, skeleton, flex tests). Below each picture: cost and model time of that pipeline (agentic columns show session wall time). "Judge scores" shows existing scores from the three vision judges (1–10, mean of two orders each). No new builds are judged. One-shot columns include repairs where needed; a second-stage tile appears only after feedback turn 2.</p>',
+    out = ['<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent vs single-run</title><style>', STYLE, '</style></head><body>',
+           '<h1>Agentic sessions vs single-run builds and feedback pipelines, same briefs</h1>',
+           '<p class="intro">Every row is one brief, exactly as the agentic builder got it. <b>The first column (green outline) is the baseline</b>: the model the Sonnet agentic session finished. Agentic-session columns show archived agent builds; first drafts and plain API pipelines show how they compare. Click any picture for that build\'s full contact sheet (12 views, skeleton, flex tests). Below each picture: cost and model time of that pipeline (agentic columns show session wall time). "Judge scores" shows existing scores from the three vision judges (1–10, mean of two orders each). No new builds are judged. Single-run builds use one request and one reply, with no tools; crash repairs are separate calls and do not change that label. Their costs and times are included in the captions. A second-stage tile appears only after feedback turn 2.</p>',
            '<div class="bar">View: ']
     for view, label in [("three-quarter", "three-quarter"), ("front", "front"), ("side", "side"), ("back", "back"), ("low", "low"), ("head", "head close-up")]:
         out.append(f'<button data-v="{view}" class="{"on" if view == "three-quarter" else ""}">{label}</button>')
@@ -265,9 +265,9 @@ def main():
     for model in MODELS:
         enabled = "checked" if model != "Old lab prompt" else ""
         out.append(f'<label><input type="checkbox" data-filter="model" value="{model}" {enabled}> {model}</label>')
-    out.append('</div><div class="filters">API stages: <label><input type="checkbox" data-filter="stage" value="one" checked> one-shot / first draft</label><label><input type="checkbox" data-filter="stage" value="two" checked> +2 turns</label> <span class="meta">"Agent" is the Sonnet session\'s first draft. Reload to see newly completed rounds.</span></div></div>')
-    sections = [("pitches-r7.json", "r10", "Held-out set: 12 briefs never used while tuning the prompts", "These are the honest test. The one-shot prompts were written while looking at the development set below, never at these."),
-                ("pitches-r5.json", "r11", "Development set: 16 briefs the prompts were tuned on", "Includes the old lab prompt column, to show where the one-shots started (off by default).")]
+    out.append('</div><div class="filters">API stages: <label><input type="checkbox" data-filter="stage" value="one" checked> single-run / first draft</label><label><input type="checkbox" data-filter="stage" value="two" checked> +2 turns</label> <span class="meta">"Agent" is the Sonnet session\'s first draft. Reload to see newly completed rounds.</span></div></div>')
+    sections = [("pitches-r7.json", "r10", "Held-out set: 12 briefs never used while tuning the prompts", "These are the honest test. The single-run prompts were written while looking at the development set below, never at these."),
+                ("pitches-r5.json", "r11", "Development set: 16 briefs the prompts were tuned on", "Includes the old lab prompt column, to show where the single-run builds started (off by default).")]
     for pitches, prefix, heading, intro in sections:
         out.append(f'<h2>{heading}</h2><p class="intro">{intro}</p><div class="scroll"><table><thead><tr><th class="rowh"></th>')
         for key, model, stage, title, description in COLUMNS:

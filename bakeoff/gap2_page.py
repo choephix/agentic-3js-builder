@@ -17,8 +17,8 @@ SITE = {"root": "../snaps/", "view": ".png", "sheet": ".jpg", "images": None}
 VIEWS = [("three-quarter", "three-quarter"), ("front", "front"), ("side", "side"),
          ("back", "back"), ("low", "low"), ("head", "head close-up")]
 COLUMNS = [("final", "Sonnet agent · final"), ("draft", "Sonnet agent · first draft"),
-           ("sonnet", "Sonnet · one-shot"), ("astra", "Astra · one-shot"), ("haiku", "Haiku · one-shot"),
-           ("app", "Sonnet · agent framing (app)")]
+           ("sonnet", "Sonnet · single-run"), ("astra", "Astra · single-run"), ("haiku", "Haiku · single-run"),
+           ("app", "Sonnet · agent framing (app, multi-call · ~17 calls)")]
 API_MODELS = ["sonnet", "astra", "haiku", "app"]
 ISSUES = ["face/eyes", "floating/broken parts", "bland colour", "too little detail", "goofy"]
 GRADES = ["as good", "a bit worse", "far worse"]
@@ -274,10 +274,10 @@ def main(publish=None):
         SITE.update(root="/renders/", view=".webp", sheet=".webp", images=set())
     output.parent.mkdir(parents=True, exist_ok=True)
     out = ['<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
-           '<title>Agent vs one-shot · phase 2</title><style>', STYLE, f'</style></head><body data-view-ext="{SITE["view"]}">',
-           '<main><div class="eyebrow">The one-shot gap / phase 2</div><h1>Same briefs. Six builds. Your verdict.</h1>',
-           '<p class="intro"><strong>Sonnet agent · final</strong> is the finished sample from the agentic session (green outline). <strong>Sonnet agent · first draft</strong> is that session’s first file write, with crash repairs where needed. <strong>Sonnet · one-shot</strong>, <strong>Astra · one-shot</strong> and <strong>Haiku · one-shot</strong> each start with one API call. <strong>Sonnet · agent framing (app)</strong> is Sonnet 5.5 given one fixed agent system/brief template and synthetic current-doc reads; it can write, edit and typecheck until it ends its turn, without renders. Untick columns under the view buttons to hide them; the choice is remembered.</p>',
-           '<p class="intro">There are <strong>no visual feedback turns</strong>: up to two repairs only send back the crash error. App framing permits at most 17 model calls before those repairs, including real requested typechecks and harmless scratch operations. Captions include the entire generation/tool loop and repairs’ cost/time; agent finals show session time. First-draft generation cost/time were not recorded. Click a picture for its contact sheet. Refresh to see newly completed builds.</p></main>',
+           '<title>Agent vs single-run and multi-call · phase 2</title><style>', STYLE, f'</style></head><body data-view-ext="{SITE["view"]}">',
+           '<main><div class="eyebrow">The single-run gap / phase 2</div><h1>Same briefs. Six builds. Your verdict.</h1>',
+           '<p class="intro"><strong>Sonnet agent · final</strong> is the finished sample from the agentic session (green outline). <strong>Sonnet agent · first draft</strong> is that session’s first file write, with crash repairs where needed. <strong>Sonnet · single-run</strong>, <strong>Astra · single-run</strong> and <strong>Haiku · single-run</strong> each use one API request and one reply, with no tools. <strong>Sonnet · agent framing (app, multi-call · ~17 calls)</strong> is Sonnet 5.5 given one fixed agent system/brief template and synthetic current-doc reads; it can write, edit and typecheck in a tool conversation, without renders. Untick columns under the view buttons to hide them; the choice is remembered.</p>',
+           '<p class="intro">There are <strong>no visual feedback turns</strong>: up to two separate repair calls only send back the crash error and do not change a single-run build’s label. App framing used 17 model calls per draw before repairs, including real requested typechecks and harmless scratch operations. Captions count repair calls separately and include the entire generation/tool loop and repairs’ cost/time; agent finals show session time. First-draft generation cost/time were not recorded. Click a picture for its contact sheet. Refresh to see newly completed builds.</p></main>',
            '<div class="bar"><div class="bar-inner"><div class="views" role="group" aria-label="Image view"><span class="view-label">View</span>']
     for view, label in VIEWS:
         out.append(f'<button type="button" data-view="{view}" aria-pressed="{str(view == "three-quarter").lower()}">{label}</button>')
@@ -295,7 +295,7 @@ def main(publish=None):
             brief = "".join(f'<span>{html.escape(line)}</span>' for line in subject["rich"].splitlines())
             out.append(f'<article class="comparison-row" data-subject="{subject_id}"><div class="row-heading"><h3>{subject_id}</h3><div class="brief">{brief}</div></div><p class="scroll-hint">Swipe the builds left to compare all six →</p><div class="tiles">')
             out.extend(cell(subject_id, column, title, base) for column, title in COLUMNS)
-            out.append('</div><div class="better" role="group" aria-label="Better one-shot"><span class="better-label">Better one-shot:</span>' + buttons(["Sonnet", "Astra", "Haiku", "App", "same"], "data-better") + '</div></article>')
+            out.append('</div><div class="better" role="group" aria-label="Better API build"><span class="better-label">Better API build:</span>' + buttons(["Sonnet", "Astra", "Haiku", "App", "same"], "data-better") + '</div></article>')
         out.append('</section>')
     out.extend(['</main><script>', SCRIPT, '</script></body></html>'])
     with tempfile.NamedTemporaryFile(mode="w", dir=output.parent, suffix=".html", delete=False) as handle:

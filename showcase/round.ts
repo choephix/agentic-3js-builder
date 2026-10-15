@@ -1080,7 +1080,7 @@ function renderLiveErrors() {
   }
 }
 
-/** One shot of the shown step across builders, in the lightbox. */
+/** The current image of the shown step across builders, in the lightbox. */
 function openAcross(subject: Subject, arms: Arm[], shot: string, index: number) {
   const items = arms
     .map((arm, position) => ({ arm, position, snap: pick(slugOf(subject, arm)).snap }))
