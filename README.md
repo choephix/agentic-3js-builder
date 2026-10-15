@@ -74,7 +74,7 @@ export default function build() {
 }
 ```
 
-The showcase (`showcase/`, Vite with plain TypeScript, `npm run showcase`) discovers every `samples/*.ts`, including guide-test builds, and shows one at a time, framed like the harness renders. It is also published at [agentic-3d-builder-sdk-showcase.netlify.app](https://agentic-3d-builder-sdk-showcase.netlify.app/). Everything about the view lives in the URL (`#redFox?mode=bones&skeleton&bend=40&panel=tree`); press `?` for the keys.
+The showcase (`showcase/`, Vite with plain TypeScript, `npm run showcase`) discovers every `samples/*.ts`, including guide-test builds, and shows one at a time, framed like the harness renders. It is also published at [agentic-3d-builder-sdk-showcase.netlify.app](https://agentic-3d-builder-sdk-showcase.netlify.app/). Everything about the view lives in the URL (`#redFox?mode=bones&skeleton&bend=40&panel=tree`); press `?` for the keys. The right of the status bar links every other page: Lab, Bake-off, Rounds, Assemble, Loading and Storage.
 
 Verify a preview deployment before promoting it to production.
 
