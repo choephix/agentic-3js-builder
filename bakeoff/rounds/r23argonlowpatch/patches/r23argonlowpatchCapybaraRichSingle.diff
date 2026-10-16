@@ -1,0 +1,19 @@
+--- r23argonlow/builds/r23argonlowCapybaraRichSingle.ts	2026-10-16 10:28:42.276101459 +0300
++++ r23argonlowpatch/builds/r23argonlowpatchCapybaraRichSingle.ts	2026-10-16 16:21:03.804162459 +0300
+@@ -207,14 +207,14 @@
+       [0, 0.56, 0.44],
+     ]),
+     {
+-      parent: spine.tip!,
++      parent: spine,
+       names: ["neck", "head"],
+       role: "neck",
+       group: "head",
+     },
+   );
+ 
+-  const head = neck.tip!;
++  const head = neck.joints[1];
+ 
+   // Snout and articulated lower jaw
+   const snoutJoint = b.joint("snout", {

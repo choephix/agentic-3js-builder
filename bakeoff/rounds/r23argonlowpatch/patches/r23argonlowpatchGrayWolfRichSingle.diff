@@ -1,0 +1,11 @@
+--- bakeoff/rounds/r23argonlow/builds/r23argonlowGrayWolfRichSingle.ts	2026-10-16 10:28:37.059988898 +0300
++++ bakeoff/rounds/r23argonlowpatch/builds/r23argonlowpatchGrayWolfRichSingle.ts	2026-10-16 16:20:08.122965771 +0300
+@@ -78,7 +78,7 @@
+     const furNoise = (noise(p, 0.07, 77) - 0.5) * 0.16;
+ 
+     // Dorsal dark cape along spine, neck, and shoulders
+-    const shoulderCape = p.z > 0.02 && p.z < 0.42 ? 0.16 * Math.exp(-((p.z - 0.22) / 0.18) ** 2) : 0;
++    const shoulderCape = p.z > 0.02 && p.z < 0.42 ? 0.16 * Math.exp(-(((p.z - 0.22) / 0.18) ** 2)) : 0;
+     const dorsalMetric = n.y + (p.y - 0.52) * 0.9 + shoulderCape - toothLarge - toothSmall + furNoise;
+ 
+     if (dorsalMetric > 0.46) return resolve(DORSAL_DARK, p, n);

@@ -1,0 +1,11 @@
+--- bakeoff/rounds/r23argonlow/builds/r23argonlowPhoenixRichSingle.ts	2026-10-16 10:32:12.176624489 +0300
++++ bakeoff/rounds/r23argonlowpatch/builds/r23argonlowpatchPhoenixRichSingle.ts	2026-10-16 16:20:25.447338124 +0300
+@@ -885,7 +885,7 @@
+   }
+   for (let i = 0; i < 14; i++) {
+     const pt = lowerChestLoop.at(i / 14);
+-    collarBeadGeos.push(new THREE.SphereGeometry(0.014, 6, 4).translate(pt.x, pt.y, pt.z));
++    collarBeadGeos.push(new THREE.SphereGeometry(0.014, 6, 4).toNonIndexed().translate(pt.x, pt.y, pt.z));
+   }
+   b.part(mergeGeometries(collarBeadGeos), GOLD_BRIGHT, {
+     bone: chest,

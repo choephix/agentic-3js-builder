@@ -1,0 +1,28 @@
+--- bakeoff/rounds/r23argonlow/builds/r23argonlowGnomeTinkererRichSingle.ts	2026-10-16 10:34:17.491319963 +0300
++++ bakeoff/rounds/r23argonlowpatch/builds/r23argonlowpatchGnomeTinkererRichSingle.ts	2026-10-16 16:20:33.407509206 +0300
+@@ -97,7 +97,7 @@
+   // Oil-stained, singed tinkerer leather apron
+   const apronPaint = paint((p) => {
+     const stain = noise(p, 0.06, 31);
+-    consthem = smoothstep(0.32, 0.22, p.y);
++    const thehem = smoothstep(0.32, 0.22, p.y);
+     const base = mix(APRON_TAN, APRON_DARK, smoothstep(0.4, 0.75, stain));
+     return mix(base, LEATHER_DARK, thehem * 0.55);
+   });
+@@ -1492,14 +1492,14 @@
+   b.part(new THREE.TorusGeometry(0.016, 0.005, 5, 7), BRASS_BRIGHT, {
+     at: [hatTipPt.x + 0.005, hatTipPt.y - 0.012, hatTipPt.z - 0.012],
+     flat: true,
+-    bone: hatChain.tip!,
++    bone: "hatTip",
+     group: "hat",
+     name: "hatTipBellRing",
+   });
+   b.part(new THREE.SphereGeometry(0.024, 7, 6), BRASS_BRIGHT, {
+     at: [hatTipPt.x + 0.008, hatTipPt.y - 0.032, hatTipPt.z - 0.018],
+     flat: true,
+-    bone: hatChain.tip!,
++    bone: "hatTip",
+     group: "hat",
+     name: "hatTipBell",
+   });

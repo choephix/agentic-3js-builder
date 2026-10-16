@@ -1,0 +1,47 @@
+--- bakeoff/rounds/r23argonlow/builds/r23argonlowPixelDungeonPropsRichSingle.ts	2026-10-16 10:33:43.294584698 +0300
++++ bakeoff/rounds/r23argonlowpatch/builds/r23argonlowpatchPixelDungeonPropsRichSingle.ts	2026-10-16 16:20:29.475424697 +0300
+@@ -1153,11 +1153,11 @@
+     });
+ 
+     if (tiltRot[0] !== 0 || tiltRot[1] !== 0 || tiltRot[2] !== 0) {
+-      b.pose(barrelJoint, {
+-        quat: new THREE.Quaternion().setFromEuler(
++      b.pose(barrelJoint,
++        new THREE.Quaternion().setFromEuler(
+           new THREE.Euler((tiltRot[0] * Math.PI) / 180, (tiltRot[1] * Math.PI) / 180, (tiltRot[2] * Math.PI) / 180),
+         ),
+-      });
++      );
+     }
+     return barrelJoint;
+   };
+@@ -1402,11 +1402,11 @@
+ 
+   // Pose jaw slightly agape and tilt the skull naturally on the stone slab
+   b.pose(skullJawJoint, { axis: [1, 0, 0], deg: 18 });
+-  b.pose(skullJoint, {
+-    quat: new THREE.Quaternion().setFromEuler(
++  b.pose(skullJoint,
++    new THREE.Quaternion().setFromEuler(
+       new THREE.Euler((-12 * Math.PI) / 180, (-32 * Math.PI) / 180, (10 * Math.PI) / 180),
+     ),
+-  });
++  );
+ 
+   // Skeletal Ribcage & Vertebrae Spine Column behind the skull
+   const spinePoints: Array<[number, number, number]> = [
+@@ -1701,11 +1701,11 @@
+     );
+ 
+     if (tiltDeg[0] !== 0 || tiltDeg[1] !== 0 || tiltDeg[2] !== 0) {
+-      b.pose(torchJoint, {
+-        quat: new THREE.Quaternion().setFromEuler(
++      b.pose(torchJoint,
++        new THREE.Quaternion().setFromEuler(
+           new THREE.Euler((tiltDeg[0] * Math.PI) / 180, (tiltDeg[1] * Math.PI) / 180, (tiltDeg[2] * Math.PI) / 180),
+         ),
+-      });
++      );
+     }
+   };
+ 

@@ -21,7 +21,7 @@ import type { PathInput } from "./path";
 import { Region } from "./region";
 import type { RegionOptions } from "./region";
 import { rigBlock } from "./rig";
-import { createChain, createJoint, pose } from "./skeleton";
+import { createChain, createJoint, Joint, pose } from "./skeleton";
 import type { Chain, ChainOptions, JointOptions, PoseRotation } from "./skeleton";
 import { capsule, frustumBox, loft, rod, spike, sprout } from "./sugar";
 import type { SproutOptions, Station } from "./sugar";
@@ -40,7 +40,7 @@ export class Builder {
   readonly ctx: Ctx;
 
   constructor(name = "creature", detail = 1, paintSize = 1024) {
-    this.ctx = new Ctx(name, detail, paintSize);
+    this.ctx = new Ctx(name, detail, paintSize, (ctx) => new Joint(ctx.root.name, ctx.root, null, ctx));
   }
 
   /**

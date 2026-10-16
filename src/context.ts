@@ -22,8 +22,7 @@ import type { Painted } from "./bake";
 import type { Frame } from "./frame";
 import { Paint } from "./paint";
 import type { RigRecord } from "./rig";
-import { Joint } from "./skeleton";
-import type { Chain } from "./skeleton";
+import type { Chain, Joint } from "./skeleton";
 
 /** What every `color` option takes: a colour string, or a Paint baked into a texture over the surface. */
 export type Fill = string | Paint;
@@ -186,7 +185,7 @@ export class Ctx {
   private staticOwner: Joint | null = null;
 
   modelSpaceOwner() {
-    return (this.staticOwner ??= new Joint(this.root.name, this.root, null, this));
+    return (this.staticOwner ??= this.makeStaticOwner(this));
   }
   readonly meshes = new Map<Joint, Mesh[]>();
   readonly owner = new Map<Mesh, Joint>();
@@ -212,6 +211,8 @@ export class Ctx {
     readonly detail: number,
     /** Paint sheet width in texels. */
     readonly paintSize: number,
+    /** Builds the model-space owner on first use; injected so this module never imports skeleton at runtime. */
+    private readonly makeStaticOwner: (ctx: Ctx) => Joint,
   ) {
     if (!(detail > 0)) throw new Error(`detail must be positive, got ${detail}`);
     if (![512, 1024, 2048].includes(paintSize)) throw new Error(`paintSize is 512, 1024 or 2048, got ${paintSize}`);

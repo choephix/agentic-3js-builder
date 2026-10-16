@@ -55,7 +55,8 @@ def checked_tile(entry):
     times = [model_ms(item) for item in history]
     data = {"cost": cost, "seconds": sum(times) / 1000 if all(time is not None for time in times) else None,
             "kb": module_kb(directory / "builds" / f"{slug}.ts"),
-            "repairs": sum(item.get("mode") == "repair" for item in history)}
+            "repairs": sum(item.get("mode") == "repair" for item in history),
+            "patched": any(item.get("mode") == "patch" for item in history)}
     check = load(directory / "checks" / f"{slug}.json", entry.get("check"))
     if entry.get("hasCode") is False:
         return {**data, "status": "crashed", "error": entry.get("error") or entry.get("finishReason") or "No module returned"}
@@ -78,7 +79,7 @@ def tile_data(subject, column):
                 "cost": build.get("cost"), "seconds": build.get("wallSeconds"),
                 "kb": module_kb(ROOT / "samples" / f"{slug}.ts"), "repairs": 0}
     pending = None
-    for suffix in ("fix2", "fix", ""):
+    for suffix in ("patch", "fix2", "fix", ""):
         candidates = [item for item in entries(ROUND_IDS[column] + suffix)
                       if item.get("subject") == subject]
         for entry in reversed(candidates):
@@ -98,6 +99,8 @@ def metric_caption(data, final=False):
     caption = f"{timing} {'session time' if final else 'model time'} · {money} · {size}"
     if not final:
         caption += f" · {data['repairs']} repair call{'s' if data['repairs'] != 1 else ''}"
+        if data.get("patched"):
+            caption += " · crash hand-patched (no model)"
     return caption
 
 
@@ -257,7 +260,7 @@ def main(publish=None):
     out = ['<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
            '<title>The single-run gap · phase 4 · Gemini 4 Argon</title><style>', STYLE, f'</style></head><body data-view-ext="{site["view"]}">',
            '<main><div class="eyebrow">The single-run gap / phase 4</div><h1>Same 28 briefs. Sonnet and Argon. Your verdict.</h1>',
-           '<p class="intro-note"><strong>Sonnet agent · final</strong> is the finished model from a Sonnet agent session, outlined in green: the quality target. <strong>Sonnet 5.5 · high</strong> is the high-effort single-run baseline (r19single); <strong>high + craft</strong> adds the craft instructions (r19craft). <strong>Gemini 4 Argon</strong> writes the same briefs at high or low effort (r23argonhigh / r23argonlow). Single-run means one request and one reply, not an agent loop. Separate repairs are allowed only if the code crashed, never to improve its looks.</p>',
+           '<p class="intro-note"><strong>Sonnet agent · final</strong> is the finished model from a Sonnet agent session, outlined in green: the quality target. <strong>Sonnet 5.5 · high</strong> is the high-effort single-run baseline (r19single); <strong>high + craft</strong> adds the craft instructions (r19craft). <strong>Gemini 4 Argon</strong> writes the same briefs at high or low effort (r23argonhigh / r23argonlow). Single-run means one request and one reply, not an agent loop. Separate repairs are allowed only if the code crashed, never to improve its looks. Argon’s weekly quota ran out before its own repair turns, so its crashed files were made to load by hand (Opus subagents, smallest mechanical change, nothing visual touched; diffs in <code>r23argon*patch/patches/</code>). Those tiles say <em>crash hand-patched</em>.</p>',
            '<details class="intro"><summary>How to compare</summary><p>Captions show model time, total estimated cost, code KB and repair calls. Time and cost include redraws and repairs; model time uses API-attempt timing where recorded, excluding queue and render time. Agent finals show session time. Column medians include rendered subjects only. Missing or unchecked builds say “pending”; completed failures say “crashed”. Regenerate the page as results arrive. Grade each API build against the green final, tag issues, and pick the best build per row. Choices stay in this browser separately from Gap 2 and Gap 3. Click a picture for its contact sheet; use “Copy my verdicts” to share your choices.</p></details></main>',
            '<div class="bar"><div class="bar-inner"><div class="views" role="group" aria-label="Image view"><span class="view-label">View</span>']
     for view, label in VIEWS:
