@@ -75,6 +75,8 @@ All five Gap3 arms share a $70 spend guard, including repairs, probes and discar
 
 `replay.ts --single --model google-antigravity/gemini-4-argon --effort high|low` runs Gemini 4 Argon on the exact frozen `r19single` conversation (rounds `r23argonhigh`, `r23argonlow`; page `gap4_page.py`). Anthropic thinking blocks are stripped from the prefix; everything else is unchanged. The gateway's `/v1/messages` route accepts the model and returns the `write` tool call directly; a chat-completions translation and fenced-code extraction exist as unused fallbacks. Output cap is 65,536 (Argon's maximum). The run stops if Gemini 5-hour usage passes 80%. The first run exhausted the account's weekly Argon quota (429 `QUOTA_EXHAUSTED`) after 20 high and 28 low modules, so 8 high draws and all repairs are recorded as `blocked: quota` in each `*-inputs/report.json` and `stopped.json`; `OMP_AUTH_BROKER_ACCOUNT_POOL_FILE` (`r23argonhigh-inputs/account-pool.json`) did not route around it.
 
+`python3 bakeoff/compare_table.py [column ...]` prints median (min–max) per pipeline over the 28 gap2 briefs: model time including repair calls (rate-limit waits excluded), final module KB, cost, output tokens, triangles, parts, textures, joints and first-render crashes. Each subject uses its last rendered build across the `patch`, `fix2`, `fix` and base rounds.
+
 ## Feedback turns
 
 `refine <round> --from <source>` gives every build of the source round one more turn, as an app would after running the module. The conversation is the arm's system prompt, the pitch, the current module as the model's own reply, and the feedback:
