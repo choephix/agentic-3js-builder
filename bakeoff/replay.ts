@@ -28,6 +28,9 @@ const SINGLE_WORKERS = process.argv.includes("--workers")
 if (SINGLE && !(SINGLE_WORKERS >= 1 && SINGLE_WORKERS <= 64)) throw Error("--workers must be 1–64");
 const singleOption = (flag: string) =>
   process.argv.includes(flag) ? process.argv[process.argv.indexOf(flag) + 1] : undefined;
+const MODEL = SINGLE ? (singleOption("--model") ?? "anthropic/claude-sonnet-5-5") : "anthropic/claude-sonnet-5-5";
+const ARGON = SINGLE && MODEL === "google-antigravity/gemini-4-argon";
+if (SINGLE && /(?:^|\/)cursor(?:\/|$)/i.test(MODEL)) throw Error("Cursor providers/models are forbidden for this run");
 const SINGLE_PROMPT = singleOption("--prompt-file");
 const SINGLE_NORIG = process.argv.includes("--no-rig");
 const SINGLE_NO_THINKING = process.argv.includes("--no-thinking");
@@ -43,9 +46,11 @@ if (SINGLE_THINKING_BUDGET)
   );
 const SINGLE_ROUND =
   singleOption("--round") ??
-  (SINGLE_REF
-    ? "r21ref" + SINGLE_EFFORT
-    : (SINGLE_EFFORT === "high" ? "r19" : "r20" + (SINGLE_EFFORT === "medium" ? "med" : "low")) + SINGLE_ARM);
+  (ARGON
+    ? "r23argon" + SINGLE_EFFORT
+    : SINGLE_REF
+      ? "r21ref" + SINGLE_EFFORT
+      : (SINGLE_EFFORT === "high" ? "r19" : "r20" + (SINGLE_EFFORT === "medium" ? "med" : "low")) + SINGLE_ARM);
 const GAP3 = /^r22(asset|norig|lean|cap|nothink)$/.test(SINGLE_ROUND);
 const SINGLE_CAP = GAP3 ? 70 : SINGLE_REF ? 40 : SINGLE_EFFORT === "high" ? 60 : 90;
 const APP_ROUND = process.argv.includes("--app-round")
@@ -64,7 +69,6 @@ const INPUT = join(
         ? "replay2-inputs"
         : "replay-inputs",
 );
-const MODEL = "anthropic/claude-sonnet-5-5";
 const SUBJECTS = ["africanElephant", "capybara", "koala", "redPanda", "treasureHoard", "soulScythe"];
 const json = (path: string) => JSON.parse(readFileSync(path, "utf8"));
 const save = (path: string, data: unknown) => {
@@ -867,6 +871,29 @@ async function prepareApp() {
 
 /** Reuse the frozen app prefix verbatim, then prefill the lookups its live loop usually makes. */
 async function prepareSingle() {
+  if (ARGON) {
+    const frozen = join(BASE, "r19single-inputs");
+    const manifest = json(join(frozen, "manifest.json"));
+    for (const subject of manifest.subjects) {
+      const input = json(join(frozen, subject.id + ".json"));
+      for (const message of input.context.messages)
+        if (message.role === "assistant")
+          message.content = message.content.filter(
+            (block: { type: string }) => !["thinking", "redactedThinking", "redacted_thinking"].includes(block.type),
+          );
+      save(join(INPUT, subject.id + ".json"), input);
+    }
+    save(join(INPUT, "manifest.json"), {
+      ...manifest,
+      model: MODEL,
+      effort: SINGLE_EFFORT,
+      maxTokens: 65536,
+      source: "bakeoff/r19single-inputs (frozen app-inputs + r19 prefill); only Anthropic thinking removed",
+      removedBlocks: ["thinking", "redactedThinking", "redacted_thinking"],
+    });
+    save(join(INPUT, "pitches.json"), json(join(frozen, "pitches.json")));
+    return;
+  }
   if (SINGLE_PROMPT || SINGLE_NORIG || GAP3) {
     const source = join(BASE, "r19" + SINGLE_ARM + "-inputs");
     const manifest = json(join(source, "manifest.json"));
@@ -1826,10 +1853,672 @@ async function runApp() {
   }
 }
 
+// Argon keeps the frozen single-run conversation, with independent transport and quota accounting.
+type ArgonBlock = { type: string; text?: string; id?: string; name?: string; arguments?: Record<string, unknown> };
+type ArgonContext = {
+  systemPrompt: string[];
+  messages: { role: string; content: ArgonBlock[]; toolCallId?: string; isError?: boolean }[];
+  tools: { name: string; description: string; parameters: Record<string, unknown> }[];
+};
+type ArgonTokens = {
+  input_tokens: number;
+  cache_read_input_tokens: number;
+  cache_creation_input_tokens: number;
+  output_tokens: number;
+  prompt_tokens: number;
+  completion_tokens: number;
+  reasoning_tokens: number | null;
+};
+type ArgonExtraction = {
+  code: string | null;
+  moduleSource: string | null;
+  returnedTools: { name: string; path: unknown }[];
+  usage: ArgonTokens;
+  providerUsage: unknown;
+  stopReason: string | null;
+  capHit: boolean;
+  costUsd: number;
+};
+type ArgonAttempt = Omit<ArgonExtraction, "code"> & {
+  request: number;
+  kind: string;
+  path: string;
+  status: number;
+  started: string;
+  wallMs: number;
+  timeToFirstByteMs: null;
+  timeToFirstByteNote: string;
+  hasCode: boolean;
+  retry: boolean;
+  transportFallback: boolean;
+  error: string | null;
+  backoffMs?: number;
+};
+type ArgonResponse = { code: string | null; moduleSource: string | null; attempts: ArgonAttempt[]; status: number };
+const argonUsage = { stopped: false };
+async function guardArgon(label: string) {
+  if (argonUsage.stopped) return false;
+  const poolPath = process.env.OMP_AUTH_BROKER_ACCOUNT_POOL_FILE;
+  const identities: string[] | undefined = poolPath ? json(poolPath)["google-antigravity"] : undefined;
+  if (poolPath)
+    await capture(join(homedir(), ".local/bin/omp"), ["usage", "invalidate", "-p", "google-antigravity"], 60000);
+  const reading = await capture(
+    join(homedir(), ".local/bin/omp"),
+    ["usage", "-p", "google-antigravity", "--json"],
+    60000,
+  );
+  if (reading.status !== 0) throw Error("Could not read Gemini quota; no further requests sent");
+  const data = JSON.parse(reading.stdout);
+  const allReports = data.reports ?? [];
+  const selected = allReports.filter(
+    (report: { metadata?: { email?: string } }) =>
+      !identities || identities.includes("email:" + report.metadata?.email),
+  );
+  const values: number[] = [];
+  const weeklyValues: number[] = [];
+  for (const report of selected)
+    for (const limit of report.limits ?? []) {
+      if (limit.label !== "Gemini") continue;
+      if (limit.window?.id === "5h" && typeof limit.amount?.used === "number") values.push(limit.amount.used);
+      if (limit.window?.id === "weekly" && typeof limit.amount?.used === "number") weeklyValues.push(limit.amount.used);
+    }
+  save(join(INPUT, "usage-" + Date.now() + ".json"), {
+    label,
+    at: new Date().toISOString(),
+    ...reading,
+    values,
+    weeklyValues,
+    accountPool: identities ?? null,
+    reports: selected,
+    unavailableAccounts: selected.filter(
+      (report: { limits: { label: string; window?: { id: string } }[] }) =>
+        !report.limits.some((limit) => limit.label === "Gemini" && limit.window?.id === "5h"),
+    ).length,
+  });
+  if (!selected.length || (!values.length && !weeklyValues.length))
+    throw Error("No selected-account Gemini quota reported; no request sent");
+  if (values.some((v) => v > 80) || (identities && weeklyValues.some((v) => v > 60))) {
+    argonUsage.stopped = true;
+    save(join(INPUT, "stopped.json"), {
+      reason: "Gemini quota guard (5 Hour >80% or selected-account Weekly >60%)",
+      label,
+      values,
+      weeklyValues,
+      accountPool: identities,
+    });
+  }
+  return !argonUsage.stopped;
+}
+function argonRequest(context: ArgonContext, path: string) {
+  if (path === "/v1/messages") {
+    const request = anthropicRequest(context);
+    return { ...request, max_tokens: 65536 };
+  }
+  const messages: Record<string, unknown>[] = [{ role: "system", content: context.systemPrompt.join("\n\n") }];
+  for (const message of context.messages) {
+    if (message.role === "toolResult") {
+      messages.push({
+        role: "tool",
+        tool_call_id: message.toolCallId,
+        content: message.content.map((block) => block.text ?? "").join("\n"),
+      });
+    } else {
+      const calls = message.content.filter((block) => block.type === "toolCall");
+      messages.push({
+        role: message.role,
+        content:
+          message.content
+            .filter((block) => block.type === "text")
+            .map((block) => block.text ?? "")
+            .join("\n") || null,
+        ...(calls.length
+          ? {
+              tool_calls: calls.map((block) => ({
+                id: block.id,
+                type: "function",
+                function: { name: block.name, arguments: JSON.stringify(block.arguments) },
+              })),
+            }
+          : {}),
+      });
+    }
+  }
+  return {
+    model: MODEL,
+    max_tokens: 65536,
+    stream: false,
+    reasoning_effort: SINGLE_EFFORT,
+    messages,
+    tools: context.tools.map((tool) => ({
+      type: "function",
+      function: { name: tool.name, description: tool.description, parameters: tool.parameters },
+    })),
+    tool_choice: "auto",
+  };
+}
+// The existing gateway owns JSON parsing; retain the complete raw body, then normalize only measured fields.
+function argonExtract(body: unknown, subject: string): ArgonExtraction {
+  const parsed = JSON.parse(JSON.stringify(body));
+  const message = parsed?.choices?.[0]?.message;
+  const calls: AppCall[] = message
+    ? (message.tool_calls ?? []).flatMap((call: { id: string; function?: { name: string; arguments: string } }) => {
+        try {
+          const input: unknown = JSON.parse(call.function?.arguments ?? "{}");
+          return input && typeof input === "object" && !Array.isArray(input) && call.function?.name
+            ? [{ id: call.id, name: call.function.name, input: Object.fromEntries(Object.entries(input)) }]
+            : [];
+        } catch {
+          return [];
+        }
+      })
+    : singleTools(parsed?.content);
+  const write = calls
+    .filter(
+      (call) =>
+        call.name === "write" &&
+        typeof call.input.path === "string" &&
+        /(?:^|\/)samples\/[^/]+\.ts$/.test(call.input.path) &&
+        call.input.path.endsWith("/" + subject + ".ts") &&
+        typeof call.input.content === "string",
+    )
+    .at(-1);
+  const prose =
+    message?.content ??
+    (parsed?.content ?? [])
+      .filter((block: { type: string }) => block.type === "text")
+      .map((block: { text: string }) => block.text)
+      .join("\n");
+  const fences =
+    typeof prose === "string"
+      ? [...prose.matchAll(/```(?:ts|typescript|tsx|js|javascript)?[^\n]*\n([\s\S]*?)```/g)]
+          .map((m) => m[1])
+          .sort((a, b) => b.length - a.length)
+      : [];
+  const code = typeof write?.input.content === "string" ? write.input.content : (fences[0] ?? null);
+  const raw = parsed?.usage ?? {};
+  const cached: number = raw.cache_read_input_tokens ?? raw.prompt_tokens_details?.cached_tokens ?? 0;
+  const input: number = raw.input_tokens ?? Math.max(0, (raw.prompt_tokens ?? 0) - cached);
+  const output: number = raw.output_tokens ?? raw.completion_tokens ?? 0;
+  const cacheWrite: number = raw.cache_creation_input_tokens ?? 0;
+  const reasoning: number | null =
+    raw.reasoning_tokens ??
+    raw.completion_tokens_details?.reasoning_tokens ??
+    raw.output_tokens_details?.reasoning_tokens ??
+    null;
+  const stop: string | null = parsed?.stop_reason ?? parsed?.choices?.[0]?.finish_reason ?? null;
+  return {
+    code,
+    moduleSource: write ? "tool_call" : code ? "fenced_text" : null,
+    returnedTools: calls.map((call) => ({ name: call.name, path: call.input.path })),
+    usage: {
+      input_tokens: input,
+      cache_read_input_tokens: cached,
+      cache_creation_input_tokens: cacheWrite,
+      output_tokens: output,
+      prompt_tokens: input + cached + cacheWrite,
+      completion_tokens: output,
+      reasoning_tokens: reasoning,
+    },
+    providerUsage: raw,
+    stopReason: stop,
+    capHit: output >= 65536 || ["length", "max_tokens"].includes(stop ?? ""),
+    costUsd: ((input + cacheWrite) * 2 + cached * 0.1 + output * 10) / 1e6,
+  };
+}
+async function argonCall(
+  gw: { send(path: string, body: unknown): Promise<{ status: number; body: unknown }> },
+  dir: string,
+  slug: string,
+  subject: string,
+  context: ArgonContext,
+  kind: string,
+): Promise<ArgonResponse> {
+  const roundPath = join(dir, "round.json");
+  const round = json(roundPath);
+  let path: string = round.transport ?? "/v1/messages";
+  const existingPath = join(dir, "runs", slug + ".json");
+  const previous = process.argv.includes("--retry-blocked") && existsSync(existingPath) ? json(existingPath) : null;
+  const partialPath = join(dir, "replies", slug + "-attempts.json");
+  const attempts: ArgonAttempt[] = previous?.attempts
+    ? [...previous.attempts]
+    : process.argv.includes("--retry-blocked") && existsSync(partialPath)
+      ? json(partialPath)
+      : [];
+  const priorRequestNumbers = readdirSync(join(dir, "requests")).flatMap((name) => {
+    const match = name.match(new RegExp("^" + slug + "-(\\d+)\\.json$"));
+    return match ? [Number(match[1])] : [];
+  });
+  const offset = Math.max(attempts.length, ...priorRequestNumbers);
+  for (let attempt = 1; attempt <= 8; attempt++) {
+    if (!(await guardArgon(slug + " " + kind + " request " + attempt))) break;
+    const body = argonRequest(context, path);
+    const sent = Date.now();
+    save(join(dir, "requests", slug + "-" + (offset + attempt) + ".json"), body);
+    const reply = await gw.send(path, body);
+    save(join(dir, "replies", slug + "-" + (offset + attempt) + ".json"), reply);
+    const extracted = argonExtract(reply.body, subject);
+    const retryable =
+      reply.status === 429 ||
+      reply.status >= 500 ||
+      /overload|rate.?limit/i.test(reply.status === 200 ? "" : JSON.stringify(reply.body));
+    const fallback =
+      path === "/v1/messages" &&
+      !retryable &&
+      (reply.status !== 200 || (!extracted.code && !extracted.returnedTools.length));
+    const { code, ...measurements } = extracted;
+    attempts.push({
+      request: offset + attempt,
+      kind,
+      path,
+      status: reply.status,
+      started: new Date(sent).toISOString(),
+      wallMs: Date.now() - sent,
+      timeToFirstByteMs: null,
+      timeToFirstByteNote: "Not observable: gateway stdio returns a buffered non-streaming reply",
+      ...measurements,
+      hasCode: Boolean(code),
+      retry: retryable,
+      transportFallback: fallback,
+      error:
+        reply.status !== 200 ? JSON.stringify(reply.body) : !code ? "Reply contained no complete sample module" : null,
+    });
+    const manifest = json(roundPath);
+    manifest.providerResponses ??= {};
+    manifest.providerResponses[slug] = attempts.map((item) => ({
+      request: item.request,
+      path: item.path,
+      status: item.status,
+      sent:
+        item.path === "/v1/messages"
+          ? { max_tokens: 65536, thinking: { type: "adaptive" }, output_config: { effort: SINGLE_EFFORT } }
+          : { max_tokens: 65536, reasoning_effort: SINGLE_EFFORT, tool_choice: "auto" },
+      usage: item.providerUsage,
+      stopReason: item.stopReason,
+    }));
+    if (reply.status === 200 && code) manifest.transport = path;
+    save(roundPath, manifest);
+    if (reply.status === 200 && code)
+      return { code, moduleSource: extracted.moduleSource, attempts, status: reply.status };
+    if (fallback) {
+      path = "/v1/chat/completions";
+      continue;
+    }
+    if (retryable && attempt < 8) {
+      const delay = Math.min(120000, 10000 * 2 ** (attempt - 1));
+      attempts[attempts.length - 1].backoffMs = delay;
+      save(join(dir, "replies", slug + "-attempts.json"), attempts);
+      await Bun.sleep(delay);
+      continue;
+    }
+    // One fresh no-write redraw, never a continuation with tool results.
+    if (
+      kind === "generation" &&
+      reply.status === 200 &&
+      attempts.filter((item) => item.status === 200 && !item.transportFallback).length < 2
+    )
+      continue;
+    return { code, moduleSource: extracted.moduleSource, attempts, status: reply.status };
+  }
+  return { code: null, moduleSource: null, attempts, status: attempts.at(-1)?.status ?? 0 };
+}
+function saveArgonRun(
+  dir: string,
+  slug: string,
+  subject: { id: string; rich: string },
+  started: number,
+  response: ArgonResponse,
+  from?: string,
+) {
+  const usage: ArgonTokens = {
+    input_tokens: 0,
+    cache_read_input_tokens: 0,
+    cache_creation_input_tokens: 0,
+    output_tokens: 0,
+    prompt_tokens: 0,
+    completion_tokens: 0,
+    reasoning_tokens: null,
+  };
+  for (const attempt of response.attempts) {
+    for (const key of [
+      "input_tokens",
+      "cache_read_input_tokens",
+      "cache_creation_input_tokens",
+      "output_tokens",
+      "prompt_tokens",
+      "completion_tokens",
+    ] as const)
+      usage[key] += attempt.usage[key];
+    if (attempt.usage.reasoning_tokens !== null)
+      usage.reasoning_tokens = (usage.reasoning_tokens ?? 0) + attempt.usage.reasoning_tokens;
+  }
+  const previousPath = join(dir, "runs", slug + ".json");
+  const previous = existsSync(previousPath) ? json(previousPath) : null;
+  const run = {
+    slug,
+    arm: "single",
+    subject: subject.id,
+    level: "rich",
+    pitch: subject.rich,
+    model: MODEL,
+    effort: SINGLE_EFFORT,
+    started: previous?.started ?? new Date(started).toISOString(),
+    wallMs: (previous?.wallMs ?? 0) + Date.now() - started,
+    status: response.status,
+    from,
+    mode: from ? "repair" : "generation",
+    hasCode: Boolean(response.code),
+    moduleBytes: response.code ? Buffer.byteLength(response.code) : 0,
+    moduleSource: response.moduleSource,
+    usage,
+    costUsd: response.attempts.reduce((sum, attempt) => sum + attempt.costUsd, 0),
+    modelCalls: response.attempts.length,
+    generationCalls: from ? 0 : 1,
+    redrawCalls: Math.max(
+      0,
+      response.attempts.filter((a) => a.status === 200 && !a.hasCode && !a.transportFallback).length,
+    ),
+    attempts: response.attempts,
+    retries: response.attempts.filter((a) => a.retry),
+    capHit: response.attempts.some((a) => a.capHit),
+    stopReason: response.attempts.at(-1)?.stopReason ?? null,
+    finishReason: response.attempts.at(-1)?.stopReason ?? null,
+    error: response.code ? null : (response.attempts.at(-1)?.error ?? "Stopped by usage guard"),
+  };
+  save(join(dir, "runs", slug + ".json"), run);
+  if (response.code) {
+    const file = join(dir, "builds", slug + ".ts");
+    text(file, wireArchived(response.code, file));
+  }
+  console.log(
+    slug,
+    run.hasCode ? run.moduleBytes + " bytes" : run.error,
+    run.modelCalls + " requests",
+    "$" + run.costUsd.toFixed(4),
+  );
+}
+function initArgonRound(round: string, from?: string) {
+  const dir = join(BASE, "rounds", round);
+  for (const name of ["builds", "checks", "replies", "requests", "runs"])
+    mkdirSync(join(dir, name), { recursive: true });
+  const previous = existsSync(join(dir, "round.json")) ? json(join(dir, "round.json")) : {};
+  const manifest = json(join(INPUT, "manifest.json"));
+  save(join(dir, "round.json"), {
+    ...previous,
+    id: round,
+    started: previous.started ?? new Date().toISOString(),
+    model: MODEL,
+    effort: SINGLE_EFFORT,
+    maxTokens: 65536,
+    workers: SINGLE_WORKERS,
+    subjects: manifest.subjects,
+    source: manifest.source,
+    refineFrom: from ?? null,
+    arms: [{ ...craft, id: "single", name: "Gemini 4 Argon · " + SINGLE_EFFORT + " · single-run" }],
+    requestPolicy:
+      "Frozen r19single context; signed Anthropic thinking removed; messages first, chat-completions fallback on rejection or malformed tool reply; automatic write or fenced module extraction",
+    requestedControls: {
+      messages: { thinking: { type: "adaptive" }, output_config: { effort: SINGLE_EFFORT }, max_tokens: 65536 },
+      chatCompletions: { reasoning_effort: SINGLE_EFFORT, max_tokens: 65536 },
+    },
+    reasoningEvidence:
+      "providerResponses preserves exact reported usage; null reasoning tokens mean not reported, not zero",
+    effortEvidence:
+      "omp models lists low, medium, high for this selector; gateway anthropic-messages-server maps output_config.effort to options.reasoning; openai-chat-server maps reasoning_effort likewise. Provider reply does not echo its effective effort.",
+    providerEchoedEffort: null,
+    reasoningReportLimitation:
+      "The gateway messages adapter encodeUsage exposes input/output/cache counts but omits internal reasoningTokens. Reasoning counts are unavailable through this successful transport; estimated non-code residual is recorded separately.",
+    pricingUsdPerMillion: { input: 2, output: 10, cacheRead: 0.1 },
+  });
+  return dir;
+}
+async function runArgon() {
+  const dir = initArgonRound(SINGLE_ROUND);
+  const gw = gateway();
+  try {
+    const queue = allPitches.filter((subject) => {
+      const path = join(
+        dir,
+        "runs",
+        SINGLE_ROUND + subject.id[0].toUpperCase() + subject.id.slice(1) + "RichSingle.json",
+      );
+      return !existsSync(path) || (process.argv.includes("--retry-blocked") && !json(path).hasCode);
+    });
+    await Promise.all(
+      Array.from({ length: SINGLE_WORKERS }, async () => {
+        while (queue.length && !argonUsage.stopped) {
+          const subject = queue.shift();
+          if (!subject) continue;
+          const slug = SINGLE_ROUND + subject.id[0].toUpperCase() + subject.id.slice(1) + "RichSingle";
+          const started = Date.now();
+          const response = await argonCall(
+            gw,
+            dir,
+            slug,
+            subject.id,
+            json(join(INPUT, subject.id + ".json")).context,
+            "generation",
+          );
+          saveArgonRun(dir, slug, subject, started, response);
+        }
+      }),
+    );
+  } finally {
+    gw.close();
+  }
+  results(SINGLE_ROUND);
+  if (!process.argv.includes("--generation-only") && !argonUsage.stopped) await checkArgon();
+}
+async function checkArgon() {
+  await cmd(["check", SINGLE_ROUND, "--skip-typecheck", "--concurrency", "2"]);
+  for (let turn = 1; turn <= 2 && !argonUsage.stopped; turn++) {
+    const latest = new Map();
+    for (const round of turn === 1 ? [SINGLE_ROUND] : [SINGLE_ROUND + "fix", SINGLE_ROUND]) {
+      const path = join(BASE, "rounds", round, "results.json");
+      for (const entry of existsSync(path) ? json(path) : [])
+        if (!latest.has(entry.subject) || (!latest.get(entry.subject).entry.hasCode && entry.hasCode))
+          latest.set(entry.subject, { round, entry });
+    }
+    const failures = [...latest.values()].filter(({ entry }) => !entry.hasCode || entry.check?.rendered === false);
+    if (!failures.length) break;
+    const next = SINGLE_ROUND + (turn === 1 ? "fix" : "fix2");
+    const dir = initArgonRound(next, SINGLE_ROUND);
+    const gw = gateway();
+    try {
+      for (const { round, entry } of failures) {
+        const slug = next + entry.slug.slice(round.length);
+        const runPath = join(dir, "runs", slug + ".json");
+        if (existsSync(runPath) && (!process.argv.includes("--retry-blocked") || json(runPath).hasCode)) continue;
+        const input = json(join(INPUT, entry.subject + ".json"));
+        let file = join(BASE, "rounds", round, "builds", entry.slug + ".ts");
+        if (!existsSync(file) && entry.from) {
+          const previous = [SINGLE_ROUND + "fix", SINGLE_ROUND].find((source) =>
+            existsSync(join(BASE, "rounds", source, "builds", entry.from + ".ts")),
+          );
+          if (previous) file = join(BASE, "rounds", previous, "builds", entry.from + ".ts");
+        }
+        input.context.messages.at(-1).content[0].text +=
+          "\nRepair only this module's render crash, preserving the design. Return the entire corrected module in one write.\nError:\n" +
+          (entry.check?.renderError ?? entry.error ?? "No complete module returned") +
+          (existsSync(file) ? "\nCurrent module:\n```ts\n" + readFileSync(file, "utf8") + "\n```" : "");
+        const started = Date.now();
+        const response = await argonCall(gw, dir, slug, entry.subject, input.context, "repair");
+        saveArgonRun(dir, slug, { id: entry.subject, rich: entry.pitch }, started, response, entry.slug);
+      }
+    } finally {
+      gw.close();
+    }
+    results(next);
+    await cmd(["check", next, "--skip-typecheck", "--concurrency", "2"]);
+  }
+}
+async function reportArgon() {
+  await capture(join(homedir(), ".local/bin/omp"), ["usage", "invalidate", "-p", "google-antigravity"], 60000);
+  await guardArgon(SINGLE_ROUND + " after");
+  const script = String.raw`
+import json, statistics, sys
+from pathlib import Path
+import tiktoken
+base = Path("bakeoff")
+enc = tiktoken.get_encoding("o200k_base")
+def load(path, fallback=None):
+    return json.loads(path.read_text()) if path.exists() else fallback
+def dist(values):
+    values = [v for v in values if v is not None]
+    return {"median": statistics.median(values), "range": [min(values), max(values)]} if values else None
+def summarize(round_name):
+    manifest = load(base / (round_name + "-inputs") / "manifest.json", {})
+    subjects = [s["id"] for s in manifest.get("subjects", [])]
+    blocker = load(base / (round_name + "-inputs") / "stopped.json")
+    by_subject = {s: [] for s in subjects}
+    for suffix in ("", "fix", "fix2"):
+        source = round_name + suffix
+        root = base / "rounds" / source
+        saved = [(path, load(path)) for path in sorted((root / "runs").glob("*.json"))]
+        known = {run["slug"] for _, run in saved}
+        for ledger in sorted((root / "replies").glob("*-attempts.json")):
+            slug = ledger.name.removesuffix("-attempts.json")
+            if slug in known:
+                continue
+            attempts = load(ledger, [])
+            subject = next((s for s in subjects if slug == source + s[0].upper() + s[1:] + "RichSingle"), None)
+            if not attempts or subject is None:
+                continue
+            saved.append((root / "runs" / (slug + ".json"), {"slug": slug, "subject": subject,
+                "hasCode": False, "status": attempts[-1]["status"], "attempts": attempts,
+                "modelCalls": len(attempts), "interrupted": True, "error": attempts[-1].get("error"),
+                "wallMs": sum(a["wallMs"] + a.get("backoffMs", 0) for a in attempts),
+                "usage": {key: sum(a.get("usage", {}).get(key, 0) or 0 for a in attempts) for key in
+                    ("input_tokens", "cache_read_input_tokens", "cache_creation_input_tokens", "output_tokens")},
+                "costUsd": sum(a.get("costUsd", 0) for a in attempts)}))
+        for path, run in saved:
+            subject = run["subject"]
+            build = path.parent.parent / "builds" / (run["slug"] + ".ts")
+            check = load(path.parent.parent / "checks" / (run["slug"] + ".json"), {})
+            usage = run.get("usage", {})
+            output = usage.get("output_tokens", usage.get("completion_tokens"))
+            code_tokens = len(enc.encode(build.read_text())) if build.exists() else None
+            reported_reasoning = usage.get("reasoning_tokens")
+            raw_input = usage.get("input_tokens", 0) + usage.get("cache_creation_input_tokens", 0)
+            cached = usage.get("cache_read_input_tokens", 0)
+            attempts = run.get("attempts", [])
+            item = {"round": source, "slug": run["slug"], "subject": subject, "repair": bool(suffix),
+                "wall_seconds": run.get("wallMs", 0) / 1000,
+                "request_wall_seconds": [a["wallMs"] / 1000 for a in attempts],
+                "time_to_first_byte_ms": None, "time_to_first_byte_note": "Not observable in buffered gateway replies",
+                "input_tokens": raw_input, "cached_input_tokens": cached, "output_tokens": output,
+                "reasoning_tokens": reported_reasoning,
+                "reasoning_share": reported_reasoning / output if reported_reasoning is not None and output else None,
+                "estimated_code_tokens": code_tokens,
+                "estimated_non_code_share": 1 - code_tokens / output if code_tokens is not None and output else None,
+                "estimated_cost_usd": run.get("costUsd"),
+                "list_price_cost_usd": (raw_input * 2 + cached * .1 + (output or 0) * 10) / 1e6,
+                "module_bytes": build.stat().st_size if build.exists() else 0,
+                "parts": (check.get("report") or {}).get("parts"),
+                "triangles": (check.get("report") or {}).get("triangles"),
+                "textures": (check.get("report") or {}).get("textures"),
+                "has_code": run.get("hasCode", build.exists()), "status": run.get("status"),
+                "rendered": check.get("rendered", False if not run.get("hasCode") else None), "render_error": check.get("renderError") or run.get("error"),
+                "stop_reason": run.get("stopReason", run.get("finishReason")),
+                "cap_hit": run.get("capHit", (output or 0) >= (120000 if round_name == "r19single" else 65536)),
+                "retries": run.get("retries", [a for a in attempts if a.get("status", 200) == 429 or a.get("status", 200) >= 500]),
+                "retry_requests": [a for index, a in enumerate(attempts) if index > 0 and
+                    (attempts[index-1].get("status", 200) == 429 or attempts[index-1].get("status", 200) >= 500)],
+                "api_error_replies": [a for a in attempts if a.get("status", 200) != 200],
+                "module_source": run.get("moduleSource", "tool_call" if run.get("hasCode") else None),
+                "requests": run.get("modelCalls", 1), "attempts": attempts}
+            by_subject.setdefault(subject, []).append(item)
+    builds = []
+    for subject, chain in by_subject.items():
+        initial = chain[0] if chain else None
+        final = next((x for x in reversed(chain) if x["has_code"]), chain[-1] if chain else None)
+        builds.append({"subject": subject, "attempted": bool(chain),
+            "initial": initial, "repairs": chain[1:], "final": final,
+            "initial_crash": (initial["rendered"] is False) if initial and initial["has_code"] else None,
+            "initial_crash_error": initial["render_error"] if initial and initial["has_code"] and initial["rendered"] is False else None,
+            "repair_count": sum(any(a.get("status") == 200 for a in x["attempts"]) for x in chain[1:]),
+            "repair_stages_attempted": max(0, len(chain)-1), "final_rendered": final["rendered"] if final else None,
+            "blocked_by_quota": bool(final and final["rendered"] is not True and
+                ((blocker or {}).get("reason") == "blocked: quota" or (chain and chain[-1]["status"] == 429))),
+            "outcome": "rendered" if final and final["rendered"] is True else "blocked: quota" if blocker else "not rendered",
+            "pipeline_cost_usd": sum(x["estimated_cost_usd"] or 0 for x in chain),
+            "pipeline_wall_seconds": sum(x["wall_seconds"] for x in chain)})
+    initial = [b["initial"] for b in builds if b["initial"]]
+    final = [b["final"] for b in builds if b["final"]]
+    all_calls = [x for chain in by_subject.values() for x in chain]
+    metrics = ["wall_seconds", "input_tokens", "cached_input_tokens", "output_tokens", "reasoning_tokens", "reasoning_share",
+        "estimated_code_tokens", "estimated_non_code_share", "estimated_cost_usd", "list_price_cost_usd", "module_bytes", "parts", "triangles", "textures"]
+    summary = {key: dist([x[key] for x in initial]) for key in metrics}
+    summary.update({"request_wall_seconds": dist([v for x in all_calls for v in x["request_wall_seconds"]]),
+        "successful_request_wall_seconds": dist([a["wallMs"] / 1000 for x in all_calls for a in x["attempts"] if a.get("status") == 200]),
+        "api_error_request_wall_seconds": dist([a["wallMs"] / 1000 for x in all_calls for a in x["attempts"] if a.get("status", 200) != 200]),
+        "final_module_bytes": dist([x["module_bytes"] for x in final]),
+        "final_parts": dist([x["parts"] for x in final]), "final_triangles": dist([x["triangles"] for x in final]),
+        "final_textures": dist([x["textures"] for x in final]),
+        "pipeline_cost_usd": dist([b["pipeline_cost_usd"] for b in builds if b["attempted"]]),
+        "pipeline_wall_seconds": dist([b["pipeline_wall_seconds"] for b in builds if b["attempted"]]),
+        "attempted": len(initial), "subjects": len(builds), "rendered": sum(b["final_rendered"] is True for b in builds),
+        "generated_modules": sum(x["has_code"] for x in initial),
+        "initial_crashes": [b["subject"] for b in builds if b["initial_crash"]],
+        "repairs": sum(b["repair_count"] for b in builds),
+        "repair_subjects": [b["subject"] for b in builds if b["repair_count"]],
+        "repair_stages_attempted": sum(b["repair_stages_attempted"] for b in builds),
+        "blocked_by_quota": [b["subject"] for b in builds if b["blocked_by_quota"]],
+        "failed": [b["subject"] for b in builds if b["final_rendered"] is False],
+        "unchecked": [b["subject"] for b in builds if b["final_rendered"] is None],
+        "cap_hits": [x["slug"] for x in all_calls if x["cap_hit"]],
+        "retries": [{"slug": x["slug"], "request": a.get("request"), "status": a["status"]} for x in all_calls for a in x["retry_requests"]],
+        "api_error_reply_count": sum(len(x["api_error_replies"]) for x in all_calls),
+        "api_error_status_counts": {str(status): sum(a["status"] == status for x in all_calls for a in x["api_error_replies"])
+            for status in sorted({a["status"] for x in all_calls for a in x["api_error_replies"]})},
+        "module_sources": {source: sum(x["module_source"] == source for x in all_calls) for source in ("tool_call", "fenced_text")},
+        "total_cost_usd": sum(x["estimated_cost_usd"] or 0 for x in all_calls),
+        "total_list_price_cost_usd": sum(x["list_price_cost_usd"] for x in all_calls),
+        "requests": sum(x["requests"] for x in all_calls)})
+    usage = [load(path) for path in sorted((base / (round_name + "-inputs")).glob("usage-*.json"))]
+    return {"round": round_name, "summary": summary, "builds": builds,
+        "usage_before": usage[0] if usage else None, "usage_after": usage[-1] if usage else None,
+        "blocker": blocker,
+        "usage_note": "Zero normalized usage on API errors means the gateway supplied no usage, not proof that upstream compute was free; every raw reply and request is retained.",
+        "token_estimator": "tiktoken 0.14.0 o200k_base on import-wired generated modules, same as r20",
+        "reasoning_note": "reasoning_tokens/share are provider-reported only; null means unavailable. Gateway /v1/messages encodeUsage omits internal reasoningTokens. Estimated non-code share includes tokenizer mismatch, prose and tool JSON overhead and is not exact reasoning.",
+        "cost_note": "List-price estimate input $2/M, cache-read $0.10/M, output $10/M. Historical Sonnet estimated_cost_usd retains original recorded cache-write price; list_price_cost_usd reprices at requested common rates.",
+        "packaging": load(base / "rounds" / round_name / "round.json", {})}
+baseline = summarize("r19single")
+for round_name in sys.argv[1:]:
+    report = summarize(round_name)
+    report["comparison"] = {"r19single": baseline["summary"]}
+    (base / (round_name + "-inputs") / "report.json").write_text(json.dumps(report, indent=2) + "\n")
+    print(json.dumps({"round": round_name, **report["summary"]}))
+print(json.dumps({"round": "r19single", **baseline["summary"]}))
+comparison = [load(base / (name + "-inputs") / "report.json", {}).get("summary", {}) for name in ("r23argonhigh", "r23argonlow")] + [baseline["summary"]]
+print("| Metric (median [min, max]) | Argon high | Argon low | Sonnet high r19single |")
+print("|---|---:|---:|---:|")
+for key in ("wall_seconds", "successful_request_wall_seconds", "request_wall_seconds", "input_tokens", "cached_input_tokens", "output_tokens", "reasoning_tokens", "reasoning_share", "estimated_code_tokens", "estimated_non_code_share", "estimated_cost_usd", "module_bytes", "final_module_bytes", "final_parts", "final_triangles", "final_textures", "pipeline_cost_usd", "pipeline_wall_seconds"):
+    cells = []
+    for summary in comparison:
+        value = summary.get(key)
+        cells.append("not reported" if value is None else f'{value["median"]:,.3f} [{value["range"][0]:,.3f}, {value["range"][1]:,.3f}]')
+    print("| " + key + " | " + " | ".join(cells) + " |")
+for key in ("attempted", "rendered", "initial_crashes", "repairs", "cap_hits", "retries", "module_sources", "total_cost_usd", "requests"):
+    print("| " + key + " | " + " | ".join(str(summary.get(key)) for summary in comparison) + " |")
+`;
+  const report = await capture(
+    "uv",
+    ["run", "--with", "tiktoken==0.14.0", "python", "-c", script, SINGLE_ROUND],
+    600000,
+  );
+  if (report.status !== 0) throw Error(report.stderr || report.stdout);
+  console.log(report.stdout);
+}
+
 const args = process.argv.slice(2);
 if (SINGLE) {
   if (!existsSync(join(INPUT, "manifest.json")) || args.includes("--prepare-only")) await prepareSingle();
-  if (args.includes("--check-only")) await checkedAndRepaired(SINGLE_ROUND);
+  if (ARGON) {
+    if (args.includes("--check-only")) await checkArgon();
+    else if (!args.includes("--prepare-only") && !args.includes("--report-only")) await runArgon();
+    if (!args.includes("--prepare-only")) await reportArgon();
+  } else if (args.includes("--check-only")) await checkedAndRepaired(SINGLE_ROUND);
   else if (!args.includes("--prepare-only")) await runSingle();
 } else if (APP) {
   if (!existsSync(join(INPUT, "manifest.json")) || args.includes("--prepare-only")) await prepareApp();
