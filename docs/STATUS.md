@@ -2,6 +2,10 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Gap3 publication, 2026-10-16
+
+The production build hook now runs both `bakeoff/gap2_page.py` and `bakeoff/gap3_page.py` with `--publish`, shipping their referenced WebP renders. Gap3 was previously generated only for local viewing and absent from the Netlify build. A full `npm run showcase:build` succeeded; the built Gap3 contains 25 briefs, seven columns and 175 model images, with all 1,225 referenced render assets present.
+
 ## `pack()`: one mesh and atlas for apps, 2026-10-15
 
 The harness's bake (`harness/assemble.ts`, `harness/atlas.ts`) moved to `src/pack.ts` and `src/atlas.ts` unchanged, and `pack(root)` returns its result as an app object: a SkinnedMesh on fresh bones named after the joints (a Mesh without joints), one atlas material plus a glowing copy per emissive strength, the warnings and `dispose()`. It is the object the GLB is exported from; live `default()` output is plain meshes whose smooth bodies deform only under `b.pose()`, so an app that animates bones needs it. The harness, preview and the showcase's GLB downloads call the same code; seven samples' GLBs (binary chunks) and atlases are byte-identical before and after. Packed and live renders of five samples look the same; the crane beacon on cargoDockCratesSonnet glows packed (as in snaps) and not in that plain live render.
