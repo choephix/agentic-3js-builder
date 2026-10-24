@@ -2,6 +2,15 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## r24: gallery single-runs and four small tests, 2026-10-24
+
+`bakeoff/pitches-r24.json` holds 268 new Category/Subject/Style briefs (familiar game styles and new ones: origami, amigurumi, stained glass, Fabergé, Bauhaus, Memphis, cyanotype, Delftware and more), plus a `vivid` paragraph level for 10 subjects and a `wild` level for 20, where the model picks an unexpected style. Every build is a single run of the `craft3` arm (`arms-r12.json`), high effort, 120k cap, through `npm run bakeoff -- run`; rounds `r24` (Sonnet 5.5), `r24opus` (Opus 5.5), `r24d2`/`r24d3` (repeat draws), `r24max` (Sonnet at max effort). 154 replies, $127.75 at list prices; generation stopped on the account's 5-hour limit with 204 briefs never asked. Of the 143 modules, 133 render; no repair calls ran for the 10 that crash.
+
+- **Max effort fails:** all 10 `r24max` replies spent the full 128k output on thinking and returned no code (16–17 min each).
+- **Opus vs Sonnet**, 10 shared briefs: Opus tidier on the snow leopard, ramen stall and tin robot, Sonnet's mimic chest livelier, zeppelins level; Opus about twice the cost.
+- **Vivid paragraph vs three-line brief**, 10 subjects: the paragraph changes the staging (the mimic gets spider legs and a gold spill) more than the craft; no consistent winner, and the baku's "inhaling a nightmare" became a floating squid.
+- **Model picks the style**, 20 subjects: 7 of 20 chose Delftware and 2 cloisonné, so "your choice" collapses onto a few favourites; the rest (marbled endpaper, Khokhloma, risograph shadowbox, seed-packet lithograph, neon ukiyo-e) are varied and render well.
+
 ## Gap3 publication, 2026-10-16
 
 The production build hook now runs both `bakeoff/gap2_page.py` and `bakeoff/gap3_page.py` with `--publish`, shipping their referenced WebP renders. Gap3 was previously generated only for local viewing and absent from the Netlify build. A full `npm run showcase:build` succeeded; the built Gap3 contains 25 briefs, seven columns and 175 model images, with all 1,225 referenced render assets present.
