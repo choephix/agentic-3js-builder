@@ -7,9 +7,10 @@ Where the work stands. The API is in `docs/api.md`, the reasons behind it in `do
 `bakeoff/pitches-r24.json` holds 268 new Category/Subject/Style briefs (familiar game styles and new ones: origami, amigurumi, stained glass, Fabergé, Bauhaus, Memphis, cyanotype, Delftware and more), plus a `vivid` paragraph level for 10 subjects and a `wild` level for 20, where the model picks an unexpected style. Every build is a single run of the `craft3` arm (`arms-r12.json`), high effort, 120k cap, through `npm run bakeoff -- run`; rounds `r24` (Sonnet 5.5), `r24opus` (Opus 5.5), `r24d2`/`r24d3` (repeat draws), `r24max` (Sonnet at max effort). 154 replies, $127.75 at list prices; generation stopped on the account's 5-hour limit with 204 briefs never asked. Of the 143 modules, 133 render; no repair calls ran for the 10 that crash.
 
 - **Max effort fails:** all 10 `r24max` replies spent the full 128k output on thinking and returned no code (16–17 min each).
-- **Opus vs Sonnet**, 10 shared briefs: Opus tidier on the snow leopard, ramen stall and tin robot, Sonnet's mimic chest livelier, zeppelins level; Opus about twice the cost.
-- **Vivid paragraph vs three-line brief**, 10 subjects: the paragraph changes the staging (the mimic gets spider legs and a gold spill) more than the craft; no consistent winner, and the baku's "inhaling a nightmare" became a floating squid.
-- **Model picks the style**, 20 subjects: 7 of 20 chose Delftware and 2 cloisonné, so "your choice" collapses onto a few favourites; the rest (marbled endpaper, Khokhloma, risograph shadowbox, seed-packet lithograph, neon ukiyo-e) are varied and render well.
+- **Opus vs Sonnet**, 10 shared briefs: Opus 13.4 min and $2.02 a build against Sonnet's 8.1 min and $0.69; 9/10 Opus modules render. Stefan's only verdict: one Opus part (a snowflake) is wildly goofier than anything he has seen.
+- **Vivid paragraph vs three-line brief**, 10 subjects: the paragraph changes what is in the scene (the mimic gets spider legs and a gold spill; the baku's "inhaling a nightmare" became a floating squid). Unjudged otherwise.
+- **Model picks the style**, 20 subjects: 7 of 20 chose Delftware and 2 cloisonné, so "your choice" collapses onto a few favourites; the rest (marbled endpaper, Khokhloma, risograph shadowbox, seed-packet lithograph, neon ukiyo-e) are varied.
+- Agent and model-judge impressions of renders are not quality evidence; Stefan's verdict pages are. The time budget of a build (86% thinking at high effort), the goal of a one-minute build with an earlier first pixel, and the rated experiment queue are in `docs/SPEED.md`.
 
 ## Gap3 publication, 2026-10-16
 

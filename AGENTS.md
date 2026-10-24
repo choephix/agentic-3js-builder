@@ -9,6 +9,7 @@ TypeScript SDK that lets fast, cheap language models write primitive-built, skel
 - Style kits → `kits/<name>.ts` with `kits/<name>.md`. Kits sit on top of `src/`; `src/` stays style-neutral and never imports a kit. A new kit gets its own doc and a mention in `GUIDE.md` and `docs/api.md`.
 - Building or briefing a sample → `GUIDE.md`, the brief handed to a builder agent with one subject.
 - Prompt bake-offs (one system prompt + one pitch → one module, as an app runs it) → `bakeoff/README.md`; results on the showcase's `/bakeoff` page, the whole story on `/lab`.
+- "Let's burn some tokens", build time, time to first pixel, or the next experiments → `docs/SPEED.md`: the goal, where a build's minutes go, the zero-token prep and the rated experiment queue. Render quality is Stefan's call from the verdict pages; model judges and your own impressions are not evidence.
 - Adding, removing or reshaping a helper → `docs/DESIGN.md`: why each helper exists, with the evidence from 100 builds.
 
 ## Conventions
