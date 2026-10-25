@@ -1,0 +1,530 @@
+{
+  "slug": "r32pard2Truck2077RichPar",
+  "arm": "par",
+  "subject": "truck2077",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: futuristic militarized truck from 2077.\nStyle: low-poly cyberpunk, extremely intricate.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T10:04:18.848Z",
+  "wallMs": 146265,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 533078,
+    "completion_tokens": 44192,
+    "total_tokens": 577270,
+    "prompt_tokens_details": {
+      "cached_tokens": 504504
+    }
+  },
+  "costUsd": 0.5495184,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 29979,
+    "slowestPartMs": 116286,
+    "critical": "cab",
+    "elapsedMs": 146265,
+    "spec": {
+      "name": "Warhound MX-77",
+      "description": "A low-poly cyberpunk armored 6x6 military truck from 2077 with a slanted armored cab, neon-lit chassis, six chunky wheels, a roof-mounted railgun turret and a modular cargo bed with missile pods and antennas.",
+      "builderName": "warhoundTruck2077",
+      "size": [
+        2.9,
+        3.1,
+        8.2
+      ],
+      "layout": "Long, low, wedge-shaped 6x6 armored truck facing +Z. Front: sloped angular armor nose with a glowing cyan light bar and a winch bumper. Behind it a tall faceted armored cab with a narrow slit windshield (glowing amber), side armor skirts and roof sensor mast. Behind the cab is a long flat cargo deck on a heavy ladder chassis carrying a rear box module with a roof missile rack and a rotating railgun turret on a ring above the cab-rear. Three axles: front at z=2.6, mid at z=-1.2, rear at z=-2.9. Chunky wheels (radius 0.62) with hexagonal hub plates and magenta neon rims sit in wheel arches; wheels touch the floor, the rest of the hull floats at 0.45 m ground clearance. Style: hard facets, hazard-yellow trim stripes, cyan and magenta neon strips along skirts, decals, vents, antennas, panel seams and rivets via the panelled paint; SVG decals for unit emblem, serial number, warning labels and HUD-like screens.",
+      "palette": {
+        "hull": "#3a4150",
+        "hullDark": "#20242e",
+        "armorLight": "#5b6676",
+        "trim": "#e7b814",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fb4",
+        "amber": "#ffab1f",
+        "glass": "#0e2a3a",
+        "rubber": "#15161b",
+        "rim": "#8a93a3",
+        "metalDark": "#2b2f38",
+        "red": "#d6262e",
+        "olive": "#4d5a3a",
+        "white": "#e9edf2"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.25,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.25,
+          2.1
+        ],
+        "cabRoof": [
+          0,
+          2.55,
+          1.6
+        ],
+        "cargoDeck": [
+          0,
+          1.35,
+          -2
+        ],
+        "cargoBoxFront": [
+          0,
+          1.35,
+          -0.6
+        ],
+        "turretRing": [
+          0,
+          2.55,
+          -0.2
+        ],
+        "axleFront": [
+          0,
+          0.62,
+          2.6
+        ],
+        "axleMid": [
+          0,
+          0.62,
+          -1.2
+        ],
+        "axleRear": [
+          0,
+          0.62,
+          -2.9
+        ],
+        "bumperFront": [
+          0,
+          0.8,
+          4
+        ],
+        "rearBumper": [
+          0,
+          0.8,
+          -4
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "cab",
+          "parent": "body",
+          "at": [
+            0,
+            1.25,
+            2.1
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "cab"
+        },
+        {
+          "name": "turretYaw",
+          "parent": "body",
+          "at": [
+            0,
+            2.55,
+            -0.2
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "gunPitch",
+          "parent": "turretYaw",
+          "at": [
+            0,
+            3,
+            -0.2
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.25,
+            0.62,
+            2.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.25,
+            0.62,
+            2.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.25,
+            0.62,
+            -1.2
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.25,
+            0.62,
+            -1.2
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.25,
+            0.62,
+            -2.9
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.25,
+            0.62,
+            -2.9
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "rampHinge",
+          "parent": "body",
+          "at": [
+            0,
+            1.45,
+            -4
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "cargo"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "The ladder frame and underbody between y=0.45 and 1.35 spanning the whole length: two heavy side rails, cross members, differential housings and driveshafts at each axle, fuel tanks and battery boxes on the sides, side skirts with cyan neon strips, hazard-yellow trim stripes, and wheel arch fenders (open to the wheels) with panelled iron paint. Includes the front armored bumper with winch drum, tow hooks, cyan light bar and amber fog lights, the sloped armored nose/hood in front of the cab (to z=4.1), the rear bumper with red tail lights and a hitch, mud flaps, exhaust stacks with glowing orange tips behind the cab, and underbody details (pipes, cables, vents). Painted metal with the clockwork-style panelled and metal paints for scuffs and verdigris-free soot near exhausts.",
+          "box": [
+            [
+              -1.45,
+              0.45,
+              -4.1
+            ],
+            [
+              1.45,
+              1.4,
+              4.1
+            ]
+          ],
+          "attaches": "Rides joint body. Top surface at chassisTop meets the cab at cabFloor and the cargo module at cargoDeck. Axle lines axleFront, axleMid and axleRear pass through its arches where the wheels attach. Front bumper at bumperFront, rear bumper at rearBumper.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 200
+        },
+        {
+          "id": "cab",
+          "builds": "The armored crew cab from y=1.25 to 2.55, z from 1.0 to 3.4: a faceted wedge of sloped armor plates with a narrow glowing amber slit windshield and side slit windows (glass colour with amber glow), spaced armor add-on plates with bolts, hinged doors with handles and tiny unit emblem decals, side mirrors with camera pods, roof sensor mast with a spinning radar dish, antennas, a roof light bar, a HUD-screen decal visible through the windshield, vents and grille intakes with cyan glow, hazard stripes, serial number SVG text on the doors, and a roof hatch ring.",
+          "box": [
+            [
+              -1.35,
+              1.25,
+              1
+            ],
+            [
+              1.35,
+              2.7,
+              3.5
+            ]
+          ],
+          "attaches": "Sits on chassis at cabFloor (y=1.25), rides joint cab (child of body). Its roof at cabRoof carries sensors; rear wall abuts cargo module near z=1.0.",
+          "joints": [
+            "cab",
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "wheels",
+          "builds": "Six chunky off-road wheels (radius 0.62, width 0.5) at axleFront, axleMid and axleRear on x=±1.25: low-poly octagon-faceted rubber tires with painted tread blocks, deep sidewalls, hexagonal armored hub plates in rim colour, magenta neon ring inserts, lug nuts, central caps with an emblem decal, brake discs and calipers visible through hubs, and short half-shaft stubs reaching in toward the chassis. Each wheel is its own joint group (wheelFL, wheelFR, wheelML, wheelMR, wheelRL, wheelRR), spun about its X axle. Front wheels have steering knuckle rods and tie rods; rear tandem has leaf-spring packs and shock absorbers with glowing yellow springs up to the chassis.",
+          "box": [
+            [
+              -1.55,
+              0,
+              -3.55
+            ],
+            [
+              1.55,
+              1.25,
+              3.25
+            ]
+          ],
+          "attaches": "Each wheel centre at axle mounts with x=±1.25; wheel joints are children of body. Shocks and springs end at chassis rail underside y≈0.9.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelRL",
+            "wheelRR",
+            "body"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "turret",
+          "builds": "The roof-mounted railgun turret centred on turretRing (0,2.55,-0.2): a slewing ring with teeth and ring lights, a faceted armored turret body (y 2.55 to 3.4) with sloped plates, hazard trim, a glowing cyan targeting sensor eye with SVG reticle decal, ammo drum and feed belt, a gunner shield, side missile launchers, and a long twin-rail railgun barrel pointing +Z mounted on gunPitch with glowing cyan capacitor coils (coil-style sweeps), muzzle brake, heat vents glowing orange and a coaxial antenna cluster at the back. Includes a small warning-label decal and unit number.",
+          "box": [
+            [
+              -0.85,
+              2.55,
+              -1.2
+            ],
+            [
+              0.85,
+              3.1,
+              2.2
+            ]
+          ],
+          "attaches": "Base ring sits on cargo module/cab junction roof at turretRing, rides turretYaw (child of body); barrel and cradle ride gunPitch.",
+          "joints": [
+            "turretYaw",
+            "gunPitch"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "cargo",
+          "builds": "The rear cargo module from z=-4.0 to z=1.0, y=1.35 to 2.55: a boxy armored container with panelled paint, rivets and weld seams, side access hatches with handles, a rear drop ramp (joint rampHinge) with hazard stripes and hydraulic pistons, a roof deck with a retractable missile rack (six cylindrical pods with red caps), side-mounted drone launcher bays with glowing screens, stowage racks with jerry cans and ammo crates, a roof-top antenna array with a satellite dish, glowing magenta neon edge strips, emblem and serial-number SVG decals, cable conduits, warning stripes, and vents with amber glow. Open flat deck section at the front with tie-down rings and a mounted comms console with a screen decal.",
+          "box": [
+            [
+              -1.45,
+              1.35,
+              -4.1
+            ],
+            [
+              1.45,
+              2.9,
+              1
+            ]
+          ],
+          "attaches": "Sits on chassis at cargoDeck (y=1.35); its front wall abuts the cab rear at z=1.0 (cargoBoxFront at z=-0.6 is the box's roof-step); turret base ring is mounted on its roof at turretRing; rear ramp hinges at rampHinge.",
+          "joints": [
+            "body",
+            "rampHinge"
+          ],
+          "floor": false,
+          "budget": 160
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T10:04:18.848Z",
+        "wallMs": 29979,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85249,
+          "completion_tokens": 3926,
+          "total_tokens": 89175,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0499984,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T10:04:48.827Z",
+        "wallMs": 19660,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89617,
+          "completion_tokens": 3394,
+          "total_tokens": 93011,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0534144,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T10:04:48.827Z",
+        "wallMs": 22062,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89590,
+          "completion_tokens": 3743,
+          "total_tokens": 93333,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0568504,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargo",
+        "started": "2026-10-25T10:04:48.827Z",
+        "wallMs": 54040,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89596,
+          "completion_tokens": 8845,
+          "total_tokens": 98441,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.10788239999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turret",
+        "started": "2026-10-25T10:04:48.827Z",
+        "wallMs": 59237,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89520,
+          "completion_tokens": 8833,
+          "total_tokens": 98353,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.1076104,
+        "hasCode": true,
+        "reasoning": "I'm planning the turret function structure, using the provided context type and setting up the yaw and pitch joints with their positions and rotation axes.\n\nStill writing part layout...\n\nAdding glowing coil rings along the barrel...\n\nI'm figuring out placement to avoid collisions between the ammo drum and the side launchers, settling on tube pods with red tips mounted on turret yaw, repositioning the drum to the rear side so it clears the launcher boxes.\n\nNow I'm positioning a sensor eye on the front of the body — a cylindrical housing with a glowing reticle disc facing forward, placed near the top right of the hull.\n\nThen I'm adding amber heat vent slats to both sides of the body and sketching hazard-stripe trim boxes along the edges.\n\nI'm planning the ring base stripes using an angled axis, plus a rear antenna cluster of three rods tipped with glowing red spheres, and a side decal plane with a warning label and unit number \"T-07\".\n\nFor the body panels I'm applying the panelled hull material with amber vents and red tips, keeping colors within the existing palette rather than adding new ones. For the slewing ring teeth, I'm building a merged loop of boxes arranged around the turret yaw radius to simulate gear teeth.\n\nNow I'm adding ring lights as small glowing cyan boxes and setting up a `put` helper for placing geometry onto bones, plus making the eye a glowing reticle plane.\n\nFor the gun assembly, I'm building the cradle with trunnion boxes at the pitch pivot, side rails, a breech block, and the mantlet where the barrel emerges from the body front. I'm also sketching a trapezoid gunner shield plate as an extruded outline near the rear-top of the turret.\n\nI'm adding a hatch cylinder with a lid on top of the body, then setting orientation conventions for cylinders—x-axis aligned for the hatch, z-axis aligned for others—plus a thin hazard-striped trim box along the front lower edge of the body. Writing geometry code...\n\n"
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T10:04:48.827Z",
+        "wallMs": 116286,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89506,
+          "completion_tokens": 15451,
+          "total_tokens": 104957,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.17376239999999998,
+        "hasCode": true,
+        "reasoning": "I'm planning the buildCab function, keeping it compact but correct against the SDK's Ctx API, and sketching the cab's bounding dimensions for the mast and body.\n\nI'm figuring out how to construct the cab body by extruding a side profile shape for the windshield slope and lower wedge, choosing panelled metal paint for the hull, then adding roof slabs and side armor plates to flesh out the geometry.\n\nFor the windshield itself, I'm computing a slanted amber glass plane angled along the windshield's slope vector so it sits flush against the cab's upper taper.\n\nI'm also deciding to render the HUD display directly onto the windshield glass itself as a glowing amber texture rather than a separate hidden plane, plus a darker frame box behind it for structure. Then I'm setting up the side window slits as small amber glowing boxes positioned between the armor plates on each side of the cab.\n\nNow I'm working through the doors: thin panel boxes on each side with their own window slits, handles, and decal planes for the emblem and serial number text, making sure the plane orientation faces outward correctly on both sides. I'm also adding the spaced armor plates along the lower sides with standoff rods and bolts to give that layered armored look ahead of the doors.\n\nMoving to the roof, I'm placing a flat roof slab, a rim ring for a hatch using a torus shape, a cylindrical hatch lid, and a light bar on top, deciding between amber, red, or cyan for the lighting.\n\nI'm also adding a mast rising near the front, capped around y 2.7 so total height with the turret stays around 3.1, plus a small spinning radar dish mounted on a hinge joint, built from a partial sphere oriented to face forward.\n\nI need to rework the dish geometry since its outline was pushing the top past the 2.7 height limit—shrinking the radius to 0.12 to keep it within bounds while adjusting the mast and feed rod positions to match.\n\nNow I'm lowering the roof and cab heights slightly so the mast and dish fit under the 2.7 limit, settling on a mast top of 2.64 and dish radius 0.1. For the antenna whips at the rear corners, I'm using thin rods with tips bent slightly toward y 2.7, capped with small spheres.\n\nMirrors will mount on arms extending from the door front out to around x ±1.55, keeping within bounds, with housing boxes and small glowing cyan camera pods. I'm also adding cyan-glowing grille vents on the cab's lower front face, though I realize the hood extends further forward than the cab there, so I need to account for how the windshield slope and hood placement interact at that boundary.\n\nNow I'm planning intake grilles for the cab's rear sides and roof, plus cheek vents along the windshield slope, all with glowing cyan slats. For hazard markings, I'm thinking through creating a diagonal yellow/black striped texture applied to thin boxes along the cab's lower edges, sizing the texture and geometry so the stripes stretch correctly across the strip.\n\nThen I'm sketching the windshield frame and brow visor as angled slabs, placing the cab hinge joint, and positioning the roof hatch and mast near the rear of the cab roof.\n\nNow I'm defining the roof's cross-section polygon, working out the flat top region and the slope down toward the windshield, plus placing the light bar along the front roof edge.\n\nI'll add cheek armor plates flanking the windshield at x=±1.2, sized to match the slope width and angled to the same normal, then keep doors simple without hinge joints for now.\n\nFor textures, I'm planning an emblem SVG with a circle and chevron dog-head motif in magenta, a serial text decal, a hazard/warning triangle label, plus HUD-style details—five textures total, applied with the glow helper for emissive highlights on flat colors.\n\nWriting rivet geometry...\n\nFor hull paint I'm layering a panelled base material with warm top lighting via a custom paint function reacting to position and normal.\n\nNow I'm working out door emblem placement, positioning the decal plane slightly offset from the door face and figuring out the correct orientation so the text reads properly depending on which side of the vehicle it's on.\n\nNow I'm sketching the door handle dimensions and setting up helper functions for building box parts, then mirroring geometry across both sides and laying out the side door region with its window slit.\n\nI'm working out the seam frame around the door and considering where to place spaced armor plates and standoffs near the lower door area.\n\nNow I'm placing additional armor plates on the front cheek and rear of the cab with standoff cylinders at the corners, then adding merged bolt details per plate before moving into the roof slab geometry.\n\nI'm sizing the roof slab to sit flush on the extruded top, then designing a reusable grille function with a dark frame and glowing cyan slat boxes for the side intakes, merging the slat geometry so the glow only applies once.\n\nNow I'm placing a matching roof grille near the center, then building a light bar housing with alternating magenta and cyan glowing lens segments merged by color, plus a small lens box for the front face, checking that the bar height clears the roof surface. I'm also adding a ring-shaped hatch using a torus geometry positioned toward the rear left of the roof.\n\nNow I'm building out the mast assembly: a base cylinder, a vertical rod, and a radar joint at the top holding a tilted dish shape, defined as a lathed outline with a feed rod extending forward along the dish's tilt axis.\n\nNow I'm adding the whip antennas as tapered rods with red sphere tips, then starting the side mirror arm as a thin rod connecting to a housing box near the top of the vehicle.\n\nNext I'll build the windshield assembly: a dark frame box, a glass plane with a HUD texture for the display, and an angled visor box positioned above the frame.\n\nAdding cheek armor plates on either side of the windshield and skipping the wiper detail for now, while noting the front lower cab face stays hidden behind the slope.\n\nI'm deciding to keep intake grilles only at the rear rather than fighting for space on the front cheeks, since the armor plate already occupies that z-position. I'll place a small unit emblem plane on the upper door panel, positioned above the window line but below the roof edge.\n\nNow I'm placing the remaining door details — serial number text, warning label, and the door handle — fine-tuning their y/z coordinates so they don't overlap the window frame. For the emblem texture, I'm sketching an SVG with a dark circle, cyan stroke, a magenta hound-head silhouette, and the number \"77\".\n\nWriting more SVG textures...\n\nStill placing door details...\n\nRear wall probably stays covered by cargo so I'll skip adding extra panels there, same with extra exhaust or conduit details — not worth the budget. I'm adding the radar joint on the cab with its position and hinge direction, confirming the cab's joint type exists, and setting up the extrude outline conventions for thickness and axis before writing the actual outline points.\n\nI'm mapping outline coordinates to model space, applying a small bevel, and making sure the extrude color respects surface normals for paneling. Now I'm writing a helper that merges multiple box geometries into one mesh by translating each box into model space, which I'll use for the mirrored side slats and similar repeated parts.\n\n"
+      }
+    ]
+  }
+}

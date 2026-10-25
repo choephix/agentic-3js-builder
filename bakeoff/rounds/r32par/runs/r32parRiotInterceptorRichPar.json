@@ -1,0 +1,459 @@
+{
+  "slug": "r32parRiotInterceptorRichPar",
+  "arm": "par",
+  "subject": "riotInterceptor",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: corporate riot-control interceptor with a water cannon and neon light bars.\nStyle: Cyberpunk 2077.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T10:04:18.847Z",
+  "wallMs": 69863,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 527090,
+    "completion_tokens": 27256,
+    "total_tokens": 554346,
+    "prompt_tokens_details": {
+      "cached_tokens": 504504
+    }
+  },
+  "costUsd": 0.3681824,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 26537,
+    "slowestPartMs": 43326,
+    "critical": "wheels",
+    "elapsedMs": 69863,
+    "spec": {
+      "name": "Arasaka-style Riot Interceptor RC-9 'Pacifier'",
+      "description": "A heavy corporate riot-control interceptor truck in Cyberpunk 2077 style: angular armored hull, roof-mounted water cannon, neon light bars, grilles, decals and glowing hologram signage.",
+      "builderName": "riotInterceptor",
+      "size": [
+        2.5,
+        2.6,
+        6
+      ],
+      "layout": "A wedge-shaped armored wheeled truck facing +Z. Low sloped nose with a grille and a bull-bar bumper carrying a cyan neon strip, a raked tinted windshield cab in the middle-front, a flat armored rear bed deck at the back carrying a swivelling water cannon turret on a ring with a tank behind it. Four big chunky wheels (two axles) with armored fenders sit on the floor. Hull is matte gunmetal with corporate white/red stripes and hazard-yellow trim; magenta and cyan neon bars run along sills, the roof light bar and the cannon barrel; amber warning lights. Panels are paint-riveted, with SVG decals (corp logo, kanji-like text, hazard chevrons) and glowing parts for lights and screens. Chunky blocky primitives with bold emissive accents everywhere.",
+      "palette": {
+        "hull": "#2c313b",
+        "hullLight": "#4a5262",
+        "hullDark": "#14171d",
+        "armor": "#1d2128",
+        "corpWhite": "#e8ecf2",
+        "corpRed": "#d1202f",
+        "hazard": "#f2c514",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2bd6",
+        "neonAmber": "#ff9a1f",
+        "glass": "#0a1a26",
+        "tire": "#0d0d10",
+        "rim": "#7b8494",
+        "steel": "#8a93a3",
+        "tankBlue": "#2b6fa8",
+        "ink": "#07080b"
+      },
+      "mounts": {
+        "bodyCenter": [
+          0,
+          1.1,
+          0
+        ],
+        "frontAxle": [
+          0,
+          0.52,
+          1.8
+        ],
+        "rearAxle": [
+          0,
+          0.52,
+          -1.7
+        ],
+        "cabFloor": [
+          0,
+          1.35,
+          0.5
+        ],
+        "roofTop": [
+          0,
+          2,
+          0.4
+        ],
+        "rearDeck": [
+          0,
+          1.45,
+          -1.9
+        ],
+        "turretRing": [
+          0,
+          1.5,
+          -1.5
+        ],
+        "cannonPivot": [
+          0,
+          2.05,
+          -1.5
+        ],
+        "bumperFront": [
+          0,
+          0.75,
+          2.95
+        ],
+        "tankMount": [
+          0,
+          1.45,
+          -2.45
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1.1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.1,
+            0.52,
+            1.8
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.1,
+            0.52,
+            1.8
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.1,
+            0.52,
+            -1.7
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.1,
+            0.52,
+            -1.7
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "turret",
+          "parent": "body",
+          "at": [
+            0,
+            1.5,
+            -1.5
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "cannon",
+          "parent": "turret",
+          "at": [
+            0,
+            2.05,
+            -1.5
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        }
+      ],
+      "parts": [
+        {
+          "id": "hull",
+          "builds": "Lower armored chassis and body: sloped wedge nose (loft), side sills with magenta neon strips, panelled gunmetal paint with rivets, wheel arches/fender flares over the four wheel positions, underbody skid plate, side doors with handles and white/red stripe and hazard chevron decals, rear bed deck plate at rearDeck, rear bumper with red tail light bars (glow), exhaust stacks. Owns everything under y=1.45 except wheels and front bumper.",
+          "box": [
+            [
+              -1.2,
+              0.3,
+              -3
+            ],
+            [
+              1.2,
+              1.5,
+              2.6
+            ]
+          ],
+          "attaches": "Wheels at axle mounts via wheel arches; cab sits on cabFloor; turret ring on turretRing; bumper at bumperFront.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Armored cab on cabFloor: raked tinted windshield and side windows (dark glass with cyan HUD-reflection decals), thick armor roof with ribs, roof light bar with alternating cyan/magenta/amber glowing segments, antennas and sensor pods, roof cameras with red glowing lens, side mirrors, corporate logo decal on roof and door, A-pillars, visor slats over the windshield, small interior hints (seats, glowing dashboard screen).",
+          "box": [
+            [
+              -1.15,
+              1.35,
+              -0.6
+            ],
+            [
+              1.15,
+              2.2,
+              1.9
+            ]
+          ],
+          "attaches": "Rests on cabFloor; roof light bar at roofTop; rear wall meets rearDeck and turret ring zone.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "frontEnd",
+          "builds": "Front end: hood/nose cap, mesh grille with glowing cyan slit lights and corp emblem, heavy bull-bar bumper at bumperFront with hazard stripes and a neon cyan strip, headlight clusters (glowing white-cyan), amber fog lights, tow hooks, riot push-plate ram, license plate with text decal, small flip-up spotlights.",
+          "box": [
+            [
+              -1.2,
+              0.4,
+              1.9
+            ],
+            [
+              1.2,
+              1.5,
+              3
+            ]
+          ],
+          "attaches": "Joins hull front at z=2.6 and cab front at z=1.9; bumper at bumperFront.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "wheels",
+          "builds": "Four big chunky wheels: tire cylinders (faceted ~12 sides) with tread grooves via paint, steel rims with bolt rings and hub caps, glowing magenta ring accent inside each rim, brake discs and calipers, axle stubs and suspension arms/shock absorbers toward body. Each wheel is built on its own wheel joint, axis along ±X, radius 0.52, width 0.42; centred x=±1.1.",
+          "box": [
+            [
+              -1.3,
+              0,
+              -2.25
+            ],
+            [
+              1.3,
+              1.05,
+              2.35
+            ]
+          ],
+          "attaches": "Wheel joints at axle mounts; suspension arms reach the hull underside.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelRL",
+            "wheelRR"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "waterCannon",
+          "builds": "Turret on turretRing: round base ring with rotating lathe collar and bolt studs, armored pedestal and gunner shield with hazard stripes, cannon on cannonPivot: thick barrel (sweep) with ribbed reinforcement bands, wide muzzle nozzle with a glowing cyan inner core, magenta neon ring stripes, hoses (tube sweeps in dark rubber with steel couplings) running to the tank, pressure gauge (gaugeTexture-style drawing), targeting sensor with red glowing eye. Behind: cylindrical blue water tank on tankMount with steel straps, level window glowing cyan, valve wheels, pipes, hazard decal and 'AQUA-SUPPRESS' text decal, ladder on rear, rear deck light bars.",
+          "box": [
+            [
+              -1.1,
+              1.45,
+              -3
+            ],
+            [
+              1.1,
+              2.6,
+              -0.4
+            ]
+          ],
+          "attaches": "Turret ring at turretRing on the hull deck; tank at tankMount on rearDeck; barrel points +Z over cab roof (above y=2.0).",
+          "joints": [
+            "body",
+            "turret",
+            "cannon"
+          ],
+          "floor": false,
+          "budget": 220
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T10:04:18.847Z",
+        "wallMs": 26537,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85252,
+          "completion_tokens": 2973,
+          "total_tokens": 88225,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0404744,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "hull",
+        "started": "2026-10-25T10:04:45.384Z",
+        "wallMs": 22514,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88355,
+          "completion_tokens": 3728,
+          "total_tokens": 92083,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0542304,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "frontEnd",
+        "started": "2026-10-25T10:04:45.384Z",
+        "wallMs": 23184,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88316,
+          "completion_tokens": 3929,
+          "total_tokens": 92245,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0561624,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T10:04:45.384Z",
+        "wallMs": 32550,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88344,
+          "completion_tokens": 5194,
+          "total_tokens": 93538,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0688684,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "waterCannon",
+        "started": "2026-10-25T10:04:45.384Z",
+        "wallMs": 35814,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88485,
+          "completion_tokens": 5701,
+          "total_tokens": 94186,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07422039999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T10:04:45.384Z",
+        "wallMs": 43326,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88338,
+          "completion_tokens": 5731,
+          "total_tokens": 94069,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0742264,
+        "hasCode": true,
+        "reasoning": "I'm planning the buildWheels function, placing each wheel joint with its spinning parts (tire, rim, bolts, hub, ring, brake disc) versus static parts like the caliper and suspension arms that stay attached to the body.\n\nWorking through the tire geometry, I'm calculating cylinder radius and faceting so the faceted edges sit as close to the floor plane as possible without clipping, settling on roughly 0.54 radius. I'm also sketching how to fake tread grooves by mapping angle around each wheel's axle to a repeating pattern, and planning the rim as an offset cylinder sized for a steel-wheel look.\n\nNow I'm laying out the rest of each wheel assembly: bolts arranged in a ring using trig positions around the hub, plus a hub cap, dish, caliper, disc, and spokes, keeping the part count per wheel around 25 so the whole vehicle with suspension stays under budget. For placement I'm deciding to use explicit rotation angles for spoke boxes since the dir-based orientation won't work for angled components.\n\nStill placing wheel geometry...\n\nPlanning hub cap, bolts, and spoke placement so the magenta ring peeks through gaps, then working out the tire's lathe profile with a rounded cross-section.\n\nStill writing tread pattern...\n\nNow moving to the suspension arm geometry connecting to the hub.\n\nAdding the brake caliper box positioned at the top of the disc, keeping it static on the body bone and colored red, then setting the color palette for tire, rim, steel, and hazard accents.\n\nNow I'm mixing paint tones for the tire, blending base rubber color with groove shading and adding a dusty brown gradient near the bottom. I'm defining wheel joint positions for FL, FR, RL, RR with their axle offsets, and setting up lathe and cylinder geometry oriented along the correct axis so the outward direction stays consistent.\n\nStill writing geometry setup...\n\n"
+      }
+    ]
+  }
+}

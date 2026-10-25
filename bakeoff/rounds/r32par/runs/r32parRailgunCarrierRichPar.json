@@ -1,0 +1,565 @@
+{
+  "slug": "r32parRailgunCarrierRichPar",
+  "arm": "par",
+  "subject": "railgunCarrier",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T10:04:18.846Z",
+  "wallMs": 65684,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 531358,
+    "completion_tokens": 28141,
+    "total_tokens": 559499,
+    "prompt_tokens_details": {
+      "cached_tokens": 504504
+    }
+  },
+  "costUsd": 0.3855684,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 28185,
+    "slowestPartMs": 37499,
+    "critical": "railgun",
+    "elapsedMs": 65684,
+    "spec": {
+      "name": "Longbow Railgun Carrier",
+      "description": "A six-wheeled low-poly sci-fi military carrier with a long electromagnetic railgun on its back, braced on four hydraulic stabiliser legs.",
+      "builderName": "railgunCarrier",
+      "size": [
+        3.6,
+        3,
+        9
+      ],
+      "layout": "Front is +Z. Wedge-nosed armoured cab sits at the front (z 2.6..4.2) with an angled windscreen with glowing cyan visor strips, headlights and a bull bar. Behind it a long low chassis (z -4.2..2.6) carries six chunky wheels in three pairs (front z=2.6, middle z=-0.4, rear z=-3.4), wheel radius 0.55, resting on y=0. Above the chassis a turntable ring at z=-1.0 carries a rotating turret base and a long railgun cradle; twin parallel rails run forward over the cab to z=4.6 and rearward with a capacitor bank behind. Four stabiliser legs fold out diagonally from the chassis sides at mid and rear, ending in broad foot pads on the floor (y=0). Style: faceted chunky panels, olive-drab hull with dark-grey armour plates, hazard yellow stripes on stabilisers and edges, cyan glowing energy strips on rails and capacitors, stencil markings and rivets painted via textures. Everything is boxy with chamfers and wedges.",
+      "palette": {
+        "hull": "#5a6148",
+        "hullDark": "#3a3f2e",
+        "armor": "#2f3338",
+        "steel": "#7b828a",
+        "trim": "#e7b814",
+        "tire": "#17181a",
+        "rim": "#555b61",
+        "glass": "#1b3a48",
+        "neonCyan": "#2ff3ff",
+        "warnRed": "#d6342a",
+        "lamp": "#fff3b0",
+        "white": "#e8e8e0"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.5,
+          0
+        ],
+        "cabRoof": [
+          0,
+          2.2,
+          3.3
+        ],
+        "turretRing": [
+          0,
+          1.5,
+          -1
+        ],
+        "railBreech": [
+          0,
+          2.75,
+          -2.6
+        ],
+        "railMuzzle": [
+          0,
+          2.75,
+          4.5
+        ],
+        "axleFront": [
+          0,
+          0.55,
+          2.6
+        ],
+        "axleMid": [
+          0,
+          0.55,
+          -0.4
+        ],
+        "axleRear": [
+          0,
+          0.55,
+          -3.4
+        ],
+        "stabFL": [
+          1.5,
+          0.9,
+          -0.4
+        ],
+        "stabFR": [
+          -1.5,
+          0.9,
+          -0.4
+        ],
+        "stabRL": [
+          1.5,
+          0.9,
+          -3
+        ],
+        "stabRR": [
+          -1.5,
+          0.9,
+          -3
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turret",
+          "parent": "body",
+          "at": [
+            0,
+            1.5,
+            -1
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "weapon"
+        },
+        {
+          "name": "railCradle",
+          "parent": "turret",
+          "at": [
+            0,
+            2.3,
+            -1
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "weapon"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.6,
+            0.55,
+            2.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.6,
+            0.55,
+            2.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.6,
+            0.55,
+            -0.4
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.6,
+            0.55,
+            -0.4
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.6,
+            0.55,
+            -3.4
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.6,
+            0.55,
+            -3.4
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "stabFL",
+          "parent": "body",
+          "at": [
+            1.5,
+            0.9,
+            -0.4
+          ],
+          "dir": [
+            0.6,
+            -0.6,
+            0.2
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "stabFR",
+          "parent": "body",
+          "at": [
+            -1.5,
+            0.9,
+            -0.4
+          ],
+          "dir": [
+            -0.6,
+            -0.6,
+            0.2
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "stabRL",
+          "parent": "body",
+          "at": [
+            1.5,
+            0.9,
+            -3
+          ],
+          "dir": [
+            0.6,
+            -0.6,
+            -0.2
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "stabRR",
+          "parent": "body",
+          "at": [
+            -1.5,
+            0.9,
+            -3
+          ],
+          "dir": [
+            -0.6,
+            -0.6,
+            -0.2
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Long armoured chassis hull: lower tub with sloped sides and skirt plates, upper deck with panelled paint (rivets, seams, stencil numbers, hazard edges), rear engine deck with vent grilles and exhaust stacks, side tool boxes, tow hooks, a rear ramp-light bar, and the turntable ring base (lathe ring with teeth marks) at turretRing. Includes axle housings and wheel arches over the three axle mounts. Does not include wheels, cab, or stabilisers.",
+          "box": [
+            [
+              -1.7,
+              0.6,
+              -4.5
+            ],
+            [
+              1.7,
+              1.6,
+              2.6
+            ]
+          ],
+          "attaches": "Cab starts at z=2.6 on chassisTop; wheels hang at axle mounts; stabiliser hinge plates at stabFL/FR/RL/RR; turret sits on turretRing.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Front crew cab: wedge-shaped armoured nose with angled glass visor (dark glass texture with cyan glowing HUD strips), armoured window slats, sloped roof with antenna cluster and sensor dome, headlights (glowing lamp colour), bull bar with yellow chevrons, front tow hooks, side mirrors, door outlines and handles, unit emblem decal on the doors. Roof at cabRoof.",
+          "box": [
+            [
+              -1.6,
+              0.6,
+              2.6
+            ],
+            [
+              1.6,
+              2.4,
+              4.4
+            ]
+          ],
+          "attaches": "Rear face meets chassis at z=2.6 on chassisTop; sits above front axle mount axleFront; railgun passes over roof above it at y>=2.5.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "wheels",
+          "builds": "Six heavy wheels with low-poly 10-sided tyres with tread bands painted by texture, steel rims with hex bolt rings, hub caps with small red unit dots, mud-splash paint on lower faces, axle stubs and brake discs, and mudguard flaps behind each wheel. Each wheel rides its own wheel joint, spun about its axle direction. Radius 0.55 and width 0.5 centred at x=±1.6 so lowest points touch y=0.",
+          "box": [
+            [
+              -1.9,
+              0,
+              -3.95
+            ],
+            [
+              1.9,
+              1.1,
+              3.15
+            ]
+          ],
+          "attaches": "Axle lines at axleFront, axleMid, axleRear; inner faces meet chassis sides at x=±1.35.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelRL",
+            "wheelRR"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "stabilisers",
+          "builds": "Four deployed hydraulic stabiliser legs, two pairs at stabFL/FR and stabRL/RR: hinge bracket, upper arm box, telescoping piston (steel cylinder inside a hazard-striped sleeve), diagonal brace strut, ball joint, and wide octagonal foot pad with ribbed underside and warning chevrons resting on y=0. Legs splay outward and down about 45 degrees to feet at x=±3.0 z=-0.4 and z=-3.0 (x=±3.0 total width within 3.6 size). Small orange beacon lights on each bracket.",
+          "box": [
+            [
+              -3.3,
+              0,
+              -3.7
+            ],
+            [
+              3.3,
+              1.1,
+              0.3
+            ]
+          ],
+          "attaches": "Hinge brackets bolt to chassis sides at stabFL, stabFR, stabRL, stabRR; each leg chain rides its stab joint.",
+          "joints": [
+            "stabFL",
+            "stabFR",
+            "stabRL",
+            "stabRR"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "railgun",
+          "builds": "Turret and railgun: rotating turret base (octagonal lathe drum with armour skirt) on turretRing with side armour cheeks, crew hatch and sensor pod, then the cradle with two long parallel rails (box sweeps, steel with glowing cyan energy strips) running from rear breech at railBreech to muzzle at railMuzzle, insulating spacer blocks every 0.6 m, a muzzle brake with cyan emitter ring, coolant tubes, and at the rear a stack of capacitor banks (cylinders with glowing cyan bands, red warning labels, cabling swept between them). Hazard-stripe bands and white stencil text on the barrel shroud. Rails ride railCradle, base rides turret.",
+          "box": [
+            [
+              -1.3,
+              1.5,
+              -4.2
+            ],
+            [
+              1.3,
+              3,
+              4.7
+            ]
+          ],
+          "attaches": "Base ring sits on turretRing at chassisTop height 1.5; rails pass above cab roof (cabRoof y=2.2) at y 2.5..3.0 from railBreech to railMuzzle.",
+          "joints": [
+            "turret",
+            "railCradle"
+          ],
+          "floor": false,
+          "budget": 200
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T10:04:18.846Z",
+        "wallMs": 28185,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85251,
+          "completion_tokens": 3606,
+          "total_tokens": 88857,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0468024,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T10:04:47.031Z",
+        "wallMs": 20936,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89200,
+          "completion_tokens": 3530,
+          "total_tokens": 92730,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0539404,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "stabilisers",
+        "started": "2026-10-25T10:04:47.031Z",
+        "wallMs": 28578,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89242,
+          "completion_tokens": 4372,
+          "total_tokens": 93614,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.062444400000000004,
+        "hasCode": true,
+        "reasoning": "I'm working out how to build the stabilizer geometry attached to the existing stabFL joint using its position and direction, constructing rods and parts in model space relative to the bone, keeping the structure compact.\n\nI'm designing each stabilizer leg per side with a hinge point near the chassis, an upper arm extending to an elbow, a piston sleeve angling down to a foot pad with a ball joint, and a diagonal brace connecting the lower chassis to the piston mid-point, while keeping all elements within sensible height bounds relative to the hinge.\n\nNow I'm detailing the piston as a thicker sleeve from elbow to midpoint and a thinner steel rod from midpoint to foot, adding hazard-stripe paint texture along a diagonal axis, and planning a chevron texture plane on top of the foot pad plus small ribs along its underside.\n\nI'm defining the pad geometry more precisely—cylinder dimensions, chevron plane placement, ribs, bolt ring—and settling on an orange glowing beacon sphere, then sketching helper functions for drawing rods and frustum boxes between points with octagonal cross-sections.\n\nFor the hydraulic hose I'll sweep a small catmull curve and add tiny cap rings, bringing the part count to roughly 25 per leg, about 100 total—seems reasonable.\n\n"
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T10:04:47.031Z",
+        "wallMs": 30329,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89211,
+          "completion_tokens": 4989,
+          "total_tokens": 94200,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0685524,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T10:04:47.031Z",
+        "wallMs": 31427,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89164,
+          "completion_tokens": 5211,
+          "total_tokens": 94375,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07067839999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "railgun",
+        "started": "2026-10-25T10:04:47.031Z",
+        "wallMs": 37499,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89290,
+          "completion_tokens": 6433,
+          "total_tokens": 95723,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0831504,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

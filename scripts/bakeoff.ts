@@ -14,6 +14,7 @@
 //   --arms a,b --subjects x,y --levels terse,rich --concurrency 8 --max-tokens 64000
 //   --arm-set <file in bakeoff/> (arms.json) --pitches <file in bakeoff/> (pitches.json); `prompt` takes --arm-set too
 //   --prompts-from <round>: reuse that round's system prompts verbatim
+//   an arm with `parallel: { plan, part }` builds through a planning call and concurrent part calls (`parallelBuild`)
 // refine options: --model, --effort (high), --max-tokens 64000, --arms, --concurrency 8
 //   --views three-quarter,front,side,low (snap shots sent as images) --critique <file in bakeoff/prompts/>
 //   (refine-critique.md) --critic <provider/id> (another model writes the change list) --repair-only (failed builds)
@@ -56,6 +57,9 @@ type Arm = {
   samplerMenu?: boolean;
   /** A prompt file in bakeoff/prompts/: the model first writes a build sheet from it, then the module. */
   plan?: string;
+  /** Parallel parts: a planning call writes a shared spec from `plan`, then one call per part writes a function from
+   *  `part`, all at once; the runner assembles one module (see `parallelBuild`). */
+  parallel?: { plan: string; part: string };
 };
 type Subject = { id: string; kind: string; terse: string; rich: string };
 type Level = "terse" | "rich";
@@ -329,6 +333,9 @@ async function run(round: string, args: string[]) {
       path,
       from ? readFileSync(join(BAKEOFF, "rounds", from, "prompts", `${arm.id}.md`), "utf8") : systemPrompt(arm),
     );
+    // A parallel-parts arm keeps its plan and part prompts next to the system prompt they extend.
+    for (const file of arm.parallel ? [arm.parallel.plan, arm.parallel.part] : [])
+      writeFileSync(join(dir, "prompts", file), read(`bakeoff/prompts/${file}`));
   }
   console.log(`${todo.length} builds to ask ${model} (${effort}) for, ${concurrency} at a time.`);
 
@@ -338,6 +345,11 @@ async function run(round: string, args: string[]) {
     if (existsSync(join(dir, "runs", `${job.slug}.json`))) return; // another runner got it first
     const system = readFileSync(join(dir, "prompts", `${job.arm.id}.md`), "utf8");
     const pitch = job.subject[job.level];
+    if (job.arm.parallel) {
+      const line = await parallelBuild({ gw, cost, dir, job, system, pitch, model, effort, maxTokens });
+      console.log(`[${++done}/${todo.length}] ${job.slug}: ${line}`);
+      return;
+    }
     const messages: { role: string; content: string }[] = [
       { role: "system", content: system },
       { role: "user", content: pitch },
@@ -393,6 +405,296 @@ async function run(round: string, args: string[]) {
   });
   gw.close();
   results(round);
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Parallel parts: one build's work split across concurrent calls. A planning call writes the shared spec (size,
+// palette, mounts, skeleton, 3–6 parts); one call per part, all at once, writes a function that builds its part into
+// the shared builder; `assemble` wraps the functions into one module. Every call gets the arm's system prompt; the
+// plan and part prompts follow the pitch in the user turn.
+
+type Vec = [number, number, number];
+type SpecPart = {
+  id: string;
+  builds: string;
+  box: [Vec, Vec];
+  attaches: string;
+  joints: string[];
+  floor: boolean;
+  budget: number;
+};
+type Spec = {
+  name: string;
+  description: string;
+  builderName?: string;
+  size: Vec;
+  layout: string;
+  palette: Record<string, string>;
+  mounts: Record<string, Vec>;
+  joints: { name: string; parent?: string; at: Vec; dir?: Vec; role?: string; group?: string }[];
+  parts: SpecPart[];
+};
+
+/** The reply's ```json block (else its longest fenced block, else the outermost braces) as a spec. Part ids become
+ *  unique alphanumeric names, since they prefix the part's joints and name its function. */
+function parseSpec(text: string): Spec {
+  const block =
+    text.match(/```json[^\n]*\n([\s\S]*?)```/)?.[1] ??
+    extractCode(text) ??
+    text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
+  const spec = JSON.parse(block.replace(/,(\s*[}\]])/g, "$1")) as Spec;
+  if (!Array.isArray(spec.parts) || !spec.parts.length) throw new Error("spec has no parts");
+  const seen = new Set<string>();
+  for (const [i, part] of spec.parts.entries()) {
+    let id = String(part.id ?? "").replace(/[^A-Za-z0-9]/g, "") || `part${i + 1}`;
+    if (!/^[A-Za-z]/.test(id)) id = `p${id}`;
+    while (seen.has(id)) id += i + 1;
+    seen.add(id);
+    part.id = id;
+  }
+  spec.palette ??= {};
+  spec.mounts ??= {};
+  spec.joints ??= [];
+  return spec;
+}
+
+/** The part prompt with this part's spec entry filled in. */
+function partPrompt(template: string, spec: Spec, part: SpecPart) {
+  const values: Record<string, string> = {
+    spec: JSON.stringify(spec, null, 2),
+    id: part.id,
+    fn: `build${part.id[0].toUpperCase()}${part.id.slice(1)}`,
+    builds: part.builds ?? "",
+    box: JSON.stringify(part.box),
+    attaches: part.attaches ?? "",
+    joints: part.joints?.length ? part.joints.map((name) => `\`${name}\``).join(", ") : "none",
+    floor: part.floor
+      ? "Its lowest points rest on the floor, y = 0."
+      : "It sits above the floor, inside its box; the parts marked `floor` rest on y = 0.",
+    budget: String(part.budget ?? Math.floor(900 / spec.parts.length)),
+    triangles: String(Math.floor(60_000 / spec.parts.length / 500) * 500),
+  };
+  return template.replace(/\{(\w+)\}/g, (whole, key: string) => values[key] ?? whole);
+}
+
+/** One module from the spec and the part functions: imports merged per source, the spec's palette, mounts and
+ *  skeleton, and each part's code in its own scope (so helpers of the same name never collide), called in spec
+ *  order. Returns the module with its SDK imports still named `agentic-3js-builder`, and the parts that had no
+ *  function. */
+function assemble(spec: Spec, parts: { part: SpecPart; code: string | null }[]) {
+  // Imports by local name. Parts can import one name from different sources (a kit name from the SDK root in one
+  // part, from its kit in another): one module keeps one, the kit's when there is one.
+  const imports = new Map<string, { from: string; item: string; typeOnly: boolean }>([
+    ["createBuilder", { from: SDK_NAME, item: "createBuilder", typeOnly: false }],
+    ["Builder", { from: SDK_NAME, item: "Builder", typeOnly: true }],
+    ["Joint", { from: SDK_NAME, item: "Joint", typeOnly: true }],
+  ]);
+  const addImport = (from: string, item: string, typeOnly: boolean) => {
+    const local = item.split(" as ").at(-1)!.trim();
+    const had = imports.get(local);
+    if (!had || (had.from === SDK_NAME && from.includes("/kits/")))
+      imports.set(local, { from, item, typeOnly: typeOnly && (had?.from !== from || had.typeOnly) });
+    else if (had.from === from && had.item === item) had.typeOnly &&= typeOnly;
+  };
+  const scopes: string[] = [];
+  const missing: string[] = [];
+  for (const { part, code } of parts) {
+    const fn = code?.match(/export\s+(?:async\s+)?function\s+([A-Za-z_$][\w$]*)|export\s+const\s+([A-Za-z_$][\w$]*)/);
+    const name = fn?.[1] ?? fn?.[2] ?? code?.match(/function\s+([A-Za-z_$][\w$]*)/)?.[1];
+    if (!code || !name) {
+      missing.push(part.id);
+      continue;
+    }
+    const body = code
+      .replace(/^import\s+(type\s+)?([\s\S]*?)\s+from\s+["']([^"']+)["'];?[ \t]*\n?/gm, (_, type, what, from) => {
+        if (/^\*\s+as\s+THREE$/.test(what.trim())) return "";
+        const named = what.match(/\{([\s\S]*)\}/)?.[1] ?? "";
+        for (const item of named.split(",").map((s: string) => s.trim().replace(/\s+/g, " "))) {
+          if (!item) continue;
+          const typeOnly = Boolean(type) || item.startsWith("type ");
+          addImport(
+            from.startsWith(SDK_NAME) && !from.includes("/kits/") ? SDK_NAME : from,
+            item.replace(/^type /, ""),
+            typeOnly,
+          );
+        }
+        const rest = what
+          .replace(/\{[\s\S]*\}/, "")
+          .replace(/,\s*$/, "")
+          .trim();
+        if (rest) addImport(from, `default as ${rest}`, false);
+        return "";
+      })
+      .replace(/^export\s+(?=(?:async\s+)?function|const|let|class)/gm, "")
+      .trim();
+    scopes.push(`  // ${part.id}\n  (() => {\n${body}\n    return ${name};\n  })(),`);
+  }
+  const importLines = [`import * as THREE from "three";`];
+  const bySource = new Map<string, string[]>();
+  for (const { from, item, typeOnly } of imports.values())
+    bySource.set(from, [...(bySource.get(from) ?? []), typeOnly ? `type ${item}` : item]);
+  for (const [from, items] of bySource) importLines.push(`import { ${items.join(", ")} } from "${from}";`);
+  const key = (name: string) => (/^[A-Za-z_$][\w$]*$/.test(name) ? name : JSON.stringify(name));
+  const vec = (v: unknown) => `[${(Array.isArray(v) ? v : [0, 0, 0]).join(", ")}] as [number, number, number]`;
+  const joints = spec.joints.map((joint) => {
+    const options = [
+      joint.parent ? `parent: J[${JSON.stringify(joint.parent)}]` : null,
+      `at: ${JSON.stringify(joint.at)}`,
+      joint.dir ? `dir: ${JSON.stringify(joint.dir)}` : null,
+      joint.role ? `role: ${JSON.stringify(joint.role)}` : null,
+      joint.group ? `group: ${JSON.stringify(joint.group)}` : null,
+    ].filter(Boolean);
+    return `  J[${JSON.stringify(joint.name)}] = b.joint(${JSON.stringify(joint.name)}, { ${options.join(", ")} });`;
+  });
+  const module = [
+    ...importLines,
+    "",
+    `export const meta = ${JSON.stringify({ name: spec.name, description: spec.description }, null, 2)};`,
+    "",
+    "// The shared spec: palette, mounts (model-space points where parts meet) and skeleton.",
+    `const P = {\n${Object.entries(spec.palette)
+      .map(([name, color]) => `  ${key(name)}: ${JSON.stringify(color)},`)
+      .join("\n")}\n};`,
+    `const M = {\n${Object.entries(spec.mounts)
+      .map(([name, at]) => `  ${key(name)}: ${vec(at)},`)
+      .join("\n")}\n};`,
+    "type Ctx = { b: Builder; J: Record<string, Joint>; P: typeof P; M: typeof M };",
+    "",
+    "// One function per part, each written by its own call.",
+    `const PARTS: ((ctx: Ctx) => void)[] = [\n${scopes.join("\n")}\n];`,
+    "",
+    "export default function build() {",
+    `  const b = createBuilder({ name: ${JSON.stringify(spec.builderName || "model")} });`,
+    "  const J: Record<string, Joint> = {};",
+    ...joints,
+    "  for (const part of PARTS) part({ b, J, P, M });",
+    "  return b.root;",
+    "}",
+    "",
+  ].join("\n");
+  return { module, missing };
+}
+
+type Asked = Awaited<ReturnType<typeof ask>>;
+
+/** One parallel-parts build: plan, then every part at once, then the module and a run record shaped like `run`'s.
+ *  `wallMs` is the plan's time plus the slowest part's; tokens and cost are summed over the calls and listed per call. */
+async function parallelBuild(o: {
+  gw: Gateway;
+  cost: Pricing;
+  dir: string;
+  job: Job;
+  system: string;
+  pitch: string;
+  model: string;
+  effort: string;
+  maxTokens: number;
+}) {
+  const { gw, cost, dir, job, system, pitch, model, effort, maxTokens } = o;
+  const files = job.arm.parallel!;
+  const prompt = (file: string) => readFileSync(join(dir, "prompts", file), "utf8").trim();
+  const body = (user: string) => ({
+    model,
+    reasoning_effort: effort,
+    max_tokens: maxTokens,
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
+  });
+  const call = (id: string, asked: Asked, hasCode: boolean) => ({
+    id,
+    started: new Date(asked.started).toISOString(),
+    wallMs: asked.wallMs,
+    status: asked.reply?.status ?? null,
+    error: asked.reply?.status === 200 ? null : JSON.stringify(asked.reply?.body).slice(0, 2000),
+    finishReason: asked.reply?.body?.choices?.[0]?.finish_reason ?? null,
+    usage: asked.usage,
+    costUsd: asked.costUsd,
+    hasCode,
+    text: asked.text,
+    reasoning: asked.message?.reasoning_content ?? null,
+  });
+  const planned = await ask(gw, body(`${pitch}\n\n${prompt(files.plan)}`), cost);
+  let spec: Spec | null = null;
+  let specError: string | null = null;
+  try {
+    spec = parseSpec(planned.text);
+  } catch (error) {
+    specError = String(error);
+  }
+  const calls = [call("plan", planned, Boolean(spec))];
+  const parts = spec
+    ? await Promise.all(
+        spec.parts.map(async (part) => {
+          const asked = await ask(gw, body(`${pitch}\n\n${partPrompt(prompt(files.part), spec!, part)}`), cost);
+          const code = asked.text ? extractCode(asked.text) : null;
+          calls.push(call(part.id, asked, Boolean(code)));
+          return { part, code, wallMs: asked.wallMs };
+        }),
+      )
+    : [];
+  const elapsedMs = Date.now() - planned.started;
+  const slowest = parts.reduce<(typeof parts)[number] | null>((a, p) => (!a || p.wallMs > a.wallMs ? p : a), null);
+  const assembled = spec ? assemble(spec, parts) : null;
+  const buildFile = join(dir, "builds", `${job.slug}.ts`);
+  if (assembled) {
+    mkdirSync(dirname(buildFile), { recursive: true });
+    writeFileSync(buildFile, wireImports(assembled.module, buildFile));
+  }
+  calls.sort((a, b) => (a.id === "plan" ? -1 : b.id === "plan" ? 1 : 0));
+  const sum = (get: (c: (typeof calls)[number]) => number | undefined) =>
+    calls.reduce((total, c) => total + (get(c) ?? 0), 0);
+  const usage = {
+    prompt_tokens: sum((c) => c.usage?.prompt_tokens),
+    completion_tokens: sum((c) => c.usage?.completion_tokens),
+    total_tokens: sum((c) => c.usage?.total_tokens),
+    prompt_tokens_details: { cached_tokens: sum((c) => c.usage?.prompt_tokens_details?.cached_tokens) },
+  };
+  const costUsd = calls.every((c) => c.costUsd != null) ? sum((c) => c.costUsd!) : null;
+  const wallMs = planned.wallMs + (slowest?.wallMs ?? 0);
+  const failed = calls.find((c) => c.status !== 200);
+  writeJson(join(dir, "runs", `${job.slug}.json`), {
+    slug: job.slug,
+    arm: job.arm.id,
+    subject: job.subject.id,
+    level: job.level,
+    pitch,
+    model,
+    effort,
+    started: new Date(planned.started).toISOString(),
+    wallMs,
+    status: failed ? failed.status : 200,
+    error: failed ? `${failed.id}: ${failed.error}` : specError,
+    finishReason: calls.every((c) => c.finishReason === "stop") ? "stop" : calls.map((c) => c.finishReason).join(","),
+    usage,
+    costUsd,
+    hasCode: Boolean(assembled),
+    reasoning: null,
+    parallel: {
+      planMs: planned.wallMs,
+      slowestPartMs: slowest?.wallMs ?? null,
+      critical: slowest?.part.id ?? null,
+      elapsedMs,
+      spec,
+      specError,
+      missingParts: assembled?.missing ?? [],
+      calls: calls.map(({ text: _text, ...rest }) => rest),
+    },
+  });
+  writeFileSync(
+    join(dir, "runs", `${job.slug}.md`),
+    calls.map((c) => `<!-- call: ${c.id} -->\n\n${c.text}`).join("\n\n"),
+  );
+  const partTimes = calls
+    .filter((c) => c.id !== "plan")
+    .map((c) => `${c.id} ${(c.wallMs / 1000).toFixed(0)}`)
+    .join(", ");
+  return (
+    `${failed ? failed.status : 200} ${assembled ? "code" : `NO CODE (${specError})`}` +
+    `${assembled?.missing.length ? ` MISSING ${assembled.missing.join(",")}` : ""}, plan ${(planned.wallMs / 1000).toFixed(0)} s + parts [${partTimes}] → ${(wallMs / 1000).toFixed(0)} s, ` +
+    `${usage.completion_tokens} out${costUsd != null ? `, $${costUsd.toFixed(3)}` : ""}`
+  );
 }
 
 function capture(command: string, args: string[], timeoutMs = 600_000) {

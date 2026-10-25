@@ -1,0 +1,461 @@
+{
+  "slug": "r32parsmHoverPickupRichPar",
+  "arm": "par",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T10:02:05.695Z",
+  "wallMs": 84703,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 527961,
+    "completion_tokens": 34482,
+    "total_tokens": 562443,
+    "prompt_tokens_details": {
+      "cached_tokens": 504504
+    }
+  },
+  "costUsd": 0.4421843999999999,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 24590,
+    "slowestPartMs": 60113,
+    "critical": "pods",
+    "elapsedMs": 84704,
+    "spec": {
+      "name": "Hover Technical",
+      "description": "A militarized pickup truck converted to four hover thrusters in a low-poly cyberpunk style, with armor plating, a roll cage, a bed-mounted gun and glowing neon underlights.",
+      "builderName": "hoverTechnical",
+      "size": [
+        2.5,
+        2,
+        5.4
+      ],
+      "layout": "A boxy pickup hovering with its underside about 0.35 m above the floor. The lowest points are the four thruster pods' skirts at y=0. Front (+Z): a sloped armored hood with a bull-bar bumper, a cyan light-bar grille and two angular headlights. Next is a tall angular cab with a slanted windshield, a roof rack and a roll bar, then the open cargo bed at the rear. The bed carries a pintle-mounted gun and ammo crates, and a rear bumper carries a tail light strip. Four chunky hexagonal thruster pods sit at the wheel positions in place of wheels, each with a turbine fan ring, a glowing cyan core and a downward cone glow. Faceted plates, hazard-stripe trim and magenta/cyan neon edge lines show the cyberpunk look on every part. Surfaces are matte dark gunmetal with worn olive-drab camo paint, grime near the bottom and bright emissive accents.",
+      "palette": {
+        "hull": "#3a4048",
+        "hullLight": "#59626d",
+        "camo": "#4d5a3a",
+        "camoDark": "#2f3824",
+        "trim": "#e7b814",
+        "dark": "#14161b",
+        "glass": "#1b3a4a",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2bd6",
+        "tail": "#ff2a3a",
+        "metal": "#8a929c",
+        "rust": "#7a4a2a",
+        "white": "#e8eef2"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          0.95,
+          0
+        ],
+        "hoodFront": [
+          0,
+          0.95,
+          2.7
+        ],
+        "cabFloor": [
+          0,
+          0.95,
+          0.3
+        ],
+        "cabRoof": [
+          0,
+          1.75,
+          -0.15
+        ],
+        "bedFloor": [
+          0,
+          0.95,
+          -1.6
+        ],
+        "bedRear": [
+          0,
+          0.95,
+          -2.7
+        ],
+        "gunMount": [
+          0,
+          1,
+          -1.5
+        ],
+        "podFL": [
+          1,
+          0.55,
+          1.75
+        ],
+        "podFR": [
+          -1,
+          0.55,
+          1.75
+        ],
+        "podRL": [
+          1,
+          0.55,
+          -1.7
+        ],
+        "podRR": [
+          -1,
+          0.55,
+          -1.7
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            0.9,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "podFL",
+          "parent": "body",
+          "at": [
+            1,
+            0.55,
+            1.75
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "pods"
+        },
+        {
+          "name": "podFR",
+          "parent": "body",
+          "at": [
+            -1,
+            0.55,
+            1.75
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "pods"
+        },
+        {
+          "name": "podRL",
+          "parent": "body",
+          "at": [
+            1,
+            0.55,
+            -1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "pods"
+        },
+        {
+          "name": "podRR",
+          "parent": "body",
+          "at": [
+            -1,
+            0.55,
+            -1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "pods"
+        },
+        {
+          "name": "gunYaw",
+          "parent": "body",
+          "at": [
+            0,
+            1,
+            -1.5
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "gun"
+        },
+        {
+          "name": "gunPitch",
+          "parent": "gunYaw",
+          "at": [
+            0,
+            1.35,
+            -1.5
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "gun"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Lower hull and frame: a faceted floor pan and side sills spanning x -1.15..1.15, a belly skid plate, bumper bars, a front bull-bar with a cyan light strip, a rear bumper with a red tail strip, fender arches faceted around each pod mount, hazard-stripe trim on the sills, side exhaust vents, a magenta neon underglow strip along each side, and a grime paint on the bottom. Includes the hood: a sloped armoured block from the cab to the front with vents, a hood scoop, camo paint, a grille texture (SVG) with cyan light-bar headlights and angular headlamps. Includes fender plates and mirrors only if they are not on the cab.",
+          "box": [
+            [
+              -1.25,
+              0.3,
+              -2.7
+            ],
+            [
+              1.25,
+              1.2,
+              2.75
+            ]
+          ],
+          "attaches": "Cab starts at cabFloor and chassisTop; the bed sits on bedFloor; the pods hang from the podXX mounts under the fender arches; the gun mounts at gunMount.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "The crew cabin from z=-0.65 to z=1.0 on the chassisTop plane: an angular faceted body with camo paint, a slanted windshield and rear window in dark teal glass with a reflection decal, side windows with armoured shutter slats, doors with handles and hazard stripes, an armoured roof with a roof rack, a light bar, an antenna, a roll bar behind the cab, side mirrors, a unit emblem and number decal (SVG), a neon magenta edge line on the roof, and a cab interior hint (seats, a steering wheel) visible through the glass.",
+          "box": [
+            [
+              -1.15,
+              0.95,
+              -0.7
+            ],
+            [
+              1.15,
+              1.95,
+              1.05
+            ]
+          ],
+          "attaches": "Sits on chassisTop/cabFloor over the chassis; the hood starts at the cab's front face (z=1.05); the bed starts at the cab's rear face (z=-0.7).",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "bed",
+          "builds": "The open cargo bed from z=-2.7 to z=-0.7: an inner floor with ribbed texture, side walls with angled armour plates, a tailgate with a hazard stripe and a tail light cluster, a wheel-arch hump for each rear pod, cargo including 2-3 ammo crates and fuel drums with stencilled labels (SVG), tie-down hooks, a rear roll hoop with a cyan light, a spare thruster cell, cables and neon trim lines. No gun here.",
+          "box": [
+            [
+              -1.2,
+              0.9,
+              -2.75
+            ],
+            [
+              1.2,
+              1.5,
+              -0.7
+            ]
+          ],
+          "attaches": "Sits on bedFloor over the chassis; its front wall meets the cab's rear face; the gun ring sits at gunMount in its centre.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "pods",
+          "builds": "Four hover thruster pods at podFL, podFR, podRL and podRR, each riding its own joint. Each is a chunky hexagonal lathe housing in dark metal with a camo cap, a skirt ring whose lowest edge touches y=0, an inner turbine with 8 blade extrusions, a glowing cyan core disc (glow kit) and a downward faint cone glow, mounting struts up to the fender, hazard-stripe trim, cyan or magenta neon rings, vent slits and bolt details. The rear pods are slightly larger, and the pod texture shows panel lines and warning labels (SVG).",
+          "box": [
+            [
+              -1.4,
+              0,
+              -2.3
+            ],
+            [
+              1.4,
+              0.75,
+              2.3
+            ]
+          ],
+          "attaches": "Struts plug into the chassis at the podXX mounts; each pod is centred on its mount in x and z, with the top at y=0.75.",
+          "joints": [
+            "podFL",
+            "podFR",
+            "podRL",
+            "podRR"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "gun",
+          "builds": "The pintle-mounted heavy weapon in the bed at gunMount: a ring base and pedestal on the body, a yaw turret yoke on gunYaw, a pitching gun cradle on gunPitch, a twin-barrel autocannon with a muzzle brake, a cooling jacket with vents, an ammo box with a belt feed, a shield plate with a hazard stripe, a cyan targeting sensor with a glowing lens, a magenta status light, and a small antenna and a decal. It stays within the bed footprint and points forward over the cab roof (+Z).",
+          "box": [
+            [
+              -0.55,
+              0.95,
+              -2.2
+            ],
+            [
+              0.55,
+              1.95,
+              -0.8
+            ]
+          ],
+          "attaches": "The base ring sits on the bed floor at gunMount; the yaw joint is at gunMount and the pitch joint 0.35 m above it.",
+          "joints": [
+            "gunYaw",
+            "gunPitch",
+            "body"
+          ],
+          "floor": false,
+          "budget": 120
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T10:02:05.695Z",
+        "wallMs": 24590,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85244,
+          "completion_tokens": 3122,
+          "total_tokens": 88366,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.041948400000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T10:02:30.286Z",
+        "wallMs": 25553,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88587,
+          "completion_tokens": 3913,
+          "total_tokens": 92500,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0565444,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bed",
+        "started": "2026-10-25T10:02:30.286Z",
+        "wallMs": 34065,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88502,
+          "completion_tokens": 5760,
+          "total_tokens": 94262,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07484439999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "gun",
+        "started": "2026-10-25T10:02:30.286Z",
+        "wallMs": 40023,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88541,
+          "completion_tokens": 7008,
+          "total_tokens": 95549,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.08740239999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T10:02:30.286Z",
+        "wallMs": 41368,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88543,
+          "completion_tokens": 7055,
+          "total_tokens": 95598,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0878764,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "pods",
+        "started": "2026-10-25T10:02:30.286Z",
+        "wallMs": 60113,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88544,
+          "completion_tokens": 7624,
+          "total_tokens": 96168,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0935684,
+        "hasCode": true,
+        "reasoning": "I'm working out the buildPods function using the module's Ctx type, positioning each pod at its mount point with the joint anchored at the top and the body centered below, using a radius around 0.42.\n\nNow I'm sketching each pod as a hex-lathed housing with a flared skirt ring at the base and a hollow inner cavity near the top, defining profile points for the outer wall, skirt, and recessed opening...\n\nBelow that I'm placing a downward-facing fan: a central disc plus eight thin blade boxes arranged radially, computing each blade's position and orientation with a yaw-plus-tilt rotation so they angle correctly around the hub.\n\nScrapping the big cone idea and simplifying: I'll layer the core disc at y=0.22 inside the housing recess, blades as a ring at y=0.17, and a small apex-down glow cone beneath the hub for that reactor-core look.\n\nNow I'm working out the housing geometry so it stays open at the bottom, placing the core disc, blades, and hub cone within the skirt so nothing clips through the solid base, then moving on to lathe the camo cap profile at the top.\n\nAdjusting the cap to sit below the 0.75 max height with its own angled profile, then adding neon ring details as thin lathed rectangles at the hub radius with hex segmentation for cyan-front/magenta-rear glow, and starting on the hazard stripe band positioned around the same radius with angular paint stripes.\n\nI'm now budgeting element counts per pod—vent slits across the hex faces, housing, skirt, cap, rings, core, cone, blades, hub, struts, and bolts—trying to keep the total near 190 across all four pods.\n\nI'm also wrestling with the hex lathe geometry, figuring out where the vertices and face midpoints actually land so the vent decorations align with the real faces instead of floating off the surface.\n\nConfirming the vent box orientation matches the lathe coordinate convention, then sizing the vents and figuring out where struts should connect the cap to the chassis without extending past the 0.75 height boundary.\n\nAdding grime paint near the bottom of the housing, then placing warning label decals on outward-facing side faces using simple planes positioned at specific angular faces like 90 degrees since direct SVG texturing on paint isn't viable.\n\nI'm also adding panel-line seams via paint logic keyed on height bands and angular vertex positions, then applying glow to specific parts using neon cyan and magenta flat colors from the kit palette.\n\nI need to double-check mounting geometry: the rear pod's radius was too large for the box bounds, so I'm scaling down to R=0.36 front and R=0.4 rear to keep everything within the ±1.4 x-range while mirroring the front pods symmetrically.\n\nNow I'm setting up a helper to place the lathe geometry at absolute positions, then designing eight propeller blades as thin boxes positioned radially around each pod, rotated by yaw angle and tilted 25 degrees for pitch.\n\nNext I'm adding the hub cylinder and cone beneath the blades, then constructing the skirt ring and housing profiles as lathed shapes with their stacked dimensions.\n\nI'm placing a hazard band and neon accent ring along the housing's outer wall, then adding six small bolt spheres arranged around the cap's flat top for detail.\n\nNow I'm adding mottled camo paint to the cap surface and making sure pod parts share the same random seed for consistency. I'm creating a warning label texture with a yellow triangle and exclamation mark, positioning it as a plane between the hazard band and neon ring, then setting up the lathe geometry calls for the turret shape.\n\n"
+      }
+    ]
+  }
+}

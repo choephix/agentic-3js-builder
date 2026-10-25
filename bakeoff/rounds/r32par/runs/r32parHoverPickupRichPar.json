@@ -1,0 +1,449 @@
+{
+  "slug": "r32parHoverPickupRichPar",
+  "arm": "par",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T10:04:18.847Z",
+  "wallMs": 72757,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 527367,
+    "completion_tokens": 28719,
+    "total_tokens": 556086,
+    "prompt_tokens_details": {
+      "cached_tokens": 505660
+    }
+  },
+  "costUsd": 0.38117,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 23620,
+    "slowestPartMs": 49137,
+    "critical": "turret",
+    "elapsedMs": 72757,
+    "spec": {
+      "name": "Hoverback Raider",
+      "description": "A militarized pickup truck converted to ride on four ducted hover thrusters, low-poly cyberpunk with neon underglow, armor plates and a roof-mounted gun.",
+      "builderName": "hoverPickup",
+      "size": [
+        2.5,
+        2.3,
+        5.6
+      ],
+      "layout": "A boxy armored pickup seen from the side: long hood at the front (+Z), a two-door cab in the middle, an open cargo bed at the back with a roll bar and a pintle gun. The truck body floats about 0.55 m above the ground. Instead of wheels, four large ducted thrusters sit at the corners (wheel positions), each a ring shroud with a glowing cyan core and fan blades, angled slightly so they read as hover pods. The lowest points are the thruster pods, which rest at y=0 (floor); the chassis underside floats above. Style: faceted low-poly boxes and wedges, matte dark gunmetal hull with hazard-yellow trim, magenta and cyan neon strips, emissive glow on the thruster cores, headlights, taillights and underglow. Textured SVG decals: kanji/stencil numbers, hazard stripes, a magenta emblem on the doors, a HUD-lit windshield. Paints: scuffed metal, rust near the lower edges, panel seams and rivets.",
+      "palette": {
+        "hull": "#3b4250",
+        "hullDark": "#20242e",
+        "hullLight": "#5a6475",
+        "trim": "#e7b814",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fa8",
+        "glass": "#1b3a52",
+        "rubber": "#15161a",
+        "rust": "#8a4a2a",
+        "steel": "#9aa4b4",
+        "lampWhite": "#fff6d0",
+        "lampRed": "#ff2a3a",
+        "olive": "#4f5a3a"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1,
+          0
+        ],
+        "hoodFront": [
+          0,
+          1,
+          2.8
+        ],
+        "cabFloor": [
+          0,
+          1,
+          0.6
+        ],
+        "cabRear": [
+          0,
+          1,
+          -0.6
+        ],
+        "bedFloor": [
+          0,
+          1.05,
+          -1.6
+        ],
+        "bedFront": [
+          0,
+          1.05,
+          -0.65
+        ],
+        "roofTop": [
+          0,
+          1.95,
+          0.2
+        ],
+        "gunMount": [
+          0,
+          1.35,
+          -1.9
+        ],
+        "thrusterFL": [
+          1.05,
+          0.5,
+          1.9
+        ],
+        "thrusterFR": [
+          -1.05,
+          0.5,
+          1.9
+        ],
+        "thrusterBL": [
+          1.05,
+          0.5,
+          -1.7
+        ],
+        "thrusterBR": [
+          -1.05,
+          0.5,
+          -1.7
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "thrusterFL",
+          "parent": "body",
+          "at": [
+            1.05,
+            0.5,
+            1.9
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterFR",
+          "parent": "body",
+          "at": [
+            -1.05,
+            0.5,
+            1.9
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterBL",
+          "parent": "body",
+          "at": [
+            1.05,
+            0.5,
+            -1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterBR",
+          "parent": "body",
+          "at": [
+            -1.05,
+            0.5,
+            -1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "gun",
+          "parent": "body",
+          "at": [
+            0,
+            1.35,
+            -1.9
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "weapon"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "The floating lower hull: slab underbody with skid plates, side sills, front bumper with bull-bar and plow wedge, rear bumper, wheel-arch-style thruster mounting bridges (struts connecting to each thruster joint at the mounts), underglow strips (glowing cyan/magenta emissive bars under the sills), exhaust/heat vents, armored side skirts with hazard stripe decals, tow hooks, panel seams and rivets via the panelled paint, rust and scuffs painted near the lower edges. Everything below y=1.0 between the thrusters except the thrusters themselves.",
+          "box": [
+            [
+              -1.2,
+              0.45,
+              -2.8
+            ],
+            [
+              1.2,
+              1,
+              2.8
+            ]
+          ],
+          "attaches": "Top face at chassisTop supports cab, hood and bed. Struts reach out to thrusterFL/FR/BL/BR mounts.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "thrusters",
+          "builds": "Four identical hover thruster pods built at the thruster mounts, each on its own joint: hexagonal/octagonal ring shroud (lathe) in hullDark with trim chevrons, inner glowing cyan core disc (glow), a fan with 8 angled blades, a stator hub, intake grille bars, magenta accent ring, small vent fins, and a downward cone nozzle with emissive blue-white glow. Pods are about 0.9 m wide and 0.5 m tall; their lowest points touch y=0. Mirrored with s=[1,-1] and front/back. Includes the thin mount arm from each pod to the chassis strut end.",
+          "box": [
+            [
+              -1.55,
+              0,
+              -2.2
+            ],
+            [
+              1.55,
+              0.85,
+              2.4
+            ]
+          ],
+          "attaches": "Each pod centred on its thrusterXX mount and joint; arms meet the chassis struts at x=±0.85.",
+          "joints": [
+            "thrusterFL",
+            "thrusterFR",
+            "thrusterBL",
+            "thrusterBR"
+          ],
+          "floor": true,
+          "budget": 170
+        },
+        {
+          "id": "cab",
+          "builds": "The crew cab and hood: sloped armored hood with raised centre scoop, vents and a hazard-yellow stripe, front grille with glowing lamp slits, two rectangular headlights (glow lampWhite), angular windshield with slits and HUD texture glow, side windows with armored shutters, door panels with door lines, handles, a magenta emblem decal and stencil number, wing mirrors with small cyan screens, roof plate with rack, light bar (neon), antennas, fender flares over the thruster mounts, side exhaust stacks. Panelled gunmetal paint with scuffs and rust at the bottom edge.",
+          "box": [
+            [
+              -1.2,
+              1,
+              -0.65
+            ],
+            [
+              1.2,
+              1.95,
+              2.8
+            ]
+          ],
+          "attaches": "Sits on chassisTop. Rear wall at cabRear/bedFront meets the bed's front wall. Roof at roofTop.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "bed",
+          "builds": "The cargo bed and rear: open bed floor with ribbed texture, side walls with armor plates and slotted tie-downs, tailgate with hazard stripes and a lowered ramp detail, roll bar hoops behind the cab with trim and spotlights, cargo crates and fuel canisters strapped inside (olive, trim), taillights (glow lampRed) with neon strip across the tailgate, rear bumper, licence plate decal with kanji text, antenna whip with a small flag, and a rear thruster-vent cowl.",
+          "box": [
+            [
+              -1.2,
+              1,
+              -2.8
+            ],
+            [
+              1.2,
+              1.75,
+              -0.65
+            ]
+          ],
+          "attaches": "Front wall touches the cab at bedFront. Floor at bedFloor over chassisTop. Roll bar frame stands at gunMount's front.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "turret",
+          "builds": "A pintle-mounted heavy gun on the bed: swivel base ring with ammo drum, pedestal, armored gun shield with trim stripes and a cyan sight slit, twin barrels with muzzle brakes and cooling sleeves, ammo belt of brass links curving into the receiver, a small radar dish and targeting module with a glowing magenta eye, handles, and a neon status light. All on the 'gun' joint so it can aim; the base is rigid on body.",
+          "box": [
+            [
+              -0.5,
+              1.05,
+              -2.4
+            ],
+            [
+              0.5,
+              2.1,
+              -0.9
+            ]
+          ],
+          "attaches": "Base on bedFloor at gunMount; the roll bar sits just forward of it.",
+          "joints": [
+            "body",
+            "gun"
+          ],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T10:04:18.847Z",
+        "wallMs": 23620,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85244,
+          "completion_tokens": 3036,
+          "total_tokens": 88280,
+          "prompt_tokens_details": {
+            "cached_tokens": 85240
+          }
+        },
+        "costUsd": 0.038892,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T10:04:42.467Z",
+        "wallMs": 17293,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88435,
+          "completion_tokens": 2589,
+          "total_tokens": 91024,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0430004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bed",
+        "started": "2026-10-25T10:04:42.467Z",
+        "wallMs": 26157,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88410,
+          "completion_tokens": 4413,
+          "total_tokens": 92823,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0611904,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "thrusters",
+        "started": "2026-10-25T10:04:42.467Z",
+        "wallMs": 34191,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88465,
+          "completion_tokens": 4936,
+          "total_tokens": 93401,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.06653039999999999,
+        "hasCode": true,
+        "reasoning": "I'm figuring out how to type the buildThrusters function parameters, deciding to follow the example's approach of typing the destructured context explicitly as Ctx rather than leaving it implicit.\n\nNow I'm designing the thruster pod geometry: positioning each pod centered at its mount joint, defining the outer shroud as an octagonal lathe shape with a wall profile tapering between radii 0.34-0.47, adding a thin magenta glowing ring around the pod, and placing a cyan glow disc at the core.\n\nWriting hub and blade geometry...\n\nAdding chevron trim pieces and shroud details...\n\nNow I'm working out the mount arms connecting the engine pods to the chassis, using rod geometry from the shroud out to around x=±0.85 with a clamp collar for attachment.\n\nI'm also planning surface detailing—a hazard-chevron or radial-ring decal texture on the core disc intake, considering an SVG texture plane facing upward with a glow effect to give the central core some visual accent.\n\nNow I'm structuring the code itself: building a reusable pod-building helper that loops over each thruster position (FL, mirrored by side and z-axis), applying the correct mounts, quaternion rotations, and flat-colored parts since glow only works on raw parts, not painted ones. I'm tallying the part count per pod—shrouds, rings, cores, hubs, blades, stators, grilles, fins, chevrons, nozzles, and arms—to make sure everything is accounted for before writing the loop.\n\n"
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T10:04:42.467Z",
+        "wallMs": 38578,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88436,
+          "completion_tokens": 6497,
+          "total_tokens": 94933,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0820824,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turret",
+        "started": "2026-10-25T10:04:42.467Z",
+        "wallMs": 49137,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88377,
+          "completion_tokens": 7248,
+          "total_tokens": 95625,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0894744,
+        "hasCode": true,
+        "reasoning": "I'm sketching out the buildTurret function, planning to keep it compact while using the context object's joint and body references safely, starting with placing the gun joint facing forward at the base position.\n\nNow I'm working out positioning details: a pedestal and swivel ring on the body joint, then the gun components (receiver box, shield, barrels, muzzle brakes, radar module) attached to the gun joint, carefully aligning cylinder orientations and box dimensions so everything lines up visually. I'm also picking a small color palette with brass tones and glow accents for the eye, slit, and status light, plus planning a hazard-stripe texture for the shield's front face.\n\nNext I'm figuring out the ammo belt and drum placement -- routing brass belt links along a curved path from the ammo drum to the receiver, and deciding how to use the along-path helper with frame positioning. Then I'm sketching out the lathe profile for the base ring, defining its outline points and bone attachment to keep the construction straightforward.\n\nNow I'm laying out the gun's mechanical frame: a pedestal cylinder, a rotating turntable ring on the gun joint, and the receiver box positioned behind it. I'm adding yoke cheek plates flanking the turntable and extruding a shield shape from a polygon outline, along with planning a sight slit cut into it.\n\nStill refining the shield slit and barrel geometry, using plain colored paint with scuff noise texture for the shield and a hazard stripe plane on its lower front, then sketching barrel sweeps and brake/sleeve details at the muzzle ends.\n\nNow I'm adding the brake with vent fins, rear handle grips and spade grips built from looped rods, and sketching a radar dish on a stalk mounted atop the shield.\n\nI need to recheck the vertical stacking so the dish stays within the 2.1 height limit—adjusting the shield top, stalk length, and dish radius so everything fits. Then I'm figuring out where to place a small targeting module box on top of the receiver, near the shield area toward the back.\n\nSince the shield blocks a front-facing eye, I'll move the module onto the top of the shield instead, offset to one side, with a glowing magenta eye sphere peeking out front and a cyan status light placed opposite the radar piece.\n\n"
+      }
+    ]
+  }
+}
