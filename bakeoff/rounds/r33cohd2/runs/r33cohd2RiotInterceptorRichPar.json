@@ -1,0 +1,480 @@
+{
+  "slug": "r33cohd2RiotInterceptorRichPar",
+  "arm": "par",
+  "subject": "riotInterceptor",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: corporate riot-control interceptor with a water cannon and neon light bars.\nStyle: Cyberpunk 2077.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T14:10:32.685Z",
+  "wallMs": 44374,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 526011,
+    "completion_tokens": 17369,
+    "total_tokens": 543380,
+    "prompt_tokens_details": {
+      "cached_tokens": 505668
+    }
+  },
+  "costUsd": 0.26494280000000003,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 21848,
+    "slowestPartMs": 22526,
+    "critical": "bed",
+    "elapsedMs": 44374,
+    "spec": {
+      "name": "Arasaka-style Riot Interceptor RC-9",
+      "description": "A hulking corporate riot-control interceptor truck with a roof water cannon, armored wedge plow and glowing neon light bars in a Cyberpunk 2077 look.",
+      "builderName": "riotInterceptor",
+      "size": [
+        2.6,
+        2.9,
+        6.4
+      ],
+      "layout": "Low, wide armored wedge-nosed truck. Front (+Z): angled push-bar plow with neon strip and hazard stripes, headlight slits, then the sloped hood, a high armored cab with narrow tinted windshield and a roof neon light bar, then a long tank/cargo bed at the rear with a roof-mounted water cannon turret on a ring. Six chunky wheels in fenders on the floor (front axle, two rear axles). Style: matte graphite hull with yellow hazard trim, corporate decals, glowing cyan and magenta neon bars, grime paint, emissive details via the glow kit.",
+      "palette": {
+        "hull": "#2a2f3a",
+        "hullDark": "#14171e",
+        "armor": "#3d4452",
+        "hazard": "#f2c200",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2bd6",
+        "glass": "#0b1a2a",
+        "tire": "#101012",
+        "rim": "#8a919e",
+        "tank": "#4a5566",
+        "water": "#6fd6ff",
+        "warnRed": "#ff2a3c",
+        "white": "#e8ecf2"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.3,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.3,
+          1.2
+        ],
+        "bedDeck": [
+          0,
+          1.3,
+          -1.5
+        ],
+        "turretRing": [
+          0,
+          2,
+          -1.4
+        ],
+        "frontAxle": [
+          0,
+          0.55,
+          2
+        ],
+        "rearAxle1": [
+          0,
+          0.55,
+          -1.3
+        ],
+        "rearAxle2": [
+          0,
+          0.55,
+          -2.6
+        ],
+        "plowMount": [
+          0,
+          0.7,
+          3.1
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turretYaw",
+          "parent": "body",
+          "at": [
+            0,
+            2,
+            -1.4
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "cannonPitch",
+          "parent": "turretYaw",
+          "at": [
+            0,
+            2.45,
+            -1.4
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.15,
+            0.55,
+            2
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.15,
+            0.55,
+            2
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.15,
+            0.55,
+            -1.3
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.15,
+            0.55,
+            -1.3
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelBL",
+          "parent": "body",
+          "at": [
+            1.15,
+            0.55,
+            -2.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelBR",
+          "parent": "body",
+          "at": [
+            -1.15,
+            0.55,
+            -2.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Lower hull and frame: slab underbody, side skirts with hazard-stripe paint and panelled armor plates, fender arches over all six wheels, rear bumper with warnRed tail light slits, exhaust stacks, underglow neon strips in neonMagenta along the skirts, grime paint darker near the floor, corporate logo decals on the flanks (SVG).",
+          "box": [
+            [
+              -1.3,
+              0.3,
+              -3.2
+            ],
+            [
+              1.3,
+              1.3,
+              2.6
+            ]
+          ],
+          "attaches": "Top at chassisTop carries cab and bed; wheel wells centred on the axle mounts; front meets plow at plowMount.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 180
+        },
+        {
+          "id": "cab",
+          "builds": "Armored cab and nose: sloped hood, high cab block with narrow tinted glass windshield and side slit windows (SVG textured with reflection streaks), roof neon light bar in neonCyan and neonMagenta with warning strobes, headlight slits glowing white, side mirrors, door seams, antenna array, cage grille, decals and plate numbers.",
+          "box": [
+            [
+              -1.25,
+              1.3,
+              0.3
+            ],
+            [
+              1.25,
+              2.5,
+              2.9
+            ]
+          ],
+          "attaches": "Sits on cabFloor; hood front meets plow at plowMount; rear wall meets the bed at bedDeck front.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "plowAndWheels",
+          "builds": "Front wedge push-bar plow with hazard stripes and neonCyan edge strip, tow hooks, bull bars, plus all six wheels: chunky low-poly tires, rim discs with bolt rings, brake discs, each on its wheel joint (rotate about the x axle), tires black with mud paint near the bottom.",
+          "box": [
+            [
+              -1.3,
+              0,
+              -3.2
+            ],
+            [
+              1.3,
+              1.1,
+              3.2
+            ]
+          ],
+          "attaches": "Plow bolts to plowMount; wheels centred on frontAxle, rearAxle1 and rearAxle2 mounts at x=±1.15 and ride the wheel joints; tire radius 0.55 so bottoms touch y=0.",
+          "joints": [
+            "body",
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelBL",
+            "wheelBR"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "bed",
+          "builds": "Rear cargo and tank section: boxy armored bed with a cylindrical water tank lying along z (tank color, banded with bolted straps, hazard stripes, level gauge glowing water), side equipment lockers with riveted panels, rear hatch with ladder, roof rails, pipes and hoses running toward the turret, neonMagenta strip lights along the top edge, decals reading WATER and a corporate emblem.",
+          "box": [
+            [
+              -1.25,
+              1.3,
+              -3.2
+            ],
+            [
+              1.25,
+              2.2,
+              0.3
+            ]
+          ],
+          "attaches": "Sits on bedDeck; front wall touches cab; its roof has the turretRing mount where the turret base ring sits.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 180
+        },
+        {
+          "id": "turret",
+          "builds": "Roof water cannon: rotating base ring and armored pedestal on turretYaw, gunner shield with narrow viewport, thick barrel on cannonPitch with a flared nozzle, cooling collars, water feed hoses, hazard stripes, glowing neonCyan nozzle ring and water-colored glowing tip, small sensor pod and a warnRed beacon. Barrel points toward +Z.",
+          "box": [
+            [
+              -0.7,
+              2,
+              -2.4
+            ],
+            [
+              0.7,
+              2.9,
+              0.1
+            ]
+          ],
+          "attaches": "Base ring sits at turretRing on the bed roof; yaw joint at turretRing, pitch joint 0.45 m above it.",
+          "joints": [
+            "turretYaw",
+            "cannonPitch"
+          ],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:10:32.685Z",
+        "wallMs": 21848,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85252,
+          "completion_tokens": 2749,
+          "total_tokens": 88001,
+          "prompt_tokens_details": {
+            "cached_tokens": 85248
+          }
+        },
+        "costUsd": 0.0360228,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:10:54.533Z",
+        "wallMs": 14975,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88133,
+          "completion_tokens": 2099,
+          "total_tokens": 90232,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0374964,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turret",
+        "started": "2026-10-25T14:10:54.533Z",
+        "wallMs": 17616,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88155,
+          "completion_tokens": 2888,
+          "total_tokens": 91043,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0454304,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:10:54.533Z",
+        "wallMs": 18856,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88122,
+          "completion_tokens": 2871,
+          "total_tokens": 90993,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0451944,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "plowAndWheels",
+        "started": "2026-10-25T14:10:54.533Z",
+        "wallMs": 19044,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88207,
+          "completion_tokens": 3125,
+          "total_tokens": 91332,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0479044,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bed",
+        "started": "2026-10-25T14:10:54.533Z",
+        "wallMs": 22526,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88142,
+          "completion_tokens": 3637,
+          "total_tokens": 91779,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0528944,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

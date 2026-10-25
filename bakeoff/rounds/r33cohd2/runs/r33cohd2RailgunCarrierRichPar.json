@@ -1,0 +1,566 @@
+{
+  "slug": "r33cohd2RailgunCarrierRichPar",
+  "arm": "par",
+  "subject": "railgunCarrier",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T14:10:32.684Z",
+  "wallMs": 46448,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 530417,
+    "completion_tokens": 15556,
+    "total_tokens": 545973,
+    "prompt_tokens_details": {
+      "cached_tokens": 505667
+    }
+  },
+  "costUsd": 0.2556267,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 24997,
+    "slowestPartMs": 21451,
+    "critical": "hull",
+    "elapsedMs": 46448,
+    "spec": {
+      "name": "Six-Wheeled Railgun Carrier",
+      "description": "A low-poly sci-fi military six-wheeled armoured carrier carrying a long electromagnetic railgun on its back, planted on four deployed stabiliser legs.",
+      "builderName": "railgunCarrier",
+      "size": [
+        4.2,
+        3,
+        9
+      ],
+      "layout": "Long, low armoured hull facing +Z. Front (z 3.2 to 4.5): sloped glacis, angular cab with a slit visor window on top of the hull, and headlights. Middle: flat deck with the turret ring at z=-0.4. Rear (z -4.5): engine deck, exhaust vents and a cargo/ammo bay. Three wheel axles per side at z=2.8, 0.2 and -2.8, with big chunky tyres (radius 0.6) set in angular wheel arches. Four stabiliser legs fold out diagonally from the hull sides near the front and rear axles to square footpads on the floor, which are wider than the tyres. A big railgun on a turret rides the deck with a long barrel extending forward over the cab, flanked by two parallel rails, glowing cyan coils, a recoil sleeve and a muzzle brake. The railgun's rails and coils glow neon cyan. Style: chunky faceted slabs, bold yellow hazard trim, olive-grey armour panels with riveted seams, dark gunmetal rails, and decals such as stencilled numbers and a unit emblem.",
+      "palette": {
+        "hull": "#4d5648",
+        "hullDark": "#2f352e",
+        "hullLight": "#6b7561",
+        "trim": "#e7b814",
+        "gunmetal": "#2a2d33",
+        "steel": "#8a919b",
+        "tyre": "#17181a",
+        "rim": "#555b63",
+        "glass": "#1b6f86",
+        "neonCyan": "#2ff3ff",
+        "warnRed": "#c8261e",
+        "lamp": "#fff1b0",
+        "cloth": "#7a6a45"
+      },
+      "mounts": {
+        "deckTop": [
+          0,
+          1.75,
+          0
+        ],
+        "turretRing": [
+          0,
+          1.75,
+          -0.4
+        ],
+        "gunPivot": [
+          0,
+          2.55,
+          -0.4
+        ],
+        "muzzle": [
+          0,
+          2.65,
+          5.2
+        ],
+        "cabRoof": [
+          0,
+          2.3,
+          3
+        ],
+        "axleFront": [
+          0,
+          0.6,
+          2.8
+        ],
+        "axleMid": [
+          0,
+          0.6,
+          0.2
+        ],
+        "axleRear": [
+          0,
+          0.6,
+          -2.8
+        ],
+        "legFrontL": [
+          1.45,
+          1.1,
+          2.2
+        ],
+        "legRearL": [
+          1.45,
+          1.1,
+          -2.4
+        ],
+        "footFrontL": [
+          2.9,
+          0,
+          3
+        ],
+        "footRearL": [
+          2.9,
+          0,
+          -3.4
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1.2,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turret",
+          "parent": "body",
+          "at": [
+            0,
+            1.75,
+            -0.4
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "gun"
+        },
+        {
+          "name": "gun",
+          "parent": "turret",
+          "at": [
+            0,
+            2.55,
+            -0.4
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "gun"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.85,
+            0.6,
+            2.8
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.85,
+            0.6,
+            0.2
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.85,
+            0.6,
+            -2.8
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.85,
+            0.6,
+            2.8
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.85,
+            0.6,
+            0.2
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.85,
+            0.6,
+            -2.8
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "legFL",
+          "parent": "body",
+          "at": [
+            1.45,
+            1.1,
+            2.2
+          ],
+          "dir": [
+            1,
+            -0.7,
+            0.3
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "legRL",
+          "parent": "body",
+          "at": [
+            1.45,
+            1.1,
+            -2.4
+          ],
+          "dir": [
+            1,
+            -0.7,
+            -0.3
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "legFR",
+          "parent": "body",
+          "at": [
+            -1.45,
+            1.1,
+            2.2
+          ],
+          "dir": [
+            -1,
+            -0.7,
+            0.3
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "legRR",
+          "parent": "body",
+          "at": [
+            -1.45,
+            1.1,
+            -2.4
+          ],
+          "dir": [
+            -1,
+            -0.7,
+            -0.3
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        }
+      ],
+      "parts": [
+        {
+          "id": "hull",
+          "builds": "Main armoured chassis: lofted/faceted lower tub and upper hull with sloped glacis and tail, panelled olive paint with riveted seams (clockwork panelled over hull paint), yellow hazard stripes on the lower skirt and rear bumper, deck plating with hatches and grab rails, side armour skirts over wheel arches, and a rear engine deck with vents and exhaust stacks. Stencilled unit number and emblem decals on the flanks.",
+          "box": [
+            [
+              -1.9,
+              0.5,
+              -4.5
+            ],
+            [
+              1.9,
+              1.95,
+              4.5
+            ]
+          ],
+          "attaches": "Sits on the wheels and carries the cab at cabRoof, the turret at turretRing, and the leg sockets at legFrontL and legRearL.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Angular command cab at the front of the hull: wedge body, slit glass visor with a drawn cyan HUD texture, roof hatch and antenna cluster, sensor pod, two headlights with lamp glow, hazard trim, and a sloped front armour plate with a tow hook.",
+          "box": [
+            [
+              -1.5,
+              1.7,
+              2
+            ],
+            [
+              1.5,
+              2.6,
+              4.4
+            ]
+          ],
+          "attaches": "Sits on the hull deck at deckTop y=1.75 with its roof at cabRoof; it stays clear of the turret ring and the gun path, which passes above it.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 120
+        },
+        {
+          "id": "wheels",
+          "builds": "Six large chunky low-poly tyres with tread blocks painted or extruded, faceted steel rims with bolt rings and hub caps, axle housings, suspension arms and shock absorbers linking to the hull, and mud-splash paint at the bottom. All the tyres rest on y = 0 and are 1.2 m in diameter. Each tyre spins on its wheel joint.",
+          "box": [
+            [
+              -2.3,
+              0,
+              -3.5
+            ],
+            [
+              2.3,
+              1.2,
+              3.5
+            ]
+          ],
+          "attaches": "Wheels are centred on the axleFront, axleMid and axleRear lines at x = ±1.85, and suspension arms reach in to the hull sides at x = ±1.6.",
+          "joints": [
+            "wheelFL",
+            "wheelML",
+            "wheelRL",
+            "wheelFR",
+            "wheelMR",
+            "wheelRR"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "stabilisers",
+          "builds": "Four deployed stabiliser legs: a hull-side mounting block, a thick hydraulic upper strut with a piston sleeve, and an angled lower leg ending in a wide square footpad with a hazard-striped rim and ground-grip ribs. The legs extend diagonally outward and down, and they separate wider than the tyres. They carry yellow warning bands, glowing red status lamps and exposed hydraulic hoses (swept tubes).",
+          "box": [
+            [
+              -3.3,
+              0,
+              -3.8
+            ],
+            [
+              3.3,
+              1.5,
+              3.4
+            ]
+          ],
+          "attaches": "Roots on the hull sides at legFrontL, legRearL and their mirrors at x = ±1.45, y = 1.1; the footpads at footFrontL and footRearL (x ±2.9) rest on y = 0.",
+          "joints": [
+            "legFL",
+            "legRL",
+            "legFR",
+            "legRR"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "railgun",
+          "builds": "The signature railgun. A rotating turret base with a ring bearing and armoured housing at turretRing, a cradle with trunnions at gunPivot, and a very long barrel assembly: two parallel gunmetal rails with a cyan glow gap between them, ring coils (glowing neon cyan) spaced along the barrel, a recoil sleeve, a heavy breech block with a power cable bundle and capacitor banks (boxes with glowing indicator strips), a muzzle brake with a glowing tip at muzzle, and yellow warning bands. A small drawn-texture warning label sits on the breech.",
+          "box": [
+            [
+              -1.3,
+              1.75,
+              -4.3
+            ],
+            [
+              1.3,
+              3,
+              5.4
+            ]
+          ],
+          "attaches": "The turret base sits on the hull at turretRing (y = 1.75) and the barrel pivots at gunPivot, with its tip at muzzle (z = 5.2) held above the cab roof so it clears cabRoof by at least 0.3 m.",
+          "joints": [
+            "turret",
+            "gun"
+          ],
+          "floor": false,
+          "budget": 220
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:10:32.684Z",
+        "wallMs": 24997,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85251,
+          "completion_tokens": 3445,
+          "total_tokens": 88696,
+          "prompt_tokens_details": {
+            "cached_tokens": 85247
+          }
+        },
+        "costUsd": 0.0429827,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "stabilisers",
+        "started": "2026-10-25T14:10:57.682Z",
+        "wallMs": 11427,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89053,
+          "completion_tokens": 1824,
+          "total_tokens": 90877,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0365864,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T14:10:57.681Z",
+        "wallMs": 12626,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89032,
+          "completion_tokens": 2005,
+          "total_tokens": 91037,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.038354400000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:10:57.681Z",
+        "wallMs": 13703,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88959,
+          "completion_tokens": 2187,
+          "total_tokens": 91146,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0400284,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "railgun",
+        "started": "2026-10-25T14:10:57.682Z",
+        "wallMs": 16048,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89104,
+          "completion_tokens": 2670,
+          "total_tokens": 91774,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0451484,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "hull",
+        "started": "2026-10-25T14:10:57.681Z",
+        "wallMs": 21451,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89018,
+          "completion_tokens": 3425,
+          "total_tokens": 92443,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0525264,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

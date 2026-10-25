@@ -1,0 +1,11 @@
+The hood `ex([...])` call in `buildFrontEnd` lists its outline points as [z, y], but the hood outline `[[2.0,0.7],[3.8,0.7],[3.8,1.4],[3.2,1.75],[2.0,1.9]]` has a closing edge 4→0 that runs along x=2.0 while the first edge runs along y=0.7. The error is edge 0→1 meeting edge 2→3, so it is the first `ex` call, the hood. Line 386 is the "front block" call (`[[3.4,0.7],[3.8,0.7],[3.8,1.4],[3.4,1.5]]`) or the hood itself. Neither edge pair crosses on the page, but the arch outline is built wrongly. It goes around the outer arc and back along the inner arc in reverse. The reversed inner arc repeats the 180° point and leaves the loop inconsistent, so the `ex` that fails is the first call that uses it. The fix is to wind the inner arc in the opposite direction, which closes the loop correctly, and to shape the arch as a proper band.
+
+Both arcs are 0°..180° outer, then 180°..0° inner, which is a valid band. So the failing call is the hood. Its edge 0→1 is the bottom, y=0.7 from z=2.0 to 3.8. Edge 2→3 runs from (3.8,1.4) to (3.2,1.75). Those do not cross, so the likely culprit is the x/y mapping: `x: [0,0,1]` with a `y` that is not perpendicular to it does not apply here. The remaining suspect is `ex` when `o` carries `thickness`. I cannot see a self-crossing in the hood data, so I am fixing the outline most likely to cross: the plow bumper `[[3.7,0.4],[3.7,0.95],[3.92,0.78],[3.92,0.4]]`, where edge 0→1 is vertical at 3.7 and edge 2→3 is vertical at 3.92. These are parallel and do not cross either.
+
+The `topY` plate outline is the one that genuinely crosses: `[[2.2,1.7],[3.6,1.7],[3.6,topY(3.6)+0.07],[3.2,topY(3.2)+0.07],[2.2,topY(2.2)+0.07]]`. The point 0 at y=1.7 lies above the topY(2.2)+0.07 value of about 1.82, so the last edge and the first edge are fine. But `topY(3.6)+0.07` is about 1.53, below 1.7, so edge 2→3 crosses edge 0→1. Raising the plate's base fixes it.
+
+<<<<<<< SEARCH
+    [[2.2, 1.7], [3.6, 1.7], [3.6, topY(3.6) + 0.07], [3.2, topY(3.2) + 0.07], [2.2, topY(2.2) + 0.07]],
+=======
+    [[2.2, 1.4], [3.6, 1.4], [3.6, topY(3.6) + 0.07], [3.2, topY(3.2) + 0.07], [2.2, topY(2.2) + 0.07]],
+>>>>>>> REPLACE

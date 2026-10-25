@@ -1,0 +1,415 @@
+{
+  "slug": "r33cohmHoverPickupRichPar",
+  "arm": "par",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:12:36.550Z",
+  "wallMs": 130788,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 438355,
+    "completion_tokens": 47025,
+    "total_tokens": 485380,
+    "prompt_tokens_details": {
+      "cached_tokens": 421576
+    }
+  },
+  "costUsd": 0.5459655999999999,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 22099,
+    "slowestPartMs": 108689,
+    "critical": "chassis",
+    "elapsedMs": 130788,
+    "spec": {
+      "name": "Hoverpickup X-9 Warthog",
+      "description": "A militarized pickup truck converted to ride on four glowing hover thruster pods, in low-poly cyberpunk style with neon trim, armor plates and a roof-mounted gun.",
+      "builderName": "hoverPickup",
+      "size": [
+        2.5,
+        2.3,
+        5.8
+      ],
+      "layout": "Pickup silhouette facing +Z: short armored hood at the front (z 1.2 to 2.9), a boxy cab with a sloped windshield (z -0.5 to 1.2), an open cargo bed at the rear (z -2.9 to -0.5) with a roll bar and a swivel gun. There are no wheels: four angular hover thruster pods sit at the wheel positions under flared arches, each a downward-facing turbine nozzle with a glowing cyan ring and a faint disc underneath. The chassis floats about 0.35 m above the ground, and the thruster pods are the lowest parts, touching y = 0. Style: faceted armor panels in dark gunmetal, hazard-yellow trim stripes, magenta and cyan neon strips along the sills, bumper and bed edges, glowing headlights, glowing visor-slit windows, decals (stencil numbers, a skull-wings emblem, a warning chevron) painted as SVG textures. The tone is cyberpunk, with panel seams, rivets and exposed vents everywhere.",
+      "palette": {
+        "hull": "#3a4150",
+        "hullDark": "#20242e",
+        "armor": "#566070",
+        "trim": "#e7b814",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fa8",
+        "glass": "#0d1a2a",
+        "rubber": "#15161a",
+        "metal": "#8a93a3",
+        "rust": "#7a4a2a",
+        "headlight": "#fff6c4",
+        "tail": "#ff2a3a",
+        "ink": "#0a0a10"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1,
+          0
+        ],
+        "hoodFront": [
+          0,
+          0.95,
+          2.9
+        ],
+        "cabFloor": [
+          0,
+          1,
+          0.35
+        ],
+        "bedFloor": [
+          0,
+          1,
+          -1.7
+        ],
+        "tailgate": [
+          0,
+          1,
+          -2.9
+        ],
+        "gunRing": [
+          0,
+          1.65,
+          -1.4
+        ],
+        "thrusterFL": [
+          1,
+          0.55,
+          1.95
+        ],
+        "thrusterFR": [
+          -1,
+          0.55,
+          1.95
+        ],
+        "thrusterRL": [
+          1,
+          0.55,
+          -1.8
+        ],
+        "thrusterRR": [
+          -1,
+          0.55,
+          -1.8
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            0.9,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "thrusterFL",
+          "parent": "body",
+          "at": [
+            1,
+            0.55,
+            1.95
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterFR",
+          "parent": "body",
+          "at": [
+            -1,
+            0.55,
+            1.95
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterRL",
+          "parent": "body",
+          "at": [
+            1,
+            0.55,
+            -1.8
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterRR",
+          "parent": "body",
+          "at": [
+            -1,
+            0.55,
+            -1.8
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "gunBase",
+          "parent": "body",
+          "at": [
+            0,
+            1.65,
+            -1.4
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "gun"
+        },
+        {
+          "name": "gunBarrel",
+          "parent": "gunBase",
+          "at": [
+            0,
+            1.95,
+            -1.4
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "gun"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Floating underframe and lower body: a faceted slab chassis between z -2.9 and 2.9, side sills with neon cyan and magenta strips, wheel-arch flares over the four thruster positions (arches cut or shaped as angular frames), a belly plate with vents and glowing underglow panel, armored front bumper with a ram bar, yellow-black hazard chevron stripes, tow hooks, a rear bumper with tail lights, and a front skid plate. Paints: gunmetal with panel seams, rivets, scratches and rust at the lower edges; decals on the side doors.",
+          "box": [
+            [
+              -1.25,
+              0.45,
+              -2.95
+            ],
+            [
+              1.25,
+              1.05,
+              2.95
+            ]
+          ],
+          "attaches": "Sits on the body joint. Thruster pods hang from the thruster mounts under the arches. The cab starts at chassisTop, and the hood and the bed floor meet it there.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Armored cab and hood: a sloped, angular hood with a center ridge, vents, a headlight cluster (glowing headlights, a magenta light bar), a front grille with neon slits, a faceted cab box with slanted armored windshield and visor-slit side windows (dark glass with cyan glow reflection textures), door panels with handles, a skull-winged emblem decal, side mirrors with tiny antennas, a roof with an antenna, a light rack and a sensor dome, and an interior suggestion (seats, dash glow) seen through the glass. Hazard stripes and stencil numbers are painted by SVG texture.",
+          "box": [
+            [
+              -1.2,
+              1,
+              -0.55
+            ],
+            [
+              1.2,
+              2.3,
+              2.9
+            ]
+          ],
+          "attaches": "Sits on chassisTop. The rear wall of the cab at z -0.5 meets the bed's front wall. The hood front reaches hoodFront.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "bed",
+          "builds": "Cargo bed with a military upfit: an open bed with angular armored side walls and ribbed floor at bedFloor, a tailgate with warning chevrons and a neon edge, a roll bar with a light bar, mounted crates and ammo boxes with stencil labels, a spare fuel canister rack, strap tie-downs, a rear antenna whip with a flag, and a rotating gun turret at gunRing: a ring base, a pivoting mount, a twin-barrel autocannon with glowing muzzle tips and an ammo belt box. Wall panels carry rivets, with neon magenta edge strips.",
+          "box": [
+            [
+              -1.25,
+              1,
+              -2.95
+            ],
+            [
+              1.25,
+              2.3,
+              -0.5
+            ]
+          ],
+          "attaches": "Sits on chassisTop and bedFloor. The front wall meets the cab's rear wall. The gun turret rides the gunBase and gunBarrel joints at gunRing. The tailgate is at tailgate.",
+          "joints": [
+            "body",
+            "gunBase",
+            "gunBarrel"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "thrusters",
+          "builds": "Four hover thruster pods, built identically and mirrored by side, at thrusterFL, FR, RL and RR, in place of wheels. Each pod is a boxy faceted nacelle under the arch, with an angular mount strut and bracing, a fan housing, a turbine of radial blades (extruded or lathe), a downward nozzle bell with a glowing cyan ring and an inner magenta core, hazard-yellow stripes on the housing, and a flat translucent glow disc or cone card of light below, at the floor. The lowest points of the nozzles touch y = 0. Add small stabilizer fins, exhaust vents and heat-shimmer texture cards. Each pod rides its own thruster joint.",
+          "box": [
+            [
+              -1.3,
+              0,
+              -2.4
+            ],
+            [
+              1.3,
+              0.75,
+              2.5
+            ]
+          ],
+          "attaches": "Hangs from the four thruster mounts, at the chassis arches, each on its own thruster joint.",
+          "joints": [
+            "thrusterFL",
+            "thrusterFR",
+            "thrusterRL",
+            "thrusterRR"
+          ],
+          "floor": true,
+          "budget": 200
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:12:36.550Z",
+        "wallMs": 22099,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85244,
+          "completion_tokens": 2881,
+          "total_tokens": 88125,
+          "prompt_tokens_details": {
+            "cached_tokens": 85240
+          }
+        },
+        "costUsd": 0.037342,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "thrusters",
+        "started": "2026-10-25T14:12:58.649Z",
+        "wallMs": 38291,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88298,
+          "completion_tokens": 5196,
+          "total_tokens": 93494,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0687964,
+        "hasCode": true,
+        "reasoning": "I'm working out the buildThrusters function using the Ctx type, positioning a thruster pod at a local origin offset by its mount point, with a joint for thrusterFL aimed downward and bound to its bone.\n\nFor the pod itself, I'm laying out a mount strut connecting to the chassis, an octagonal housing cylinder, a tapering nozzle bell ending at the lowest point, a cyan glow ring at the lip, a magenta core disc, and radial turbine blades tucked inside near the bottom opening so they're visible from below.\n\nFor the glow disc beneath each pod, I'm using a plane with a radial gradient texture facing upward, positioned just above y=0, with alpha-tested edges to create a hard-edged ring-and-disc glow shape. I'm also planning a few vertical heat-shimmer cards standing near each pod using a wavy-line texture for added atmospheric effect.\n\nI'm also sketching out beam-light cards hanging beneath each pod with cyan streak textures, hazard stripe paint on the housing band, a mounting strut hull with diagonal bracing rods, small side fins, and dark vent boxes, all built from the limited color palette with an octagonal cylinder forming the housing shape.\n\nNow I'm looping over the four thruster pods, naming them and positioning fins on their outer sides using a sign-based offset, working out the extrusion direction and triangular outline points so each fin faces outward correctly.\n\nNext I'm turning to the turbine assembly, planning eight radial blades extruded with radial and tangential axes plus thickness, topped with a central hub cylinder, then starting on bone attachment and a ring/torus component.\n\nStill working out the lathe outline for the nozzle shell...\n\nHousing sits above as a tall cylinder from y 0.3 to 0.72, and I'm sizing the strut mount around y 0.55 so it stays within the chassis bounding box. I'll give the lathe 8 segments, use flat colors so glow kits can apply properly, and write the disc texture as a simple ringed SVG.\n\n"
+      },
+      {
+        "id": "bed",
+        "started": "2026-10-25T14:12:58.649Z",
+        "wallMs": 79063,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88293,
+          "completion_tokens": 11939,
+          "total_tokens": 100232,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.1362164,
+        "hasCode": true,
+        "reasoning": "I'm planning the buildBed function using the provided Ctx type with helpers like b, J, P, M, keeping it concise and within the known API. I'm sketching the bed's bounding coordinates, roughly spanning x from -1.25 to 1.25, y from 1 to 2.3, and z from -2.95 to -0.5.\n\nI'm laying out the bed geometry in detail: floor slab resting atop the chassis, side walls up to about 1.65 height, a front wall meeting the cab, and a tailgate at the rear. I'm planning a box helper function tied to the body bone, gun joints for a turret mount with barrel and base positions, decorative decal planes for hazard stripes and panel textures on the outer faces, and pulling in paint and glow styles from the clockwork kit for a gunmetal panelled look.\n\nWriting box helper function...\n\nNow I'm adding side wall panels with angled top rails, a glowing magenta edge strip, merged rivet spheres along each wall, and flared armor plates near the wheel arches to give the bed a more rugged, built-up look.\n\nI'm also roughing out ribbed floor plating, a front wall panel for the cab, and a roll bar structure with uprights, a top crossbar, and diagonal braces for structural detail.\n\nNow I'm adding the tailgate with a glowing neon edge strip, a chevron decal plane, hinge cylinders, latches, and corner posts, then moving on to placing crates in the bed.\n\nAdding tie-down rings, a tilted whip antenna with a small magenta flag at the rear corner, and now working out the gun turret's ring base and pedestal height relative to the bed floor.\n\nBuilding the turret's yoke cheeks, cradle box, and twin barrels with shrouds and glowing muzzle tips...\n\nI'm checking for collisions between the barrels, the roll bar, and the cab rear wall, adjusting the roll bar's z-position and shortening the barrel length so nothing clips through the cab geometry.\n\nAdjusting mount position so cradle and barrels sit at z -1.3 to -0.8 with rear breeches behind, then adding an ammo box and belt sweep connecting it to the breech using a curved tube geometry.\n\nNow I'm adding glowing cyan tips to the barrel muzzles, panelled seam paint on the hull using the metal palette, and grain texture on the floor, while keeping to the shared color palette plus a few custom additions, and planning chevron, stencil, and skull emblem decals for the walls or crate.\n\nWriting decal and rivet code...\n\n"
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:12:58.649Z",
+        "wallMs": 92471,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88259,
+          "completion_tokens": 12514,
+          "total_tokens": 100773,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.1418984,
+        "hasCode": true,
+        "reasoning": "I'm working out the cab dimensions, planning the box and hood shapes with their z and y ranges relative to the chassis width.\n\nFor the greenhouse, I'm sketching a roof slab, sloped windshield glass, and A-pillar rods, plus narrow visor-style side window panes positioned on the upper cab sides.\n\nFor the upper cab, I'll make it a solid dark armored box with glass planes and framing on the outer faces, a rear wall with a window plane, and a sloped windshield slab angled backward to avoid clipping through the greenhouse geometry.\n\nThe greenhouse box sits behind the windshield plane so it won't poke through the glass. Since the glass is opaque and dark, I don't need to worry about rendering interior seats or dash details visible through it—I'll keep the windshield as a simple glass plane with a dash line at the right height instead.\n\nStill working out door panel geometry and placement...\n\nNow mirroring parts across both sides: mirror arms with housings, antenna rod, roof slab, light rack with emissive boxes, and a sensor dome made from a half-sphere, positioning everything along the roof top.\n\nI'm adjusting height limits so nothing pokes above 2.3 -- shrinking the roof, light rack, and sensor dome slightly, and reworking the greenhouse and windshield dimensions to fit within the new roof position.\n\nChecking the box-to-plane alignment, I shrink the front face to match the windshield plane closely, then plan A-pillar rods connecting the lower and upper windshield corners, and consider adding an armored brow plate over the glass. I also start sketching side window planes positioned flush with the hull sides.\n\nAdding glowing headlight boxes and a magenta light bar across the front fascia, then working out the hood's forward slope by tilting its box rotation so the front edge sits lower than the rear.\n\nI'm skipping fender arches but adding neon cyan ridge strips along the hood edges, and considering where to place a hazard stripe texture -- likely on the hood's front lip or the cab's rear top edge.\n\nComputing placement for the hood decal...\n\nNow I'm setting up the lower cab body box and planning door seam strips with merged rivet spheres for efficiency, using mergeGeometries to keep them as one draw call. I'm considering a subtle glow card behind the windshield for dash lighting but deciding it's probably not worth the visual complexity.\n\nI'm positioning door handles as small rod boxes, working out placement for a stenciled number decal and skull-winged emblem on the lower door panel, figuring out the exact x/y/z offsets so handles, stencil text, and emblem don't overlap on the door surface.\n\nFor the glass, I plan to use the glow helper on the window parts since the dark window texture colors will stay dark while still getting a subtle highlight, and I'm building each body part as a plane geometry with its own texture, position, and bone attachment.\n\nI'm setting up a box-building helper tied to the body bone with position and rotation options, plus a rod helper for cylindrical connectors, and planning custom procedural paints for the hull — gunmetal with panel seam lines, rust blending near the lower body, and a warm-lit grain texture for the hood panel.\n\nNow I'm computing the sloped hood surface with a topY function, placing hood vents, a central ridge, and angled chamfer plates along the hood's side edges to match the slope.\n\nFor the roof, I'm planning a light rack with rails and glowing cyan/white light cubes facing forward, plus a sensor dome mounted toward the rear center of the roof.\n\nNow I'm adding small antennas with glowing red tips near the rear, plus tiny mirror antennas, then setting up merged rivet decals around the door frame perimeters using small spheres for an efficient low-poly detail pass.\n\nFor the doors, I'm placing thin painted plates along the lower body sides with a dark vertical seam strip separating front and rear panels, deciding to skip extra neon sill accents for now. I'm also outlining the texture set needed—windows, grille, skull, stencil, hazard, windshield—keeping each SVG definition compact.\n\nFor the window SVG I'm sketching a dark cyan-tinted interior with diagonal streaks, rounded seat silhouettes rimmed in cyan, and a glowing dash line at the bottom; the windshield gets similar dark glass streaks plus a magenta HUD accent line. I'm also confirming door orientation logic for each side before writing everything out in full.\n\n"
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:12:58.649Z",
+        "wallMs": 108689,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88261,
+          "completion_tokens": 14495,
+          "total_tokens": 102756,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.1617124,
+        "hasCode": true,
+        "reasoning": "I'm planning out the chassis dimensions and the body joint position, then working out how to structure the buildChassis function signature using the context object provided by the module.\n\nFor the geometry, I'm mapping out the overall slab shape, sill pieces between the pod arches, and thruster placement, then thinking through how to construct the arch frames around each pod using boxes or an extruded outline shape since extrusion can't easily handle holes.\n\nFor the paint, I'll pull in panelled texturing from the clockwork kit, with a custom base paint that mixes gunmetal tones and adds rust streaking at lower y-values using noise. Then I'll add lower side sills on both sides with thin glowing neon strips, cyan on top and magenta below.\n\nNext I'm planning the sill armor plates as angular extruded skirts, a belly plate with vent slats and an underglow panel facing downward, plus a front bumper assembly with a ram bar, hazard chevron texture, sloped skid plate, and tow hooks.\n\nNow I'm adding a rear bumper with glowing tail lights, hazard stripes, tow hooks and a hitch, then working out the side skirt decals — figuring out plane orientation and text direction so the numbers and emblems read correctly when viewed from outside the vehicle.\n\nI need to use a flat color for the glow rather than paint. For rivets, I'll merge small low-poly cylinders along edges using mergeGeometries, building rows along the bumper face and sill. I'm also planning merged dark boxes for belly vent slats, plus fender flares extruded on top of the arches with thin glowing strips following the inner arch outline.\n\nWriting sweep path helper...\n\nFor the lighting, I'm adding red glow boxes and strips for taillights at the rear corners, a magenta underglow plane beneath the body, and a front bumper with cyan and magenta neon strips. I'm keeping the total part count well under the 190 limit, aiming for roughly 60-90 parts, and starting to write helper functions for placing parts on the body bone.\n\nNow I'm working out the dimensions for the top slab, flares, and bumpers — setting widths, heights, and z-ranges for the hood slab, front/rear bumpers, and flares, plus considering a chamfered look versus simpler wedge shapes to keep things manageable.\n\nAdding neon sill strips...\n\nI'm placing decals on the slab side around x 1.16, checking that the sill armor and cab door positions don't overlap with the decal zones. Flares stay restricted to covering the arches only, and I'm adding chevron hazard trim strips along the tops of the arch flares for visual detail.\n\nWorking out the flare outline polygon as a series of (z,y) coordinate points relative to the pod center, mirroring the shape for left and right sides and positioning it at the 1.15–1.25 thickness band.\n\nNow I'm defining the arch neon as a thin cyan glowing rod swept along the inner edge of the flare, then moving on to the belly plate armor with ventilation slats on the underside, adjusting the y-position to keep clearances consistent.\n\nAdjusting dimensions and positioning of the belly plate and sill box, then adding recessed slats underneath with dark ink coloring for a vented armor look.\n\nNow I'm setting up the glow panel with neon magenta coloring, then sketching the front skid plate as an extruded sloped shape with ridge detailing, and building the front bumper box with adjusted vertical placement.\n\nAdjusting the bumper layout so the ram bar, hazard plane, and neon strip sit at distinct heights without overlapping, then adding angled wing corner boxes at the sides.\n\nNow I'm adding tow hooks as small torus rings mounted near the bumper center, a rear bumper section with glowing red tail lights, and a hazard plane facing backward, plus starting the hitch geometry.\n\nFor rivets, I'm writing a helper that generates small merged cylinder geometries oriented to match each panel's surface normal (rotating for front, side, or top faces), then placing repeated rows of these along the bumper edges to simulate hardware detail.\n\nNow I'm defining the base hull paint shader, blending hull color with a darker variant using noise-based smoothstep transitions, then layering in rust patches controlled by vertical position and additional noise.\n\nNow I'm sketching the texture set: a hazard chevron SVG with yellow/black diagonal stripes, a stenciled \"07\" number decal with dark outline, and a skull-wings emblem in magenta/white with eye sockets and wing polygons. I'm also considering a fourth stencil label like \"X-9\" for added detail.\n\nFor applying these decals, I'm placing them as textured planes on each side of the hull, positioning them so the artwork reads correctly from the outside when viewed from the front. I still need to add the tail light cluster with ribs and decide whether corner marker lights are worth including.\n\nAdding underbody cross struts connecting the thruster pods to the body, with yellow-tipped beams between the pods, plus a cyan underglow strip planned along the bottom edges of the plate.\n\nNow I'm setting up helper functions for the build: a box-creation shorthand for body parts, and a rivets helper that generates small cylinder geometries oriented along a given axis and placed at specified points with a given color.\n\nBuilding chevron warning stripe decals...\n\nAdding stencil numbering, tail light glow, and ram bar details...\n\n"
+      }
+    ]
+  }
+}

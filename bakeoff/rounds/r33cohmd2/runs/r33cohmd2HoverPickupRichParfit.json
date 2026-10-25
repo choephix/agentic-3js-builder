@@ -1,0 +1,1173 @@
+{
+  "slug": "r33cohmd2HoverPickupRichParfit",
+  "arm": "parfit",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:12:36.530Z",
+  "wallMs": 132386,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 997428,
+    "completion_tokens": 45165,
+    "total_tokens": 1042593,
+    "prompt_tokens_details": {
+      "cached_tokens": 944177
+    }
+  },
+  "costUsd": 0.6525697,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 24383,
+    "slowestPartMs": 97408,
+    "critical": "cabShell",
+    "elapsedMs": 121792,
+    "spec": {
+      "name": "Hover Technical",
+      "description": "A militarized pickup truck converted to ride on four downward-facing hover thrusters, in low-poly cyberpunk style with neon underglow, armor plates and a roof-mounted gun.",
+      "builderName": "hoverTechnical",
+      "size": [
+        2.5,
+        2.3,
+        5.6
+      ],
+      "layout": "A boxy armored pickup hovering about 0.35 m above the floor. The front (+Z) holds a sloped hood with an angular grille, a light bar and a bull-bar bumper. The cab with a raked windshield sits mid-front. A flat cargo bed behind it carries a pintle-mounted autocannon on a ring. Four large thruster nacelles replace the wheels, one at each corner, flaring out from the fenders, with glowing cyan intake rings underneath and orange vents. Chunky faceted panels and bold yellow hazard stripes. Magenta and cyan neon strips run along the sills and rear. The only floor-resting pieces are four short landing skids under the thrusters, and the hull floats 0.35 m up. Flat colours dominate, with SVG decals (stencil numbers, hazard stripes, glyphs, a tiger-head emblem) and glow on lights, thrusters and screens.",
+      "palette": {
+        "hull": "#3a4350",
+        "hullDark": "#1f252e",
+        "armor": "#566070",
+        "trim": "#e7b814",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fa8",
+        "glass": "#0e2a3a",
+        "ventOrange": "#ff8a1c",
+        "rubber": "#15171c",
+        "metal": "#8a93a3",
+        "rust": "#7a4a2e",
+        "white": "#e8ecf2",
+        "red": "#d6283a"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1,
+          0
+        ],
+        "hullFloor": [
+          0,
+          0.45,
+          0
+        ],
+        "cabBase": [
+          0,
+          1,
+          0.35
+        ],
+        "hoodBase": [
+          0,
+          1,
+          1.9
+        ],
+        "bedFloor": [
+          0,
+          1,
+          -1.7
+        ],
+        "gunRing": [
+          0,
+          1.25,
+          -1.2
+        ],
+        "thrusterFL": [
+          1.15,
+          0.75,
+          1.75
+        ],
+        "thrusterFR": [
+          -1.15,
+          0.75,
+          1.75
+        ],
+        "thrusterBL": [
+          1.15,
+          0.75,
+          -1.75
+        ],
+        "thrusterBR": [
+          -1.15,
+          0.75,
+          -1.75
+        ],
+        "bumperFront": [
+          0,
+          0.7,
+          2.8
+        ],
+        "bumperRear": [
+          0,
+          0.7,
+          -2.8
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            0.9,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "thrusterFL",
+          "parent": "body",
+          "at": [
+            1.15,
+            0.75,
+            1.75
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterFR",
+          "parent": "body",
+          "at": [
+            -1.15,
+            0.75,
+            1.75
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterBL",
+          "parent": "body",
+          "at": [
+            1.15,
+            0.75,
+            -1.75
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterBR",
+          "parent": "body",
+          "at": [
+            -1.15,
+            0.75,
+            -1.75
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "gunYaw",
+          "parent": "body",
+          "at": [
+            0,
+            1.25,
+            -1.2
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "gun"
+        },
+        {
+          "name": "gunPitch",
+          "parent": "gunYaw",
+          "at": [
+            0,
+            1.75,
+            -1.2
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "gun"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Lower hull and frame: a faceted underbody tub, sills, side skirts with a neon cyan and magenta strip, a belly plate with a central glowing keel vent, a rear diffuser, mounting pylons toward the four thrusters, exposed pipes and cable runs, and a painted panelled metal texture with a hazard-stripe decal. Also the underside glow panels.",
+          "box": [
+            [
+              -1.1,
+              0.35,
+              -2.8
+            ],
+            [
+              1.1,
+              1.05,
+              2.8
+            ]
+          ],
+          "attaches": "Top at chassisTop supports the cab, hood and bed. Pylons reach the four thruster mounts. The bumpers attach at bumperFront and bumperRear.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 120
+        },
+        {
+          "id": "thrusters",
+          "builds": "Four hover nacelles, each a lathe or ngon housing with flared fender mount, a ring of cyan glowing intake blades on the underside, an orange glowing exhaust throat, a fin ring of 6 stabilizer fins, an armored cowl with a stencil number decal, and a short landing skid leg that touches y=0. The left and right sides mirror each other. Each rides its own thruster joint.",
+          "box": [
+            [
+              -1.25,
+              0,
+              -2.35
+            ],
+            [
+              1.25,
+              1,
+              2.35
+            ]
+          ],
+          "attaches": "Each nacelle is centred on its thruster mount and joins the chassis pylons and the fender flares of the cab and bed.",
+          "joints": [
+            "thrusterFL",
+            "thrusterFR",
+            "thrusterBL",
+            "thrusterBR"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "cabShell",
+          "builds": "The armored cab body: faceted roof, A, B and C pillars, doors with armor plates, a roll cage on the roof, side mirrors, door handles, a glowing neon trim line, a sloped windshield and side windows with dark glass and a glossy streak texture, a tiger-head emblem decal on the doors, and the interior seen through the glass (seats, a steering wheel, a glowing dash screen with an SVG HUD).",
+          "box": [
+            [
+              -1.2,
+              1,
+              -0.6
+            ],
+            [
+              1.2,
+              2.1,
+              1.3
+            ]
+          ],
+          "attaches": "Sits on cabBase and chassisTop. The front edge meets hoodBase. The rear wall meets the bed at z=-0.6 and the roof rack carries the light bar.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "frontEnd",
+          "builds": "The nose: a sloped faceted hood with scoops and vents plus an orange glowing vent strip, an angular grille with a drawn mesh texture, two headlights with glow plus a light bar on top, a bull-bar bumper with a winch and a hazard-striped plate, front fender flares over the front thrusters, a number plate decal, and small tow hooks.",
+          "box": [
+            [
+              -1.25,
+              0.5,
+              1.3
+            ],
+            [
+              1.25,
+              1.45,
+              2.85
+            ]
+          ],
+          "attaches": "Hood starts at hoodBase and meets the cab front. The bumper sits at bumperFront. Fender flares wrap the thrusterFL and thrusterFR mounts.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "cargoBed",
+          "builds": "The rear bed: armored side walls and a tailgate in angular plates with rivets, a ribbed floor, fender flares over the rear thrusters, ammo crates, a spare thruster cell, fuel jerrycans, tie-down straps and lashing hooks, a rear bumper with red tail lights (glow) and a magenta neon strip, a stencil decal, an antenna, and a rear exhaust vent.",
+          "box": [
+            [
+              -1.25,
+              0.5,
+              -2.85
+            ],
+            [
+              1.25,
+              1.6,
+              -0.6
+            ]
+          ],
+          "attaches": "Floor sits on bedFloor and chassisTop. The front wall meets the cab rear at z=-0.6. The rear bumper is at bumperRear. The gun ring base rises from gunRing.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "gunTurret",
+          "builds": "A pintle-mounted autocannon: a ring base with a ring track and a rotating yoke on gunYaw, a gun cradle on gunPitch, a boxy receiver with panel paint, a long barrel with a shroud, a muzzle brake and a glowing orange tip, an ammo drum and a belt of rounds, a shield plate with a hazard stripe and a small targeting sensor with a cyan lens. Faces forward (+Z).",
+          "box": [
+            [
+              -0.6,
+              1.2,
+              -1.8
+            ],
+            [
+              0.6,
+              2.3,
+              1
+            ]
+          ],
+          "attaches": "Base ring is at gunRing on the bed floor. The yoke rides gunYaw and the cradle rides gunPitch.",
+          "joints": [
+            "gunYaw",
+            "gunPitch"
+          ],
+          "floor": false,
+          "budget": 120
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:12:36.530Z",
+        "wallMs": 24383,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85491,
+          "completion_tokens": 3148,
+          "total_tokens": 88639,
+          "prompt_tokens_details": {
+            "cached_tokens": 85487
+          }
+        },
+        "costUsd": 0.040036699999999995,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "thrusters",
+        "started": "2026-10-25T14:13:00.913Z",
+        "wallMs": 22695,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88552,
+          "completion_tokens": 4013,
+          "total_tokens": 92565,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0574744,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "frontEnd",
+        "started": "2026-10-25T14:13:00.914Z",
+        "wallMs": 24433,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88542,
+          "completion_tokens": 4103,
+          "total_tokens": 92645,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0583544,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "gunTurret",
+        "started": "2026-10-25T14:13:00.914Z",
+        "wallMs": 29468,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88565,
+          "completion_tokens": 5285,
+          "total_tokens": 93850,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07022039999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:13:00.913Z",
+        "wallMs": 34134,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88539,
+          "completion_tokens": 6013,
+          "total_tokens": 94552,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0774484,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoBed",
+        "started": "2026-10-25T14:13:00.914Z",
+        "wallMs": 35202,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88569,
+          "completion_tokens": 6148,
+          "total_tokens": 94717,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0788584,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cabShell",
+        "started": "2026-10-25T14:13:00.914Z",
+        "wallMs": 97408,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88560,
+          "completion_tokens": 12805,
+          "total_tokens": 101365,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.1454104,
+        "hasCode": true,
+        "reasoning": "I'm planning a single function to build the cab shell, mapping out the box dimensions for the cab region and attaching box geometry pieces to the body bone, using rotation options for the slanted parts.\n\nWorking through the cab components: a paneled lower body box with a slightly recessed glass greenhouse above it, corner pillars, a sloped roof, and a raked windshield plane that needs careful rotation math to tilt it correctly between the cowl and roof edge.\n\nWorking through the window geometry, I decide skipping separate glass planes avoids z-fighting issues, so instead I'll just apply the streak texture directly onto the glass box faces.\n\nI'll simplify: just make window glass strips dark along the top edge and a pillar divider, leaving the middle open as a gunport-style cab window rather than trying to fake transparency with cutout textures.\n\nFor the texture itself, I'm going with mostly transparent glass with a few diagonal glossy stripes drawn semi-opaque to suggest reflections, applied consistently across windshield, side, and rear windows.\n\nNow I'm thinking through the interior setup — seats, a steering wheel torus, a dash with a glowing HUD screen using a glow effect, plus a floor and back wall to close off the cab space.\n\nI'm working out dimensions: the solid lower body box up to a certain height holds the seats, a dash box sits under the windshield, and seats are placed at specific front and rear positions. Then I'm laying out the pillar structure — sloped A-pillars as rods, vertical B-pillars and C-pillars as boxes — framing toward the roof box.\n\nNow I need to adjust the roof height since the cage would otherwise poke through the top budget, so I'm lowering the roof slightly and adding a roll cage with thin tube posts above it, plus a front light bar mounted on a roof rack.\n\nFor the doors, I'm adding angled armor plates on each side using extrusion with a hexagonal outline, figuring out the correct thickness axis from the cross product of the extrude direction and up vector so the plates sit flush against the body.\n\nI'm also planning a tiger-head emblem decal rendered via SVG texture on an outward-facing plane on each door, orange with stripes, ears, and eyes, making sure the orientation reads correctly from outside the vehicle. Then I'll add small metal door handles and side mirrors with rod arms and mirror boxes positioned near the A-pillar base.\n\nNow I'm sketching cyan neon trim strips along the door sill and roof edge for a glowing accent, deciding to skip armored window shutters, and sizing the lower body hull box to sit correctly on top of the chassis.\n\nI'm working out the windshield and cowl geometry, setting the body top and dash line to meet cleanly, then applying a paneled hull paint texture. I'm also starting to extrude the faceted roof profile as a polygon along the cross-section.\n\nStill laying out the cab geometry...\n\nNow for interior details: seats with cushion, backrest and headrest boxes, a rear bench, a steering wheel made from a torus plus column rod, and a dashboard box spanning the front.\n\nI'm positioning the dashboard under the windshield slope, checking the windshield's z-coordinate at different heights to make sure the dash fits beneath it, then placing a glowing HUD screen plane on the dash's rear face facing the rear seats.\n\nI realize a screen facing straight back would be hidden from the front view through the windshield, so I'm angling it upward instead, tilted to be visible from both the windshield and side windows -- maybe adding both a top screen and a smaller instrument cluster glow behind the wheel. I'm also planning a light bar rack with glowing lenses mounted near the roof's front edge.\n\nNow I'm positioning the light bar box dimensions so it sits just above the roof line with tiny support feet, adding anti-intrusion rods across the side windows in hull-dark color, and sketching out a hazard stripe decal placement on the cowl or B-pillar along with the tiger emblem detail for the cab.\n\nI'm planning the glass texture as an SVG with dark and lighter streak colors forming diagonal stripe bands, and outlining the box/material helper functions I'll need before writing the final code.\n\nNow I'm working out the geometry for side window panes and the windshield, figuring out their positions relative to the pillars and roof header so the glass fits correctly within the body frame.\n\nLowering the body between y 1.0-1.52, then adding a roll cage with corner posts and crossbars just above the roof, and sketching mirror arms extending outward from the cowl.\n\nI'm placing a mirror housing box at the end of each arm with a thin inner panel acting as the reflective face, keeping it simple rather than adding a full glass plane. Now I'm starting the door armor plate as an extruded outline following a set of profile points along the door's length.\n\nWorking out door positions for a crew cab with front and rear doors...\n\nAdding door handles, a tiger emblem decal on the front door, a hazard stripe on the rear door, and cyan/magenta neon trim lines along the sill and roof edge for the glow effect.\n\nNow I'm positioning the steering wheel and column for the driver seat, placing interior seats to avoid z-fighting with the lower body geometry, then starting to write the actual component code with the necessary imports for textures and glow materials.\n\nStill building helper functions...\n\nNow I'm sketching the tiger badge SVG with orange face, stripes, and a dark circular backing with a yellow ring, plus a cyan HUD overlay with speed bars, a radar circle, and a \"HOVER 0.35m\" readout.\n\nWriting hazard stripe pattern...\n\nWith around 100 parts total, I'll write everything out now.\n\n"
+      },
+      {
+        "id": "fit-frontEnd",
+        "started": "2026-10-25T14:14:39.598Z",
+        "wallMs": 5676,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 94272,
+          "completion_tokens": 872,
+          "total_tokens": 95144,
+          "prompt_tokens_details": {
+            "cached_tokens": 88538
+          }
+        },
+        "costUsd": 0.029041800000000003,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-chassis",
+        "started": "2026-10-25T14:14:39.598Z",
+        "wallMs": 6088,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 96016,
+          "completion_tokens": 726,
+          "total_tokens": 96742,
+          "prompt_tokens_details": {
+            "cached_tokens": 88535
+          }
+        },
+        "costUsd": 0.0310755,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-cargoBed",
+        "started": "2026-10-25T14:14:39.598Z",
+        "wallMs": 7334,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 95737,
+          "completion_tokens": 1151,
+          "total_tokens": 96888,
+          "prompt_tokens_details": {
+            "cached_tokens": 88565
+          }
+        },
+        "costUsd": 0.0347105,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-thrusters",
+        "started": "2026-10-25T14:14:39.598Z",
+        "wallMs": 8024,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 94585,
+          "completion_tokens": 901,
+          "total_tokens": 95486,
+          "prompt_tokens_details": {
+            "cached_tokens": 88548
+          }
+        },
+        "costUsd": 0.0299388,
+        "hasCode": true,
+        "reasoning": "I'm recalculating the nacelle position relative to the mount so the cowl stays within the bounding box, pulling the center further inward since the extent still overshoots the ±1.25 limit.\n\nChecking the z-axis too: the skid tip extends past 2.35, so I'm shifting its center inward by 0.1 to stay under 2.30. On the y-axis, the frustum pokes above 1.0, so I'll lower its position to about 0.7 to bring it back in bounds.\n\n"
+      }
+    ],
+    "fit": {
+      "fitMs": 10595,
+      "checkMs": 1275,
+      "afterMs": 1293,
+      "repairMs": 8024,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "chassis",
+          "meshes": 115,
+          "outside": 13,
+          "maxOver": 0.25,
+          "bounds": [
+            [
+              -1.2781,
+              0.1962,
+              -3.054
+            ],
+            [
+              1.2781,
+              1.0817,
+              2.9746
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "diffuser",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.751,
+                0.2992,
+                -3.054
+              ],
+              "max": [
+                0.751,
+                0.6196,
+                -2.4532
+              ],
+              "over": 0.25,
+              "where": [
+                "0.25 m past the box's -z face (z = -2.8)"
+              ]
+            },
+            {
+              "name": "part.body.31",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.62,
+                0.1962,
+                -3.0114
+              ],
+              "max": [
+                -0.58,
+                0.5238,
+                -2.4286
+              ],
+              "over": 0.21,
+              "where": [
+                "0.15 m past the box's -y face (y = 0.35)",
+                "0.21 m past the box's -z face (z = -2.8)"
+              ]
+            },
+            {
+              "name": "part.body.32",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.38,
+                0.1962,
+                -3.0114
+              ],
+              "max": [
+                -0.34,
+                0.5238,
+                -2.4286
+              ],
+              "over": 0.21,
+              "where": [
+                "0.15 m past the box's -y face (y = 0.35)",
+                "0.21 m past the box's -z face (z = -2.8)"
+              ]
+            },
+            {
+              "name": "part.body.33",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.14,
+                0.1962,
+                -3.0114
+              ],
+              "max": [
+                -0.1,
+                0.5238,
+                -2.4286
+              ],
+              "over": 0.21,
+              "where": [
+                "0.15 m past the box's -y face (y = 0.35)",
+                "0.21 m past the box's -z face (z = -2.8)"
+              ]
+            },
+            {
+              "name": "part.body.34",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.1,
+                0.1962,
+                -3.0114
+              ],
+              "max": [
+                0.14,
+                0.5238,
+                -2.4286
+              ],
+              "over": 0.21,
+              "where": [
+                "0.15 m past the box's -y face (y = 0.35)",
+                "0.21 m past the box's -z face (z = -2.8)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "thrusters",
+          "meshes": 204,
+          "outside": 84,
+          "maxOver": 0.48,
+          "bounds": [
+            [
+              -1.73,
+              -0.02,
+              -2.4001
+            ],
+            [
+              1.73,
+              1.0302,
+              2.4
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "plane.thrusterFL",
+              "bones": [
+                "thrusterFL"
+              ],
+              "min": [
+                1.725,
+                0.36,
+                1.55
+              ],
+              "max": [
+                1.725,
+                0.76,
+                1.95
+              ],
+              "over": 0.48,
+              "where": [
+                "0.48 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "plane.thrusterFL.2",
+              "bones": [
+                "thrusterFL"
+              ],
+              "min": [
+                1.725,
+                0.305,
+                1.64
+              ],
+              "max": [
+                1.725,
+                0.355,
+                1.86
+              ],
+              "over": 0.48,
+              "where": [
+                "0.48 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "plane.thrusterFL.3",
+              "bones": [
+                "thrusterFL"
+              ],
+              "min": [
+                1.725,
+                0.75,
+                1.88
+              ],
+              "max": [
+                1.725,
+                0.85,
+                1.98
+              ],
+              "over": 0.48,
+              "where": [
+                "0.48 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "box.thrusterFL.24",
+              "bones": [
+                "thrusterFL"
+              ],
+              "min": [
+                1.71,
+                0.37,
+                1.47
+              ],
+              "max": [
+                1.73,
+                0.39,
+                2.03
+              ],
+              "over": 0.48,
+              "where": [
+                "0.48 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "plane.thrusterFR",
+              "bones": [
+                "thrusterFR"
+              ],
+              "min": [
+                -1.725,
+                0.3599,
+                1.5499
+              ],
+              "max": [
+                -1.725,
+                0.7601,
+                1.9501
+              ],
+              "over": 0.48,
+              "where": [
+                "0.48 m past the box's -x face (x = -1.25)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cabShell",
+          "meshes": 96,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.2301,
+              0.9996,
+              -0.6501
+            ],
+            [
+              1.2301,
+              2.0992,
+              1.2215
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "frontEnd",
+          "meshes": 79,
+          "outside": 16,
+          "maxOver": 0.29,
+          "bounds": [
+            [
+              -1.4676,
+              0.4238,
+              1.0071
+            ],
+            [
+              1.4676,
+              1.5001,
+              2.9743
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.body.131",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.0998,
+                0.6246,
+                1.0071
+              ],
+              "max": [
+                1.3002,
+                1.1354,
+                1.1929
+              ],
+              "over": 0.29,
+              "where": [
+                "0.29 m past the box's -z face (z = 1.3)"
+              ]
+            },
+            {
+              "name": "part.body.141",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.3002,
+                0.6245,
+                1.0071
+              ],
+              "max": [
+                -1.0998,
+                1.1355,
+                1.1929
+              ],
+              "over": 0.29,
+              "where": [
+                "0.29 m past the box's -z face (z = 1.3)"
+              ]
+            },
+            {
+              "name": "part.body.129",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1924,
+                0.5931,
+                1.1487
+              ],
+              "max": [
+                1.4676,
+                1.1669,
+                2.3513
+              ],
+              "over": 0.22,
+              "where": [
+                "0.22 m past the box's +x face (x = 1.25)",
+                "0.15 m past the box's -z face (z = 1.3)"
+              ]
+            },
+            {
+              "name": "part.body.139",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.4676,
+                0.5931,
+                1.1486
+              ],
+              "max": [
+                -1.1924,
+                1.1669,
+                2.3514
+              ],
+              "over": 0.22,
+              "where": [
+                "0.22 m past the box's -x face (x = -1.25)",
+                "0.15 m past the box's -z face (z = 1.3)"
+              ]
+            },
+            {
+              "name": "part.body.137",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.425,
+                0.665,
+                1.2489
+              ],
+              "max": [
+                1.455,
+                0.695,
+                2.2511
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's +x face (x = 1.25)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cargoBed",
+          "meshes": 164,
+          "outside": 8,
+          "maxOver": 1.03,
+          "bounds": [
+            [
+              -1.4206,
+              0.455,
+              -2.875
+            ],
+            [
+              1.4206,
+              2.6301,
+              -0.5974
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sphere.body.53",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.1801,
+                2.5699,
+                -0.9286
+              ],
+              "max": [
+                -1.1257,
+                2.6301,
+                -0.8714
+              ],
+              "over": 1.03,
+              "where": [
+                "1.03 m past the box's +y face (y = 1.6)"
+              ]
+            },
+            {
+              "name": "sweep.body.47",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.1584,
+                1.7208,
+                -0.9076
+              ],
+              "max": [
+                -1.0912,
+                2.6056,
+                -0.7903
+              ],
+              "over": 1.01,
+              "where": [
+                "1.01 m past the box's +y face (y = 1.6)"
+              ]
+            },
+            {
+              "name": "box.body.113",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.2203,
+                2.195,
+                -0.845
+              ],
+              "max": [
+                -1.0197,
+                2.205,
+                -0.835
+              ],
+              "over": 0.6,
+              "where": [
+                "0.6 m past the box's +y face (y = 1.6)"
+              ]
+            },
+            {
+              "name": "box.body.61",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.9594,
+                1.0249,
+                -2.3601
+              ],
+              "max": [
+                1.4206,
+                1.0951,
+                -2.2999
+              ],
+              "over": 0.17,
+              "where": [
+                "0.17 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "box.body.71",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.4206,
+                1.0249,
+                -2.3601
+              ],
+              "max": [
+                -0.9594,
+                1.0951,
+                -2.2999
+              ],
+              "over": 0.17,
+              "where": [
+                "0.17 m past the box's -x face (x = -1.25)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "gunTurret",
+          "meshes": 76,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.5617,
+              1.1699,
+              -1.7617
+            ],
+            [
+              0.575,
+              2.174,
+              1.005
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": null,
+      "afterError": "Bundling failed:\n  bakeoff/rounds/r33cohmd2/fit/r33cohmd2HoverPickupRichParfit-after.ts:1047:0 Unexpected \"===\"",
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "chassis",
+          "wallMs": 6088,
+          "edits": 4,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "thrusters",
+          "wallMs": 8024,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "frontEnd",
+          "wallMs": 5676,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "cargoBed",
+          "wallMs": 7334,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": [
+        "chassis",
+        "thrusters",
+        "frontEnd",
+        "cargoBed"
+      ]
+    }
+  }
+}

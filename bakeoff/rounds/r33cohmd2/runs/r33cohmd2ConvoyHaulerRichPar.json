@@ -1,0 +1,520 @@
+{
+  "slug": "r33cohmd2ConvoyHaulerRichPar",
+  "arm": "par",
+  "subject": "convoyHauler",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:12:36.526Z",
+  "wallMs": 114831,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 530225,
+    "completion_tokens": 37870,
+    "total_tokens": 568095,
+    "prompt_tokens_details": {
+      "cached_tokens": 505666
+    }
+  },
+  "costUsd": 0.4783846,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 26828,
+    "slowestPartMs": 88003,
+    "critical": "chassisRunning",
+    "elapsedMs": 114831,
+    "spec": {
+      "name": "Convoy Hauler Mk-IV 'Lockjaw'",
+      "description": "A low-poly cyberpunk six-wheeled armoured convoy hauler with a slab-sided cab, gun turret and roof rack, towing a sealed hazard-striped cargo pod on its flatbed, lit with neon trim.",
+      "builderName": "convoyHauler",
+      "size": [
+        3,
+        3.1,
+        8.4
+      ],
+      "layout": "Long chunky silhouette facing +Z. Front 0 to 4.2: a wedge-nosed armoured cab (sloped hood with a bull-bar ram and angular headlight slits, a raised cockpit with a narrow cyan-lit slit windscreen, side armour skirts, an roof turret behind the cab roof). Behind the cab, a long flatbed chassis from z=-0.6 to z=-4.2 carries a big rounded-box sealed cargo pod with chevron hazard stripes, clamp straps, a glowing magenta seam and a biohazard-style emblem decal. Six fat low-poly wheels on three axles (front z=2.7, middle z=-0.9, rear z=-3.3) with hubcaps and neon rim rings, fender arches over them. Everything is faceted and blocky: sheet-metal panels with rivet seams, dark gunmetal hull, yellow-black hazard trim, cyan and magenta neon strips and emissive glow lights, antenna masts, exhaust stacks behind the cab, tail lights red. Style shows via bold neon edge strips, decals/signage in SVG (kanji-like glyphs, serial numbers) and grime paint.",
+      "palette": {
+        "hull": "#3a4150",
+        "hullDark": "#20242e",
+        "armor": "#555d6e",
+        "trim": "#e7b814",
+        "trimBlack": "#16161a",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2bd6",
+        "neonLime": "#9dff3b",
+        "tire": "#15161a",
+        "rim": "#8a93a5",
+        "glass": "#0f3a4a",
+        "podShell": "#c9ced8",
+        "podDark": "#5b6272",
+        "warnRed": "#e0233a",
+        "rust": "#7a4a2c",
+        "steel": "#9aa3b2"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.2,
+          -2.4
+        ],
+        "cabFloor": [
+          0,
+          1.2,
+          2
+        ],
+        "cabRoof": [
+          0,
+          2.35,
+          1.6
+        ],
+        "turretRing": [
+          0,
+          2.35,
+          0.5
+        ],
+        "podBed": [
+          0,
+          1.3,
+          -2.4
+        ],
+        "axleFront": [
+          0,
+          0.55,
+          2.7
+        ],
+        "axleMid": [
+          0,
+          0.55,
+          -0.9
+        ],
+        "axleRear": [
+          0,
+          0.55,
+          -3.3
+        ],
+        "rackBack": [
+          0,
+          1.2,
+          -0.7
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "cab",
+          "parent": "body",
+          "at": [
+            0,
+            1.2,
+            2
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turretYaw",
+          "parent": "cab",
+          "at": [
+            0,
+            2.35,
+            0.5
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "gunPitch",
+          "parent": "turretYaw",
+          "at": [
+            0,
+            2.75,
+            0.7
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "podLid",
+          "parent": "body",
+          "at": [
+            0,
+            2.55,
+            -2.4
+          ],
+          "dir": [
+            0,
+            0,
+            -1
+          ],
+          "role": "hinge",
+          "group": "pod"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.25,
+            0.55,
+            2.7
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.25,
+            0.55,
+            2.7
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.25,
+            0.55,
+            -0.9
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.25,
+            0.55,
+            -0.9
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.25,
+            0.55,
+            -3.3
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.25,
+            0.55,
+            -3.3
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassisRunning",
+          "builds": "Frame and running gear: low flatbed ladder chassis with hazard-trimmed side skirts and rivet-panelled paint, three axles with differential housings and leaf-spring blocks, six faceted low-poly tyres (octagonal cylinders with tread notches) on joints wheelFL..wheelRR with steel hubcaps, lug nuts and cyan neon rim rings, fender arches and mudflaps with grime paint, rear bumper with red tail lights and a towing hook, under-glow magenta strips along the underside, exhaust stacks rising behind the cab on the left and right.",
+          "box": [
+            [
+              -1.5,
+              0,
+              -4.2
+            ],
+            [
+              1.5,
+              1.3,
+              4.2
+            ]
+          ],
+          "attaches": "Deck at chassisTop (y=1.2) carries the pod and rack; cab mounts at cabFloor; wheels pivot on axleFront/axleMid/axleRear lines.",
+          "joints": [
+            "body",
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelRL",
+            "wheelRR"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Armoured cab: wedge nose with sloped hood plates, front grille with glowing cyan slits and a heavy yellow-black striped ram bar, angular headlight slits (lime/white emissive), a raised cockpit with a narrow glass slit windscreen (emissive cyan tint with SVG HUD-like glyph decal), side armour plates with rivets and door seams, wing mirrors, roof armour with vents, side-door decals (unit number, kanji-like glyphs via SVG), antenna mast with blinking red tip, neon edge strips in cyan along the roofline. Hull painted with panelled gunmetal and grime paint.",
+          "box": [
+            [
+              -1.4,
+              1.2,
+              0.3
+            ],
+            [
+              1.4,
+              2.4,
+              4.2
+            ]
+          ],
+          "attaches": "Sits on chassis at cabFloor (y=1.2); roof at cabRoof; turret rides on turretRing.",
+          "joints": [
+            "cab"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "turret",
+          "builds": "Roof gun turret: round faceted ring base on turretRing, rotating armoured housing on joint turretYaw with angled plates, twin barrels on gunPitch with muzzle brakes and heat-vent slits, an ammo box on the side with a hazard stripe, a small sensor eye (magenta emissive lens) and an SVG-painted warning label; plus the roof rack behind the cab at rackBack with spare jerrycans, antenna cluster and a cyan-lit searchlight bar.",
+          "box": [
+            [
+              -1.3,
+              2.3,
+              -0.9
+            ],
+            [
+              1.3,
+              3.1,
+              1.6
+            ]
+          ],
+          "attaches": "Base ring at turretRing (y=2.35); rack rests on chassisTop line at rackBack and cab roof.",
+          "joints": [
+            "turretYaw",
+            "gunPitch"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "cargoPod",
+          "builds": "Sealed cargo pod: large rounded-box capsule built from a lofted body in light podShell paint with panel seams, dark end caps, a hinged-looking lid seam on podLid, four heavy clamp straps (trim yellow/black) with bolt plates bolted to the bed, glowing magenta seam strips and a lit status screen near the front, hazard chevron stripes (SVG texture) along the flanks, a biohazard/quarantine emblem and serial number decals (SVG), rear locking wheel and cable conduits, small corner anchors. Red warning beacon on top that glows.",
+          "box": [
+            [
+              -1.4,
+              1.2,
+              -4.2
+            ],
+            [
+              1.4,
+              3.1,
+              -0.7
+            ]
+          ],
+          "attaches": "Rests on the flatbed at podBed (y=1.3); clamps weld to the chassis deck; lid hinge at podLid.",
+          "joints": [
+            "podLid",
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "escortDetails",
+          "builds": "Armoured side hardware and lighting along the whole hauler: left and right side armour panels between cab and pod with rivet seams, fold-down tool lockers, ladder rungs to the deck, cable runs, fuel tank cylinders under the deck edge, a neon strip loop along each flank (cyan up front, magenta at the back), floodlight pods at the cab corners, license-plate/hologram sign at the rear with an SVG glyph, bundled antenna array at the rear, spare tyre on the side, and grime/scratch paint decals.",
+          "box": [
+            [
+              -1.55,
+              0.5,
+              -4.2
+            ],
+            [
+              1.55,
+              2,
+              2
+            ]
+          ],
+          "attaches": "Mounted to chassis sides at chassisTop and to the pod and cab walls; does not intersect wheels at axle lines.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:12:36.526Z",
+        "wallMs": 26828,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85250,
+          "completion_tokens": 3462,
+          "total_tokens": 88712,
+          "prompt_tokens_details": {
+            "cached_tokens": 85246
+          }
+        },
+        "costUsd": 0.0431526,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "escortDetails",
+        "started": "2026-10-25T14:13:03.354Z",
+        "wallMs": 22218,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88972,
+          "completion_tokens": 3443,
+          "total_tokens": 92415,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0526144,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turret",
+        "started": "2026-10-25T14:13:03.354Z",
+        "wallMs": 25078,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88959,
+          "completion_tokens": 4553,
+          "total_tokens": 93512,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0636884,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoPod",
+        "started": "2026-10-25T14:13:03.354Z",
+        "wallMs": 45012,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89000,
+          "completion_tokens": 7209,
+          "total_tokens": 96209,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.09033039999999999,
+        "hasCode": true,
+        "reasoning": "I'm deciding to avoid relying on an external Ctx type and instead use loosely typed inline parameters for safety, then sketching out the pod box dimensions for the module's layout.\n\nFor geometry, I'm leaning toward a loft body for the main pod shape with tapered stations rather than a plain box, and planning the lid as a separate slab riding on its own joint. For decals like hazard stripes and the emblem, I'm considering building the body from a boxy core so flat side planes can be easily attached, since a rounded loft shape would complicate placing flat decal planes.\n\nSetting the lower main box as the body and an upper box as the lid, skipping true chamfers in favor of thin corner rods for a rounded-edge look. Mapping out strap positions along the z-axis at four evenly spaced points.\n\nAdding side panels and lid covers at specific widths, using yellow trim accents with black stripe plates rather than decals. Now I'm writing the final box-generation helper code to assemble all these parts with their colors and bone attachments.\n\n"
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:13:03.354Z",
+        "wallMs": 48532,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88995,
+          "completion_tokens": 7039,
+          "total_tokens": 96034,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.08862039999999999,
+        "hasCode": true,
+        "reasoning": "I'm writing the buildCab function that takes a context object and constructs a cabin box shape, positioning its joint near the center-top of the structure.\n\nI'm working out the cab body silhouette as a series of z/y outline points, extruding a profile for the hood sloping up into the cockpit and windscreen, then figuring out the angled windscreen plane's orientation.\n\nFor the windscreen I'm placing a glass plane at the slope's midpoint with a HUD-style texture (dark glass, cyan glyphs, glow effect), and applying a panelled metal finish with some grime detailing over the extruded body.\n\nNow I'm adding the front details: cyan glowing grille slits, a ram bar with chevron trim across the front, and angled headlight slits near the top of the hood before it slopes down.\n\nThen I'm placing side armour plates with thickness and color, dark seam lines for doors, merged spheres for rivets, and a decal plane on each side with unit numbering, making sure the text orientation reads correctly from the outside viewer's perspective on each side.\n\nI'm adding cyan neon strips along the roofline edges, a top armor plate slightly overlapping the roof, dark vent slits, and checking the turret ring position stays clear of the cab roof. Then I'm positioning mirror arms and housings out at the sides near the top of the cab.\n\nI'll add a short antenna with a glowing red tip, a hood with a center ridge and side vents, and decide the floodlights are handled by the escort vehicle instead. For textures I'm planning a HUD overlay, a door decal with a unit number and kanji reading \"escort,\" and a hazard stripe bar, though I'll use shapes instead of SVG text since CJK fonts may not render reliably.\n\nStill writing shapes...\n\n"
+      },
+      {
+        "id": "chassisRunning",
+        "started": "2026-10-25T14:13:03.354Z",
+        "wallMs": 88003,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89049,
+          "completion_tokens": 12164,
+          "total_tokens": 101213,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.1399784,
+        "hasCode": true,
+        "reasoning": "I'm working on a function to build the chassis and running gear, thinking through how to handle the context type without redeclaring or conflicting with the module's existing Ctx definition.\n\nFor the wheels, I'm positioning cylindrical geometry rotated to align its axis along X, computing tyre radius and width so they sit flush with the body and stay within box limits. I'm also planning tread lugs as small boxes arranged radially around each tyre, considering merging the geometries per wheel to cut down on part count.\n\nStill positioning wheel parts...\n\nNow I'm setting up the neon rim torus rotated to lie flat with a Y-axis orientation, applying the glow kit to the neon pieces, then sketching out the chassis ladder frame with two side rails running the length of the car.\n\nI'm sizing the deck plate to clear the wheel positions, checking that its width and z-span don't collide with the wheels sitting at x 1.0-1.5 while still extending far enough back to support the cab floor up front.\n\nI'm now working out skirt panels between the wheel arches, placing them at x ±1.05 spanning between the mid and front wheels, and thinking about adding diagonal hazard stripe paint across them.\n\nShifting to the front end, I'm planning a front crossmember and tow plate near z 4.1, extending the deck forward, and sizing a rear bumper box with tail lights and a hook at the back of the chassis.\n\nNow I'm working on the rear axle setup — cylindrical axles passing through the wheel hubs, a rounded differential housing, and leaf spring blocks mounted over the axles to connect rigidly to the body frame. I'm also sketching fender arches as half-cylinder shells fitted over the wheels.\n\nFor the fender shape, I'm reconsidering the approach — instead of a curved shell, I'm trying a simpler top plate plus angled side plates positioned just above the wheel height, adjusting the y-coordinates so they don't overlap the deck or clip into the wheels.\n\nNow I'm adding mudflaps as flat boxes positioned behind the rear wheels.\n\nI also want magenta underglow strips beneath the rails, thin emissive boxes running the length of the body, plus exhaust stacks placed behind the cab at roughly chest height on either side.\n\nChecking the stack placement against the turret and pod boxes to make sure they don't collide — turret housing sits at x ±1.3, pod extends to z -0.7, so putting stacks at x ±1.2, z -0.05 with a small radius keeps them clear, rising from y 1.2 to 2.5 with a capped top.\n\nNow I need rivet-panelled paint for the hull and a grime overlay — I'm defining a grime paint function that mixes the base color toward near-black using layered noise, weighted more heavily at lower elevations, and resolving the base color properly before mixing.\n\nFor the hazard stripes I'm writing a diagonal checkerboard paint function parameterized by axis so it works on both the skirt (facing x) and bumper (facing z) panels. Then I'm adding a tiny glowing neon ring on the rim, detailing the tire as a flat-shaded low-poly cylinder, and giving the sidewall a slightly raised darker inner ring before moving on to the hub geometry.\n\nWorking out hub, lug nuts, rim disc, and neon ring placement...\n\nNow I'm placing the rear tow hook as a small torus loop near the bumper, plus red glow boxes for tail lights slightly protruding past the bumper face, and adding a front crossmember box near the bumper.\n\nI'm laying out the ladder-frame crossmembers as merged dark boxes spaced along the chassis, checking clearance against the axle, differential housing, and rail geometry, then planning the deck as a top plate spanning the frame.\n\nNow I'm adding deck edge trim with hazard-striped boxes along both sides, and considering a small SVG decal plate on the skirt showing an identifying marking like \"LOCKJAW-04\" instead of kanji text since glyph rendering may not work reliably.\n\nPositioning the serial plate as a thin plane on the outer skirt face, with mirrored orientation on the opposite side so text reads correctly from outside. I'm also refining the skirt geometry, adding a hazard-striped trim strip along its lower edge and working out the z-range segments so the skirt clears the front and mid wheel positions properly.\n\nNow I'm sizing the rear skirt segment to sit between the mid and rear wheel edges, and setting the skirt's height and thickness so it stays clear of the deck and wheels while keeping overall part and triangle counts reasonable. I'm also considering adding underglow strips along the skirt bottom.\n\nWriting helper functions...\n\nThen I'm planning the axle as a steel cylinder bridging the hubs, and the exhaust stack with rim bands, a cap, a rust-colored heat shield, and a mounting bracket — checking that the stack placement at the outer edge stays clear of the deck and skirts.\n\nWorking out the fender plate tilt direction: rotating about X by positive θ tips the +Z side downward, so I'll use +35° for the front plate and -35° for the rear to get the descending slope I want. Tire color stays flat grime tone, then I'll write it out.\n\n"
+      }
+    ]
+  }
+}

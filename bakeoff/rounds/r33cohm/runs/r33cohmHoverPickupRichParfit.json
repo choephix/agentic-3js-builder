@@ -1,0 +1,1514 @@
+{
+  "slug": "r33cohmHoverPickupRichParfit",
+  "arm": "parfit",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:12:36.550Z",
+  "wallMs": 80621,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 1185692,
+    "completion_tokens": 31699,
+    "total_tokens": 1217391,
+    "prompt_tokens_details": {
+      "cached_tokens": 1125213
+    }
+  },
+  "costUsd": 0.5504692999999999,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 29215,
+    "slowestPartMs": 33937,
+    "critical": "cabShell",
+    "elapsedMs": 63153,
+    "spec": {
+      "name": "Hover Technical",
+      "description": "A militarized pickup truck converted to ride on four downward-facing hover thrusters, in a low-poly cyberpunk style with neon underglow, armour plating and a roll-cage gun mount.",
+      "builderName": "hoverTechnical",
+      "size": [
+        2.5,
+        2.3,
+        5.4
+      ],
+      "layout": "A chunky boxy pickup floating about 0.45 m above the floor on four hover thrusters (one per old wheel position). From the front (+Z): a bull-bar and winch bumper with twin headlights and a grille, a sloped hood, a short armoured cab with slit windows, an open cargo bed behind the cab with a roll-cage and a pintle-mounted gun, and at the rear a tail panel with lights and a rear bumper. Four cylindrical thruster pods hang below the corner fenders, each with a glowing cyan ring and a vent cone underneath. The body is dark gunmetal with yellow hazard trim, magenta and cyan neon strips, and angular faceted armour panels. Panels carry stencilled numbers and kanji-like decals. Every shape is blocky and faceted, with glow on lights, underglow and thruster rings. The thruster pods stand at the floor line y=0 (their bottoms rest on the floor via the thruster feet); the body floats above.",
+      "palette": {
+        "hull": "#2d323d",
+        "hullLight": "#4a5262",
+        "armor": "#3a4150",
+        "dark": "#12141a",
+        "trim": "#f2c200",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fb4",
+        "glass": "#0b2a3a",
+        "rubber": "#1a1a1f",
+        "steel": "#8b94a6",
+        "rust": "#7a4a2e",
+        "red": "#d8202a",
+        "white": "#f1f4f8",
+        "orange": "#ff7a1a"
+      },
+      "mounts": {
+        "bodyCenter": [
+          0,
+          1,
+          0
+        ],
+        "hoodFront": [
+          0,
+          1.05,
+          2
+        ],
+        "cabFloor": [
+          0,
+          0.85,
+          0.3
+        ],
+        "cabRoof": [
+          0,
+          1.85,
+          0
+        ],
+        "bedFloor": [
+          0,
+          0.9,
+          -1.7
+        ],
+        "bedRear": [
+          0,
+          0.9,
+          -2.6
+        ],
+        "frontBumper": [
+          0,
+          0.7,
+          2.6
+        ],
+        "rearBumper": [
+          0,
+          0.7,
+          -2.65
+        ],
+        "gunPintle": [
+          0,
+          1.65,
+          -1.4
+        ],
+        "thrusterFL": [
+          0.95,
+          0.5,
+          1.6
+        ],
+        "thrusterFR": [
+          -0.95,
+          0.5,
+          1.6
+        ],
+        "thrusterRL": [
+          0.95,
+          0.5,
+          -1.7
+        ],
+        "thrusterRR": [
+          -0.95,
+          0.5,
+          -1.7
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "cab",
+          "parent": "body",
+          "at": [
+            0,
+            1,
+            0.3
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "cab"
+        },
+        {
+          "name": "gunMount",
+          "parent": "body",
+          "at": [
+            0,
+            1.65,
+            -1.4
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "gun"
+        },
+        {
+          "name": "gunBarrel",
+          "parent": "gunMount",
+          "at": [
+            0,
+            1.75,
+            -1.4
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "gun"
+        },
+        {
+          "name": "thrusterFL",
+          "parent": "body",
+          "at": [
+            0.95,
+            0.5,
+            1.6
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterFR",
+          "parent": "body",
+          "at": [
+            -0.95,
+            0.5,
+            1.6
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterRL",
+          "parent": "body",
+          "at": [
+            0.95,
+            0.5,
+            -1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterRR",
+          "parent": "body",
+          "at": [
+            -0.95,
+            0.5,
+            -1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "The floating underbody and frame: a faceted skid-plate belly tub, two longitudinal frame rails, cross-members, the lower fender sills, a neon magenta underglow strip along each side and a glowing cyan underglow panel on the belly (glow kit). Paint: gunmetal plate with scratches and panelled seams (panelled paint) and hazard-yellow chevron stripes on the sill sides via a custom paint. Hover lift-pad mounting plates at the four thruster mounts with bolts.",
+          "box": [
+            [
+              -1.2,
+              0.5,
+              -2.7
+            ],
+            [
+              1.2,
+              1,
+              2.5
+            ]
+          ],
+          "attaches": "Thruster pods hang from the plates at thrusterFL/FR/RL/RR; the cab and bed sit on its top at y=1.0; bumpers attach at frontBumper and rearBumper.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 120
+        },
+        {
+          "id": "thrusters",
+          "builds": "Four hover thruster pods, built identically via one helper and mirrored: a squat armoured cylinder housing with faceted sides and yellow hazard band, a glowing cyan intake ring on top, a downward-flaring nozzle cone with inner glowing cyan disc and radial fins, stabiliser fins on the outer side, small exhaust vents, and a stubby landing foot ring whose bottom touches y=0. Each pod is a few cm from the body bottom plate and rides its own thruster joint. Includes a faint translucent-looking glow cone of cyan cards below the nozzle. Decals: number stencil per pod on the outer wall (SVG texture).",
+          "box": [
+            [
+              -1.25,
+              0,
+              -2.1
+            ],
+            [
+              1.25,
+              0.85,
+              2
+            ]
+          ],
+          "attaches": "Top of each pod meets the chassis lift plate at thrusterFL/FR/RL/RR (y about 0.5-0.85); each pod uses its matching thruster joint.",
+          "joints": [
+            "thrusterFL",
+            "thrusterFR",
+            "thrusterRL",
+            "thrusterRR"
+          ],
+          "floor": true,
+          "budget": 130
+        },
+        {
+          "id": "cabShell",
+          "builds": "The armoured cab body from firewall to rear cab wall: a boxy faceted loft or box assembly with sloped A-pillars, a thick flat roof with a roof armour plate and a small sensor pod and antenna, two side doors with slit armoured windows (glass colour with SVG window frame decal and bullet-impact decals), door handles, side mirrors, wing armour skirts, and a cab interior hint (seats, dash glow, headrests) visible through the glass. Paint: gunmetal with panelled seams, hazard yellow trim stripes, a white stencilled unit number and kanji-like glyph decal on each door.",
+          "box": [
+            [
+              -1.2,
+              1,
+              -0.9
+            ],
+            [
+              1.2,
+              2,
+              1.1
+            ]
+          ],
+          "attaches": "Sits on the chassis top (y=1.0) at cabFloor; its front meets the hood at z about 1.1; its rear wall meets the bed at z about -0.9; roof at cabRoof.",
+          "joints": [
+            "cab",
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "frontEnd",
+          "builds": "The hood and front fascia: a sloped faceted hood with a raised armoured scoop and vents with glowing orange glow strips, front fenders with fender flare armour above each thruster, a mesh grille drawn as an SVG texture (cyberpunk slits with cyan glow lines), twin angular headlights (glowing white-cyan, glow kit) with brow shields, a magenta neon light bar across the grille, a heavy bull-bar front bumper with a winch, tow hooks, yellow hazard corners, and a licence plate with SVG text.",
+          "box": [
+            [
+              -1.25,
+              0.6,
+              1.1
+            ],
+            [
+              1.25,
+              1.55,
+              2.7
+            ]
+          ],
+          "attaches": "Hood rear edge meets cabShell front at z 1.1; bumper at frontBumper; sits on the chassis top and front of its frame at z 2.5.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "cargoBed",
+          "builds": "The open truck bed behind the cab: a floor with ribbed deck plates, side walls and tailgate of faceted armour panels with yellow hazard top trim, wheel-arch bulges over the rear thrusters, a roll-cage of rods rising from the bed rails behind the cab to a rear crossbar with a mount bar for the gun, a spare ammo crate stack, fuel canisters strapped with straps, a neon cyan strip along the bed rim, a rear bumper with tail lights (red glow) and exhaust-style vent stacks, and a rear licence decal. Paint: scuffed gunmetal with rust at the edges.",
+          "box": [
+            [
+              -1.25,
+              0.85,
+              -2.7
+            ],
+            [
+              1.25,
+              1.95,
+              -0.85
+            ]
+          ],
+          "attaches": "Front wall meets cabShell rear at z -0.9; floor at bedFloor on the chassis top; the roll-cage crossbar holds the gunPintle; rear bumper at rearBumper.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "gunMount",
+          "builds": "The pintle-mounted heavy weapon on the roll-cage: a pivot post and rotating swivel base on the gunMount joint, a faceted armoured gun shield plate, a boxy receiver with ammo box and a belt of cartridges, a long barrel with a perforated cooling shroud, heat-vent slots, a flash hider with orange glow tip, a rail with a small red-dot sight with glowing lens, handles, and a cyan status screen with SVG readout on the receiver (glow). The barrel is on gunBarrel so it can elevate; it points forward over the cab (+Z).",
+          "box": [
+            [
+              -0.4,
+              1.5,
+              -2
+            ],
+            [
+              0.4,
+              2.3,
+              -0.2
+            ]
+          ],
+          "attaches": "Base plate sits on the roll-cage mount at gunPintle (0, 1.65, -1.4); post rides gunMount, barrel rides gunBarrel.",
+          "joints": [
+            "gunMount",
+            "gunBarrel"
+          ],
+          "floor": false,
+          "budget": 110
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:12:36.550Z",
+        "wallMs": 29215,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85491,
+          "completion_tokens": 3700,
+          "total_tokens": 89191,
+          "prompt_tokens_details": {
+            "cached_tokens": 85487
+          }
+        },
+        "costUsd": 0.0455567,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "thrusters",
+        "started": "2026-10-25T14:13:05.766Z",
+        "wallMs": 15795,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89239,
+          "completion_tokens": 2677,
+          "total_tokens": 91916,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0454884,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:13:05.765Z",
+        "wallMs": 18727,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89174,
+          "completion_tokens": 2962,
+          "total_tokens": 92136,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0482084,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "frontEnd",
+        "started": "2026-10-25T14:13:05.766Z",
+        "wallMs": 19769,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89182,
+          "completion_tokens": 3136,
+          "total_tokens": 92318,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0499644,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoBed",
+        "started": "2026-10-25T14:13:05.766Z",
+        "wallMs": 22109,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89226,
+          "completion_tokens": 3386,
+          "total_tokens": 92612,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0525524,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "gunMount",
+        "started": "2026-10-25T14:13:05.766Z",
+        "wallMs": 27317,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89207,
+          "completion_tokens": 4788,
+          "total_tokens": 93995,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0665344,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cabShell",
+        "started": "2026-10-25T14:13:05.766Z",
+        "wallMs": 33937,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89218,
+          "completion_tokens": 5269,
+          "total_tokens": 94487,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0713664,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-cargoBed",
+        "started": "2026-10-25T14:13:41.423Z",
+        "wallMs": 4431,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 93225,
+          "completion_tokens": 350,
+          "total_tokens": 93575,
+          "prompt_tokens_details": {
+            "cached_tokens": 89222
+          }
+        },
+        "costUsd": 0.0204282,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-cabShell",
+        "started": "2026-10-25T14:13:41.423Z",
+        "wallMs": 5113,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 95581,
+          "completion_tokens": 802,
+          "total_tokens": 96383,
+          "prompt_tokens_details": {
+            "cached_tokens": 89214
+          }
+        },
+        "costUsd": 0.0296754,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-thrusters",
+        "started": "2026-10-25T14:13:41.423Z",
+        "wallMs": 6700,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 93940,
+          "completion_tokens": 669,
+          "total_tokens": 94609,
+          "prompt_tokens_details": {
+            "cached_tokens": 89235
+          }
+        },
+        "costUsd": 0.0250235,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-chassis",
+        "started": "2026-10-25T14:13:41.423Z",
+        "wallMs": 8026,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 93464,
+          "completion_tokens": 1048,
+          "total_tokens": 94512,
+          "prompt_tokens_details": {
+            "cached_tokens": 89170
+          }
+        },
+        "costUsd": 0.027985,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-gunMount",
+        "started": "2026-10-25T14:13:41.423Z",
+        "wallMs": 9323,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 95014,
+          "completion_tokens": 947,
+          "total_tokens": 95961,
+          "prompt_tokens_details": {
+            "cached_tokens": 89203
+          }
+        },
+        "costUsd": 0.030012300000000002,
+        "hasCode": true,
+        "reasoning": "I'm noticing the gunBarrel joint's measured position doesn't match what I expect—the barrel parts are showing up near z≈-0.03, y≈2.1 instead of the offset I calculated from the joint's declared position, suggesting the `at` coordinate might be relative rather than absolute.\n\nTracing through, the flash hider glow ends up at roughly z≈-0.02 once all the barrel segment lengths are summed, which exceeds the -0.2 bound. I'll shorten the barrel length from 0.88 to 0.66 to pull things back within range, then adjust the cooling fin positions so they don't overlap into the flash hider region. The y-overshoot to 2.40 is minor and under the 15cm threshold, so I'll leave that alone.\n\n"
+      },
+      {
+        "id": "fit-frontEnd",
+        "started": "2026-10-25T14:13:41.423Z",
+        "wallMs": 12176,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 93731,
+          "completion_tokens": 1965,
+          "total_tokens": 95696,
+          "prompt_tokens_details": {
+            "cached_tokens": 89178
+          }
+        },
+        "costUsd": 0.0376738,
+        "hasCode": true,
+        "reasoning": "I need to pull the bull-bar pieces back inside the z ≤ 2.7 boundary since several are sitting at z 2.82. The simplest fix is shifting that whole group backward, moving the vertical bars from around 2.78-2.86 down to roughly 2.61-2.65.\n\nNow I'm going through each remaining component that pokes past the limit — the hazard box, tow hook sweep, bumper box, winch, red indicator box, mounting plate, and side box — and recalculating new z positions so each stays within bounds, trimming most to around 2.5-2.7. I'll need to make precise edits since the winch alone has several lines referencing z 2.8 that all need replacing.\n\n"
+      }
+    ],
+    "fit": {
+      "fitMs": 17469,
+      "checkMs": 1717,
+      "afterMs": 3572,
+      "repairMs": 12176,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "chassis",
+          "meshes": 89,
+          "outside": 12,
+          "maxOver": 0.5,
+          "bounds": [
+            [
+              -1.7032,
+              0.415,
+              -2.8554
+            ],
+            [
+              1.431,
+              1.0001,
+              2.6801
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "extrude.body",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.7032,
+                0.5191,
+                2.3544
+              ],
+              "max": [
+                0,
+                0.8397,
+                2.655
+              ],
+              "over": 0.5,
+              "where": [
+                "0.5 m past the box's -x face (x = -1.2)",
+                "0.15 m past the box's +z face (z = 2.5)"
+              ]
+            },
+            {
+              "name": "extrude.body.2",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.7032,
+                0.5191,
+                -2.8554
+              ],
+              "max": [
+                0,
+                0.8397,
+                -2.5548
+              ],
+              "over": 0.5,
+              "where": [
+                "0.5 m past the box's -x face (x = -1.2)",
+                "0.16 m past the box's -z face (z = -2.7)"
+              ]
+            },
+            {
+              "name": "part.body.29",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.469,
+                0.5799,
+                1.119
+              ],
+              "max": [
+                1.431,
+                0.6601,
+                2.081
+              ],
+              "over": 0.23,
+              "where": [
+                "0.23 m past the box's +x face (x = 1.2)"
+              ]
+            },
+            {
+              "name": "part.body.32",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.431,
+                0.5799,
+                1.119
+              ],
+              "max": [
+                -0.469,
+                0.6601,
+                2.081
+              ],
+              "over": 0.23,
+              "where": [
+                "0.23 m past the box's -x face (x = -1.2)"
+              ]
+            },
+            {
+              "name": "part.body.35",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.469,
+                0.5799,
+                -2.181
+              ],
+              "max": [
+                1.431,
+                0.6601,
+                -1.219
+              ],
+              "over": 0.23,
+              "where": [
+                "0.23 m past the box's +x face (x = 1.2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "thrusters",
+          "meshes": 176,
+          "outside": 24,
+          "maxOver": 0.43,
+          "bounds": [
+            [
+              -1.6814,
+              -0.0001,
+              -2.1716
+            ],
+            [
+              1.6812,
+              0.88,
+              2.0716
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "extrude.thrusterFL",
+              "bones": [
+                "thrusterFL"
+              ],
+              "min": [
+                1.3805,
+                0.5701,
+                1.585
+              ],
+              "max": [
+                1.6809,
+                0.7403,
+                1.615
+              ],
+              "over": 0.43,
+              "where": [
+                "0.43 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "extrude.thrusterFL.2",
+              "bones": [
+                "thrusterFL"
+              ],
+              "min": [
+                1.3805,
+                0.3698,
+                1.585
+              ],
+              "max": [
+                1.6809,
+                0.54,
+                1.615
+              ],
+              "over": 0.43,
+              "where": [
+                "0.43 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "extrude.thrusterFR",
+              "bones": [
+                "thrusterFR"
+              ],
+              "min": [
+                -1.681,
+                0.5701,
+                1.585
+              ],
+              "max": [
+                -1.3806,
+                0.7403,
+                1.615
+              ],
+              "over": 0.43,
+              "where": [
+                "0.43 m past the box's -x face (x = -1.25)"
+              ]
+            },
+            {
+              "name": "extrude.thrusterFR.2",
+              "bones": [
+                "thrusterFR"
+              ],
+              "min": [
+                -1.681,
+                0.3698,
+                1.585
+              ],
+              "max": [
+                -1.3806,
+                0.5401,
+                1.615
+              ],
+              "over": 0.43,
+              "where": [
+                "0.43 m past the box's -x face (x = -1.25)"
+              ]
+            },
+            {
+              "name": "extrude.thrusterRL",
+              "bones": [
+                "thrusterRL"
+              ],
+              "min": [
+                1.3807,
+                0.5701,
+                -1.715
+              ],
+              "max": [
+                1.6812,
+                0.7404,
+                -1.685
+              ],
+              "over": 0.43,
+              "where": [
+                "0.43 m past the box's +x face (x = 1.25)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cabShell",
+          "meshes": 90,
+          "outside": 9,
+          "maxOver": 0.3,
+          "bounds": [
+            [
+              -1.49,
+              0.9999,
+              -0.92
+            ],
+            [
+              1.49,
+              2.298,
+              1.1023
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sphere.cab.2",
+              "bones": [
+                "cab"
+              ],
+              "min": [
+                -0.878,
+                2.242,
+                -0.7743
+              ],
+              "max": [
+                -0.822,
+                2.298,
+                -0.7257
+              ],
+              "over": 0.3,
+              "where": [
+                "0.3 m past the box's +y face (y = 2)"
+              ]
+            },
+            {
+              "name": "part.cab.14",
+              "bones": [
+                "cab"
+              ],
+              "min": [
+                1.43,
+                1.52,
+                0.825
+              ],
+              "max": [
+                1.49,
+                1.72,
+                0.975
+              ],
+              "over": 0.29,
+              "where": [
+                "0.29 m past the box's +x face (x = 1.2)"
+              ]
+            },
+            {
+              "name": "part.cab.27",
+              "bones": [
+                "cab"
+              ],
+              "min": [
+                -1.49,
+                1.52,
+                0.825
+              ],
+              "max": [
+                -1.43,
+                1.72,
+                0.975
+              ],
+              "over": 0.29,
+              "where": [
+                "0.29 m past the box's -x face (x = -1.2)"
+              ]
+            },
+            {
+              "name": "sphere.cab",
+              "bones": [
+                "cab"
+              ],
+              "min": [
+                -0.88,
+                2.23,
+                -0.776
+              ],
+              "max": [
+                -0.82,
+                2.29,
+                -0.724
+              ],
+              "over": 0.29,
+              "where": [
+                "0.29 m past the box's +y face (y = 2)"
+              ]
+            },
+            {
+              "name": "sweep.cab.6",
+              "bones": [
+                "cab"
+              ],
+              "min": [
+                -0.8594,
+                1.9942,
+                -0.7583
+              ],
+              "max": [
+                -0.7794,
+                2.2527,
+                -0.6784
+              ],
+              "over": 0.25,
+              "where": [
+                "0.25 m past the box's +y face (y = 2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "frontEnd",
+          "meshes": 56,
+          "outside": 14,
+          "maxOver": 0.21,
+          "bounds": [
+            [
+              -1.3301,
+              0.5299,
+              1.0186
+            ],
+            [
+              1.3301,
+              1.4814,
+              2.9101
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.body.106",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.0401,
+                0.5299,
+                2.8499
+              ],
+              "max": [
+                0.0401,
+                0.6301,
+                2.9101
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's +z face (z = 2.7)"
+              ]
+            },
+            {
+              "name": "sweep.body.2",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.4757,
+                0.538,
+                2.7045
+              ],
+              "max": [
+                0.5267,
+                0.7013,
+                2.9034
+              ],
+              "over": 0.2,
+              "where": [
+                "0.2 m past the box's +z face (z = 2.7)"
+              ]
+            },
+            {
+              "name": "sweep.body.3",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.5267,
+                0.538,
+                2.7046
+              ],
+              "max": [
+                -0.4758,
+                0.7013,
+                2.9035
+              ],
+              "over": 0.2,
+              "where": [
+                "0.2 m past the box's +z face (z = 2.7)"
+              ]
+            },
+            {
+              "name": "part.body.104",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.1899,
+                0.5748,
+                2.7148
+              ],
+              "max": [
+                0.2501,
+                0.7452,
+                2.8852
+              ],
+              "over": 0.19,
+              "where": [
+                "0.19 m past the box's +z face (z = 2.7)"
+              ]
+            },
+            {
+              "name": "part.body.105",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.2501,
+                0.5748,
+                2.7148
+              ],
+              "max": [
+                -0.1899,
+                0.7452,
+                2.8852
+              ],
+              "over": 0.19,
+              "where": [
+                "0.19 m past the box's +z face (z = 2.7)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cargoBed",
+          "meshes": 95,
+          "outside": 2,
+          "maxOver": 0.27,
+          "bounds": [
+            [
+              -1.2703,
+              0.5789,
+              -2.7903
+            ],
+            [
+              1.2703,
+              1.9928,
+              -0.8398
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "cylinder.body.25",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.0197,
+                0.5789,
+                -2.1211
+              ],
+              "max": [
+                1.2203,
+                1.4211,
+                -1.2789
+              ],
+              "over": 0.27,
+              "where": [
+                "0.27 m past the box's -y face (y = 0.85)"
+              ]
+            },
+            {
+              "name": "cylinder.body.26",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.2203,
+                0.5789,
+                -2.1211
+              ],
+              "max": [
+                -1.0197,
+                1.4211,
+                -1.2789
+              ],
+              "over": 0.27,
+              "where": [
+                "0.27 m past the box's -y face (y = 0.85)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "gunMount",
+          "meshes": 129,
+          "outside": 7,
+          "maxOver": 0.19,
+          "bounds": [
+            [
+              -0.4004,
+              1.65,
+              -1.7403
+            ],
+            [
+              0.4004,
+              2.4025,
+              -0.01
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "cylinder.gunBarrel.68",
+              "bones": [
+                "gunBarrel"
+              ],
+              "min": [
+                -0.03,
+                2.09,
+                -0.03
+              ],
+              "max": [
+                0.03,
+                2.15,
+                -0.01
+              ],
+              "over": 0.19,
+              "where": [
+                "0.19 m past the box's +z face (z = -0.2)"
+              ]
+            },
+            {
+              "name": "cylinder.gunBarrel.67",
+              "bones": [
+                "gunBarrel"
+              ],
+              "min": [
+                -0.05,
+                2.07,
+                -0.1501
+              ],
+              "max": [
+                0.05,
+                2.17,
+                -0.0299
+              ],
+              "over": 0.17,
+              "where": [
+                "0.17 m past the box's +z face (z = -0.2)"
+              ]
+            },
+            {
+              "name": "box.gunBarrel.31",
+              "bones": [
+                "gunBarrel"
+              ],
+              "min": [
+                0.0293,
+                2.1493,
+                -0.13
+              ],
+              "max": [
+                0.0414,
+                2.1614,
+                -0.03
+              ],
+              "over": 0.17,
+              "where": [
+                "0.17 m past the box's +z face (z = -0.2)"
+              ]
+            },
+            {
+              "name": "box.gunBarrel.32",
+              "bones": [
+                "gunBarrel"
+              ],
+              "min": [
+                -0.0414,
+                2.1493,
+                -0.13
+              ],
+              "max": [
+                -0.0293,
+                2.1614,
+                -0.03
+              ],
+              "over": 0.17,
+              "where": [
+                "0.17 m past the box's +z face (z = -0.2)"
+              ]
+            },
+            {
+              "name": "box.gunBarrel.33",
+              "bones": [
+                "gunBarrel"
+              ],
+              "min": [
+                -0.0414,
+                2.0786,
+                -0.13
+              ],
+              "max": [
+                -0.0293,
+                2.0907,
+                -0.03
+              ],
+              "over": 0.17,
+              "where": [
+                "0.17 m past the box's +z face (z = -0.2)"
+              ]
+            }
+          ]
+        }
+      ],
+      "after": [
+        {
+          "id": "chassis",
+          "meshes": 89,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.2501,
+              0.415,
+              -2.7002
+            ],
+            [
+              1.2501,
+              1.0001,
+              2.5301
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "thrusters",
+          "meshes": 176,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.2806,
+              -0.0001,
+              -2.1716
+            ],
+            [
+              1.2805,
+              0.88,
+              2.0716
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "cabShell",
+          "meshes": 90,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.245,
+              0.9999,
+              -0.92
+            ],
+            [
+              1.245,
+              2.1479,
+              1.1023
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "frontEnd",
+          "meshes": 55,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.3301,
+              0.5299,
+              1.0186
+            ],
+            [
+              1.3301,
+              1.4814,
+              2.7052
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "cargoBed",
+          "meshes": 95,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.2703,
+              0.8197,
+              -2.7903
+            ],
+            [
+              1.2703,
+              1.9928,
+              -0.8398
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "gunMount",
+          "meshes": 129,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.4004,
+              1.65,
+              -1.7403
+            ],
+            [
+              0.4004,
+              2.4025,
+              -0.23
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "chassis",
+          "wallMs": 8026,
+          "edits": 6,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "thrusters",
+          "wallMs": 6700,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "cabShell",
+          "wallMs": 5113,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "frontEnd",
+          "wallMs": 12176,
+          "edits": 4,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "cargoBed",
+          "wallMs": 4431,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "gunMount",
+          "wallMs": 9323,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  }
+}

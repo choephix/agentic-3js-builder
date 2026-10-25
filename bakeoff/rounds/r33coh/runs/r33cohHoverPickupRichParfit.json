@@ -1,0 +1,1581 @@
+{
+  "slug": "r33cohHoverPickupRichParfit",
+  "arm": "parfit",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T14:10:32.711Z",
+  "wallMs": 57380,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 1166401,
+    "completion_tokens": 23429,
+    "total_tokens": 1189830,
+    "prompt_tokens_details": {
+      "cached_tokens": 1117304
+    }
+  },
+  "costUsd": 0.44421439999999995,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 24904,
+    "slowestPartMs": 19762,
+    "critical": "gun",
+    "elapsedMs": 44667,
+    "spec": {
+      "name": "Hover Technical",
+      "description": "A militarized pickup truck converted to ride on four ducted hover thrusters, in low-poly cyberpunk style with neon underglow and armour plating.",
+      "builderName": "hoverTechnical",
+      "size": [
+        2.4,
+        2.1,
+        5.4
+      ],
+      "layout": "A chunky pickup silhouette hovering about 0.35 m above the ground, nose toward +Z. Front: sloped armoured hood with a grille and light bar, then a boxy two-door cab with raked glazing, then an open cargo bed at the rear holding a pintle-mounted gun. Wheels are replaced by four ducted hover thrusters (drum nacelles with glowing cyan fans) on short pylons at the wheel positions, pointing down and slightly outward. Style: faceted low-poly plates, matte dark gunmetal hull with hazard-yellow trim and magenta/cyan neon strips, painted panel lines, rivets, decals and grime. The model stands with its thruster pods' lowest points on y = 0, and the body floats above them.",
+      "palette": {
+        "hull": "#2f3540",
+        "hullLight": "#4a5361",
+        "armor": "#1d2128",
+        "trim": "#e7b814",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fa8",
+        "glass": "#14304a",
+        "rubber": "#101114",
+        "metal": "#8a929e",
+        "rust": "#7a4a2a",
+        "lamp": "#fff4c0",
+        "thrustCore": "#bff9ff"
+      },
+      "mounts": {
+        "bodyCenter": [
+          0,
+          1,
+          0
+        ],
+        "chassisTop": [
+          0,
+          1,
+          0
+        ],
+        "hoodFront": [
+          0,
+          1,
+          2.7
+        ],
+        "cabFloor": [
+          0,
+          1,
+          0.3
+        ],
+        "bedFloor": [
+          0,
+          1,
+          -1.7
+        ],
+        "gunPintle": [
+          0,
+          1.35,
+          -1.6
+        ],
+        "podFL": [
+          0.95,
+          0.5,
+          1.7
+        ],
+        "podFR": [
+          -0.95,
+          0.5,
+          1.7
+        ],
+        "podRL": [
+          0.95,
+          0.5,
+          -1.6
+        ],
+        "podRR": [
+          -0.95,
+          0.5,
+          -1.6
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "podFL",
+          "parent": "body",
+          "at": [
+            0.95,
+            0.5,
+            1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "pods"
+        },
+        {
+          "name": "podFR",
+          "parent": "body",
+          "at": [
+            -0.95,
+            0.5,
+            1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "pods"
+        },
+        {
+          "name": "podRL",
+          "parent": "body",
+          "at": [
+            0.95,
+            0.5,
+            -1.6
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "pods"
+        },
+        {
+          "name": "podRR",
+          "parent": "body",
+          "at": [
+            -0.95,
+            0.5,
+            -1.6
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "pods"
+        },
+        {
+          "name": "gunMount",
+          "parent": "body",
+          "at": [
+            0,
+            1.35,
+            -1.6
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "gun"
+        },
+        {
+          "name": "gunBarrel",
+          "parent": "gunMount",
+          "at": [
+            0,
+            1.75,
+            -1.6
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "gun"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "The floating underbody: a faceted frame slab with side sills, armoured belly plate, crossmembers, battery pack boxes, exhaust-free underside with glowing magenta underglow strips and cyan conduit pipes, plus hazard-striped sill paints and bolt rows. Includes the four pylon arms that run from the frame out to the pod mounts (the pylon arms end at the pod mounts; the pods themselves belong to the pod parts).",
+          "box": [
+            [
+              -1.2,
+              0.5,
+              -2.6
+            ],
+            [
+              1.2,
+              1.05,
+              2.6
+            ]
+          ],
+          "attaches": "Top at chassisTop supports cab, hood and bed; pylons end at podFL, podFR, podRL, podRR.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "podsFront",
+          "builds": "The two front hover thruster pods (podFL, podFR): each a faceted drum nacelle with armoured shroud, inner ring, a glowing cyan fan disc textured with an SVG blade pattern facing down, an intake grille on top, hazard-stripe band, small stabiliser fins, a downward cyan thrust glow cone card and mounting collar. Pods are mirrored across x. Lowest points of the drums touch y = 0.",
+          "box": [
+            [
+              -1.2,
+              0,
+              1.2
+            ],
+            [
+              1.2,
+              0.75,
+              2.2
+            ]
+          ],
+          "attaches": "Collars attach to the pylon ends at podFL and podFR.",
+          "joints": [
+            "podFL",
+            "podFR"
+          ],
+          "floor": true,
+          "budget": 130
+        },
+        {
+          "id": "podsRear",
+          "builds": "The two rear hover thruster pods (podRL, podRR): same design language as the front pods but slightly larger, with extra exhaust vents on the rear face and magenta accent rings, glowing fan discs with SVG blade texture, hazard bands, stabiliser fins and a thrust glow card. Mirrored across x. Lowest points touch y = 0.",
+          "box": [
+            [
+              -1.25,
+              0,
+              -2.2
+            ],
+            [
+              1.25,
+              0.75,
+              -1
+            ]
+          ],
+          "attaches": "Collars attach to the pylon ends at podRL and podRR.",
+          "joints": [
+            "podRL",
+            "podRR"
+          ],
+          "floor": true,
+          "budget": 130
+        },
+        {
+          "id": "cab",
+          "builds": "The armoured cab shell from cabFloor up: boxy faceted body with sloped roof, A and C pillars, door panels with panel lines and handles, side mirrors with cyan edge lights, armoured window shutters half-raised, tinted glass with an SVG reflection streak texture, roof rack with antenna mast, interior dash, seats and a steering wheel visible through the glass, door decals and faction stencil emblem, and a rear cab wall with a window toward the bed.",
+          "box": [
+            [
+              -1.1,
+              1,
+              -0.9
+            ],
+            [
+              1.1,
+              2.1,
+              1.1
+            ]
+          ],
+          "attaches": "Sits on chassisTop at cabFloor; rear wall meets the bed at z=-0.9; front meets the hood at z=1.1.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "hoodFront",
+          "builds": "The front end from z=1.1 to the nose: sloped armoured hood with vents and a scoop, hazard-striped bumper-ram with bull bar, a cyberpunk grille with glowing cyan slits, twin headlamps with lamp glow and a magenta light bar across the nose, fender flares over the front pods, tow hooks, a number plate decal, and a small winch. Wheel arches are replaced by flared thruster shrouds above the pods.",
+          "box": [
+            [
+              -1.2,
+              0.75,
+              1.1
+            ],
+            [
+              1.2,
+              1.6,
+              2.7
+            ]
+          ],
+          "attaches": "Back edge meets the cab at z=1.1; underside sits on chassisTop; nose is at hoodFront.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "cargoBed",
+          "builds": "The open cargo bed from z=-0.9 to the tail: floor deck at bedFloor, side walls and tailgate of armour panels with painted panel lines, ribbed inner floor, tie-down rings, stacked ammo crates and a fuel drum, a glowing neon tail light bar and brake lights, rear bumper with hazard stripes, rear fender flares above the rear pods, a roll bar behind the cab, and a square mounting base plate at gunPintle.",
+          "box": [
+            [
+              -1.2,
+              0.75,
+              -2.7
+            ],
+            [
+              1.2,
+              1.9,
+              -0.9
+            ]
+          ],
+          "attaches": "Front wall meets cab rear at z=-0.9; sits on chassisTop; base plate carries the gun at gunPintle.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "gun",
+          "builds": "The pintle-mounted heavy weapon: a swivel pedestal and turntable at gunPintle on gunMount, an armoured cradle with side plates, a boxy receiver with ammo box and a belt of brass rounds, a shield plate with a small viewport, a long faceted barrel with cooling shroud, muzzle brake and glowing cyan heat strips on gunBarrel, a ring sight, plus handles and a seat-less spade grip. Barrel points toward +Z over the cab roof direction.",
+          "box": [
+            [
+              -0.5,
+              1.3,
+              -2.1
+            ],
+            [
+              0.5,
+              2.1,
+              -0.3
+            ]
+          ],
+          "attaches": "Pedestal base sits on the bed base plate at gunPintle; gunBarrel joint carries the barrel and shroud.",
+          "joints": [
+            "gunMount",
+            "gunBarrel"
+          ],
+          "floor": false,
+          "budget": 100
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:10:32.711Z",
+        "wallMs": 24904,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85491,
+          "completion_tokens": 3240,
+          "total_tokens": 88731,
+          "prompt_tokens_details": {
+            "cached_tokens": 85487
+          }
+        },
+        "costUsd": 0.0409567,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoBed",
+        "started": "2026-10-25T14:10:57.615Z",
+        "wallMs": 13846,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88666,
+          "completion_tokens": 2003,
+          "total_tokens": 90669,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0376024,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "podsRear",
+        "started": "2026-10-25T14:10:57.615Z",
+        "wallMs": 13928,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88596,
+          "completion_tokens": 2371,
+          "total_tokens": 90967,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0411424,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "podsFront",
+        "started": "2026-10-25T14:10:57.615Z",
+        "wallMs": 14201,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88625,
+          "completion_tokens": 2249,
+          "total_tokens": 90874,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0399804,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:10:57.615Z",
+        "wallMs": 14391,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88648,
+          "completion_tokens": 2311,
+          "total_tokens": 90959,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0406464,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:10:57.615Z",
+        "wallMs": 16568,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88656,
+          "completion_tokens": 2709,
+          "total_tokens": 91365,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0446424,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "hoodFront",
+        "started": "2026-10-25T14:10:57.615Z",
+        "wallMs": 16908,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88654,
+          "completion_tokens": 2676,
+          "total_tokens": 91330,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.044308400000000005,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "gun",
+        "started": "2026-10-25T14:10:57.615Z",
+        "wallMs": 19762,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88678,
+          "completion_tokens": 3372,
+          "total_tokens": 92050,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0513164,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-chassis",
+        "started": "2026-10-25T14:11:18.703Z",
+        "wallMs": 1949,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 92235,
+          "completion_tokens": 232,
+          "total_tokens": 92467,
+          "prompt_tokens_details": {
+            "cached_tokens": 88644
+          }
+        },
+        "costUsd": 0.0183664,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-cab",
+        "started": "2026-10-25T14:11:18.703Z",
+        "wallMs": 2290,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 91975,
+          "completion_tokens": 314,
+          "total_tokens": 92289,
+          "prompt_tokens_details": {
+            "cached_tokens": 88652
+          }
+        },
+        "costUsd": 0.0186512,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-cargoBed",
+        "started": "2026-10-25T14:11:18.703Z",
+        "wallMs": 3881,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 91276,
+          "completion_tokens": 289,
+          "total_tokens": 91565,
+          "prompt_tokens_details": {
+            "cached_tokens": 88662
+          }
+        },
+        "costUsd": 0.0169842,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-hoodFront",
+        "started": "2026-10-25T14:11:18.703Z",
+        "wallMs": 4808,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 92136,
+          "completion_tokens": 748,
+          "total_tokens": 92884,
+          "prompt_tokens_details": {
+            "cached_tokens": 88650
+          }
+        },
+        "costUsd": 0.023317,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-podsFront",
+        "started": "2026-10-25T14:11:18.703Z",
+        "wallMs": 9243,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 92765,
+          "completion_tokens": 915,
+          "total_tokens": 93680,
+          "prompt_tokens_details": {
+            "cached_tokens": 88621
+          }
+        },
+        "costUsd": 0.0263001,
+        "hasCode": true,
+        "reasoning": "I'm checking the pod center offsets and drum radius math to make sure the outward-extending drums stay within the 1.2 box limit.\n\n"
+      }
+    ],
+    "fit": {
+      "fitMs": 12714,
+      "checkMs": 1324,
+      "afterMs": 2140,
+      "repairMs": 9243,
+      "error": null,
+      "threw": {
+        "podsRear": "(intermediate value)(intermediate value)(intermediate value) is not iterable"
+      },
+      "before": [
+        {
+          "id": "chassis",
+          "meshes": 87,
+          "outside": 12,
+          "maxOver": 0.21,
+          "bounds": [
+            [
+              -1.215,
+              0.29,
+              -2.6238
+            ],
+            [
+              1.215,
+              1.0501,
+              2.6238
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.body.8",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.3497,
+                0.29,
+                -1.2504
+              ],
+              "max": [
+                0.7503,
+                0.33,
+                -0.5496
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's -y face (y = 0.5)"
+              ]
+            },
+            {
+              "name": "part.body.10",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.3497,
+                0.29,
+                -0.2504
+              ],
+              "max": [
+                0.7503,
+                0.33,
+                0.4504
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's -y face (y = 0.5)"
+              ]
+            },
+            {
+              "name": "part.body.12",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.3497,
+                0.29,
+                0.7496
+              ],
+              "max": [
+                0.7503,
+                0.33,
+                1.4504
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's -y face (y = 0.5)"
+              ]
+            },
+            {
+              "name": "part.body.17",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.7503,
+                0.29,
+                -1.2505
+              ],
+              "max": [
+                -0.3497,
+                0.33,
+                -0.5495
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's -y face (y = 0.5)"
+              ]
+            },
+            {
+              "name": "part.body.19",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.7503,
+                0.29,
+                -0.2505
+              ],
+              "max": [
+                -0.3497,
+                0.33,
+                0.4505
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's -y face (y = 0.5)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "podsFront",
+          "meshes": 54,
+          "outside": 33,
+          "maxOver": 0.39,
+          "bounds": [
+            [
+              -1.5857,
+              -0.0001,
+              1.2249
+            ],
+            [
+              1.5857,
+              0.83,
+              2.195
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.podFL.6",
+              "bones": [
+                "podFL"
+              ],
+              "min": [
+                1.4743,
+                0.1314,
+                1.43
+              ],
+              "max": [
+                1.5857,
+                0.4686,
+                1.73
+              ],
+              "over": 0.39,
+              "where": [
+                "0.39 m past the box's +x face (x = 1.2)"
+              ]
+            },
+            {
+              "name": "part.podFL.7",
+              "bones": [
+                "podFL"
+              ],
+              "min": [
+                1.4743,
+                0.1314,
+                1.67
+              ],
+              "max": [
+                1.5857,
+                0.4686,
+                1.97
+              ],
+              "over": 0.39,
+              "where": [
+                "0.39 m past the box's +x face (x = 1.2)"
+              ]
+            },
+            {
+              "name": "part.podFR.6",
+              "bones": [
+                "podFR"
+              ],
+              "min": [
+                -1.5857,
+                0.1314,
+                1.43
+              ],
+              "max": [
+                -1.4743,
+                0.4686,
+                1.73
+              ],
+              "over": 0.39,
+              "where": [
+                "0.39 m past the box's -x face (x = -1.2)"
+              ]
+            },
+            {
+              "name": "part.podFR.7",
+              "bones": [
+                "podFR"
+              ],
+              "min": [
+                -1.5857,
+                0.1314,
+                1.67
+              ],
+              "max": [
+                -1.4743,
+                0.4686,
+                1.97
+              ],
+              "over": 0.39,
+              "where": [
+                "0.39 m past the box's -x face (x = -1.2)"
+              ]
+            },
+            {
+              "name": "torus.podFL",
+              "bones": [
+                "podFL"
+              ],
+              "min": [
+                0.5579,
+                0.608,
+                1.2511
+              ],
+              "max": [
+                1.5021,
+                0.632,
+                2.1489
+              ],
+              "over": 0.3,
+              "where": [
+                "0.3 m past the box's +x face (x = 1.2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "podsRear",
+          "meshes": 32,
+          "outside": 9,
+          "maxOver": 0.4,
+          "bounds": [
+            [
+              0.4118,
+              0,
+              -2.1382
+            ],
+            [
+              1.6504,
+              0.795,
+              -1.0618
+            ]
+          ],
+          "floats": null,
+          "threw": "(intermediate value)(intermediate value)(intermediate value) is not iterable",
+          "misfit": false,
+          "worst": [
+            {
+              "name": "extrude.podRL",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                1.4303,
+                0.1998,
+                -1.2148
+              ],
+              "max": [
+                1.6504,
+                0.5,
+                -1.1848
+              ],
+              "over": 0.4,
+              "where": [
+                "0.4 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "extrude.podRL.2",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                1.4303,
+                0.1998,
+                -2.0152
+              ],
+              "max": [
+                1.6504,
+                0.5,
+                -1.9852
+              ],
+              "over": 0.4,
+              "where": [
+                "0.4 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "torus.podRL.2",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                0.4118,
+                0.262,
+                -2.1382
+              ],
+              "max": [
+                1.4882,
+                0.298,
+                -1.0618
+              ],
+              "over": 0.24,
+              "where": [
+                "0.24 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "sphere.podRL",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                1.4177,
+                0.6,
+                -1.6173
+              ],
+              "max": [
+                1.4523,
+                0.64,
+                -1.5827
+              ],
+              "over": 0.2,
+              "where": [
+                "0.2 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "part.podRL.2",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                0.4629,
+                0.455,
+                -2.1122
+              ],
+              "max": [
+                1.4371,
+                0.545,
+                -1.0878
+              ],
+              "over": 0.19,
+              "where": [
+                "0.19 m past the box's +x face (x = 1.25)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cab",
+          "meshes": 57,
+          "outside": 2,
+          "maxOver": 0.65,
+          "bounds": [
+            [
+              -1.25,
+              1.0245,
+              -0.955
+            ],
+            [
+              1.25,
+              2.7501,
+              1.1018
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sphere.body.5",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.6301,
+                2.6899,
+                -0.626
+              ],
+              "max": [
+                -0.5699,
+                2.7501,
+                -0.574
+              ],
+              "over": 0.65,
+              "where": [
+                "0.65 m past the box's +y face (y = 2.1)"
+              ]
+            },
+            {
+              "name": "sweep.body.25",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.6213,
+                2.2025,
+                -0.6213
+              ],
+              "max": [
+                -0.5812,
+                2.7035,
+                -0.5812
+              ],
+              "over": 0.6,
+              "where": [
+                "0.6 m past the box's +y face (y = 2.1)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "hoodFront",
+          "meshes": 71,
+          "outside": 5,
+          "maxOver": 0.8,
+          "bounds": [
+            [
+              -2.0044,
+              0.6949,
+              1.0483
+            ],
+            [
+              1.3506,
+              1.6639,
+              2.8701
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "extrude.body",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -2.0044,
+                1,
+                1.1024
+              ],
+              "max": [
+                0,
+                1.6013,
+                2.6558
+              ],
+              "over": 0.8,
+              "where": [
+                "0.8 m past the box's -x face (x = -1.2)"
+              ]
+            },
+            {
+              "name": "part.body.104",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.9599,
+                0.7699,
+                2.8099
+              ],
+              "max": [
+                1.0401,
+                0.8701,
+                2.8701
+              ],
+              "over": 0.17,
+              "where": [
+                "0.17 m past the box's +z face (z = 2.7)"
+              ]
+            },
+            {
+              "name": "part.body.105",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.0401,
+                0.7699,
+                2.8099
+              ],
+              "max": [
+                -0.9599,
+                0.8701,
+                2.8701
+              ],
+              "over": 0.17,
+              "where": [
+                "0.17 m past the box's +z face (z = 2.7)"
+              ]
+            },
+            {
+              "name": "part.body.108",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.8494,
+                0.8395,
+                1.0985
+              ],
+              "max": [
+                1.3506,
+                1.2605,
+                2.3015
+              ],
+              "over": 0.15,
+              "where": [
+                "0.15 m past the box's +x face (x = 1.2)"
+              ]
+            },
+            {
+              "name": "part.body.112",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.3507,
+                0.8394,
+                1.0984
+              ],
+              "max": [
+                -0.8493,
+                1.2606,
+                2.3016
+              ],
+              "over": 0.15,
+              "where": [
+                "0.15 m past the box's -x face (x = -1.2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cargoBed",
+          "meshes": 38,
+          "outside": 2,
+          "maxOver": 0.15,
+          "bounds": [
+            [
+              -1.3501,
+              0.7997,
+              -2.7503
+            ],
+            [
+              1.3501,
+              1.8925,
+              -0.8774
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.body.123",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.2899,
+                1.0994,
+                -2.0763
+              ],
+              "max": [
+                1.3501,
+                1.5006,
+                -1.1237
+              ],
+              "over": 0.15,
+              "where": [
+                "0.15 m past the box's +x face (x = 1.2)"
+              ]
+            },
+            {
+              "name": "part.body.129",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.3501,
+                1.0994,
+                -2.0763
+              ],
+              "max": [
+                -1.2899,
+                1.5006,
+                -1.1237
+              ],
+              "over": 0.15,
+              "where": [
+                "0.15 m past the box's -x face (x = -1.2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "gun",
+          "meshes": 60,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.4003,
+              1.35,
+              -2.075
+            ],
+            [
+              0.4003,
+              2.0595,
+              -0.1699
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "chassis",
+          "meshes": 87,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.215,
+              0.3997,
+              -2.6238
+            ],
+            [
+              1.215,
+              1.0501,
+              2.6238
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "podsFront",
+          "meshes": 54,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.1757,
+              -0.0001,
+              1.2249
+            ],
+            [
+              1.1757,
+              0.83,
+              2.195
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "podsRear",
+          "meshes": 32,
+          "outside": 9,
+          "maxOver": 0.4,
+          "bounds": [
+            [
+              0.4118,
+              0,
+              -2.1382
+            ],
+            [
+              1.6504,
+              0.795,
+              -1.0618
+            ]
+          ],
+          "floats": null,
+          "threw": "(intermediate value)(intermediate value)(intermediate value) is not iterable",
+          "misfit": false,
+          "worst": [
+            {
+              "name": "extrude.podRL",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                1.4303,
+                0.1998,
+                -1.2148
+              ],
+              "max": [
+                1.6504,
+                0.5,
+                -1.1848
+              ],
+              "over": 0.4,
+              "where": [
+                "0.4 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "extrude.podRL.2",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                1.4303,
+                0.1998,
+                -2.0152
+              ],
+              "max": [
+                1.6504,
+                0.5,
+                -1.9852
+              ],
+              "over": 0.4,
+              "where": [
+                "0.4 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "torus.podRL.2",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                0.4118,
+                0.262,
+                -2.1382
+              ],
+              "max": [
+                1.4882,
+                0.298,
+                -1.0618
+              ],
+              "over": 0.24,
+              "where": [
+                "0.24 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "sphere.podRL",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                1.4177,
+                0.6,
+                -1.6173
+              ],
+              "max": [
+                1.4523,
+                0.64,
+                -1.5827
+              ],
+              "over": 0.2,
+              "where": [
+                "0.2 m past the box's +x face (x = 1.25)"
+              ]
+            },
+            {
+              "name": "part.podRL.2",
+              "bones": [
+                "podRL"
+              ],
+              "min": [
+                0.4629,
+                0.455,
+                -2.1122
+              ],
+              "max": [
+                1.4371,
+                0.545,
+                -1.0878
+              ],
+              "over": 0.19,
+              "where": [
+                "0.19 m past the box's +x face (x = 1.25)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cab",
+          "meshes": 57,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.25,
+              1.0245,
+              -0.955
+            ],
+            [
+              1.25,
+              2.2275,
+              1.1018
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "hoodFront",
+          "meshes": 71,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.3107,
+              0.6949,
+              1.0483
+            ],
+            [
+              1.3106,
+              1.6639,
+              2.7601
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "cargoBed",
+          "meshes": 38,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.3376,
+              0.7997,
+              -2.7503
+            ],
+            [
+              1.3376,
+              1.8925,
+              -0.8774
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "gun",
+          "meshes": 60,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.4003,
+              1.35,
+              -2.075
+            ],
+            [
+              0.4003,
+              2.0595,
+              -0.1699
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {
+        "podsRear": "(intermediate value)(intermediate value)(intermediate value) is not iterable"
+      },
+      "repairs": [
+        {
+          "id": "chassis",
+          "wallMs": 1949,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "podsFront",
+          "wallMs": 9243,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "cab",
+          "wallMs": 2290,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "hoodFront",
+          "wallMs": 4808,
+          "edits": 3,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "cargoBed",
+          "wallMs": 3881,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  }
+}

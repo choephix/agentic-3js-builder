@@ -1,0 +1,1776 @@
+{
+  "slug": "r33cohmRailgunCarrierRichParfit",
+  "arm": "parfit",
+  "subject": "railgunCarrier",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:12:36.548Z",
+  "wallMs": 82917,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 1283968,
+    "completion_tokens": 39377,
+    "total_tokens": 1323345,
+    "prompt_tokens_details": {
+      "cached_tokens": 1213036
+    }
+  },
+  "costUsd": 0.6569376,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 31779,
+    "slowestPartMs": 31320,
+    "critical": "stabilisers",
+    "elapsedMs": 63099,
+    "spec": {
+      "name": "Six-Wheeled Railgun Carrier",
+      "description": "A low-poly sci-fi military six-wheeled carrier with a long electromagnetic railgun on its back, braced on four deployed stabiliser legs.",
+      "builderName": "railgunCarrier",
+      "size": [
+        5.2,
+        3.3,
+        11
+      ],
+      "layout": "A long armoured hull (about 2.6 m wide, 7.6 m long) rides on three axles of big chunky wheels (front, middle, rear) whose tread bottoms touch y=0. The cab is a wedge-shaped armoured block at the front (+Z) with a slanted glass visor, a cyan-lit sensor strip and a yellow-black hazard nose. Behind the cab the long flat deck carries a turntable ring with a squat armoured gun cradle. The railgun is two parallel rails with glowing cyan capacitor coils, a recoil sleeve and a flared muzzle brake, and it extends forward over the cab roof, pointing +Z. Four hydraulic stabiliser legs (two at the hull middle, two at the rear) are deployed outward and down with flat footpads on the floor, which make the model 5.2 m wide. Faceted low-poly hull plates in olive-grey with yellow hazard trim, dark gunmetal rails, cyan neon glow on coils, lights and vents. Boxy chamfered shapes, panelled paint with rivets, decals (unit numbers, warning chevrons) as SVG textures.",
+      "palette": {
+        "hullOlive": "#4d5640",
+        "hullDark": "#2f352b",
+        "armorGrey": "#6b7078",
+        "gunmetal": "#23262c",
+        "steel": "#9aa1ab",
+        "rubber": "#16171a",
+        "hazardYellow": "#e7b814",
+        "hazardBlack": "#18181a",
+        "neonCyan": "#2ff3ff",
+        "glassDark": "#0f2a38",
+        "warnRed": "#d8322b",
+        "hydraulicChrome": "#c5ccd6",
+        "padOrange": "#c9691f"
+      },
+      "mounts": {
+        "deckTop": [
+          0,
+          1.75,
+          -0.8
+        ],
+        "cabRoof": [
+          0,
+          2.45,
+          3.1
+        ],
+        "turretRing": [
+          0,
+          1.85,
+          -1.2
+        ],
+        "gunPivot": [
+          0,
+          2.6,
+          -1.2
+        ],
+        "axleFront": [
+          0,
+          0.8,
+          3.4
+        ],
+        "axleMid": [
+          0,
+          0.8,
+          0.2
+        ],
+        "axleRear": [
+          0,
+          0.8,
+          -3
+        ],
+        "stabFrontAnchor": [
+          1.3,
+          1.2,
+          -0.6
+        ],
+        "stabRearAnchor": [
+          1.3,
+          1.2,
+          -3.6
+        ],
+        "muzzle": [
+          0,
+          2.75,
+          5.4
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1.3,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turret",
+          "parent": "body",
+          "at": [
+            0,
+            1.85,
+            -1.2
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "gun",
+          "parent": "turret",
+          "at": [
+            0,
+            2.6,
+            -1.2
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.45,
+            0.8,
+            3.4
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.45,
+            0.8,
+            3.4
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.45,
+            0.8,
+            0.2
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.45,
+            0.8,
+            0.2
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.45,
+            0.8,
+            -3
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.45,
+            0.8,
+            -3
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "stabFL",
+          "parent": "body",
+          "at": [
+            1.3,
+            1.2,
+            -0.6
+          ],
+          "dir": [
+            0.6,
+            -0.8,
+            0
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "stabFR",
+          "parent": "body",
+          "at": [
+            -1.3,
+            1.2,
+            -0.6
+          ],
+          "dir": [
+            -0.6,
+            -0.8,
+            0
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "stabRL",
+          "parent": "body",
+          "at": [
+            1.3,
+            1.2,
+            -3.6
+          ],
+          "dir": [
+            0.6,
+            -0.8,
+            0
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "stabRR",
+          "parent": "body",
+          "at": [
+            -1.3,
+            1.2,
+            -3.6
+          ],
+          "dir": [
+            -0.6,
+            -0.8,
+            0
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        }
+      ],
+      "parts": [
+        {
+          "id": "hullLower",
+          "builds": "Main armoured hull tub from the rear to the cab: a long chamfered slab body (frustum boxes and lofts) with a sloped underbelly, side skirts, wheel arches cut as raised fender boxes over each wheel, a flat deck with panelled paint and rivets, rear ramp-door panel with hazard chevron decal, tow hooks, rear tail lights, exhaust stacks, engine vent grilles glowing faintly cyan, side tool lockers and a unit-number SVG decal on each flank. Includes the frame beams that the stabiliser anchors and the axles bolt to.",
+          "box": [
+            [
+              -1.5,
+              0.7,
+              -5.5
+            ],
+            [
+              1.5,
+              1.85,
+              3
+            ]
+          ],
+          "attaches": "Deck at deckTop carries the turret ring; front end meets the cab at z=3.0; stabiliser anchors at stabFrontAnchor and stabRearAnchor on its flanks; axle lines axleMid and axleRear pass under it.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "cabShell",
+          "builds": "Wedge-shaped armoured cab at the front: faceted roof and sloped front glacis plates with panelled paint, side armour with crew hatch door outlines and hinges, roof hatch with ring, antenna masts, a sensor dome and a small camera turret on the cabRoof, wing-mirror arms, roof rails and a warning light bar. Rear wall of the cab is shared with the deck at z=3.0.",
+          "box": [
+            [
+              -1.5,
+              1.7,
+              3
+            ],
+            [
+              1.5,
+              2.9,
+              5.2
+            ]
+          ],
+          "attaches": "Sits on the front of hullLower at z=3.0; cabRoof mount on top; the railgun barrel passes above it at gunPivot height.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "cabFace",
+          "builds": "The front face of the vehicle: slanted dark glass visor with an SVG-drawn reflection and a sensor strip, cyan headlights and a glowing LED strip, angular grille with a vent texture, hazard yellow-black chevron bumper and plough nose, armoured lamp cages, a front winch with hook, tow eyes, a license plate and small emblem decals, wiper bars, and the front fender fronts above the first wheels.",
+          "box": [
+            [
+              -1.5,
+              0.7,
+              5
+            ],
+            [
+              1.5,
+              2.6,
+              5.6
+            ]
+          ],
+          "attaches": "Attaches to the front edge of cabShell at z=5.0 and to the front of hullLower; the barrel muzzle height at muzzle sits above it.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "runningGear",
+          "builds": "Six chunky low-poly wheels (octagonal tyres of radius 0.8 with deep tread blocks, dark rubber, steel hub discs with bolts and a cyan rim accent; hubs textured with an SVG drawing), mudguard lips, axle housings and differential bulges, leaf-spring packs and suspension arms, and a drive shaft along the underside. Wheels ride their wheel joints in pairs at the three axle mounts; tyre bottoms touch y=0.",
+          "box": [
+            [
+              -1.95,
+              0,
+              -4
+            ],
+            [
+              1.95,
+              1.6,
+              4.2
+            ]
+          ],
+          "attaches": "Wheel centres at axleFront, axleMid and axleRear with x=±1.45; the axle housings bolt to the underside of hullLower.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelRL",
+            "wheelRR",
+            "body"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "stabilisers",
+          "builds": "Four deployed stabiliser legs: each has a shoulder bracket and hydraulic pivot at its anchor on the hull flank, a diagonal outer strut running outward and down, a chrome telescoping piston inner rod, a collar with a hazard stripe, a hinge knuckle, and a wide octagonal orange-grey footpad with ribs and bolts flat on the floor (pad bottoms at y=0), with a small warning light and a hazard decal on each strut. Two front-pair at the mid-hull (z=-0.6) and two rear-pair at the tail (z=-3.6), splayed out to x=±2.6.",
+          "box": [
+            [
+              -2.6,
+              0,
+              -4.4
+            ],
+            [
+              2.6,
+              1.5,
+              0.2
+            ]
+          ],
+          "attaches": "Roots at stabFrontAnchor and stabRearAnchor on the hull flanks (x=±1.3, y=1.2); feet on the floor.",
+          "joints": [
+            "stabFL",
+            "stabFR",
+            "stabRL",
+            "stabRR"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "turretMount",
+          "builds": "Turntable ring and gun cradle: a toothed slewing ring on the deck (lathe), a rotating squat armoured turret base with faceted side cheeks, a rear ammo and power-capacitor housing box with glowing cyan charge cells, cooling fins, an equipment platform with a small crane arm, an access ladder, hazard-striped handrails and a rear radiator. Two trunnion yoke arms rise to hold the gun pivot, and a raised elevation actuator cylinder connects cradle to gun.",
+          "box": [
+            [
+              -1.3,
+              1.75,
+              -4
+            ],
+            [
+              1.3,
+              3.3,
+              1.6
+            ]
+          ],
+          "attaches": "Sits on the turretRing mount over the deck of hullLower; the yokes cradle the gun at gunPivot.",
+          "joints": [
+            "turret"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "railgun",
+          "builds": "The long railgun on the gun joint: two parallel dark gunmetal rails with an inner gap, a breech block, a recoil sleeve with chrome rods, a series of spaced capacitor coil rings glowing cyan (glow kit) along the barrel, insulator spacers, power bus cables swept along the sides, a heavy flared muzzle brake with a glowing slit, a hazard-striped muzzle tip, a small targeting sensor on top and engraved SVG warning labels. Barrel extends from the breech at z=-4.0 forward over the cab to the muzzle at z=5.4.",
+          "box": [
+            [
+              -0.7,
+              2.1,
+              -4
+            ],
+            [
+              0.7,
+              3.3,
+              5.4
+            ]
+          ],
+          "attaches": "Pivots on the trunnions at gunPivot [0,2.6,-1.2]; the muzzle mount marks its tip above the cab.",
+          "joints": [
+            "gun"
+          ],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:12:36.548Z",
+        "wallMs": 31779,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85498,
+          "completion_tokens": 4186,
+          "total_tokens": 89684,
+          "prompt_tokens_details": {
+            "cached_tokens": 85494
+          }
+        },
+        "costUsd": 0.0504174,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "railgun",
+        "started": "2026-10-25T14:13:08.327Z",
+        "wallMs": 21208,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89835,
+          "completion_tokens": 3288,
+          "total_tokens": 93123,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0527904,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "hullLower",
+        "started": "2026-10-25T14:13:08.327Z",
+        "wallMs": 23510,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89874,
+          "completion_tokens": 3967,
+          "total_tokens": 93841,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0596584,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cabShell",
+        "started": "2026-10-25T14:13:08.327Z",
+        "wallMs": 24314,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89778,
+          "completion_tokens": 4065,
+          "total_tokens": 93843,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.060446400000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turretMount",
+        "started": "2026-10-25T14:13:08.327Z",
+        "wallMs": 24931,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89805,
+          "completion_tokens": 4090,
+          "total_tokens": 93895,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0607504,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "runningGear",
+        "started": "2026-10-25T14:13:08.327Z",
+        "wallMs": 25201,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89836,
+          "completion_tokens": 4243,
+          "total_tokens": 94079,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0623424,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cabFace",
+        "started": "2026-10-25T14:13:08.327Z",
+        "wallMs": 25636,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89787,
+          "completion_tokens": 4285,
+          "total_tokens": 94072,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0626644,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "stabilisers",
+        "started": "2026-10-25T14:13:08.327Z",
+        "wallMs": 31320,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89868,
+          "completion_tokens": 4300,
+          "total_tokens": 94168,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0629764,
+        "hasCode": true,
+        "reasoning": "I'm planning the suspension geometry, using the existing stabilizer joints as anchors so each leg's bracket, strut, and piston chain together from anchor point down to the ground pad.\n\nI'm computing the exact positions for the foot pad, knuckle sphere, and strut sleeve along a diagonal path from anchor to foot, then picking color names from the palette (gunmetal, hazard yellow, hydraulic chrome, pad orange, armor grey, warn red, steel) and planning a hazard-stripe texture for the collar piece.\n\nWorking out stripe orientation for the collar...\n\nSwitching the sleeve to a box section for flat decal placement, then adding a small glowing warning light near the anchor end, and sketching a bracket box with a pivot cylinder on the hull flank.\n\nI'm roughing out the pad assembly - an octagonal base, rim plates, ribs, and bolt cylinders - and tallying parts per leg (~25 pieces × 4 legs ≈ 100 total), which feels manageable.\n\nNow I'm defining the crossing rib boxes on the pad top, bolt placement via a loop, and figuring out the rod function signature for the piston/knuckle geometry, planning to sweep a circle along a lerped vector for the piston rod.\n\nNext I'm naming and positioning the four stabilizer points—FL, FR, RL, RR—with their respective offsets.\n\n"
+      },
+      {
+        "id": "fit-stabilisers",
+        "started": "2026-10-25T14:13:41.399Z",
+        "wallMs": 3742,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 94385,
+          "completion_tokens": 336,
+          "total_tokens": 94721,
+          "prompt_tokens_details": {
+            "cached_tokens": 89864
+          }
+        },
+        "costUsd": 0.021388400000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-runningGear",
+        "started": "2026-10-25T14:13:41.399Z",
+        "wallMs": 5655,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 94943,
+          "completion_tokens": 699,
+          "total_tokens": 95642,
+          "prompt_tokens_details": {
+            "cached_tokens": 89832
+          }
+        },
+        "costUsd": 0.026195200000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-cabShell",
+        "started": "2026-10-25T14:13:41.399Z",
+        "wallMs": 5696,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 95072,
+          "completion_tokens": 799,
+          "total_tokens": 95871,
+          "prompt_tokens_details": {
+            "cached_tokens": 89774
+          }
+        },
+        "costUsd": 0.027563400000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-cabFace",
+        "started": "2026-10-25T14:13:41.399Z",
+        "wallMs": 6781,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 95157,
+          "completion_tokens": 962,
+          "total_tokens": 96119,
+          "prompt_tokens_details": {
+            "cached_tokens": 89783
+          }
+        },
+        "costUsd": 0.029346300000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-railgun",
+        "started": "2026-10-25T14:13:41.399Z",
+        "wallMs": 11457,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 94433,
+          "completion_tokens": 1409,
+          "total_tokens": 95842,
+          "prompt_tokens_details": {
+            "cached_tokens": 89831
+          }
+        },
+        "costUsd": 0.032277099999999996,
+        "hasCode": true,
+        "reasoning": "I'm tracking down the overflow issue to the coil loop's spacer cylinders — the last coil iteration pushes the z-position out to 6.1, which is extending beyond the expected bounds.\n\nFixing the spacing math so the coils end closer to the muzzle brake without overlap, then adjusting the antenna, sensor sphere, and glow elements since their vertical positions are also slightly exceeding the allowed limit — tightening those y-offsets so everything stays within tolerance.\n\nAlso repositioning the breech cylinder: shifting it forward so its range falls within acceptable bounds instead of poking out the back. Now I need to translate all these recalculated values into the actual edit lines.\n\n"
+      },
+      {
+        "id": "fit-hullLower",
+        "started": "2026-10-25T14:13:41.399Z",
+        "wallMs": 16286,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 95697,
+          "completion_tokens": 2748,
+          "total_tokens": 98445,
+          "prompt_tokens_details": {
+            "cached_tokens": 89870
+          }
+        },
+        "costUsd": 0.048121,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ],
+    "fit": {
+      "fitMs": 19818,
+      "checkMs": 1749,
+      "afterMs": 1779,
+      "repairMs": 16286,
+      "error": null,
+      "threw": {
+        "turretMount": "part(): color takes a colour string or a paint; got a 1009 \"svg\""
+      },
+      "before": [
+        {
+          "id": "hullLower",
+          "meshes": 100,
+          "outside": 28,
+          "maxOver": 0.87,
+          "bounds": [
+            [
+              -1.7703,
+              0.5488,
+              -6.0096
+            ],
+            [
+              1.7703,
+              2.7201,
+              3.6558
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "cylinder.body.2",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.9698,
+                2.6199,
+                -5.0302
+              ],
+              "max": [
+                1.2302,
+                2.7201,
+                -4.7698
+              ],
+              "over": 0.87,
+              "where": [
+                "0.87 m past the box's +y face (y = 1.85)"
+              ]
+            },
+            {
+              "name": "cylinder.body.5",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.2302,
+                2.6199,
+                -5.0302
+              ],
+              "max": [
+                -0.9698,
+                2.7201,
+                -4.7698
+              ],
+              "over": 0.87,
+              "where": [
+                "0.87 m past the box's +y face (y = 1.85)"
+              ]
+            },
+            {
+              "name": "cylinder.body",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.9798,
+                1.8493,
+                -5.0202
+              ],
+              "max": [
+                1.2202,
+                2.6507,
+                -4.7798
+              ],
+              "over": 0.8,
+              "where": [
+                "0.8 m past the box's +y face (y = 1.85)"
+              ]
+            },
+            {
+              "name": "cylinder.body.4",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.2202,
+                1.8493,
+                -5.0202
+              ],
+              "max": [
+                -0.9798,
+                2.6507,
+                -4.7798
+              ],
+              "over": 0.8,
+              "where": [
+                "0.8 m past the box's +y face (y = 1.85)"
+              ]
+            },
+            {
+              "name": "sweep.body.3",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.8972,
+                0.6304,
+                -6.0096
+              ],
+              "max": [
+                0.8972,
+                0.9695,
+                3.6558
+              ],
+              "over": 0.66,
+              "where": [
+                "0.51 m past the box's -z face (z = -5.5)",
+                "0.66 m past the box's +z face (z = 3)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cabShell",
+          "meshes": 72,
+          "outside": 11,
+          "maxOver": 1.28,
+          "bounds": [
+            [
+              -1.91,
+              1.6006,
+              1.7212
+            ],
+            [
+              1.91,
+              3.5851,
+              6.2099
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sweep.body.4",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.4529,
+                1.6312,
+                1.7212
+              ],
+              "max": [
+                1.4529,
+                2.5175,
+                6.2099
+              ],
+              "over": 1.28,
+              "where": [
+                "1.28 m past the box's -z face (z = 3)",
+                "1.01 m past the box's +z face (z = 5.2)"
+              ]
+            },
+            {
+              "name": "part.body.21",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1649,
+                3.5149,
+                3.2196
+              ],
+              "max": [
+                1.2351,
+                3.5851,
+                3.2804
+              ],
+              "over": 0.69,
+              "where": [
+                "0.69 m past the box's +y face (y = 2.9)"
+              ]
+            },
+            {
+              "name": "sweep.body.16",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1776,
+                2.4525,
+                3.2321
+              ],
+              "max": [
+                1.2277,
+                3.5549,
+                3.2822
+              ],
+              "over": 0.65,
+              "where": [
+                "0.65 m past the box's +y face (y = 2.9)"
+              ]
+            },
+            {
+              "name": "part.body.8",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.89,
+                2.4398,
+                4.8048
+              ],
+              "max": [
+                1.91,
+                2.6602,
+                4.9552
+              ],
+              "over": 0.41,
+              "where": [
+                "0.41 m past the box's +x face (x = 1.5)"
+              ]
+            },
+            {
+              "name": "part.body.13",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.91,
+                2.4398,
+                4.8048
+              ],
+              "max": [
+                -1.89,
+                2.6602,
+                4.9552
+              ],
+              "over": 0.41,
+              "where": [
+                "0.41 m past the box's -x face (x = -1.5)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cabFace",
+          "meshes": 76,
+          "outside": 8,
+          "maxOver": 0.73,
+          "bounds": [
+            [
+              -1.7808,
+              0.621,
+              4.2738
+            ],
+            [
+              1.7808,
+              2.7006,
+              5.7504
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "box.body.98",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1192,
+                1.6699,
+                4.2738
+              ],
+              "max": [
+                1.7808,
+                1.7501,
+                5.2262
+              ],
+              "over": 0.73,
+              "where": [
+                "0.28 m past the box's +x face (x = 1.5)",
+                "0.73 m past the box's -z face (z = 5)"
+              ]
+            },
+            {
+              "name": "box.body.109",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.7808,
+                1.6699,
+                4.2738
+              ],
+              "max": [
+                -1.1192,
+                1.7501,
+                5.2262
+              ],
+              "over": 0.73,
+              "where": [
+                "0.28 m past the box's -x face (x = -1.5)",
+                "0.73 m past the box's -z face (z = 5)"
+              ]
+            },
+            {
+              "name": "part.body.47",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1392,
+                1.4097,
+                4.2989
+              ],
+              "max": [
+                1.7608,
+                1.6903,
+                5.2011
+              ],
+              "over": 0.7,
+              "where": [
+                "0.26 m past the box's +x face (x = 1.5)",
+                "0.7 m past the box's -z face (z = 5)"
+              ]
+            },
+            {
+              "name": "part.body.48",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.7608,
+                1.4096,
+                4.2989
+              ],
+              "max": [
+                -1.1392,
+                1.6904,
+                5.2011
+              ],
+              "over": 0.7,
+              "where": [
+                "0.26 m past the box's -x face (x = -1.5)",
+                "0.7 m past the box's -z face (z = 5)"
+              ]
+            },
+            {
+              "name": "box.body.99",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1493,
+                1.2146,
+                5.1335
+              ],
+              "max": [
+                1.7507,
+                1.5854,
+                5.3665
+              ],
+              "over": 0.25,
+              "where": [
+                "0.25 m past the box's +x face (x = 1.5)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "runningGear",
+          "meshes": 179,
+          "outside": 6,
+          "maxOver": 0.27,
+          "bounds": [
+            [
+              -1.9401,
+              -0.0701,
+              -4.2126
+            ],
+            [
+              1.9401,
+              1.7251,
+              4.4687
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.body.53",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.059,
+                1.2025,
+                4.2313
+              ],
+              "max": [
+                1.841,
+                1.6975,
+                4.4687
+              ],
+              "over": 0.27,
+              "where": [
+                "0.27 m past the box's +z face (z = 4.2)"
+              ]
+            },
+            {
+              "name": "part.body.56",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.841,
+                1.2024,
+                4.2313
+              ],
+              "max": [
+                -1.059,
+                1.6976,
+                4.4687
+              ],
+              "over": 0.27,
+              "where": [
+                "0.27 m past the box's +z face (z = 4.2)"
+              ]
+            },
+            {
+              "name": "box.body.167",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.6298,
+                0.8497,
+                -4.2126
+              ],
+              "max": [
+                0.7702,
+                1.0503,
+                4.2126
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's -z face (z = -4)"
+              ]
+            },
+            {
+              "name": "box.body.168",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.7702,
+                0.8497,
+                -4.2126
+              ],
+              "max": [
+                -0.6298,
+                1.0503,
+                4.2126
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's -z face (z = -4)"
+              ]
+            },
+            {
+              "name": "part.body.52",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.059,
+                1.6249,
+                2.4475
+              ],
+              "max": [
+                1.841,
+                1.6951,
+                4.3525
+              ],
+              "over": 0.15,
+              "where": [
+                "0.15 m past the box's +z face (z = 4.2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "stabilisers",
+          "meshes": 136,
+          "outside": 20,
+          "maxOver": 0.46,
+          "bounds": [
+            [
+              -3.0609,
+              -0.0001,
+              -4.1609
+            ],
+            [
+              3.0608,
+              1.4754,
+              -0.0393
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.stabFL",
+              "bones": [
+                "stabFL"
+              ],
+              "min": [
+                1.9394,
+                -0.0001,
+                -1.1606
+              ],
+              "max": [
+                3.0606,
+                0.1201,
+                -0.0394
+              ],
+              "over": 0.46,
+              "where": [
+                "0.46 m past the box's +x face (x = 2.6)"
+              ]
+            },
+            {
+              "name": "part.stabFR",
+              "bones": [
+                "stabFR"
+              ],
+              "min": [
+                -3.0607,
+                -0.0001,
+                -1.1607
+              ],
+              "max": [
+                -1.9393,
+                0.1201,
+                -0.0393
+              ],
+              "over": 0.46,
+              "where": [
+                "0.46 m past the box's -x face (x = -2.6)"
+              ]
+            },
+            {
+              "name": "part.stabRL",
+              "bones": [
+                "stabRL"
+              ],
+              "min": [
+                1.9392,
+                -0.0001,
+                -4.1608
+              ],
+              "max": [
+                3.0608,
+                0.1201,
+                -3.0392
+              ],
+              "over": 0.46,
+              "where": [
+                "0.46 m past the box's +x face (x = 2.6)"
+              ]
+            },
+            {
+              "name": "part.stabRR",
+              "bones": [
+                "stabRR"
+              ],
+              "min": [
+                -3.0609,
+                -0.0001,
+                -4.1609
+              ],
+              "max": [
+                -1.9391,
+                0.1201,
+                -3.0391
+              ],
+              "over": 0.46,
+              "where": [
+                "0.46 m past the box's -x face (x = -2.6)"
+              ]
+            },
+            {
+              "name": "part.stabFL.2",
+              "bones": [
+                "stabFL"
+              ],
+              "min": [
+                2.0395,
+                0.12,
+                -1.0605
+              ],
+              "max": [
+                2.9605,
+                0.18,
+                -0.1395
+              ],
+              "over": 0.36,
+              "where": [
+                "0.36 m past the box's +x face (x = 2.6)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turretMount",
+          "meshes": 44,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.27,
+              1.76,
+              -2.47
+            ],
+            [
+              1.27,
+              3.2902,
+              0.2009
+            ]
+          ],
+          "floats": null,
+          "threw": "part(): color takes a colour string or a paint; got a 1009 \"svg\"",
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "railgun",
+          "meshes": 110,
+          "outside": 12,
+          "maxOver": 1.31,
+          "bounds": [
+            [
+              -0.735,
+              2.0798,
+              -4.3
+            ],
+            [
+              0.735,
+              3.8001,
+              6.7101
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "cylinder.gun.26",
+              "bones": [
+                "gun"
+              ],
+              "min": [
+                0.148,
+                2.62,
+                6.3299
+              ],
+              "max": [
+                0.252,
+                2.74,
+                6.7101
+              ],
+              "over": 1.31,
+              "where": [
+                "1.31 m past the box's +z face (z = 5.4)"
+              ]
+            },
+            {
+              "name": "cylinder.gun.27",
+              "bones": [
+                "gun"
+              ],
+              "min": [
+                -0.252,
+                2.62,
+                6.3299
+              ],
+              "max": [
+                -0.148,
+                2.74,
+                6.7101
+              ],
+              "over": 1.31,
+              "where": [
+                "1.31 m past the box's +z face (z = 5.4)"
+              ]
+            },
+            {
+              "name": "box.gun.45",
+              "bones": [
+                "gun"
+              ],
+              "min": [
+                0.39,
+                2.4299,
+                6.01
+              ],
+              "max": [
+                0.49,
+                2.9301,
+                6.19
+              ],
+              "over": 0.79,
+              "where": [
+                "0.79 m past the box's +z face (z = 5.4)"
+              ]
+            },
+            {
+              "name": "box.gun.46",
+              "bones": [
+                "gun"
+              ],
+              "min": [
+                -0.49,
+                2.4299,
+                6.01
+              ],
+              "max": [
+                -0.39,
+                2.9301,
+                6.19
+              ],
+              "over": 0.79,
+              "where": [
+                "0.79 m past the box's +z face (z = 5.4)"
+              ]
+            },
+            {
+              "name": "torus.gun.9",
+              "bones": [
+                "gun"
+              ],
+              "min": [
+                -0.4702,
+                2.2098,
+                6.0334
+              ],
+              "max": [
+                0.4702,
+                3.1502,
+                6.1666
+              ],
+              "over": 0.77,
+              "where": [
+                "0.77 m past the box's +z face (z = 5.4)"
+              ]
+            }
+          ]
+        }
+      ],
+      "after": [
+        {
+          "id": "hullLower",
+          "meshes": 94,
+          "outside": 2,
+          "maxOver": 0.26,
+          "bounds": [
+            [
+              -1.5003,
+              0.5488,
+              -5.609
+            ],
+            [
+              1.5003,
+              1.9713,
+              3.2552
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sweep.body.3",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.8975,
+                0.699,
+                -5.609
+              ],
+              "max": [
+                0.8975,
+                0.9995,
+                3.2552
+              ],
+              "over": 0.26,
+              "where": [
+                "0.26 m past the box's +z face (z = 3)"
+              ]
+            },
+            {
+              "name": "sweep.body",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.3021,
+                0.5488,
+                -5.4087
+              ],
+              "max": [
+                1.3021,
+                1.8509,
+                3.0048
+              ],
+              "over": 0.15,
+              "where": [
+                "0.15 m past the box's -y face (y = 0.7)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cabShell",
+          "meshes": 72,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.5851,
+              1.6006,
+              2.9494
+            ],
+            [
+              1.5851,
+              2.8851,
+              5.0601
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "cabFace",
+          "meshes": 76,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.5902,
+              0.621,
+              4.9133
+            ],
+            [
+              1.5902,
+              2.7006,
+              5.6551
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "runningGear",
+          "meshes": 179,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.9401,
+              -0.0701,
+              -3.912
+            ],
+            [
+              1.9401,
+              1.7251,
+              4.2987
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "stabilisers",
+          "meshes": 136,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -2.5408,
+              -0.0001,
+              -4.1408
+            ],
+            [
+              2.5408,
+              1.4754,
+              -0.0593
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "turretMount",
+          "meshes": 44,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.27,
+              1.76,
+              -2.47
+            ],
+            [
+              1.27,
+              3.2902,
+              0.2009
+            ]
+          ],
+          "floats": null,
+          "threw": "part(): color takes a colour string or a paint; got a 1009 \"svg\"",
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "railgun",
+          "meshes": 110,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.735,
+              2.0798,
+              -4
+            ],
+            [
+              0.735,
+              3.3,
+              5.43
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {
+        "turretMount": "part(): color takes a colour string or a paint; got a 1009 \"svg\""
+      },
+      "repairs": [
+        {
+          "id": "hullLower",
+          "wallMs": 16286,
+          "edits": 10,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "cabShell",
+          "wallMs": 5696,
+          "edits": 3,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "cabFace",
+          "wallMs": 6781,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "runningGear",
+          "wallMs": 5655,
+          "edits": 4,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "stabilisers",
+          "wallMs": 3742,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "railgun",
+          "wallMs": 11457,
+          "edits": 3,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  }
+}

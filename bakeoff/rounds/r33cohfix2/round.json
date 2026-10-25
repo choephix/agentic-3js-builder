@@ -1,0 +1,104 @@
+{
+  "id": "r33cohfix2",
+  "started": "2026-10-25T14:13:32.532Z",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "sdkCommit": "acb47020",
+  "promptsFrom": null,
+  "maxTokens": 120000,
+  "pricing": {
+    "input": 2,
+    "output": 10,
+    "cacheRead": 0.1,
+    "cacheWrite": 2.5
+  },
+  "arms": [
+    {
+      "id": "par",
+      "letter": "P",
+      "name": "Craft v3, parallel parts",
+      "idea": "craft3 split across concurrent calls: one planning call writes a shared spec (size, palette, mounts, skeleton, 3-6 parts), then one call per part writes a function into the shared builder, all at once; the runner assembles one module",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-sdk.md",
+      "kits": true,
+      "sources": [
+        "paint.ts",
+        "texture.ts"
+      ],
+      "extra": [
+        "ambition2.md",
+        "craft3.md"
+      ],
+      "parallel": {
+        "plan": "par-plan.md",
+        "part": "par-part.md"
+      }
+    },
+    {
+      "id": "parfit",
+      "letter": "F",
+      "name": "Craft v3, parallel parts, even work and box check",
+      "idea": "par with an even-work plan prompt (5-8 parts of equal work, the richest pieces split, every box inside the size at full reach) and a box check after assembly: each part is measured against its spec box and the floor without a model, every part reaching more than 15 cm out gets one low-effort edit call in its own part conversation, all at once, then the module is reassembled",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-sdk.md",
+      "kits": true,
+      "sources": [
+        "paint.ts",
+        "texture.ts"
+      ],
+      "extra": [
+        "ambition2.md",
+        "craft3.md"
+      ],
+      "parallel": {
+        "plan": "par-plan-even.md",
+        "part": "par-part.md",
+        "fit": "par-box.md"
+      }
+    }
+  ],
+  "subjects": [
+    {
+      "id": "truck2077",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: futuristic militarized truck from 2077.\nStyle: low-poly cyberpunk, extremely intricate.",
+      "rich": "Category: Vehicle.\nSubject: futuristic militarized truck from 2077.\nStyle: low-poly cyberpunk, extremely intricate."
+    },
+    {
+      "id": "convoyHauler",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk.",
+      "rich": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk."
+    },
+    {
+      "id": "railgunCarrier",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military.",
+      "rich": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military."
+    },
+    {
+      "id": "riotInterceptor",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: corporate riot-control interceptor with a water cannon and neon light bars.\nStyle: Cyberpunk 2077.",
+      "rich": "Category: Vehicle.\nSubject: corporate riot-control interceptor with a water cannon and neon light bars.\nStyle: Cyberpunk 2077."
+    },
+    {
+      "id": "hoverPickup",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+      "rich": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk."
+    }
+  ],
+  "refineFrom": "r33cohfix",
+  "views": [
+    "three-quarter",
+    "front",
+    "side",
+    "low"
+  ],
+  "critique": "refine-critique.md",
+  "critic": null,
+  "systemPromptOverride": null
+}

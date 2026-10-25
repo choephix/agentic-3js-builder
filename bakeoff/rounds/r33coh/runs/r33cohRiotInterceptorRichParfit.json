@@ -1,0 +1,479 @@
+{
+  "slug": "r33cohRiotInterceptorRichParfit",
+  "arm": "parfit",
+  "subject": "riotInterceptor",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: corporate riot-control interceptor with a water cannon and neon light bars.\nStyle: Cyberpunk 2077.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T14:10:32.710Z",
+  "wallMs": 42067,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 700872,
+    "completion_tokens": 20492,
+    "total_tokens": 721364,
+    "prompt_tokens_details": {
+      "cached_tokens": 672672
+    }
+  },
+  "costUsd": 0.3285872,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 21017,
+    "slowestPartMs": 19779,
+    "critical": "tankBay",
+    "elapsedMs": 40796,
+    "spec": {
+      "name": "Arasaka-style Riot Interceptor RC-9",
+      "description": "A corporate armored riot-control interceptor truck with a roof water cannon, neon light bars and cyberpunk grime and decals.",
+      "builderName": "riotInterceptor",
+      "size": [
+        2.6,
+        2.7,
+        6
+      ],
+      "layout": "A low, wide, wedge-shaped armored vehicle facing +Z. Chunky six-wheel running gear with fender arches at the sides, a sloped armored nose with a light-bar bumper and a ram plow at the front, a boxy armored cab with a narrow slit windshield mid-front, a roof turret ring with a water cannon pointing forward, and a rear tank bay with hoses and a tail light bar at the back. Cyberpunk 2077 style: matte graphite hull, hazard yellow stripes, corporate red emblem decals, glowing cyan and magenta neon bars, grime paints at the lower body, SVG decals and warning text.",
+      "palette": {
+        "hull": "#2b303a",
+        "hullDark": "#14171d",
+        "armor": "#454c59",
+        "hazard": "#f2c200",
+        "corpRed": "#d1202f",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2bd6",
+        "glass": "#0b1a24",
+        "rubber": "#0e0e10",
+        "rim": "#7b8494",
+        "steel": "#8d96a5",
+        "tankBlue": "#2a5d86",
+        "white": "#e8ecef",
+        "amber": "#ff9a1f"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.3,
+          0
+        ],
+        "axleFront": [
+          0,
+          0.5,
+          1.9
+        ],
+        "axleMid": [
+          0,
+          0.5,
+          0.2
+        ],
+        "axleRear": [
+          0,
+          0.5,
+          -1.7
+        ],
+        "cabFloor": [
+          0,
+          1.3,
+          1.1
+        ],
+        "turretRing": [
+          0,
+          2.15,
+          0.1
+        ],
+        "cannonPivot": [
+          0,
+          2.45,
+          0.3
+        ],
+        "tankBay": [
+          0,
+          1.3,
+          -1.9
+        ],
+        "bumperFront": [
+          0,
+          0.75,
+          3
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turret",
+          "parent": "body",
+          "at": [
+            0,
+            2.15,
+            0.1
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "cannon",
+          "parent": "turret",
+          "at": [
+            0,
+            2.45,
+            0.3
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Lower hull and underbody: a wide faceted slab loft from nose to tail with sloped sides, side skirts, fender arches over six wheel wells, undercarriage with axles, driveshafts and exhaust pipes, painted with hullDark grime near the bottom and hazard chevron stripes on the skirts, panelled rivet seams, and plate number decals.",
+          "box": [
+            [
+              -1.3,
+              0.25,
+              -3
+            ],
+            [
+              1.3,
+              1.35,
+              2.7
+            ]
+          ],
+          "attaches": "Top at chassisTop carries cab and tank bay; wheels bolt to the axle mounts; bumper starts at bumperFront.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "wheels",
+          "builds": "Six chunky wheels on three axles (axleFront, axleMid, axleRear), each a faceted rubber tyre with lathe tread blocks, steel rim with bolts and a neon cyan hub ring glow, plus mud flaps and brake discs and axle housings.",
+          "box": [
+            [
+              -1.3,
+              0,
+              -2.3
+            ],
+            [
+              1.3,
+              1,
+              2.5
+            ]
+          ],
+          "attaches": "Axle lines at axleFront, axleMid, axleRear, x = ±1.05, centered at y 0.5; tyre bottoms rest on floor.",
+          "joints": [
+            "body"
+          ],
+          "floor": true,
+          "budget": 130
+        },
+        {
+          "id": "cabShell",
+          "builds": "Armored cab body on cabFloor: angular box with sloped roof and A-pillars, narrow slit windshield and side windows in dark glass with reflection gradient texture, side doors with handles and a corp emblem decal, roof rails, antenna and sensor pods, wing mirrors, riot-bar window cages, amber strobe lights on the roof front.",
+          "box": [
+            [
+              -1.2,
+              1.3,
+              -0.6
+            ],
+            [
+              1.2,
+              2.2,
+              2.3
+            ]
+          ],
+          "attaches": "Sits on chassisTop at cabFloor; roof meets turretRing at its rear half; front face meets the nose part.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "noseBumper",
+          "builds": "Sloped armored hood and front fascia with a grille of slats glowing cyan behind, twin headlights drawn as slim neon strips, a big neon cyan and magenta light bar across the bumper, a hazard striped ram plow with steel push bars, tow hooks, corp red emblem decal on the hood, and small warning text decals.",
+          "box": [
+            [
+              -1.3,
+              0.35,
+              2.2
+            ],
+            [
+              1.3,
+              1.5,
+              3
+            ]
+          ],
+          "attaches": "Back edge meets chassis front and cab front at z about 2.3; bumper center at bumperFront.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "turretBase",
+          "builds": "Roof turret ring at turretRing: a round faceted lathe pedestal with rotating collar, armored shield housing, a rotating beacon with magenta glow and a camera eye drawn as an SVG decal, hazard striped ring, cable bundles, and a small seat platform behind with handrails.",
+          "box": [
+            [
+              -0.8,
+              2.1,
+              -0.7
+            ],
+            [
+              0.8,
+              2.7,
+              0.9
+            ]
+          ],
+          "attaches": "Base rests on cab roof at turretRing; cannon rides at cannonPivot.",
+          "joints": [
+            "turret"
+          ],
+          "floor": false,
+          "budget": 120
+        },
+        {
+          "id": "waterCannon",
+          "builds": "Water cannon on joint cannon: a thick tapered barrel pointing +Z with reinforcing bands, a big flared nozzle with glowing cyan interior, a water feed hose in ribbed sweeps down to the turret, a pressure gauge decal, hazard stripes, side lamps, and a small targeting laser sight in magenta.",
+          "box": [
+            [
+              -0.45,
+              2.2,
+              0
+            ],
+            [
+              0.45,
+              2.7,
+              2.1
+            ]
+          ],
+          "attaches": "Pivot at cannonPivot; hose reaches the turretRing.",
+          "joints": [
+            "cannon"
+          ],
+          "floor": false,
+          "budget": 120
+        },
+        {
+          "id": "tankBay",
+          "builds": "Rear section at tankBay: a horizontal blue water tank cylinder with banded straps and level gauge decal, a boxy armored equipment cabinet, rear doors, pipes and valves, side hoses coiled in sweeps, ladder, a tail light bar in glowing red and magenta, a rear bumper with hazard stripes, exhaust stacks, a large corp logo and warning text decals.",
+          "box": [
+            [
+              -1.25,
+              1.3,
+              -3
+            ],
+            [
+              1.25,
+              2.3,
+              -0.7
+            ]
+          ],
+          "attaches": "Sits on chassisTop at tankBay; front meets cab rear at z about -0.6.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 120
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:10:32.710Z",
+        "wallMs": 21017,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85499,
+          "completion_tokens": 2673,
+          "total_tokens": 88172,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0379684,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T14:10:53.727Z",
+        "wallMs": 14309,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87888,
+          "completion_tokens": 2290,
+          "total_tokens": 90178,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.038916400000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:10:53.727Z",
+        "wallMs": 14532,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87924,
+          "completion_tokens": 2402,
+          "total_tokens": 90326,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0401084,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turretBase",
+        "started": "2026-10-25T14:10:53.727Z",
+        "wallMs": 15683,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87895,
+          "completion_tokens": 2390,
+          "total_tokens": 90285,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.039930400000000005,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "waterCannon",
+        "started": "2026-10-25T14:10:53.727Z",
+        "wallMs": 15789,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87906,
+          "completion_tokens": 2619,
+          "total_tokens": 90525,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0422424,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "noseBumper",
+        "started": "2026-10-25T14:10:53.727Z",
+        "wallMs": 16222,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87911,
+          "completion_tokens": 2224,
+          "total_tokens": 90135,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0383024,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cabShell",
+        "started": "2026-10-25T14:10:53.727Z",
+        "wallMs": 19359,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87922,
+          "completion_tokens": 2933,
+          "total_tokens": 90855,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0454144,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tankBay",
+        "started": "2026-10-25T14:10:53.727Z",
+        "wallMs": 19779,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87927,
+          "completion_tokens": 2961,
+          "total_tokens": 90888,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0457044,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ],
+    "fit": {
+      "fitMs": 1271,
+      "checkMs": 1271,
+      "afterMs": null,
+      "repairMs": 0,
+      "error": "Bundling failed:\n  bakeoff/rounds/r33coh/fit/r33cohRiotInterceptorRichParfit-before.ts:2:91 No matching export in \"src/index.ts\" for import \"panelled\"",
+      "threw": {},
+      "before": [],
+      "after": null,
+      "afterError": null,
+      "afterThrew": null,
+      "repairs": [],
+      "reverted": []
+    }
+  }
+}

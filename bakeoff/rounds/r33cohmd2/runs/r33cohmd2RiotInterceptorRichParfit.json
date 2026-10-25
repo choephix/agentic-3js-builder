@@ -1,0 +1,1576 @@
+{
+  "slug": "r33cohmd2RiotInterceptorRichParfit",
+  "arm": "parfit",
+  "subject": "riotInterceptor",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: corporate riot-control interceptor with a water cannon and neon light bars.\nStyle: Cyberpunk 2077.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:12:36.529Z",
+  "wallMs": 96526,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 1272244,
+    "completion_tokens": 45130,
+    "total_tokens": 1317374,
+    "prompt_tokens_details": {
+      "cached_tokens": 1205810
+    }
+  },
+  "costUsd": 0.7047489999999998,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 25827,
+    "slowestPartMs": 54108,
+    "critical": "waterCannon",
+    "elapsedMs": 79936,
+    "spec": {
+      "name": "Riot Interceptor RX-9",
+      "description": "A corporate riot-control interceptor: a low armored wedge hover-truck with a roof-mounted water cannon and neon light bars, in Cyberpunk 2077 style.",
+      "builderName": "riotInterceptor",
+      "size": [
+        2.6,
+        2.3,
+        5.8
+      ],
+      "layout": "Low, aggressive wedge vehicle facing +Z. Front: sloped armored nose with a push-bar ram and a cyan neon strip under it. Mid: cabin with a slanted tinted windshield and side windows, riot-mesh grilles, a light bar across the roof front. Rear: a raised turret ring on the roof-rear holding a chunky water cannon pointing forward, with a tank pack behind it. Four fat armored wheels with glowing hub rings sit at the corners, on the floor. Colours: matte graphite hull with hazard-yellow stripes, corporate white panels with logo decals, magenta and cyan neon bars and underglow, warning-orange accents. Panelled and scuffed paints, SVG decals (logo, ID numbers, hazard chevrons, warning text), glowing parts via the glow kit.",
+      "palette": {
+        "hull": "#2a2e38",
+        "hullDark": "#14161c",
+        "panelWhite": "#d9dde3",
+        "hazard": "#f2c200",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2bd6",
+        "warnRed": "#ff2a3c",
+        "orange": "#ff7a1a",
+        "glass": "#0b2a3a",
+        "tire": "#0d0d10",
+        "steel": "#7b8494",
+        "brass": "#b98a3c",
+        "water": "#6fd8ff",
+        "ink": "#08080c"
+      },
+      "mounts": {
+        "deckTop": [
+          0,
+          1.35,
+          0
+        ],
+        "roofFront": [
+          0,
+          1.75,
+          0.3
+        ],
+        "turretRing": [
+          0,
+          1.75,
+          -1.3
+        ],
+        "muzzle": [
+          0,
+          2,
+          1.2
+        ],
+        "noseTip": [
+          0,
+          0.7,
+          2.9
+        ],
+        "axleFront": [
+          0,
+          0.5,
+          1.8
+        ],
+        "axleRear": [
+          0,
+          0.5,
+          -1.8
+        ],
+        "cabinBase": [
+          0,
+          1.3,
+          0.2
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            0.9,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turretYaw",
+          "parent": "body",
+          "at": [
+            0,
+            1.75,
+            -1.3
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "cannonPitch",
+          "parent": "turretYaw",
+          "at": [
+            0,
+            2,
+            -1.2
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.15,
+            0.5,
+            1.8
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.15,
+            0.5,
+            1.8
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.15,
+            0.5,
+            -1.8
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.15,
+            0.5,
+            -1.8
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassisLower",
+          "builds": "Lower hull and underbody: floor pan, side skirts with hazard chevron stripes, wheel arches with fender flares, rear bumper with tail lights (red glow), exhaust vents, underglow neon strips (magenta) along the sides underneath, skid plates, tow hooks. Panelled graphite paint with scuffs and grime near the bottom.",
+          "box": [
+            [
+              -1.3,
+              0.2,
+              -2.9
+            ],
+            [
+              1.3,
+              1.35,
+              2.2
+            ]
+          ],
+          "attaches": "Cabin sits on deckTop/cabinBase; wheels on axleFront/axleRear lines; nose part continues at z 2.2.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "wheels",
+          "builds": "Four fat armored hover-truck wheels: chunky tread tires (lathe or cylinders with tread blocks), steel armored hubcaps with bolts, glowing cyan hub rings, brake discs with orange calipers, mudguard details. Each wheel rides its own wheel joint. Lowest tread touches y=0. Wheel radius 0.5.",
+          "box": [
+            [
+              -1.3,
+              0,
+              -2.3
+            ],
+            [
+              1.3,
+              1,
+              2.3
+            ]
+          ],
+          "attaches": "Centres at wheelFL/FR/RL/RR joints on axleFront and axleRear.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelRL",
+            "wheelRR"
+          ],
+          "floor": true,
+          "budget": 130
+        },
+        {
+          "id": "noseRam",
+          "builds": "Front end: sloped armored nose wedge, push-bar ram with hazard stripes and bolts, mesh grille with radiator slats, twin angular headlights (white glow) with cyan DRL strips, glowing neon cyan lower splitter strip, corporate badge decal, license plate with SVG ID text, light-bar mini sirens on bumper corners (alternating red/blue glow), tow shackles.",
+          "box": [
+            [
+              -1.3,
+              0.25,
+              2.1
+            ],
+            [
+              1.3,
+              1.4,
+              2.9
+            ]
+          ],
+          "attaches": "Starts where chassisLower ends (z 2.1) and meets the cabin hood at deckTop; tip at noseTip.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "cabin",
+          "builds": "Cabin shell on deckTop: slanted tinted windshield and side glass (glass colour with SVG reflection streaks), white panel roof with logo decal, A/B pillars, riot-mesh window grilles, door seams and handles, side mirrors with small glowing indicators, interior silhouettes (seats, dash with glowing screens drawn as SVG HUD textures, two helmeted officer heads), side corporate livery and unit number decals.",
+          "box": [
+            [
+              -1.2,
+              1.3,
+              -1
+            ],
+            [
+              1.2,
+              1.8,
+              1.4
+            ]
+          ],
+          "attaches": "Base on cabinBase/deckTop; roof carries roofLightBar and turret ring behind it at turretRing.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 140
+        },
+        {
+          "id": "roofLights",
+          "builds": "Roof neon and sensors: big double light bar across the roof front (alternating magenta and cyan glow blocks with dark housings and SVG lens pattern), side neon bars running along roof edges, antenna array with blinking red tips, loudspeaker horns, camera pods, floodlights (white glow), a hologram corporate sign panel (SVG, glowing) on a bracket, and neon edge lines along the cabin pillars.",
+          "box": [
+            [
+              -1.2,
+              1.7,
+              -1
+            ],
+            [
+              1.2,
+              2.3,
+              1.4
+            ]
+          ],
+          "attaches": "Sits on cabin roof at roofFront; keeps clear of turret ring at z -1.3.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 120
+        },
+        {
+          "id": "turretBase",
+          "builds": "Rear roof turret platform: rotating ring base on turretRing (turretYaw joint), armored swivel housing with panel paint and hazard stripes, side hydraulic pistons, ammo/water hose connectors, the water tank pack behind (white cylindrical tanks with water-level SVG gauges, glowing cyan fill windows, pipes in brass and steel), warning decals, pump manifold with valves.",
+          "box": [
+            [
+              -1.1,
+              1.35,
+              -2.9
+            ],
+            [
+              1.1,
+              2.3,
+              -0.4
+            ]
+          ],
+          "attaches": "Base on turretRing at roof rear; the cannon pivots on cannonPitch above it at z -1.2.",
+          "joints": [
+            "body",
+            "turretYaw"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "waterCannon",
+          "builds": "Chunky water cannon on cannonPitch joint: gimbal yoke with side trunnions, thick main barrel (lathe) with segmented collars, hazard bands, a flared nozzle with glowing water-blue core, inner rifling rings, top-mounted targeting camera with red glow, side pressure gauge (gaugeTexture), feed hose sweep to the tank, orange warning stripes, neon magenta accent line along the barrel, small mist cards at the muzzle.",
+          "box": [
+            [
+              -0.45,
+              1.8,
+              -1.9
+            ],
+            [
+              0.45,
+              2.3,
+              1.2
+            ]
+          ],
+          "attaches": "Pivot at cannonPitch on turretBase yoke; muzzle ends at muzzle mount, above the cabin roof lights.",
+          "joints": [
+            "cannonPitch"
+          ],
+          "floor": false,
+          "budget": 110
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:12:36.529Z",
+        "wallMs": 25827,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85499,
+          "completion_tokens": 3233,
+          "total_tokens": 88732,
+          "prompt_tokens_details": {
+            "cached_tokens": 85495
+          }
+        },
+        "costUsd": 0.0408875,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T14:13:02.356Z",
+        "wallMs": 20076,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88611,
+          "completion_tokens": 3302,
+          "total_tokens": 91913,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.050482400000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassisLower",
+        "started": "2026-10-25T14:13:02.356Z",
+        "wallMs": 22813,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88621,
+          "completion_tokens": 3702,
+          "total_tokens": 92323,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0545024,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "roofLights",
+        "started": "2026-10-25T14:13:02.356Z",
+        "wallMs": 24774,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88625,
+          "completion_tokens": 4156,
+          "total_tokens": 92781,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0590504,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turretBase",
+        "started": "2026-10-25T14:13:02.356Z",
+        "wallMs": 29933,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88635,
+          "completion_tokens": 4897,
+          "total_tokens": 93532,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0664804,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "noseRam",
+        "started": "2026-10-25T14:13:02.356Z",
+        "wallMs": 30282,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88628,
+          "completion_tokens": 5389,
+          "total_tokens": 94017,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07138639999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cabin",
+        "started": "2026-10-25T14:13:02.356Z",
+        "wallMs": 33598,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88631,
+          "completion_tokens": 5586,
+          "total_tokens": 94217,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0733624,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "waterCannon",
+        "started": "2026-10-25T14:13:02.357Z",
+        "wallMs": 54108,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88665,
+          "completion_tokens": 7427,
+          "total_tokens": 96092,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.09184039999999999,
+        "hasCode": true,
+        "reasoning": "I'm sketching out the buildWaterCannon function, planning the joint placement at cannonPitch with a barrel box spanning the z-axis, mounted around y=2.0, before moving into the lathe geometry for the barrel shape.\n\nI'm defining the barrel's lathe outline from base to flared nozzle, adding a glowing water disc near the tip, and figuring out how to attach it all to the cannonPitch bone using cylinder helpers for collars and hazard-striped bands along the body.\n\nNow I'm laying out the yoke's side plates and trunnions as boxes with axis-aligned cylinders, placing a gauge plane on the outer face of the left plate, and positioning the camera housing on top so it clears the barrel's radius. I'm also sketching a curved feed hose path from the barrel rear down into the tank using a swept tube with small radius, and starting to place a magenta neon accent rod along the barrel's top edge.\n\nDefining the barrel profile points...\n\nAdding mist card ring...\n\nPulling z to 1.15, then thinking about adding warning stripes on the breech boxes and a small decal plate with \"DANGER HIGH PRESSURE\" chevrons on the right plate. Sticking mostly to the palette colors with just a couple custom ones.\n\nNow I'm working out the yoke trunnion geometry -- positioning the plates and connecting rod at the pivot point, adjusting the barrel's starting z-coordinate and profile length so it properly meets the trunnion joint without overlap.\n\nStill placing torus and collar details...\n\nNow I'm sizing the camera housing box and positioning it relative to the barrel's top, making sure it sits just above the breech at around y=2.17 to 2.27.\n\nNext I'm placing the lens as a small glowing red cylinder at the front of the camera housing, then working out the gauge dimensions and position on the plate, adjusting coordinates so it clears the trunnion and fits within the plate's bounds. I'm also working out the position of a decal on the right plate's outward-facing surface.\n\nNow I'm planning the implementation: using a part helper function with the glow and metal texture kits, deciding on paint schemes for the barrel using a panelled white metal finish, and sketching out the overall code structure before writing it.\n\n"
+      },
+      {
+        "id": "fit-roofLights",
+        "started": "2026-10-25T14:13:58.593Z",
+        "wallMs": 5063,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 93872,
+          "completion_tokens": 811,
+          "total_tokens": 94683,
+          "prompt_tokens_details": {
+            "cached_tokens": 88621
+          }
+        },
+        "costUsd": 0.027474099999999998,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-turretBase",
+        "started": "2026-10-25T14:13:58.593Z",
+        "wallMs": 6273,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 94206,
+          "completion_tokens": 998,
+          "total_tokens": 95204,
+          "prompt_tokens_details": {
+            "cached_tokens": 88631
+          }
+        },
+        "costUsd": 0.029993099999999998,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-noseRam",
+        "started": "2026-10-25T14:13:58.593Z",
+        "wallMs": 7411,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 95668,
+          "completion_tokens": 845,
+          "total_tokens": 96513,
+          "prompt_tokens_details": {
+            "cached_tokens": 88624
+          }
+        },
+        "costUsd": 0.0314004,
+        "hasCode": true,
+        "reasoning": "I notice the loft sweep is extending unexpectedly past where it should, likely due to round caps rather than flat ones. I'm considering swapping the loft for a tapered frustum box between the correct z-range instead to get cleaner geometry.\n\nWith a flat-ended box section along the z-axis, I can shift the bar's z-position to 2.82 so everything stays within bounds — checking the bolts, struts, chevron, and badge offsets all fall within tolerance now, and confirming the bar doesn't collide with the grille or headlights since they're separated in y.\n\n"
+      },
+      {
+        "id": "fit-cabin",
+        "started": "2026-10-25T14:13:58.593Z",
+        "wallMs": 8425,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 95635,
+          "completion_tokens": 1459,
+          "total_tokens": 97094,
+          "prompt_tokens_details": {
+            "cached_tokens": 88627
+          }
+        },
+        "costUsd": 0.037468699999999994,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-wheels",
+        "started": "2026-10-25T14:13:58.593Z",
+        "wallMs": 9636,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 92817,
+          "completion_tokens": 855,
+          "total_tokens": 93672,
+          "prompt_tokens_details": {
+            "cached_tokens": 88607
+          }
+        },
+        "costUsd": 0.0258307,
+        "hasCode": true,
+        "reasoning": "I need to fix the flaps and domes—checking the dome's lathe geometry against the wheel position, since the tire's outer edge at x=1.35 appears to already exceed the box limit of 1.3.\n\nThe tire extending slightly past the limit is fine since only overhangs beyond 15cm get flagged, but the dome's current reach is too far out, so I'll flatten its outline heights to cap the max extent closer to 1.42 while keeping bolts and hubcap placement clear. For the mud flaps, I'm adjusting the z-offset so the front flap sits centered properly and the rear flap shifts to stay just behind its wheel rather than overshooting the box depth.\n\n"
+      },
+      {
+        "id": "fit-chassisLower",
+        "started": "2026-10-25T14:13:58.593Z",
+        "wallMs": 12997,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 94131,
+          "completion_tokens": 2470,
+          "total_tokens": 96601,
+          "prompt_tokens_details": {
+            "cached_tokens": 88617
+          }
+        },
+        "costUsd": 0.044589699999999996,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ],
+    "fit": {
+      "fitMs": 16591,
+      "checkMs": 2125,
+      "afterMs": 1464,
+      "repairMs": 12997,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "chassisLower",
+          "meshes": 87,
+          "outside": 20,
+          "maxOver": 0.28,
+          "bounds": [
+            [
+              -1.4,
+              0.15,
+              -3.1121
+            ],
+            [
+              1.4,
+              1.37,
+              2.4801
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.body.6",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1199,
+                0.6048,
+                2.36
+              ],
+              "max": [
+                1.3201,
+                1.1552,
+                2.48
+              ],
+              "over": 0.28,
+              "where": [
+                "0.28 m past the box's +z face (z = 2.2)"
+              ]
+            },
+            {
+              "name": "part.body.23",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.3201,
+                0.6047,
+                2.3599
+              ],
+              "max": [
+                -1.1199,
+                1.1553,
+                2.4801
+              ],
+              "over": 0.28,
+              "where": [
+                "0.28 m past the box's +z face (z = 2.2)"
+              ]
+            },
+            {
+              "name": "flare",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.2034,
+                0.5,
+                1.1495
+              ],
+              "max": [
+                1.3366,
+                1.1505,
+                2.4505
+              ],
+              "over": 0.25,
+              "where": [
+                "0.25 m past the box's +z face (z = 2.2)"
+              ]
+            },
+            {
+              "name": "part.body.4",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.0899,
+                1.07,
+                1.1495
+              ],
+              "max": [
+                1.3101,
+                1.17,
+                2.4505
+              ],
+              "over": 0.25,
+              "where": [
+                "0.25 m past the box's +z face (z = 2.2)"
+              ]
+            },
+            {
+              "name": "box.body.11",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.57,
+                0.155,
+                1.5496
+              ],
+              "max": [
+                0.63,
+                0.205,
+                2.4504
+              ],
+              "over": 0.25,
+              "where": [
+                "0.25 m past the box's +z face (z = 2.2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "wheels",
+          "meshes": 68,
+          "outside": 6,
+          "maxOver": 0.2,
+          "bounds": [
+            [
+              -1.4602,
+              -0.0298,
+              -2.5002
+            ],
+            [
+              1.4602,
+              1.0298,
+              2.3297
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "flap.wheelRL",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.36,
+                0.2199,
+                -2.5002
+              ],
+              "max": [
+                1.38,
+                0.4201,
+                -2.1998
+              ],
+              "over": 0.2,
+              "where": [
+                "0.2 m past the box's -z face (z = -2.3)"
+              ]
+            },
+            {
+              "name": "flap.wheelRR",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.38,
+                0.2199,
+                -2.5002
+              ],
+              "max": [
+                -1.36,
+                0.4201,
+                -2.1998
+              ],
+              "over": 0.2,
+              "where": [
+                "0.2 m past the box's -z face (z = -2.3)"
+              ]
+            },
+            {
+              "name": "dome.wheelFL",
+              "bones": [
+                "wheelFL"
+              ],
+              "min": [
+                1.3501,
+                0.1999,
+                1.4999
+              ],
+              "max": [
+                1.4601,
+                0.8001,
+                2.1001
+              ],
+              "over": 0.16,
+              "where": [
+                "0.16 m past the box's +x face (x = 1.3)"
+              ]
+            },
+            {
+              "name": "dome.wheelFR",
+              "bones": [
+                "wheelFR"
+              ],
+              "min": [
+                -1.4601,
+                0.1999,
+                1.4999
+              ],
+              "max": [
+                -1.3501,
+                0.8001,
+                2.1001
+              ],
+              "over": 0.16,
+              "where": [
+                "0.16 m past the box's -x face (x = -1.3)"
+              ]
+            },
+            {
+              "name": "dome.wheelRL",
+              "bones": [
+                "wheelRL"
+              ],
+              "min": [
+                1.3501,
+                0.1998,
+                -2.1002
+              ],
+              "max": [
+                1.4602,
+                0.8002,
+                -1.4998
+              ],
+              "over": 0.16,
+              "where": [
+                "0.16 m past the box's +x face (x = 1.3)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "noseRam",
+          "meshes": 81,
+          "outside": 17,
+          "maxOver": 1.28,
+          "bounds": [
+            [
+              -1.325,
+              0.24,
+              0.8246
+            ],
+            [
+              1.325,
+              1.3814,
+              3.8978
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sweep.body",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.2815,
+                0.2506,
+                0.8246
+              ],
+              "max": [
+                1.2815,
+                1.249,
+                3.8978
+              ],
+              "over": 1.28,
+              "where": [
+                "1.28 m past the box's -z face (z = 2.1)",
+                "1 m past the box's +z face (z = 2.9)"
+              ]
+            },
+            {
+              "name": "cylinder.body",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.4827,
+                0.38,
+                3.105
+              ],
+              "max": [
+                0.5173,
+                0.42,
+                3.125
+              ],
+              "over": 0.23,
+              "where": [
+                "0.23 m past the box's +z face (z = 2.9)"
+              ]
+            },
+            {
+              "name": "cylinder.body.2",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.7027,
+                0.38,
+                3.105
+              ],
+              "max": [
+                0.7373,
+                0.42,
+                3.125
+              ],
+              "over": 0.23,
+              "where": [
+                "0.23 m past the box's +z face (z = 2.9)"
+              ]
+            },
+            {
+              "name": "cylinder.body.3",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.9227,
+                0.38,
+                3.105
+              ],
+              "max": [
+                0.9573,
+                0.42,
+                3.125
+              ],
+              "over": 0.23,
+              "where": [
+                "0.23 m past the box's +z face (z = 2.9)"
+              ]
+            },
+            {
+              "name": "cylinder.body.4",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1427,
+                0.38,
+                3.105
+              ],
+              "max": [
+                1.1773,
+                0.42,
+                3.125
+              ],
+              "over": 0.23,
+              "where": [
+                "0.23 m past the box's +z face (z = 2.9)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cabin",
+          "meshes": 97,
+          "outside": 14,
+          "maxOver": 0.3,
+          "bounds": [
+            [
+              -1.4976,
+              1.1295,
+              -1.0271
+            ],
+            [
+              1.4976,
+              2.0378,
+              1.5063
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.body.80",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.4249,
+                1.4298,
+                1.0249
+              ],
+              "max": [
+                1.4951,
+                1.6102,
+                1.1751
+              ],
+              "over": 0.3,
+              "where": [
+                "0.3 m past the box's +x face (x = 1.2)"
+              ]
+            },
+            {
+              "name": "box.body.55",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.4224,
+                1.425,
+                1.175
+              ],
+              "max": [
+                1.4976,
+                1.455,
+                1.205
+              ],
+              "over": 0.3,
+              "where": [
+                "0.3 m past the box's +x face (x = 1.2)"
+              ]
+            },
+            {
+              "name": "plane.body.27",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.495,
+                1.4749,
+                1.0349
+              ],
+              "max": [
+                1.495,
+                1.6051,
+                1.1651
+              ],
+              "over": 0.3,
+              "where": [
+                "0.3 m past the box's +x face (x = 1.2)"
+              ]
+            },
+            {
+              "name": "part.body.87",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.4951,
+                1.4298,
+                1.0249
+              ],
+              "max": [
+                -1.4249,
+                1.6102,
+                1.1751
+              ],
+              "over": 0.3,
+              "where": [
+                "0.3 m past the box's -x face (x = -1.2)"
+              ]
+            },
+            {
+              "name": "box.body.63",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.4976,
+                1.425,
+                1.175
+              ],
+              "max": [
+                -1.4224,
+                1.455,
+                1.205
+              ],
+              "over": 0.3,
+              "where": [
+                "0.3 m past the box's -x face (x = -1.2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "roofLights",
+          "meshes": 100,
+          "outside": 9,
+          "maxOver": 0.32,
+          "bounds": [
+            [
+              -1.15,
+              1.3777,
+              -0.8191
+            ],
+            [
+              1.15,
+              2.5721,
+              1.3155
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sweep.body.13",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1086,
+                1.3777,
+                -0.8155
+              ],
+              "max": [
+                1.1366,
+                1.7855,
+                -0.688
+              ],
+              "over": 0.32,
+              "where": [
+                "0.32 m past the box's -y face (y = 1.7)"
+              ]
+            },
+            {
+              "name": "sweep.body.15",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.1367,
+                1.3777,
+                -0.8155
+              ],
+              "max": [
+                -1.1086,
+                1.7855,
+                -0.688
+              ],
+              "over": 0.32,
+              "where": [
+                "0.32 m past the box's -y face (y = 1.7)"
+              ]
+            },
+            {
+              "name": "sweep.body.12",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                1.1086,
+                1.4248,
+                1.1101
+              ],
+              "max": [
+                1.1366,
+                1.7885,
+                1.3155
+              ],
+              "over": 0.28,
+              "where": [
+                "0.28 m past the box's -y face (y = 1.7)"
+              ]
+            },
+            {
+              "name": "sweep.body.14",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -1.1367,
+                1.4248,
+                1.1102
+              ],
+              "max": [
+                -1.1086,
+                1.7885,
+                1.3155
+              ],
+              "over": 0.28,
+              "where": [
+                "0.28 m past the box's -y face (y = 1.7)"
+              ]
+            },
+            {
+              "name": "sphere.body.9",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.0279,
+                2.5279,
+                -0.8191
+              ],
+              "max": [
+                0.0721,
+                2.5721,
+                -0.7809
+              ],
+              "over": 0.27,
+              "where": [
+                "0.27 m past the box's +y face (y = 2.3)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "turretBase",
+          "meshes": 93,
+          "outside": 3,
+          "maxOver": 0.15,
+          "bounds": [
+            [
+              -1.2001,
+              1.3399,
+              -2.8513
+            ],
+            [
+              1.2001,
+              2.4508,
+              -0.6383
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.body.117",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.8907,
+                2.18,
+                -2.6207
+              ],
+              "max": [
+                -0.3493,
+                2.4507,
+                -2.0793
+              ],
+              "over": 0.15,
+              "where": [
+                "0.15 m past the box's +y face (y = 2.3)"
+              ]
+            },
+            {
+              "name": "part.body.123",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                -0.2708,
+                2.18,
+                -2.6208
+              ],
+              "max": [
+                0.2708,
+                2.4508,
+                -2.0792
+              ],
+              "over": 0.15,
+              "where": [
+                "0.15 m past the box's +y face (y = 2.3)"
+              ]
+            },
+            {
+              "name": "part.body.129",
+              "bones": [
+                "body"
+              ],
+              "min": [
+                0.3492,
+                2.18,
+                -2.6208
+              ],
+              "max": [
+                0.8908,
+                2.4508,
+                -2.0792
+              ],
+              "over": 0.15,
+              "where": [
+                "0.15 m past the box's +y face (y = 2.3)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "waterCannon",
+          "meshes": 54,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.35,
+              1.715,
+              -1.911
+            ],
+            [
+              0.368,
+              2.285,
+              1.2
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "chassisLower",
+          "meshes": 87,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.4,
+              0.15,
+              -2.9301
+            ],
+            [
+              1.4,
+              1.37,
+              2.2301
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "wheels",
+          "meshes": 68,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.4202,
+              -0.0298,
+              -2.3298
+            ],
+            [
+              1.4202,
+              1.0298,
+              2.3297
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "noseRam",
+          "meshes": 81,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.325,
+              0.24,
+              2.0525
+            ],
+            [
+              1.325,
+              1.3814,
+              3.0202
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "cabin",
+          "meshes": 97,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.2401,
+              1.2746,
+              -1.0271
+            ],
+            [
+              1.2401,
+              1.9401,
+              1.5063
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "roofLights",
+          "meshes": 100,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.15,
+              1.6988,
+              -0.8191
+            ],
+            [
+              1.15,
+              2.436,
+              1.3082
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "turretBase",
+          "meshes": 93,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.2001,
+              1.3399,
+              -2.8513
+            ],
+            [
+              1.2001,
+              2.3013,
+              -0.6383
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "waterCannon",
+          "meshes": 54,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.35,
+              1.715,
+              -1.911
+            ],
+            [
+              0.368,
+              2.285,
+              1.2
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "chassisLower",
+          "wallMs": 12997,
+          "edits": 5,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "wheels",
+          "wallMs": 9636,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "noseRam",
+          "wallMs": 7411,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "cabin",
+          "wallMs": 8425,
+          "edits": 4,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "roofLights",
+          "wallMs": 5063,
+          "edits": 3,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "turretBase",
+          "wallMs": 6273,
+          "edits": 3,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  }
+}

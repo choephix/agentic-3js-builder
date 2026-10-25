@@ -30,6 +30,8 @@ import { homedir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
+import { measure, measuredText, probe } from "./partfit";
+import type { PartFit, Probe } from "./partfit";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const BAKEOFF = join(ROOT, "bakeoff");
@@ -58,8 +60,9 @@ type Arm = {
   /** A prompt file in bakeoff/prompts/: the model first writes a build sheet from it, then the module. */
   plan?: string;
   /** Parallel parts: a planning call writes a shared spec from `plan`, then one call per part writes a function from
-   *  `part`, all at once; the runner assembles one module (see `parallelBuild`). */
-  parallel?: { plan: string; part: string };
+   *  `part`, all at once; the runner assembles one module (see `parallelBuild`). With `fit` (a prompt file) the
+   *  runner then measures every part against its box and gives each one that sticks out one edit call from it. */
+  parallel?: { plan: string; part: string; fit?: string };
 };
 type Subject = { id: string; kind: string; terse: string; rich: string };
 type Level = "terse" | "rich";
@@ -333,9 +336,9 @@ async function run(round: string, args: string[]) {
       path,
       from ? readFileSync(join(BAKEOFF, "rounds", from, "prompts", `${arm.id}.md`), "utf8") : systemPrompt(arm),
     );
-    // A parallel-parts arm keeps its plan and part prompts next to the system prompt they extend.
-    for (const file of arm.parallel ? [arm.parallel.plan, arm.parallel.part] : [])
-      writeFileSync(join(dir, "prompts", file), read(`bakeoff/prompts/${file}`));
+    // A parallel-parts arm keeps its plan, part and fit prompts next to the system prompt they extend.
+    for (const file of arm.parallel ? [arm.parallel.plan, arm.parallel.part, arm.parallel.fit] : [])
+      if (file) writeFileSync(join(dir, "prompts", file), read(`bakeoff/prompts/${file}`));
   }
   console.log(`${todo.length} builds to ask ${model} (${effort}) for, ${concurrency} at a time.`);
 
@@ -578,7 +581,8 @@ function assemble(spec: Spec, parts: { part: SpecPart; code: string | null }[]) 
 type Asked = Awaited<ReturnType<typeof ask>>;
 
 /** One parallel-parts build: plan, then every part at once, then the module and a run record shaped like `run`'s.
- *  `wallMs` is the plan's time plus the slowest part's; tokens and cost are summed over the calls and listed per call. */
+ *  `wallMs` is the plan's time plus the slowest part's (plus the box check and its repairs with `fit`); tokens and
+ *  cost are summed over the calls and listed per call. */
 async function parallelBuild(o: {
   gw: Gateway;
   cost: Pricing;
@@ -627,10 +631,11 @@ async function parallelBuild(o: {
   const parts = spec
     ? await Promise.all(
         spec.parts.map(async (part) => {
-          const asked = await ask(gw, body(`${pitch}\n\n${partPrompt(prompt(files.part), spec!, part)}`), cost);
+          const partUser = `${pitch}\n\n${partPrompt(prompt(files.part), spec!, part)}`;
+          const asked = await ask(gw, body(partUser), cost);
           const code = asked.text ? extractCode(asked.text) : null;
           calls.push(call(part.id, asked, Boolean(code)));
-          return { part, code, wallMs: asked.wallMs };
+          return { part, code, wallMs: asked.wallMs, partUser };
         }),
       )
     : [];
@@ -642,6 +647,98 @@ async function parallelBuild(o: {
     mkdirSync(dirname(buildFile), { recursive: true });
     writeFileSync(buildFile, wireImports(assembled.module, buildFile));
   }
+  // The box check (`fit`): measure every part against its box and the floor without a model; each part reaching more
+  // than 15 cm out gets one low-effort edit call, in its own part conversation, all at once; then the module is
+  // reassembled and measured again. A repaired part that throws where its original didn't goes back to the original.
+  let fit: Record<string, unknown> | null = null;
+  let fitMs = 0;
+  if (files.fit && spec && assembled) {
+    const fitStarted = Date.now();
+    const ids = parts.filter((p) => !assembled.missing.includes(p.part.id)).map((p) => p.part.id);
+    const brief = (fits: PartFit[]) => fits.map(({ worst, ...rest }) => ({ ...rest, worst: worst.slice(0, 5) }));
+    const before = await probe(buildFile, ids, "before");
+    const measured = before.error ? [] : measure(spec.parts, before);
+    const template = prompt(files.fit);
+    const repairs = await Promise.all(
+      measured
+        .filter((m) => m.misfit)
+        .map(async (m) => {
+          const p = parts.find((q) => q.part.id === m.id)!;
+          const feedback = template.replace(/\{(\w+)\}/g, (whole, key: string) =>
+            key === "box"
+              ? JSON.stringify(p.part.box)
+              : key === "size"
+                ? spec!.size.join(" × ")
+                : key === "measured"
+                  ? measuredText(m)
+                  : whole,
+          );
+          const asked = await ask(
+            gw,
+            {
+              model,
+              // Moving pieces to measured numbers is a small edit: low effort, as for crash repairs.
+              reasoning_effort: "low",
+              max_tokens: maxTokens,
+              messages: [
+                { role: "system", content: system },
+                { role: "user", content: p.partUser },
+                { role: "assistant", content: `\`\`\`ts\n${p.code}\n\`\`\`` },
+                { role: "user", content: feedback },
+              ],
+            },
+            cost,
+          );
+          const edited = applyEdits(p.code!, asked.text);
+          const code = edited.blocks ? edited.code : (extractCode(asked.text) ?? p.code!);
+          calls.push(call(`fit-${m.id}`, asked, code !== p.code));
+          return {
+            id: m.id,
+            code,
+            wallMs: asked.wallMs,
+            edits: edited.blocks,
+            failedEdits: edited.failed.length,
+            changed: code !== p.code,
+          };
+        }),
+    );
+    const write = (keep: Set<string>) => {
+      const repaired = new Map(repairs.filter((r) => keep.has(r.id)).map((r) => [r.id, r.code]));
+      const module = assemble(
+        spec!,
+        parts.map((p) => ({ part: p.part, code: repaired.get(p.part.id) ?? p.code })),
+      ).module;
+      writeFileSync(buildFile, wireImports(module, buildFile));
+    };
+    const kept = new Set(repairs.filter((r) => r.changed).map((r) => r.id));
+    let after: Probe | null = null;
+    const reverted: string[] = [];
+    if (kept.size) {
+      write(kept);
+      after = await probe(buildFile, ids, "after");
+      for (const id of kept)
+        if ((after.error || after.threw[id]) && !before.threw[id]) {
+          kept.delete(id);
+          reverted.push(id);
+        }
+      if (reverted.length) write(kept);
+    }
+    fitMs = Date.now() - fitStarted;
+    fit = {
+      fitMs,
+      checkMs: before.ms,
+      afterMs: after?.ms ?? null,
+      repairMs: repairs.length ? Math.max(...repairs.map((r) => r.wallMs)) : 0,
+      error: before.error,
+      threw: before.threw,
+      before: brief(measured),
+      after: after && !after.error ? brief(measure(spec.parts, after)) : null,
+      afterError: after?.error ?? null,
+      afterThrew: after?.threw ?? null,
+      repairs: repairs.map(({ code: _code, ...rest }) => rest),
+      reverted,
+    };
+  }
   calls.sort((a, b) => (a.id === "plan" ? -1 : b.id === "plan" ? 1 : 0));
   const sum = (get: (c: (typeof calls)[number]) => number | undefined) =>
     calls.reduce((total, c) => total + (get(c) ?? 0), 0);
@@ -652,7 +749,7 @@ async function parallelBuild(o: {
     prompt_tokens_details: { cached_tokens: sum((c) => c.usage?.prompt_tokens_details?.cached_tokens) },
   };
   const costUsd = calls.every((c) => c.costUsd != null) ? sum((c) => c.costUsd!) : null;
-  const wallMs = planned.wallMs + (slowest?.wallMs ?? 0);
+  const wallMs = planned.wallMs + (slowest?.wallMs ?? 0) + fitMs;
   const failed = calls.find((c) => c.status !== 200);
   writeJson(join(dir, "runs", `${job.slug}.json`), {
     slug: job.slug,
@@ -680,6 +777,7 @@ async function parallelBuild(o: {
       specError,
       missingParts: assembled?.missing ?? [],
       calls: calls.map(({ text: _text, ...rest }) => rest),
+      ...(fit ? { fit } : {}),
     },
   });
   writeFileSync(
@@ -690,9 +788,11 @@ async function parallelBuild(o: {
     .filter((c) => c.id !== "plan")
     .map((c) => `${c.id} ${(c.wallMs / 1000).toFixed(0)}`)
     .join(", ");
+  const repaired = (fit?.repairs as { id: string }[] | undefined)?.map((r) => r.id).join(",");
   return (
     `${failed ? failed.status : 200} ${assembled ? "code" : `NO CODE (${specError})`}` +
-    `${assembled?.missing.length ? ` MISSING ${assembled.missing.join(",")}` : ""}, plan ${(planned.wallMs / 1000).toFixed(0)} s + parts [${partTimes}] → ${(wallMs / 1000).toFixed(0)} s, ` +
+    `${assembled?.missing.length ? ` MISSING ${assembled.missing.join(",")}` : ""}, plan ${(planned.wallMs / 1000).toFixed(0)} s + parts [${partTimes}]` +
+    `${fit ? ` + fit ${(fitMs / 1000).toFixed(0)} s [${repaired || "no repairs"}]` : ""} → ${(wallMs / 1000).toFixed(0)} s, ` +
     `${usage.completion_tokens} out${costUsd != null ? `, $${costUsd.toFixed(3)}` : ""}`
   );
 }

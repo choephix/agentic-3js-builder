@@ -1,0 +1,449 @@
+{
+  "slug": "r33cohd2HoverPickupRichPar",
+  "arm": "par",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T14:10:32.686Z",
+  "wallMs": 41561,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 524951,
+    "completion_tokens": 17403,
+    "total_tokens": 542354,
+    "prompt_tokens_details": {
+      "cached_tokens": 505660
+    }
+  },
+  "costUsd": 0.26317799999999997,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 19071,
+    "slowestPartMs": 22490,
+    "critical": "bed",
+    "elapsedMs": 41562,
+    "spec": {
+      "name": "Hoverjack Pickup",
+      "description": "A militarized pickup truck converted to ride on four vectored hover thrusters, in low-poly cyberpunk style with neon underglow, armor plates and a roof-mounted gun.",
+      "builderName": "hoverPickup",
+      "size": [
+        2.5,
+        2.3,
+        5.6
+      ],
+      "layout": "A chunky boxy pickup facing +Z. Hood and cab at the front (z 0.4 to 2.6), open cargo bed behind (z -2.6 to 0.4). The body floats about 0.35 m above the floor on four large ducted hover thrusters, one at each wheel position, replacing wheels, with cyan glow rings underneath. The lowest points (thruster nozzles) sit on y=0 to 0.05, while the hull belly is at y=0.45. Angular armor plates, a bull bar at the front, slanted windshield with cyan tint, roof light bar, and a pintle-mounted gun on the bed. Style: faceted low-poly shapes, dark gunmetal hull with olive-drab and matte black armor, hazard-yellow trim stripes, neon cyan and magenta glow accents, painted decals, worn panel paints and glowing screens.",
+      "palette": {
+        "hull": "#3b4250",
+        "armor": "#2a2f2b",
+        "olive": "#4f5a3a",
+        "trim": "#e7b814",
+        "dark": "#14161c",
+        "metal": "#7a8290",
+        "glass": "#1b6f86",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fb0",
+        "lamp": "#fff2b0",
+        "tail": "#ff3030",
+        "rubber": "#1d1d22"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.1,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.1,
+          1.5
+        ],
+        "bedFloor": [
+          0,
+          1.15,
+          -1.6
+        ],
+        "turretMount": [
+          0,
+          1.15,
+          -1.4
+        ],
+        "thrusterFL": [
+          1.05,
+          0.45,
+          1.85
+        ],
+        "thrusterFR": [
+          -1.05,
+          0.45,
+          1.85
+        ],
+        "thrusterRL": [
+          1.05,
+          0.45,
+          -1.85
+        ],
+        "thrusterRR": [
+          -1.05,
+          0.45,
+          -1.85
+        ],
+        "frontBumper": [
+          0,
+          0.75,
+          2.8
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "thrusterFL",
+          "parent": "body",
+          "at": [
+            1.05,
+            0.45,
+            1.85
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterFR",
+          "parent": "body",
+          "at": [
+            -1.05,
+            0.45,
+            1.85
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterRL",
+          "parent": "body",
+          "at": [
+            1.05,
+            0.45,
+            -1.85
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterRR",
+          "parent": "body",
+          "at": [
+            -1.05,
+            0.45,
+            -1.85
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "gunYaw",
+          "parent": "body",
+          "at": [
+            0,
+            1.15,
+            -1.4
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "gunPitch",
+          "parent": "gunYaw",
+          "at": [
+            0,
+            1.75,
+            -1.4
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Lower hull: belly pan, side skirts, frame rails, wheel-arch-style cutouts around the thrusters, front bumper with bull bar and tow hooks, rear bumper, hazard-yellow trim stripes, underglow neon strips (glow) along the belly, panelled and scuffed paints, vents and rivet details, headlamp glow units in the bumper.",
+          "box": [
+            [
+              -1.25,
+              0.4,
+              -2.8
+            ],
+            [
+              1.25,
+              1.15,
+              2.9
+            ]
+          ],
+          "attaches": "Cab and hood sit on chassisTop; thrusters hang from the four thruster mounts; bed floor starts at bedFloor.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Hood with vents and armor plates, fenders, cab box with slanted windshield and side windows (tinted glass colour with glow-screen reflections via SVG), doors with handles and painted decals/emblems, mirrors, roof armor plates, roof light bar with cyan and magenta glow lamps, antenna, grille with glowing slits, hazard stripes and unit-number stencils.",
+          "box": [
+            [
+              -1.2,
+              1.1,
+              0.3
+            ],
+            [
+              1.2,
+              2.3,
+              2.7
+            ]
+          ],
+          "attaches": "Sits on chassisTop and cabFloor; the rear cab wall meets the bed front at z=0.3.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 200
+        },
+        {
+          "id": "bed",
+          "builds": "Open cargo bed: floor, side walls with armor panelling and ribs, tailgate, roll hoop behind the cab, tie-down rings, tail lights (glow red), ammo crates and a fuel drum in the bed, stencil markings, cyberpunk neon sign strip on the tailgate.",
+          "box": [
+            [
+              -1.22,
+              1.1,
+              -2.8
+            ],
+            [
+              1.22,
+              1.9,
+              0.3
+            ]
+          ],
+          "attaches": "Floor at bedFloor, starts where the cab ends at z=0.3; the turret mounts at turretMount.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "thrusters",
+          "builds": "Four identical hover thruster pods, one at each thruster mount: a lathe-turned ducted housing with mounting pylon strut up into the chassis, internal fan blades, glowing cyan inner ring and downward cone glow, magenta accent band, hazard marks, vents and bolts. Nozzle bottoms touch the floor at y 0 to 0.05. Each pod parented to its own thruster joint.",
+          "box": [
+            [
+              -1.25,
+              0,
+              -2.3
+            ],
+            [
+              1.25,
+              0.75,
+              2.3
+            ]
+          ],
+          "attaches": "Each pod is centred on its thruster mount and its pylon reaches the chassis underside at y=0.45 to 0.75.",
+          "joints": [
+            "thrusterFL",
+            "thrusterFR",
+            "thrusterRL",
+            "thrusterRR"
+          ],
+          "floor": true,
+          "budget": 180
+        },
+        {
+          "id": "gun",
+          "builds": "Pintle-mounted heavy gun on the bed: swivel base ring, post, yaw cradle, twin barrels with muzzle brakes, ammo box with belt, shield plate with painted hazard stripes, glowing targeting sight screen, magenta and cyan accent lights.",
+          "box": [
+            [
+              -0.45,
+              1.15,
+              -2.2
+            ],
+            [
+              0.45,
+              2.1,
+              -0.5
+            ]
+          ],
+          "attaches": "Base at turretMount on the bed floor; yaw on gunYaw, barrel assembly on gunPitch.",
+          "joints": [
+            "gunYaw",
+            "gunPitch"
+          ],
+          "floor": false,
+          "budget": 120
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:10:32.686Z",
+        "wallMs": 19071,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85244,
+          "completion_tokens": 2608,
+          "total_tokens": 87852,
+          "prompt_tokens_details": {
+            "cached_tokens": 85240
+          }
+        },
+        "costUsd": 0.034612,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "thrusters",
+        "started": "2026-10-25T14:10:51.758Z",
+        "wallMs": 15232,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87980,
+          "completion_tokens": 2398,
+          "total_tokens": 90378,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0401804,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:10:51.758Z",
+        "wallMs": 19565,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87940,
+          "completion_tokens": 2954,
+          "total_tokens": 90894,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.045660400000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:10:51.758Z",
+        "wallMs": 19677,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87950,
+          "completion_tokens": 3005,
+          "total_tokens": 90955,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0461904,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "gun",
+        "started": "2026-10-25T14:10:51.758Z",
+        "wallMs": 20188,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87922,
+          "completion_tokens": 3016,
+          "total_tokens": 90938,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0462444,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bed",
+        "started": "2026-10-25T14:10:51.758Z",
+        "wallMs": 22490,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 87915,
+          "completion_tokens": 3422,
+          "total_tokens": 91337,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0502904,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}
