@@ -8,7 +8,7 @@ Five vehicle pitches near the catalogs' own prompt (`bakeoff/pitches-r26.json`: 
 
 r26's sampler text told the model to copy recipes and build only the body itself; Stefan's intent is that everything is the model's own. r27/r28 rerun with that intent (`sampler2.md`) plus two ablations, two draws each: `sampler2nomat` (no `materials2077.ts`) and `samplermenu` (header menus only, `samplerMenu: true`). The materials sampler is where the time and the palette lifting come from: without it, 32 s against the control's 24 s. Readings in `docs/SPEED.md`.
 
-r29 targets level of detail (`detail.md`: every part gets invented details, and those get details of their own) with and without the four vehicle samplers (no materials sampler, `sampler4.md`). With the samplers: 60 s against 111 s for the same ~6k triangles. Readings in `docs/SPEED.md`.
+r29 targets level of detail (`detail.md`: every part gets invented details, and those get details of their own) with and without the four vehicle samplers (no materials sampler, `sampler4.md`), four draws each. With the samplers: 61 s against 95 s for about the same ~6k triangles. Readings in `docs/SPEED.md`.
 
 ## r25fable: Fable 5.1 single-runs at low, 2026-10-25
 

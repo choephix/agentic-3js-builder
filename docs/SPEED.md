@@ -20,25 +20,25 @@ Estimate: billed completion tokens minus code chars ÷ 2.8 minus prose chars ÷ 
 
 What the past rounds say about the dials (medians; crash = failed first render, all later repaired):
 
-| Round       | Effort / prompt                        | Out tokens |  Module |        Wall |         Crash |  Cost |
-| ----------- | -------------------------------------- | ---------: | ------: | ----------: | ------------: | ----: |
-| r24         | high, craft3 + kits                    |      63.8k | 24.5 KB |     8.1 min |         8/123 | $0.69 |
-| r24max      | max                                    |       128k |    none |      16 min | 10/10 no code | $1.29 |
-| r24opus     | Opus high                              |      84.3k |   33 KB |    13.4 min |          1/10 | $2.02 |
-| r25fable    | Fable 5.1 low, 5 r24 briefs            |      28.9k | 22.8 KB |     6.9 min |    0/5 (1 TS) | $1.47 |
-| r26         | low, craft3, 5 vehicle pitches         |       3.7k |    6 KB |        25 s |           1/5 | $0.21 |
-| r26 sampler | low, craft3 + `catalogs/` + sampler.md |      11.4k |   11 KB |        75 s |           0/5 | $0.46 |
-| r27/r28     | low, craft3, 2 more draws (n = 15)     |       3.5k |  5.7 KB |        24 s |          2/15 | $0.05 |
-| sampler2    | samplers as inspiration only           |      10.7k | 12.5 KB |        71 s |          0/10 | $0.31 |
-| …nomat      | sampler2 without `materials2077.ts`    |       4.9k |  7.9 KB |        32 s |          2/10 | $0.38 |
-| samplermenu | only each sampler's header menu        |       4.0k |  6.5 KB |        26 s |          1/10 | $0.23 |
-| r29 detail  | craft3 + `detail.md`, no samplers      |      14.9k | 11.8 KB |       111 s |          1/10 | $0.31 |
-| detail4     | detail + 4 samplers + `sampler4.md`    |       8.8k | 10.8 KB |        60 s |          2/10 | $0.40 |
-| r20medcraft | medium                                 |      43.2k | 20.5 KB |     5.5 min |          1/28 | $0.66 |
-| r20lowcraft | low                                    |      32.0k | 15.8 KB |     4.1 min |          2/28 | $0.49 |
-| r22lean     | low, game-asset brief, no rig          |      17.6k | 11.5 KB |     2.4 min |          2/25 | $0.26 |
-| r22nothink  | "thinking off" (see gateway note), low |      14.0k | 24.3 KB | **1.5 min** |     **14/25** | $0.25 |
-| r2          | medium, the early docs-only prompt     |       7.6k |  6.6 KB |     0.9 min |         9/280 | $0.09 |
+| Round       | Effort / prompt                         | Out tokens |  Module |        Wall |         Crash |  Cost |
+| ----------- | --------------------------------------- | ---------: | ------: | ----------: | ------------: | ----: |
+| r24         | high, craft3 + kits                     |      63.8k | 24.5 KB |     8.1 min |         8/123 | $0.69 |
+| r24max      | max                                     |       128k |    none |      16 min | 10/10 no code | $1.29 |
+| r24opus     | Opus high                               |      84.3k |   33 KB |    13.4 min |          1/10 | $2.02 |
+| r25fable    | Fable 5.1 low, 5 r24 briefs             |      28.9k | 22.8 KB |     6.9 min |    0/5 (1 TS) | $1.47 |
+| r26         | low, craft3, 5 vehicle pitches          |       3.7k |    6 KB |        25 s |           1/5 | $0.21 |
+| r26 sampler | low, craft3 + `catalogs/` + sampler.md  |      11.4k |   11 KB |        75 s |           0/5 | $0.46 |
+| r27/r28     | low, craft3, 2 more draws (n = 15)      |       3.5k |  5.7 KB |        24 s |          2/15 | $0.05 |
+| sampler2    | samplers as inspiration only            |      10.7k | 12.5 KB |        71 s |          0/10 | $0.31 |
+| …nomat      | sampler2 without `materials2077.ts`     |       4.9k |  7.9 KB |        32 s |          2/10 | $0.38 |
+| samplermenu | only each sampler's header menu         |       4.0k |  6.5 KB |        26 s |          1/10 | $0.23 |
+| r29 detail  | craft3 + `detail.md`, no samplers, n=20 |      13.0k | 10.9 KB |        95 s |          2/20 | $0.31 |
+| detail4     | detail + 4 samplers + `sampler4.md`     |       9.0k | 11.1 KB |        61 s |          5/20 | $0.40 |
+| r20medcraft | medium                                  |      43.2k | 20.5 KB |     5.5 min |          1/28 | $0.66 |
+| r20lowcraft | low                                     |      32.0k | 15.8 KB |     4.1 min |          2/28 | $0.49 |
+| r22lean     | low, game-asset brief, no rig           |      17.6k | 11.5 KB |     2.4 min |          2/25 | $0.26 |
+| r22nothink  | "thinking off" (see gateway note), low  |      14.0k | 24.3 KB | **1.5 min** |     **14/25** | $0.25 |
+| r2          | medium, the early docs-only prompt      |       7.6k |  6.6 KB |     0.9 min |         9/280 | $0.09 |
 
 Readings:
 
@@ -52,7 +52,7 @@ Readings:
 - Repeat draws of one brief vary a lot (r24d3 ran 5 subjects × 3); any arm with fewer than ~20 briefs is noise.
 - **Samplers at low (r26, 2026-10-25)** add time; they don't shave it. Five futuristic-military vehicle pitches (`pitches-r26.json`), Sonnet 5.5 low, run by `scripts/bakeoff.ts run` (one request, one reply). Arm `sampler` appends the six part-family files in `catalogs/` (~46k tokens, board code cut) after craft3, with `prompts/sampler.md`: the pitch is the subject, build its own vehicle and ideas, copy and change recipes where they serve. Against plain craft3 on the same pitches, medians: 75 s vs 25 s, 11.4k vs 3.7k output tokens (~6k vs ~1.4k estimated thinking), 11 vs 6 KB, 6.9k vs 2.7k triangles, $0.46 vs $0.21; 0/5 vs 1/5 crashed (a `polyline` with too few points, fixed in one 3 s edit repair, `r26fix`). 8-token copy overlap with the samplers: 19–30% vs 8–15% for the control, which shares SDK idioms; no build calls `assemble` or rebuilds the sampler pickup body. The `run` framing at low writes far smaller modules than r20lowcraft's replay framing (6 KB vs 15.8 KB). Whether the sampler builds look better is Stefan's call (sheet: `~/tmp/public/nilo/agentic-3js-builder/r26/craft3-vs-sampler.jpg`).
 - **r26 tested the wrong instruction.** `sampler.md` said "copy recipes; the body is your own construction", which isn't Stefan's intent: everything is the model's own design and construction, since the intricate details Sonnet and Opus invent are what make from-scratch builds good. r27/r28 (two draws each, same 5 pitches, Sonnet low; cost is per build and drops once the prompt is cached) test that intent with `prompts/sampler2.md`, the samplers' copy instructions cut and the preamble "Reference only". Medians in the table above. Readings: the corrected text changed nothing measurable (71 s, 12.5 KB, overlap 24%). **`materials2077.ts` drives most of the added time:** without it the samplers cost 8 s over the control (32 s vs 24 s) for ~1.7× the triangles. With it, builds lift a median 7.5 of its hex colours (control: 1), and 8 of 10 sampler2 builds come out in its nightOps look (gunmetal, magenta and cyan neon); the two railgun carriers are olive. The menus alone (no code, ~6k tokens) build at control speed and size. Sheets: `r26/arms-draw1.jpg`, `r26/arms-draw2.jpg` (columns craft3, menu, nomat, sampler2). Looks are Stefan's call; n = 10 per arm is still noise-level.
-- **Level of detail, with and without samplers (r29, two draws).** Stefan's target: borrowed parts are not to be reused with changed numbers; every detail gets new details invented on top. `prompts/detail.md` asks for that (every part gets invented details, and those get details of their own, two or three layers deep); `detail` adds it to craft3, `detail4` also adds the four vehicle samplers (truck with its gear, tank tracks and armour, mounted weapons, sci-fi hull; no `materials2077.ts`) with `prompts/sampler4.md`. **With detail as the target, the samplers halve the time for the same geometry:** 60 s vs 111 s, 8.8k vs 14.9k output tokens, 6.0k vs 6.1k triangles, 10.8 vs 11.8 KB. Pairwise by pitch and draw, detail4 is faster in 7 of 10, even in 2, slower in 1 (a 142 s truck). Overlap with the samplers is 16% (control 13%) and no palette lifting. Three crashes, each fixed by one 3–6 s edit repair. First result where the samplers save time; looks are Stefan's call (`r26/detail-draw1-stats.jpg`, `-draw2-`).
+- **Level of detail, with and without samplers (r29, four draws: `r29`, `r29d2`–`r29d4`).** Stefan's target: borrowed parts are not to be reused with changed numbers; every detail gets new details invented on top. `prompts/detail.md` asks for that (every part gets invented details, and those get details of their own, two or three layers deep); `detail` adds it to craft3, `detail4` also adds the four vehicle samplers (truck with its gear, tank tracks and armour, mounted weapons, sci-fi hull; no `materials2077.ts`) with `prompts/sampler4.md`. **With detail as the target, the samplers cut the time by about a third for the same geometry:** 61 s vs 95 s, 9.0k vs 13.0k output tokens, 6.1k vs 5.7k triangles, 11.1 vs 10.9 KB. Pairwise by pitch and draw, detail4 is faster by over 10 s in 13 of 20 and slower in 5. Overlap with the samplers is 16.5% (control 13%), no palette lifting. More first-render crashes with the samplers (5/20 vs 2/20), each fixed by one 3–6 s edit repair. First result where the samplers save time; looks are Stefan's call (`r26/draws-detail4.jpg`, `r26/draws-detail.jpg`).
 
 ## Stefan's hypotheses, answered
 
