@@ -2,6 +2,10 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## r26: the part-family samplers at low, 2026-10-25
+
+Five vehicle pitches near the catalogs' own prompt (`bakeoff/pitches-r26.json`: the 2077 truck, a convoy hauler, a railgun carrier, a riot interceptor, a hover pickup), Sonnet 5.5 low, single runs. Arm `craft3` vs arm `sampler` (craft3 + every `catalogs/` file except the board helpers + `bakeoff/prompts/sampler.md`), both in `bakeoff/arms-r26.json`; new arm field `samplers` in `scripts/bakeoff.ts`. The samplers didn't shave time: medians 75 s vs 25 s, 11 vs 6 KB, $0.46 vs $0.21, 0/5 vs 1/5 crashes. No sampler build reuses the pickup base. Numbers in `docs/SPEED.md`; the looks are Stefan's call.
+
 ## r25fable: Fable 5.1 single-runs at low, 2026-10-25
 
 Five r24 briefs (ramen stall, mimic chest, alebrije, zeppelin, tin robot), one request each, run one at a time, `craft3` arm, low effort, through `npm run bakeoff -- run r25fable --model anthropic/claude-fable-5-1`. Medians 6.9 min, 28.9k output tokens, 22.8 KB, $1.47 (total $8.06); Sonnet at high on the same briefs: 7.4 min, $0.74. All 5 render; one type error. Routed to stefan@revoltage.io (Fable meter 28 → 30). Numbers and readings in `docs/SPEED.md`.

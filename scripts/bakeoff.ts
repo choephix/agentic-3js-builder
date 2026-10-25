@@ -50,6 +50,8 @@ type Arm = {
   kits?: boolean;
   /** SDK source files (names in src/) appended verbatim after the reference. */
   sources?: string[];
+  /** Sampler files (names in catalogs/, without `.ts`) appended last as read-only recipes, board code cut. */
+  samplers?: string[];
   /** A prompt file in bakeoff/prompts/: the model first writes a build sheet from it, then the module. */
   plan?: string;
 };
@@ -125,6 +127,21 @@ function sourcesContext(files: string[]) {
   return `# Selected SDK source\n\nThese files are part of the module \`"${SDK_NAME}"\`.\n\n${body}`;
 }
 
+/** Samplers as the model reads them: SDK imports renamed, the cull-board section and its helpers cut. */
+function samplersContext(names: string[]) {
+  const body = names
+    .map((name) => {
+      const text = cleanDoc(read(`catalogs/${name}.ts`))
+        .replace(/^import .* from "\.\/board";\n/gm, "")
+        .replace(/(["'])\.\.\/kits\/([a-z]+)\1/g, `"${SDK_NAME}/kits/$2"`)
+        .replace(/(["'])\.\.\/src\/[a-z]+\1/g, `"${SDK_NAME}"`)
+        .replace(/\n\/\/ -+ boards?\n[\s\S]*$/, "\n");
+      return `## Sampler: catalogs/${name}.ts\n\n\`\`\`ts\n${text.trimEnd()}\n\`\`\``;
+    })
+    .join("\n\n");
+  return `# Samplers\n\nRead-only recipe files. Your module can't import them: copy what you use into it.\n\n${body}`;
+}
+
 function systemPrompt(arm: Arm) {
   const parts = [read(`bakeoff/prompts/${arm.contract}`)];
   if (arm.taste) parts.push(read(`bakeoff/prompts/${arm.taste}`));
@@ -133,6 +150,7 @@ function systemPrompt(arm: Arm) {
   if (ref) parts.push(ref);
   if (arm.kits) parts.push(kitsContext());
   if (arm.sources?.length) parts.push(sourcesContext(arm.sources));
+  if (arm.samplers?.length) parts.push(samplersContext(arm.samplers));
   return `${parts.map((part) => part.trim()).join("\n\n")}\n`;
 }
 
