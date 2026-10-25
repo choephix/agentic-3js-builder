@@ -8,9 +8,11 @@ Five vehicle pitches near the catalogs' own prompt (`bakeoff/pitches-r26.json`: 
 
 r26's sampler text told the model to copy recipes and build only the body itself; Stefan's intent is that everything is the model's own. r27/r28 rerun with that intent (`sampler2.md`) plus two ablations, two draws each: `sampler2nomat` (no `materials2077.ts`) and `samplermenu` (header menus only, `samplerMenu: true`). The materials sampler is where the time and the palette lifting come from: without it, 32 s against the control's 24 s. Readings in `docs/SPEED.md`.
 
-r29 targets level of detail (`detail.md`: every part gets invented details, and those get details of their own) with and without the four vehicle samplers (no materials sampler, `sampler4.md`), four draws each. With the samplers: 61 s against 95 s for about the same ~6k triangles. Readings in `docs/SPEED.md`.
+r29 targets level of detail (`detail.md`: every part gets invented details, and those get details of their own) with and without the four vehicle samplers (no materials sampler, `sampler4.md`), four draws each. The samplers' apparent time saving (61 s against 95 s) came from one slow batch: in the later batch both arms took about 60 s. Stefan sees no visible difference. Readings in `docs/SPEED.md`.
 
 `r30`/`r30d2` rerun the unchanged `sampler2nomat` arm at high effort: medians 505 s, 68.2k output tokens, 30.1 KB and 15.5k triangles against low effort's 32 s, 4.9k, 7.9 KB and 3.8k triangles, with 2/10 first-render crashes, one of two low-effort repairs successful, and $10.14 total spend.
+
+Stefan's verdict on the r30 sheet: high effort is night and day better than low. `r31m`/`r31md2` ran A (craft3), C (+ samplers), E (+ detail text) and F (+ both) at medium effort in one batch: A and C both 154 s, E 177 s, F 202 s; C has ~1.6× A's triangles, F none over E. Across low, medium and high the samplers never change thinking time, so they are not a speed lever. Next: a two-stage build (a fast first draft with the basic shape, then a separate detail pass on it), in its own session.
 
 ## r25fable: Fable 5.1 single-runs at low, 2026-10-25
 
