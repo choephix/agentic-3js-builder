@@ -1,0 +1,26 @@
+{
+  "slug": "r31mHoverPickupRichCraft3",
+  "arm": "craft3",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T09:20:42.025Z",
+  "wallMs": 81137,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 84135,
+    "completion_tokens": 10536,
+    "total_tokens": 94671,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.27363,
+  "hasCode": true,
+  "reasoning": "Given the low effort budget, I'm planning a static model built from primitive parts—extrusions, lathes, and glow elements—keeping everything in model space, and sketching rough dimensions for a pickup truck body around 5.4m long and 2m wide.\n\nI'm working out the hovering stance: thruster pods touch near y=0 while the chassis sits above, then defining the chassis plate dimensions and starting an extrusion profile for the lower body's side silhouette, tracing coordinates for the hood, windshield, roof, and bed outline point by point.\n\nRather than rely on an imported kit, I'll handle the paint myself using countershading and noise for a metal panel look. For the bed, instead of relying on the solid extrusion, I'm separating it out into its own floor, side walls, tailgate, and headboard pieces so it reads as hollow, trimming the main body profile to stop at the cab.\n\nNow I'm adding a roll bar and a mounted turret weapon with rod barrels in the bed, along with ammo crates for a militarized look. For windows, I'm working out dark glowing glass panels: small protruding side windows at fixed thickness, and a slanted windshield slab computed from the slope angle between two reference points to get the correct box dimensions and rotation.\n\nI'm calculating the exact rotation angle around the x-axis so the windshield box tilts correctly, finding it should be about 59.7 degrees, then positioning its center and nudging it slightly outward along its normal to avoid z-fighting.\n\nNow I'm setting up the hover thruster pods — placing four nacelles at the wheel positions and building each as a lathed ring duct.\n\nAdding rear exhaust jets and refining the pod's lathe outline with a chamfered shell shape, plus a glowing cyan torus ring around the pod rim for accent lighting.\n\nNow planning hood armor details—a spiked ram bumper, cyan light bar, magenta headlights, and a cyberpunk grille texture—along with decal planes for door emblems, hazard stripes, and number markings mounted on the body sides.\n\nPlacing the door emblem and hazard stripes on the body's side panels, then adding armor plating, a roof light rack with antenna and dish, a roll cage over the bed, and a mounted turret with barrels on a pedestal.\n\nFor the rear I'm working through tail lights, exhaust thrusters with glowing orange discs, and a cyan under-glow strip along the chassis skirt. Finally I'm setting up the body paint as a dark olive gunmetal tone with noise, countershading, and wear near the lower edges.\n\nBelow 0.8 I'm adding darker mud and grime, layering camo patches that blend with the countershading so the paint function can return a nested paint result. Checking overall dimensions confirms the vehicle sits around 2.3 tall with the antenna, grounded by the pods. Now I'm writing a box helper function to simplify adding parts...\n\nStill writing parts for the bed floor and walls...\n\nNow I'm adding a gun turret to the bed with a pedestal, mount box, and twin barrels, plus thinking through how to build a roll bar using rods without explicit joint bones for static models.\n\nFor the bed accessories, I'm placing two crates with hazard textures and deciding on a simplified hover fan design using a glowing disc with rotated boxes instead of actual blades.\n\nNow I'm placing the roof details — a cyan light bar, antenna, and dish — working out their positions relative to the sloped roofline.\n\nThen I'm positioning the front bumper with spikes, adjusting its height and depth so it clears the body panel, and placing the grille texture plane just above it without overlap.\n\nHeadlights go at the corners as small glowing magenta boxes, narrowing the grille width so it fits between them. With the geometry finalized, I plan the SVG textures: diagonal hazard stripe patterns in yellow and black, plus an emblem with a circular eye and chevrons -- then move to writing the export code.\n\n",
+  "plan": null
+}
