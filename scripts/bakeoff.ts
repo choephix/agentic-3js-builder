@@ -480,18 +480,13 @@ function partPrompt(template: string, spec: Spec, part: SpecPart) {
   return template.replace(/\{(\w+)\}/g, (whole, key: string) => values[key] ?? whole);
 }
 
-/** One module from the spec and the part functions: imports merged per source, the spec's palette, mounts and
- *  skeleton, and each part's code in its own scope (so helpers of the same name never collide), called in spec
- *  order. Returns the module with its SDK imports still named `agentic-3js-builder`, and the parts that had no
- *  function. */
-function assemble(spec: Spec, parts: { part: SpecPart; code: string | null }[]) {
-  // Imports by local name. Parts can import one name from different sources (a kit name from the SDK root in one
-  // part, from its kit in another): one module keeps one, the kit's when there is one.
-  const imports = new Map<string, { from: string; item: string; typeOnly: boolean }>([
-    ["createBuilder", { from: SDK_NAME, item: "createBuilder", typeOnly: false }],
-    ["Builder", { from: SDK_NAME, item: "Builder", typeOnly: true }],
-    ["Joint", { from: SDK_NAME, item: "Joint", typeOnly: true }],
-  ]);
+type Import = { from: string; item: string; typeOnly: boolean };
+
+/** Strips every code's import statements and merges them by local name, after the `base` imports. Codes can import
+ *  one name from different sources (a kit name from the SDK root in one, from its kit in another): one module keeps
+ *  one, the kit's when there is one. Returns the import lines (`three` first) and each code without its imports. */
+function mergeImports(codes: string[], base: Import[] = []) {
+  const imports = new Map<string, Import>(base.map((i) => [i.item.split(" as ").at(-1)!.trim(), { ...i }]));
   const addImport = (from: string, item: string, typeOnly: boolean) => {
     const local = item.split(" as ").at(-1)!.trim();
     const had = imports.get(local);
@@ -499,44 +494,62 @@ function assemble(spec: Spec, parts: { part: SpecPart; code: string | null }[]) 
       imports.set(local, { from, item, typeOnly: typeOnly && (had?.from !== from || had.typeOnly) });
     else if (had.from === from && had.item === item) had.typeOnly &&= typeOnly;
   };
-  const scopes: string[] = [];
-  const missing: string[] = [];
-  for (const { part, code } of parts) {
-    const fn = code?.match(/export\s+(?:async\s+)?function\s+([A-Za-z_$][\w$]*)|export\s+const\s+([A-Za-z_$][\w$]*)/);
-    const name = fn?.[1] ?? fn?.[2] ?? code?.match(/function\s+([A-Za-z_$][\w$]*)/)?.[1];
-    if (!code || !name) {
-      missing.push(part.id);
-      continue;
-    }
-    const body = code
-      .replace(/^import\s+(type\s+)?([\s\S]*?)\s+from\s+["']([^"']+)["'];?[ \t]*\n?/gm, (_, type, what, from) => {
-        if (/^\*\s+as\s+THREE$/.test(what.trim())) return "";
-        const named = what.match(/\{([\s\S]*)\}/)?.[1] ?? "";
-        for (const item of named.split(",").map((s: string) => s.trim().replace(/\s+/g, " "))) {
-          if (!item) continue;
-          const typeOnly = Boolean(type) || item.startsWith("type ");
-          addImport(
-            from.startsWith(SDK_NAME) && !from.includes("/kits/") ? SDK_NAME : from,
-            item.replace(/^type /, ""),
-            typeOnly,
-          );
-        }
-        const rest = what
-          .replace(/\{[\s\S]*\}/, "")
-          .replace(/,\s*$/, "")
-          .trim();
-        if (rest) addImport(from, `default as ${rest}`, false);
-        return "";
-      })
-      .replace(/^export\s+(?=(?:async\s+)?function|const|let|class)/gm, "")
-      .trim();
-    scopes.push(`  // ${part.id}\n  (() => {\n${body}\n    return ${name};\n  })(),`);
-  }
+  const bodies = codes.map((code) =>
+    code.replace(/^import\s+(type\s+)?([\s\S]*?)\s+from\s+["']([^"']+)["'];?[ \t]*\n?/gm, (_, type, what, from) => {
+      if (/^\*\s+as\s+THREE$/.test(what.trim())) return "";
+      const named = what.match(/\{([\s\S]*)\}/)?.[1] ?? "";
+      for (const item of named.split(",").map((s: string) => s.trim().replace(/\s+/g, " "))) {
+        if (!item) continue;
+        const typeOnly = Boolean(type) || item.startsWith("type ");
+        addImport(
+          from.startsWith(SDK_NAME) && !from.includes("/kits/") ? SDK_NAME : from,
+          item.replace(/^type /, ""),
+          typeOnly,
+        );
+      }
+      const rest = what
+        .replace(/\{[\s\S]*\}/, "")
+        .replace(/,\s*$/, "")
+        .trim();
+      if (rest) addImport(from, `default as ${rest}`, false);
+      return "";
+    }),
+  );
   const importLines = [`import * as THREE from "three";`];
   const bySource = new Map<string, string[]>();
   for (const { from, item, typeOnly } of imports.values())
     bySource.set(from, [...(bySource.get(from) ?? []), typeOnly ? `type ${item}` : item]);
   for (const [from, items] of bySource) importLines.push(`import { ${items.join(", ")} } from "${from}";`);
+  return { importLines, bodies };
+}
+
+/** One module from the spec and the part functions: imports merged per source, the spec's palette, mounts and
+ *  skeleton, and each part's code in its own scope (so helpers of the same name never collide), called in spec
+ *  order. Returns the module with its SDK imports still named `agentic-3js-builder`, and the parts that had no
+ *  function. */
+function assemble(spec: Spec, parts: { part: SpecPart; code: string | null }[]) {
+  const missing: string[] = [];
+  const named = parts.flatMap(({ part, code }) => {
+    const fn = code?.match(/export\s+(?:async\s+)?function\s+([A-Za-z_$][\w$]*)|export\s+const\s+([A-Za-z_$][\w$]*)/);
+    const name = fn?.[1] ?? fn?.[2] ?? code?.match(/function\s+([A-Za-z_$][\w$]*)/)?.[1];
+    if (!code || !name) {
+      missing.push(part.id);
+      return [];
+    }
+    return [{ part, code, name }];
+  });
+  const { importLines, bodies } = mergeImports(
+    named.map((n) => n.code),
+    [
+      { from: SDK_NAME, item: "createBuilder", typeOnly: false },
+      { from: SDK_NAME, item: "Builder", typeOnly: true },
+      { from: SDK_NAME, item: "Joint", typeOnly: true },
+    ],
+  );
+  const scopes = named.map(({ part, name }, i) => {
+    const body = bodies[i].replace(/^export\s+(?=(?:async\s+)?function|const|let|class)/gm, "").trim();
+    return `  // ${part.id}\n  (() => {\n${body}\n    return ${name};\n  })(),`;
+  });
   const key = (name: string) => (/^[A-Za-z_$][\w$]*$/.test(name) ? name : JSON.stringify(name));
   const vec = (v: unknown) => `[${(Array.isArray(v) ? v : [0, 0, 0]).join(", ")}] as [number, number, number]`;
   const joints = spec.joints.map((joint) => {
@@ -1198,8 +1211,9 @@ export {
   applyEdits,
   extractCode,
   reportText,
+  mergeImports,
 };
-export type { Asked, CheckRecord, SnapReport };
+export type { Asked, CheckRecord, SnapReport, Gateway, Pricing };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [command, target, ...rest] = process.argv.slice(2);

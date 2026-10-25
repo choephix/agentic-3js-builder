@@ -1,0 +1,117 @@
+{
+  "id": "r33twod2fix",
+  "started": "2026-10-25T14:13:47.654Z",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "sdkCommit": "acb47020",
+  "promptsFrom": null,
+  "maxTokens": 120000,
+  "pricing": {
+    "input": 2,
+    "output": 10,
+    "cacheRead": 0.1,
+    "cacheWrite": 2.5
+  },
+  "arms": [
+    {
+      "id": "craft3",
+      "letter": "S",
+      "name": "Craft v3, subject only",
+      "idea": "Craft v2 without the staged base: the code goes to the subject",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-sdk.md",
+      "kits": true,
+      "sources": [
+        "paint.ts",
+        "texture.ts"
+      ],
+      "extra": [
+        "ambition2.md",
+        "craft3.md"
+      ]
+    },
+    {
+      "id": "flat",
+      "letter": "T",
+      "name": "Craft v3, flat colour only",
+      "idea": "craft3 with every texture ask cut: texture-free copies of contract, taste, ambition2 and craft3 that ask for one flat colour per part and detail carried by geometry, and no paint.ts or texture.ts source",
+      "contract": "contract-flat.md",
+      "context": "docs",
+      "taste": "taste-sdk-flat.md",
+      "kits": true,
+      "extra": [
+        "ambition2-flat.md",
+        "craft3-flat.md"
+      ]
+    },
+    {
+      "id": "twostage",
+      "letter": "W",
+      "name": "Two-stage build with requests",
+      "idea": "Stage 1: one call on the flat arm's system prompt plus two-stage1.md writes the whole model in flat colours, ending with a request list (details to add and textures to paint, each tied to a part and a place) and a STAGE2 hook, and renders on its own (first pixel). Stage 2, all at once on craft3's system prompt: the add requests in up to 6 calls that each return one function appended to the module, and the texture requests in one SEARCH/REPLACE edit call on stage 1's code; the runner merges them into one module.",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-sdk.md",
+      "kits": true,
+      "sources": [
+        "paint.ts",
+        "texture.ts"
+      ],
+      "extra": [
+        "ambition2.md",
+        "craft3.md"
+      ],
+      "twostage": {
+        "stage1Arm": "flat",
+        "stage1": "two-stage1.md",
+        "add": "two-add.md",
+        "texture": "two-texture.md",
+        "maxAddCalls": 6
+      }
+    }
+  ],
+  "subjects": [
+    {
+      "id": "truck2077",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: futuristic militarized truck from 2077.\nStyle: low-poly cyberpunk, extremely intricate.",
+      "rich": "Category: Vehicle.\nSubject: futuristic militarized truck from 2077.\nStyle: low-poly cyberpunk, extremely intricate."
+    },
+    {
+      "id": "convoyHauler",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk.",
+      "rich": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk."
+    },
+    {
+      "id": "railgunCarrier",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military.",
+      "rich": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military."
+    },
+    {
+      "id": "riotInterceptor",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: corporate riot-control interceptor with a water cannon and neon light bars.\nStyle: Cyberpunk 2077.",
+      "rich": "Category: Vehicle.\nSubject: corporate riot-control interceptor with a water cannon and neon light bars.\nStyle: Cyberpunk 2077."
+    },
+    {
+      "id": "hoverPickup",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+      "rich": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk."
+    }
+  ],
+  "twostageRunner": "scripts/twostage.ts",
+  "refineFrom": "r33twod2",
+  "views": [
+    "three-quarter",
+    "front",
+    "side",
+    "low"
+  ],
+  "critique": "refine-critique.md",
+  "critic": null,
+  "systemPromptOverride": null
+}

@@ -1,0 +1,26 @@
+{
+  "slug": "r33twoTruck2077RichCraft3",
+  "arm": "craft3",
+  "subject": "truck2077",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: futuristic militarized truck from 2077.\nStyle: low-poly cyberpunk, extremely intricate.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T14:09:18.247Z",
+  "wallMs": 83360,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 84140,
+    "completion_tokens": 11970,
+    "total_tokens": 96110,
+    "prompt_tokens_details": {
+      "cached_tokens": 84136
+    }
+  },
+  "costUsd": 0.1281216,
+  "hasCode": true,
+  "reasoning": "I'm planning out a single TypeScript module for a static truck model—roughly 7m long, 2.6m wide, 3m tall, facing +Z, with simple wheel geometry and no joints needed since it's not a creature rig.\n\nNow I'm sketching out the specific components: a dark box chassis, an angular wedge cab with sloped windshield built from an extruded profile, an armored cargo bed with a turret ring and missile pod, and six cylindrical wheels arranged across three axles with glowing cyan hub rims and dark tires.\n\nI'm layering on the finishing details—wheel arches, glowing headlight strips, SVG decal textures on the cargo sides and front grille, a lathe-based turret with twin barrel cylinders, roof-mounted missile tubes, plus antennas, exhaust stacks, fuel tanks, angled armor plates, neon underglow strips, and red tail lights.\n\nNow I'm settling on the color palette—gunmetal, olive-black, neon cyan/magenta accents, hazard yellow—and planning the texture set (hazard stripes, side emblem reading \"NOMAD-77\", HUD windshield, grille, plate), pulling panelled metal materials from the clockwork kit for the hull while making sure wheels sit flush on the floor.\n\nNow I'm sketching out helper functions for building box parts with position and rotation, treating this as a static model that can skip joint bones, and working out the cab's extruded outline profile in the z-y plane to shape the hood, windshield, and roof lines.\n\nWorking out the windshield angle and rotation direction so the slope leans toward -z at the top, computing the tilt needed on the X axis...\n\nI'm positioning the windshield plane with its HUD texture outward along the rotated normal, then setting up the cargo box dimensions behind it.\n\nNow I'm detailing the side panels with ribbing, and working out the wheel assemblies — tires, hub caps, and lug bolts — placing them symmetrically on both sides using axle positions in the yz plane.\n\nI'm reworking the overall proportions so the chassis half-width, wheel placement, and cab thickness avoid overlap, then adding fender boxes positioned above each wheel to cover the tire tops.\n\nFactoring in the turret on top of the cargo bed, total height comes to around 3.9 units, reasonable for a military truck silhouette. Now I'm writing the turret geometry -- a lathe-based mount, a boxy body with a sensor glass, and twin cylindrical barrels angled to aim forward, plus muzzle brake details and a rocket pod attachment.\n\nAdding rocket pods and radar...\n\nStill placing details...\n\nFor the rear I'm adding a hazard door plane facing backward, red glow tail lights, and a plate. On the roof I'm placing the light bar, sensors, a camera dome, cargo ridges, vents, antennas, cab armor plates with neon trim edges, door seams, and mirror arms—keeping in mind glow effects only apply to flat-color parts.\n\nNow I'm adding a horizontal cyan neon stripe to the cargo side panel, plus bolted gunmetal plates of varying heights and an emblem texture plate on each side. I'm sketching out the emblem SVG with \"NOVA-77 ARMORED\" text, a hexagon outline, chevrons, and a number, plus a separate hazard-stripe texture with diagonal yellow/black pattern fills.\n\nFor the windshield, I'm going with an opaque dark teal background with cyan grid lines, a small horizon line, and a \"2077-WAR\" plate text, keeping total color count manageable. For the grille I'm adding dark slits with magenta accent lines.\n\nI'm confirming the rotation array format is [x,y,z] in degrees, and that the plane helper prioritizes direction vectors over rotation for orientation -- so I'll use a direction vector for the windshield plane, but switch to explicit rotation for the angled glass boxes sitting on it.\n\nTime to write the actual code now.\n\n",
+  "plan": null
+}
