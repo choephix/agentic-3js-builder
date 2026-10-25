@@ -52,6 +52,8 @@ type Arm = {
   sources?: string[];
   /** Sampler files (names in catalogs/, without `.ts`) appended last as read-only recipes, board code cut. */
   samplers?: string[];
+  /** With `samplers`: only each file's header menu (slots and one line per construction), no code. */
+  samplerMenu?: boolean;
   /** A prompt file in bakeoff/prompts/: the model first writes a build sheet from it, then the module. */
   plan?: string;
 };
@@ -127,19 +129,25 @@ function sourcesContext(files: string[]) {
   return `# Selected SDK source\n\nThese files are part of the module \`"${SDK_NAME}"\`.\n\n${body}`;
 }
 
-/** Samplers as the model reads them: SDK imports renamed, the cull-board section and its helpers cut. */
-function samplersContext(names: string[]) {
+/** Samplers as the model reads them: SDK imports renamed, the headers' copy-this instructions and the cull-board
+ *  section cut. */
+function samplersContext(names: string[], menu = false) {
   const body = names
     .map((name) => {
       const text = cleanDoc(read(`catalogs/${name}.ts`))
         .replace(/^import .* from "\.\/board";\n/gm, "")
         .replace(/(["'])\.\.\/kits\/([a-z]+)\1/g, `"${SDK_NAME}/kits/$2"`)
         .replace(/(["'])\.\.\/src\/[a-z]+\1/g, `"${SDK_NAME}"`)
-        .replace(/\n\/\/ -+ boards?\n[\s\S]*$/, "\n");
+        .replace(/\n\/\/ -+ boards?\n[\s\S]*$/, "\n")
+        .replace(/ \* Pick the parts you like, copy [\s\S]*? per pick\. /, " * ")
+        .replace(/: copy them with a variant\./, ".")
+        .replace(/ Each recipe is a plain function; copy what you use\./, "");
+      if (menu) return `## Sampler menu: catalogs/${name}.ts\n\n${text.slice(0, text.indexOf("\n */") + 4)}`;
       return `## Sampler: catalogs/${name}.ts\n\n\`\`\`ts\n${text.trimEnd()}\n\`\`\``;
     })
     .join("\n\n");
-  return `# Samplers\n\nRead-only recipe files. Your module can't import them: copy what you use into it.\n\n${body}`;
+  if (menu) return `# Sampler menus\n\n${body}`;
+  return `# Samplers\n\nReference only. Your module imports \`three\` and the SDK.\n\n${body}`;
 }
 
 function systemPrompt(arm: Arm) {
@@ -150,7 +158,7 @@ function systemPrompt(arm: Arm) {
   if (ref) parts.push(ref);
   if (arm.kits) parts.push(kitsContext());
   if (arm.sources?.length) parts.push(sourcesContext(arm.sources));
-  if (arm.samplers?.length) parts.push(samplersContext(arm.samplers));
+  if (arm.samplers?.length) parts.push(samplersContext(arm.samplers, arm.samplerMenu));
   return `${parts.map((part) => part.trim()).join("\n\n")}\n`;
 }
 
