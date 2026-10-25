@@ -246,6 +246,7 @@ export function ventScoop(b: Builder, m: Mount, c: Roles) {
   b.frustumBox(f.local([0, 0.0, -0.2]), f.local([0, 0.0, 0.2]), [0.4, 0.02], [0.5, 0.22], {
     bone: m.bone,
     color: c.trim,
+    up: m.n,
   }); // wedge, rising along w
   b.part(box(0.44, 0.16, 0.03), c.dark, { frame: f.moved([0, 0.1, 0.22]), bone: m.bone }); // open mouth
   for (const u of [-0.15, 0, 0.15])

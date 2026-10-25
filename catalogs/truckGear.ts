@@ -246,7 +246,8 @@ function coil(b: Builder, bone: Joint, c: Roles, from: V3, to: V3, r: number, n:
     b.part(new THREE.TorusGeometry(r, r * 0.18, 5, 8), c.steel, {
       bone,
       at: [from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t, from[2] + (to[2] - from[2]) * t],
-      rotation: [90, 0, 0],
+      dir: [to[0] - from[0], to[1] - from[1], to[2] - from[2]],
+      axis: "z",
     });
   }
 }
@@ -563,7 +564,7 @@ export function headlightCowl(b: Builder, m: Mount, c: Roles) {
   b.part(new THREE.CylinderGeometry(0.16, 0.16, 0.26, 8, 1, false, -Math.PI / 2, Math.PI), c.trim, {
     bone: B,
     at: [x, y, z - 0.1],
-    rotation: [90, 0, 0],
+    rotation: [-90, 0, 0],
     flat: true,
   }); // half-cylinder hood, open underneath, axis along Z
   b.part(cyl(0.14, 0.2, 10), c.dark, { bone: B, at: [x, y - 0.02, z - 0.14], rotation: [90, 0, 0], flat: true });
@@ -689,8 +690,8 @@ export function mirrorStalk(b: Builder, m: Mount, c: Roles) {
   const s = m.s;
   for (const dy of [0, -0.12])
     b.rod([x, y + dy, z], [x + s * 0.3, y + 0.05 + dy, z + 0.05], 0.015, c.steel, { bone: m.bone, sides: 6 });
-  b.part(box(0.04, 0.26, 0.2), c.dark, { bone: m.bone, at: [x + s * 0.32, y, z + 0.05] });
-  b.part(box(0.01, 0.22, 0.16), c.glass, { bone: m.bone, at: [x + s * 0.32, y, z + 0.075] });
+  b.part(box(0.2, 0.26, 0.04), c.dark, { bone: m.bone, at: [x + s * 0.32, y, z + 0.05] });
+  b.part(box(0.16, 0.22, 0.01), c.glass, { bone: m.bone, at: [x + s * 0.32, y, z + 0.025] });
 }
 
 export function mirrorCamera(b: Builder, m: Mount, c: Roles) {
@@ -698,7 +699,7 @@ export function mirrorCamera(b: Builder, m: Mount, c: Roles) {
   const s = m.s;
   b.part(box(0.14, 0.05, 0.08), c.dark, { bone: m.bone, at: [x + s * 0.06, y, z] });
   b.part(new THREE.SphereGeometry(0.06, 8, 6), c.trim, { bone: m.bone, at: [x + s * 0.16, y, z], flat: true });
-  b.part(cyl(0.025, 0.05, 8), c.dark, { bone: m.bone, at: [x + s * 0.16, y, z + 0.06], rotation: [90, 0, 0] }); // lens
+  b.part(cyl(0.025, 0.05, 8), c.dark, { bone: m.bone, at: [x + s * 0.16, y, z - 0.06], rotation: [90, 0, 0] }); // rear-view lens
 }
 
 export const mirrors = { stalk: mirrorStalk, camera: mirrorCamera };

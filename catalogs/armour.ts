@@ -533,7 +533,7 @@ export function visionSlit(b: Builder, m: Mount, c: Roles) {
 
 export function visionBlock(b: Builder, m: Mount, c: Roles) {
   const f = frame(m.at, m.n);
-  const tilt = f.quat.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -0.35));
+  const tilt = f.quat.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), 0.35));
   b.part(box(0.6, 0.06, 0.2), c.dark, { frame: f.moved([0, 0.03, 0]), bone: m.bone });
   for (const u of [-0.19, 0, 0.19]) {
     b.part(box(0.16, 0.08, 0.14), c.glass, { at: f.local([u, 0.09, 0]), quat: tilt, bone: m.bone });
@@ -569,10 +569,10 @@ export const visions = { slit: visionSlit, block: visionBlock, periscope: vision
 // ---------------------------------------------------------------- smoke launchers (top face; fire forward = -w)
 
 function tube(b: Builder, m: Mount, c: Roles, f: Frame, u: number, w: number, r = 0.03) {
-  b.rod(f.local([u, 0.04, w]), f.local([u, 0.24, w - 0.16]), r, c.weapon, { bone: m.bone, sides: 7 });
+  b.rod(f.local([u, 0.04, w]), f.local([u - m.s * 0.08, 0.24, w - 0.16]), r, c.weapon, { bone: m.bone, sides: 7 });
   b.part(cyl(r * 1.2, 0.03, 7), c.dark, {
-    at: f.local([u, 0.25, w - 0.17]),
-    dir: f.dir([0, 0.78, -0.62]),
+    at: f.local([u - m.s * 0.084, 0.25, w - 0.168]),
+    dir: f.dir([-m.s * 0.08, 0.2, -0.16]),
     bone: m.bone,
   });
 }

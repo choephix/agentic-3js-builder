@@ -442,7 +442,7 @@ export function rifleCarbine(b: Builder, m: Mount, c: Roles) {
   b.rod([x, y + 0.01, z + 0.2], [x, y + 0.01, z + 0.48], 0.02, c.dark, { bone: B, sides: 8 });
   glow(b.part(cyl(0.025, 0.02, 8), c.light, { bone: B, at: [x, y + 0.01, z + 0.48], rotation: [90, 0, 0] }));
   b.part(box(0.05, 0.1, 0.22), c.dark, { bone: B, at: [x, y - 0.02, z - 0.3] }); // stock
-  b.part(box(0.04, 0.12, 0.05), c.dark, { bone: B, at: [x, y - 0.1, z - 0.06], rotation: [-15, 0, 0] }); // grip
+  b.part(box(0.04, 0.12, 0.05), c.dark, { bone: B, at: [x, y - 0.1, z - 0.06], rotation: [15, 0, 0] }); // grip
   b.part(box(0.04, 0.14, 0.06), c.steel, { bone: B, at: [x, y - 0.1, z + 0.08], rotation: [10, 0, 0] }); // magazine
   b.part(box(0.05, 0.04, 0.16), c.steel, { bone: B, at: [x, y - 0.05, z + 0.3] }); // foregrip rail
 }
@@ -459,7 +459,7 @@ export function rifleLong(b: Builder, m: Mount, c: Roles) {
   for (const s of [1, -1])
     b.rod([x, y - 0.02, z + 0.35], [x + s * 0.08, y - 0.2, z + 0.38], 0.008, c.steel, { bone: B, sides: 5 }); // bipod
   b.part(box(0.05, 0.1, 0.24), c.dark, { bone: B, at: [x, y - 0.02, z - 0.4] });
-  b.part(box(0.04, 0.12, 0.05), c.dark, { bone: B, at: [x, y - 0.1, z - 0.18], rotation: [-15, 0, 0] });
+  b.part(box(0.04, 0.12, 0.05), c.dark, { bone: B, at: [x, y - 0.1, z - 0.18], rotation: [15, 0, 0] });
 }
 
 export function rifleBullpup(b: Builder, m: Mount, c: Roles) {
@@ -467,7 +467,7 @@ export function rifleBullpup(b: Builder, m: Mount, c: Roles) {
   const B = m.bone;
   b.part(box(0.07, 0.1, 0.5), c.weapon, { bone: B, at: [x, y, z - 0.1] }); // long receiver reaching the shoulder
   b.part(box(0.04, 0.16, 0.05), c.steel, { bone: B, at: [x, y - 0.12, z - 0.2], rotation: [10, 0, 0] }); // magazine behind the grip
-  b.part(box(0.04, 0.12, 0.05), c.dark, { bone: B, at: [x, y - 0.1, z + 0.02], rotation: [-15, 0, 0] }); // grip
+  b.part(box(0.04, 0.12, 0.05), c.dark, { bone: B, at: [x, y - 0.1, z + 0.02], rotation: [15, 0, 0] }); // grip
   b.rod([x, y + 0.06, z - 0.3], [x, y + 0.06, z + 0.05], 0.015, c.dark, { bone: B, sides: 6 }); // carry handle
   for (const dz of [-0.3, 0.05]) b.part(box(0.03, 0.05, 0.03), c.dark, { bone: B, at: [x, y + 0.045, z + dz] });
   b.rod([x, y + 0.01, z + 0.15], [x, y + 0.01, z + 0.4], 0.022, c.dark, { bone: B, sides: 8 });
@@ -486,7 +486,8 @@ export function rackClip(b: Builder, m: Mount, c: Roles) {
       at: f.local([u, 0.12, 0]),
       quat: f.quat
         .clone()
-        .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2 + 0.95)),
+        .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2))
+        .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI * 0.8)), // axis along the rifle, gap outward
       bone: m.bone,
     });
   return {
@@ -504,8 +505,11 @@ export function rackCradle(b: Builder, m: Mount, c: Roles) {
   b.part(box(0.7, 0.16, 0.03), c.steel, { frame: f.moved([0, 0.08, -0.08]), bone: m.bone }); // shelf
   for (const u of [-0.22, 0.22])
     b.part(new THREE.TorusGeometry(0.06, 0.012, 5, 10, Math.PI), c.steel, {
-      at: f.local([u, 0.12, -0.06]),
-      quat: f.quat.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2)),
+      at: f.local([u, 0.12, 0]),
+      quat: f.quat
+        .clone()
+        .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 2))
+        .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), -Math.PI / 2)), // cradle below the rifle, open upward
       bone: m.bone,
     });
   b.part(box(0.04, 0.14, 0.02), c.tyre, { frame: f.moved([0, 0.12, 0.02]), bone: m.bone }); // strap
