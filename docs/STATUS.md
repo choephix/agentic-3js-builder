@@ -8,6 +8,8 @@ Five vehicle pitches near the catalogs' own prompt (`bakeoff/pitches-r26.json`: 
 
 r26's sampler text told the model to copy recipes and build only the body itself; Stefan's intent is that everything is the model's own. r27/r28 rerun with that intent (`sampler2.md`) plus two ablations, two draws each: `sampler2nomat` (no `materials2077.ts`) and `samplermenu` (header menus only, `samplerMenu: true`). The materials sampler is where the time and the palette lifting come from: without it, 32 s against the control's 24 s. Readings in `docs/SPEED.md`.
 
+r29 targets level of detail (`detail.md`: every part gets invented details, and those get details of their own) with and without the four vehicle samplers (no materials sampler, `sampler4.md`). With the samplers: 60 s against 111 s for the same ~6k triangles. Readings in `docs/SPEED.md`.
+
 ## r25fable: Fable 5.1 single-runs at low, 2026-10-25
 
 Five r24 briefs (ramen stall, mimic chest, alebrije, zeppelin, tin robot), one request each, run one at a time, `craft3` arm, low effort, through `npm run bakeoff -- run r25fable --model anthropic/claude-fable-5-1`. Medians 6.9 min, 28.9k output tokens, 22.8 KB, $1.47 (total $8.06); Sonnet at high on the same briefs: 7.4 min, $0.74. All 5 render; one type error. Routed to stefan@revoltage.io (Fable meter 28 → 30). Numbers and readings in `docs/SPEED.md`.

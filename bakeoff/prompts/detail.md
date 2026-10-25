@@ -1,0 +1,3 @@
+## Level of detail
+
+Detail is what this build is judged on. Every part gets new details invented for it and added on top, and those details get details of their own. A wheel is a tyre with tread blocks, a rim with spokes, a hub with lug nuts in a recessed ring, a valve stem. A door is a panel with seams, a handle in its recess, hinges, a window in its frame, a stencilled number with a dark outline. An armour plate has chamfered edges, bolts, a weld seam, a scuffed warning mark. Build a part, ask what it is made of, what is fastened to it and what has happened to it, and add that, two or three layers deep, on every part the viewer sees. Each part ends up visibly richer than its plain shape.
