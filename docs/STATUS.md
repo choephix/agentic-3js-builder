@@ -10,6 +10,8 @@ r26's sampler text told the model to copy recipes and build only the body itself
 
 r29 targets level of detail (`detail.md`: every part gets invented details, and those get details of their own) with and without the four vehicle samplers (no materials sampler, `sampler4.md`), four draws each. With the samplers: 61 s against 95 s for about the same ~6k triangles. Readings in `docs/SPEED.md`.
 
+`r30`/`r30d2` rerun the unchanged `sampler2nomat` arm at high effort: medians 505 s, 68.2k output tokens, 30.1 KB and 15.5k triangles against low effort's 32 s, 4.9k, 7.9 KB and 3.8k triangles, with 2/10 first-render crashes, one of two low-effort repairs successful, and $10.14 total spend.
+
 ## r25fable: Fable 5.1 single-runs at low, 2026-10-25
 
 Five r24 briefs (ramen stall, mimic chest, alebrije, zeppelin, tin robot), one request each, run one at a time, `craft3` arm, low effort, through `npm run bakeoff -- run r25fable --model anthropic/claude-fable-5-1`. Medians 6.9 min, 28.9k output tokens, 22.8 KB, $1.47 (total $8.06); Sonnet at high on the same briefs: 7.4 min, $0.74. All 5 render; one type error. Routed to stefan@revoltage.io (Fable meter 28 → 30). Numbers and readings in `docs/SPEED.md`.
