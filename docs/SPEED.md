@@ -75,10 +75,25 @@ Readings:
 ## Stefan's hypotheses, answered
 
 - **"Is it 90% thinking?"** Yes: ~86% of billed output at high effort, ~7 of 8 minutes. The module itself is already about one minute.
-- **"Yield a partial result without textures first."** Textures are 14–25% of the code, so a texture-last ordering shaves ≤15 s off the ~68 s of code, and only once thinking is down. Nothing is runnable until `build()` closes, so staging needs three things together: low effort, an emission order the model keeps (skeleton and masses first, paint last), and an SDK call that paints an already-built assembly by part name. Rated E6 below: worth doing after the examples result, not before.
+- **"Yield a partial result without textures first."** Measured at medium (`r32flat`): a prompt without texture asks cut thinking 39% and time from 141 s to 89 s, far more than the ≤15 s of writing estimated here before; the saving is thinking, not code. Textures can come back in a second pass: the model writes no UVs, since every SDK helper gives its surface paint coordinates (`docs/conventions.md`, "Paint surface coordinates") and a texture is an option on the part call. See "Two-stage build with requests" below.
 - **"Put the plan in the output."** The thinking summaries show what the 55k tokens do: the build sheet (skeleton plan, limb placement, numbers). A bounded visible build sheet (≤40 lines) is the standard substitute for thinking when thinking is off, and it survives any reordering we impose on the code. It is cheap (~1k tokens, ~8 s) and worth one arm (E4). It is not the lever: the lever is removing the 55k.
 - **"Maybe I'm overthinking it."** My read: the hidden thinking and a visible plan don't stack well while adaptive thinking is on (the model thinks and then writes the plan it already made). Low effort stays the floor because quality is the bar (Stefan, 2026-10-25), so the remaining cut has to come from the model needing less deliberation: examples and templates, measured as billed thinking at low. Plan-vs-no-plan is a smaller question after that.
 - **"Build more machinery beforehand; examples and templates."** The no-thinking crashes are exactly the class that in-context code fixes (the model copies field names and argument shapes it has seen) and that machinery fixes (fewer shapes to guess). Stefan's refinement, a parts catalog per topology, is the E2 pilot below; it is template and examples in one. The copying risk is measurable without taste: n-gram overlap with the catalog in context.
+
+## Routes to explore (Stefan, 2026-10-25)
+
+Not run yet. For the next runs Stefan wants low effort before high, and builds no slower than medium's ~2.5 min.
+
+**Two-stage build with requests.** Stage 1 builds the model in flat colours and ends with a list of requests for stage 2: details to add and textures to paint, each tied to a part and a place. Asking for the list tells stage 1 that a second stage is coming, so it leaves room for what it requested instead of building emblems and stripes as geometry (the `r32flat` prompt asked for exactly that). Stage 2 works through the list, plus a share of its own ideas, instead of inventing at random. The list also makes stage 2 parallel: each request is one call, all run at once, assembled like parallel parts (`scripts/bakeoff.ts`, `assemble`).
+
+- Requests that add parts are append-only and parallelise cleanly: each carries its anchor (a mount or frame on a stage-1 part) and what to build there; its call returns one function; the assembler appends it.
+- Requests that change an existing part (a texture on the cab door) need an edit to stage 1's code, which parallel calls can't make safely. They run as one sequential edit call, or the SDK gets a call that paints an already-built part by name (E6's missing piece), which makes them append-only too.
+- Measure: stage 1's time and thinking with the request list against `r32flat` (the list may bring some texture thinking back); stage 2's wall time; whether stage 2's additions land where stage 1 left room (loose parts, envelope). Variant: stage 1 as parallel parts.
+
+**Haiku render loop.** Neither agentic nor a single run. Haiku 5.5 at low effort writes a module; it is rendered to one contact sheet with every view; the next single call gets the sheet (from the second turn on, the before and after sheets) and is told to fix what is wrong and add detail; repeat a fixed number of turns (20), since nothing decides when it is done. Variant: a fix call and an add call per turn, in parallel. The output is a page with a slider over the 20 frames, to see how the model evolved or got worse. In an app each frame replaces the model on screen, so the user watches it build itself. Best case: Sonnet-high quality at the same or lower time and price.
+
+- Mostly existing machinery: `refine` with `--views` sends the renders and takes SEARCH/REPLACE edits (`prompts/refine-critique.md`), so 20 chained `refine` rounds with `--model` Haiku are the driver. New: the before/after pair in the prompt, the slider page, and the fix/add pair (two edits from one base can collide; alternating fix and add turns avoids that).
+- Starting facts: Haiku streams ~210 tok/s. Haiku-100 (agentic, high effort) made complete but simpler builds, about half Sonnet's parts and triangles. Sonnet critique turns improved their input in phase 1, but by model judges, so that is unconfirmed.
 
 ## Zero-token prep (do before the next burn)
 
@@ -112,6 +127,8 @@ Yield = how far it can move first-pixel and full-build time with quality holding
 Order of play for a session: P1, P3, P4 and P5 first (harness work and picking, no model tokens), then E2 (which contains E1), then E5 or E3 depending on E2, then whichever of E4/E7/E8 the numbers make interesting. E6 and E9 wait.
 
 ## Catalog pilot (E2), design
+
+**Dropped for good (Stefan, 2026-10-25).** No speed gain at low, medium or high effort, no visible gain, and a risk of samey builds. `catalogs/` stays in the repo as a record only.
 
 Stefan's idea (2026-10-25), replacing whole-module examples: a **sampler** is one whole subject with everything for that subject on it: a complete base (a pickup) with several constructions of each of its parts attached and named by slot and variant (`wheelOffroad`, `wheelSpoked`, `headlightSlit`, `cabBoxy`). A cheap router (or a tag match) picks a few samplers whose subjects the prompt should borrow from, and the builder blends them into the requested subject: it picks the parts it likes and makes them its own, with an instruction to exaggerate and blend, not take as is. The test hand-picks the samplers.
 
