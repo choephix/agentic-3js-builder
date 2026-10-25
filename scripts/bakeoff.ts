@@ -5,7 +5,8 @@
 //
 //   npm run bakeoff -- prompt <arm>                       write the arm's system prompt to scratch/ and print its size
 //   npm run bakeoff -- run <round> [options]              ask the model for every missing (arm, subject, level) build
-//   npm run bakeoff -- check <round>                      typecheck and render every build without a render yet
+//   npm run bakeoff -- check <round>                      typecheck and render every build without a render yet;
+//                                                         builds checked with --skip-typecheck get their type errors
 //   npm run bakeoff -- refine <round> --from <round>[,…]  one feedback turn for every build of the source round(s)
 //   npm run bakeoff -- results <round>                    rebuild results.json from the run and check records
 //
@@ -16,6 +17,7 @@
 // refine options: --model, --effort (high), --max-tokens 64000, --arms, --concurrency 8
 //   --views three-quarter,front,side,low (snap shots sent as images) --critique <file in bakeoff/prompts/>
 //   (refine-critique.md) --critic <provider/id> (another model writes the change list) --repair-only (failed builds)
+//   --types: type errors count as failures and go into the repair turn (refine-types.md); off by default
 //
 // Everything lands in bakeoff/rounds/<round>/: round.json (model, effort, arms, pitches as run), prompts/<arm>.md
 // (the exact system prompts), runs/<slug>.json (request, reply, usage, cost, timing), runs/<slug>.md (the reply),
@@ -393,21 +395,38 @@ function findReport(slug: string) {
 async function check(round: string, args: string[]) {
   const dir = join(BAKEOFF, "rounds", round);
   const tsx = join(ROOT, "node_modules/.bin/tsx");
-  const builds = readdirSync(join(dir, "builds"))
+  const skipTypes = args.includes("--skip-typecheck");
+  const concurrency = Number(option(args, "concurrency", "2"));
+  const checkPath = (slug: string) => join(dir, "checks", `${slug}.json`);
+  const typecheck = async (file: string) => {
+    const types = await capture(tsx, ["scripts/typecheck.ts", file], 180_000);
+    // Unused names (TS6133) are style, not API mistakes.
+    return [...`${types.stdout}\n${types.stderr}`.matchAll(/^.*error TS(?!6133)\d+:.*$/gm)].map((m) => m[0]);
+  };
+  const typeFields = (errors: string[] | null) => ({
+    typeErrors: errors ? errors.length : null,
+    typecheckSkipped: !errors,
+    typeErrorSample: (errors ?? []).slice(0, 20).map((line) => line.replace(`${ROOT}/`, "")),
+  });
+  const slugs = readdirSync(join(dir, "builds"))
     .filter((name) => name.endsWith(".ts"))
-    .map((name) => name.slice(0, -3))
-    .filter((slug) => !existsSync(join(dir, "checks", `${slug}.json`)));
+    .map((name) => name.slice(0, -3));
+  // Builds rendered by a `--skip-typecheck` check get their type errors filled in, without a new render.
+  const untyped = skipTypes
+    ? []
+    : slugs.filter((slug) => existsSync(checkPath(slug)) && readJson<CheckRecord>(checkPath(slug)).typecheckSkipped);
+  if (untyped.length) console.log(`${untyped.length} checked builds to typecheck.`);
+  await pool(untyped, concurrency, async (slug) => {
+    const errors = await typecheck(join(dir, "builds", `${slug}.ts`));
+    writeJson(checkPath(slug), { ...readJson<CheckRecord>(checkPath(slug)), ...typeFields(errors) });
+    console.log(`${slug}: ${errors.length} type errors`);
+  });
+  const builds = slugs.filter((slug) => !existsSync(checkPath(slug)));
   console.log(`${builds.length} builds to check.`);
   let done = 0;
-  await pool(builds, Number(option(args, "concurrency", "2")), async (slug) => {
+  await pool(builds, concurrency, async (slug) => {
     const file = join(dir, "builds", `${slug}.ts`);
-    const types = args.includes("--skip-typecheck")
-      ? { stdout: "", stderr: "" }
-      : await capture(tsx, ["scripts/typecheck.ts", file], 180_000);
-    // Unused names (TS6133) are style, not API mistakes.
-    const typeErrors = [...`${types.stdout}\n${types.stderr}`.matchAll(/^.*error TS(?!6133)\d+:.*$/gm)].map(
-      (m) => m[0],
-    );
+    const typeErrors = skipTypes ? null : await typecheck(file);
     let render = await capture(tsx, ["scripts/snap.ts", file, "v01"]);
     // A dropped connection to the shared browser is not the build's fault: try once more.
     if (/do not launch your own browser/.test(render.stdout + render.stderr)) {
@@ -422,11 +441,9 @@ async function check(round: string, args: string[]) {
       console.log(`${slug}: shared browser unreachable, left unchecked`);
       return;
     }
-    writeJson(join(dir, "checks", `${slug}.json`), {
+    writeJson(checkPath(slug), {
       slug,
-      typeErrors: args.includes("--skip-typecheck") ? null : typeErrors.length,
-      typecheckSkipped: args.includes("--skip-typecheck"),
-      typeErrorSample: typeErrors.slice(0, 8).map((line) => line.replace(`${ROOT}/`, "")),
+      ...typeFields(typeErrors),
       rendered: Boolean(report),
       lane: found?.lane ?? null,
       renderError: report ? null : output.trim().split("\n").slice(-25).join("\n"),
@@ -443,7 +460,7 @@ async function check(round: string, args: string[]) {
     });
     done++;
     console.log(
-      `[${done}/${builds.length}] ${slug}: ${typeErrors.length} type errors, ${report ? `rendered (${report.triangles} tris)` : "RENDER FAILED"}`,
+      `[${done}/${builds.length}] ${slug}: ${typeErrors ? `${typeErrors.length} type errors` : "typecheck skipped"}, ${report ? `rendered (${report.triangles} tris)` : "RENDER FAILED"}`,
     );
   });
   results(round);
@@ -462,7 +479,14 @@ type SnapReport = {
   issues: { level: string; message: string }[];
   loose?: { clusters: { label: string; gap: number; nearest?: { name: string } }[] };
 };
-type CheckRecord = { rendered: boolean; lane: string | null; renderError: string | null };
+type CheckRecord = {
+  rendered: boolean;
+  lane: string | null;
+  renderError: string | null;
+  typeErrors: number | null;
+  typecheckSkipped: boolean;
+  typeErrorSample: string[];
+};
 type RunRecord = {
   arm: string;
   subject: string;
@@ -517,6 +541,9 @@ async function refine(round: string, args: string[]) {
   const critique = option(args, "critique", "refine-critique.md");
   const criticModel = option(args, "critic", "");
   const only = list(option(args, "arms", ""));
+  // `--types`: a build with type errors counts as failed even when it rendered; the repair turn gets the errors.
+  const types = args.includes("--types");
+  const failed = (checked: CheckRecord) => !checked.rendered || (types && (checked.typeErrors ?? 0) > 0);
   const sources = new Map<string, { from: string; src: string; slug: string }>();
   for (const from of froms) {
     const src = join(BAKEOFF, "rounds", from);
@@ -535,9 +562,18 @@ async function refine(round: string, args: string[]) {
     )
     .filter(
       ({ src, slug }) =>
-        !args.includes("--repair-only") || !readJson<CheckRecord>(join(src, "checks", `${slug}.json`)).rendered,
+        !args.includes("--repair-only") || failed(readJson<CheckRecord>(join(src, "checks", `${slug}.json`))),
     )
     .filter(({ slugOut }) => !existsSync(join(dir, "runs", `${slugOut}.json`)));
+  if (types) {
+    const untyped = todo.filter(
+      ({ src, slug }) => readJson<CheckRecord>(join(src, "checks", `${slug}.json`)).typecheckSkipped,
+    );
+    if (untyped.length)
+      console.log(
+        `${untyped.length} source builds were never typechecked (run \`check\` on their round): ${untyped.map((t) => t.slug).join(", ")}`,
+      );
+  }
   const cost = await pricing(model);
   const criticCost = criticModel ? await pricing(criticModel) : undefined;
   const sourceManifest = readJson<Record<string, unknown>>(join(BAKEOFF, "rounds", froms.at(-1)!, "round.json"));
@@ -575,7 +611,8 @@ async function refine(round: string, args: string[]) {
       .replace(/(["'])(?:\.\.\/)+kits\/([a-z]+)\1/g, `"${SDK_NAME}/kits/$2"`)
       .replace(/(["'])(?:\.\.\/)+src\/index\1/g, `"${SDK_NAME}"`);
     const snaps = checked.lane && join(SNAPS, slug, checked.lane, "snaps");
-    const mode = checked.rendered && snaps ? "critique" : "repair";
+    const mode = failed(checked) || !snaps ? "repair" : "critique";
+    const typeErrors = types ? (checked.typeErrors ?? 0) : 0;
     // Props have no head close-up: send the views this build's snap wrote.
     const shown = snaps ? views.filter((view) => existsSync(join(snaps, `v01-${view}.png`))) : [];
     const images = shown.flatMap((view) => [
@@ -627,9 +664,27 @@ async function refine(round: string, args: string[]) {
                 .trim()}\n\n${edits}`,
             },
           ]
-        : `${read("bakeoff/prompts/refine-repair.md")
-            .replace("{error}", (checked.renderError ?? "no render").replace(`${ROOT}/`, ""))
-            .trim()}\n\n${edits}`;
+        : typeErrors
+          ? `${read("bakeoff/prompts/refine-types.md")
+              .replace(
+                "{types}",
+                [
+                  ...checked.typeErrorSample.map((line) => line.replace(/^[^(]*\(/, "module.ts(")),
+                  ...(typeErrors > checked.typeErrorSample.length
+                    ? [`… ${typeErrors - checked.typeErrorSample.length} more`]
+                    : []),
+                ].join("\n"),
+              )
+              .replace(
+                "{render}",
+                checked.rendered
+                  ? "It still renders; make the reported lines match the SDK."
+                  : `Running it, the app stopped with this error:\n\n\`\`\`\n${(checked.renderError ?? "no render").replace(`${ROOT}/`, "")}\n\`\`\``,
+              )
+              .trim()}\n\n${edits}`
+          : `${read("bakeoff/prompts/refine-repair.md")
+              .replace("{error}", (checked.renderError ?? "no render").replace(`${ROOT}/`, ""))
+              .trim()}\n\n${edits}`;
     const body = {
       model,
       reasoning_effort: effort,
@@ -655,6 +710,7 @@ async function refine(round: string, args: string[]) {
       slug: slugOut,
       from: slug,
       mode,
+      ...(typeErrors ? { typeErrorsSent: typeErrors } : {}),
       arm: previous.arm,
       subject: previous.subject,
       level: previous.level,

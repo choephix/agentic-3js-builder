@@ -81,7 +81,7 @@ All five Gap3 arms share a $70 spend guard, including repairs, probes and discar
 
 `refine <round> --from <source>` gives every build of the source round one more turn, as an app would after running the module. The conversation is the arm's system prompt, the pitch, the current module as the model's own reply, and the feedback:
 
-- **Repair**, when the module failed: the error (`prompts/refine-repair.md`).
+- **Repair**, when the module failed: the error (`prompts/refine-repair.md`). With `--types` a build with type errors also counts as failed, even when it rendered, and its repair gets the compiler errors (up to 20) plus the render error if it crashed (`prompts/refine-types.md`). Off by default: single-run measurements keep their builds as the model wrote them. One pass over an old round: `check <round>` (fills in type errors where the round was checked with `--skip-typecheck`, without re-rendering), `refine <round>tfix --from <round> --repair-only --types --effort low`, `check <round>tfix`. The `tfix` suffix keeps these out of the gap pages, which read `fix`/`fix2` as crash repairs.
 - **Critique**, when it built: the snap's shots as images (`--views`) and its measurements (counts, size, issues, loose parts), with `prompts/refine-critique.md` or another `--critique` file. `--critic <model>` lets a second model write the change list from the renders and the code (`prompts/refine-critic.md`) and the builder makes it (`prompts/refine-apply.md`).
 
 The reply is SEARCH/REPLACE edits (`prompts/refine-edits.md`) or a whole module. The new round's slugs swap the round prefix (`r6RedPandaRichCraft` → `r6c1RedPandaRichCraft`); `chainCostUsd` sums the chain. `--from a,b` takes each build from the first listed round that has it, so a repair round can lead the round it repaired. A check that can't reach the shared browser leaves the build unchecked rather than recording a failure.
@@ -95,8 +95,8 @@ The reply is SEARCH/REPLACE edits (`prompts/refine-edits.md`) or a whole module.
 ```
 npm run bakeoff -- prompt <arm>            # write an arm's system prompt to scratch/bakeoff/ and print its size
 npm run bakeoff -- run <round> [--model anthropic/claude-sonnet-5-5] [--effort medium] [--arms a,b] [--subjects x,y] [--levels terse,rich] [--concurrency 8] [--arm-set arms.json] [--pitches pitches.json]
-npm run bakeoff -- check <round>           # typecheck and render (snap tag v01) every build without a check yet
-npm run bakeoff -- refine <round> --from <round>[,<round>] [--model …] [--views …] [--critique file.md] [--critic model] [--repair-only]
+npm run bakeoff -- check <round>           # typecheck and render (snap tag v01) every build without a check yet; typecheck builds checked with --skip-typecheck
+npm run bakeoff -- refine <round> --from <round>[,<round>] [--model …] [--views …] [--critique file.md] [--critic model] [--repair-only] [--types]
 npm run bakeoff -- results <round>         # rebuild results.json
 npm run lab-thumbs                         # thumbnails for the /lab page (missing or outdated ones only)
 npm run lab-export                         # static /lab copy on webshare (rerun after new rounds)
