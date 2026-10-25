@@ -2,6 +2,12 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## First catalogs (E2 prep), 2026-10-25
+
+`catalogs/` holds the first part catalogs from the `docs/SPEED.md` catalog pilot, hand-picked as if a router chose them for "futuristic militarized truck from 2077, low-poly 2077 aesthetic, extremely intricate": `truck.ts` (base, cabs, beds, anchors, `assemble(picks)`), `truckGear.ts` (wheels, suspension, bumpers, headlights, grilles, mirrors, exhausts, racks), `armour.ts`, `mountedWeapons.ts`, `scifiHull.ts` and `materials2077.ts` (the style: palettes, paints, neon, decals, screens), 20–37 KB each. Each opens with a menu header, slots hold ≤8 variants named slot + variant, and each file's default export (plus extra `board*` exports) lays every variant out labelled for culling. `demoTruck2077.ts` is `assemble(picks)` for the prompt above: 528 parts, 15k triangles, 20 joints, 0 issues. The pick format, anchors and `Mount` shape are in `truck.ts`'s header.
+
+Built by one Fable 5.1 (high) agentic session: 165 turns, 52 min, $32.58 at list prices, plus $4.44 for a first attempt stopped before it wrote files; stefan@revoltage.io's 7-day Fable meter went 23 → 28 over both (whole-point readings). SDK gaps it worked around: no oriented frame that carries a bone; `part({ frame, rotation })` replaces the frame's orientation instead of composing; yaw hinges need `dir`/`up` juggling; `resolve()` in `src/paint` is undocumented; faceted torus tyres need `tubularSegments` divisible by 4 to touch the floor. Unjudged: the boards are Stefan's to cull.
+
 ## r24: gallery single-runs and four small tests, 2026-10-24
 
 `bakeoff/pitches-r24.json` holds 268 new Category/Subject/Style briefs (familiar game styles and new ones: origami, amigurumi, stained glass, Fabergé, Bauhaus, Memphis, cyanotype, Delftware and more), plus a `vivid` paragraph level for 10 subjects and a `wild` level for 20, where the model picks an unexpected style. Every build is a single run of the `craft3` arm (`arms-r12.json`), high effort, 120k cap, through `npm run bakeoff -- run`; rounds `r24` (Sonnet 5.5), `r24opus` (Opus 5.5), `r24d2`/`r24d3` (repeat draws), `r24max` (Sonnet at max effort). 154 replies, $127.75 at list prices; generation stopped on the account's 5-hour limit with 204 briefs never asked. Of the 143 modules, 133 render; no repair calls ran for the 10 that crash.
