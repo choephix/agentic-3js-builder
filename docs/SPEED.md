@@ -20,34 +20,40 @@ Estimate: billed completion tokens minus code chars ÷ 2.8 minus prose chars ÷ 
 
 What the past rounds say about the dials (medians; crash = failed first render, repair outcomes noted below):
 
-| Round       | Effort / prompt                             | Out tokens |  Module |        Wall |         Crash |  Cost |
-| ----------- | ------------------------------------------- | ---------: | ------: | ----------: | ------------: | ----: |
-| r24         | high, craft3 + kits                         |      63.8k | 24.5 KB |     8.1 min |         8/123 | $0.69 |
-| r24max      | max                                         |       128k |    none |      16 min | 10/10 no code | $1.29 |
-| r24opus     | Opus high                                   |      84.3k |   33 KB |    13.4 min |          1/10 | $2.02 |
-| r25fable    | Fable 5.1 low, 5 r24 briefs                 |      28.9k | 22.8 KB |     6.9 min |    0/5 (1 TS) | $1.47 |
-| r26         | low, craft3, 5 vehicle pitches              |       3.7k |    6 KB |        25 s |           1/5 | $0.21 |
-| r26 sampler | low, craft3 + `catalogs/` + sampler.md      |      11.4k |   11 KB |        75 s |           0/5 | $0.46 |
-| r27/r28     | low, craft3, 2 more draws (n = 15)          |       3.5k |  5.7 KB |        24 s |          2/15 | $0.05 |
-| sampler2    | samplers as inspiration only                |      10.7k | 12.5 KB |        71 s |          0/10 | $0.31 |
-| …nomat      | sampler2 without `materials2077.ts`         |       4.9k |  7.9 KB |        32 s |          2/10 | $0.38 |
-| r30 …nomat  | high, same sampler2 without materials, n=10 |      68.2k | 30.1 KB |     8.4 min |          2/10 | $1.01 |
-| samplermenu | only each sampler's header menu             |       4.0k |  6.5 KB |        26 s |          1/10 | $0.23 |
-| r29 detail  | craft3 + `detail.md`, no samplers, n=20     |      13.0k | 10.9 KB |        95 s |          2/20 | $0.31 |
-| detail4     | detail + 4 samplers + `sampler4.md`         |       9.0k | 11.1 KB |        61 s |          5/20 | $0.40 |
-| r31m A      | medium, craft3, one batch with C/E/F, n=10  |      19.8k | 13.6 KB |       154 s |          1/10 | $0.21 |
-| r31m C      | medium, + 4 samplers (`sampler2nomat`)      |      21.2k | 15.9 KB |       154 s |          2/10 | $0.23 |
-| r31m E      | medium, + `detail.md`                       |      23.5k | 16.9 KB |       177 s |          1/10 | $0.24 |
-| r31m F      | medium, + `detail.md` + 4 samplers          |      27.2k | 19.9 KB |       202 s |          0/10 | $0.29 |
-| r32e9       | medium, craft3 + `decide.md` (E9)           |      20.8k | 14.1 KB |       158 s |          3/10 | $0.22 |
-| r32plan     | medium, craft3 + `buildsheet.md` (E4)       |      19.8k | 14.0 KB |       153 s |          1/10 | $0.21 |
-| r32flat     | medium, flat colours, no texture asks       |      11.8k |  9.3 KB |        89 s |          0/10 | $0.13 |
-| r32par      | medium, plan + 5 parts in parallel          |      28.4k | 38.6 KB |        71 s |          4/10 | $0.38 |
-| r20medcraft | medium                                      |      43.2k | 20.5 KB |     5.5 min |          1/28 | $0.66 |
-| r20lowcraft | low                                         |      32.0k | 15.8 KB |     4.1 min |          2/28 | $0.49 |
-| r22lean     | low, game-asset brief, no rig               |      17.6k | 11.5 KB |     2.4 min |          2/25 | $0.26 |
-| r22nothink  | "thinking off" (see gateway note), low      |      14.0k | 24.3 KB | **1.5 min** |     **14/25** | $0.25 |
-| r2          | medium, the early docs-only prompt          |       7.6k |  6.6 KB |     0.9 min |         9/280 | $0.09 |
+| Round       | Effort / prompt                             | Out tokens |   Module |                                    Wall |              Crash |       Cost |
+| ----------- | ------------------------------------------- | ---------: | -------: | --------------------------------------: | -----------------: | ---------: |
+| r24         | high, craft3 + kits                         |      63.8k |  24.5 KB |                                 8.1 min |              8/123 |      $0.69 |
+| r24max      | max                                         |       128k |     none |                                  16 min |      10/10 no code |      $1.29 |
+| r24opus     | Opus high                                   |      84.3k |    33 KB |                                13.4 min |               1/10 |      $2.02 |
+| r25fable    | Fable 5.1 low, 5 r24 briefs                 |      28.9k |  22.8 KB |                                 6.9 min |         0/5 (1 TS) |      $1.47 |
+| r26         | low, craft3, 5 vehicle pitches              |       3.7k |     6 KB |                                    25 s |                1/5 |      $0.21 |
+| r26 sampler | low, craft3 + `catalogs/` + sampler.md      |      11.4k |    11 KB |                                    75 s |                0/5 |      $0.46 |
+| r27/r28     | low, craft3, 2 more draws (n = 15)          |       3.5k |   5.7 KB |                                    24 s |               2/15 |      $0.05 |
+| sampler2    | samplers as inspiration only                |      10.7k |  12.5 KB |                                    71 s |               0/10 |      $0.31 |
+| …nomat      | sampler2 without `materials2077.ts`         |       4.9k |   7.9 KB |                                    32 s |               2/10 |      $0.38 |
+| r30 …nomat  | high, same sampler2 without materials, n=10 |      68.2k |  30.1 KB |                                 8.4 min |               2/10 |      $1.01 |
+| samplermenu | only each sampler's header menu             |       4.0k |   6.5 KB |                                    26 s |               1/10 |      $0.23 |
+| r29 detail  | craft3 + `detail.md`, no samplers, n=20     |      13.0k |  10.9 KB |                                    95 s |               2/20 |      $0.31 |
+| detail4     | detail + 4 samplers + `sampler4.md`         |       9.0k |  11.1 KB |                                    61 s |               5/20 |      $0.40 |
+| r31m A      | medium, craft3, one batch with C/E/F, n=10  |      19.8k |  13.6 KB |                                   154 s |               1/10 |      $0.21 |
+| r31m C      | medium, + 4 samplers (`sampler2nomat`)      |      21.2k |  15.9 KB |                                   154 s |               2/10 |      $0.23 |
+| r31m E      | medium, + `detail.md`                       |      23.5k |  16.9 KB |                                   177 s |               1/10 |      $0.24 |
+| r31m F      | medium, + `detail.md` + 4 samplers          |      27.2k |  19.9 KB |                                   202 s |               0/10 |      $0.29 |
+| r32e9       | medium, craft3 + `decide.md` (E9)           |      20.8k |  14.1 KB |                                   158 s |               3/10 |      $0.22 |
+| r32plan     | medium, craft3 + `buildsheet.md` (E4)       |      19.8k |  14.0 KB |                                   153 s |               1/10 |      $0.21 |
+| r32flat     | medium, flat colours, no texture asks       |      11.8k |   9.3 KB |                                    89 s |               0/10 |      $0.13 |
+| r32par      | medium, plan + 5 parts in parallel          |      28.4k |  38.6 KB |                                    71 s |               4/10 |      $0.38 |
+| r33pf       | low, parflat (par on flat prompts)          |      16.2k |  23.7 KB |                                    49 s |               2/10 |      $0.21 |
+| r33pfm      | medium, parflat                             |      25.2k |  30.7 KB |                                    79 s | 3/9 (+1 no module) |      $0.30 |
+| r33cohm     | medium, parfit (even plan + box check)      |      48.0k |  54.0 KB |                                   133 s |               2/10 |      $0.61 |
+| r33two      | low, two-stage final (stage 1 21 s)         |      15.1k |  23.4 KB |                                    38 s |               3/10 |      $0.22 |
+| r33twom     | medium, two-stage final (stage 1 58 s)      |      24.2k |  33.1 KB |                                    79 s |               1/10 |      $0.31 |
+| r33hl loop  | Haiku low, frame 0 + 20 fix/add turns       |   ~50k sum | 17–20 KB | 224–242 s model, 300–331 s with renders |         0/40 turns | $0.15–0.17 |
+| r20medcraft | medium                                      |      43.2k |  20.5 KB |                                 5.5 min |               1/28 |      $0.66 |
+| r20lowcraft | low                                         |      32.0k |  15.8 KB |                                 4.1 min |               2/28 |      $0.49 |
+| r22lean     | low, game-asset brief, no rig               |      17.6k |  11.5 KB |                                 2.4 min |               2/25 |      $0.26 |
+| r22nothink  | "thinking off" (see gateway note), low      |      14.0k |  24.3 KB |                             **1.5 min** |          **14/25** |      $0.25 |
+| r2          | medium, the early docs-only prompt          |       7.6k |   6.6 KB |                                 0.9 min |              9/280 |      $0.09 |
 
 Readings:
 
@@ -72,6 +78,13 @@ Readings:
   - **Parallel parts** (`r32par`, `run` with an arm's `parallel: {plan, part}`, see `bakeoff/README.md`): a planning call returns a JSON spec (size, palette, mounts, joints, 3–6 parts with boxes and budgets), then one call per part runs at once, and the assembler writes one module. **71 s (55–146) vs 146 s (102–255), faster in all 10 pairs.** Plan 24–30 s; wall time is set by the heaviest part (cab, turret or hull, 8–15k tokens). Total thinking about equals craft3's (12.7k vs 13.7k summed over six calls); the code grows: 38.6 KB, 15.6k triangles, 527–766 parts. 4/10 first-render crashes, all in part code, each fixed by one repair. Coherence faults: in 4 builds a slab or box sticks out past the body (up to 2 m outside the spec envelope), one railgun has a 7 m stray rod, and every build renders larger than its spec size. $0.38 per build cached (~1.9× craft3).
   - Looks are Stefan's call: sheets `r26/r32e9.jpg`, `r26/r32plan.jpg`, `r26/r32flat.jpg`, `r26/r32par.jpg`.
 
+- **Four follow-ups, run side by side (r33, 2026-10-25; medians with ranges, n=10 per arm, each with its controls in the same batch, low then medium).** Batch drift is large again: in the r33pf batch par took 123 s at medium against 71 s in r32par and 84 s in r33cohm, so compare only within a batch.
+  - **Parallel parts in flat colour** (`r33pf`/`r33pfd2` low, `r33pfm`/`r33pfmd2` medium; `arms-r33pf.json`, arm `parflat`: `par` on the flat system prompt with `prompts/par-plan-flat.md` and `par-part-flat.md`). Low: parflat 49 s (40–54), par 50 s (44–55), flat 24 s (19–30), craft3 28 s (20–122); parflat is slower than flat in all 10 pairs because the plan call (25 s) is as long as the critical part (22 s). Medium: parflat 79 s (52–150), par 123 s (78–180), flat 66 s (47–114), craft3 160 s (118–206); parflat beats par by >10 s in 6 of 9 pairs and craft3 in 7, and is level with flat (2 faster, 3 slower, 4 ties). Flat colour halves the parallel arm's summed thinking (11.7k vs 21.6k) and its critical part (54 s vs 93 s). Triangles: parflat 15.4k (low) and 17.4k (medium) against flat 2.0k and 5.3k. Textures: parflat 0 in 19/19; single-call flat still 4/10 at medium. Every parflat build has meshes >15 cm past the spec size (87 low, 114 medium). One medium plan wrote JavaScript inside its JSON spec and produced no module. Cached cost $0.21 / $0.30.
+  - **Parallel parts: even work + box check** (`r33coh`/`r33cohd2` low, `r33cohm`/`r33cohmd2` medium; arm `parfit`, `prompts/par-plan-even.md` with 5–8 equal parts, `parallel.fit` with `prompts/par-box.md`, `scripts/partfit.ts`). The box check works: parts reaching >15 cm outside their box go from 5–6 per build to 0 (0–2) after one repair call each, envelope meshes from 73 to 16 (low) and 54 to 2 (medium), rendered size vs spec from 1.38× to 1.18× and 1.32× to 1.11×. It costs 18 s (1–33) and 23 s (11–31). The even plan doesn't even out the work: at medium the critical part got longer, 83 s (31–181) vs 56 s (32–109), the heaviest part still writing 11.3k tokens, and summed thinking rose to 24.2k vs 14.0k. Net: 67 s vs 46 s at low (slower in 9/10 pairs), 133 s vs 84 s at medium (slower in 8/10); $0.53 vs $0.27 and $0.73 vs $0.42. Floor depth and loose clusters show no clear change.
+  - **Two-stage build with requests** (`r33two`/`r33twod2` low, `r33twom`/`r33twomd2` medium; `scripts/twostage.ts`, `arms-r33two.json`, `prompts/two-stage1.md`, `two-add.md`, `two-texture.md`). Stage 1 is one flat-colour call that renders on its own and exports `REQUESTS` (add requests with a model-space `at`, `normal`, `bone` and the `room` kept clear; texture requests by part name) and a `STAGE2` hook. Stage 2 runs at once on craft3's prompt: the add requests in 6 calls, one function each, and the texture requests in one SEARCH/REPLACE call. Medium: first pixel (stage 1) 58 s (24–84), final 79 s (45–132) vs craft3 171 s (116–298), faster in 10/10 pairs, and level with flat's 63 s (40–182: 3 faster, 4 slower, 3 ties). 10.1k triangles vs 5.5k (craft3) and 5.2k (flat), 567 parts, 7 textures (craft3 8), $0.31 cached. Low: stage 1 21 s, final 38 s (30–60) vs 23 s for craft3 and flat, 7.6k triangles vs 2.4k. Writing the list doesn't bring thinking back: stage 1 thinks less than flat (4.6k vs 5.4k medium; 1.1k vs 1.5k low) and builds less (medium 170 parts, 3.1k triangles vs flat's 288 and 5.2k). The texture edit call is the slowest stage-2 call in 7/10 medium builds. All 20 lists parsed, all hooks written, 110/110 texture edits applied. 46% (medium) / 32% (low) of stage-2 meshes centre in a room stage 1 kept; 4% / 7% reach >15 cm past stage 1's bounds, mostly antennas. Crashes: final 1/10 medium, 3/10 low (kit names imported from the SDK root, a `bone: null` copied from a request), each fixed by one 3–5 s repair; stage 1 never crashed.
+  - **Haiku render loop** (`r33hld2loop`, `r33hld3loop`; `scripts/render-loop.ts`, `prompts/loop-fix.md`, `loop-add.md`). Truck2077, Haiku 5.5 low, craft3 frame 0, 20 turns (odd: fix; even: fix and add detail), each turn given the contact sheet (from turn 2 the before and after sheets) and the measurements, replying with SEARCH/REPLACE edits. Two loops ran at once (draw 1's frame 0 crashed through two repairs, so `r33hld3` replaced it). Frame 0: 94 s (53–118), ~18k thinking. Turns: 6 s (4–11) per call plus ~4 s to render, 1.45k output tokens; 0/40 crashed, 158/161 edit blocks applied. A whole loop: 224 / 242 s of model time, 300 / 331 s with renders, $0.28 / $0.33 billed. Triangles 5.3k→10.0k and 3.6k→7.1k, parts 119→283 and 181→338; fix turns often leave the triangle count unchanged. The cost per turn jumps 5× once the prompt passes 100k tokens (Haiku's long-context rate). For scale, r30 Sonnet high on the pitch: 551 / 543 s, $1.10 / $1.08, 20.4k / 21.5k triangles (another batch).
+  - Looks are Stefan's call: sheets `r33/parflat-low.jpg`, `r33/parflat-medium.jpg`, `r33/parfit-low.jpg`, `r33/parfit-medium.jpg`, `r33/twostage-low.jpg`, `r33/twostage-medium.jpg`, `r33/haikuloop.jpg`, slider page `r33/loop/index.html`.
+
 ## Stefan's hypotheses, answered
 
 - **"Is it 90% thinking?"** Yes: ~86% of billed output at high effort, ~7 of 8 minutes. The module itself is already about one minute.
@@ -82,7 +95,7 @@ Readings:
 
 ## Routes to explore (Stefan, 2026-10-25)
 
-Not run yet. For the next runs Stefan wants low effort before high, and builds no slower than medium's ~2.5 min.
+First runs: r33 (readings above). For the next runs Stefan wants low effort before high, and builds no slower than medium's ~2.5 min.
 
 **Two-stage build with requests.** Stage 1 builds the model in flat colours and ends with a list of requests for stage 2: details to add and textures to paint, each tied to a part and a place. Asking for the list tells stage 1 that a second stage is coming, so it leaves room for what it requested instead of building emblems and stripes as geometry (the `r32flat` prompt asked for exactly that). Stage 2 works through the list, plus a share of its own ideas, instead of inventing at random. The list also makes stage 2 parallel: each request is one call, all run at once, assembled like parallel parts (`scripts/bakeoff.ts`, `assemble`).
 
