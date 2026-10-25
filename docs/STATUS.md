@@ -14,6 +14,8 @@ r29 targets level of detail (`detail.md`: every part gets invented details, and 
 
 Stefan's verdict on the r30 sheet: high effort is night and day better than low. `r31m`/`r31md2` ran A (craft3), C (+ samplers), E (+ detail text) and F (+ both) at medium effort in one batch: A and C both 154 s, E 177 s, F 202 s; C has ~1.6× A's triangles, F none over E. Across low, medium and high the samplers never change thinking time, so they are not a speed lever. Next: a two-stage build (a fast first draft with the basic shape, then a separate detail pass on it), in its own session.
 
+r32 tested four ideas at medium, each against a same-batch craft3 control: "decide, don't draft" and a visible build sheet change nothing; flat colours cut time 37% (89 s vs 141 s) and thinking 39%; parallel parts (plan call, then 3–6 part calls at once, assembled into one module) halves wall time (71 s vs 146 s) with ~2.7× the triangles, at the cost of 4/10 first-render crashes and parts that stick out past the body. Readings in `docs/SPEED.md`.
+
 ## r25fable: Fable 5.1 single-runs at low, 2026-10-25
 
 Five r24 briefs (ramen stall, mimic chest, alebrije, zeppelin, tin robot), one request each, run one at a time, `craft3` arm, low effort, through `npm run bakeoff -- run r25fable --model anthropic/claude-fable-5-1`. Medians 6.9 min, 28.9k output tokens, 22.8 KB, $1.47 (total $8.06); Sonnet at high on the same briefs: 7.4 min, $0.74. All 5 render; one type error. Routed to stefan@revoltage.io (Fable meter 28 → 30). Numbers and readings in `docs/SPEED.md`.
