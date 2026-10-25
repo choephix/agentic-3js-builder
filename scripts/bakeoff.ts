@@ -1086,7 +1086,20 @@ function results(round: string) {
   console.log(`results.json: ${entries.length} builds, $${total.toFixed(2)} estimated.`);
 }
 
-export { gateway, ask, wireImports, results, capture, systemPrompt };
+export {
+  gateway,
+  ask,
+  wireImports,
+  results,
+  capture,
+  systemPrompt,
+  pricing,
+  check,
+  applyEdits,
+  extractCode,
+  reportText,
+};
+export type { Asked, CheckRecord, SnapReport };
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [command, target, ...rest] = process.argv.slice(2);
