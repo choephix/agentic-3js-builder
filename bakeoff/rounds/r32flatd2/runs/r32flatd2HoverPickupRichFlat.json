@@ -1,0 +1,26 @@
+{
+  "slug": "r32flatd2HoverPickupRichFlat",
+  "arm": "flat",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T09:58:59.251Z",
+  "wallMs": 90064,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 74083,
+    "completion_tokens": 12031,
+    "total_tokens": 86114,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.268476,
+  "hasCode": true,
+  "reasoning": "I'm planning out a single TypeScript module for a compact pickup truck model, roughly 5.4m long and 2m wide, as a static structure with no joints needed. I'm thinking through how to position it hovering slightly above ground with thrusters while keeping its lowest points grounded.\n\nWorking out the dimensions in model space, deciding to build the chassis, cab, hood, and bed using boxes, with an extruded polygon profile for the cabin silhouette along the z-axis.\n\nFor windows I'm planning dark-cyan glass as thin extruded slabs on the sides and a tilted windshield box computed from the slope between hood and cab roof points, using a rotation quaternion to angle it correctly.\n\nSettling on that windshield tilt angle, I'm now planning the truck bed details: floor, walls, tailgate, roll bar with a mounted turret gun, armor plates, bull bar, and light bar. For the cyberpunk-military look I want glowing neon strips in magenta and cyan, red taillight glow, and four hover-thruster pods at the wheel positions with octagonal housings and glowing rings, finished in a dark gunmetal/olive paint scheme.\n\nPositioning the hover pods...\n\nAdding the fan on top with rotating blades, then layering in cyberpunk neon underglow strips and magenta side accents, plus hood vents, scoop, and glowing headlight boxes near the front.\n\nNow I'm building the front armor with a slatted grille, bull bar, and plow wedge, then adding roof details like a glowing light bar, antenna array, sensor dome, and armor rack. I'm also constructing a rotating turret in the bed with twin glowing-tipped barrels, a shield plate, ammo box, and a roll cage made from connected rod segments.\n\nFor the bed itself, I'm defining a thin floor and side walls, placing the tailgate, and separating out a chassis box that spans the vehicle's length beneath the cab and bed walls, with the body extruded upward from the cab profile.\n\nRather than fender flares over each pod, I'll skip those and instead add angular olive side skirts between the pods for a wing-like look. I'm settling on a color palette—olive drab hull, dark frame, teal-tinted glass, and neon cyan/magenta/amber/red accents—plus yellow-black hazard stripes on the bumper, and now I'm starting a reusable box helper function to place these parts.\n\nWriting helper functions...\n\nI'm checking that the overall height works out to about 2.4 units with everything resting on the floor, then planning a door emblem using an SVG texture with a hexagon shape and \"HX-07\" text with a chevron, positioned on mirrored side panels below the window line.\n\nStill placing the emblem geometry...\n\nNow I'm defining the side window as an extruded polygon shape matching the cab profile, positioning its points to align with the windshield angle.\n\nThat window edge works for the pillar. Now I'm adding a thin dark b-pillar box and positioning the rear window, adjusting the roof profile points to taper toward the back and placing a rear window box that follows the slanted back edge.\n\nI'm finalizing the body profile points to avoid self-intersection, keeping the bed region starting around z=-0.3, and now adding headlights positioned on the slanted front face near z=2.66.\n\nStill placing details... I'm figuring out the tilt rotation for the headlight boxes to match the slope angle, then adding a grille box lower on the front face around z=2.65.\n\nNow I'm positioning the dark grille, bumper armor wedge with hazard stripes, and a plow blade as a rotated box, then working out hood vent slats along the sloped hood top with their positions and rotation to match the slope angle.\n\nNext I'm adding a hood scoop, a roof light bar with glow segments, and a roll bar built from rods in the truck bed.\n\nThen I'm placing a gun turret on a pedestal with rotated cylinder barrels, taillights glowing red, a tailgate with rear thruster nozzles glowing orange, plus antennas, a sensor dome, and side armor plates near the doors.\n\nStill writing component details...\n\nAdding hazard stripe boxes...\n\n",
+  "plan": null
+}
