@@ -9,7 +9,7 @@ The goal and the experiment queue for the next token-burning session. Read this 
 
 ## Where the time goes
 
-Sonnet 5.5 streams at ~132 output tokens/s (Opus 5.5 ~102, Haiku 5.5 ~210). Wall time is billed output tokens ÷ that rate; the 84k-token prompt is cached and prefills in seconds. One craft3 build at high effort (r24, 124 builds):
+Sonnet 5.5 streams at ~132 output tokens/s (Opus 5.5 ~102, Fable 5.1 ~74, Haiku 5.5 ~210). Wall time is billed output tokens ÷ that rate; the 84k-token prompt is cached and prefills in seconds. One craft3 build at high effort (r24, 124 builds):
 
 | Share of billed output | Tokens (median) |   Time | What it is                                     |
 | ---------------------: | --------------: | -----: | ---------------------------------------------- |
@@ -25,6 +25,7 @@ What the past rounds say about the dials (medians; crash = failed first render, 
 | r24         | high, craft3 + kits                    |      63.8k | 24.5 KB |     8.1 min |         8/123 | $0.69 |
 | r24max      | max                                    |       128k |    none |      16 min | 10/10 no code | $1.29 |
 | r24opus     | Opus high                              |      84.3k |   33 KB |    13.4 min |          1/10 | $2.02 |
+| r25fable    | Fable 5.1 low, 5 r24 briefs            |      28.9k | 22.8 KB |     6.9 min |    0/5 (1 TS) | $1.47 |
 | r20medcraft | medium                                 |      43.2k | 20.5 KB |     5.5 min |          1/28 | $0.66 |
 | r20lowcraft | low                                    |      32.0k | 15.8 KB |     4.1 min |          2/28 | $0.49 |
 | r22lean     | low, game-asset brief, no rig          |      17.6k | 11.5 KB |     2.4 min |          2/25 | $0.26 |
@@ -38,6 +39,8 @@ Readings:
 - **Ambition is the other axis.** The early prompt (r2) got 6.6 KB modules in 56 s; the lean brief (r22lean) 11.5 KB in 2.4 min at low. Whether the smaller modules are acceptable is a verdict-page question nobody has answered: `bakeoff/judging/` holds Stefan's phase-2 verdicts only, none for the r20–r22 speed arms (`gap3/`).
 - **The gateway can't switch thinking off for Sonnet 5.5.** `--no-thinking` omits the parameter and pins effort low; 21/25 r22nothink replies still carried a thinking block. `budget_tokens` is dropped for adaptive models. A "no thinking" arm run through it measures the gateway, not the model.
 - Opus 5.5 at high was slower and dearer. Stefan's only verdict so far: one Opus part (a snowflake) is wildly goofier than anything he has seen; the rest is unjudged.
+- **Fable 5.1 at low (r25fable)** on 5 briefs Sonnet and Opus built at high in r24 (ramen stall, mimic chest, alebrije, zeppelin, tin robot), run one at a time: medians 6.9 min, 28.9k output tokens (~24k of it thinking), 22.8 KB, $1.47 once the prompt is cached (the first run paid the $1 cache write: $2.75). The same 5 on Sonnet high: 7.4 min, 56.9k, 21.3 KB, $0.74. Fable thinks about half as many tokens at low as Sonnet does at high, but streams at ~74 tokens/s against ~130, so wall time comes out the same and each build costs about 2×. Its code alone (~6k tokens) takes ~85 s, so Fable can't reach the one-minute goal even with no thinking. All 5 render; the tin robot has one type error (`.bone` on `PartOptions | undefined`). $8.06 moved stefan@revoltage.io's 7-day Fable meter 28 → 30 (whole-point readings; the catalog session measured ~$7.4 a point). Quality: unjudged; sheet at `~/tmp/public/nilo/agentic-3js-builder/r25/sonnet-opus-fable.jpg`.
+- **Where Fable could fit instead of per-request builds:** (1) Fable writes a short build sheet at low (parts, proportions, numbers, rig, paint plan, ~1–2k output tokens) and Sonnet at low writes the module from it; tests whether the deliberation can be handed over as text. Pair it with the typecheck gate and edit repair (P1), since the API-guess crashes aren't design errors. (2) Fable authors the catalogs offline, as it did for `catalogs/`. (3) Fable writes the example builds for whole-module example arms, if its builds clear Stefan's bar. (4) Fable reads the crash and type errors across the ~230 bakeoff modules and proposes forgiving API shapes and a shorter `docs/api.md`, with the API decisions left to Stefan.
 - Repeat draws of one brief vary a lot (r24d3 ran 5 subjects × 3); any arm with fewer than ~20 briefs is noise.
 
 ## Stefan's hypotheses, answered

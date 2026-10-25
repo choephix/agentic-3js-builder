@@ -2,6 +2,10 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## r25fable: Fable 5.1 single-runs at low, 2026-10-25
+
+Five r24 briefs (ramen stall, mimic chest, alebrije, zeppelin, tin robot), one request each, run one at a time, `craft3` arm, low effort, through `npm run bakeoff -- run r25fable --model anthropic/claude-fable-5-1`. Medians 6.9 min, 28.9k output tokens, 22.8 KB, $1.47 (total $8.06); Sonnet at high on the same briefs: 7.4 min, $0.74. All 5 render; one type error. Routed to stefan@revoltage.io (Fable meter 28 → 30). Numbers and readings in `docs/SPEED.md`; quality unjudged.
+
 ## First catalogs (E2 prep), 2026-10-25
 
 `catalogs/` holds the first part catalogs from the `docs/SPEED.md` catalog pilot, hand-picked as if a router chose them for "futuristic militarized truck from 2077, low-poly 2077 aesthetic, extremely intricate": `truck.ts` (base, cabs, beds, anchors, `assemble(picks)`), `truckGear.ts` (wheels, suspension, bumpers, headlights, grilles, mirrors, exhausts, racks), `armour.ts`, `mountedWeapons.ts`, `scifiHull.ts` and `materials2077.ts` (the style: palettes, paints, neon, decals, screens), 20–37 KB each. Each opens with a menu header, slots hold ≤8 variants named slot + variant, and each file's default export (plus extra `board*` exports) lays every variant out labelled for culling. `demoTruck2077.ts` is `assemble(picks)` for the prompt above: 528 parts, 15k triangles, 20 joints, 0 issues. The pick format, anchors and `Mount` shape are in `truck.ts`'s header.
