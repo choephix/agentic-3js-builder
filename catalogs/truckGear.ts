@@ -373,7 +373,7 @@ export function bumperRam(b: Builder, m: Mount, c: Roles) {
   const f = m.n[2];
   const B = m.bone;
   for (const s of [1, -1] as const) {
-    b.part(box(1.1, 0.4, 0.06), c.trim, { bone: B, at: [x + s * 0.5, y, z - f * 0.14], rotation: [0, s * f * -25, 0] }); // angled plate
+    b.part(box(1.1, 0.4, 0.06), c.trim, { bone: B, at: [x + s * 0.5, y, z - f * 0.14], rotation: [0, s * f * 25, 0] }); // angled plate
     for (let i = 0; i < 4; i++) {
       const u = 0.12 + i * 0.26;
       b.spike([x + s * u, y - 0.17, z + f * (0.08 - u * 0.45)], [0, 0, f], 0.14, 0.03, c.steel, { bone: B, sides: 5 }); // teeth

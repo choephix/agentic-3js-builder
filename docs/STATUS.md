@@ -4,13 +4,17 @@ Where the work stands. The API is in `docs/api.md`, the reasons behind it in `do
 
 ## r25fable: Fable 5.1 single-runs at low, 2026-10-25
 
-Five r24 briefs (ramen stall, mimic chest, alebrije, zeppelin, tin robot), one request each, run one at a time, `craft3` arm, low effort, through `npm run bakeoff -- run r25fable --model anthropic/claude-fable-5-1`. Medians 6.9 min, 28.9k output tokens, 22.8 KB, $1.47 (total $8.06); Sonnet at high on the same briefs: 7.4 min, $0.74. All 5 render; one type error. Routed to stefan@revoltage.io (Fable meter 28 → 30). Numbers and readings in `docs/SPEED.md`; quality unjudged.
+Five r24 briefs (ramen stall, mimic chest, alebrije, zeppelin, tin robot), one request each, run one at a time, `craft3` arm, low effort, through `npm run bakeoff -- run r25fable --model anthropic/claude-fable-5-1`. Medians 6.9 min, 28.9k output tokens, 22.8 KB, $1.47 (total $8.06); Sonnet at high on the same briefs: 7.4 min, $0.74. All 5 render; one type error. Routed to stefan@revoltage.io (Fable meter 28 → 30). Numbers and readings in `docs/SPEED.md`.
+
+Stefan's verdict: Fable 5.1 is not better than Opus 5.5 at 3D, probably a training difference, and wouldn't be worth it even at the same price and speed. Fable is out for 3D work, catalog authoring included.
 
 ## First catalogs (E2 prep), 2026-10-25
 
 `catalogs/` holds the first part catalogs from the `docs/SPEED.md` catalog pilot, hand-picked as if a router chose them for "futuristic militarized truck from 2077, low-poly 2077 aesthetic, extremely intricate": `truck.ts` (base, cabs, beds, anchors, `assemble(picks)`), `truckGear.ts` (wheels, suspension, bumpers, headlights, grilles, mirrors, exhausts, racks), `armour.ts`, `mountedWeapons.ts`, `scifiHull.ts` and `materials2077.ts` (the style: palettes, paints, neon, decals, screens), 20–37 KB each. Each opens with a menu header, slots hold ≤8 variants named slot + variant, and each file's default export (plus extra `board*` exports) lays every variant out labelled for culling. `demoTruck2077.ts` is `assemble(picks)` for the prompt above: 528 parts, 15k triangles, 20 joints, 0 issues. The pick format, anchors and `Mount` shape are in `truck.ts`'s header.
 
 Built by one Fable 5.1 (high) agentic session: 165 turns, 52 min, $32.58 at list prices, plus $4.44 for a first attempt stopped before it wrote files; stefan@revoltage.io's 7-day Fable meter went 23 → 28 over both (whole-point readings). SDK gaps it worked around: no oriented frame that carries a bone; `part({ frame, rotation })` replaces the frame's orientation instead of composing; yaw hinges need `dir`/`up` juggling; `resolve()` in `src/paint` is undocumented; faceted torus tyres need `tubularSegments` divisible by 4 to touch the floor. Unjudged: the boards are Stefan's to cull.
+
+Stefan's correction: a sampler is one whole subject with everything for it on it, and the router picks whole subjects to blend (for this prompt: an everything-truck, an everything-tank, an everything-mounted-weapons platform and a spaceship). Apart from `truck.ts`/`truckGear.ts`, this set splits parts by family across subjects, so it stays as a comparison arm; the design is in `docs/SPEED.md` "Catalog pilot". `bumperRam` had its plates yawed the wrong way (a scoop instead of a forward point); fixed, demo snap v05.
 
 ## r24: gallery single-runs and four small tests, 2026-10-24
 
