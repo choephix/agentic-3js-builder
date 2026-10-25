@@ -1,0 +1,449 @@
+{
+  "slug": "r33pfmd2RiotInterceptorRichPar",
+  "arm": "par",
+  "subject": "riotInterceptor",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: corporate riot-control interceptor with a water cannon and neon light bars.\nStyle: Cyberpunk 2077.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:04:05.820Z",
+  "wallMs": 139572,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 527500,
+    "completion_tokens": 42282,
+    "total_tokens": 569782,
+    "prompt_tokens_details": {
+      "cached_tokens": 505668
+    }
+  },
+  "costUsd": 0.5170507999999999,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 25676,
+    "slowestPartMs": 113896,
+    "critical": "cabAndFront",
+    "elapsedMs": 139572,
+    "spec": {
+      "name": "Arasaka-style Riot Interceptor RC-9 'Pacifier'",
+      "description": "A chunky corporate riot-control armored interceptor truck with a roof water cannon, plated cyberpunk hull and glowing neon light bars.",
+      "builderName": "riotInterceptor",
+      "size": [
+        2.6,
+        2.7,
+        6
+      ],
+      "layout": "A low, wide, wedge-nosed armored van, 6 m long. Front (+Z): angled armored ram bumper with a glowing cyan light strip, slit headlights, hood sloping up to a raked windshield. Cab with dark tinted glass, then a long boxy armored cargo/crowd-control body behind. A rotating water cannon turret sits on the roof near the rear-centre with a thick barrel pointing forward (+Z), pipes and a tank. Four fat wheels with heavy fenders rest on the floor. Roof carries a neon light bar (red/blue alternating) and magenta/cyan neon trim lines along the flanks. Cyberpunk 2077 style: matte graphite hull panels, yellow-black hazard stripes, corporate logo decals, kanji-like glyphs, grime paints, hot neon accents that glow. Slight bone-level jaggedness: chamfered plates, vents, antennas.",
+      "palette": {
+        "hull": "#2b2f3a",
+        "hullDark": "#15171e",
+        "plate": "#454c5c",
+        "hazard": "#f2c200",
+        "black": "#0a0a0e",
+        "glass": "#0e2a3a",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2bd6",
+        "neonRed": "#ff2a3a",
+        "neonBlue": "#2a5bff",
+        "neonYellow": "#fff04a",
+        "rubber": "#16161a",
+        "rim": "#8a93a6",
+        "steel": "#7b8394",
+        "water": "#7fe0ff",
+        "white": "#e8ecf2"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.3,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.3,
+          1.1
+        ],
+        "bodyRoofRear": [
+          0,
+          2.1,
+          -1.2
+        ],
+        "turretRing": [
+          0,
+          2.1,
+          -1.3
+        ],
+        "roofBarMount": [
+          0,
+          2.15,
+          0.6
+        ],
+        "axleFront": [
+          0,
+          0.55,
+          1.9
+        ],
+        "axleRear": [
+          0,
+          0.55,
+          -1.8
+        ],
+        "bumperFront": [
+          0,
+          0.7,
+          3
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.15,
+            0.55,
+            1.9
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.15,
+            0.55,
+            1.9
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelBL",
+          "parent": "body",
+          "at": [
+            1.15,
+            0.55,
+            -1.8
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelBR",
+          "parent": "body",
+          "at": [
+            -1.15,
+            0.55,
+            -1.8
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "turretYaw",
+          "parent": "body",
+          "at": [
+            0,
+            2.1,
+            -1.3
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "cannonPitch",
+          "parent": "turretYaw",
+          "at": [
+            0,
+            2.55,
+            -1.2
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassisAndBumper",
+          "builds": "Lower armored chassis: floor slab, skirts, sloped ram bumper with hazard stripes and cyan neon strip, front splitter, tow hooks, rear bumper with red tail strip, underbody dark paint with grime, side skirts with magenta underglow neon strips, fender arches (wheel wells) with fender flares, exhaust pipes, step plates. Panelled plating paint (riveted seams), hazard-striped lower edges.",
+          "box": [
+            [
+              -1.3,
+              0.25,
+              -3
+            ],
+            [
+              1.3,
+              1.3,
+              3
+            ]
+          ],
+          "attaches": "Top face at chassisTop supports cab and cargo body; fender arches surround wheel joints; bumper at bumperFront.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "cabAndFront",
+          "builds": "Front cab: raked wedge hood with vents and slit headlights glowing cyan/white, raked windshield and tinted side glass with wipers, A-pillars, door panels with handles and corporate logo decal (SVG: shield with kanji-like glyphs), side mirrors with small neon, mesh grille with LED, roof visor, push-bar lamps, 'RIOT CONTROL' lettering on doors, antenna cluster. Faceted chamfered armor plates.",
+          "box": [
+            [
+              -1.3,
+              1.3,
+              0.4
+            ],
+            [
+              1.3,
+              2.2,
+              3
+            ]
+          ],
+          "attaches": "Sits on cabFloor/chassisTop; rear wall meets cargo body at z=0.4; roof bar at roofBarMount.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "cargoBody",
+          "builds": "Long boxy armored crowd-control body behind the cab: layered hull panels with rivets, hazard stripes, side shutters and gun ports, glowing magenta and cyan neon trim lines along the flanks, SVG decals (POLICE-style corp logo, kanji glyphs, barcode, unit number RC-9), rear double doors with handles and red tail lights, roof rails, roof vents, cable conduits, roof light bar (alternating red and blue glowing segments with housing) on roofBarMount, rear turret base plate with ring and bolts at turretRing, floodlights, roof antennas.",
+          "box": [
+            [
+              -1.3,
+              1.3,
+              -3
+            ],
+            [
+              1.3,
+              2.3,
+              0.4
+            ]
+          ],
+          "attaches": "Rests on chassisTop; front wall meets cab at z=0.4; turret ring at turretRing on roof; roof bar at roofBarMount.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "wheelsAndRunning",
+          "builds": "Four fat armored wheels (two sides, front and rear) each with chunky treaded tire (lathe/cylinder with tread blocks), steel rim with bolt ring and hub cap, brake discs with yellow calipers, heavy axle beams and leaf-spring suspension arms, mud flaps. Each wheel is rigged on its wheel joint with axis along X. Tires touch the floor at y=0 (radius 0.55). Rim glows faint cyan ring light.",
+          "box": [
+            [
+              -1.45,
+              0,
+              -2.4
+            ],
+            [
+              1.45,
+              1.1,
+              2.5
+            ]
+          ],
+          "attaches": "Wheels ride wheelFL, wheelFR, wheelBL, wheelBR at axleFront/axleRear lines; axle beams tie into chassis.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelBL",
+            "wheelBR",
+            "body"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "waterCannonTurret",
+          "builds": "Roof-mounted water cannon: rotating turret base drum with ring bearing at turretRing, armored shield housing, pressurised water tank (cylinder with glowing blue-white water level window, gauge texture, hazard bands), thick faceted cannon barrel with reinforcing rings and a flared nozzle pointing +Z, glowing cyan nozzle ring and water-tinted tip, hoses/pipes sweeping from tank to barrel, swivel yoke arms, targeting sensor with magenta lens glow, small camera, status LEDs, hazard stripes and warning decals. Barrel rides cannonPitch, base rides turretYaw. Rest pose: barrel pointing forward, slightly raised.",
+          "box": [
+            [
+              -0.6,
+              2.1,
+              -2.4
+            ],
+            [
+              0.6,
+              2.7,
+              0.1
+            ]
+          ],
+          "attaches": "Base drum sits on turretRing at roof of cargoBody; yaw joint turretYaw, barrel pivots on cannonPitch.",
+          "joints": [
+            "turretYaw",
+            "cannonPitch"
+          ],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:04:05.820Z",
+        "wallMs": 25676,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85252,
+          "completion_tokens": 3044,
+          "total_tokens": 88296,
+          "prompt_tokens_details": {
+            "cached_tokens": 85248
+          }
+        },
+        "costUsd": 0.0389728,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassisAndBumper",
+        "started": "2026-10-25T14:04:31.496Z",
+        "wallMs": 23867,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88406,
+          "completion_tokens": 3559,
+          "total_tokens": 91965,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0526424,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "waterCannonTurret",
+        "started": "2026-10-25T14:04:31.496Z",
+        "wallMs": 33841,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88520,
+          "completion_tokens": 5601,
+          "total_tokens": 94121,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07329039999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheelsAndRunning",
+        "started": "2026-10-25T14:04:31.496Z",
+        "wallMs": 35536,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88453,
+          "completion_tokens": 5842,
+          "total_tokens": 94295,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07556639999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoBody",
+        "started": "2026-10-25T14:04:31.496Z",
+        "wallMs": 64190,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88456,
+          "completion_tokens": 9349,
+          "total_tokens": 97805,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.11064239999999999,
+        "hasCode": true,
+        "reasoning": "I'm planning a single buildCargoBody function, sketching the main box dimensions and considering using panelled/metal paint from the clockwork kit to keep the look rich but the code compact.\n\nNow I'm laying out the component pieces: a helper for creating boxes attached to the body bone, a glow helper for emissive highlights, and the main shell proportions. I'm working through the roof chamfer, side panels, and a hazard-stripe texture plane for the lower section, figuring out sizes and positions for each.\n\nStill planning details... neon trim rods along the flanks, shutter and gun-port boxes, side decals including a logo, kanji-style drawn strokes, barcode, and unit number text, plus rear door panels with handles and glowing tail lights, roof rails with posts, roof vents, and sweep-based conduits.\n\nNow I'm working out the roof light bar placement and sizing so it sits properly above the shell, with alternating red/blue glowing segments, and sketching a turret base plate as a bolted ring at the rear of the roof.\n\nAdding floodlights, antennas, front wall panel, then writing a paint function for grime that darkens lower hull panels using mix and noise for a weathered, countershaded look.\n\nFor the textured plane parts, I'm placing them facing outward on each side with correct orientation so hazard text reads properly from outside, and adding a rear panel too. Now I'm setting up merged rivet geometry along panel seams using mergeGeometries for efficiency.\n\nWorking out shell dimensions...\n\nAdjusting panel heights and adding cyan trim near the roofline so it doesn't clash with the panel tops, then adding shutter slats on panel 2, gun ports with steel rings on panel 3, and a decal logo on panel 1.\n\nWorking out placement for kanji, barcode, and RC-9 text across panels 3, 2, and 1 -- ports and kanji on panel 3, logo centered on panel 1, and barcode plus RC-9 text positioned below the shutter on panel 2, keeping mirrored decals on just one side.\n\nThen I plan the light bar housing with glow segments slightly protruding from the base, dimensions and spacing for eight segments across the front, plus end caps. I'll use the provided Ctx type as-is in the function signature without importing it, then move on to writing the code.\n\n"
+      },
+      {
+        "id": "cabAndFront",
+        "started": "2026-10-25T14:04:31.496Z",
+        "wallMs": 113896,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88413,
+          "completion_tokens": 14887,
+          "total_tokens": 103300,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.16593639999999998,
+        "hasCode": true,
+        "reasoning": "I'm planning the truck geometry as a single function: a chassis box with a bumper, then a hood wedge and separate cabin box stacked on top, using specific coordinate ranges to keep proportions balanced.\n\nFor the hood and cabin, I'm sketching them as extruded side-profile polygons so I get an angled windshield and sloped hood, then considering whether to just build them as tilted boxes instead for simplicity.\n\nI'm computing the windshield's tilt angle (~33.7°) from its rise/run, figuring out the correct rotation direction so the top slopes forward correctly, and working out the small outward offset along the surface normal so the glass sits just outside the cabin shell.\n\nNow I'm sizing the side glass panels relative to the cabin width, extruding thin window boxes positioned just outside the body, and shaping the window polygon to follow the A-pillar rake.\n\nI'm adding a \"RIOT CONTROL\" decal below the window using a text-textured plane positioned on the door, and working out the plane's orientation so the text faces outward correctly on the left side.\n\nOn the right side, flipping the direction vector similarly keeps the text readable from outside without needing a mirror. Now I'm placing door panel lines, handle boxes, and the logo/text decal textures within the door's bounds along the z-axis.\n\nWorking out hood details next: angled vents, headlight slits, and the bumper positioned below the hood's front face.\n\nAdding vents on the sloped hood surface with proper rotation to match the incline angle, plus slat details, then planning chamfered armor plates on the hood sides with hazard stripe paint accents.\n\nFor the hazard stripes, I'm computing a diagonal pattern based on z+y coordinates modulo a period. I'm also designing custom paint functions for grime and mottling on the cabin lower hull, then adding a tilted sun visor box extending forward over the windshield.\n\nNow I'm figuring out the roof geometry—cabin roof versus cargo box roof heights differ slightly, and I'm placing a roof bar mount on the cargo body. I'm also adding angled A-pillar rods on either side of the windshield using rounded connectors between two points, colored to match the dark hull trim.\n\nThen I'm narrowing the cabin width slightly so side mirrors fit within the body bounds, adjusting the mirror arms and boxes to sit just past x 1.2, and adding a small magenta glow box near the mirror base as a neon accent before moving on to the front push-bar lamps.\n\nI'm placing lamp pods as glowing cylinders on the hood's front top corners, adding small yellow light boxes along the visor front edge, planning thin angled wiper boxes on the windshield, and considering a rear roof antenna cluster -- though I need to watch that the antenna height doesn't poke through the top of the bounding box.\n\nNow I'm adding door handles as small boxes near the top corners of each door, plus thin dark vertical seam lines along the door edges to suggest paneling detail.\n\nI'm running a glowing cyan trim line along the cab flank and hood side at a consistent height, leaving the magenta accent for the chassis. For the windshield, rather than adding glow, I'm considering a semi-transparent decal overlay with gradient streaks to fake a reflective glass look.\n\nFor the streaks I'm orienting a plane slightly offset from the windshield surface, aligning it to the glass's actual normal direction rather than default axes so the streaks sit flush. For the logo, since kanji glyphs can't rely on font rendering, I'll need to draw the strokes manually as custom paths.\n\nNow I'm planning the shield logo (red/yellow with hand-drawn glyph strokes), a bold monospace \"RIOT CONTROL\" text label, and glow effects applied selectively—full glow for flat-colored parts and LED accents, textured glow for the gauge. I'm also sketching helper functions for placing mirrored box parts and constructing the hood wedge via an extruded, lightly beveled shape.\n\nStill writing hood/cabin outline coordinates and the custom hull paint function blending noise-based grime and plating colors...\n\nNow I'm defining a hazard-stripe paint pattern for the lower sill plate using a modulo check on surface coordinates, then setting up the sill's extrusion geometry mirrored on both sides.\n\nI'm designing chamfered armor plates for the hood sides and door sides, extruded at symmetric x-offsets with a plate color, and considering adding a few small steel rivets as spheres along the plate edges.\n\nI'm positioning the glass slightly proud of the plate surface, keeping it within the cabin silhouette bounds, with the A-pillar slope defining where the front edge meets the windshield top.\n\nPlacing the windshield glass box with rotation matching the slope, then thinking through wiper placement as thin rods lying along the glass surface, offset slightly outward along the normal.\n\nNow I'm positioning the visor box above and tilting it slightly forward, adding side supports, and placing four small lamp boxes along the front edge with a slight downward offset to account for the tilt.\n\nI'm now working on the hood vent slats, computing the slope center and normal direction for the hood surface, then figuring out the tilt angle and offsets needed to place four thin plate boxes evenly along that sloped direction.\n\nNext I add a glowing cyan neon strip along the hood crest, then move to designing the front fascia plate and headlight slit boxes positioned on the vertical front face.\n\nStill placing mirror geometry... now I'm adding roof antennas, sizing rod heights and positions for a clustered array with a central dish.\n\nFor the A-pillars, I'm defining rod endpoints along the windshield slope, offsetting them slightly outward from the glass surface using a helper function, then placing the roof plate as a thin dark panel above the cabin.\n\nAdding roof vents and keeping the roof bar separate from the panel, I'm sizing a smaller panel segment so it doesn't overlap the cargo roof bar, plus a visor piece. Wheel arches aren't needed since the cabin sits above wheel height, so I'm moving on to decals and the glow effect code.\n\nSetting up part helpers for textured versus painted materials, making sure painted sill strips skip the glow effect while textured decals use plain color. I'm defining a box helper function and extrude options to streamline building the body parts.\n\nFor the windshield glass I'm layering a semi-transparent light streak texture over the shaded panel, positioning it slightly above the box surface along the slope normal. For the logo I'm sketching a shield SVG with a dark fill and hazard stroke, using red and yellow accent lines for the inner glyph.\n\nNow I'm sizing the door decal plates and logo text placement, working out the exact coordinates and dimensions so the \"RIOT CONTROL\" text and hazard logo fit proportionally within the door panel bounds.\n\n"
+      }
+    ]
+  }
+}

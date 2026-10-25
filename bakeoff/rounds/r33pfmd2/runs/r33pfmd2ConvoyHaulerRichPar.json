@@ -1,0 +1,530 @@
+{
+  "slug": "r33pfmd2ConvoyHaulerRichPar",
+  "arm": "par",
+  "subject": "convoyHauler",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:04:05.818Z",
+  "wallMs": 116374,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 532009,
+    "completion_tokens": 29931,
+    "total_tokens": 561940,
+    "prompt_tokens_details": {
+      "cached_tokens": 505666
+    }
+  },
+  "costUsd": 0.4025626,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 30810,
+    "slowestPartMs": 85564,
+    "critical": "cargoPod",
+    "elapsedMs": 116374,
+    "spec": {
+      "name": "Convoy Hauler MK-IV 'Lockjaw'",
+      "description": "A low-poly cyberpunk six-wheeled armoured convoy hauler with a slab-sided cab, roof turret and rear flatbed carrying a sealed, glowing cargo pod.",
+      "builderName": "convoyHauler",
+      "size": [
+        3,
+        3.2,
+        8.4
+      ],
+      "layout": "Long, low, wedge-nosed truck facing +Z. Front: angled armoured bull-bar and ram plate with twin neon-cyan headlight slits (z 4.2 to 3.6). Cab: boxy armoured cabin (z 3.6 to 1.6) with raked windscreen shaped as a dark visor band lit cyan, side armour skirts, roof light bar in magenta. Roof turret ring at the cab roof's rear with a twin-barrel autocannon. Middle: chassis rail frame between the axles. Rear (z 1.4 to -4.2): flatbed deck carrying a big sealed cargo pod, a rounded-hex capsule with yellow-black hazard bands, riveted panels, strapped by four cross-straps with clamps, a glowing magenta seal-lock hatch on the rear face and cyan status strips along the sides. Six big chunky wheels (three per side: front steering axle, two rear tandem axles) with dark tyres, hex hubcaps with neon rims; they sit on y=0. Style: faceted low-poly slabs, hazard-yellow trim, panel seams, rivets, SVG decals (unit number, warning icons, kanji-like glyphs, barcodes), neon cyan/magenta emissive accents (use glow on lights, strips, seal hatch). Dirty hull paint with wear toward the bottom.",
+      "palette": {
+        "hull": "#3b4250",
+        "hullDark": "#232833",
+        "hullLight": "#5a6475",
+        "trim": "#e7b814",
+        "hazardBlack": "#15171c",
+        "tyre": "#14151a",
+        "hub": "#7b8394",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fb4",
+        "glass": "#0c2a3a",
+        "pod": "#d9dde3",
+        "podDark": "#8a93a3",
+        "rust": "#7a4a2c",
+        "steel": "#9aa3b2",
+        "strap": "#2a2d36",
+        "warnRed": "#d8321f"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.3,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.3,
+          2.6
+        ],
+        "cabRoof": [
+          0,
+          2.55,
+          2.6
+        ],
+        "turretRing": [
+          0,
+          2.55,
+          1.9
+        ],
+        "flatbedDeck": [
+          0,
+          1.45,
+          -1.4
+        ],
+        "podCenter": [
+          0,
+          2.35,
+          -1.4
+        ],
+        "axleFront": [
+          0,
+          0.62,
+          2.9
+        ],
+        "axleMid": [
+          0,
+          0.62,
+          -0.9
+        ],
+        "axleRear": [
+          0,
+          0.62,
+          -2.5
+        ],
+        "bumperFront": [
+          0,
+          0.8,
+          4.2
+        ],
+        "podRearFace": [
+          0,
+          2.35,
+          -4.2
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "cab",
+          "parent": "body",
+          "at": [
+            0,
+            1.3,
+            2.6
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "cab"
+        },
+        {
+          "name": "turretBase",
+          "parent": "cab",
+          "at": [
+            0,
+            2.55,
+            1.9
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "gunPitch",
+          "parent": "turretBase",
+          "at": [
+            0,
+            2.95,
+            2
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.35,
+            0.62,
+            2.9
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.35,
+            0.62,
+            2.9
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.35,
+            0.62,
+            -0.9
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.35,
+            0.62,
+            -0.9
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.35,
+            0.62,
+            -2.5
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.35,
+            0.62,
+            -2.5
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "podHatch",
+          "parent": "body",
+          "at": [
+            0,
+            2.35,
+            -4.2
+          ],
+          "dir": [
+            0,
+            0,
+            -1
+          ],
+          "role": "hinge",
+          "group": "cargo"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Ladder-frame chassis and flatbed: two long side rails, cross-members, fuel tanks and battery boxes on the sides, a lower armoured belly plate with panelled/dirty paint, mudguard fenders over all six wheels, the flatbed deck plate (z 1.4 to -4.2) with hazard-yellow edge trim, tie-down rings, side tool lockers with rivets, rear bumper with tail lights (red glow) and a licence/unit-number SVG plate, exhaust stacks behind the cab on both sides with dark soot paint. Suspension leaf springs and axle beams at the three axle mounts (axles span between wheel joints, no wheels).",
+          "box": [
+            [
+              -1.5,
+              0.45,
+              -4.3
+            ],
+            [
+              1.5,
+              1.5,
+              3
+            ]
+          ],
+          "attaches": "Rides on joint body. Cab starts at cabFloor; flatbed deck at flatbedDeck carries the pod; axle beams end at wheel joints.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Armoured cab from z 3.6 to 1.6 on top of the chassis front (y 1.3 to 2.55) plus the nose: sloped bonnet/ram wedge to the front bumper at bumperFront, a heavy bull-bar and ram plate with hazard stripes, twin cyan neon headlight slits (glow), a visor-like raked windscreen with SVG glass texture (cyan HUD reflections), side windows with armoured slats, side armour skirts with panel paint and rivets, door seams, mirrors with small cams, roof light bar (magenta glow) and roof antennas/sensor dome, a unit-number decal and a corporate emblem SVG on the doors, grille vents with a neon strip. Wear paint: dirt rising from bottom.",
+          "box": [
+            [
+              -1.5,
+              0.6,
+              1.6
+            ],
+            [
+              1.5,
+              2.7,
+              4.3
+            ]
+          ],
+          "attaches": "Rides joint cab. Sits on chassis at cabFloor; roof at cabRoof where turret base is mounted; its rear wall faces the flatbed at z 1.6.",
+          "joints": [
+            "cab"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "turret",
+          "builds": "Roof-mounted remote weapon station at turretRing: a rotating faceted hex base ring with hazard stripe and rivets (on turretBase), a boxy gun cradle with armoured shield, twin autocannon barrels with muzzle brakes and ammo-belt box on the side (on gunPitch), a small sensor eye with a red glow lens, a camera pod with cyan glow, and cable runs. Barrels point forward (+Z) at rest.",
+          "box": [
+            [
+              -0.7,
+              2.55,
+              1.2
+            ],
+            [
+              0.7,
+              3.2,
+              3.3
+            ]
+          ],
+          "attaches": "Base ring sits on mount turretRing atop cab roof; joints turretBase and gunPitch.",
+          "joints": [
+            "turretBase",
+            "gunPitch"
+          ],
+          "floor": false,
+          "budget": 120
+        },
+        {
+          "id": "wheels",
+          "builds": "Six big chunky low-poly wheels, 0.62 m radius, 0.5 m wide, with 10-sided tread-blocked tyres (lathe or cylinder with a tread paint of dark rubber with dust at the bottom), hex-bolt hubcaps in steel with neon cyan rim ring (glow), lug nuts, a brake disc and caliper hint behind each, central hub axle caps with a tiny SVG logo. Each wheel is built on its wheel joint, axis along x; the wheels' lowest points touch y = 0. Left side wheels at +X, right at -X, mirror outward faces.",
+          "box": [
+            [
+              -1.65,
+              0,
+              -3.15
+            ],
+            [
+              1.65,
+              1.25,
+              3.55
+            ]
+          ],
+          "attaches": "Wheels centre on mounts axleFront, axleMid, axleRear at x = ±1.35; ride joints wheelFL, wheelFR, wheelML, wheelMR, wheelRL, wheelRR.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelRL",
+            "wheelRR"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "cargoPod",
+          "builds": "The sealed cargo pod on the flatbed (z 1.2 to -4.2, y 1.45 to 3.25, width 2.4): a chunky faceted rounded-hex capsule in light pod paint with panel seams and rivets, yellow-black hazard bands at both ends, dark ribbed reinforcement rings, four cross-straps with ratchet clamps over the top, cyan status strips (glow) along both sides, SVG decals (biohazard-style warning icon, barcodes, glyph labels, stencil serial, red warnings), a top vent hatch and antenna, a big magenta glowing seal-lock hatch on the rear face with a lock wheel and bolts (on podHatch), corner brackets bolted down to the deck, lifting eyes on top, and pipes/cables on the front face toward the cab.",
+          "box": [
+            [
+              -1.3,
+              1.45,
+              -4.35
+            ],
+            [
+              1.3,
+              3.25,
+              1.3
+            ]
+          ],
+          "attaches": "Sits on flatbedDeck, centred at podCenter; rear face at podRearFace holds the hatch joint podHatch; front face stops just behind the cab wall at z ~1.3.",
+          "joints": [
+            "body",
+            "podHatch"
+          ],
+          "floor": false,
+          "budget": 190
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:04:05.818Z",
+        "wallMs": 30810,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85250,
+          "completion_tokens": 3763,
+          "total_tokens": 89013,
+          "prompt_tokens_details": {
+            "cached_tokens": 85246
+          }
+        },
+        "costUsd": 0.0461626,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T14:04:36.628Z",
+        "wallMs": 15389,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89372,
+          "completion_tokens": 2555,
+          "total_tokens": 91927,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0445344,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turret",
+        "started": "2026-10-25T14:04:36.628Z",
+        "wallMs": 17795,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89257,
+          "completion_tokens": 2822,
+          "total_tokens": 92079,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0469744,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:04:36.628Z",
+        "wallMs": 24660,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89375,
+          "completion_tokens": 3869,
+          "total_tokens": 93244,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0576804,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:04:36.628Z",
+        "wallMs": 30121,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89341,
+          "completion_tokens": 5078,
+          "total_tokens": 94419,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0697024,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoPod",
+        "started": "2026-10-25T14:04:36.628Z",
+        "wallMs": 85564,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89414,
+          "completion_tokens": 11844,
+          "total_tokens": 101258,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.1375084,
+        "hasCode": true,
+        "reasoning": "I'll write a single buildCargoPod function, using a loosely typed context parameter rather than importing the Ctx type directly, and start laying out the pod geometry centered at x=0 spanning the z-axis.\n\nI'm shaping the pod as a chamfered hexagonal capsule by extruding a chamfered-rectangle outline along the z-axis, with tapered frustum-like end caps on each side of the main body, then applying a custom hazard-band paint pattern based on z-position rather than relying on a prebuilt kit.\n\nFor the paint, I'm defining diagonal hazard stripes near the front and rear sections where the surface normal faces outward, plus seam lines at intervals along the body, and darkening colors toward the bottom to suggest dirt accumulation. I'll add a few slightly larger ribbed ring extrusions around the body for detail.\n\nStill placing straps and rings...\n\nWorking out the strap path coordinates...\n\nNow I'm placing the hardware details: ratchet boxes mounted on each side with small levers, plus L-shaped corner brackets at the deck's bottom positions on both sides of the pod.\n\nI'm also figuring out the cyan accent strips running along the vertical walls between the strap clamps and rings, checking segment lengths so they fit in the gaps without colliding with the surrounding hardware.\n\nFinalizing the strap/ring positions along the spine, then moving to the rear hatch joint—placing a small octagonal cylinder part to represent the pod hatch facing backward.\n\nBuilding the hatch assembly...\n\nNow I'm placing decal textures on the side walls facing outward, like biohazard icons and warning strips positioned at specific heights on the left and right surfaces.\n\nNow I'm placing the top details: a vent hatch box near the ring at z=-1.5, an antenna rod with a glowing red tip, and lifting-eye torus rings positioned near the straps at z=-1.1, rotated along the x-axis.\n\nFor the front face, I'm adding small exhaust-style pipes near the cab gap, running vertically with an elbow bend outward, using a polyline path at x ±0.5 with steel coloring.\n\nNow I'm working on the paint function for the pod body, planning hazard stripes on the front/rear caps using a diagonal grid based on position, plus seam lines on flat faces at regular intervals to suggest panel joints.\n\nAdding rivet dots along seams...\n\nThen I'm layering in weathering by blending toward a rust color using a smoothstep based on vertical position combined with noise, pulling in the mix, noise, smoothstep, and paint helpers from the builder SDK.\n\nI'm defining the hex outline geometry and a small box helper for creating bone-attached parts with flat shading, then extruding the main pod body, adding slightly scaled rings for the hull trim, and setting up the rear frame plate extrusion.\n\nI'll add bolts around the hatch in a circular pattern using small cylinders, then build a lock wheel with a torus and spoke elements positioned at the hatch's center.\n\nNow I'm sketching cables as curved sweeps, generating the texture SVGs with a glow kit import, and placing decal planes on the side walls above the chamfer line.\n\nAdding strap clamps and mounting brackets...\n\nI'll simplify this to a small deck plate box with bolt cylinders instead, that's easier than matching the chamfer angle exactly.\n\n"
+      }
+    ]
+  }
+}

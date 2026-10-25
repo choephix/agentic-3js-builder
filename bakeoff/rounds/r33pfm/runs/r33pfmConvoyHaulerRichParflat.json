@@ -1,0 +1,484 @@
+{
+  "slug": "r33pfmConvoyHaulerRichParflat",
+  "arm": "parflat",
+  "subject": "convoyHauler",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:04:05.819Z",
+  "wallMs": 55406,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 467622,
+    "completion_tokens": 19368,
+    "total_tokens": 486990,
+    "prompt_tokens_details": {
+      "cached_tokens": 445399
+    }
+  },
+  "costUsd": 0.28266589999999997,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 27615,
+    "slowestPartMs": 27791,
+    "critical": "cab",
+    "elapsedMs": 55407,
+    "spec": {
+      "name": "Convoy Hauler Nyx-9",
+      "description": "A low-poly cyberpunk armoured convoy hauler: a wedge-nosed six-wheel cab guarding a sealed, neon-latched cargo pod on a flatbed.",
+      "builderName": "convoyHauler",
+      "size": [
+        2.8,
+        3,
+        8.4
+      ],
+      "layout": "Long heavy truck facing +Z. Front (z 2.6..4.2): wedge armoured nose with a dozer bumper, cyan headlight bar and a slit visor windshield. Cab (z 0.6..3.2) sits above the front axles with side skirts, mirrors, roof light bar and a small roof turret. Behind the cab (z -4.2..0.4) a flatbed chassis carries the sealed cargo pod: a rounded-box capsule with armour ribs, magenta glowing seams, hazard stripes and a door with a lock. Six chunky octagonal wheels rest on the floor (front axle z=2.7, rear tandem z=-1.8 and -3.4) with dark tyres and yellow hubs. Every part is blocky and faceted with flat colours; neon cyan and magenta accents mark edges, vents and lights; yellow hazard trim on bumpers and skirts.",
+      "palette": {
+        "hull": "#2f3644",
+        "hullLight": "#4a5468",
+        "hullDark": "#161a22",
+        "trim": "#e7b814",
+        "tyre": "#0d0e12",
+        "hub": "#8a93a6",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2bd6",
+        "glass": "#0b2a3a",
+        "pod": "#d9dde6",
+        "podDark": "#7d8597",
+        "warn": "#ff4a2a",
+        "metal": "#59606e",
+        "lamp": "#fff4c2"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.1,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.1,
+          1.9
+        ],
+        "flatbedTop": [
+          0,
+          1.25,
+          -1.9
+        ],
+        "podBase": [
+          0,
+          1.25,
+          -2
+        ],
+        "turretRing": [
+          0,
+          3,
+          1
+        ],
+        "axleFront": [
+          0,
+          0.55,
+          2.7
+        ],
+        "axleRear1": [
+          0,
+          0.55,
+          -1.8
+        ],
+        "axleRear2": [
+          0,
+          0.55,
+          -3.4
+        ],
+        "bumperFront": [
+          0,
+          0.7,
+          4.2
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "cab",
+          "parent": "body",
+          "at": [
+            0,
+            1.1,
+            1.9
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge"
+        },
+        {
+          "name": "turret",
+          "parent": "cab",
+          "at": [
+            0,
+            3,
+            1
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.2,
+            0.55,
+            2.7
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.2,
+            0.55,
+            2.7
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.2,
+            0.55,
+            -1.8
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.2,
+            0.55,
+            -1.8
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelBL",
+          "parent": "body",
+          "at": [
+            1.2,
+            0.55,
+            -3.4
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelBR",
+          "parent": "body",
+          "at": [
+            -1.2,
+            0.55,
+            -3.4
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Ladder frame and flatbed deck from z -4.2 to 2.6 at y 0.7..1.25: hullDark main rails, metal cross members, fuel tanks and battery boxes slung under the sides, rear bumper with warn tail lights and trim hazard stripes, rear tow hook, mud flaps, side skirts with trim chevrons, underbody neonCyan glow strips, fender arches over each wheel position (hull with hullLight edge).",
+          "box": [
+            [
+              -1.4,
+              0.45,
+              -4.2
+            ],
+            [
+              1.4,
+              1.3,
+              2.6
+            ]
+          ],
+          "attaches": "Cab sits on cabFloor; pod on podBase/flatbedTop; wheels on the axle mounts; nose bumper meets bumperFront.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "wheels",
+          "builds": "Six octagonal-faceted wheels, each: tyre cylinder (tyre) 0.55 radius and 0.5 wide, tread blocks, hub disc (hub) with trim ring, five bolts, a neonCyan hub light ring, brake disc and caliper behind. Axle beams between pairs in metal with a differential housing. Wheels centred on x=±1.2 at axle mounts with their lowest point on y=0, each parented to its wheel joint.",
+          "box": [
+            [
+              -1.5,
+              0,
+              -3.95
+            ],
+            [
+              1.5,
+              1.1,
+              3.25
+            ]
+          ],
+          "attaches": "Hubs at axleFront, axleRear1, axleRear2 mounts; each wheel on its own wheelXX joint.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelBL",
+            "wheelBR",
+            "body"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "cab",
+          "builds": "Armoured cab z 0.6..3.2, y 1.1..2.8: hull boxy body with sloped wedge hood to the nose, hullLight panel plates, glass slit visor windshield with a neonCyan edge line and side windows with armour bars, door seams, handles and magenta door emblem, hazard-striped bumper plate at bumperFront (z up to 4.2) with dozer blade, cyan headlight bar and lamp lights, grille vents, roof light bar with warn and cyan lights, antenna, side mirrors on arms, exhaust stacks behind the cab in metal with trim rings, a roof turret base ring at turretRing.",
+          "box": [
+            [
+              -1.35,
+              0.55,
+              0.6
+            ],
+            [
+              1.35,
+              3,
+              4.2
+            ]
+          ],
+          "attaches": "Stands on cabFloor over the chassis; bumper at bumperFront; turret ring at turretRing; exhausts stand against the pod front face at z 0.4.",
+          "joints": [
+            "cab",
+            "body"
+          ],
+          "floor": false,
+          "budget": 220
+        },
+        {
+          "id": "turret",
+          "builds": "Small remote guard turret on turretRing: rotating drum base (hullDark), faceted armoured housing (hull, hullLight plates), twin barrels with muzzle brakes and trim bands, a sensor eye pod with a glowing neonMagenta lens and cyan scanner slit, ammo box at the side with warn stripe, cable sweeps to the cab roof.",
+          "box": [
+            [
+              -0.5,
+              2.95,
+              0.4
+            ],
+            [
+              0.5,
+              3.6,
+              2
+            ]
+          ],
+          "attaches": "Base sits at turretRing on the cab roof.",
+          "joints": [
+            "turret"
+          ],
+          "floor": false,
+          "budget": 100
+        },
+        {
+          "id": "cargoPod",
+          "builds": "Sealed cargo pod on the flatbed from z -4.1 to 0.3, y 1.25..3.0, x ±1.25: pod-coloured rounded-box capsule built from a loft/boxes with chamfered top, podDark armour ribs every 0.8 m, hazard trim stripes along the base, neonMagenta glowing seam lines along the top edges and ribs, rear double door with big lock wheel, hinges and bolts, a ring of cyan status lights, a hazard emblem and serial stencil panel on the sides, roof vents and a small antenna dish, ratchet tie-down straps with buckles bolted to flatbed edges, corner castings in metal.",
+          "box": [
+            [
+              -1.3,
+              1.25,
+              -4.15
+            ],
+            [
+              1.3,
+              3,
+              0.35
+            ]
+          ],
+          "attaches": "Rests on podBase at flatbedTop; front face against the cab rear at z≈0.4.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 250
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:04:05.819Z",
+        "wallMs": 27615,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75243,
+          "completion_tokens": 3041,
+          "total_tokens": 78284,
+          "prompt_tokens_details": {
+            "cached_tokens": 75239
+          }
+        },
+        "costUsd": 0.0379419,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turret",
+        "started": "2026-10-25T14:04:33.435Z",
+        "wallMs": 17976,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 78391,
+          "completion_tokens": 3032,
+          "total_tokens": 81423,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.046441199999999995,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T14:04:33.435Z",
+        "wallMs": 18140,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 78486,
+          "completion_tokens": 2638,
+          "total_tokens": 81124,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0426912,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:04:33.435Z",
+        "wallMs": 18850,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 78459,
+          "completion_tokens": 2946,
+          "total_tokens": 81405,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0457172,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoPod",
+        "started": "2026-10-25T14:04:33.435Z",
+        "wallMs": 26261,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 78518,
+          "completion_tokens": 4132,
+          "total_tokens": 82650,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.057695199999999995,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:04:33.435Z",
+        "wallMs": 27791,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 78525,
+          "completion_tokens": 3579,
+          "total_tokens": 82104,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.052179199999999995,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

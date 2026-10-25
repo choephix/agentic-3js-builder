@@ -1,0 +1,572 @@
+{
+  "slug": "r33pfmd2RailgunCarrierRichPar",
+  "arm": "par",
+  "subject": "railgunCarrier",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:04:05.819Z",
+  "wallMs": 116698,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 532483,
+    "completion_tokens": 41100,
+    "total_tokens": 573583,
+    "prompt_tokens_details": {
+      "cached_tokens": 505667
+    }
+  },
+  "costUsd": 0.5151986999999999,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 32555,
+    "slowestPartMs": 84143,
+    "critical": "railgun",
+    "elapsedMs": 116699,
+    "spec": {
+      "name": "Longspear Railgun Carrier",
+      "description": "A six-wheeled low-poly sci-fi military railgun carrier, deployed on four hydraulic stabiliser legs with a long glowing-rail cannon raised on a turret.",
+      "builderName": "railgunCarrier",
+      "size": [
+        3.6,
+        3.2,
+        9
+      ],
+      "layout": "Faces +Z. Heavy angular hull about 2.5 m wide and 7 m long, with a sloped armoured cab at the front (+Z) that has a cyan-glass visor slit and a roof sensor mast. Behind the cab a flat deck carries a turret ring at z=-1.0. A chunky railgun cradle sits on the ring; twin rails with cyan glowing capacitor strips extend 5 m forward over the cab, with a muzzle brake at the front. Three axles (z=+2.6, 0.2, -2.4) carry six big chunky wheels, hubs rendered as bolted discs. Four stabiliser legs deploy diagonally outward from the hull sides at z=+1.6 and z=-3.0, ending in square pads flat on the floor; the wheels sit just clear of the floor, so the vehicle rests on the pads and the wheels' lowest points touch y=0 too. Style: faceted boxes and wedges, olive-grey armour panels with yellow hazard trim, dark gunmetal mechanics, cyan glow on rails, visor, and lights, stencilled markings and rivets painted as textures.",
+      "palette": {
+        "hull": "#4a5440",
+        "hullDark": "#333b2e",
+        "hullLight": "#6b7758",
+        "gunmetal": "#2b2f36",
+        "steel": "#7f8791",
+        "tire": "#15171a",
+        "hazard": "#e7b814",
+        "markRed": "#b8322a",
+        "neonCyan": "#2ff3ff",
+        "glass": "#0d3a4a",
+        "rubber": "#222428",
+        "white": "#e8e8e0"
+      },
+      "mounts": {
+        "deckTop": [
+          0,
+          1.75,
+          -1
+        ],
+        "hullFloor": [
+          0,
+          0.95,
+          0
+        ],
+        "turretRing": [
+          0,
+          1.75,
+          -1
+        ],
+        "cabRoof": [
+          0,
+          2.35,
+          2.6
+        ],
+        "axleFront": [
+          0,
+          0.7,
+          2.6
+        ],
+        "axleMid": [
+          0,
+          0.7,
+          0.2
+        ],
+        "axleRear": [
+          0,
+          0.7,
+          -2.4
+        ],
+        "legFrontL": [
+          1.25,
+          1.1,
+          1.6
+        ],
+        "legFrontR": [
+          -1.25,
+          1.1,
+          1.6
+        ],
+        "legRearL": [
+          1.25,
+          1.1,
+          -3
+        ],
+        "legRearR": [
+          -1.25,
+          1.1,
+          -3
+        ],
+        "gunPivot": [
+          0,
+          2.55,
+          -1
+        ],
+        "muzzle": [
+          0,
+          2.9,
+          4.4
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1.2,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turret",
+          "parent": "body",
+          "at": [
+            0,
+            1.75,
+            -1
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "gun",
+          "parent": "turret",
+          "at": [
+            0,
+            2.55,
+            -1
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.45,
+            0.7,
+            2.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.45,
+            0.7,
+            2.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.45,
+            0.7,
+            0.2
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.45,
+            0.7,
+            0.2
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.45,
+            0.7,
+            -2.4
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.45,
+            0.7,
+            -2.4
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "legFL",
+          "parent": "body",
+          "at": [
+            1.25,
+            1.1,
+            1.6
+          ],
+          "dir": [
+            0.6,
+            -0.8,
+            0
+          ],
+          "role": "leg",
+          "group": "legs"
+        },
+        {
+          "name": "legFR",
+          "parent": "body",
+          "at": [
+            -1.25,
+            1.1,
+            1.6
+          ],
+          "dir": [
+            -0.6,
+            -0.8,
+            0
+          ],
+          "role": "leg",
+          "group": "legs"
+        },
+        {
+          "name": "legRL",
+          "parent": "body",
+          "at": [
+            1.25,
+            1.1,
+            -3
+          ],
+          "dir": [
+            0.6,
+            -0.8,
+            0
+          ],
+          "role": "leg",
+          "group": "legs"
+        },
+        {
+          "name": "legRR",
+          "parent": "body",
+          "at": [
+            -1.25,
+            1.1,
+            -3
+          ],
+          "dir": [
+            -0.6,
+            -0.8,
+            0
+          ],
+          "role": "leg",
+          "group": "legs"
+        }
+      ],
+      "parts": [
+        {
+          "id": "hull",
+          "builds": "Main armoured chassis body from z=-3.9 to z=1.9: faceted box lower tub with sloped front glacis and angled side skirts, a flat rear deck with hazard-striped edge, rear engine block with vent grilles and exhaust stacks, side fender boxes over each wheel, tool boxes, tow hook and tail lights (glowing red), paint panelled with rivets and wear. Includes the turret-ring base plate (low cylinder) at the turretRing mount, a stencilled white unit number and red marking decals. Wheel arches are open for the wheels. Paint: olive armour with lighter tops, dark grime near the bottom.",
+          "box": [
+            [
+              -1.5,
+              0.8,
+              -3.9
+            ],
+            [
+              1.5,
+              1.8,
+              1.9
+            ]
+          ],
+          "attaches": "Carries all other parts via the body joint. Cab starts at z=1.9. Turret sits on turretRing/deckTop. Legs bolt to the legFront*/legRear* mounts on the sides. Axle mounts are in the wheel arches.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "cab",
+          "builds": "Forward armoured crew cab from z=1.9 to z=4.2: sloped wedge nose, angled windshield with cyan-glass visor slit drawn as an SVG decal with reflections, side hatch door with handle and hazard trim, roof with sensor mast, radar dish, antenna whips, searchlight bar with glowing lamps, front bumper with a winch, headlights (glow), mud flaps, and a front armour plate with chevron paint. The cab roof stays below y=2.4 so the railgun passes over it.",
+          "box": [
+            [
+              -1.3,
+              0.85,
+              1.9
+            ],
+            [
+              1.3,
+              2.6,
+              4.2
+            ]
+          ],
+          "attaches": "Rear face meets the hull front at z=1.9. Roof at cabRoof. Rides the body joint.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "runningGear",
+          "builds": "Six chunky low-poly wheels (octagonal tires with tread blocks painted or extruded, steel hub discs with bolt rings, central caps) on three axles at axleFront/axleMid/axleRear, each on its own wheel joint, radius 0.7 so the wheel bottoms touch y=0. Axle beams, differential housings, leaf-spring packs and drive shafts visible under the hull between the wheel pairs, brake discs, and mud guards. Hub texture painted with a yellow stripe.",
+          "box": [
+            [
+              -1.85,
+              0,
+              -3.1
+            ],
+            [
+              1.85,
+              1.4,
+              3.3
+            ]
+          ],
+          "attaches": "Wheel joints parent to body at the axle mounts; axles run under the hull at y=0.7 and enter the wheel arches of hull and cab.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelRL",
+            "wheelRR",
+            "body"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "stabilisers",
+          "builds": "Four deployed hydraulic stabiliser legs: a box-section mounting bracket on the hull flank at each leg mount, an outward-diagonal telescoping main strut (outer sleeve plus a polished steel inner piston rod), a diagonal brace strut with pivot pins, hydraulic hoses (thin sweeps), and a large square foot pad with a rubber underside and hazard-striped edge, bolted, with a small ball joint. Pads sit flat at y=0 about 2.6 m out from the centreline. Each leg uses its own leg joint (legFL, legFR, legRL, legRR). Warning decals on the sleeves.",
+          "box": [
+            [
+              -2.5,
+              0,
+              -3.6
+            ],
+            [
+              2.5,
+              1.5,
+              2.2
+            ]
+          ],
+          "attaches": "Roots at legFrontL/R and legRearL/R mounts on the hull sides; feet end on the floor.",
+          "joints": [
+            "legFL",
+            "legFR",
+            "legRL",
+            "legRR",
+            "body"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "railgun",
+          "builds": "Rotating turret and railgun. Turret: faceted rotating base on the turretRing mount (joint turret) with a side armour housing, ammo and capacitor boxes, a coolant tank, and ladder rungs. The gun cradle (joint gun) pivots at gunPivot with two big trunnion discs. Twin parallel box rails about 5.5 m long run forward over the cab to the muzzle at z=4.4 with a gap between them. Glowing cyan capacitor strips run along the rail inner faces and across coils, and glow rings sit at intervals as cyan glowing discs. The breech block at the rear carries heavy capacitor banks with hazard stripes and cooling fins, and a flared muzzle brake at the front. Includes the rail support brackets, a recoil buffer cylinder, a targeting optics box with a glowing lens, and cable sweeps. Glow kit used for cyan elements.",
+          "box": [
+            [
+              -1.3,
+              1.75,
+              -3.6
+            ],
+            [
+              1.3,
+              3.2,
+              4.5
+            ]
+          ],
+          "attaches": "Turret base sits on turretRing at deckTop (y=1.75); gun cradle pivots at gunPivot; muzzle ends at the muzzle mount; rails pass above the cabRoof (y<=2.6 cab roof, rails at y 2.7-3.1).",
+          "joints": [
+            "turret",
+            "gun"
+          ],
+          "floor": false,
+          "budget": 200
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:04:05.819Z",
+        "wallMs": 32555,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85251,
+          "completion_tokens": 3791,
+          "total_tokens": 89042,
+          "prompt_tokens_details": {
+            "cached_tokens": 85247
+          }
+        },
+        "costUsd": 0.046442699999999996,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:04:38.374Z",
+        "wallMs": 33682,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89367,
+          "completion_tokens": 5243,
+          "total_tokens": 94610,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07140439999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "hull",
+        "started": "2026-10-25T14:04:38.374Z",
+        "wallMs": 33912,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89455,
+          "completion_tokens": 5031,
+          "total_tokens": 94486,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.06946039999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "stabilisers",
+        "started": "2026-10-25T14:04:38.374Z",
+        "wallMs": 41163,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89431,
+          "completion_tokens": 5937,
+          "total_tokens": 95368,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0784724,
+        "hasCode": true,
+        "reasoning": "I'm designing compact stabilizer legs for each side, computing mount points and pad positions symmetrically based on the side multiplier, with joints attaching to the leg bones at the mount location.\n\nNow I'm working out the strut geometry for each leg: a bracket box near the mount, a tapered sleeve-and-piston pair forming the main strut down to the pad, collar rings at the junction, and a diagonal brace connecting the bracket to a point along the strut for added rigidity.\n\nI'm adding a hazard-striped border plane above the pad with transparent center, corner bolt cylinders, and a ball joint sphere at the piston end, plus a warning triangle decal positioned on the tilted sleeve's outer face.\n\nNow I'm placing the hydraulic hose geometry as curved sweeps between the bracket and sleeve/piston, using a rubber-colored material and offsetting along the z-axis based on front/rear leg position.\n\nSteel parts use the metal palette, with custom paint treatments for grime and countershading on the sleeve and bracket. I'm mirroring geometry across the x-axis for left/right legs, mapping each joint position, then writing a cylinder helper to build rods, collars, and pivot pins along their respective axes.\n\nAdding bolts around the pad corners and generating a hazard-stripe SVG pattern (rotated diagonal stripes masked to the pad's inner border) for texture. Writing the warning label SVG with a yellow triangle and black exclamation mark plus text.\n\n"
+      },
+      {
+        "id": "runningGear",
+        "started": "2026-10-25T14:04:38.374Z",
+        "wallMs": 79579,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89418,
+          "completion_tokens": 10306,
+          "total_tokens": 99724,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.12213639999999999,
+        "hasCode": true,
+        "reasoning": "I'm drafting the buildRunningGear function, setting up wheel joints with outward-facing directions and appropriate radius and width values for each wheel position.\n\nFor the wheel geometry itself, I need an octagonal cylinder that sits flat on the ground rather than resting on an edge vertex — so I'm rotating the cylinder slightly and adjusting the circumradius to compensate, then aiming it along the correct outward axis.\n\nPositioning the wheels, I'm computing the outward offset for left versus right sides and checking that the outermost tire edge still fits within the bounding box. For tread detail I'm weighing whether to add individual blocks around each wheel's circumference, but that would mean dozens of extra parts, so I should find a way to merge or simplify them.\n\nInstead I'm planning to merge each wheel's tread blocks into a single geometry in model space, computing positions using the wheel's bone origin, radius, and angle around the axle, with each box rotated appropriately about the X axis.\n\nChecking the tread block placement so the blocks don't dip too far below the tire floor — adjusting radial center and height so the lowest point stays within a reasonable tolerance. Now moving on to modeling the sidewall as a cylinder.\n\nWorking out the hub assembly: a textured disc for the hub face with a bolt ring pattern, a steel hub cylinder, a central cap, eight bolts arranged radially, and a dark gunmetal inner rim ring.\n\nI'm reconsidering brake discs since they'd be hidden inside the tire -- better to mount them inboard on the axle between wheel and differential so they spin with the wheel, plus adding caliper boxes on the body. Now designing the hub texture as an SVG with a dark outer ring, steel disc base, yellow diameter stripe, and a bolt-ring pattern around the center.\n\nModeling the drivetrain: axle rods running across at ride height, a low-poly differential housing near center, an axle beam box, and stacked leaf springs tapering along the body sides.\n\nI'm also adding drive shafts with universal joint spheres connecting the axles, and adjusting vertical placement so the springs sit under the axles rather than clipping into the hull floor, keeping everything within a sensible ground clearance.\n\nNow I'm thinking through leaf spring layering beneath each axle with graduated lengths and small shackle details, and considering how to add mud guards over the wheels using a simple layered box or curved extrusion approach.\n\nAdding hanging rubber mudguard flaps behind each of the six wheels, positioned and sized to match front, mid, and rear wheel locations, with rubber coloring for the flaps.\n\nFor the tires, I'm painting the sidewalls with a noise-based mottled dirt effect that darkens toward the bottom and mixes in a muddy brown tone, plus adding a gunmetal rim ring detail near the tire face.\n\nEach wheel is building up from several merged parts -- tire, tread, hub cylinder, hub texture circle, cap, eight bolts, brake disc, inner drum hub, and mudflap -- totaling roughly 54 pieces across six wheels, with axle assemblies adding beams, differential housings, and more.\n\nI'm tallying everything up: springs with their shackles and mounts, driveshafts, half-shaft covers, bringing the total to around 140 parts. Now I'm working out mount placement using the spec's axle coordinates and joint positions, defining how each part's geometry attaches to its bone with position and direction vectors, accounting for cases where the direction flips sideways.\n\nFor the tire tread I'm building a helper that generates small box geometries around the tire's circumference, rotating each block by its angular position and translating it outward to the tire radius, adding paired blocks per segment to create the tread pattern with a central groove.\n\nI'm importing mergeGeometries from the three.js addons to combine these treads, and planning the suspension parts next: leaf springs as steel boxes along the axle, gunmetal for secondary pieces, a drive shaft using a rod helper between two points, and ball joint caps at the ends.\n\nFor the differential, I'm placing a scaled sphere (gunmetal) at the axle center plus a small pumpkin cover cylinder facing forward with a breather pipe on top, then switching the axle itself to a gunmetal rod spanning from one side to the other with octagonal cross-section.\n\nNow I'm adding half-shafts, brake discs at each wheel position, and calipers positioned low enough to stay visible beneath the hull rather than hidden inside it, followed by an inner hub drum cylinder to complete the brake assembly.\n\nWriting wheel table and hub SVG...\n\nStill placing wheel hub details...\n\n"
+      },
+      {
+        "id": "railgun",
+        "started": "2026-10-25T14:04:38.374Z",
+        "wallMs": 84143,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89561,
+          "completion_tokens": 10792,
+          "total_tokens": 100353,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.1272824,
+        "hasCode": true,
+        "reasoning": "I'm planning a buildRailgun function that constructs the turret and gun assembly from joint data, laying out parts like the housing, boxes, tank, ladder on the turret and trunnion discs, cradle, rails on the gun barrel.\n\nI'm figuring out the exact dimensions and positions for the rails, breech block, muzzle brake, and turret base, keeping everything within sensible bounding boxes so parts don't clip into the hull or each other.\n\nNow I'm placing trunnion discs on a horizontal axis at the gun joint, and adding glowing capacitor strips along the inner rail faces.\n\nFor the glow rings, I realize a single large torus around both rails would poke outside the housing, so instead I'll give each rail its own smaller flattened torus, spaced along the barrel like coil wraps.\n\nNow I'm sketching the support structure: dark gunmetal bridge boxes across the top spanning the rails with a thin glowing strip, plus pylon brackets beneath the rails positioned to clear the cab roof.\n\nFor the muzzle, I'm flaring the barrel end using a tapered frustum shape that widens slightly toward the tip, with dark recessed slots cut into it for a brake-like detail.\n\nThen I'm sizing the breech block as a box sitting behind the barrel, keeping it under the height limit, and adding capacitor cylinders on either side with hazard-striped rings, plus thin cooling fins along the rear top for sci-fi weapon detailing.\n\nNext I'm placing an optics sight box mounted to the side of the gun with a glowing cyan lens cylinder, then adding a recoil buffer cylinder between the rails behind the breech with a thin steel rod running through it.\n\nNow I'm routing power cables with a curved sweep from breech to turret housing, bound to the gun bone. Then I'm building the turret: a lathed cylinder base ring, an upper box-shaped housing with a chamfered front, considering a faceted octagonal turret shape as an alternative.\n\nStill working out side armour boxes, ammo and capacitor compartments, and a rear coolant tank, placing them in model-space coordinates relative to the turret bone.\n\nI'm simplifying the layout by putting the ladder on the right side of the turret near the octagon edge, with rails and rungs positioned vertically, then checking whether the rear-left coolant tank placement clears the octagon boundary.\n\nFor the left side I'm placing a side armor housing box with ammo boxes possibly on top, while on the front deck I'm positioning capacitor boxes flanking the gun path with a cyan strip detail.\n\nNow I'm working through the cradle geometry, fitting side plates and trunnion discs into the available space while checking that none of these pieces overlap with the housing or turret top boundaries.\n\nNext I'm laying out the gun rails spanning from the breech end forward, sizing their length and paint finish with a gunmetal/steel mix, then preparing to import the glow kit for the rail strip highlighting.\n\nI'm setting up small box/cylinder helper functions to simplify placing parts onto bones, then sketching where cooling fins should go—thin vertical plates along the breech's rear face near the capacitor banks, spaced across the width.\n\nNow I'm planning hazard striping and decals: adding striped warning bands near the breech front, plus a textured plane on the turret housing side bearing a stenciled \"RG-01\" marking oriented so it reads correctly from outside, along with a warning triangle decal elsewhere on the tank.\n\nI'm then sketching cable sweeps using catmull curves running from a cap box near the breech up toward the turret, bound to the gun bone with a small rubber-colored tube, and considering adding coiled gunmetal boxes ringing the side rails -- though I need to check the coil width doesn't clash with the inner rail face spacing.\n\nInstead of coils along the rails, I'll add horizontal bridge boxes spanning across the rails at regular z-intervals with a glowing strip on top, alternating with torus rings positioned between the bridges so they don't overlap vertically.\n\nWriting trunnion and bolt geometry...\n\nFor the turret, I'll use a conditional paint function that shades the upper surface lighter than the base hull color. I'll skip extra panel detailing and just finish writing the muzzle brake slots to complete the model.\n\n"
+      }
+    ]
+  }
+}

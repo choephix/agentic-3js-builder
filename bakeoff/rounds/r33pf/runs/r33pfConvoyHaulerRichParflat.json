@@ -1,0 +1,436 @@
+{
+  "slug": "r33pfConvoyHaulerRichParflat",
+  "arm": "parflat",
+  "subject": "convoyHauler",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T13:59:30.716Z",
+  "wallMs": 51210,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 387451,
+    "completion_tokens": 14598,
+    "total_tokens": 402049,
+    "prompt_tokens_details": {
+      "cached_tokens": 296128
+    }
+  },
+  "costUsd": 0.3582388,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 20272,
+    "slowestPartMs": 30938,
+    "critical": "chassis",
+    "elapsedMs": 51211,
+    "spec": {
+      "name": "Convoy Hauler MX-9",
+      "description": "A low-poly cyberpunk armoured six-wheel convoy hauler with a slab-sided cab and a sealed, glowing cargo pod on its rear bed.",
+      "builderName": "convoyHauler",
+      "size": [
+        3,
+        3.1,
+        9
+      ],
+      "layout": "A long, low, angular truck facing +Z. Front: wedge-nosed armoured cab (z 2.2 to 4.5) with slit visor windscreen, bull bar, headlight strips in neon cyan and a roof light bar. Behind the cab a flat chassis deck (top y 1.2) runs to z -4.5. Six chunky wheels: front axle at z 3.0 and two rear axles at z -1.6 and z -3.4, resting on the floor. The sealed cargo pod (rounded-hex ribbed capsule, magenta glowing seams, hazard stripes, clamp straps) sits on the deck from z 1.6 to -4.4, rising to y 3.1. Style: faceted low-poly slabs, dark gunmetal hull, yellow hazard trim, neon cyan and magenta glow strips on every part, small panel and rivet details as separate parts.",
+      "palette": {
+        "hull": "#2f3540",
+        "hullDark": "#1b1f27",
+        "hullLight": "#4a5565",
+        "trim": "#e7b814",
+        "trimDark": "#14120a",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fb4",
+        "glass": "#0b2a3a",
+        "tire": "#101114",
+        "rim": "#8a93a3",
+        "podShell": "#d9dde3",
+        "podRib": "#8b94a3",
+        "warnRed": "#e0262f",
+        "metal": "#6b7482",
+        "rust": "#7a4a2b"
+      },
+      "mounts": {
+        "deckTop": [
+          0,
+          1.2,
+          0
+        ],
+        "cabRear": [
+          0,
+          1.2,
+          2.2
+        ],
+        "podBase": [
+          0,
+          1.25,
+          -1.4
+        ],
+        "axleFront": [
+          0,
+          0.6,
+          3
+        ],
+        "axleRear1": [
+          0,
+          0.6,
+          -1.6
+        ],
+        "axleRear2": [
+          0,
+          0.6,
+          -3.4
+        ],
+        "bumperFront": [
+          0,
+          0.7,
+          4.5
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "cab",
+          "parent": "body",
+          "at": [
+            0,
+            1.2,
+            3.3
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "cab"
+        },
+        {
+          "name": "pod",
+          "parent": "body",
+          "at": [
+            0,
+            1.25,
+            -1.4
+          ],
+          "dir": [
+            0,
+            0,
+            -1
+          ],
+          "role": "hinge",
+          "group": "pod"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.3,
+            0.6,
+            3
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.3,
+            0.6,
+            3
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.3,
+            0.6,
+            -1.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.3,
+            0.6,
+            -1.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelBL",
+          "parent": "body",
+          "at": [
+            1.3,
+            0.6,
+            -3.4
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelBR",
+          "parent": "body",
+          "at": [
+            -1.3,
+            0.6,
+            -3.4
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Frame and deck: long hull slab with chamfered edges, side skirts with hazard-stripe panels, underbody dark boxes, fuel tanks and battery cases on the flanks, a rear bumper with red tail lights and cyan under-glow strips, deck plate with rivet rows and tie-down rings, mud-flap panels. Colours hull, hullDark, hullLight, trim, neonCyan, warnRed, metal.",
+          "box": [
+            [
+              -1.5,
+              0.45,
+              -4.5
+            ],
+            [
+              1.5,
+              1.2,
+              2.2
+            ]
+          ],
+          "attaches": "Top face at deckTop carries the pod at podBase and meets the cab at cabRear; wheel arches open around the axle mounts.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "cab",
+          "builds": "Armoured cab: wedge-nosed faceted body, sloped hood, slit visor windscreen in glass with cyan frame, side window slits, armour plates with rivets and hazard trim, roof light bar with magenta and cyan lights, bull bar and front bumper at bumperFront with twin neon cyan headlight strips, grille slats, side mirrors, exhaust stacks behind the cab, door seams, an emblem stripe. Colours hull, hullLight, glass, neonCyan, neonMagenta, trim, metal.",
+          "box": [
+            [
+              -1.5,
+              1.2,
+              2.2
+            ],
+            [
+              1.5,
+              2.7,
+              4.5
+            ]
+          ],
+          "attaches": "Sits on the chassis at cabRear; its front reaches bumperFront.",
+          "joints": [
+            "cab",
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "wheels",
+          "builds": "Six wheels at the axle mounts, each with a chunky low-poly tire with tread blocks, a rim disc with bolt ring, a hub with a cyan glowing centre cap, and brake disc; plus axle bars, suspension springs and leaf packs visible between wheels and chassis, and wheel arch fender trims in hull colour with yellow edge lines. Tires tire, rims rim, hubs metal and neonCyan.",
+          "box": [
+            [
+              -1.5,
+              0,
+              -4
+            ],
+            [
+              1.5,
+              1.2,
+              3.7
+            ]
+          ],
+          "attaches": "Wheels sit at axleFront, axleRear1 and axleRear2 on joints wheelFL..wheelBR with axle at y 0.6 and radius 0.6 so they touch the floor.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelBL",
+            "wheelBR",
+            "body"
+          ],
+          "floor": true,
+          "budget": 220
+        },
+        {
+          "id": "cargoPod",
+          "builds": "Sealed cargo pod: long faceted hexagonal capsule on a cradle base, pale podShell body with podRib ring ribs, domed faceted end caps, glowing magenta seam strips along the sides and top, hazard-stripe bands, warning red lock indicators, a sealed hatch door with a keypad and a cyan status light, heavy clamp straps over the top with bolts, corner brackets, stencil-like emblem bars, and small antenna on top. Glow on the seams and lights.",
+          "box": [
+            [
+              -1.4,
+              1.25,
+              -4.4
+            ],
+            [
+              1.4,
+              3.1,
+              1.6
+            ]
+          ],
+          "attaches": "Cradle base rests on the deck at podBase height y 1.25 on the chassis; straps clamp down onto the cradle.",
+          "joints": [
+            "pod"
+          ],
+          "floor": false,
+          "budget": 220
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T13:59:30.716Z",
+        "wallMs": 20272,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75243,
+          "completion_tokens": 2654,
+          "total_tokens": 77897,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "costUsd": 0.177026,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T13:59:50.989Z",
+        "wallMs": 15294,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 78081,
+          "completion_tokens": 2669,
+          "total_tokens": 80750,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0421912,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoPod",
+        "started": "2026-10-25T13:59:50.989Z",
+        "wallMs": 20522,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 78055,
+          "completion_tokens": 3516,
+          "total_tokens": 81571,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0506092,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T13:59:50.989Z",
+        "wallMs": 24715,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 78044,
+          "completion_tokens": 3222,
+          "total_tokens": 81266,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.047647199999999994,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T13:59:50.989Z",
+        "wallMs": 30938,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 78028,
+          "completion_tokens": 2537,
+          "total_tokens": 80565,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.040765199999999994,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

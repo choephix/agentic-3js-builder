@@ -1,0 +1,442 @@
+{
+  "slug": "r33pfd2HoverPickupRichPar",
+  "arm": "par",
+  "subject": "hoverPickup",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: militarized pickup converted to hover thrusters.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T13:59:30.729Z",
+  "wallMs": 44399,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 525446,
+    "completion_tokens": 16728,
+    "total_tokens": 542174,
+    "prompt_tokens_details": {
+      "cached_tokens": 420420
+    }
+  },
+  "costUsd": 0.41937399999999997,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 24187,
+    "slowestPartMs": 20212,
+    "critical": "rocketPod",
+    "elapsedMs": 44399,
+    "spec": {
+      "name": "Hoverjack Technical",
+      "description": "A militarized pickup truck converted to run on four downward-firing hover thrusters, low-poly cyberpunk with neon underglow, armor plating and a bed-mounted rocket pod.",
+      "builderName": "hoverjackTechnical",
+      "size": [
+        2.5,
+        2.2,
+        5.6
+      ],
+      "layout": "A boxy armored pickup floating about 0.35 m above the floor on four glowing thruster pods, one at each former wheel position. Front (+Z): angular sloped hood with a bull-bar bumper, a slit of cyan headlights and a roof-mounted light bar. Middle: a chunky two-door cab with slanted tinted glass, hex-painted armor plates and a roof rack. Back: an open cargo bed with ribbed walls, a roll cage and a rocket pod on a pivot. Underneath: a flat skid plate with magenta neon underglow strips; four ducted thruster nacelles with cyan glowing rings hang from short pylons at the corners. Style: faceted low-poly slabs, bevelled edges, dark gunmetal hull with yellow hazard trim, neon cyan and magenta glow on lights, thruster cores, underglow and decals (kanji and barcode SVG decals on the doors and tailgate). Only the thruster pods nearly touch the floor (lowest points sit at y=0), the hull floats above.",
+      "palette": {
+        "hull": "#3a414d",
+        "hullDark": "#20242c",
+        "armor": "#566070",
+        "trim": "#e7b814",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fb4",
+        "glass": "#17283a",
+        "rubber": "#15161a",
+        "metal": "#8a93a3",
+        "rust": "#7a4a2e",
+        "white": "#e8ecf2",
+        "red": "#d8283a"
+      },
+      "mounts": {
+        "hullTop": [
+          0,
+          1,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1,
+          0.3
+        ],
+        "bedFloor": [
+          0,
+          0.95,
+          -1.7
+        ],
+        "frontAxle": [
+          0,
+          0.55,
+          1.7
+        ],
+        "rearAxle": [
+          0,
+          0.55,
+          -1.7
+        ],
+        "thrusterFL": [
+          1.05,
+          0.55,
+          1.7
+        ],
+        "thrusterFR": [
+          -1.05,
+          0.55,
+          1.7
+        ],
+        "thrusterRL": [
+          1.05,
+          0.55,
+          -1.7
+        ],
+        "thrusterRR": [
+          -1.05,
+          0.55,
+          -1.7
+        ],
+        "podPivot": [
+          0,
+          1.55,
+          -1.9
+        ],
+        "roofTop": [
+          0,
+          2,
+          0.2
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "thrusterFL",
+          "parent": "body",
+          "at": [
+            1.05,
+            0.55,
+            1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterFR",
+          "parent": "body",
+          "at": [
+            -1.05,
+            0.55,
+            1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterRL",
+          "parent": "body",
+          "at": [
+            1.05,
+            0.55,
+            -1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "thrusterRR",
+          "parent": "body",
+          "at": [
+            -1.05,
+            0.55,
+            -1.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge",
+          "group": "thrusters"
+        },
+        {
+          "name": "podPivot",
+          "parent": "body",
+          "at": [
+            0,
+            1.55,
+            -1.9
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "weapon"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Lower hull: flat skid plate with magenta underglow strips (glow), side sills with yellow hazard-stripe paint, front bumper with bull-bar and tow hooks, rear bumper, wheel-arch-style cutouts as dark inset panels around the thruster mounts, pylon struts reaching down to each thruster mount, exhaust vents, panelled gunmetal paint on the lower body.",
+          "box": [
+            [
+              -1.15,
+              0.45,
+              -2.8
+            ],
+            [
+              1.15,
+              1,
+              2.8
+            ]
+          ],
+          "attaches": "Cab sits on cabFloor, bed on bedFloor; thruster pylons end at thrusterFL/FR/RL/RR mounts.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Front body: sloped faceted hood with vents and a hazard-striped scoop, fenders, grille with cyan headlight slits (glow), two-door cab with slanted tinted glass windshield and side windows, armor plates with hex paint, door decals (SVG kanji and barcode), side mirrors, roof with roof rack and neon light bar (glow), antenna, interior seats and dashboard hints visible through glass.",
+          "box": [
+            [
+              -1.2,
+              1,
+              -0.9
+            ],
+            [
+              1.2,
+              2.2,
+              2.8
+            ]
+          ],
+          "attaches": "Rests on chassis at cabFloor; rear wall of cab meets the bed at z=-0.9; roof rack at roofTop.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 200
+        },
+        {
+          "id": "bed",
+          "builds": "Open cargo bed behind the cab: floor at bedFloor, ribbed side walls and tailgate with barcode/warning SVG decals, yellow trim caps, roll cage bars of rods, tail lights (red glow), spare fuel canisters and crates strapped in, tie-down hooks, rear light strips in magenta (glow), tailgate hinge.",
+          "box": [
+            [
+              -1.2,
+              0.95,
+              -2.8
+            ],
+            [
+              1.2,
+              1.9,
+              -0.9
+            ]
+          ],
+          "attaches": "Floor sits on chassis at bedFloor; front wall abuts the cab at z=-0.9; the rocket pod sits above it at podPivot.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "thrusters",
+          "builds": "Four ducted hover thruster nacelles, one per corner, each on its own joint: octagonal lathe shroud in armor metal with hazard-stripe rim, inner fan of blades, glowing cyan core disc and downward glow ring (glow), short upper pylon bracket reaching the hull, vent fins, small rivet details, scorch paint at the bottom. Lowest points of the nacelles sit on y=0.",
+          "box": [
+            [
+              -1.25,
+              0,
+              -2.1
+            ],
+            [
+              1.25,
+              0.8,
+              2.1
+            ]
+          ],
+          "attaches": "Each nacelle centres on its thruster mount and rides the matching joint; brackets reach up to the chassis pylon ends.",
+          "joints": [
+            "thrusterFL",
+            "thrusterFR",
+            "thrusterRL",
+            "thrusterRR"
+          ],
+          "floor": true,
+          "budget": 170
+        },
+        {
+          "id": "rocketPod",
+          "builds": "Bed-mounted weapon on podPivot: swivel base ring and pedestal, tilted 6-tube rocket launcher box with red-tipped rockets and glowing tube rims, armored shield plate, ammo belt of small boxes, a targeting sensor with a cyan lens and a small SVG skull decal, yellow warning chevrons.",
+          "box": [
+            [
+              -0.6,
+              1.4,
+              -2.7
+            ],
+            [
+              0.6,
+              2.1,
+              -1.1
+            ]
+          ],
+          "attaches": "Base stands on bedFloor at podPivot, rides the podPivot joint so it can rotate.",
+          "joints": [
+            "podPivot"
+          ],
+          "floor": false,
+          "budget": 140
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T13:59:30.729Z",
+        "wallMs": 24187,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85244,
+          "completion_tokens": 2716,
+          "total_tokens": 87960,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "costUsd": 0.197648,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "thrusters",
+        "started": "2026-10-25T13:59:54.916Z",
+        "wallMs": 13550,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88065,
+          "completion_tokens": 2254,
+          "total_tokens": 90319,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.038910400000000005,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T13:59:54.916Z",
+        "wallMs": 17431,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88040,
+          "completion_tokens": 2850,
+          "total_tokens": 90890,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0448204,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bed",
+        "started": "2026-10-25T13:59:54.916Z",
+        "wallMs": 17740,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88030,
+          "completion_tokens": 2990,
+          "total_tokens": 91020,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0462004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T13:59:54.916Z",
+        "wallMs": 18626,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88044,
+          "completion_tokens": 2453,
+          "total_tokens": 90497,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0408584,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "rocketPod",
+        "started": "2026-10-25T13:59:54.916Z",
+        "wallMs": 20212,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 88023,
+          "completion_tokens": 3465,
+          "total_tokens": 91488,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0509364,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

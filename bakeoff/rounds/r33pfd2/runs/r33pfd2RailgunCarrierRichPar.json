@@ -1,0 +1,560 @@
+{
+  "slug": "r33pfd2RailgunCarrierRichPar",
+  "arm": "par",
+  "subject": "railgunCarrier",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T13:59:30.727Z",
+  "wallMs": 52420,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 531034,
+    "completion_tokens": 17887,
+    "total_tokens": 548921,
+    "prompt_tokens_details": {
+      "cached_tokens": 420420
+    }
+  },
+  "costUsd": 0.44214000000000003,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 29648,
+    "slowestPartMs": 22772,
+    "critical": "chassis",
+    "elapsedMs": 52420,
+    "spec": {
+      "name": "Longspine Railgun Carrier",
+      "description": "A six-wheeled low-poly sci-fi military railgun carrier with a long rail barrel, deployed on four hydraulic stabiliser legs.",
+      "builderName": "railgunCarrier",
+      "size": [
+        4.2,
+        3.4,
+        11
+      ],
+      "layout": "Long, heavy 6x6 truck-like hull facing +Z. Front: armoured cab with a slanted glacis, angular windscreen slits and a sensor mast. Middle: flat deck with the railgun turret ring at the centre. Rear: capacitor bank and generator block, with stabiliser legs lowered at the four corners of the mid and rear hull. Six wheels in 3 axles (front, middle, rear) rest on y=0, with stabiliser pads also touching the floor. The railgun barrel is a twin-rail assembly pointing forward over the cab at about 15 degrees elevation, with a coil ring series along it. Style: faceted chunky armour plates in olive-gunmetal, hazard yellow trim, cyan glowing energy rails and coils, panelled paint with rivets, decals and stencil numbers drawn as SVG.",
+      "palette": {
+        "hull": "#4a5240",
+        "hullDark": "#2f352b",
+        "armorLight": "#6b7558",
+        "gunmetal": "#2b2f36",
+        "steel": "#8a919c",
+        "rubber": "#16171a",
+        "hazard": "#e7b814",
+        "glowCyan": "#2ff3ff",
+        "glowBlue": "#3a7bff",
+        "glass": "#1c3a4a",
+        "warnRed": "#c8281e",
+        "white": "#e8ecef"
+      },
+      "mounts": {
+        "deckTop": [
+          0,
+          1.75,
+          0
+        ],
+        "cabRoof": [
+          0,
+          2.55,
+          3.4
+        ],
+        "turretRing": [
+          0,
+          1.85,
+          -0.6
+        ],
+        "breech": [
+          0,
+          2.7,
+          -1.6
+        ],
+        "muzzle": [
+          0,
+          3.1,
+          5.6
+        ],
+        "axleFront": [
+          0,
+          0.7,
+          3.6
+        ],
+        "axleMid": [
+          0,
+          0.7,
+          -0.6
+        ],
+        "axleRear": [
+          0,
+          0.7,
+          -3.4
+        ],
+        "stabFL": [
+          1.75,
+          1.2,
+          1.2
+        ],
+        "stabRL": [
+          1.75,
+          1.2,
+          -4.2
+        ],
+        "genDeck": [
+          0,
+          1.75,
+          -4
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1.2,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.7,
+            0.7,
+            3.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.7,
+            0.7,
+            3.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.7,
+            0.7,
+            -0.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.7,
+            0.7,
+            -0.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.7,
+            0.7,
+            -3.4
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.7,
+            0.7,
+            -3.4
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "turret",
+          "parent": "body",
+          "at": [
+            0,
+            1.85,
+            -0.6
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine",
+          "group": "gun"
+        },
+        {
+          "name": "gunElev",
+          "parent": "turret",
+          "at": [
+            0,
+            2.7,
+            -1.6
+          ],
+          "dir": [
+            0,
+            0.26,
+            0.97
+          ],
+          "role": "hinge",
+          "group": "gun"
+        },
+        {
+          "name": "stabFL",
+          "parent": "body",
+          "at": [
+            1.75,
+            1.2,
+            1.2
+          ],
+          "dir": [
+            0.5,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "stab"
+        },
+        {
+          "name": "stabFR",
+          "parent": "body",
+          "at": [
+            -1.75,
+            1.2,
+            1.2
+          ],
+          "dir": [
+            -0.5,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "stab"
+        },
+        {
+          "name": "stabRL",
+          "parent": "body",
+          "at": [
+            1.75,
+            1.2,
+            -4.2
+          ],
+          "dir": [
+            0.5,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "stab"
+        },
+        {
+          "name": "stabRR",
+          "parent": "body",
+          "at": [
+            -1.75,
+            1.2,
+            -4.2
+          ],
+          "dir": [
+            -0.5,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "stab"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Main hull from y=0.9 to 1.75 from z=-5.5 to z=2.4: a loft/frustum-box lower hull with chamfered sides, a flat deck with panelled paint (rivets, hazard-stripe edge trims), side skirts and fender arches over the wheels, a rear bumper with tow hooks, underbody beams and axle housings reaching the three wheel axles, tail lights, stencil numbers and unit emblem decals via SVG textures. Includes the capacitor bank and generator block at the rear deck (genDeck): boxy cooling fins, glowing cyan indicator strips, exhaust stacks, cable runs.",
+          "box": [
+            [
+              -2.05,
+              0.8,
+              -5.5
+            ],
+            [
+              2.05,
+              2.7,
+              2.4
+            ]
+          ],
+          "attaches": "Carries all joints by parent body; wheels, stabilisers and turret mount to its axle lines, stabFL/stabRL points and turretRing. Cab starts at z=2.4.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Armoured cab at the front, z=2.4 to 5.2: sloped glacis plate, angled box cab with narrow glass slit windows (glass colour, SVG reflection streaks), roof hatch, sensor mast with dish and antenna, roof light bar, headlights glowing, front bumper with a hazard-striped ram plate, tow shackles, wing mirrors, side doors with handles and number decals, grille vents, armour add-on plates with bolts.",
+          "box": [
+            [
+              -1.95,
+              0.9,
+              2.4
+            ],
+            [
+              1.95,
+              3,
+              5.4
+            ]
+          ],
+          "attaches": "Sits on the chassis front at z=2.4 and the front axle housing at axleFront. Roof at cabRoof. Rides joint body.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "runningGear",
+          "builds": "Six chunky low-poly wheels on three axles (rubber tyres with 8-sided lathe profile, tread blocks, steel hub discs with lug nuts and a hazard ring, painted mud near the bottoms), axle stubs, suspension arms and shock absorbers (coil via a sweep) running to the chassis. Wheel radius 0.7, centred at y=0.7, wheels at x=±1.7 on axleFront, axleMid, axleRear, so tyres touch y=0. Each wheel rides its own wheel joint.",
+          "box": [
+            [
+              -2.1,
+              0,
+              -4.2
+            ],
+            [
+              2.1,
+              1.4,
+              4.4
+            ]
+          ],
+          "attaches": "Wheel joints sit at axle lines under the chassis; suspension arms end at the chassis underside.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelRL",
+            "wheelRR"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "stabilisers",
+          "builds": "Four deployed stabiliser legs: each has a side-mounted box outrigger housing on the hull at stabFL/FR/RL/RR, a splayed telescoping hydraulic leg (two nested tubes in steel and hazard yellow, with a piston rod, bolts and hose sweeps) angling outward and down to a wide octagonal foot pad on the ground (y=0, pad radius 0.45, with a rubber underlay and warning chevron texture). Legs extend to x=±2.1 at floor. Warning red beacon on each housing.",
+          "box": [
+            [
+              -2.2,
+              0,
+              -4.7
+            ],
+            [
+              2.2,
+              1.6,
+              1.7
+            ]
+          ],
+          "attaches": "Housings attach to the chassis flanks at stabFL, stabFR, stabRL and stabRR points; foot pads rest on y=0.",
+          "joints": [
+            "stabFL",
+            "stabFR",
+            "stabRL",
+            "stabRR"
+          ],
+          "floor": true,
+          "budget": 120
+        },
+        {
+          "id": "railgun",
+          "builds": "Turret and railgun: a rotating turret base ring at turretRing with a faceted armoured housing (panelled paint, hazard trim, crew hatch), gunElev cradle with trunnion blocks at breech, a massive breech block, twin parallel rails of gunmetal about 0.18 wide each spanning breech to muzzle (z=-1.6 to 5.6, rising about 15 degrees, so the muzzle is at y=3.1 above the cab), glowing cyan energy strips along the inner rail faces, a series of 8 coil rings spaced along the barrel (steel with glow cyan inner bands), a muzzle brake with glowing blue core, hydraulic recoil cylinders, ammo feed box and cable bundles back to the generator, SVG decals (warning chevrons, caution text).",
+          "box": [
+            [
+              -1.5,
+              1.75,
+              -2.4
+            ],
+            [
+              1.5,
+              3.4,
+              5.7
+            ]
+          ],
+          "attaches": "Turret base sits on the deck at turretRing (0,1.85,-0.6); barrel passes above cabRoof, clearing the cab by at least 0.2 m; muzzle at muzzle mount.",
+          "joints": [
+            "turret",
+            "gunElev"
+          ],
+          "floor": false,
+          "budget": 190
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T13:59:30.727Z",
+        "wallMs": 29648,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85251,
+          "completion_tokens": 3526,
+          "total_tokens": 88777,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "costUsd": 0.205762,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "stabilisers",
+        "started": "2026-10-25T14:00:00.376Z",
+        "wallMs": 13556,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89141,
+          "completion_tokens": 2236,
+          "total_tokens": 91377,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0408824,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "runningGear",
+        "started": "2026-10-25T14:00:00.376Z",
+        "wallMs": 16386,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89142,
+          "completion_tokens": 2244,
+          "total_tokens": 91386,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0409644,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:00:00.376Z",
+        "wallMs": 19593,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89088,
+          "completion_tokens": 2963,
+          "total_tokens": 92051,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0480464,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "railgun",
+        "started": "2026-10-25T14:00:00.376Z",
+        "wallMs": 20610,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89239,
+          "completion_tokens": 3497,
+          "total_tokens": 92736,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.053688400000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:00:00.375Z",
+        "wallMs": 22772,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89173,
+          "completion_tokens": 3421,
+          "total_tokens": 92594,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0527964,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

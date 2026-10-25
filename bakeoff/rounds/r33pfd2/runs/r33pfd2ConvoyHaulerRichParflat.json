@@ -1,0 +1,322 @@
+{
+  "slug": "r33pfd2ConvoyHaulerRichParflat",
+  "arm": "parflat",
+  "subject": "convoyHauler",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-25T13:59:30.726Z",
+  "wallMs": 40456,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 461441,
+    "completion_tokens": 15772,
+    "total_tokens": 477213,
+    "prompt_tokens_details": {
+      "cached_tokens": 370160
+    }
+  },
+  "costUsd": 0.37729799999999997,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 19754,
+    "slowestPartMs": 20702,
+    "critical": "cargoPod",
+    "elapsedMs": 40457,
+    "spec": {
+      "name": "Convoy Hauler Aegis-7",
+      "description": "A low-poly cyberpunk armoured convoy hauler: wedge-nosed six-wheel tractor cab towing a sealed, neon-banded cargo pod.",
+      "builderName": "convoyHauler",
+      "size": [
+        2.8,
+        3,
+        9
+      ],
+      "layout": "Static vehicle facing +Z. Front: angular wedge cab with slit visor windscreen, bull-bar and headlights (z 4.5 to 1.6). Behind the cab, a flat armoured chassis with six wheels (two front, four rear tandem) runs the full length at y 0.4-1.2. The sealed cargo pod is a long hex-profile capsule on a cradle over the rear chassis (z 1.4 to -4.5), with hazard stripes, glowing cyan seams and a rear door. Roof of the cab carries antenna, light bar and a small sensor turret. Flat colours only; style shows via chamfered boxes, neon trim lines (cyan, magenta), hazard-yellow stripes and glowing lights.",
+      "palette": {
+        "hull": "#2f3644",
+        "hullDark": "#1b1f29",
+        "hullLight": "#4a5468",
+        "trim": "#e7b814",
+        "trimDark": "#14120a",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fb4",
+        "glass": "#0a2a3a",
+        "tyre": "#111216",
+        "rim": "#8a93a6",
+        "pod": "#d9dde6",
+        "podShade": "#9aa3b5",
+        "warnRed": "#e0262f",
+        "lamp": "#fff3b0",
+        "rust": "#6b3f2a"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.2,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.2,
+          3
+        ],
+        "cradleTop": [
+          0,
+          1.55,
+          -1.6
+        ],
+        "podCentre": [
+          0,
+          2.3,
+          -1.5
+        ],
+        "axleF": [
+          0,
+          0.55,
+          3.2
+        ],
+        "axleR1": [
+          0,
+          0.55,
+          -1.2
+        ],
+        "axleR2": [
+          0,
+          0.55,
+          -2.8
+        ],
+        "roofTop": [
+          0,
+          2.7,
+          2.7
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Armoured ladder chassis and under-body: two long side rails, cross members, fuel/battery boxes, skirt plates with hazard-yellow chevrons, mudflaps, front bumper with bull-bar and tow hooks, rear bumper with red tail lights and neon magenta underglow strips. Colours hullDark, hull, trim, warnRed, neonMagenta.",
+          "box": [
+            [
+              -1.3,
+              0.35,
+              -4.5
+            ],
+            [
+              1.3,
+              1.2,
+              4.5
+            ]
+          ],
+          "attaches": "Top face at chassisTop supports cab (cabFloor) and cargo cradle (cradleTop); wheel wells open at axle mounts.",
+          "joints": [],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "wheels",
+          "builds": "Six chunky low-poly wheels (8-sided tyres) at axleF, axleR1, axleR2, both sides, with rim discs, hub bolts, cyan hub lights, axles, plus mudguard arches over each wheel. Colours tyre, rim, hullLight, neonCyan.",
+          "box": [
+            [
+              -1.4,
+              0,
+              -3.5
+            ],
+            [
+              1.4,
+              1.1,
+              4
+            ]
+          ],
+          "attaches": "Wheel centres at y 0.55 on axle mounts; axles meet chassis sides.",
+          "joints": [],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "cab",
+          "builds": "Wedge-shaped armoured tractor cab: chamfered hull boxes, sloped bonnet, slit glass visor windscreen with side windows, door seams, wing mirrors, grille with glowing lamp headlights and cyan DRL strips, roof light bar (magenta/red), antenna mast, small sensor turret dome, exhaust stacks behind the cab, hazard stripe on bonnet. Colours hull, hullLight, glass, lamp, neonCyan, neonMagenta, trim.",
+          "box": [
+            [
+              -1.35,
+              1.2,
+              1.6
+            ],
+            [
+              1.35,
+              2.9,
+              4.4
+            ]
+          ],
+          "attaches": "Sits on chassis at cabFloor; rear wall faces the pod at z 1.6; roof at roofTop.",
+          "joints": [],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cargoPod",
+          "builds": "Sealed hexagonal-profile cargo pod, long capsule built from chamfered segments: pod and podShade panels with seam rings, glowing neon cyan seam lines, hazard-yellow bands, bolted armour plates, rear double door with wheel lock and red lock lights, ID emblem and warning decals as small parts, top vent fins and sensor nodules. Colours pod, podShade, hull, trim, neonCyan, warnRed, trimDark.",
+          "box": [
+            [
+              -1.3,
+              1.5,
+              -4.5
+            ],
+            [
+              1.3,
+              3,
+              1.4
+            ]
+          ],
+          "attaches": "Rests in cradle at cradleTop; centre at podCentre; front face near cab rear wall.",
+          "joints": [],
+          "floor": false,
+          "budget": 220
+        },
+        {
+          "id": "cradle",
+          "builds": "Cargo cradle and fittings: three saddle frames cradling the pod with rubber pads, tie-down chain straps with ratchet buckles, a coupling plate and hydraulic rams, cable runs along the sides with cyan connectors, side tool lockers, rear ladder, rust-streak patches and small signage plates. Colours hullDark, hullLight, trim, rust, neonCyan, tyre.",
+          "box": [
+            [
+              -1.4,
+              1.2,
+              -4.4
+            ],
+            [
+              1.4,
+              2.2,
+              1.5
+            ]
+          ],
+          "attaches": "Base on chassisTop; saddles top out at cradleTop under the pod.",
+          "joints": [],
+          "floor": false,
+          "budget": 130
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T13:59:30.726Z",
+        "wallMs": 19754,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75243,
+          "completion_tokens": 2140,
+          "total_tokens": 77383,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "costUsd": 0.171886,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T13:59:50.481Z",
+        "wallMs": 11786,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77185,
+          "completion_tokens": 2011,
+          "total_tokens": 79196,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.033819199999999994,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T13:59:50.481Z",
+        "wallMs": 16010,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77274,
+          "completion_tokens": 2606,
+          "total_tokens": 79880,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.039947199999999995,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T13:59:50.481Z",
+        "wallMs": 16517,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77244,
+          "completion_tokens": 2820,
+          "total_tokens": 80064,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.042027199999999994,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cradle",
+        "started": "2026-10-25T13:59:50.481Z",
+        "wallMs": 17623,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77232,
+          "completion_tokens": 2607,
+          "total_tokens": 79839,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0398732,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoPod",
+        "started": "2026-10-25T13:59:50.481Z",
+        "wallMs": 20702,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77263,
+          "completion_tokens": 3588,
+          "total_tokens": 80851,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.049745199999999996,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

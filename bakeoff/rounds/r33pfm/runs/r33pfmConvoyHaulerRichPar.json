@@ -1,0 +1,541 @@
+{
+  "slug": "r33pfmConvoyHaulerRichPar",
+  "arm": "par",
+  "subject": "convoyHauler",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: armoured convoy hauler guarding a sealed cargo pod.\nStyle: low-poly cyberpunk.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:04:05.818Z",
+  "wallMs": 112073,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 531366,
+    "completion_tokens": 39056,
+    "total_tokens": 570422,
+    "prompt_tokens_details": {
+      "cached_tokens": 505666
+    }
+  },
+  "costUsd": 0.4925265999999999,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 27672,
+    "slowestPartMs": 84401,
+    "critical": "cab",
+    "elapsedMs": 112074,
+    "spec": {
+      "name": "Convoy Hauler MK-IV 'Lockjaw'",
+      "description": "A low-poly cyberpunk six-wheeled armoured convoy hauler with a hunched cab, roof gun turret and a sealed glowing cargo pod strapped to its flatbed.",
+      "builderName": "convoyHauler",
+      "size": [
+        3,
+        3.2,
+        8.4
+      ],
+      "layout": "Faces +Z. Front to back: a sloped armoured bull-bar and ram plate with twin headlamps at z 4.2, a chunky wedge cab (z 1.6 to 3.7) with a narrow neon-cyan visor slit window strip and roof turret ring, then a long low chassis flatbed (z -4.0 to 1.6) carrying a huge rounded-box sealed cargo pod (z -3.8 to 1.2) held by yellow-black hazard straps and clamps, with a glowing magenta seam and cyan status panel. Three axles (front z 2.9, mid z -0.6, rear z -2.9) with six chunky low-poly octagonal wheels resting on the floor, wheel radius 0.62. Fender arches over wheels, side skirts, exhaust stacks behind the cab. Style: faceted blocky hulls in dark gunmetal with yellow hazard trim, magenta and cyan neon glow strips, decals and SVG textures (warning chevrons, serial stencils, circuit lines, a skull-eye emblem), grime paints low on the body and light edge wear on top. All parts are flat-shaded chunky primitives.",
+      "palette": {
+        "hull": "#3a404e",
+        "hullDark": "#20242e",
+        "hullLight": "#5b6578",
+        "trim": "#f0b90f",
+        "trimBlack": "#14161c",
+        "neonCyan": "#2ff3ff",
+        "neonMagenta": "#ff2fa8",
+        "glass": "#0e2a3a",
+        "rubber": "#16171b",
+        "rim": "#8a93a6",
+        "podShell": "#d8dde6",
+        "podDark": "#4a5262",
+        "warnRed": "#e0302c",
+        "steel": "#9aa3b2",
+        "rust": "#6b4a36",
+        "headlamp": "#fff4c2"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.3,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.3,
+          2.65
+        ],
+        "cabRoof": [
+          0,
+          2.55,
+          2.5
+        ],
+        "turretRing": [
+          0,
+          2.6,
+          2.1
+        ],
+        "bullBarFront": [
+          0,
+          0.9,
+          4.2
+        ],
+        "podBase": [
+          0,
+          1.3,
+          -1.3
+        ],
+        "axleFront": [
+          0,
+          0.62,
+          2.9
+        ],
+        "axleMid": [
+          0,
+          0.62,
+          -0.6
+        ],
+        "axleRear": [
+          0,
+          0.62,
+          -2.9
+        ],
+        "wheelTrackX": [
+          1.35,
+          0.62,
+          0
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "cab",
+          "parent": "body",
+          "at": [
+            0,
+            1.3,
+            2.65
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turretYaw",
+          "parent": "cab",
+          "at": [
+            0,
+            2.6,
+            2.1
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "gunPitch",
+          "parent": "turretYaw",
+          "at": [
+            0,
+            2.95,
+            2.3
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "pod",
+          "parent": "body",
+          "at": [
+            0,
+            1.3,
+            -1.3
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine",
+          "group": "cargo"
+        },
+        {
+          "name": "podHatch",
+          "parent": "pod",
+          "at": [
+            0,
+            2.75,
+            -1.3
+          ],
+          "dir": [
+            0,
+            0,
+            -1
+          ],
+          "role": "hinge",
+          "group": "cargo"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.35,
+            0.62,
+            2.9
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.35,
+            0.62,
+            2.9
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.35,
+            0.62,
+            -0.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.35,
+            0.62,
+            -0.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.35,
+            0.62,
+            -2.9
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.35,
+            0.62,
+            -2.9
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Ladder-frame chassis and flatbed: a long low faceted deck slab with side skirts, paneled hull plating (panelled paint on hull colour with hazard trim edges), underbody beams, fuel tanks and battery boxes slung between axles, axle housings and suspension arms (leaf springs, shock rods) at the three axle mounts, rear bumper with tow hooks and red tail-lights, side toolboxes, exhaust stacks behind the cab with glowing heat vents, neon magenta underglow strips, stencilled serial-number SVG decals and grime paint (darker towards the bottom, rust at the lower edges). Wheel fender arches over each wheel and mud flaps.",
+          "box": [
+            [
+              -1.5,
+              0.4,
+              -4.2
+            ],
+            [
+              1.5,
+              1.6,
+              1.6
+            ]
+          ],
+          "attaches": "Top deck at chassisTop carries the pod (podBase) and meets the cab at cabFloor. Axle housings end at axleFront/axleMid/axleRear where wheels mount. Rides joint body.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "cab",
+          "builds": "Armoured wedge cab with sloped windshield, narrow neon-cyan visor-slit windows drawn as SVG glass with scan-line reflections, angular roof armour plates, side door panels with hazard chevron stripes and a skull-eye emblem decal, roof antennae and a sensor array, light bar with glowing amber/cyan lamps, mirrors, grille and ram bull-bar with plate steel and spikes at bullBarFront, twin headlamps (glow), front bumper hazard stripes, step rails and handles. Includes interior hint (seat headrests visible through glass).",
+          "box": [
+            [
+              -1.5,
+              1.3,
+              1.6
+            ],
+            [
+              1.5,
+              2.6,
+              4.3
+            ]
+          ],
+          "attaches": "Sits on chassis at cabFloor; roof meets the turret at turretRing and cabRoof. Rides joints cab (and body for the bull-bar).",
+          "joints": [
+            "cab",
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "turret",
+          "builds": "Roof-mounted remote weapon station at turretRing: lathe ring base with bolts, rotating faceted armour housing on turretYaw, twin barrel autocannon with shrouds, muzzle brakes and ammo box with feed belt on gunPitch, a sensor eye dome with a glowing red lens, a small cyan status LED strip, hazard-striped armour plates, antenna whip. Paint with worn edges and scorch marks on the barrels.",
+          "box": [
+            [
+              -0.8,
+              2.55,
+              1.2
+            ],
+            [
+              0.8,
+              3.2,
+              3.5
+            ]
+          ],
+          "attaches": "Base ring sits on the cab roof at turretRing (0, 2.6, 2.1). Rides turretYaw and gunPitch.",
+          "joints": [
+            "turretYaw",
+            "gunPitch"
+          ],
+          "floor": false,
+          "budget": 140
+        },
+        {
+          "id": "cargoPod",
+          "builds": "The sealed cargo pod: a big chunky rounded-faceted capsule or chamfered box (podShell with podDark ribs) on podBase, with ribbed panel lines, a glowing magenta seam and a cyan lock-status panel with SVG text (SEALED / BIO-HAZARD / serial), hazard-striped hatch on top (podHatch) with heavy bolts, four yellow-black cargo straps with ratchet buckles and clamps down to the deck, corner guard brackets, pressure valves, a glowing vent, warning labels (red triangle SVG) and chevron decals, slight dirt and scuff paint. Frame cradle rails under the pod rest on the chassis deck.",
+          "box": [
+            [
+              -1.3,
+              1.3,
+              -4
+            ],
+            [
+              1.3,
+              3,
+              1.3
+            ]
+          ],
+          "attaches": "Cradle sits on the chassis deck at podBase / chassisTop; front stops just behind the cab at z 1.3. Rides joints pod and podHatch.",
+          "joints": [
+            "pod",
+            "podHatch"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "wheels",
+          "builds": "Six chunky low-poly wheels (radius 0.62, width 0.55) at the axle mounts, x = ±1.35: octagonal rubber tyres with tread block ridges, steel rims with lug bolts, hub caps with a neon-cyan ring glow, brake discs and calipers behind the rims, mud and dust paint at the lower tyre, and an orange hazard-stripe on the inner rim. The left wheels face +X, the right wheels face -X. Each wheel rides its own hinge joint so it can spin.",
+          "box": [
+            [
+              -1.65,
+              0,
+              -3.55
+            ],
+            [
+              1.65,
+              1.25,
+              3.55
+            ]
+          ],
+          "attaches": "Hubs centred on axleFront (z 2.9), axleMid (z -0.6) and axleRear (z -2.9) at wheelTrackX; the axle stubs from the chassis end at the hubs. Lowest points rest on y=0.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelRL",
+            "wheelRR"
+          ],
+          "floor": true,
+          "budget": 190
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:04:05.818Z",
+        "wallMs": 27672,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85250,
+          "completion_tokens": 3634,
+          "total_tokens": 88884,
+          "prompt_tokens_details": {
+            "cached_tokens": 85246
+          }
+        },
+        "costUsd": 0.0448726,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wheels",
+        "started": "2026-10-25T14:04:33.491Z",
+        "wallMs": 26491,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89241,
+          "completion_tokens": 3595,
+          "total_tokens": 92836,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0546724,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "turret",
+        "started": "2026-10-25T14:04:33.491Z",
+        "wallMs": 32541,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89162,
+          "completion_tokens": 5557,
+          "total_tokens": 94719,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07413439999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cargoPod",
+        "started": "2026-10-25T14:04:33.491Z",
+        "wallMs": 36074,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89254,
+          "completion_tokens": 5848,
+          "total_tokens": 95102,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.07722839999999999,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:04:33.491Z",
+        "wallMs": 60492,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89255,
+          "completion_tokens": 8979,
+          "total_tokens": 98234,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.1085404,
+        "hasCode": true,
+        "reasoning": "I'm working out the chassis geometry, using the module's Ctx type without redefining it, and planning a box part attached to the body bone with specific dimensions for the deck.\n\nWorking through wheel clearance, I'm adjusting the deck width and fender placement so the fenders properly wrap around the wheels without overlapping the body box. I'm then laying out the remaining parts: a deck slab with paneled hull color, side skirts with hazard trim stripes, longitudinal and cross underbody beams, and fuel tank cylinders positioned between the axles.\n\nNow I'm placing the battery boxes between the front axle and midpoint, sizing axle housing cylinders with differential spheres, adding leaf springs and tilted shock rods above each axle, and finishing with a rear bumper box sized to match the chassis width.\n\nAdding hazard stripes, tow hooks, and glowing red tail lights positioned at the rear corners, then figuring out toolbox placement on the frame sides between the mid and rear wheels, making sure they clear the fuel tanks positioned further inboard.\n\nAdding glowing heat vents to the stacks, magenta underglow strips beneath the skirt bottoms, and simple box-plate fender arches positioned over each wheel top.\n\nI need to check for position conflicts between the mid flaps and the toolbox/fuel tank along z — adjusting the toolbox to a slightly deeper position resolves the overlap with the flap placement. I also want to add serial decal textures on the skirts, rendering text like \"LJ-MK4 // 0447-C\" on side-facing planes.\n\nFor the remaining surface details, I'm planning stencils and chevron graphics on the rear bumper, plus procedural grime effects on the skirts using paint functions that darken the lower portions and add rust near the edges by mixing noise and smoothstep. I also need to add yellow deck trim rails along the edges, small tie-down anchor boxes, a front chassis crossmember, a hitch, and headlights.\n\nFor bolts and rivets along the deck edge, I'm planning to merge a row of small cylinder geometries into a single part using BufferGeometryUtils, and setting up helper functions for boxes and rotated cylinders to build beams along different axes.\n\nShocks run from the axle points up to the frame mounts, and I'm figuring out where to apply decal textures -- serial numbers on the skirts, chevrons on the bumper face, circuit patterns on the battery box tops, and small warning labels elsewhere.\n\nStill working out decal orientation...\n\n"
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:04:33.491Z",
+        "wallMs": 84401,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89204,
+          "completion_tokens": 11443,
+          "total_tokens": 100647,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.13307839999999999,
+        "hasCode": true,
+        "reasoning": "I'm planning the cab structure with careful attention to box geometry placement and dimensions, working out the coordinates for the cab's height, width, and depth along with the bull-bar extension.\n\nNow I'm sketching a wedge-shaped cab profile extruded sideways, defining an outline of points that trace the hood, windshield slope, roof, and back wall to create a hunched, angular shape, with the body thickness set around 2.5 units wide and the roof kept low enough to leave clearance for a turret above.\n\nI'm planning to import a panelled paint style from the clockwork kit for the hull surface, then add a windshield slit on the sloped front face using a glowing plane texture angled along the slope's normal direction.\n\nNow I'm adding side windows as dark glass planes with cyan scanlines positioned on either side of the hull, plus a hazard chevron strip texture for the lower door panels.\n\nThe side plane faces -X, keeping the emblem symmetric regardless of mirroring. I'm adding roof armor plates and a flat brow slab over the visor, skipping rotation since the angle is uncertain, then planning antenna rods for roof sensors.\n\nNow I'm placing sensor boxes near x ±1.0, z 1.9 on the roof, and adding a front light bar at the roof lip with alternating amber and cyan glowing lamps housed in black trim.\n\nAdjusting the bar and brow heights to avoid collisions, settling on the brow around y 2.5 and bar centered near y 2.55-2.58. Then I'm designing the front grille as a dark slatted box with steel trim, plus headlamp boxes on either side with glowing lenses and black bezels.\n\nNow I'm building the bull-bar: a sloped ram plate extruded as a trapezoid profile, lower plates, connecting frame arms between the body and bumper, and a row of spikes projecting forward along the front.\n\nPlanning hazard stripe paint for the ram plate and bumper boxes using an alternating band pattern.\n\nChecking wheel radius and bumper z-position for clearance, then placing the bull-bar bone on the body and the rest of the hierarchy on the cab. I'm working out mirror arm and housing placement near the cab corners, and sizing step rail boxes with brackets alongside the wheel positions to avoid overlap.\n\nNow I'm adding door handles as vertical steel rods at the door edge, keeping exhaust and fender details tied to the chassis, and placing hidden headrest boxes behind the windshield glass that get drawn as lighter silhouettes within the dark glass texture itself.\n\nFor the glow effect, I'm applying it to the textured parts so the glass emits its dark blue and cyan tones at reduced strength. I'm sketching a skull emblem with magenta eye sockets and teeth as a non-glowing decal, plus a yellow-and-black chevron stripe pattern sized at a 10:1 ratio for the side panel.\n\nNow I'm adding a serial stencil plane reading \"HAULER-04\" near the rear door, positioning it below the emblem, along with thin black vertical boxes to simulate door seams and angled rear armor shoulder plates near the back of the vehicle.\n\nSkipping the back wall for now, I'm adding hood vents as three small slats positioned along the sloped hood surface, calculating their height based on the hood's slope angle. For body trim I'm deciding to rely on the existing chevron strip rather than adding a separate overlapping belt stripe along the side.\n\nNow I'm designing a paint wrapper that darkens the hull with grime below a certain height and applies edge wear elsewhere, blending a mottled dark-rust grime texture with the base panel paint. Then I'm setting up the light-bar lamps, looping through seven positions and alternating amber and cyan glow colors.\n\nNext I'm using the rod helper to build a thin antenna with a glowing red tip bead, then sketching a sensor array using a box base with a dome-shaped lens, and finally adding slanted windshield pillar rods connecting the frame corners.\n\nDefining the ram plate geometry...\n\nAdjusting tow bar position and headlamp housing placement, then setting up small helper functions for boxes and decal planes to keep the part-creation code concise.\n\nWriting glass SVG texture...\n\n"
+      }
+    ]
+  }
+}

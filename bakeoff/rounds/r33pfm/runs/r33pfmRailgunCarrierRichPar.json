@@ -1,0 +1,566 @@
+{
+  "slug": "r33pfmRailgunCarrierRichPar",
+  "arm": "par",
+  "subject": "railgunCarrier",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: six-wheeled railgun carrier braced on stabiliser legs.\nStyle: low-poly sci-fi military.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "medium",
+  "started": "2026-10-25T14:04:05.819Z",
+  "wallMs": 78182,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 532081,
+    "completion_tokens": 28595,
+    "total_tokens": 560676,
+    "prompt_tokens_details": {
+      "cached_tokens": 505667
+    }
+  },
+  "costUsd": 0.3893447,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 31431,
+    "slowestPartMs": 46751,
+    "critical": "cab",
+    "elapsedMs": 78182,
+    "spec": {
+      "name": "Longshot Railgun Carrier",
+      "description": "A six-wheeled low-poly sci-fi military carrier with a long electromagnetic railgun on a turret, braced on four deployed stabiliser legs.",
+      "builderName": "longshotRailgunCarrier",
+      "size": [
+        4.6,
+        3.3,
+        9
+      ],
+      "layout": "Heavy 6x6 truck-like carrier facing +Z. Front (z +3.0 to +4.5): angular armoured cab with a sloped windscreen (cyan glass decal, glowing), headlight bars and a bull-bar bumper. Mid and rear (z +3.0 to -4.5): long flat chassis deck with side skirts, three wheel axles (front z=2.6, middle z=-0.4, rear z=-3.2) with chunky 8-sided tyres. Rear deck carries a turret ring at z=-1.6 with a boxy turret and a long railgun (twin rails, coil rings glowing cyan, muzzle brake) pointing forward over the cab, elevated about 12 degrees. Four stabiliser legs are lowered to the ground at the corners (x=+-2.2, z=+2.0 and z=-3.8) as angled hydraulic struts with big square pads on y=0, wheels still touching the floor. Style: faceted low-poly, chunky armour plates in olive/dark grey, hazard yellow stripes on legs and bumpers, cyan glowing energy accents, panel seams and rivets painted on, decals for unit number and warning labels.",
+      "palette": {
+        "hull": "#4a5240",
+        "hullDark": "#2f3529",
+        "armor": "#5d6650",
+        "metal": "#3a3f47",
+        "steel": "#8a919c",
+        "tyre": "#17191c",
+        "hazard": "#e7b814",
+        "glass": "#1a3c4a",
+        "neonCyan": "#2ff3ff",
+        "warnRed": "#d9342b",
+        "white": "#e8ebe6",
+        "rubber": "#26282b"
+      },
+      "mounts": {
+        "chassisTop": [
+          0,
+          1.5,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.5,
+          3.7
+        ],
+        "turretRing": [
+          0,
+          1.6,
+          -1.6
+        ],
+        "gunPivot": [
+          0,
+          2.55,
+          -1.2
+        ],
+        "muzzle": [
+          0,
+          2.95,
+          3.9
+        ],
+        "axleFront": [
+          0,
+          0.8,
+          2.6
+        ],
+        "axleMid": [
+          0,
+          0.8,
+          -0.4
+        ],
+        "axleRear": [
+          0,
+          0.8,
+          -3.2
+        ],
+        "legFL": [
+          1.9,
+          1.1,
+          2
+        ],
+        "legFR": [
+          -1.9,
+          1.1,
+          2
+        ],
+        "legRL": [
+          1.9,
+          1.1,
+          -3.8
+        ],
+        "legRR": [
+          -1.9,
+          1.1,
+          -3.8
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1.1,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "turret",
+          "parent": "body",
+          "at": [
+            0,
+            1.6,
+            -1.6
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "gun",
+          "parent": "turret",
+          "at": [
+            0,
+            2.55,
+            -1.2
+          ],
+          "dir": [
+            0,
+            0.2,
+            1
+          ],
+          "role": "hinge",
+          "group": "turret"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.85,
+            0.8,
+            2.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.85,
+            0.8,
+            2.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelML",
+          "parent": "body",
+          "at": [
+            1.85,
+            0.8,
+            -0.4
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelMR",
+          "parent": "body",
+          "at": [
+            -1.85,
+            0.8,
+            -0.4
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.85,
+            0.8,
+            -3.2
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.85,
+            0.8,
+            -3.2
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "legFL",
+          "parent": "body",
+          "at": [
+            1.9,
+            1.1,
+            2
+          ],
+          "dir": [
+            0.5,
+            -1,
+            0.1
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "legFR",
+          "parent": "body",
+          "at": [
+            -1.9,
+            1.1,
+            2
+          ],
+          "dir": [
+            -0.5,
+            -1,
+            0.1
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "legRL",
+          "parent": "body",
+          "at": [
+            1.9,
+            1.1,
+            -3.8
+          ],
+          "dir": [
+            0.5,
+            -1,
+            -0.1
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        },
+        {
+          "name": "legRR",
+          "parent": "body",
+          "at": [
+            -1.9,
+            1.1,
+            -3.8
+          ],
+          "dir": [
+            -0.5,
+            -1,
+            -0.1
+          ],
+          "role": "leg",
+          "group": "stabilisers"
+        }
+      ],
+      "parts": [
+        {
+          "id": "chassis",
+          "builds": "Main frame and deck: long box-section chassis rails, a flat armoured rear/mid deck with panelled paint (seams, rivets, wear on edges, dark underside), side skirts with hazard-striped edges, wheel arches over all six wheel positions, fuel tanks and tool lockers on the flanks, rear ramp/bumper with tow hooks and tail lights (red), underbody axles, driveshaft and differential boxes (visible between wheels), a turret ring base at turretRing (steel lathe ring with bolt studs), unit number and warning decals on the skirts. Rides joint body.",
+          "box": [
+            [
+              -2,
+              0.55,
+              -4.5
+            ],
+            [
+              2,
+              1.6,
+              3
+            ]
+          ],
+          "attaches": "Cab starts at chassis front face z=3.0; turret ring seat at mount turretRing; wheel arches enclose axleFront/axleMid/axleRear; leg sockets at legFL/FR/RL/RR on the flanks.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "cab",
+          "builds": "Forward armoured crew cab: faceted sloped hull with angular armour plates, large canted windscreen and side windows in glow-cyan-tinted glass (textured decals with frame lines), roof sensor pod and antenna whip, wing mirrors, headlight bars and fog lamps (glowing), bull-bar bumper with hazard stripes, front tow hooks, grille vents, door outlines with handles, exhaust stacks behind the cab, camo/panel paint in hull and armor colours, unit insignia decal on the door. Rides joint body.",
+          "box": [
+            [
+              -1.9,
+              1.5,
+              3
+            ],
+            [
+              1.9,
+              3,
+              4.5
+            ]
+          ],
+          "attaches": "Sits on chassis front face at mount cabFloor (z 3.0 to 4.5 region); gun barrel passes above its roof at muzzle height.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "runningGear",
+          "builds": "All six wheels: chunky 8-sided tyres with painted tread blocks, steel hubs with lug nuts, hub caps with a cyan ring glow, centre-tyre-inflation hoses, suspension swing arms and shock absorbers with coil springs (using coil), mud flaps at each wheel (rubber), each wheel on its own wheel joint (wheelFL etc.), wheel radius about 0.8 and width 0.6 so lowest point touches y=0. Axle housings link left and right wheels at axleFront/axleMid/axleRear.",
+          "box": [
+            [
+              -2.3,
+              0,
+              -4
+            ],
+            [
+              2.3,
+              1.6,
+              3.2
+            ]
+          ],
+          "attaches": "Wheels centred on axle mounts at x=+-1.85, y=0.8; suspension arms connect to the chassis underside at y 0.6 to 1.0.",
+          "joints": [
+            "wheelFL",
+            "wheelFR",
+            "wheelML",
+            "wheelMR",
+            "wheelRL",
+            "wheelRR",
+            "body"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "stabilisers",
+          "builds": "Four deployed stabiliser legs: each has a socket housing bolted to the chassis side, a hazard-striped outer hydraulic cylinder angled outward, a chrome inner piston rod, a knee hinge bracket, a lower strut reaching the ground and a big square footpad (with ribbed ground-grip underside, hazard corner marks and a small warning decal), hydraulic hoses (curved sweeps) and bolt rings. Legs are splayed outward to x about +-2.2 with the pads resting flat on y=0. Each leg uses its joints legFL/FR/RL/RR as the upper bone.",
+          "box": [
+            [
+              -2.45,
+              0,
+              -4.3
+            ],
+            [
+              2.45,
+              1.4,
+              2.5
+            ]
+          ],
+          "attaches": "Upper ends at leg mounts legFL, legFR, legRL, legRR on the chassis flanks; feet rest on the floor outside the wheel track.",
+          "joints": [
+            "legFL",
+            "legFR",
+            "legRL",
+            "legRR"
+          ],
+          "floor": true,
+          "budget": 140
+        },
+        {
+          "id": "railgun",
+          "builds": "Rotating turret and railgun: boxy faceted turret housing on a lathe turret ring (turret joint), armour plates, sensor eye with glowing lens, ammunition feed box and capacitor banks on the sides with warning labels and cyan charge-level bar textures, hatch, then the gun on its elevation joint with trunnion cradles: a long breech block, twin parallel steel rails with insulating spacer blocks, a series of glowing cyan coil rings along the barrel, side heat-sink fins, a muzzle brake with cyan glow slot, cooling pipes and a recoil buffer cylinder; gun elevated about 12 degrees and extends over the cab to the muzzle mount. Hazard stripes on the breech, unit stencil decal on the turret.",
+          "box": [
+            [
+              -1.5,
+              1.6,
+              -3
+            ],
+            [
+              1.5,
+              3.3,
+              4.5
+            ]
+          ],
+          "attaches": "Turret base sits on turretRing mount on the chassis; gun trunnion at gunPivot; muzzle ends near mount muzzle above the cab roof.",
+          "joints": [
+            "turret",
+            "gun"
+          ],
+          "floor": false,
+          "budget": 200
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "started": "2026-10-25T14:04:05.819Z",
+        "wallMs": 31431,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 85251,
+          "completion_tokens": 3733,
+          "total_tokens": 88984,
+          "prompt_tokens_details": {
+            "cached_tokens": 85247
+          }
+        },
+        "costUsd": 0.0458627,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "started": "2026-10-25T14:04:37.250Z",
+        "wallMs": 23881,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89366,
+          "completion_tokens": 3534,
+          "total_tokens": 92900,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.054312400000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "runningGear",
+        "started": "2026-10-25T14:04:37.250Z",
+        "wallMs": 24970,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89371,
+          "completion_tokens": 3763,
+          "total_tokens": 93134,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0566124,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "railgun",
+        "started": "2026-10-25T14:04:37.250Z",
+        "wallMs": 36264,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89408,
+          "completion_tokens": 5632,
+          "total_tokens": 95040,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0753764,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "stabilisers",
+        "started": "2026-10-25T14:04:37.250Z",
+        "wallMs": 38377,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89365,
+          "completion_tokens": 5291,
+          "total_tokens": 94656,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0718804,
+        "hasCode": true,
+        "reasoning": "I'm working out the geometry for a single function to build four stabiliser legs, calculating joint positions and directions so each leg extends outward from the chassis toward its foot pad while staying within the bounding box.\n\nI'm checking for collisions between the foot pads and the wheels at each corner, adjusting pad centers and z-offsets for the front and rear legs so the pads clear the wheel contact patches given the wheel radii and spans.\n\nNow I'm structuring the leg as a joint chain, with hip, knee, and foot joints named per side, making sure the chain references the existing leg joint as its root.\n\nRear leg mirrors with negative z offsets and the knee at a midpoint. I'm laying out the leg assembly: socket housing, outer cylinder with hazard-striped paint, a chrome piston rod reaching to the knee bracket, a lower strut to the foot's ball joint, and a ribbed foot pad with small protruding rib boxes underneath.\n\nNow I'm adding pad details: positioning the pad box and ribs at the floor level, merging the rib geometry into one part, adding yellow hazard corner marks and a warning decal on top, sweeping rubber hose geometry from socket to cylinder, and placing small bolt-cylinder studs around each socket face using merged geometry.\n\nI'm figuring out the stripe pattern formula for the hazard paint, then setting up the bone and joint hierarchy for the stabiliser legs -- naming knee and foot joints per leg side (FL/FR) and positioning the rod and piston segments along each bone.\n\nNow I'm placing the foot padding geometry with ribbed boxes merged under the foot joint, plus a small decal plane for added detail.\n\nAdding hazard corner marks and merging geometries...\n\n"
+      },
+      {
+        "id": "cab",
+        "started": "2026-10-25T14:04:37.250Z",
+        "wallMs": 46751,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 89320,
+          "completion_tokens": 6642,
+          "total_tokens": 95962,
+          "prompt_tokens_details": {
+            "cached_tokens": 84084
+          }
+        },
+        "costUsd": 0.0853004,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}
