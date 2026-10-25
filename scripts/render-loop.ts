@@ -125,6 +125,7 @@ async function main() {
   const pitch: string = run0.pitch;
 
   const cost = await pricing(model);
+  const originRound = readJson(join(ROUNDS, origin, "round.json"));
   if (!existsSync(join(dir, "round.json")))
     writeJson(join(dir, "round.json"), {
       id: round,
@@ -137,6 +138,8 @@ async function main() {
       arm: run0.arm,
       subject: run0.subject,
       level: run0.level,
+      arms: originRound.arms.filter((arm: Json) => arm.id === run0.arm),
+      subjects: originRound.subjects.filter((subject: Json) => subject.id === run0.subject),
       prompts: { fix: "loop-fix.md", add: "loop-add.md", edits: "refine-edits.md", repair: "refine-repair.md" },
       pricing: cost ?? null,
       sdkCommit: (await capture("git", ["rev-parse", "--short", "HEAD"])).stdout.trim(),
