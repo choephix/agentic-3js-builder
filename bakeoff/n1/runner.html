@@ -1,0 +1,46 @@
+<!doctype html><meta charset="utf-8"><title>N1 low-poly harness runner</title><script>
+let readyPromise;
+const esc = s => s.replace(/<\/script/giu, '<\\/script');
+async function setup() {
+  if (readyPromise) return readyPromise;
+  readyPromise = (async () => {
+    const [harness, runtime] = await Promise.all([
+      fetch('/sandbox/lowpoly-harness.js').then(r => r.text()),
+      fetch('/sandbox/three-runtime.js').then(r => r.text()),
+    ]);
+    const frame = document.createElement('iframe');
+    frame.setAttribute('sandbox','allow-scripts');
+    frame.style.cssText='position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:0';
+    frame.srcdoc = '<!doctype html><script>window.onerror=(m,s,l,c,e)=>parent.postMessage({type:"debug",message:String(m),line:l}, "*");<\/script><script type="module">'+esc(harness)+'<\/script>';
+    document.body.appendChild(frame);
+    addEventListener('message', e => { if (e.data?.type === 'debug') window.__n1Debug = e.data; });
+    const win = await new Promise((resolve,reject) => {
+      const timer=setTimeout(()=>reject(new Error('sandbox ready timeout')),15000);
+      addEventListener('message', function on(e) {
+        if(e.source===frame.contentWindow && e.data?.type==='nilo-low-poly:ready') { clearTimeout(timer); removeEventListener('message',on); resolve(frame.contentWindow); }
+      });
+    });
+    win.postMessage({type:'nilo-low-poly:init',runtimeSource:runtime},'*');
+    return win;
+  })();
+  return readyPromise;
+}
+window.__n1Ready = setup;
+window.__n1Run = async ({code, description, scope='prop', mergeRenders=false}) => {
+  const win=await setup(); const requestId=crypto.randomUUID();
+  return await new Promise((resolve,reject)=>{
+    const timer=setTimeout(()=>{removeEventListener('message',on);reject(new Error('sandbox result timeout'));},50000);
+    function on(e) {
+      if(e.source===win && e.data?.type==='nilo-low-poly:result' && e.data.requestId===requestId) {
+        clearTimeout(timer); removeEventListener('message',on);
+        const r=e.data; if(r.ok && r.glb instanceof ArrayBuffer) {
+          const bytes=new Uint8Array(r.glb); let b=''; for(let i=0;i<bytes.length;i+=0x8000)b+=String.fromCharCode(...bytes.subarray(i,i+0x8000)); r.glbBase64=btoa(b); delete r.glb;
+        }
+        resolve(r);
+      }
+    }
+    addEventListener('message',on);
+    win.postMessage({type:'nilo-low-poly:run',requestId,scope,code,budgetMs:30000,mergeRenders,document:{description,instructionPackVersion:22,edits:[]}},'*');
+  });
+};
+</script>

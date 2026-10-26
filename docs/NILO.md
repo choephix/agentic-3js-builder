@@ -47,6 +47,28 @@ Sonnet 5.5 at medium effort, same batch (r33, n=10, medians with ranges):
 
 Both at low effort are faster (flat 24 s, two-stage 21 s → 38 s) and Stefan judged high effort "night and day" better than low, so medium is the compromise these numbers use.
 
+## Low-poly measured (N1, 2026-10-27)
+
+Nilo's own loop on the same 20 r24 `rich` briefs as `r35sm` (Sonnet 5.5 medium: craft3, flat, two-stage), `scope: prop`, `quality: 2`, Gemini 3.8 Flash at medium reasoning. Imported from Nilo `0c4fd24d71`: `runLowPolyBuilderLoop`, the instruction-pack prompt builders, `appendLowPolyOutputBudget`, `lowPolyMaxOutputTokens`. `resolveLowPolyTurnSettings` wouldn't import outside the monorepo (`@nilo/logger/functions`), so its non-admin settings were set by hand: temperatures 0.7 / 0.3, caps 8k / 64k / 4k, image detail high. Reasoning tokens and four image parts per critique were confirmed in the responses. Runs went through Nilo's real sandbox harness on the NVIDIA Chromium. LLM calls went through the local omp gateway, not the Firebase callable, so the callable's overhead isn't in these times.
+
+| Medians (ranges)    | Low-poly, Gemini       | flat, Sonnet   | two-stage, Sonnet | craft3, Sonnet |
+| ------------------- | ---------------------- | -------------- | ----------------- | -------------- |
+| First pixel         | 79 s (55–114)          | 111 s (42–233) | 76 s (20–158)     | 181 s (59–268) |
+| Final               | 200 s (73–355)         | 111 s          | 99 s (30–178)     | 181 s          |
+| Calls               | 4 (3–4)                | 1              | 8                 | 1              |
+| Output tokens       | 27.6k (8.7k reasoning) | 14.5k          | 26.2k             | 24.2k          |
+| Cost, list          | $0.13                  | $0.15          | $0.42             | $0.25          |
+| Triangles           | 9.2k (1.9k–49k)        | 8.5k           | 13.6k             | 6.4k           |
+| Unusable at the end | 0/20                   | 0/20           | 0/20              | 0/20           |
+
+- **The critic never approved.** 17 critiques, 17 `REVISE`. The other 3 briefs crashed in round 1, so there was nothing to critique. Every brief therefore ran both rounds, and the default `quality: 2` always costs 3–4 calls. The final build is never reviewed.
+- **Where low-poly's time goes**, per call: design 19.5 s, build 64.8 s (11–217 s, 10.6k output tokens), critique 23.1 s, sandbox run 0.3 s.
+- **Mid-loop failures**: 3 sandbox crashes in round 1 (a `const` reassigned, a redeclared identifier, a null `index`), each costing the round. blueprintSpitfire's round-2 build failed validation, so its round-1 build (critic: `REVISE`) was kept. All 20 ended with a valid build.
+- **Low-poly's draft comes as early as two-stage's** (79 s vs 76 s). Its final comes 89 s later than flat's and 101 s later than two-stage's, and 19 s later than craft3's. r35sm ran alongside the Terra bakeoff, so its times are slower than r33's (flat 111 s vs 63 s); compare within a batch.
+- Page with renders side by side: `n1/index.html`. Data: `bakeoff/n1/results.json`; scripts in `bakeoff/n1/` (`run.ts` needs a Nilo clone with the sandbox harness built, see its imports). Looks are Stefan's call.
+- Production numbers (`LowPolyGenerationTasks`) weren't read: this machine has no Firestore access.
+- **Quota:** the 77 calls took stefan.ginev@nilo.io's Antigravity Gemini weekly meter from 0% to 100% (resets 2026-11-02). N2 waits for the reset or another Gemini route (OpenRouter).
+
 ## Folding the SDK in: the options
 
 1. **New engine behind the existing tool.** `generate_low_poly_model` keeps its schema; the client executor picks the engine by flag (per user or admin), and the GLB's document records `engine: "sdk"` so `edit_low_poly_model` dispatches on it. The agent's routing, skills and tool docs don't change, and the flag gives an A/B on real prompts.
@@ -95,10 +117,11 @@ Work, in order:
 
 Rated like `docs/SPEED.md`'s queue; all 20 r24 briefs unless noted.
 
-| Rank | ID  | What                                                                                                                                                               | Builds | Cost          | Why                                                                                                |
-| ---: | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -----: | ------------- | -------------------------------------------------------------------------------------------------- |
-|    1 | N1  | **Low-poly baseline**: Nilo's own generator (its lab, `src/lowPoly/lab`) on the same briefs, default Gemini 3.8 Flash and `quality: 2`; time, calls, cost, renders |     20 | Gemini, small | "Improve low-poly" needs low-poly's numbers; none are documented                                   |
-|    2 | N2  | **Gemini 3.8 Flash on the SDK** (`google-antigravity/gemini-3.8-flash`), `craft3-flat` + declarations, medium and low, against Sonnet medium                       |     40 | Gemini quota  | Whether the SDK keeps Nilo's model; its crash and type-error rate on a 66 KB API it has never seen |
-|    3 | N3  | **Single run with declarations at medium**: `craft3-flat` + `declarations` vs `craft3-flat`, Sonnet                                                                |     40 | ~$6           | r34 cut type errors 8/40 → 1/40 at low on craft3; the shipping prompt is flat at medium            |
-|    4 | N4  | **Nilo briefs**: props and scenes as the World Agent writes them (short, a position, `scope`), from real agent transcripts, through the N3 winner                  |     20 | ~$3           | The r24 briefs are gallery pitches; the agent's briefs are shorter and include multi-entity scenes |
-|    5 | N5  | **Worker run**: every r32flat/N3 module through a worker-only harness (no `document`)                                                                              |      0 | —             | Counts `svg()` leaks and anything else that needs the DOM                                          |
+| Rank | ID  | What                                                                                                                                                                                                                                            | Builds | Cost                         | Why                                                                                                |
+| ---: | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -----: | ---------------------------- | -------------------------------------------------------------------------------------------------- |
+|    1 | N1  | ~~Low-poly baseline~~: done 2026-10-27, see "Low-poly measured" above                                                                                                                                                                           |     20 | Gemini meter 0 → 100%        | —                                                                                                  |
+|    2 | N2  | **Gemini 3.8 Flash on the SDK**, `craft3-flat` + declarations, medium and low, against Sonnet medium. Antigravity's weekly Gemini meter is spent until 2026-11-02; OpenRouter (`openrouter-curated/google/gemini-3.8-flash`) is the other route |     40 | Gemini quota or OpenRouter $ | Whether the SDK keeps Nilo's model; its crash and type-error rate on a 66 KB API it has never seen |
+|    3 | N1b | **Sonnet 5.5 on low-poly's loop**: `bakeoff/n1/run.ts` with the Sonnet model flag; isolates model from SDK                                                                                                                                      |     20 | ~$5, Anthropic               | Whether the SDK or the model makes the difference                                                  |
+|    4 | N3  | **Single run with declarations at medium**: `craft3-flat` + `declarations` vs `craft3-flat`, Sonnet                                                                                                                                             |     40 | ~$6                          | r34 cut type errors 8/40 → 1/40 at low on craft3; the shipping prompt is flat at medium            |
+|    5 | N4  | **Nilo briefs**: props and scenes as the World Agent writes them (short, a position, `scope`), from real agent transcripts, through the N3 winner                                                                                               |     20 | ~$3                          | The r24 briefs are gallery pitches; the agent's briefs are shorter and include multi-entity scenes |
+|    6 | N5  | **Worker run**: every r32flat/N3 module through a worker-only harness (no `document`)                                                                                                                                                           |      0 | —                            | Counts `svg()` leaks and anything else that needs the DOM                                          |
