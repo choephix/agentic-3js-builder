@@ -1,0 +1,29 @@
+{
+  "slug": "r35txSpaceGalleyRichCraft3",
+  "arm": "craft3",
+  "subject": "spaceGalley",
+  "level": "rich",
+  "pitch": "Category: Prop group.\nSubject: spaceship galley kitchen.\nStyle: Alien (1979) Nostromo.",
+  "model": "openai-codex/gpt-6.1-terra",
+  "effort": "xhigh",
+  "started": "2026-10-26T21:10:48.833Z",
+  "wallMs": 485491,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 58311,
+    "completion_tokens": 26702,
+    "total_tokens": 85013,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 13423
+    }
+  },
+  "costUsd": 0,
+  "hasCode": true,
+  "reasoning": "**Modeling spaceship kitchens**\n\nI need to produce a single code module for a spaceship galley kitchen, specifically inspired by the Nostromo from Alien (1979). The project requires building detailed primitives without joints, focusing on the realism of the kitchen’s layout and props. I’m thinking a compact assembly is necessary, with elements like a bulkhead, cabinets, and various textures. I want to ensure everything is realistically scaled and maintain an industrial aesthetic with specific colors. It might be beneficial to incorporate features like analog gauges and seamless geometries.\n\n**Designing the spaceship interiors**\n\nI need to consider using SVG textures for elements like warning labels, the control panel, and the coffee mug. Flat materials with textures on boxes and planes would be effective. The model should have about 180 to 340 parts and ideally 700 to 1100 lines. I plan to write robust TypeScript with SDK API and focus on not making unsupported assumptions. The design will include coordinates, with the model measuring 2.8m wide, 2.4m high, and 1.4m deep, centered at x=0 and standing at y=0. We can create a wall-mounted galley segment too!\n\n**Establishing galley aesthetics**\n\nI’m planning to place the galley counter along the back wall at approximately y=1.0, incorporating appliances and cabinets into the design. For the aesthetic, I envision olive-gray panel bodies paired with black crevices, accompanied by brass or copper hoses. Off-white enamel finishes would add a nice touch, complemented by amber indicator glows. Warning labels should incorporate red and yellow for clarity. This combination should create a striking and functional galley kitchen environment!**Designing cabinet layout**\n\nI'm working on the layout for the upper cabinet carcass, which measures [2.55, .55, .48] and needs to be positioned at certain heights. The bottom and top of the cabinet will be at y1.655 and y2.205 respectively. I’m considering adding a shelf underneath and adding handles or rods for functionality. Maybe placing a central hood above the cabinets could help obscure the center. The layout appears to fit a galley style since it has left and right segments.**Considering code structure**\n\nI’m thinking about using `rng` for tile variation, maybe for randomness, but I know that we can also keep it deterministic. I want to create the `createBuilder` function with details like `{name: \"nostromo-galley\", detail: 1}` and I’m considering a default `detail` value of 1. For `paintSize`, I’m unsure if 2048 is necessary since 1024 might be enough. I have concerns about `panelled` paint on simple shapes creating a lot of texture charts, but using it on structural panels sounds manageable. Let’s outline more helper types like `addBox`, `addCyl`, and others.**Designing floor structures**\n\nI'm laying out details for the floor. The main section will have a size of [2.8, .1, 1.45], centered with certain height positions and a top section. I might add anti-slip strips and consider a raised front threshold. For the structural integrity, I’ll include corner bolts, specifying the vertical direction for them and positioning the outer box for the back wall with a dark inset panel. I want everything to be detailed without overcomplicating it!**Organizing build details**\n\nI need to connect the labels on the warning panel to the box front, which is a good detail to include. For the b.part, using `flat:true` on the sphere makes it faceted, but it's irrelevant for flat planes. Maybe I should consider `b.sweep` without `flat`, and include an option like `smooth:false`. \n\nIt looks like I might also want to use `b.rod` with a circular section and rounded caps. I need to make sure I estimate the lines and include everything in the build sequence.",
+  "plan": null
+}

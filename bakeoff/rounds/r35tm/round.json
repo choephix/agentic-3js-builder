@@ -1,0 +1,1715 @@
+{
+  "id": "r35tm",
+  "started": "2026-10-26T21:04:17.331Z",
+  "model": "openai-codex/gpt-6.1-terra",
+  "effort": "medium",
+  "sdkCommit": "09c1ca59",
+  "promptsFrom": null,
+  "maxTokens": 120000,
+  "pricing": {
+    "input": 0,
+    "output": 0,
+    "cacheRead": 0,
+    "cacheWrite": 0
+  },
+  "arms": [
+    {
+      "id": "craft3",
+      "letter": "S",
+      "name": "Craft v3, subject only",
+      "idea": "Craft v2 without the staged base: the code goes to the subject",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-sdk.md",
+      "kits": true,
+      "sources": [
+        "paint.ts",
+        "texture.ts"
+      ],
+      "extra": [
+        "ambition2.md",
+        "craft3.md"
+      ]
+    },
+    {
+      "id": "flat",
+      "letter": "T",
+      "name": "Craft v3, flat colour only",
+      "idea": "craft3 with every texture ask cut: texture-free copies of contract, taste, ambition2 and craft3 that ask for one flat colour per part and detail carried by geometry, and no paint.ts or texture.ts source",
+      "contract": "contract-flat.md",
+      "context": "docs",
+      "taste": "taste-sdk-flat.md",
+      "kits": true,
+      "extra": [
+        "ambition2-flat.md",
+        "craft3-flat.md"
+      ]
+    },
+    {
+      "id": "twostage",
+      "letter": "W",
+      "name": "Two-stage build with requests",
+      "idea": "Stage 1: one call on the flat arm's system prompt plus two-stage1.md writes the whole model in flat colours, ending with a request list (details to add and textures to paint, each tied to a part and a place) and a STAGE2 hook, and renders on its own (first pixel). Stage 2, all at once on craft3's system prompt: the add requests in up to 6 calls that each return one function appended to the module, and the texture requests in one SEARCH/REPLACE edit call on stage 1's code; the runner merges them into one module.",
+      "contract": "contract.md",
+      "context": "docs",
+      "taste": "taste-sdk.md",
+      "kits": true,
+      "sources": [
+        "paint.ts",
+        "texture.ts"
+      ],
+      "extra": [
+        "ambition2.md",
+        "craft3.md"
+      ],
+      "twostage": {
+        "stage1Arm": "flat",
+        "stage1": "two-stage1.md",
+        "add": "two-add.md",
+        "texture": "two-texture.md",
+        "maxAddCalls": 6
+      }
+    }
+  ],
+  "subjects": [
+    {
+      "id": "snowLeopard",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: snow leopard crouched on a rocky ledge, tail curled.\nStyle: Genshin Impact.",
+      "rich": "Category: Animal.\nSubject: snow leopard crouched on a rocky ledge, tail curled.\nStyle: Genshin Impact.",
+      "vivid": "A snow leopard pressed low on a wind-scoured ledge, ice crusted in its fur, the thick tail wrapped across its paws like a scarf. Eyes pale and fixed on something far below. Genshin Impact look: clean painted gradients, soft rim light, crisp silhouette."
+    },
+    {
+      "id": "axolotl",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: axolotl with frilly pink gills.\nStyle: chibi.",
+      "rich": "Category: Animal.\nSubject: axolotl with frilly pink gills.\nStyle: chibi.",
+      "vivid": "A tiny pink axolotl grinning up at you, three feathery gill fronds on each side of its head puffed out like a lion's mane, stubby four-toed hands, a ribbon tail. Chibi proportions: head as big as the body, glossy eyes, candy colours."
+    },
+    {
+      "id": "pangolin",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: pangolin half curled into a ball.\nStyle: low-poly.",
+      "rich": "Category: Animal.\nSubject: pangolin half curled into a ball.\nStyle: low-poly."
+    },
+    {
+      "id": "mandrill",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: mandrill baring its fangs.\nStyle: Blizzard/Warcraft.",
+      "rich": "Category: Animal.\nSubject: mandrill baring its fangs.\nStyle: Blizzard/Warcraft."
+    },
+    {
+      "id": "secretaryBird",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: secretary bird mid-stride, stomping a snake.\nStyle: Overwatch.",
+      "rich": "Category: Animal.\nSubject: secretary bird mid-stride, stomping a snake.\nStyle: Overwatch."
+    },
+    {
+      "id": "narwhal",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: narwhal breaching from the sea.\nStyle: Pixar.",
+      "rich": "Category: Animal.\nSubject: narwhal breaching from the sea.\nStyle: Pixar."
+    },
+    {
+      "id": "galapagosTortoise",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: giant Galápagos tortoise.\nStyle: claymation (Aardman).",
+      "rich": "Category: Animal.\nSubject: giant Galápagos tortoise.\nStyle: claymation (Aardman)."
+    },
+    {
+      "id": "mantisShrimp",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: peacock mantis shrimp.\nStyle: high-fantasy anime.",
+      "rich": "Category: Animal.\nSubject: peacock mantis shrimp.\nStyle: high-fantasy anime."
+    },
+    {
+      "id": "platypus",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: platypus.\nStyle: Studio Ghibli.",
+      "rich": "Category: Animal.\nSubject: platypus.\nStyle: Studio Ghibli."
+    },
+    {
+      "id": "stagBeetle",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: stag beetle.\nStyle: Japanese lacquerware (black urushi with gold maki-e).",
+      "rich": "Category: Animal.\nSubject: stag beetle.\nStyle: Japanese lacquerware (black urushi with gold maki-e)."
+    },
+    {
+      "id": "basilisk",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: basilisk, serpent king with a crest.\nStyle: Dark Souls.",
+      "rich": "Category: Fantastical creature.\nSubject: basilisk, serpent king with a crest.\nStyle: Dark Souls."
+    },
+    {
+      "id": "thunderbird",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: thunderbird with lightning-feather wings.\nStyle: Pacific Northwest formline art.",
+      "rich": "Category: Fantastical creature.\nSubject: thunderbird with lightning-feather wings.\nStyle: Pacific Northwest formline art."
+    },
+    {
+      "id": "manticore",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: manticore with scorpion tail.\nStyle: Blizzard/Warcraft.",
+      "rich": "Category: Fantastical creature.\nSubject: manticore with scorpion tail.\nStyle: Blizzard/Warcraft."
+    },
+    {
+      "id": "baku",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: baku, the dream-eating tapir spirit.\nStyle: ukiyo-e woodblock print.",
+      "rich": "Category: Fantastical creature.\nSubject: baku, the dream-eating tapir spirit.\nStyle: ukiyo-e woodblock print.",
+      "vivid": "The baku, Japanese dream-eater: elephant trunk, tiger paws, an ox tail, a tapir's stocky body, rolling cloud-scrolls around its feet as it inhales a sleeper's nightmare. Rendered like an Edo ukiyo-e print: flat inked outlines, indigo and vermilion, woodgrain texture."
+    },
+    {
+      "id": "wyvernMount",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: saddled wyvern mount with reins and saddlebags.\nStyle: World of Warcraft.",
+      "rich": "Category: Fantastical creature.\nSubject: saddled wyvern mount with reins and saddlebags.\nStyle: World of Warcraft."
+    },
+    {
+      "id": "jackalope",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: jackalope.\nStyle: vintage tourist postcard.",
+      "rich": "Category: Fantastical creature.\nSubject: jackalope.\nStyle: vintage tourist postcard."
+    },
+    {
+      "id": "mothman",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: mothman perched on a bridge girder.\nStyle: 1950s pulp sci-fi cover.",
+      "rich": "Category: Fantastical creature.\nSubject: mothman perched on a bridge girder.\nStyle: 1950s pulp sci-fi cover."
+    },
+    {
+      "id": "tanuki",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: shape-shifting tanuki with a leaf on its head.\nStyle: Studio Ghibli.",
+      "rich": "Category: Fantastical creature.\nSubject: shape-shifting tanuki with a leaf on its head.\nStyle: Studio Ghibli."
+    },
+    {
+      "id": "hydra",
+      "kind": "Monster",
+      "terse": "Category: Monster.\nSubject: five-headed hydra.\nStyle: God of War.",
+      "rich": "Category: Monster.\nSubject: five-headed hydra.\nStyle: God of War."
+    },
+    {
+      "id": "mimicChest",
+      "kind": "Monster",
+      "terse": "Category: Monster.\nSubject: treasure-chest mimic with a long tongue.\nStyle: Dungeons & Dragons.",
+      "rich": "Category: Monster.\nSubject: treasure-chest mimic with a long tongue.\nStyle: Dungeons & Dragons.",
+      "vivid": "A treasure chest that is not a treasure chest: the lid hinges open into a jaw of uneven fangs, a purple tongue lolls over the gold coins, little spidery legs prop it up, one eye peeks from the keyhole. Dungeons & Dragons manual illustration energy."
+    },
+    {
+      "id": "sandworm",
+      "kind": "Monster",
+      "terse": "Category: Monster.\nSubject: desert sandworm erupting from the dunes.\nStyle: Dune concept art.",
+      "rich": "Category: Monster.\nSubject: desert sandworm erupting from the dunes.\nStyle: Dune concept art."
+    },
+    {
+      "id": "gargoyle",
+      "kind": "Monster",
+      "terse": "Category: Monster.\nSubject: cathedral gargoyle crouched on a ledge.\nStyle: gothic stone carving.",
+      "rich": "Category: Monster.\nSubject: cathedral gargoyle crouched on a ledge.\nStyle: gothic stone carving."
+    },
+    {
+      "id": "slimeKing",
+      "kind": "Monster",
+      "terse": "Category: Monster.\nSubject: crowned slime king.\nStyle: Dragon Quest (Akira Toriyama).",
+      "rich": "Category: Monster.\nSubject: crowned slime king.\nStyle: Dragon Quest (Akira Toriyama)."
+    },
+    {
+      "id": "roninCat",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: ronin samurai cat with a straw hat.\nStyle: Redwall storybook.",
+      "rich": "Category: Humanoid character.\nSubject: ronin samurai cat with a straw hat.\nStyle: Redwall storybook."
+    },
+    {
+      "id": "deepSeaDiver",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: brass-helmet deep sea diver.\nStyle: Bioshock.",
+      "rich": "Category: Humanoid character.\nSubject: brass-helmet deep sea diver.\nStyle: Bioshock."
+    },
+    {
+      "id": "spacePirate",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: one-eyed space pirate captain.\nStyle: Ratchet & Clank.",
+      "rich": "Category: Humanoid character.\nSubject: one-eyed space pirate captain.\nStyle: Ratchet & Clank."
+    },
+    {
+      "id": "plagueDoctor",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: plague doctor with lantern.\nStyle: Darkest Dungeon.",
+      "rich": "Category: Humanoid character.\nSubject: plague doctor with lantern.\nStyle: Darkest Dungeon."
+    },
+    {
+      "id": "dwarfBlacksmith",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: dwarf blacksmith at an anvil.\nStyle: Blizzard/Warcraft.",
+      "rich": "Category: Humanoid character.\nSubject: dwarf blacksmith at an anvil.\nStyle: Blizzard/Warcraft."
+    },
+    {
+      "id": "lunarAstronaut",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: 1969 lunar astronaut planting a flag.\nStyle: NASA archival realism.",
+      "rich": "Category: Humanoid character.\nSubject: 1969 lunar astronaut planting a flag.\nStyle: NASA archival realism."
+    },
+    {
+      "id": "netrunner",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: cyberpunk netrunner with cables and visor.\nStyle: Cyberpunk 2077.",
+      "rich": "Category: Humanoid character.\nSubject: cyberpunk netrunner with cables and visor.\nStyle: Cyberpunk 2077."
+    },
+    {
+      "id": "shrineMaiden",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: shrine maiden with a kitsune mask.\nStyle: high-fantasy anime.",
+      "rich": "Category: Humanoid character.\nSubject: shrine maiden with a kitsune mask.\nStyle: high-fantasy anime."
+    },
+    {
+      "id": "steamLocomotive",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: 4-4-0 American steam locomotive.\nStyle: lithographed tinplate toy.",
+      "rich": "Category: Vehicle.\nSubject: 4-4-0 American steam locomotive.\nStyle: lithographed tinplate toy."
+    },
+    {
+      "id": "vespaSidecar",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: 1960s scooter with a sidecar.\nStyle: Wes Anderson pastel.",
+      "rich": "Category: Vehicle.\nSubject: 1960s scooter with a sidecar.\nStyle: Wes Anderson pastel."
+    },
+    {
+      "id": "hoverbike",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: desert hoverbike.\nStyle: Star Wars.",
+      "rich": "Category: Vehicle.\nSubject: desert hoverbike.\nStyle: Star Wars."
+    },
+    {
+      "id": "nautilusSub",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: Captain Nemo's Nautilus submarine.\nStyle: Jules Verne steampunk.",
+      "rich": "Category: Vehicle.\nSubject: Captain Nemo's Nautilus submarine.\nStyle: Jules Verne steampunk."
+    },
+    {
+      "id": "tukTuk",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: decorated auto rickshaw.\nStyle: Indian truck art.",
+      "rich": "Category: Vehicle.\nSubject: decorated auto rickshaw.\nStyle: Indian truck art."
+    },
+    {
+      "id": "zeppelin",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: passenger zeppelin with gondola.\nStyle: art deco.",
+      "rich": "Category: Vehicle.\nSubject: passenger zeppelin with gondola.\nStyle: art deco.",
+      "vivid": "A 1930s luxury passenger zeppelin: silver ribbed envelope, sunburst-fin tail, a long gondola with stepped windows and chevron trims, two engine pods with spinning propellers. Pure art deco: streamlined, gold and cream, geometric ornament everywhere."
+    },
+    {
+      "id": "lunarRover",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: Apollo lunar roving vehicle.\nStyle: NASA archival realism.",
+      "rich": "Category: Vehicle.\nSubject: Apollo lunar roving vehicle.\nStyle: NASA archival realism."
+    },
+    {
+      "id": "farmTractor",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: vintage red farm tractor.\nStyle: Fisher-Price toy.",
+      "rich": "Category: Vehicle.\nSubject: vintage red farm tractor.\nStyle: Fisher-Price toy."
+    },
+    {
+      "id": "dragonBoat",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: dragon boat with drummer and paddles.\nStyle: Chinese festival lacquer.",
+      "rich": "Category: Vehicle.\nSubject: dragon boat with drummer and paddles.\nStyle: Chinese festival lacquer."
+    },
+    {
+      "id": "chickenWalker",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: chicken-legged walking house-machine.\nStyle: Howl's Moving Castle.",
+      "rich": "Category: Vehicle.\nSubject: chicken-legged walking house-machine.\nStyle: Howl's Moving Castle."
+    },
+    {
+      "id": "iceCreamTruck",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: ice cream truck.\nStyle: Animal Crossing.",
+      "rich": "Category: Vehicle.\nSubject: ice cream truck.\nStyle: Animal Crossing."
+    },
+    {
+      "id": "gunblade",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: gunblade.\nStyle: Final Fantasy.",
+      "rich": "Category: Weapon.\nSubject: gunblade.\nStyle: Final Fantasy."
+    },
+    {
+      "id": "runicWarhammer",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: runic dwarven warhammer.\nStyle: God of War.",
+      "rich": "Category: Weapon.\nSubject: runic dwarven warhammer.\nStyle: God of War."
+    },
+    {
+      "id": "poseidonTrident",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: Poseidon's trident.\nStyle: Greek black-figure pottery.",
+      "rich": "Category: Weapon.\nSubject: Poseidon's trident.\nStyle: Greek black-figure pottery."
+    },
+    {
+      "id": "katanaStand",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: katana and wakizashi on a lacquer stand.\nStyle: Edo-period Japanese.",
+      "rich": "Category: Weapon.\nSubject: katana and wakizashi on a lacquer stand.\nStyle: Edo-period Japanese."
+    },
+    {
+      "id": "plasmaPistol",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: plasma pistol.\nStyle: Ratchet & Clank.",
+      "rich": "Category: Weapon.\nSubject: plasma pistol.\nStyle: Ratchet & Clank."
+    },
+    {
+      "id": "jukebox",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: 1950s jukebox.\nStyle: Americana chrome and neon.",
+      "rich": "Category: Object.\nSubject: 1950s jukebox.\nStyle: Americana chrome and neon."
+    },
+    {
+      "id": "grandfatherClock",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: grandfather clock with visible pendulum.\nStyle: Victorian mahogany.",
+      "rich": "Category: Object.\nSubject: grandfather clock with visible pendulum.\nStyle: Victorian mahogany."
+    },
+    {
+      "id": "typewriter",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: mechanical typewriter with paper in it.\nStyle: realistic.",
+      "rich": "Category: Object.\nSubject: mechanical typewriter with paper in it.\nStyle: realistic."
+    },
+    {
+      "id": "espressoMachine",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: lever espresso machine.\nStyle: Italian chrome.",
+      "rich": "Category: Object.\nSubject: lever espresso machine.\nStyle: Italian chrome."
+    },
+    {
+      "id": "gramophone",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: gramophone with a flower horn.\nStyle: art nouveau.",
+      "rich": "Category: Object.\nSubject: gramophone with a flower horn.\nStyle: art nouveau."
+    },
+    {
+      "id": "arcadeCabinet",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: 1980s arcade cabinet.\nStyle: synthwave.",
+      "rich": "Category: Object.\nSubject: 1980s arcade cabinet.\nStyle: synthwave."
+    },
+    {
+      "id": "orrery",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: brass orrery of the solar system.\nStyle: steampunk.",
+      "rich": "Category: Object.\nSubject: brass orrery of the solar system.\nStyle: steampunk."
+    },
+    {
+      "id": "terrarium",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: glass terrarium with moss and tiny mushrooms.\nStyle: Studio Ghibli.",
+      "rich": "Category: Object.\nSubject: glass terrarium with moss and tiny mushrooms.\nStyle: Studio Ghibli."
+    },
+    {
+      "id": "pinballMachine",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: pinball machine.\nStyle: 1970s space-age.",
+      "rich": "Category: Object.\nSubject: pinball machine.\nStyle: 1970s space-age."
+    },
+    {
+      "id": "telescope",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: brass refracting telescope on a tripod.\nStyle: Victorian scientific instrument.",
+      "rich": "Category: Object.\nSubject: brass refracting telescope on a tripod.\nStyle: Victorian scientific instrument."
+    },
+    {
+      "id": "sewingMachine",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: treadle sewing machine.\nStyle: Victorian black and gold.",
+      "rich": "Category: Object.\nSubject: treadle sewing machine.\nStyle: Victorian black and gold."
+    },
+    {
+      "id": "ramenStall",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: night ramen stall with lanterns and stools.\nStyle: Studio Ghibli.",
+      "rich": "Category: Diorama.\nSubject: night ramen stall with lanterns and stools.\nStyle: Studio Ghibli.",
+      "vivid": "A tiny ramen yatai at midnight: red noren curtain, steaming pot, three stools, paper lanterns swaying, a cat asleep under the counter, rain puddles reflecting the warm light. Studio Ghibli warmth: soft painted shapes, cozy lived-in clutter."
+    },
+    {
+      "id": "lighthouseStorm",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: lighthouse on a cliff in a storm.\nStyle: Sea of Thieves.",
+      "rich": "Category: Diorama.\nSubject: lighthouse on a cliff in a storm.\nStyle: Sea of Thieves."
+    },
+    {
+      "id": "babaYagaHut",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: Baba Yaga's hut on chicken legs.\nStyle: Slavic folk art.",
+      "rich": "Category: Diorama.\nSubject: Baba Yaga's hut on chicken legs.\nStyle: Slavic folk art."
+    },
+    {
+      "id": "moonBase",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: small moon base with dome and antenna.\nStyle: 1950s retro-futurism.",
+      "rich": "Category: Diorama.\nSubject: small moon base with dome and antenna.\nStyle: 1950s retro-futurism."
+    },
+    {
+      "id": "bakeryFront",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: bakery storefront with awning.\nStyle: Animal Crossing.",
+      "rich": "Category: Diorama.\nSubject: bakery storefront with awning.\nStyle: Animal Crossing."
+    },
+    {
+      "id": "pirateCove",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: pirate cove with shipwreck and treasure.\nStyle: Sea of Thieves.",
+      "rich": "Category: Diorama.\nSubject: pirate cove with shipwreck and treasure.\nStyle: Sea of Thieves."
+    },
+    {
+      "id": "zenGarden",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: zen rock garden with a small pagoda.\nStyle: minimalist Japanese.",
+      "rich": "Category: Diorama.\nSubject: zen rock garden with a small pagoda.\nStyle: minimalist Japanese."
+    },
+    {
+      "id": "desertOasis",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: desert oasis caravan stop.\nStyle: Journey (thatgamecompany).",
+      "rich": "Category: Diorama.\nSubject: desert oasis caravan stop.\nStyle: Journey (thatgamecompany)."
+    },
+    {
+      "id": "coralReef",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: coral reef with clownfish and anemones.\nStyle: Finding Nemo.",
+      "rich": "Category: Diorama.\nSubject: coral reef with clownfish and anemones.\nStyle: Finding Nemo."
+    },
+    {
+      "id": "route66Station",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: Route 66 gas station.\nStyle: Edward Hopper painting.",
+      "rich": "Category: Diorama.\nSubject: Route 66 gas station.\nStyle: Edward Hopper painting."
+    },
+    {
+      "id": "mushroomVillage",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: mushroom-house village.\nStyle: storybook illustration.",
+      "rich": "Category: Diorama.\nSubject: mushroom-house village.\nStyle: storybook illustration."
+    },
+    {
+      "id": "arcticOutpost",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: arctic research outpost.\nStyle: Firewatch flat colour.",
+      "rich": "Category: Diorama.\nSubject: arctic research outpost.\nStyle: Firewatch flat colour."
+    },
+    {
+      "id": "summerPlatform",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: rural Japanese train platform in summer.\nStyle: Makoto Shinkai.",
+      "rich": "Category: Diorama.\nSubject: rural Japanese train platform in summer.\nStyle: Makoto Shinkai."
+    },
+    {
+      "id": "marketStall",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: medieval market stall with produce.\nStyle: Kingdom Come realism.",
+      "rich": "Category: Prop group.\nSubject: medieval market stall with produce.\nStyle: Kingdom Come realism."
+    },
+    {
+      "id": "vikingFeast",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: Viking longhouse feast table.\nStyle: Valheim.",
+      "rich": "Category: Prop group.\nSubject: Viking longhouse feast table.\nStyle: Valheim."
+    },
+    {
+      "id": "spaceGalley",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: spaceship galley kitchen.\nStyle: Alien (1979) Nostromo.",
+      "rich": "Category: Prop group.\nSubject: spaceship galley kitchen.\nStyle: Alien (1979) Nostromo."
+    },
+    {
+      "id": "origamiDragon",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: dragon.\nStyle: folded origami paper.",
+      "rich": "Category: Fantastical creature.\nSubject: dragon.\nStyle: folded origami paper."
+    },
+    {
+      "id": "knittedOctopus",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: octopus.\nStyle: hand-knitted wool amigurumi.",
+      "rich": "Category: Animal.\nSubject: octopus.\nStyle: hand-knitted wool amigurumi."
+    },
+    {
+      "id": "stainedGlassPeacock",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: peacock with fanned tail.\nStyle: stained glass with lead came.",
+      "rich": "Category: Animal.\nSubject: peacock with fanned tail.\nStyle: stained glass with lead came."
+    },
+    {
+      "id": "fabergeEgg",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: jewelled egg opening to reveal a tiny automaton.\nStyle: Fabergé enamel and gold.",
+      "rich": "Category: Object.\nSubject: jewelled egg opening to reveal a tiny automaton.\nStyle: Fabergé enamel and gold."
+    },
+    {
+      "id": "terracottaWarrior",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: terracotta warrior.\nStyle: Qin dynasty terracotta.",
+      "rich": "Category: Humanoid character.\nSubject: terracotta warrior.\nStyle: Qin dynasty terracotta."
+    },
+    {
+      "id": "bauhausBird",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: songbird on a branch.\nStyle: Bauhaus primary-colour geometry.",
+      "rich": "Category: Animal.\nSubject: songbird on a branch.\nStyle: Bauhaus primary-colour geometry."
+    },
+    {
+      "id": "memphisToucan",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: toucan.\nStyle: Memphis Group 1980s design.",
+      "rich": "Category: Animal.\nSubject: toucan.\nStyle: Memphis Group 1980s design."
+    },
+    {
+      "id": "brutalistBlock",
+      "kind": "Architecture",
+      "terse": "Category: Architecture.\nSubject: brutalist housing block.\nStyle: raw concrete brutalism.",
+      "rich": "Category: Architecture.\nSubject: brutalist housing block.\nStyle: raw concrete brutalism."
+    },
+    {
+      "id": "vaporwaveBust",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: classical marble bust with palm trees and a grid floor.\nStyle: vaporwave.",
+      "rich": "Category: Object.\nSubject: classical marble bust with palm trees and a grid floor.\nStyle: vaporwave."
+    },
+    {
+      "id": "blueprintSpitfire",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: Spitfire fighter plane.\nStyle: cyanotype blueprint.",
+      "rich": "Category: Vehicle.\nSubject: Spitfire fighter plane.\nStyle: cyanotype blueprint."
+    },
+    {
+      "id": "tinRobot",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: wind-up robot with key in its back.\nStyle: 1950s Japanese tin toy.",
+      "rich": "Category: Humanoid character.\nSubject: wind-up robot with key in its back.\nStyle: 1950s Japanese tin toy.",
+      "vivid": "A 1950s Japanese wind-up tin robot: boxy lithographed body with printed dials and rivets, a clear dome head with sparks inside, accordion arms, a big brass key in its back, scuffed paint at the edges. Toy-shelf charm."
+    },
+    {
+      "id": "brickCastle",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: castle with drawbridge.\nStyle: interlocking toy bricks.",
+      "rich": "Category: Diorama.\nSubject: castle with drawbridge.\nStyle: interlocking toy bricks."
+    },
+    {
+      "id": "voxelWhale",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: humpback whale.\nStyle: voxel.",
+      "rich": "Category: Animal.\nSubject: humpback whale.\nStyle: voxel."
+    },
+    {
+      "id": "claymationSheepdog",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: sheepdog.\nStyle: claymation (Aardman).",
+      "rich": "Category: Animal.\nSubject: sheepdog.\nStyle: claymation (Aardman)."
+    },
+    {
+      "id": "ps1Knight",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: knight in plate armour.\nStyle: PS1-era low-res textures.",
+      "rich": "Category: Humanoid character.\nSubject: knight in plate armour.\nStyle: PS1-era low-res textures."
+    },
+    {
+      "id": "moebiusRider",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: desert rider on a strange long-legged beast.\nStyle: Moebius comic.",
+      "rich": "Category: Humanoid character.\nSubject: desert rider on a strange long-legged beast.\nStyle: Moebius comic."
+    },
+    {
+      "id": "burtonCat",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: skinny black cat with spiral tail.\nStyle: Tim Burton.",
+      "rich": "Category: Animal.\nSubject: skinny black cat with spiral tail.\nStyle: Tim Burton."
+    },
+    {
+      "id": "delftTeapot",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: teapot shaped like an elephant.\nStyle: Delft blue porcelain.",
+      "rich": "Category: Object.\nSubject: teapot shaped like an elephant.\nStyle: Delft blue porcelain."
+    },
+    {
+      "id": "soapstoneBear",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: polar bear.\nStyle: Inuit soapstone carving.",
+      "rich": "Category: Animal.\nSubject: polar bear.\nStyle: Inuit soapstone carving."
+    },
+    {
+      "id": "alebrije",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: alebrije jaguar-eagle.\nStyle: Oaxacan alebrije painted wood.",
+      "rich": "Category: Fantastical creature.\nSubject: alebrije jaguar-eagle.\nStyle: Oaxacan alebrije painted wood.",
+      "vivid": "An Oaxacan alebrije: a jaguar's body with eagle wings and a curling serpent tail, every surface covered in tiny painted dots, zigzags and petals in hot pink, turquoise, lime and orange, carved from copal wood with visible knife facets."
+    },
+    {
+      "id": "matryoshka",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: matryoshka set, opened and lined up.\nStyle: Russian folk lacquer.",
+      "rich": "Category: Object.\nSubject: matryoshka set, opened and lined up.\nStyle: Russian folk lacquer."
+    },
+    {
+      "id": "neonJellyfish",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: jellyfish.\nStyle: neon tube sign.",
+      "rich": "Category: Animal.\nSubject: jellyfish.\nStyle: neon tube sign."
+    },
+    {
+      "id": "muranoSeahorse",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: seahorse.\nStyle: Murano blown glass.",
+      "rich": "Category: Animal.\nSubject: seahorse.\nStyle: Murano blown glass."
+    },
+    {
+      "id": "woodcutRaven",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: raven on a skull.\nStyle: woodcut print.",
+      "rich": "Category: Animal.\nSubject: raven on a skull.\nStyle: woodcut print."
+    },
+    {
+      "id": "mosaicDolphin",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: dolphin leaping.\nStyle: Roman mosaic.",
+      "rich": "Category: Animal.\nSubject: dolphin leaping.\nStyle: Roman mosaic."
+    },
+    {
+      "id": "kintsugiBowl",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: kintsugi bowl with a goldfish swimming inside.\nStyle: Japanese ceramics.",
+      "rich": "Category: Object.\nSubject: kintsugi bowl with a goldfish swimming inside.\nStyle: Japanese ceramics."
+    },
+    {
+      "id": "cardboardRobot",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: kid in a cardboard-box robot costume.\nStyle: cardboard craft.",
+      "rich": "Category: Humanoid character.\nSubject: kid in a cardboard-box robot costume.\nStyle: cardboard craft."
+    },
+    {
+      "id": "holoKoi",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: pair of koi circling.\nStyle: holographic iridescent.",
+      "rich": "Category: Animal.\nSubject: pair of koi circling.\nStyle: holographic iridescent."
+    },
+    {
+      "id": "deskLampCreature",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: desk lamp creature hopping.\nStyle: Pixar.",
+      "rich": "Category: Fantastical creature.\nSubject: desk lamp creature hopping.\nStyle: Pixar."
+    },
+    {
+      "id": "mondrianHouse",
+      "kind": "Architecture",
+      "terse": "Category: Architecture.\nSubject: small house.\nStyle: De Stijl (Mondrian).",
+      "rich": "Category: Architecture.\nSubject: small house.\nStyle: De Stijl (Mondrian)."
+    },
+    {
+      "id": "dragonflyBrooch",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: dragonfly.\nStyle: art nouveau Lalique jewellery.",
+      "rich": "Category: Animal.\nSubject: dragonfly.\nStyle: art nouveau Lalique jewellery."
+    },
+    {
+      "id": "quetzalcoatl",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: Quetzalcoatl, the feathered serpent.\nStyle: Aztec codex.",
+      "rich": "Category: Fantastical creature.\nSubject: Quetzalcoatl, the feathered serpent.\nStyle: Aztec codex."
+    },
+    {
+      "id": "solarBarque",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: solar barque of Ra.\nStyle: ancient Egyptian.",
+      "rich": "Category: Vehicle.\nSubject: solar barque of Ra.\nStyle: ancient Egyptian."
+    },
+    {
+      "id": "mingVase",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: vase with a coiling dragon.\nStyle: blue-and-white Ming porcelain.",
+      "rich": "Category: Object.\nSubject: vase with a coiling dragon.\nStyle: blue-and-white Ming porcelain."
+    },
+    {
+      "id": "feltBunny",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: rabbit.\nStyle: needle-felted wool.",
+      "rich": "Category: Animal.\nSubject: rabbit.\nStyle: needle-felted wool."
+    },
+    {
+      "id": "balloonDog",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: balloon animal dog.\nStyle: Jeff Koons mirror chrome.",
+      "rich": "Category: Animal.\nSubject: balloon animal dog.\nStyle: Jeff Koons mirror chrome."
+    },
+    {
+      "id": "gingerbreadHouse",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: gingerbread house.\nStyle: candy and icing.",
+      "rich": "Category: Diorama.\nSubject: gingerbread house.\nStyle: candy and icing."
+    },
+    {
+      "id": "sushiBoat",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: sushi boat platter.\nStyle: realistic food.",
+      "rich": "Category: Prop group.\nSubject: sushi boat platter.\nStyle: realistic food."
+    },
+    {
+      "id": "burgerTower",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: towering burger with everything.\nStyle: Overcooked.",
+      "rich": "Category: Object.\nSubject: towering burger with everything.\nStyle: Overcooked."
+    },
+    {
+      "id": "cakeCastle",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: castle made of cake.\nStyle: patisserie.",
+      "rich": "Category: Diorama.\nSubject: castle made of cake.\nStyle: patisserie."
+    },
+    {
+      "id": "cathedralFacade",
+      "kind": "Architecture",
+      "terse": "Category: Architecture.\nSubject: gothic cathedral facade with rose window.\nStyle: gothic.",
+      "rich": "Category: Architecture.\nSubject: gothic cathedral facade with rose window.\nStyle: gothic."
+    },
+    {
+      "id": "dutchWindmill",
+      "kind": "Architecture",
+      "terse": "Category: Architecture.\nSubject: Dutch windmill.\nStyle: Animal Crossing.",
+      "rich": "Category: Architecture.\nSubject: Dutch windmill.\nStyle: Animal Crossing."
+    },
+    {
+      "id": "pagoda",
+      "kind": "Architecture",
+      "terse": "Category: Architecture.\nSubject: five-storey pagoda.\nStyle: Japanese temple.",
+      "rich": "Category: Architecture.\nSubject: five-storey pagoda.\nStyle: Japanese temple."
+    },
+    {
+      "id": "strandbeest",
+      "kind": "Abstract",
+      "terse": "Category: Abstract.\nSubject: wind-walking beach creature of tubes.\nStyle: Theo Jansen kinetic sculpture.",
+      "rich": "Category: Abstract.\nSubject: wind-walking beach creature of tubes.\nStyle: Theo Jansen kinetic sculpture.",
+      "vivid": "A Theo Jansen strandbeest: a long skeletal walker made of pale yellow PVC tubes and zip ties, a dozen leg linkages on a crankshaft, sail wings catching the wind, standing on wet sand. Kinetic sculpture: honest joints, lightweight, mechanical."
+    },
+    {
+      "id": "calderMobile",
+      "kind": "Abstract",
+      "terse": "Category: Abstract.\nSubject: hanging mobile.\nStyle: Alexander Calder.",
+      "rich": "Category: Abstract.\nSubject: hanging mobile.\nStyle: Alexander Calder."
+    },
+    {
+      "id": "celticHarp",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: harp.\nStyle: Celtic knotwork.",
+      "rich": "Category: Object.\nSubject: harp.\nStyle: Celtic knotwork."
+    },
+    {
+      "id": "drumKit",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: rock drum kit.\nStyle: glam rock.",
+      "rich": "Category: Object.\nSubject: rock drum kit.\nStyle: glam rock."
+    },
+    {
+      "id": "accordion",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: piano accordion.\nStyle: Italian mother-of-pearl.",
+      "rich": "Category: Object.\nSubject: piano accordion.\nStyle: Italian mother-of-pearl."
+    },
+    {
+      "id": "venusFlytrap",
+      "kind": "Plant",
+      "terse": "Category: Plant.\nSubject: giant venus flytrap in a pot.\nStyle: Little Shop of Horrors.",
+      "rich": "Category: Plant.\nSubject: giant venus flytrap in a pot.\nStyle: Little Shop of Horrors."
+    },
+    {
+      "id": "saguaroGroup",
+      "kind": "Plant",
+      "terse": "Category: Plant.\nSubject: saguaro cacti with a roadrunner.\nStyle: American Southwest.",
+      "rich": "Category: Plant.\nSubject: saguaro cacti with a roadrunner.\nStyle: American Southwest."
+    },
+    {
+      "id": "lotusPond",
+      "kind": "Plant",
+      "terse": "Category: Plant.\nSubject: lotus pond with a frog.\nStyle: Chinese ink painting.",
+      "rich": "Category: Plant.\nSubject: lotus pond with a frog.\nStyle: Chinese ink painting."
+    },
+    {
+      "id": "cherryBlossom",
+      "kind": "Plant",
+      "terse": "Category: Plant.\nSubject: cherry blossom tree.\nStyle: ukiyo-e woodblock print.",
+      "rich": "Category: Plant.\nSubject: cherry blossom tree.\nStyle: ukiyo-e woodblock print."
+    },
+    {
+      "id": "applianceDragon",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: dragon built from kitchen appliances.\nStyle: junk sculpture.",
+      "rich": "Category: Fantastical creature.\nSubject: dragon built from kitchen appliances.\nStyle: junk sculpture."
+    },
+    {
+      "id": "mouseTeaParty",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: mice having a tea party in a teacup.\nStyle: Beatrix Potter.",
+      "rich": "Category: Diorama.\nSubject: mice having a tea party in a teacup.\nStyle: Beatrix Potter."
+    },
+    {
+      "id": "snailCottage",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: snail with a cottage for a shell.\nStyle: storybook illustration.",
+      "rich": "Category: Fantastical creature.\nSubject: snail with a cottage for a shell.\nStyle: storybook illustration."
+    },
+    {
+      "id": "hamsterMech",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: hamster piloting a mech.\nStyle: chibi.",
+      "rich": "Category: Vehicle.\nSubject: hamster piloting a mech.\nStyle: chibi."
+    },
+    {
+      "id": "capybaraOnsen",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: capybaras in a hot spring.\nStyle: kawaii.",
+      "rich": "Category: Diorama.\nSubject: capybaras in a hot spring.\nStyle: kawaii."
+    },
+    {
+      "id": "robotBarista",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: robot barista.\nStyle: Portal (Aperture Science).",
+      "rich": "Category: Humanoid character.\nSubject: robot barista.\nStyle: Portal (Aperture Science)."
+    },
+    {
+      "id": "pigeonKnight",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: pigeon in knight's armour.\nStyle: medieval manuscript marginalia.",
+      "rich": "Category: Humanoid character.\nSubject: pigeon in knight's armour.\nStyle: medieval manuscript marginalia."
+    },
+    {
+      "id": "frogWizard",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: frog wizard with staff.\nStyle: storybook illustration.",
+      "rich": "Category: Humanoid character.\nSubject: frog wizard with staff.\nStyle: storybook illustration."
+    },
+    {
+      "id": "octopusChef",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: octopus chef juggling pans.\nStyle: Pixar.",
+      "rich": "Category: Fantastical creature.\nSubject: octopus chef juggling pans.\nStyle: Pixar."
+    },
+    {
+      "id": "cloudSheep",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: sheep made of cloud floating.\nStyle: Kirby.",
+      "rich": "Category: Fantastical creature.\nSubject: sheep made of cloud floating.\nStyle: Kirby."
+    },
+    {
+      "id": "ringStation",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: rotating ring space station.\nStyle: 2001: A Space Odyssey.",
+      "rich": "Category: Vehicle.\nSubject: rotating ring space station.\nStyle: 2001: A Space Odyssey."
+    },
+    {
+      "id": "alienFlora",
+      "kind": "Plant",
+      "terse": "Category: Plant.\nSubject: bioluminescent alien plant.\nStyle: Avatar.",
+      "rich": "Category: Plant.\nSubject: bioluminescent alien plant.\nStyle: Avatar."
+    },
+    {
+      "id": "alienQueen",
+      "kind": "Monster",
+      "terse": "Category: Monster.\nSubject: insectoid alien queen.\nStyle: H.R. Giger biomechanical.",
+      "rich": "Category: Monster.\nSubject: insectoid alien queen.\nStyle: H.R. Giger biomechanical."
+    },
+    {
+      "id": "repairDroid",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: repair droid.\nStyle: Star Wars.",
+      "rich": "Category: Humanoid character.\nSubject: repair droid.\nStyle: Star Wars."
+    },
+    {
+      "id": "hauntedDollhouse",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: haunted Victorian dollhouse.\nStyle: gothic.",
+      "rich": "Category: Diorama.\nSubject: haunted Victorian dollhouse.\nStyle: gothic.",
+      "vivid": "A Victorian dollhouse opened like a cutaway: four rooms, a creaky staircase, a portrait whose eyes follow you, a tiny ghost girl in the attic, dust sheets on the furniture, a crow on the roof. Gothic, moody purples and sick greens, candlelight glow."
+    },
+    {
+      "id": "headlessHorseman",
+      "kind": "Monster",
+      "terse": "Category: Monster.\nSubject: headless horseman with jack-o'-lantern.\nStyle: Tim Burton.",
+      "rich": "Category: Monster.\nSubject: headless horseman with jack-o'-lantern.\nStyle: Tim Burton."
+    },
+    {
+      "id": "wendigo",
+      "kind": "Monster",
+      "terse": "Category: Monster.\nSubject: wendigo.\nStyle: folk horror.",
+      "rich": "Category: Monster.\nSubject: wendigo.\nStyle: folk horror."
+    },
+    {
+      "id": "trireme",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: Greek trireme.\nStyle: ancient Greek.",
+      "rich": "Category: Vehicle.\nSubject: Greek trireme.\nStyle: ancient Greek."
+    },
+    {
+      "id": "sphinx",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: sphinx.\nStyle: ancient Egyptian.",
+      "rich": "Category: Fantastical creature.\nSubject: sphinx.\nStyle: ancient Egyptian."
+    },
+    {
+      "id": "samuraiArmour",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: samurai armour on a display stand.\nStyle: Edo-period Japanese.",
+      "rich": "Category: Object.\nSubject: samurai armour on a display stand.\nStyle: Edo-period Japanese."
+    },
+    {
+      "id": "vikingLongship",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: viking longship.\nStyle: Norse.",
+      "rich": "Category: Vehicle.\nSubject: viking longship.\nStyle: Norse."
+    },
+    {
+      "id": "redPandaBard",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: red panda bard with a lute.\nStyle: Redwall storybook.",
+      "rich": "Category: Humanoid character.\nSubject: red panda bard with a lute.\nStyle: Redwall storybook."
+    },
+    {
+      "id": "mechaniBee",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: clockwork honeybee.\nStyle: steampunk brass and glass.",
+      "rich": "Category: Animal.\nSubject: clockwork honeybee.\nStyle: steampunk brass and glass."
+    },
+    {
+      "id": "lionDance",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: Chinese lion dance costume mid-leap.\nStyle: Lunar New Year festival.",
+      "rich": "Category: Object.\nSubject: Chinese lion dance costume mid-leap.\nStyle: Lunar New Year festival.",
+      "wild": "Category: Object.\nSubject: Chinese lion dance costume mid-leap.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "hippoBallerina",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: hippo ballerina in a tutu.\nStyle: Fantasia (Disney 1940).",
+      "rich": "Category: Animal.\nSubject: hippo ballerina in a tutu.\nStyle: Fantasia (Disney 1940)."
+    },
+    {
+      "id": "chameleon",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: panther chameleon on a branch, tongue out.\nStyle: National Geographic realism.",
+      "rich": "Category: Animal.\nSubject: panther chameleon on a branch, tongue out.\nStyle: National Geographic realism."
+    },
+    {
+      "id": "armadillo",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: three-banded armadillo.\nStyle: low-poly.",
+      "rich": "Category: Animal.\nSubject: three-banded armadillo.\nStyle: low-poly."
+    },
+    {
+      "id": "beaverDam",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: beaver at its lodge and dam.\nStyle: Animal Crossing.",
+      "rich": "Category: Diorama.\nSubject: beaver at its lodge and dam.\nStyle: Animal Crossing."
+    },
+    {
+      "id": "owlLibrarian",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: great horned owl librarian with spectacles.\nStyle: Beatrix Potter.",
+      "rich": "Category: Humanoid character.\nSubject: great horned owl librarian with spectacles.\nStyle: Beatrix Potter.",
+      "wild": "Category: Humanoid character.\nSubject: great horned owl librarian with spectacles.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "cyberSamurai",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: cyber samurai with a glowing katana.\nStyle: Cyberpunk 2077.",
+      "rich": "Category: Humanoid character.\nSubject: cyber samurai with a glowing katana.\nStyle: Cyberpunk 2077."
+    },
+    {
+      "id": "desertNomad",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: Tuareg desert nomad with a camel.\nStyle: Moebius comic.",
+      "rich": "Category: Humanoid character.\nSubject: Tuareg desert nomad with a camel.\nStyle: Moebius comic."
+    },
+    {
+      "id": "deepOneAngler",
+      "kind": "Monster",
+      "terse": "Category: Monster.\nSubject: deep-sea anglerfish monster.\nStyle: Subnautica.",
+      "rich": "Category: Monster.\nSubject: deep-sea anglerfish monster.\nStyle: Subnautica."
+    },
+    {
+      "id": "treeFrog",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: red-eyed tree frog on a leaf.\nStyle: Pixar.",
+      "rich": "Category: Animal.\nSubject: red-eyed tree frog on a leaf.\nStyle: Pixar."
+    },
+    {
+      "id": "koiDragon",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: koi transforming into a dragon at a waterfall.\nStyle: Chinese ink painting.",
+      "rich": "Category: Fantastical creature.\nSubject: koi transforming into a dragon at a waterfall.\nStyle: Chinese ink painting."
+    },
+    {
+      "id": "phoenix",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: phoenix rising from embers.\nStyle: Hearthstone.",
+      "rich": "Category: Fantastical creature.\nSubject: phoenix rising from embers.\nStyle: Hearthstone.",
+      "wild": "Category: Fantastical creature.\nSubject: phoenix rising from embers.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "kappa",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: kappa with a water dish on its head.\nStyle: yokai woodblock print.",
+      "rich": "Category: Fantastical creature.\nSubject: kappa with a water dish on its head.\nStyle: yokai woodblock print."
+    },
+    {
+      "id": "griffinChick",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: baby griffin hatching from an egg.\nStyle: Pixar.",
+      "rich": "Category: Fantastical creature.\nSubject: baby griffin hatching from an egg.\nStyle: Pixar."
+    },
+    {
+      "id": "cerberusPup",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: three-headed puppy.\nStyle: Hades (Supergiant Games).",
+      "rich": "Category: Fantastical creature.\nSubject: three-headed puppy.\nStyle: Hades (Supergiant Games).",
+      "wild": "Category: Fantastical creature.\nSubject: three-headed puppy.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "goldenSnitchOrrery",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: clockwork flying golden ball with wings.\nStyle: Harry Potter prop.",
+      "rich": "Category: Object.\nSubject: clockwork flying golden ball with wings.\nStyle: Harry Potter prop."
+    },
+    {
+      "id": "walkingCastle",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: walking fortress on four mechanical legs.\nStyle: Studio Ghibli.",
+      "rich": "Category: Vehicle.\nSubject: walking fortress on four mechanical legs.\nStyle: Studio Ghibli.",
+      "wild": "Category: Vehicle.\nSubject: walking fortress on four mechanical legs.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "monsterBusStop",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: forest bus stop in the rain with a giant forest spirit.\nStyle: Studio Ghibli.",
+      "rich": "Category: Diorama.\nSubject: forest bus stop in the rain with a giant forest spirit.\nStyle: Studio Ghibli."
+    },
+    {
+      "id": "witchBroom",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: witch's broom loaded with luggage.\nStyle: Kiki's Delivery Service.",
+      "rich": "Category: Vehicle.\nSubject: witch's broom loaded with luggage.\nStyle: Kiki's Delivery Service.",
+      "wild": "Category: Vehicle.\nSubject: witch's broom loaded with luggage.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "pirateGalleon",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: pirate galleon under full sail.\nStyle: Sea of Thieves.",
+      "rich": "Category: Vehicle.\nSubject: pirate galleon under full sail.\nStyle: Sea of Thieves.",
+      "wild": "Category: Vehicle.\nSubject: pirate galleon under full sail.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "spaceShuttle",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: space shuttle on its launch pad.\nStyle: NASA archival realism.",
+      "rich": "Category: Vehicle.\nSubject: space shuttle on its launch pad.\nStyle: NASA archival realism."
+    },
+    {
+      "id": "gondola",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: Venetian gondola with gondolier.\nStyle: Venetian Renaissance.",
+      "rich": "Category: Vehicle.\nSubject: Venetian gondola with gondolier.\nStyle: Venetian Renaissance."
+    },
+    {
+      "id": "bigRig",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: chrome big-rig truck.\nStyle: Americana.",
+      "rich": "Category: Vehicle.\nSubject: chrome big-rig truck.\nStyle: Americana.",
+      "wild": "Category: Vehicle.\nSubject: chrome big-rig truck.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "steamTank",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: steam-powered landship tank.\nStyle: dieselpunk.",
+      "rich": "Category: Vehicle.\nSubject: steam-powered landship tank.\nStyle: dieselpunk."
+    },
+    {
+      "id": "dirigibleBike",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: pedal-powered flying machine.\nStyle: Leonardo da Vinci sketch.",
+      "rich": "Category: Vehicle.\nSubject: pedal-powered flying machine.\nStyle: Leonardo da Vinci sketch."
+    },
+    {
+      "id": "mechSpider",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: spider-legged mech.\nStyle: Mobile Suit Gundam.",
+      "rich": "Category: Vehicle.\nSubject: spider-legged mech.\nStyle: Mobile Suit Gundam."
+    },
+    {
+      "id": "racingKart",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: racing kart with a banana peel behind it.\nStyle: Mario Kart.",
+      "rich": "Category: Vehicle.\nSubject: racing kart with a banana peel behind it.\nStyle: Mario Kart."
+    },
+    {
+      "id": "sleigh",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: Santa's sleigh piled with gifts.\nStyle: Coca-Cola Christmas illustration.",
+      "rich": "Category: Vehicle.\nSubject: Santa's sleigh piled with gifts.\nStyle: Coca-Cola Christmas illustration."
+    },
+    {
+      "id": "cannon",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: naval cannon on a wooden carriage.\nStyle: Age of Sail realism.",
+      "rich": "Category: Weapon.\nSubject: naval cannon on a wooden carriage.\nStyle: Age of Sail realism.",
+      "wild": "Category: Weapon.\nSubject: naval cannon on a wooden carriage.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "crossbow",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: repeating crossbow.\nStyle: Chinese Han dynasty.",
+      "rich": "Category: Weapon.\nSubject: repeating crossbow.\nStyle: Chinese Han dynasty."
+    },
+    {
+      "id": "lightsaberHilt",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: ornate energy-sword hilt.\nStyle: Star Wars.",
+      "rich": "Category: Weapon.\nSubject: ornate energy-sword hilt.\nStyle: Star Wars."
+    },
+    {
+      "id": "scythe",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: reaper's scythe with a soul lantern.\nStyle: Hollow Knight.",
+      "rich": "Category: Weapon.\nSubject: reaper's scythe with a soul lantern.\nStyle: Hollow Knight."
+    },
+    {
+      "id": "stormBow",
+      "kind": "Weapon",
+      "terse": "Category: Weapon.\nSubject: elven longbow with storm runes.\nStyle: Elden Ring.",
+      "rich": "Category: Weapon.\nSubject: elven longbow with storm runes.\nStyle: Elden Ring."
+    },
+    {
+      "id": "mjolnirTankard",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: viking tankard shaped like a hammer.\nStyle: Norse.",
+      "rich": "Category: Object.\nSubject: viking tankard shaped like a hammer.\nStyle: Norse."
+    },
+    {
+      "id": "apothecaryScale",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: brass apothecary scale with weights.\nStyle: Victorian.",
+      "rich": "Category: Object.\nSubject: brass apothecary scale with weights.\nStyle: Victorian."
+    },
+    {
+      "id": "crystalBall",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: fortune teller's crystal ball on a claw stand.\nStyle: art nouveau.",
+      "rich": "Category: Object.\nSubject: fortune teller's crystal ball on a claw stand.\nStyle: art nouveau.",
+      "wild": "Category: Object.\nSubject: fortune teller's crystal ball on a claw stand.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "boombox",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: 1980s boombox.\nStyle: hip-hop graffiti.",
+      "rich": "Category: Object.\nSubject: 1980s boombox.\nStyle: hip-hop graffiti."
+    },
+    {
+      "id": "rotaryPhone",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: rotary telephone.\nStyle: 1960s Bakelite.",
+      "rich": "Category: Object.\nSubject: rotary telephone.\nStyle: 1960s Bakelite."
+    },
+    {
+      "id": "sewingBird",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: music box with a dancing figure.\nStyle: Victorian.",
+      "rich": "Category: Object.\nSubject: music box with a dancing figure.\nStyle: Victorian."
+    },
+    {
+      "id": "diceTower",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: dice tower shaped like a castle keep.\nStyle: tabletop RPG.",
+      "rich": "Category: Object.\nSubject: dice tower shaped like a castle keep.\nStyle: tabletop RPG."
+    },
+    {
+      "id": "chessSet",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: chess set mid-game, ivory and ebony.\nStyle: Staunton classic.",
+      "rich": "Category: Prop group.\nSubject: chess set mid-game, ivory and ebony.\nStyle: Staunton classic."
+    },
+    {
+      "id": "lanternFestival",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: lantern festival riverbank.\nStyle: Tangled (Disney).",
+      "rich": "Category: Diorama.\nSubject: lantern festival riverbank.\nStyle: Tangled (Disney)."
+    },
+    {
+      "id": "cliffMonastery",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: monastery on a cliff edge.\nStyle: Himalayan Tibetan.",
+      "rich": "Category: Diorama.\nSubject: monastery on a cliff edge.\nStyle: Himalayan Tibetan."
+    },
+    {
+      "id": "steampunkWorkshop",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: inventor's cluttered workshop.\nStyle: steampunk.",
+      "rich": "Category: Diorama.\nSubject: inventor's cluttered workshop.\nStyle: steampunk."
+    },
+    {
+      "id": "desertRuin",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: sunken desert temple ruin.\nStyle: Uncharted.",
+      "rich": "Category: Diorama.\nSubject: sunken desert temple ruin.\nStyle: Uncharted."
+    },
+    {
+      "id": "underwaterCity",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: domed underwater city.\nStyle: Bioshock.",
+      "rich": "Category: Diorama.\nSubject: domed underwater city.\nStyle: Bioshock."
+    },
+    {
+      "id": "treeHobbitHole",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: hillside burrow home with a round door.\nStyle: Tolkien illustration.",
+      "rich": "Category: Diorama.\nSubject: hillside burrow home with a round door.\nStyle: Tolkien illustration."
+    },
+    {
+      "id": "neonAlley",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: rainy neon alleyway with noodle shop.\nStyle: Blade Runner.",
+      "rich": "Category: Diorama.\nSubject: rainy neon alleyway with noodle shop.\nStyle: Blade Runner.",
+      "wild": "Category: Diorama.\nSubject: rainy neon alleyway with noodle shop.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "farmBarn",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: red barn with silo and animals.\nStyle: Stardew Valley.",
+      "rich": "Category: Diorama.\nSubject: red barn with silo and animals.\nStyle: Stardew Valley."
+    },
+    {
+      "id": "spaceCockpit",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: starfighter cockpit interior.\nStyle: Star Wars.",
+      "rich": "Category: Prop group.\nSubject: starfighter cockpit interior.\nStyle: Star Wars."
+    },
+    {
+      "id": "astronautBedroom",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: kid's bedroom with rocket posters and a telescope.\nStyle: Pixar.",
+      "rich": "Category: Diorama.\nSubject: kid's bedroom with rocket posters and a telescope.\nStyle: Pixar."
+    },
+    {
+      "id": "icecaveDragon",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: ice cave with a sleeping dragon on gold.\nStyle: The Hobbit.",
+      "rich": "Category: Diorama.\nSubject: ice cave with a sleeping dragon on gold.\nStyle: The Hobbit."
+    },
+    {
+      "id": "volcanoForge",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: volcanic forge with lava channels.\nStyle: Dark Souls.",
+      "rich": "Category: Diorama.\nSubject: volcanic forge with lava channels.\nStyle: Dark Souls."
+    },
+    {
+      "id": "pondLife",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: pond with lily pads, dragonflies and a heron.\nStyle: watercolour.",
+      "rich": "Category: Diorama.\nSubject: pond with lily pads, dragonflies and a heron.\nStyle: watercolour."
+    },
+    {
+      "id": "gnomeGarden",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: garden gnome village in the flowerbed.\nStyle: storybook.",
+      "rich": "Category: Diorama.\nSubject: garden gnome village in the flowerbed.\nStyle: storybook."
+    },
+    {
+      "id": "papercraftCity",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: small city block.\nStyle: papercraft.",
+      "rich": "Category: Diorama.\nSubject: small city block.\nStyle: papercraft."
+    },
+    {
+      "id": "paperLantern",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: paper lantern carp.\nStyle: Japanese festival.",
+      "rich": "Category: Object.\nSubject: paper lantern carp.\nStyle: Japanese festival."
+    },
+    {
+      "id": "quillingPeacock",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: peacock.\nStyle: paper quilling.",
+      "rich": "Category: Animal.\nSubject: peacock.\nStyle: paper quilling."
+    },
+    {
+      "id": "crochetCactus",
+      "kind": "Plant",
+      "terse": "Category: Plant.\nSubject: potted cacti.\nStyle: crochet.",
+      "rich": "Category: Plant.\nSubject: potted cacti.\nStyle: crochet."
+    },
+    {
+      "id": "lowpolyFox",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: arctic fox.\nStyle: faceted crystal low-poly.",
+      "rich": "Category: Animal.\nSubject: arctic fox.\nStyle: faceted crystal low-poly."
+    },
+    {
+      "id": "glassChess",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: chess knight.\nStyle: cut crystal glass.",
+      "rich": "Category: Object.\nSubject: chess knight.\nStyle: cut crystal glass."
+    },
+    {
+      "id": "copperOwl",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: owl.\nStyle: hammered copper sculpture.",
+      "rich": "Category: Animal.\nSubject: owl.\nStyle: hammered copper sculpture."
+    },
+    {
+      "id": "marbleLion",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: guardian lion.\nStyle: Carrara marble statue.",
+      "rich": "Category: Animal.\nSubject: guardian lion.\nStyle: Carrara marble statue."
+    },
+    {
+      "id": "jadeDragon",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: coiled dragon.\nStyle: carved jade.",
+      "rich": "Category: Fantastical creature.\nSubject: coiled dragon.\nStyle: carved jade."
+    },
+    {
+      "id": "bronzeHorse",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: galloping horse.\nStyle: Han dynasty bronze (Flying Horse of Gansu).",
+      "rich": "Category: Animal.\nSubject: galloping horse.\nStyle: Han dynasty bronze (Flying Horse of Gansu)."
+    },
+    {
+      "id": "woodToyTrain",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: wooden toy train with three cars.\nStyle: Montessori wooden toy.",
+      "rich": "Category: Vehicle.\nSubject: wooden toy train with three cars.\nStyle: Montessori wooden toy."
+    },
+    {
+      "id": "plushDragon",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: dragon.\nStyle: plush stuffed toy.",
+      "rich": "Category: Fantastical creature.\nSubject: dragon.\nStyle: plush stuffed toy."
+    },
+    {
+      "id": "vinylFigure",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: astronaut.\nStyle: designer vinyl toy (Kidrobot).",
+      "rich": "Category: Humanoid character.\nSubject: astronaut.\nStyle: designer vinyl toy (Kidrobot)."
+    },
+    {
+      "id": "celShadedRanger",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: forest ranger.\nStyle: Breath of the Wild cel shading.",
+      "rich": "Category: Humanoid character.\nSubject: forest ranger.\nStyle: Breath of the Wild cel shading."
+    },
+    {
+      "id": "gameboyHero",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: hero with sword and shield.\nStyle: Game Boy 4-colour green.",
+      "rich": "Category: Humanoid character.\nSubject: hero with sword and shield.\nStyle: Game Boy 4-colour green."
+    },
+    {
+      "id": "risoPrintWhale",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: whale.\nStyle: risograph print with misregistered colours.",
+      "rich": "Category: Animal.\nSubject: whale.\nStyle: risograph print with misregistered colours."
+    },
+    {
+      "id": "popArtRocket",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: retro rocket.\nStyle: Roy Lichtenstein pop art.",
+      "rich": "Category: Vehicle.\nSubject: retro rocket.\nStyle: Roy Lichtenstein pop art."
+    },
+    {
+      "id": "artDecoLioness",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: lioness.\nStyle: art deco bronze.",
+      "rich": "Category: Animal.\nSubject: lioness.\nStyle: art deco bronze."
+    },
+    {
+      "id": "cubistGuitarist",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: guitar player.\nStyle: Picasso cubism.",
+      "rich": "Category: Humanoid character.\nSubject: guitar player.\nStyle: Picasso cubism."
+    },
+    {
+      "id": "surrealElephant",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: elephant on long spindly legs.\nStyle: Salvador Dalí.",
+      "rich": "Category: Animal.\nSubject: elephant on long spindly legs.\nStyle: Salvador Dalí."
+    },
+    {
+      "id": "escherStairs",
+      "kind": "Abstract",
+      "terse": "Category: Abstract.\nSubject: impossible staircase building.\nStyle: M.C. Escher.",
+      "rich": "Category: Abstract.\nSubject: impossible staircase building.\nStyle: M.C. Escher."
+    },
+    {
+      "id": "gaudiDragon",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: dragon fountain.\nStyle: Gaudí trencadís mosaic.",
+      "rich": "Category: Fantastical creature.\nSubject: dragon fountain.\nStyle: Gaudí trencadís mosaic."
+    },
+    {
+      "id": "fauvistTiger",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: tiger in the jungle.\nStyle: Henri Rousseau.",
+      "rich": "Category: Animal.\nSubject: tiger in the jungle.\nStyle: Henri Rousseau."
+    },
+    {
+      "id": "klimtTree",
+      "kind": "Plant",
+      "terse": "Category: Plant.\nSubject: tree of life with spirals.\nStyle: Gustav Klimt gold.",
+      "rich": "Category: Plant.\nSubject: tree of life with spirals.\nStyle: Gustav Klimt gold."
+    },
+    {
+      "id": "hokusaiWave",
+      "kind": "Abstract",
+      "terse": "Category: Abstract.\nSubject: great wave with boats.\nStyle: Hokusai.",
+      "rich": "Category: Abstract.\nSubject: great wave with boats.\nStyle: Hokusai."
+    },
+    {
+      "id": "ottomanLamp",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: mosaic lamp.\nStyle: Ottoman Turkish.",
+      "rich": "Category: Object.\nSubject: mosaic lamp.\nStyle: Ottoman Turkish."
+    },
+    {
+      "id": "persianCarpetFlying",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: flying carpet with rider.\nStyle: Persian miniature.",
+      "rich": "Category: Vehicle.\nSubject: flying carpet with rider.\nStyle: Persian miniature."
+    },
+    {
+      "id": "inkBrushCrane",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: red-crowned crane.\nStyle: sumi-e ink.",
+      "rich": "Category: Animal.\nSubject: red-crowned crane.\nStyle: sumi-e ink."
+    },
+    {
+      "id": "africanMask",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: ceremonial mask on a stand.\nStyle: West African carved wood.",
+      "rich": "Category: Object.\nSubject: ceremonial mask on a stand.\nStyle: West African carved wood."
+    },
+    {
+      "id": "totemPole",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: totem pole.\nStyle: Pacific Northwest formline art.",
+      "rich": "Category: Object.\nSubject: totem pole.\nStyle: Pacific Northwest formline art."
+    },
+    {
+      "id": "dayOfDeadSkeleton",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: mariachi skeleton with guitar.\nStyle: Día de Muertos calavera.",
+      "rich": "Category: Humanoid character.\nSubject: mariachi skeleton with guitar.\nStyle: Día de Muertos calavera."
+    },
+    {
+      "id": "balineseBarong",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: Barong protector spirit.\nStyle: Balinese carving.",
+      "rich": "Category: Fantastical creature.\nSubject: Barong protector spirit.\nStyle: Balinese carving."
+    },
+    {
+      "id": "moaiHead",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: moai head on a platform.\nStyle: Rapa Nui stone.",
+      "rich": "Category: Object.\nSubject: moai head on a platform.\nStyle: Rapa Nui stone."
+    },
+    {
+      "id": "celticCross",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: high cross with knotwork.\nStyle: Celtic stone carving.",
+      "rich": "Category: Object.\nSubject: high cross with knotwork.\nStyle: Celtic stone carving."
+    },
+    {
+      "id": "kokeshiDolls",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: set of kokeshi dolls.\nStyle: Japanese wooden folk craft.",
+      "rich": "Category: Object.\nSubject: set of kokeshi dolls.\nStyle: Japanese wooden folk craft."
+    },
+    {
+      "id": "dalaHorse",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: Dala horse.\nStyle: Swedish folk painting.",
+      "rich": "Category: Animal.\nSubject: Dala horse.\nStyle: Swedish folk painting."
+    },
+    {
+      "id": "nutcracker",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: nutcracker soldier.\nStyle: Christmas wooden toy.",
+      "rich": "Category: Humanoid character.\nSubject: nutcracker soldier.\nStyle: Christmas wooden toy."
+    },
+    {
+      "id": "retroRobotDog",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: robot dog.\nStyle: 1980s Japanese toy (Takara).",
+      "rich": "Category: Animal.\nSubject: robot dog.\nStyle: 1980s Japanese toy (Takara)."
+    },
+    {
+      "id": "blobfish",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: blobfish.\nStyle: kawaii.",
+      "rich": "Category: Animal.\nSubject: blobfish.\nStyle: kawaii."
+    },
+    {
+      "id": "anglerLamp",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: lamp shaped like an anglerfish.\nStyle: industrial design.",
+      "rich": "Category: Object.\nSubject: lamp shaped like an anglerfish.\nStyle: industrial design."
+    },
+    {
+      "id": "treeSloth",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: three-toed sloth hanging from a branch.\nStyle: Ice Age (Blue Sky).",
+      "rich": "Category: Animal.\nSubject: three-toed sloth hanging from a branch.\nStyle: Ice Age (Blue Sky).",
+      "wild": "Category: Animal.\nSubject: three-toed sloth hanging from a branch.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "shoebill",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: shoebill stork.\nStyle: National Geographic realism.",
+      "rich": "Category: Animal.\nSubject: shoebill stork.\nStyle: National Geographic realism.",
+      "wild": "Category: Animal.\nSubject: shoebill stork.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "dumboOctopus",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: dumbo octopus.\nStyle: deep-sea documentary.",
+      "rich": "Category: Animal.\nSubject: dumbo octopus.\nStyle: deep-sea documentary.",
+      "wild": "Category: Animal.\nSubject: dumbo octopus.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "hercBeetle",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: Hercules beetle.\nStyle: scientific illustration.",
+      "rich": "Category: Animal.\nSubject: Hercules beetle.\nStyle: scientific illustration."
+    },
+    {
+      "id": "tardigrade",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: tardigrade.\nStyle: microscope SEM-style.",
+      "rich": "Category: Animal.\nSubject: tardigrade.\nStyle: microscope SEM-style.",
+      "wild": "Category: Animal.\nSubject: tardigrade.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "okapi",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: okapi.\nStyle: Studio Ghibli.",
+      "rich": "Category: Animal.\nSubject: okapi.\nStyle: Studio Ghibli."
+    },
+    {
+      "id": "puffinColony",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: puffins on a sea cliff.\nStyle: Wes Anderson pastel.",
+      "rich": "Category: Diorama.\nSubject: puffins on a sea cliff.\nStyle: Wes Anderson pastel."
+    },
+    {
+      "id": "honeyBadger",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: honey badger with a cobra.\nStyle: Overwatch.",
+      "rich": "Category: Animal.\nSubject: honey badger with a cobra.\nStyle: Overwatch."
+    },
+    {
+      "id": "bisonHerd",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: American bison.\nStyle: Native plains ledger art.",
+      "rich": "Category: Animal.\nSubject: American bison.\nStyle: Native plains ledger art."
+    },
+    {
+      "id": "peacockSpider",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: peacock spider displaying.\nStyle: macro photography.",
+      "rich": "Category: Animal.\nSubject: peacock spider displaying.\nStyle: macro photography."
+    },
+    {
+      "id": "emperorPenguins",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: emperor penguin with chick.\nStyle: Happy Feet.",
+      "rich": "Category: Animal.\nSubject: emperor penguin with chick.\nStyle: Happy Feet."
+    },
+    {
+      "id": "kiwiBird",
+      "kind": "Animal",
+      "terse": "Category: Animal.\nSubject: kiwi bird.\nStyle: claymation (Aardman).",
+      "rich": "Category: Animal.\nSubject: kiwi bird.\nStyle: claymation (Aardman)."
+    },
+    {
+      "id": "moleCity",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: cutaway of a mole's underground home.\nStyle: Richard Scarry.",
+      "rich": "Category: Diorama.\nSubject: cutaway of a mole's underground home.\nStyle: Richard Scarry.",
+      "wild": "Category: Diorama.\nSubject: cutaway of a mole's underground home.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "robotGardener",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: rusty robot gardener.\nStyle: Castle in the Sky.",
+      "rich": "Category: Humanoid character.\nSubject: rusty robot gardener.\nStyle: Castle in the Sky.",
+      "wild": "Category: Humanoid character.\nSubject: rusty robot gardener.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "beekeeper",
+      "kind": "Humanoid character",
+      "terse": "Category: Humanoid character.\nSubject: beekeeper with smoker and hive.\nStyle: Stardew Valley.",
+      "rich": "Category: Humanoid character.\nSubject: beekeeper with smoker and hive.\nStyle: Stardew Valley.",
+      "wild": "Category: Humanoid character.\nSubject: beekeeper with smoker and hive.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "knightSnail",
+      "kind": "Fantastical creature",
+      "terse": "Category: Fantastical creature.\nSubject: knight jousting on a snail.\nStyle: medieval manuscript marginalia.",
+      "rich": "Category: Fantastical creature.\nSubject: knight jousting on a snail.\nStyle: medieval manuscript marginalia.",
+      "wild": "Category: Fantastical creature.\nSubject: knight jousting on a snail.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "catCafe",
+      "kind": "Diorama",
+      "terse": "Category: Diorama.\nSubject: cat café interior.\nStyle: kawaii.",
+      "rich": "Category: Diorama.\nSubject: cat café interior.\nStyle: kawaii."
+    },
+    {
+      "id": "toyBox",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: open toy box spilling toys.\nStyle: Toy Story.",
+      "rich": "Category: Prop group.\nSubject: open toy box spilling toys.\nStyle: Toy Story.",
+      "wild": "Category: Prop group.\nSubject: open toy box spilling toys.\nStyle: your choice. Pick an unexpected, striking visual style that suits this subject (not the obvious one), name it in a comment at the top of the module, and commit to it everywhere."
+    },
+    {
+      "id": "breakfastSet",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: full English breakfast on a table.\nStyle: realistic food.",
+      "rich": "Category: Prop group.\nSubject: full English breakfast on a table.\nStyle: realistic food."
+    },
+    {
+      "id": "dimSumCart",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: dim sum cart with bamboo steamers.\nStyle: Hong Kong.",
+      "rich": "Category: Prop group.\nSubject: dim sum cart with bamboo steamers.\nStyle: Hong Kong."
+    },
+    {
+      "id": "tacoTruck",
+      "kind": "Vehicle",
+      "terse": "Category: Vehicle.\nSubject: taco truck.\nStyle: Day-of-the-Dead painted.",
+      "rich": "Category: Vehicle.\nSubject: taco truck.\nStyle: Day-of-the-Dead painted."
+    },
+    {
+      "id": "spiceMarket",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: spice market stall with cone piles.\nStyle: Moroccan.",
+      "rich": "Category: Prop group.\nSubject: spice market stall with cone piles.\nStyle: Moroccan."
+    },
+    {
+      "id": "bentoBox",
+      "kind": "Prop group",
+      "terse": "Category: Prop group.\nSubject: bento box lunch.\nStyle: Japanese anime food.",
+      "rich": "Category: Prop group.\nSubject: bento box lunch.\nStyle: Japanese anime food."
+    },
+    {
+      "id": "candyMachine",
+      "kind": "Object",
+      "terse": "Category: Object.\nSubject: gumball machine.\nStyle: 1950s Americana.",
+      "rich": "Category: Object.\nSubject: gumball machine.\nStyle: 1950s Americana."
+    }
+  ],
+  "twostageRunner": "scripts/twostage.ts"
+}

@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>r35 · Terra vs Sonnet</title>
+  <style>
+    :root {
+      --bg: #14161a;
+      --panel: #1d2026;
+      --panel2: #252931;
+      --line: #30353f;
+      --text: #e6e8eb;
+      --muted: #8b929e;
+      --s: #d9a26b;
+      --t: #6bc4d9;
+      --good: #7fd88f;
+      --bad: #f07a7a;
+      --warn: #e8c46a;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font:
+        14px/1.45 ui-sans-serif,
+        system-ui,
+        sans-serif;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(20, 22, 26, 0.94);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 20px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    h1 .s {
+      color: var(--s);
+    }
+    h1 .t {
+      color: var(--t);
+    }
+    .bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .pill {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pill b {
+      color: var(--text);
+      font-weight: 600;
+    }
+    .tabs button,
+    .cfg button,
+    .picks button,
+    .tool {
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 5px 11px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .tabs button.on,
+    .cfg button.on {
+      background: #3a4150;
+      border-color: #5b6475;
+    }
+    .tool.on {
+      background: #4b3a5a;
+      border-color: #7d5f96;
+    }
+    main {
+      padding: 16px 20px 80px;
+      max-width: 1700px;
+      margin: 0 auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+    }
+    th,
+    td {
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: right;
+      white-space: nowrap;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 500;
+    }
+    td:first-child,
+    th:first-child {
+      text-align: left;
+    }
+    td.s {
+      color: var(--s);
+    }
+    td.t {
+      color: var(--t);
+    }
+    .win {
+      background: rgba(127, 216, 143, 0.13);
+      border-radius: 4px;
+    }
+    .sec {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+    .sec h2 {
+      font-size: 14px;
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .note {
+      color: var(--muted);
+      font-size: 12px;
+      margin: 8px 0 0;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 240px 1fr 1fr;
+      gap: 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 14px;
+      scroll-margin-top: 110px;
+    }
+    .row.cur {
+      outline: 2px solid #5b6475;
+    }
+    .brief {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+    .brief b {
+      display: block;
+      color: var(--text);
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .brief .style {
+      color: #c9b6e8;
+    }
+    .brief details {
+      margin-top: 6px;
+    }
+    .brief p {
+      white-space: pre-wrap;
+      margin: 6px 0 0;
+    }
+    .side {
+      position: relative;
+    }
+    .side img {
+      width: 100%;
+      aspect-ratio: 1/0.93;
+      object-fit: cover;
+      object-position: 50% 100%;
+      display: block;
+      border-radius: 8px;
+      background: #d5d9de;
+      cursor: zoom-in;
+    }
+    .ph {
+      aspect-ratio: 1/0.93;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--panel2);
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      padding: 12px;
+    }
+    .ph.crashed,
+    .ph.failed {
+      color: var(--bad);
+    }
+    .ph small {
+      display: block;
+      margin-top: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      max-height: 6em;
+      overflow: hidden;
+    }
+    .tag {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.6);
+    }
+    .tag.s {
+      color: var(--s);
+    }
+    .tag.t {
+      color: var(--t);
+    }
+    .tag.x {
+      color: #ddd;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+    .chip {
+      font-size: 11.5px;
+      background: var(--panel2);
+      border-radius: 5px;
+      padding: 1px 7px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .chip b {
+      color: var(--text);
+      font-weight: 600;
+    }
+    .chip.bad {
+      color: var(--bad);
+    }
+    .chip.warn {
+      color: var(--warn);
+    }
+    .picks {
+      grid-column: 2/4;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+    .picks button.on {
+      background: #2f5a3a;
+      border-color: var(--good);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 150px repeat(12, 1fr);
+      gap: 4px;
+      font-size: 11px;
+    }
+    .grid .h {
+      color: var(--muted);
+      text-align: center;
+      padding: 4px 0;
+    }
+    .grid .h.s {
+      color: var(--s);
+    }
+    .grid .h.t {
+      color: var(--t);
+    }
+    .grid img {
+      width: 100%;
+      aspect-ratio: 1/0.93;
+      object-fit: cover;
+      object-position: 50% 100%;
+      border-radius: 4px;
+      background: #d5d9de;
+      cursor: zoom-in;
+      display: block;
+    }
+    .grid .ph {
+      font-size: 10px;
+      padding: 2px;
+      border-radius: 4px;
+    }
+    .grid .sub {
+      align-self: center;
+      color: var(--text);
+    }
+    .grid .cap {
+      color: var(--muted);
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    kbd {
+      background: var(--panel2);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 5px;
+      font-size: 11px;
+    }
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      display: none;
+      place-items: center;
+      z-index: 9;
+      cursor: zoom-out;
+    }
+    #lightbox img {
+      max-width: 96vw;
+      max-height: 94vh;
+    }
+    #lightbox img.blind {
+      clip-path: inset(7% 0 0 0);
+    }
+    .fixed {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #1b1d22;
+      background: var(--warn);
+      border-radius: 5px;
+      padding: 1px 7px;
+    }
+    .grid > div {
+      position: relative;
+    }
+    .fixed.g {
+      top: 3px;
+      right: 3px;
+      font-size: 9px;
+      padding: 0 4px;
+    }
+  </style>
+  <header>
+    <h1><span class="s">Sonnet 5.5</span> vs <span class="t">GPT-6.1 Terra</span> · same 20 briefs, same prompts</h1>
+    <div class="bar" id="status"></div>
+    <div class="bar" style="margin-top: 8px">
+      <span class="tabs"
+        ><button data-tab="pairs" class="on">Side by side</button> <button data-tab="grid">Overview grid</button>
+        <button data-tab="numbers">Numbers</button></span
+      >
+      <span class="cfg" id="cfg"></span>
+      <button class="tool" id="blind" title="Hide model names and shuffle sides">Blind</button>
+      <button class="tool" id="copy">Copy my picks</button>
+    </div>
+  </header>
+  <main id="main"></main>
+  <div id="lightbox"><img alt="" /></div>
+  <script>
+    const KEY = "r35-picks-v1",
+      UI = "r35-ui-v1";
+    let D = null,
+      picks = JSON.parse(localStorage.getItem(KEY) || "{}"),
+      ui = Object.assign(
+        { tab: "pairs", cfg: "high", blind: false, cur: 0 },
+        JSON.parse(localStorage.getItem(UI) || "{}"),
+      );
+    const save = () => {
+      localStorage.setItem(KEY, JSON.stringify(picks));
+      localStorage.setItem(UI, JSON.stringify(ui));
+    };
+    const esc = (s) =>
+      String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    const fmt = (v, d = 0) => (v == null ? "–" : Number(v).toLocaleString("en", { maximumFractionDigits: d }));
+    const k = (v) => (v == null ? "–" : v >= 1000 ? (v / 1000).toFixed(1) + "k" : String(v));
+    const swap = (sub, cfg) => {
+      let h = 0;
+      for (const c of sub + cfg) h = (h * 31 + c.charCodeAt(0)) | 0;
+      return (h & 1) === 1;
+    };
+    const name = { s: "Sonnet 5.5", t: "GPT-6.1 Terra" };
+    const isFinal = (v) => /:two(H)?$/.test(v);
+    function chips(c, vid) {
+      if (!c || c.state === "queued") return "";
+      const out = [];
+      if (c.wall != null)
+        out.push(
+          `<span class=chip><b>${c.wall}s</b>${isFinal(vid) && c.stage2 ? ` (1: ${Math.round(c.stage2.stage1Ms / 1000)}s + 2: ${Math.round(c.stage2.stage2Ms / 1000)}s)` : ""}</span>`,
+        );
+      if (c.think != null) out.push(`<span class=chip>think <b>${c.thinkExact ? "" : "~"}${k(c.think)}</b></span>`);
+      if (c.out != null) out.push(`<span class=chip>out <b>${k(c.out)}</b></span>`);
+      if (c.tps) out.push(`<span class=chip><b>${c.tps}</b> tok/s</span>`);
+      if (c.kb != null) out.push(`<span class=chip><b>${c.kb}</b> KB</span>`);
+      if (c.parts != null) out.push(`<span class=chip><b>${c.parts}</b> parts</span>`);
+      if (c.tris != null) out.push(`<span class=chip><b>${k(c.tris)}</b> tris</span>`);
+      if (c.tex) out.push(`<span class=chip><b>${c.tex}</b> tex</span>`);
+      if (c.typeErrors) out.push(`<span class="chip warn">${c.typeErrors} type err</span>`);
+      if (c.cost) out.push(`<span class=chip>$${c.cost.toFixed(2)}</span>`);
+      if (c.fix)
+        out.push(
+          c.state === "ok"
+            ? `<span class=chip>repair ran for type errors (+${c.fix.wall}s), first render shown</span>`
+            : c.fix.state === "ok"
+              ? `<span class="chip warn">first try ${c.state}; ${c.fix.repairs === 2 ? "2 repairs" : "repaired"} in <b>${c.fix.wall}s</b> → working at <b>${c.toWorking}s</b></span>`
+              : `<span class="chip bad">${c.fix.repairs === 2 ? "2 repairs" : "repair"} ${c.fix.state}</span>`,
+        );
+      return `<div class=chips>${out.join("")}</div>`;
+    }
+    function pic(c, cls = "") {
+      if (!c || c.state === "queued") return `<div class="ph ${cls}">queued</div>`;
+      if (c.state === "ok") return `<img loading=lazy src="${c.img}" data-sheet="${c.sheet}" alt="">`;
+      if (c.fix && c.fix.state === "ok")
+        return `<img loading=lazy src="${c.fix.img}" data-sheet="${c.fix.sheet}" alt=""><span class="fixed ${cls}">repaired</span>`;
+      const why =
+        (ui.blind && ui.tab === "pairs") || cls === "g"
+          ? ""
+          : (c.fix && c.fix.renderError) || c.renderError || c.error || "";
+      const st =
+        c.state === "rendering"
+          ? "built · rendering…"
+          : c.fix
+            ? c.fix.state === "rendering"
+              ? `${c.state} · repair rendering…`
+              : `${c.state}, repair ${c.fix.state}`
+            : c.state;
+      return `<div class="ph ${c.state} ${cls}">${st}${why ? `<small>${esc(why)}</small>` : ""}</div>`;
+    }
+    function status() {
+      const u = D.usage,
+        b = [`<span class=pill>updated <b>${D.updated}</b></span>`];
+      if (u) {
+        b.push(`<span class=pill>Codex 7d <b>${u.start.codex}% → ${u.codex}%</b> (cap 40)</span>`);
+        b.push(
+          `<span class=pill>marcellus 5h <b>${Math.round(u.marcellus["5h"])}%</b> · 7d <b>${Math.round(u.start.marcellus["7d"])}% → ${Math.round(u.marcellus["7d"])}%</b></span>`,
+        );
+        b.push(`<span class=pill>revoltage 7d <b>${u.revoltage["7d"]}%</b> (untouched)</span>`);
+      }
+      for (const m of ["s", "t"]) {
+        let n = 0,
+          ok = 0,
+          all = 0;
+        for (const v of Object.keys(D.variants).filter((v) => v[0] === m)) {
+          const s = D.summary[v];
+          n += s.n;
+          ok += s.ok;
+          all += D.rows.length;
+        }
+        b.push(
+          `<span class=pill style="color:var(--${m})">${name[m]} <b>${n}/${all}</b> replied · <b>${ok}</b> rendered</span>`,
+        );
+      }
+      const p = Object.values(picks).reduce((a, o) => a + Object.keys(o).length, 0);
+      b.push(`<span class=pill>your picks <b>${p}</b></span>`);
+      document.getElementById("status").innerHTML = b.join("");
+      document.getElementById("cfg").innerHTML =
+        ui.tab === "pairs"
+          ? D.configs
+              .map(([id, l]) => `<button data-cfg="${id}" class="${ui.cfg === id ? "on" : ""}">${esc(l)}</button>`)
+              .join(" ")
+          : "";
+      document.getElementById("blind").classList.toggle("on", ui.blind);
+    }
+    function briefHtml(r) {
+      const lines = r.brief.split("\n");
+      const subj = (lines[1] || r.id).replace(/^Subject:\s*/, ""),
+        style = (lines[2] || "").replace(/^Style:\s*/, "");
+      return `<div class=brief><b>${esc(subj)}</b><span class=style>${esc(style)}</span><details><summary>brief</summary><p>${esc(r.brief)}</p></details></div>`;
+    }
+    function pairs() {
+      const cfg = ui.cfg,
+        conf = D.configs.find((c) => c[0] === cfg) || D.configs[0],
+        col = { s: conf[2], t: conf[3] };
+      return D.rows
+        .map((r, i) => {
+          const sides = ui.blind && swap(r.id, cfg) ? ["t", "s"] : ["s", "t"];
+          const pick = (picks[cfg] || {})[r.id];
+          const side = (m, j) => {
+            const c = r.cells[col[m]];
+            const lab = ui.blind
+              ? `<span class="tag x">${"AB"[j]}</span>`
+              : `<span class="tag ${m}">${name[m]} · ${esc(D.variants[col[m]])}</span>`;
+            return `<div class=side>${lab}${pic(c)}${ui.blind ? "" : chips(c, col[m])}</div>`;
+          };
+          const btn = (v, l) => `<button data-pick="${v}" class="${pick === v ? "on" : ""}">${l}</button>`;
+          const lbl = (m) => (ui.blind ? `${m === sides[0] ? "A" : "B"} better` : `${name[m]} better`);
+          return `<div class="row ${i === ui.cur ? "cur" : ""}" data-i=${i} data-sub="${r.id}">${briefHtml(r)}${side(sides[0], 0)}${side(sides[1], 1)}
+      <div class=picks>${btn(sides[0], "← " + lbl(sides[0]))}${btn("=", "same")}${btn(sides[1], lbl(sides[1]) + " →")}</div></div>`;
+        })
+        .join("");
+    }
+    function grid() {
+      const vs = Object.keys(D.variants);
+      const head = ["<div></div>"].concat(
+        vs.map((v) => `<div class="h ${v[0]}">${v[0] === "s" ? "Sonnet" : "Terra"}<br>${esc(D.variants[v])}</div>`),
+      );
+      const rows = D.rows.flatMap((r) =>
+        [
+          `<div class=sub>${esc((r.brief.split("\n")[1] || r.id).replace(/^Subject:\s*/, "").slice(0, 60))}</div>`,
+        ].concat(
+          vs.map((v) => {
+            const c = r.cells[v];
+            return `<div>${pic(c, "g")}<div class=cap>${c.wall != null ? c.wall + "s" : ""}</div></div>`;
+          }),
+        ),
+      );
+      return `<div class="sec" style="overflow-x:auto"><h2>Every build. Rows: briefs. Columns: model × setup. Caption: model time. Click for the full sheet.</h2><div class=grid style="grid-template-columns:130px repeat(${vs.length},minmax(78px,1fr));min-width:${130 + vs.length * 82}px">${head.join("")}${rows.join("")}</div></div>`;
+    }
+    function numbers() {
+      const metrics = [
+        ["wall", "model time, s", 0, "low"],
+        ["think", "thinking tokens", 0, "low"],
+        ["out", "output tokens", 0, "low"],
+        ["tps", "tokens/s", 0, "high"],
+        ["kb", "module KB", 1, null],
+        ["parts", "parts", 0, null],
+        ["tris", "triangles", 0, null],
+        ["tex", "textures", 0, null],
+      ];
+      let h = `<div class=sec><h2>Medians per setup (replied builds; parts, triangles and textures over rendered builds). Green: faster or leaner than the other model on the same setup; size columns are not scored.</h2><table><tr><th>setup</th><th>model</th><th>replied</th><th>rendered</th><th>crashed</th><th>no code / failed</th><th>type-error builds</th><th>working after 1 / 2 repairs</th><th>time to working, s</th>${metrics.map((m) => `<th>${m[1]}</th>`).join("")}<th>$ / build</th><th>$ total</th></tr>`;
+      for (const v of Object.keys(D.variants).sort(
+        (a, b) => a.slice(2).localeCompare(b.slice(2)) || a.localeCompare(b),
+      )) {
+        const m = v[0],
+          s = D.summary[v],
+          o = D.summary[(m === "s" ? "t" : "s") + v.slice(1)];
+        const cls = (key, dir) =>
+          dir && o && s[key] != null && o[key] != null && (dir === "low" ? s[key] < o[key] : s[key] > o[key])
+            ? "win"
+            : "";
+        h += `<tr><td>${esc(D.variants[v])}</td><td class=${m}>${name[m]}</td><td>${s.n}/${D.rows.length}</td><td>${s.ok}</td><td>${s.crashed || ""}</td><td>${s.failed || ""}</td><td>${s.typeErr || ""}</td><td>${s.usable1}${s.usable !== s.usable1 ? ` / ${s.usable}` : ""}</td><td class="${cls("toWorking", "low")}">${fmt(s.toWorking)}</td>${metrics.map(([key, , d, dir]) => `<td class="${cls(key, dir)}">${key === "think" && m === "s" && s[key] != null ? "~" : ""}${fmt(s[key], d)}</td>`).join("")}<td>${s.cost ? "$" + s.cost.toFixed(2) : m === "t" ? "sub" : "–"}</td><td>${s.costSum ? "$" + s.costSum : ""}</td></tr>`;
+      }
+      h += `</table><p class=note>Sonnet's thinking is estimated (billed output minus the reply; it returns a summary only); Terra reports its reasoning tokens exactly. Terra runs on the Codex subscription, so its calls show no dollar cost; the Codex meter moves instead. A two-stage final's time is stage 1 + stage 2, its tokens sum every call. Model time only; rendering adds a few seconds.</p></div>`;
+      const tally = {};
+      for (const [cfg, o] of Object.entries(picks))
+        for (const v of Object.values(o)) {
+          tally[cfg] = tally[cfg] || { s: 0, t: 0, "=": 0 };
+          tally[cfg][v]++;
+        }
+      h += `<div class=sec><h2>Your picks</h2>${
+        ui.blind
+          ? "<p class=note>Hidden in blind mode. Turn Blind off to see the tally.</p>"
+          : `<table><tr><th>side by side</th><th class=s>Sonnet better</th><th>same</th><th class=t>Terra better</th></tr>${D.configs
+              .map(([id, l]) => {
+                const t = tally[id] || { s: 0, t: 0, "=": 0 };
+                return `<tr><td>${esc(l)}</td><td>${t.s}</td><td>${t["="]}</td><td>${t.t}</td></tr>`;
+              })
+              .join("")}</table>`
+      }</div>`;
+      return h;
+    }
+    function render() {
+      if (!D) return;
+      status();
+      const y = scrollY;
+      document.getElementById("main").innerHTML =
+        ui.tab === "pairs"
+          ? `<p class=note style="margin-top:0">Pick per row; <kbd>j</kbd>/<kbd>k</kbd> move, <kbd>1</kbd> left, <kbd>2</kbd> same, <kbd>3</kbd> right, <kbd>b</kbd> blind. Picks stay in this browser.</p>` +
+            pairs()
+          : ui.tab === "grid"
+            ? grid()
+            : numbers();
+      scrollTo(0, y);
+      document.querySelectorAll(".tabs button").forEach((b) => b.classList.toggle("on", b.dataset.tab === ui.tab));
+    }
+    async function load() {
+      try {
+        const r = await fetch("data.json?" + Date.now());
+        const d = await r.json();
+        if (!D || JSON.stringify(d) !== JSON.stringify(D)) {
+          D = d;
+          render();
+        }
+      } catch (e) {}
+    }
+    document.addEventListener("click", (e) => {
+      const t = e.target;
+      if (t.dataset.tab) {
+        ui.tab = t.dataset.tab;
+        save();
+        render();
+        scrollTo(0, 0);
+      } else if (t.dataset.cfg) {
+        ui.cfg = t.dataset.cfg;
+        save();
+        render();
+      } else if (t.id === "blind") {
+        ui.blind = !ui.blind;
+        save();
+        render();
+      } else if (t.dataset.pick) {
+        const row = t.closest(".row");
+        const o = (picks[ui.cfg] = picks[ui.cfg] || {});
+        o[row.dataset.sub] === t.dataset.pick ? delete o[row.dataset.sub] : (o[row.dataset.sub] = t.dataset.pick);
+        ui.cur = +row.dataset.i;
+        save();
+        render();
+      } else if (t.dataset.sheet) {
+        const lb = document.getElementById("lightbox"),
+          im = lb.querySelector("img");
+        const blind = ui.blind && ui.tab === "pairs";
+        im.src = blind ? t.src : t.dataset.sheet;
+        im.classList.toggle("blind", blind);
+        lb.style.display = "grid";
+      } else if (t.closest("#lightbox")) document.getElementById("lightbox").style.display = "none";
+      else if (t.id === "copy") {
+        navigator.clipboard.writeText(JSON.stringify(picks, null, 1)).then(
+          () => (t.textContent = "Copied"),
+          () => prompt("Copy:", JSON.stringify(picks)),
+        );
+      }
+    });
+    document.addEventListener("keydown", (e) => {
+      if (ui.tab !== "pairs" || e.target.tagName === "INPUT") return;
+      const rows = document.querySelectorAll(".row");
+      if (e.key === "Escape") document.getElementById("lightbox").style.display = "none";
+      if (e.key === "j" || e.key === "k") {
+        ui.cur = Math.max(0, Math.min(rows.length - 1, ui.cur + (e.key === "j" ? 1 : -1)));
+        save();
+        render();
+        document.querySelectorAll(".row")[ui.cur].scrollIntoView({ block: "start" });
+      }
+      if ("123".includes(e.key) && e.key.length === 1) {
+        const row = rows[ui.cur];
+        if (!row) return;
+        row.querySelectorAll(".picks button")[+e.key - 1].click();
+        ui.cur = Math.min(rows.length - 1, ui.cur + 1);
+        save();
+        render();
+        document.querySelectorAll(".row")[ui.cur].scrollIntoView({ block: "start" });
+      }
+      if (e.key === "b") {
+        ui.blind = !ui.blind;
+        save();
+        render();
+      }
+    });
+    load();
+    setInterval(load, 30000);
+  </script>
+</html>
