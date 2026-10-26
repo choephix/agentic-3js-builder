@@ -24,8 +24,8 @@
 // (the exact system prompts), runs/<slug>.json (request, reply, usage, cost, timing), runs/<slug>.md (the reply),
 // builds/<slug>.ts (the module, with the SDK import pointed at src/index), checks/<slug>.json (type errors, render
 // report), results.json (all of it, for the showcase's bakeoff page). Renders go where `npm run snap` puts them.
-import { spawn } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -53,6 +53,8 @@ type Arm = {
   kits?: boolean;
   /** SDK source files (names in src/) appended verbatim after the reference. */
   sources?: string[];
+  /** The SDK's type declarations (`tsc` output for src/, comments cut): every export's exact shape, no bodies. */
+  declarations?: boolean;
   /** Sampler files (names in catalogs/, without `.ts`) appended last as read-only recipes, board code cut. */
   samplers?: string[];
   /** With `samplers`: only each file's header menu (slots and one line per construction), no code. */
@@ -136,6 +138,33 @@ function sourcesContext(files: string[]) {
   return `# Selected SDK source\n\nThese files are part of the module \`"${SDK_NAME}"\`.\n\n${body}`;
 }
 
+function declarationsContext() {
+  const out = join(ROOT, "node_modules/.cache/declarations", String(process.pid));
+  const config = join(out, "tsconfig.json");
+  mkdirSync(out, { recursive: true });
+  writeJson(config, { extends: join(ROOT, "tsconfig.json"), files: [join(ROOT, "src/index.ts")], include: [] });
+  const tsc = spawnSync(
+    join(ROOT, "node_modules/.bin/tsc"),
+    ["-p", config, "--noEmit", "false", "--declaration", "--emitDeclarationOnly", "--rootDir", ROOT, "--outDir", out],
+    { encoding: "utf8" },
+  );
+  const dir = join(out, "src");
+  if (!existsSync(dir)) throw new Error(`Declaration emit failed:\n${tsc.stdout}${tsc.stderr}`);
+  const body = readdirSync(dir)
+    .filter((name) => name.endsWith(".d.ts"))
+    .sort()
+    .map((name) => {
+      const text = readFileSync(join(dir, name), "utf8")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/^\s*\/\/.*\n/gm, "")
+        .replace(/^\s*\n/gm, "");
+      return `## src/${name}\n\n\`\`\`ts\n${text.trimEnd()}\n\`\`\``;
+    })
+    .join("\n\n");
+  rmSync(out, { recursive: true, force: true });
+  return `# SDK type declarations\n\nThe exact type of everything the module \`"${SDK_NAME}"\` exports, generated from its source with bodies and comments cut. \`src/index.d.ts\` is the module.\n\n${body}`;
+}
+
 /** Samplers as the model reads them: SDK imports renamed, the headers' copy-this instructions and the cull-board
  *  section cut. */
 function samplersContext(names: string[], menu = false) {
@@ -165,6 +194,7 @@ function systemPrompt(arm: Arm) {
   if (ref) parts.push(ref);
   if (arm.kits) parts.push(kitsContext());
   if (arm.sources?.length) parts.push(sourcesContext(arm.sources));
+  if (arm.declarations) parts.push(declarationsContext());
   if (arm.samplers?.length) parts.push(samplersContext(arm.samplers, arm.samplerMenu));
   return `${parts.map((part) => part.trim()).join("\n\n")}\n`;
 }
