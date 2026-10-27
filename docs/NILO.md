@@ -2,6 +2,8 @@
 
 The plan for putting this SDK behind the Nilo World Agent (`~/workspace/nilo`), as a replacement for or alongside the existing low-poly generator. Read this when the work moves to the Nilo repo, or when Stefan asks what's left before the SDK ships there. Timing numbers come from `docs/SPEED.md`; looks are Stefan's call.
 
+A brief for Nilo teammates with no context on this repo (the proposal, the 20 briefs side by side, what we learned, next steps, open decisions) is published at https://assets.public.cx/nilo/3d-sdk/demo/. `python3 bakeoff/n1/brief/build.py` rebuilds it from the N1 and r35 records into `~/tmp/public/nilo/agentic-3js-builder/nilo-brief/`; republish that folder with the `share` script after a change.
+
 ## What Nilo has today: low-poly
 
 Mapped 2026-10-26 at Nilo `0c4fd24d71`. Paths are in `~/workspace/nilo`.

@@ -1,0 +1,1471 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text to 3D model, faster: an SDK engine for Nilo's model generator</title>
+    <style>
+      :root {
+        --ink: #1c1916;
+        --mute: #5c554c;
+        --bg: #faf7f2;
+        --card: #fffdf9;
+        --line: #d8cec0;
+        --head: #f1ebe2;
+        --nilo: #8a4b0f;
+        --nilobg: #f8ecd9;
+        --sdk: #1f5f8b;
+        --sdkbg: #e3eef7;
+        --top: #5b3c99;
+        --topbg: #ece4f7;
+        --win: #1f6b3a;
+        --winbg: #e3f1e6;
+        --drop: #9b2c2c;
+        --dropbg: #f6e1e1;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.55 system-ui,
+          sans-serif;
+      }
+      .wrap {
+        max-width: 78rem;
+        margin: auto;
+        padding: 1.4rem 1.1rem 4rem;
+      }
+      .narrow {
+        max-width: 50rem;
+      }
+      h1 {
+        font-size: 1.75rem;
+        line-height: 1.2;
+        margin: 0.2rem 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin: 2.8rem 0 0.6rem;
+        padding-top: 0.7rem;
+        border-top: 2px solid var(--line);
+      }
+      h3 {
+        font-size: 1.05rem;
+        margin: 1.4rem 0 0.4rem;
+      }
+      p {
+        margin: 0.4rem 0 0.8rem;
+      }
+      a {
+        color: #0b57d0;
+      }
+      code {
+        font:
+          0.88em ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+        background: #efe8dd;
+        padding: 0.05rem 0.3rem;
+        border-radius: 4px;
+      }
+      .lead {
+        font-size: 1.08rem;
+      }
+      .mute {
+        color: var(--mute);
+      }
+      .small {
+        font-size: 0.88rem;
+      }
+      :focus-visible {
+        outline: 3px solid #0b57d0;
+        outline-offset: 2px;
+      }
+      button {
+        min-height: 32px;
+        padding: 0.3rem 0.7rem;
+        font: inherit;
+        font-size: 0.92rem;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--card);
+        color: var(--ink);
+        cursor: pointer;
+      }
+      button[aria-pressed="true"] {
+        background: var(--ink);
+        color: #fff;
+        border-color: var(--ink);
+      }
+      nav.toc {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: var(--bg);
+        border-bottom: 1px solid var(--line);
+        padding: 0.45rem 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem 1rem;
+        font-size: 0.95rem;
+      }
+      nav.toc a {
+        text-decoration: none;
+        padding: 0.2rem 0;
+        display: inline-block;
+        min-height: 24px;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+        gap: 0.8rem;
+        margin: 1rem 0 0.6rem;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-top: 5px solid var(--line);
+        border-radius: 10px;
+        padding: 0.75rem 0.9rem;
+      }
+      .card.nilo {
+        border-top-color: var(--nilo);
+      }
+      .card.sdk {
+        border-top-color: var(--sdk);
+      }
+      .card.top {
+        border-top-color: var(--top);
+      }
+      .card h3 {
+        margin: 0 0 0.15rem;
+        font-size: 1.02rem;
+      }
+      .card .who {
+        font-size: 0.85rem;
+        color: var(--mute);
+        margin-bottom: 0.4rem;
+      }
+      .card dl {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.1rem 0.8rem;
+        margin: 0;
+      }
+      .card dt {
+        color: var(--mute);
+        font-size: 0.92rem;
+      }
+      .card dd {
+        margin: 0;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        font-weight: 650;
+      }
+      .card dd .r {
+        font-weight: 400;
+        color: var(--mute);
+        font-size: 0.8rem;
+        display: block;
+        margin-top: -0.15rem;
+      }
+      .card .pick {
+        display: inline-block;
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--win);
+        background: var(--winbg);
+        border: 1px solid currentColor;
+        border-radius: 999px;
+        padding: 0 0.5rem;
+      }
+      .callout {
+        border-left: 4px solid var(--nilo);
+        background: var(--nilobg);
+        padding: 0.6rem 0.9rem;
+        border-radius: 0 8px 8px 0;
+        margin: 0.8rem 0;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 0.93rem;
+      }
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 0.45rem 0.6rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: var(--head);
+      }
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .scroll {
+        overflow-x: auto;
+      }
+      ol.learn > li {
+        margin: 0.2rem 0 0.9rem;
+      }
+      ol.learn > li > strong:first-child {
+        display: block;
+      }
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        align-items: center;
+        margin: 0.5rem 0;
+      }
+      .toolbar .lbl {
+        font-size: 0.88rem;
+        color: var(--mute);
+        margin-right: 0.2rem;
+      }
+      .chart {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 0.4rem;
+      }
+      svg text {
+        font-family: system-ui, sans-serif;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1rem;
+        font-size: 0.86rem;
+        margin: 0.5rem 0;
+        align-items: center;
+      }
+      .sw {
+        display: inline-block;
+        width: 14px;
+        height: 10px;
+        border-radius: 2px;
+        vertical-align: middle;
+        margin-right: 0.3rem;
+      }
+      /* gallery */
+      .ghead,
+      .grow {
+        display: grid;
+        grid-template-columns: repeat(var(--n, 6), minmax(0, 1fr));
+        gap: 0.45rem;
+      }
+      .ghead {
+        position: sticky;
+        top: 2.3rem;
+        z-index: 4;
+        background: var(--bg);
+        padding: 0.35rem 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .ghead div {
+        font-size: 0.8rem;
+        font-weight: 700;
+        line-height: 1.2;
+        padding: 0.2rem 0.35rem;
+        border-radius: 6px;
+      }
+      .ghead div span {
+        display: block;
+        font-weight: 400;
+      }
+      .g-nilo {
+        color: var(--nilo);
+        background: var(--nilobg);
+      }
+      .g-sdk {
+        color: var(--sdk);
+        background: var(--sdkbg);
+      }
+      .g-top {
+        color: var(--top);
+        background: var(--topbg);
+      }
+      .brief {
+        margin: 1.1rem 0 0.3rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.15rem 0.6rem;
+        align-items: baseline;
+      }
+      .brief b {
+        font-size: 1.02rem;
+      }
+      .brief .cat {
+        font-size: 0.78rem;
+        font-weight: 650;
+        color: var(--mute);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0 0.45rem;
+      }
+      .tile {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--card);
+        text-align: left;
+        overflow: hidden;
+        min-height: 0;
+      }
+      .tile img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+        object-fit: cover;
+        background: #e8e2d8;
+      }
+      .tile .cap {
+        padding: 0.25rem 0.4rem 0.35rem;
+        font-size: 0.78rem;
+        line-height: 1.3;
+        font-variant-numeric: tabular-nums;
+      }
+      .tile .cap .t {
+        font-weight: 750;
+        font-size: 0.9rem;
+      }
+      .tile .lab {
+        display: none;
+        font-weight: 650;
+        color: var(--mute);
+      }
+      .tile .fix {
+        color: var(--nilo);
+        font-weight: 650;
+      }
+      .tile.look {
+        border-style: dashed;
+      }
+      @media (max-width: 860px) {
+        .ghead {
+          display: none;
+        }
+        .grow {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .tile .lab {
+          display: block;
+        }
+      }
+      @media (max-width: 520px) {
+        .grow {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      dialog {
+        border: none;
+        border-radius: 12px;
+        padding: 0;
+        width: min(70rem, 96vw);
+        max-height: 94vh;
+        background: var(--card);
+        color: var(--ink);
+      }
+      dialog::backdrop {
+        background: rgba(20, 16, 12, 0.7);
+      }
+      .dlg {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 19rem;
+      }
+      .dlg img {
+        width: 100%;
+        display: block;
+        background: #e8e2d8;
+      }
+      .dlg .side {
+        padding: 0.9rem 1rem;
+        overflow: auto;
+        max-height: 94vh;
+        border-left: 1px solid var(--line);
+      }
+      .dlg .side h3 {
+        margin: 0 0 0.2rem;
+      }
+      .dlg .nav {
+        display: flex;
+        gap: 0.4rem;
+        margin: 0.6rem 0;
+        flex-wrap: wrap;
+      }
+      .dlg table {
+        font-size: 0.85rem;
+        margin: 0.4rem 0;
+      }
+      .dlg ul {
+        padding-left: 1.1rem;
+        margin: 0.3rem 0;
+        font-size: 0.85rem;
+      }
+      .dlg .k {
+        font-weight: 700;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--mute);
+        margin: 0.8rem 0 0.15rem;
+      }
+      @media (max-width: 860px) {
+        .dlg {
+          grid-template-columns: 1fr;
+        }
+        .dlg .side {
+          border-left: none;
+          border-top: 1px solid var(--line);
+          max-height: none;
+        }
+        dialog {
+          overflow: auto;
+        }
+      }
+      details {
+        margin: 0.6rem 0;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 650;
+        min-height: 24px;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0 0.45rem;
+        border-radius: 999px;
+        border: 1px solid currentColor;
+        white-space: nowrap;
+      }
+      .t-drop {
+        color: var(--drop);
+        background: var(--dropbg);
+      }
+      .t-park {
+        color: var(--nilo);
+        background: var(--nilobg);
+      }
+      .t-next {
+        color: var(--sdk);
+        background: var(--sdkbg);
+      }
+      .t-int {
+        color: var(--top);
+        background: var(--topbg);
+      }
+      .glance {
+        background: #1c1916;
+        color: #faf7f2;
+        border-radius: 10px;
+        padding: 0.9rem 1.1rem;
+        margin-top: 2.4rem;
+      }
+      .glance a {
+        color: #9cc3ff;
+      }
+      .glance ul {
+        margin: 0.3rem 0;
+        padding-left: 1.2rem;
+      }
+      footer {
+        margin-top: 2rem;
+        font-size: 0.85rem;
+        color: var(--mute);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+      @media print {
+        nav.toc,
+        .toolbar,
+        .ghead {
+          display: none;
+          position: static;
+        }
+        details > *:not(summary) {
+          display: block !important;
+        }
+        a[href^="http"]::after {
+          content: " (" attr(href) ")";
+          font-size: 0.8em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Text to 3D model, faster: an SDK engine for Nilo's model generator</h1>
+        <p class="lead narrow">
+          We built a TypeScript library of modelling helpers that a language model writes code against, and ran it on 20
+          briefs next to Nilo's current low-poly generator. One Sonnet 5.5 call against the SDK delivers a finished
+          model in a median of <strong>{{flat.final}}</strong>. Nilo's loop takes <strong>{{lp.final}}</strong> to its
+          final model and shows a first draft at {{lp.look}}. We propose adding the SDK as a second engine behind the
+          existing <code>generate_low_poly_model</code> tool, behind a flag, starting with the one-call version.
+        </p>
+        <div class="callout narrow small">
+          <strong>Read the comparison with one caveat.</strong> Low-poly ran on Gemini 3.8 Flash, its production model,
+          and the SDK on Sonnet 5.5, so the engine and the model changed at once. Running each engine on the other's
+          model is the first item under <a href="#next">next steps</a>. The looks are yours to judge in the
+          <a href="#gallery">side-by-side renders</a>.
+        </div>
+        <nav class="toc" aria-label="Sections">
+          <a href="#stand">At a glance</a><a href="#what">What the SDK is</a
+          ><a href="#gallery">Same brief, side by side</a><a href="#time">Where the time goes</a
+          ><a href="#learned">What we learned</a><a href="#dropped">Tried and dropped</a><a href="#next">Next steps</a
+          ><a href="#ask">Decisions we need</a><a href="#method">How we measured</a>
+        </nav>
+      </header>
+
+      <main>
+        <section id="stand" aria-labelledby="h-stand">
+          <h2 id="h-stand">At a glance: the same 20 briefs, four ways</h2>
+          <div class="cards">
+            <div class="card nilo">
+              <h3>Nilo low-poly, today</h3>
+              <div class="who">Gemini 3.8 Flash, medium reasoning. Design, build, critique, build.</div>
+              <dl>
+                <dt>First draft</dt>
+                <dd>{{lp.look}}<span class="r">{{lp.look.range}}</span></dd>
+                <dt>Final model</dt>
+                <dd>{{lp.final}}<span class="r">{{lp.final.range}}</span></dd>
+                <dt>Model calls</dt>
+                <dd>3–4</dd>
+                <dt>Triangles</dt>
+                <dd>{{lp.tris}}</dd>
+                <dt>Cost per model</dt>
+                <dd>{{lp.cost}}</dd>
+              </dl>
+            </div>
+            <div class="card sdk">
+              <h3>SDK, one call</h3>
+              <div class="who">Sonnet 5.5, medium effort, flat colours (no textures).</div>
+              <dl>
+                <dt>First draft</dt>
+                <dd>same as final</dd>
+                <dt>Final model</dt>
+                <dd>{{flat.final}}<span class="r">{{flat.final.range}}</span></dd>
+                <dt>Model calls</dt>
+                <dd>1</dd>
+                <dt>Triangles</dt>
+                <dd>{{flat.tris}}</dd>
+                <dt>Cost per model</dt>
+                <dd>{{flat.cost}}</dd>
+              </dl>
+              <span class="pick">Proposed first step</span>
+            </div>
+            <div class="card sdk">
+              <h3>SDK, two-stage</h3>
+              <div class="who">
+                Sonnet 5.5, medium. A flat draft that lists what it wants added, then 7 calls at once add parts and
+                textures.
+              </div>
+              <dl>
+                <dt>First draft</dt>
+                <dd>{{two.look}}<span class="r">{{two.look.range}}</span></dd>
+                <dt>Final model</dt>
+                <dd>{{two.final}}<span class="r">{{two.final.range}}</span></dd>
+                <dt>Model calls</dt>
+                <dd>8</dd>
+                <dt>Triangles</dt>
+                <dd>{{two.tris}}</dd>
+                <dt>Cost per model</dt>
+                <dd>{{two.cost}}</dd>
+              </dl>
+            </div>
+            <div class="card top">
+              <h3>SDK, high effort</h3>
+              <div class="who">
+                Sonnet 5.5, high effort, one call with textures. The best looks we have, and the slowest.
+              </div>
+              <dl>
+                <dt>First draft</dt>
+                <dd>same as final</dd>
+                <dt>Final model</dt>
+                <dd>{{high.final}}<span class="r">{{high.final.range}}</span></dd>
+                <dt>Model calls</dt>
+                <dd>1</dd>
+                <dt>Triangles</dt>
+                <dd>{{high.tris}}</dd>
+                <dt>Cost per model</dt>
+                <dd>{{high.cost}}</dd>
+              </dl>
+            </div>
+          </div>
+          <p class="mute small narrow">
+            Medians, with the fastest and slowest brief underneath. Every pipeline ended with a usable model on all 20
+            briefs. SDK times include the repair call when a first build crashed.
+          </p>
+        </section>
+
+        <section id="what" aria-labelledby="h-what">
+          <h2 id="h-what">What the SDK is</h2>
+          <div class="narrow">
+            <p>
+              The model writes one TypeScript module against a set of modelling helpers instead of raw three.js. It lays
+              out joints, sweeps tubes along them, extrudes plates, turns domes on a lathe and sticks parts onto the
+              surfaces it has already built. The SDK returns a three.js object, which an app packs into a single mesh
+              with one texture atlas, rigged when the model has joints. The library is about 9k lines, plus optional
+              style kits for pixel, toon and clockwork looks.
+            </p>
+            <p>
+              The model gets the API reference and a page of conventions in its prompt, about 84k tokens that stay
+              cached between calls. A typecheck runs on every module; if it fails, or the first render crashes, one
+              cheap repair call sends back targeted edits.
+            </p>
+          </div>
+          <div class="scroll">
+            <table>
+              <caption class="mute small" style="text-align: left; caption-side: top; padding-bottom: 0.3rem">
+                How it differs from the current low-poly generator
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col">Low-poly today</th>
+                  <th scope="col">SDK</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">What the model writes</th>
+                  <td>An import-free JavaScript module on raw three.js geometry</td>
+                  <td>A TypeScript module calling SDK helpers (joints, sweeps, extrusions, surface attachment)</td>
+                </tr>
+                <tr>
+                  <th scope="row">Output</th>
+                  <td>A tree of named meshes, one flat-colour material each</td>
+                  <td>One packed mesh with one atlas material (plus a glowing copy for emissive parts)</td>
+                </tr>
+                <tr>
+                  <th scope="row">Colour</th>
+                  <td>A flat colour per mesh</td>
+                  <td>Flat colours, or painted and SVG textures through the atlas</td>
+                </tr>
+                <tr>
+                  <th scope="row">Rigging</th>
+                  <td>Not allowed; <code>rig_character</code> is a separate tool</td>
+                  <td>Named joints and a skinned mesh, built in</td>
+                </tr>
+                <tr>
+                  <th scope="row">Calls per model</th>
+                  <td>1 design + 2 builds + 1 critique at the default quality</td>
+                  <td>1 (one call) or 8 (two-stage), plus at most one repair</td>
+                </tr>
+                <tr>
+                  <th scope="row">Edits after the fact</th>
+                  <td>Palette and parameter edits, part patches, split</td>
+                  <td>Not built yet; would be search-and-replace edits on the stored source</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>How it would plug into Nilo</h3>
+          <p class="narrow">
+            <code>generate_low_poly_model</code> keeps its schema. The client picks the engine by flag, and the stored
+            model records <code>engine: "sdk"</code> so edits know which path to take. The World Agent's routing and
+            tool docs stay as they are, and the flag gives an A/B on real prompts. The server adds a build role and a
+            repair role to the existing code-generation callable; the client sandbox gets an SDK branch and reuses
+            upload, spawn, draft display and task recording.
+          </p>
+          <details class="narrow">
+            <summary>The engine in pseudocode</summary>
+            <pre
+              style="
+                overflow-x: auto;
+                background: #efe8dd;
+                padding: 0.7rem 0.8rem;
+                border-radius: 8px;
+                font-size: 0.84rem;
+                line-height: 1.45;
+              "
+            ><code>// server: code-generation callable, new role "sdk-build"
+system = [SDK_API, SDK_CONVENTIONS, SDK_DECLARATIONS, FLAT_PROMPT]   // cached prefix
+src = fence(await sonnet({ effort: "medium", system, user: brief }))
+errors = tsc(src, SDK_DECLARATIONS)                                 // ~1 s
+if (errors.length) src = applySearchReplace(src, await sonnet({ effort: "low", repair: errors }))
+return { js: stripTypes(src), source: src }
+
+// client: sandbox harness, engine "sdk"
+const root = (await import(blobUrl(js))).default()
+const mesh = await createStaticMesh(root, name)   // createSkinnedMesh once a rig is used
+mesh.userData = { lowPoly: { engine: "sdk", source }, entities: [name] }
+glb = await exportGlb(mesh)                       // then the existing upload, spawn and record</code></pre>
+          </details>
+        </section>
+
+        <section id="gallery" aria-labelledby="h-gallery">
+          <h2 id="h-gallery">Same brief, side by side</h2>
+          <p class="narrow">
+            Each row is one brief. Dashed tiles are first drafts: what the user sees while the rest of the pipeline
+            runs. The time under each tile is when that build was ready. Click any tile to see every angle and how the
+            time was spent. Each pipeline renders with its own viewer, so backgrounds and lighting differ.
+          </p>
+          <div class="toolbar" role="toolbar" aria-label="Columns">
+            <span class="lbl">Show:</span>
+            <span id="colToggles"></span>
+          </div>
+          <div class="toolbar" role="toolbar" aria-label="Brief category">
+            <span class="lbl">Category:</span>
+            <span id="catToggles"></span>
+          </div>
+          <div class="ghead" id="ghead"></div>
+          <div id="rows"></div>
+        </section>
+
+        <section id="time" aria-labelledby="h-time">
+          <h2 id="h-time">Where the time goes</h2>
+          <p class="narrow">
+            One row per pipeline, on one time scale. <strong>▲</strong> marks the first draft and <strong>●</strong> the
+            finished model; one-call rows have only <strong>●</strong>, because the first thing the user sees is the
+            final model. Stacked bars are calls running at the same time; the darkest one is the slowest, the one
+            everyone waits for.
+          </p>
+          <div class="chart scroll"><div id="timeline"></div></div>
+          <div class="legend">
+            <span><span class="sw" style="background: #3d3a36"></span>one model call</span>
+            <span><span class="sw" style="background: #b06a1d"></span>low-poly build</span>
+            <span><span class="sw" style="background: #e0b27a"></span>low-poly design or critique</span>
+            <span><span class="sw" style="background: #1f5f8b"></span>draft call</span>
+            <span><span class="sw" style="background: #9bbbd4"></span>calls running at once</span>
+          </div>
+          <p class="mute small narrow">
+            Low-poly's bars are per-call medians laid end to end, so they don't add up exactly to its median final time.
+            The model writes at about 130 tokens a second in every Sonnet row; the differences are time spent thinking.
+          </p>
+        </section>
+
+        <section id="learned" aria-labelledby="h-learned">
+          <h2 id="h-learned">What we learned</h2>
+          <p class="narrow mute">
+            From about 30 rounds of controlled runs, each comparing setups in the same batch with 10 or more builds per
+            setup.
+          </p>
+          <ol class="learn narrow">
+            <li>
+              <strong>Reasoning effort is the quality dial, and time follows it.</strong> On these 20 briefs, one Sonnet
+              call took {{low.final}} at low effort, {{medium.final}} at medium and {{high.final}} at high. Output speed
+              barely moves; the extra time is thinking, about 1.8k, 17k and 55k thinking tokens. High effort gives
+              visibly more detailed models: compare the last column of the gallery.
+            </li>
+            <li>
+              <strong>Telling the model to think less does nothing.</strong> We tried a library of reference code in the
+              prompt, an instruction to settle decisions first and write the code once, and a written build plan at the
+              top of the module. None of them changed thinking time.
+            </li>
+            <li>
+              <strong>Giving it less to do works.</strong> Dropping textures, so every surface is one flat colour, cut
+              thinking by 39% and build time from 141 s to 89 s at medium. The model spent part of the saving on more
+              geometry. Nilo's low-poly already works in flat colour.
+            </li>
+            <li>
+              <strong>Splitting the work across calls that run at once works.</strong> A planning call followed by five
+              part calls in parallel halved build time at medium, from 146 s to 71 s, and was faster on all 10 pairs,
+              with about 2.7 times the triangles. Parts built by separate calls don't always fit together; checking each
+              part against its planned box removed the overhang in a follow-up test. Two-stage reuses this machinery.
+            </li>
+            <li>
+              <strong>Crashes are cheap to fix.</strong> A typecheck plus one repair call fixes nearly every crashed
+              build in 3–6 s. Putting the SDK's type declarations in the prompt cut builds with type errors from 8 in 40
+              to 1 in 40, at no extra build time.
+            </li>
+            <li>
+              <strong>Nilo's critic never approved a build.</strong> In 17 critiques it answered "revise" 17 times; the
+              other 3 briefs crashed in their first round, leaving nothing to critique. So every brief paid for both
+              rounds, and the final build is never reviewed.
+            </li>
+          </ol>
+        </section>
+
+        <section id="dropped" aria-labelledby="h-dropped">
+          <h2 id="h-dropped">Tried and dropped</h2>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Idea</th>
+                  <th scope="col">Result</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>A library of ready-made colour schemes and shape code in the prompt</td>
+                  <td>
+                    No change in build time at low, medium or high effort, and builds drifted toward the library's own
+                    colour schemes.
+                  </td>
+                  <td><span class="tag t-drop">dropped</span></td>
+                </tr>
+                <tr>
+                  <td>Prompts that ask the model to plan briefly or decide before writing</td>
+                  <td>
+                    Same-batch build times of 166 s against 158 s, and 149 s against 153 s. The model thinks as long as
+                    its effort level allows.
+                  </td>
+                  <td><span class="tag t-drop">dropped</span></td>
+                </tr>
+                <tr>
+                  <td>A cheap model refining its own model from screenshots, 20 rounds (Claude Haiku, low effort)</td>
+                  <td>
+                    The first build took about 94 s, longer than one Sonnet call at low effort, and later rounds mostly
+                    moved small pieces around.
+                  </td>
+                  <td><span class="tag t-park">parked</span></td>
+                </tr>
+                <tr>
+                  <td>Splitting parallel part calls into evenly sized jobs, to shorten the slowest one</td>
+                  <td>The slowest part got slower.</td>
+                  <td><span class="tag t-drop">dropped</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="mute small narrow">
+            The screenshot loop may come back in a different form: start from a fast flat Sonnet draft instead of the
+            cheap model's own first build, send each view as its own image, and prompt for structural changes rather
+            than small moves.
+          </p>
+        </section>
+
+        <section id="next" aria-labelledby="h-next">
+          <h2 id="h-next">Next steps</h2>
+          <p class="narrow">
+            Each of these runs on the same 20 briefs with a control in the same batch. Tagged
+            <span class="tag t-int">integration</span> if it answers a question about shipping in Nilo,
+            <span class="tag t-next">speed</span> if it tries to bring the first draft or the final model forward.
+          </p>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Experiment</th>
+                  <th scope="col">What it answers</th>
+                  <th scope="col">Model cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="num">1</td>
+                  <td><span class="tag t-int">integration</span> Sonnet 5.5 on today's low-poly loop</td>
+                  <td>
+                    Whether the gap comes from the SDK or from the model. The World Agent's admin model menu already
+                    supports this, so it needs no code.
+                  </td>
+                  <td class="num">~$5</td>
+                </tr>
+                <tr>
+                  <td class="num">2</td>
+                  <td><span class="tag t-int">integration</span> Gemini 3.8 Flash on the SDK, low and medium</td>
+                  <td>
+                    Whether Nilo can keep its current model, and how often it crashes on an API it has never seen.
+                  </td>
+                  <td class="num">Gemini quota</td>
+                </tr>
+                <tr>
+                  <td class="num">3</td>
+                  <td><span class="tag t-int">integration</span> One call with the type declarations, at medium</td>
+                  <td>The exact prompt we would ship, and its crash rate.</td>
+                  <td class="num">~$6</td>
+                </tr>
+                <tr>
+                  <td class="num">4</td>
+                  <td><span class="tag t-int">integration</span> Briefs as the World Agent writes them</td>
+                  <td>Real agent briefs are shorter than these gallery briefs and include multi-object scenes.</td>
+                  <td class="num">~$3</td>
+                </tr>
+                <tr>
+                  <td class="num">5</td>
+                  <td><span class="tag t-int">integration</span> Every module through a worker-only sandbox</td>
+                  <td>Which builds need the DOM (SVG textures do), since Nilo runs builds in a web worker.</td>
+                  <td class="num">none</td>
+                </tr>
+                <tr>
+                  <td class="num">6</td>
+                  <td><span class="tag t-next">speed</span> Base first, then parts in parallel</td>
+                  <td>
+                    One call builds a bare base as the first draft and lists the parts it needs; part calls then build
+                    against the base's real geometry instead of numbers in a plan. Our estimate: first draft at about 20
+                    s and final at about 45 s at low effort.
+                  </td>
+                  <td class="num">~$8</td>
+                </tr>
+                <tr>
+                  <td class="num">7</td>
+                  <td><span class="tag t-next">speed</span> Parallel parts with only the box check</td>
+                  <td>Whether the fit fix costs only its own ~20 s. It was tested together with another change.</td>
+                  <td class="num">~$8</td>
+                </tr>
+                <tr>
+                  <td class="num">8</td>
+                  <td>
+                    <span class="tag t-next">speed</span> Two-stage with its texture requests spread over several calls
+                  </td>
+                  <td>The single texture call was the slowest second-stage call in 7 of 10 builds.</td>
+                  <td class="num">~$8</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <details class="narrow">
+            <summary>Integration work, in order</summary>
+            <ul>
+              <li>
+                <strong>SDK side.</strong> A browser bundle built against Nilo's three.js (0.186; the SDK is on 0.185).
+                SVG textures need the DOM, so either the one-call prompt avoids them, or the sandbox draws them on the
+                main thread (two-stage needs this). A Nilo variant of the prompt with Nilo's floor and scale.
+              </li>
+              <li>
+                <strong>Server.</strong> Build and repair roles in the code-generation callable, a typecheck against the
+                SDK declarations, and prompt caching on the 84k-token prefix.
+              </li>
+              <li>
+                <strong>Client.</strong> The engine switch in the generator, an SDK branch in the sandbox harness that
+                skips the per-mesh material checks (the atlas is one texture), and the engine stamp on the stored model.
+              </li>
+              <li>
+                <strong>Edits.</strong> Free-form and part edits as search-and-replace calls on the stored source.
+                Palette and parameter edits stay deterministic only if the prompt asks the module to export them.
+              </li>
+            </ul>
+          </details>
+        </section>
+
+        <section id="ask" aria-labelledby="h-ask">
+          <h2 id="h-ask">Decisions we need</h2>
+          <ol class="learn narrow">
+            <li>
+              <strong>One tool with an engine flag, or a separate tool from the start?</strong> We lean toward one tool:
+              the agent's routing stays as it is, and the flag gives an A/B. A separate tool makes sense once the SDK
+              does something low-poly can't, such as rigged creatures.
+            </li>
+            <li>
+              <strong>Sonnet 5.5 or Gemini 3.8 Flash?</strong> Sonnet is tested at {{flat.cost}} per model for one call.
+              Gemini is Nilo's default and likely several times cheaper, but has never run on the SDK (next step 2).
+            </li>
+            <li>
+              <strong>Static meshes first, or skinned meshes from day one?</strong> Skinned meshes would expose named
+              joints to animation generation.
+            </li>
+            <li>
+              <strong>Where should the SDK live?</strong> A package in the Nilo monorepo means about 9k lines in the
+              first pull request. The alternative is a separate repo that Nilo consumes.
+            </li>
+            <li>
+              <strong>One call only, or two-stage as well?</strong> Two-stage maps onto Nilo's draft entities and gives
+              the more detailed model, but costs 7 more calls per model and needs SVG drawing outside the worker.
+            </li>
+          </ol>
+        </section>
+
+        <section id="method" aria-labelledby="h-method">
+          <h2 id="h-method">How we measured</h2>
+          <details class="narrow">
+            <summary>Setup, caveats and the full numbers</summary>
+            <ul>
+              <li>
+                <strong>Briefs.</strong> 20 gallery briefs, each a category, a subject and a style, for example "piano
+                accordion, Italian mother-of-pearl". Two per category for most of 12 categories: animals, monsters,
+                humanoid characters, fantastical creatures, architecture, dioramas, abstract pieces, objects, plants, a
+                vehicle, a weapon and a prop group.
+              </li>
+              <li>
+                <strong>Low-poly.</strong> Nilo's own builder loop and prompts, imported from the Nilo repo, run through
+                its real sandbox harness on a desktop NVIDIA GPU. Gemini 3.8 Flash at medium reasoning,
+                <code>quality: 2</code>, <code>scope: prop</code>. Model calls went through a local gateway rather than
+                the Firebase callable, so network and queueing differ from production. Production latencies weren't
+                available.
+              </li>
+              <li>
+                <strong>SDK.</strong> Sonnet 5.5 through the Anthropic API, all SDK columns in one batch. Times run from
+                the request to a working model, including any repair.
+              </li>
+              <li>
+                <strong>Batches drift.</strong> The same setup can run up to twice as slow in a different batch. This
+                SDK batch ran next to other experiments and came out slower than earlier ones: one call in flat colour
+                took 109 s here and 63–66 s in an earlier batch of vehicle briefs. Compare numbers within this page, not
+                with numbers from elsewhere.
+              </li>
+              <li>
+                <strong>Cost.</strong> Per model, as billed in these runs: Sonnet with its prompt prefix cached, Gemini
+                at list price.
+              </li>
+            </ul>
+            <div class="scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Median (fastest–slowest)</th>
+                    <th scope="col">First draft</th>
+                    <th scope="col">Final</th>
+                    <th scope="col">Triangles</th>
+                    <th scope="col">Cost</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Low-poly, Gemini 3.8 Flash</th>
+                    <td class="num">{{lp.look}} ({{lp.look.range}})</td>
+                    <td class="num">{{lp.final}} ({{lp.final.range}})</td>
+                    <td class="num">{{lp.tris}} ({{lp.tris.range}})</td>
+                    <td class="num">{{lp.cost}} ({{lp.cost.range}})</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">SDK, low effort, one call with textures</th>
+                    <td class="num">—</td>
+                    <td class="num">{{low.final}} ({{low.final.range}})</td>
+                    <td class="num">{{low.tris}} ({{low.tris.range}})</td>
+                    <td class="num">{{low.cost}} ({{low.cost.range}})</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">SDK, medium, one call, flat</th>
+                    <td class="num">—</td>
+                    <td class="num">{{flat.final}} ({{flat.final.range}})</td>
+                    <td class="num">{{flat.tris}} ({{flat.tris.range}})</td>
+                    <td class="num">{{flat.cost}} ({{flat.cost.range}})</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">SDK, medium, one call with textures</th>
+                    <td class="num">—</td>
+                    <td class="num">{{medium.final}} ({{medium.final.range}})</td>
+                    <td class="num">{{medium.tris}} ({{medium.tris.range}})</td>
+                    <td class="num">{{medium.cost}} ({{medium.cost.range}})</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">SDK, medium, two-stage</th>
+                    <td class="num">{{two.look}} ({{two.look.range}})</td>
+                    <td class="num">{{two.final}} ({{two.final.range}})</td>
+                    <td class="num">{{two.tris}} ({{two.tris.range}})</td>
+                    <td class="num">{{two.cost}} ({{two.cost.range}})</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">SDK, high, one call with textures</th>
+                    <td class="num">—</td>
+                    <td class="num">{{high.final}} ({{high.final.range}})</td>
+                    <td class="num">{{high.tris}} ({{high.tris.range}})</td>
+                    <td class="num">{{high.cost}} ({{high.cost.range}})</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+        </section>
+
+        <section class="glance" aria-labelledby="h-glance">
+          <h2 id="h-glance" style="border: none; margin: 0 0 0.3rem; padding: 0; font-size: 1.1rem">In short</h2>
+          <ul>
+            <li>
+              An SDK engine builds a finished model from text in about {{flat.final}} with one Sonnet call, against
+              {{lp.final}} for today's low-poly loop. Model and engine changed together, so the first experiment
+              separates them.
+            </li>
+            <li>
+              Proposal: a second engine behind <code>generate_low_poly_model</code>, behind a flag, one call in flat
+              colour at medium effort.
+            </li>
+            <li>
+              Higher reasoning effort looks clearly better and costs minutes; flat colour and parallel calls are the two
+              things that cut time.
+            </li>
+            <li>Five decisions are open, listed under <a href="#ask" style="color: #9cc3ff">Decisions we need</a>.</li>
+          </ul>
+        </section>
+      </main>
+
+      <footer>
+        <p>
+          Generated 27 October 2026 from the run records. Source, API reference and the full integration plan:
+          <a href="https://github.com/choephix/agentic-3js-builder">github.com/choephix/agentic-3js-builder</a>, in
+          <code>docs/NILO.md</code> and <code>docs/SPEED.md</code>.
+        </p>
+      </footer>
+
+      <dialog id="dlg" aria-labelledby="dlgTitle">
+        <div class="dlg">
+          <img id="dlgImg" alt="" />
+          <div class="side">
+            <h3 id="dlgTitle"></h3>
+            <div id="dlgSub" class="mute small"></div>
+            <div class="nav">
+              <button type="button" id="dlgPrev" aria-label="Previous build">← Prev</button>
+              <button type="button" id="dlgNext" aria-label="Next build">Next →</button>
+              <button type="button" id="dlgClose">Close</button>
+            </div>
+            <div id="dlgBody"></div>
+          </div>
+        </div>
+      </dialog>
+    </div>
+
+    <script>
+      /*DATA*/
+      const $ = (s) => document.querySelector(s);
+      const el = (tag, attrs = {}, ...kids) => {
+        const e = document.createElement(tag);
+        for (const [k, v] of Object.entries(attrs)) {
+          if (k === "class") e.className = v;
+          else if (k === "text") e.textContent = v;
+          else e.setAttribute(k, v);
+        }
+        for (const c of kids) if (c != null) e.append(c);
+        return e;
+      };
+      const SV = "http://www.w3.org/2000/svg";
+      const sv = (tag, attrs = {}, text) => {
+        const e = document.createElementNS(SV, tag);
+        for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+        if (text != null) e.textContent = text;
+        return e;
+      };
+      const fmtK = (n) => (n == null ? "—" : (n / 1000).toFixed(1) + "k");
+      const GROUP = { lpDraft: "g-nilo", lpFinal: "g-nilo", flat: "g-sdk", two1: "g-sdk", two: "g-sdk", high: "g-top" };
+      const SUB = {
+        lpDraft: "Gemini 3.8 Flash",
+        lpFinal: "Gemini 3.8 Flash",
+        flat: "Sonnet 5.5, medium, flat",
+        two1: "Sonnet 5.5, medium",
+        two: "Sonnet 5.5, medium",
+        high: "Sonnet 5.5, high, textures",
+      };
+      const shown = new Set(DATA.cols.map((c) => c[0]));
+      let cat = "All";
+
+      function colToggles() {
+        const box = $("#colToggles");
+        for (const [k, a, b] of DATA.cols) {
+          const btn = el("button", { type: "button", "aria-pressed": "true", text: `${a}: ${b}` });
+          btn.onclick = () => {
+            if (shown.has(k) && shown.size > 1) shown.delete(k);
+            else shown.add(k);
+            btn.setAttribute("aria-pressed", String(shown.has(k)));
+            render();
+          };
+          box.append(btn, " ");
+        }
+        const cats = ["All", ...new Set(DATA.briefs.map((b) => b.category))];
+        const cb = $("#catToggles");
+        for (const c of cats) {
+          const btn = el("button", { type: "button", "aria-pressed": String(c === cat), "data-cat": c, text: c });
+          btn.onclick = () => {
+            cat = c;
+            cb.querySelectorAll("button").forEach((o) => o.setAttribute("aria-pressed", String(o.dataset.cat === c)));
+            render();
+          };
+          cb.append(btn, " ");
+        }
+      }
+
+      let order = [];
+      function render() {
+        const cols = DATA.cols.filter((c) => shown.has(c[0]));
+        const head = $("#ghead");
+        head.style.setProperty("--n", cols.length);
+        head.replaceChildren(
+          ...cols.map(([k, a, b]) => el("div", { class: GROUP[k] }, `${a}, ${b}`, el("span", { text: SUB[k] }))),
+        );
+        const rows = $("#rows");
+        rows.replaceChildren();
+        order = [];
+        for (const br of DATA.briefs) {
+          if (cat !== "All" && br.category !== cat) continue;
+          rows.append(
+            el(
+              "div",
+              { class: "brief" },
+              el("b", { text: br.subject }),
+              el("span", { class: "mute", text: br.style }),
+              el("span", { class: "cat", text: br.category }),
+            ),
+          );
+          const g = el("div", { class: "grow" });
+          g.style.setProperty("--n", cols.length);
+          for (const [k, a, b] of cols) {
+            const c = br.cells[k];
+            const idx = order.length;
+            order.push({ br, k, a, b });
+            const isLook = b === "first draft";
+            const cap = el(
+              "div",
+              { class: "cap" },
+              el("span", { class: "lab", text: `${a}, ${b}` }),
+              el("span", { class: "t", text: `${c.t} s` }),
+            );
+            if (!isLook) cap.append(el("br"), `${fmtK(c.tris)} tris · $${c.cost.toFixed(2)}`);
+            if (c.repaired) cap.append(el("br"), el("span", { class: "fix", text: "crashed once, repaired" }));
+            const btn = el(
+              "button",
+              {
+                type: "button",
+                class: "tile" + (isLook ? " look" : ""),
+                "aria-label": `${br.subject}: ${a}, ${b}, ready at ${c.t} seconds. Open details.`,
+              },
+              el("img", { src: c.img, alt: `${br.subject}, ${a}, ${b}`, loading: "lazy", width: "440", height: "440" }),
+              cap,
+            );
+            btn.onclick = () => openAt(idx);
+            g.append(btn);
+          }
+          rows.append(g);
+        }
+      }
+
+      let cur = 0;
+      function callsTable(calls, label) {
+        const t = el("table");
+        t.append(
+          el(
+            "thead",
+            {},
+            el("tr", {}, el("th", { scope: "col", text: label }), el("th", { scope: "col", text: "seconds" })),
+          ),
+        );
+        const tb = el("tbody");
+        for (const c of calls)
+          tb.append(el("tr", {}, el("td", { text: c.role }), el("td", { class: "num", text: c.s.toFixed(1) })));
+        t.append(tb);
+        return t;
+      }
+      function openAt(i) {
+        cur = (i + order.length) % order.length;
+        const { br, k, a, b } = order[cur];
+        const c = br.cells[k];
+        $("#dlgImg").src = c.full;
+        $("#dlgImg").alt = `${br.subject}, ${a}, ${b}: all views`;
+        $("#dlgTitle").textContent = `${br.subject}`;
+        $("#dlgSub").textContent = `${br.style} · ${a}, ${b} (${SUB[k]})`;
+        const body = $("#dlgBody");
+        body.replaceChildren();
+        const facts = [["Ready at", `${c.t} s`]];
+        if (c.tris != null && b !== "first draft") facts.push(["Triangles", c.tris.toLocaleString()]);
+        if (c.cost != null && b !== "first draft") facts.push(["Cost", `$${c.cost.toFixed(3)}`]);
+        if (c.repaired) facts.push(["Repair", "first build crashed; one repair call fixed it"]);
+        const dl = el("table");
+        for (const [x, y] of facts) dl.append(el("tr", {}, el("th", { scope: "row", text: x }), el("td", { text: y })));
+        body.append(dl);
+        if (c.note) body.append(el("p", { class: "small mute", text: c.note }));
+        if (k === "lpDraft")
+          body.append(
+            el("p", {
+              class: "small",
+              text: "The first round's build, shown while the critique and the second build run.",
+            }),
+          );
+        if (k === "two1")
+          body.append(
+            el("p", {
+              class: "small",
+              text: "The flat draft from the first call. It ends with a list of requests that the second stage works through.",
+            }),
+          );
+        if (c.calls) {
+          body.append(el("div", { class: "k", text: "Model calls" }));
+          body.append(callsTable(c.calls, k === "two" ? "call (after stage 1, all at once)" : "call, in order"));
+        }
+        if (c.requests) {
+          const adds = c.requests.filter((q) => q.kind === "add").length;
+          body.append(
+            el("div", {
+              class: "k",
+              text: `What the draft asked for: ${adds} parts, ${c.requests.length - adds} textures`,
+            }),
+          );
+          const ul = el("ul");
+          for (const q of c.requests)
+            ul.append(el("li", {}, el("strong", { text: q.kind === "add" ? "add: " : "texture: " }), q.what));
+          body.append(ul);
+        }
+        const d = $("#dlg");
+        if (!d.open) d.showModal();
+      }
+      $("#dlgPrev").onclick = () => openAt(cur - 1);
+      $("#dlgNext").onclick = () => openAt(cur + 1);
+      $("#dlgClose").onclick = () => $("#dlg").close();
+      $("#dlg").addEventListener("click", (e) => {
+        if (e.target === e.currentTarget) e.currentTarget.close();
+      });
+      $("#dlg").addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          openAt(cur - 1);
+        }
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          openAt(cur + 1);
+        }
+      });
+
+      function timeline() {
+        const T = DATA.timeline,
+          MAX = 240,
+          W = 940,
+          L = 250,
+          R = 70,
+          RH = 50,
+          top = 26;
+        const lp = T.lp;
+        const rows = [
+          {
+            name: "Nilo low-poly (Gemini)",
+            sub: `first draft ${Math.round(T.lpLook)} s · final ${Math.round(T.lpFinal)} s`,
+            look: T.lpLook,
+            final: T.lpFinal,
+            segs: (() => {
+              let t = 0;
+              return [
+                ["design", lp.design1, "#e0b27a"],
+                ["build", lp.build1, "#b06a1d"],
+                ["critique", lp.critique1, "#e0b27a"],
+                ["build", lp.build2, "#b06a1d"],
+              ].map(([n, d, f]) => {
+                const s = { a: t, b: t + d, fill: f, label: n };
+                t += d;
+                return s;
+              });
+            })(),
+          },
+          {
+            name: "SDK, one call, low effort",
+            sub: `final ${Math.round(T.low)} s · with textures`,
+            look: T.low,
+            final: T.low,
+            segs: [{ a: 0, b: T.low, fill: "#3d3a36" }],
+          },
+          {
+            name: "SDK, one call, medium, flat",
+            sub: `final ${Math.round(T.flat)} s`,
+            look: T.flat,
+            final: T.flat,
+            segs: [{ a: 0, b: T.flat, fill: "#3d3a36" }],
+          },
+          {
+            name: "SDK, two-stage, medium",
+            sub: `first draft ${Math.round(T.twoLook)} s · final ${Math.round(T.twoFinal)} s`,
+            look: T.twoLook,
+            final: T.twoFinal,
+            segs: [
+              { a: 0, b: T.twoLook, fill: "#1f5f8b", label: "draft" },
+              { a: T.twoLook, lanes: T.twoLanes },
+            ],
+          },
+          {
+            name: "SDK, one call, medium, textures",
+            sub: `final ${Math.round(T.medium)} s`,
+            look: T.medium,
+            final: T.medium,
+            segs: [{ a: 0, b: T.medium, fill: "#3d3a36" }],
+          },
+          {
+            name: "SDK, one call, high effort",
+            sub: `final ${Math.round(T.high)} s · with textures`,
+            look: T.high,
+            final: T.high,
+            segs: [{ a: 0, b: T.high, fill: "#3d3a36" }],
+          },
+        ];
+        const H = top + rows.length * RH + 6;
+        const x = (t) => L + (Math.min(t, MAX) / MAX) * (W - L - R);
+        const s = sv("svg", {
+          viewBox: `0 0 ${W} ${H}`,
+          width: "100%",
+          style: "min-width:640px",
+          role: "img",
+          "aria-label": "Timeline of each pipeline: when the first draft and the final model are ready",
+        });
+        for (let t = 0; t <= MAX; t += 30) {
+          s.append(sv("line", { x1: x(t), x2: x(t), y1: top - 6, y2: H - 4, stroke: "#e6ddd0" }));
+          s.append(sv("text", { x: x(t), y: 14, "text-anchor": "middle", "font-size": 11, fill: "#5c554c" }, `${t} s`));
+        }
+        rows.forEach((r, i) => {
+          const y = top + i * RH;
+          s.append(sv("text", { x: 6, y: y + 16, "font-size": 12.5, fill: "#1c1916", "font-weight": 650 }, r.name));
+          s.append(sv("text", { x: 6, y: y + 32, "font-size": 11, fill: "#5c554c" }, r.sub));
+          for (const g of r.segs) {
+            if (g.lanes) {
+              const n = g.lanes.length,
+                h = 28 / n;
+              g.lanes.forEach((len, j) =>
+                s.append(
+                  sv("rect", {
+                    x: x(g.a),
+                    y: y + 3 + j * h,
+                    width: Math.max(1, x(g.a + len) - x(g.a)),
+                    height: h - 1,
+                    fill: j === 0 ? "#4f86ad" : "#9bbbd4",
+                  }),
+                ),
+              );
+            } else {
+              s.append(
+                sv("rect", {
+                  x: x(g.a),
+                  y: y + 3,
+                  width: Math.max(1, x(g.b) - x(g.a)),
+                  height: 28,
+                  rx: 3,
+                  fill: g.fill,
+                }),
+              );
+              if (g.label && x(g.b) - x(g.a) > 50)
+                s.append(
+                  sv(
+                    "text",
+                    {
+                      x: (x(g.a) + x(g.b)) / 2,
+                      y: y + 21,
+                      "text-anchor": "middle",
+                      "font-size": 11,
+                      fill: g.fill === "#e0b27a" ? "#1c1916" : "#fff",
+                    },
+                    g.label,
+                  ),
+                );
+            }
+          }
+          const over = r.final > MAX;
+          if (over)
+            s.append(
+              sv(
+                "text",
+                { x: W - R + 6, y: y + 21, "font-size": 12, fill: "#1c1916", "font-weight": 700 },
+                `→ ${Math.round(r.final)} s`,
+              ),
+            );
+          if (r.look < r.final && r.look <= MAX)
+            s.append(
+              sv("text", { x: x(r.look), y: y + 46, "text-anchor": "middle", "font-size": 13, fill: "#1f5f8b" }, "▲"),
+            );
+          if (!over)
+            s.append(
+              sv("circle", { cx: x(r.final), cy: y + 17, r: 6, fill: "#1c1916", stroke: "#fffdf9", "stroke-width": 2 }),
+            );
+        });
+        $("#timeline").replaceChildren(s);
+      }
+
+      colToggles();
+      render();
+      timeline();
+      if (/[?&]open=all\b/.test(location.search)) document.querySelectorAll("details").forEach((d) => (d.open = true));
+    </script>
+  </body>
+</html>
