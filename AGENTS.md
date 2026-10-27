@@ -11,6 +11,7 @@ TypeScript SDK that lets fast, cheap language models write primitive-built, skel
 - Prompt bake-offs (one system prompt + one pitch → one module, as an app runs it) → `bakeoff/README.md`; results on the showcase's `/bakeoff` page, the whole story on `/lab`.
 - "Let's burn some tokens", build time, time to first pixel, or the next experiments → `docs/SPEED.md`: the goal, where a build's minutes go, the zero-token prep and the rated experiment queue. Render quality is Stefan's call from the verdict pages; model judges and your own impressions are not evidence.
 - Bringing the SDK into Nilo (`~/workspace/nilo`), the low-poly generator it would replace, single run vs two-stage there → `docs/NILO.md`.
+- Wrong-way rotations (parts facing, tilting or turning the wrong way; the rotation side quest) → `docs/ROTATION.md`, read whole before starting.
 - Adding, removing or reshaping a helper → `docs/DESIGN.md`: why each helper exists, with the evidence from 100 builds.
 
 ## Conventions

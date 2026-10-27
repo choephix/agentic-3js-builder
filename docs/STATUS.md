@@ -2,6 +2,10 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Rotation side quest, 2026-10-27
+
+Stefan started a side quest on parts that face, tilt or turn the wrong way (wheel stripes, spikes, roofs that come out as a V). Problem, ground rules, hypotheses, a first platform draft and the verbatim record of the conversation that started it: `docs/ROTATION.md`. Research in `docs/research/rotation-*.md`. Nothing built or run yet.
+
 ## Where we stand on speed and quality, 2026-10-27
 
 The goal (`docs/SPEED.md`, "Goal"): a beautiful model from a text prompt as fast as possible, and something good on screen as early as possible, without breaking the bank. Numbers, rounds and readings are in `docs/SPEED.md`; this is the summary.
