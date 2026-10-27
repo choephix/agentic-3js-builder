@@ -20,7 +20,7 @@ TypeScript SDK that lets fast, cheap language models write primitive-built, skel
 - npm, not pnpm.
 - Verify with smoke renders (`npm run snap`); add permanent tests and run test suites only when Stefan asks.
 - Renders use the shared NVIDIA headless Chromium on 127.0.0.1:9333. If `curl -s 127.0.0.1:9333/json/version` answers, use it; otherwise start it with `~/.omp/profiles/nilo/agent/skills/nilo-live-qa/chrome-nvidia.sh --user-data-dir=/tmp/creature-lab-chrome --remote-debugging-port=9333 --headless=new` and check the WebGL renderer reports RTX 3060. Other sessions share it: never stop it or delete its profile, and close only the pages your scripts opened (never `browser.close()`). Long measurement runs use their own port and `--user-data-dir`, stopped and deleted when done.
-- Images for Stefan go under `~/tmp/public/nilo/agentic-3js-builder/`.
+- Images and pages for Stefan go under `~/tmp/public/nilo/agentic-3js-builder/`. That folder is served publicly, live, at `https://axalon.prj.cx/nilo/agentic-3js-builder/` (same paths as `http://axalon:8080/nilo/agentic-3js-builder/`); give Stefan the public link. Anything written there is public: no account emails, tokens or credentials.
 - Text written for models (GUIDE, `docs/api.md`, `docs/conventions.md`, kit docs, briefs): the target and hard requirements, positively phrased; capable models choose their own construction.
 
 ## Commands
