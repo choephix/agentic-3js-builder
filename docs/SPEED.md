@@ -114,12 +114,19 @@ First runs: r33 (readings above). For the next runs Stefan wants low effort befo
 
 - Requests that add parts are append-only and parallelise cleanly: each carries its anchor (a mount or frame on a stage-1 part) and what to build there; its call returns one function; the assembler appends it.
 - Requests that change an existing part (a texture on the cab door) need an edit to stage 1's code, which parallel calls can't make safely. They run as one sequential edit call, or the SDK gets a call that paints an already-built part by name (E6's missing piece), which makes them append-only too.
+- Stefan, 2026-10-27, on delegating stage 2: stage 1 does its best within its output budget and leaves its to-dos explained in the code; stage-2 calls each take a group of them in parallel. Open: how to split the work programmatically. Tag each to-do with a kind (texture, add-part, …) and hand each kind to one call in bulk, or give every to-do its own call; worth testing both. Swapping models and effort per stage is part of the space.
 - Measure: stage 1's time and thinking with the request list against `r32flat` (the list may bring some texture thinking back); stage 2's wall time; whether stage 2's additions land where stage 1 left room (loose parts, envelope). Variant: stage 1 as parallel parts.
 
 **Haiku render loop.** Neither agentic nor a single run. Haiku 5.5 at low effort writes a module; it is rendered to one contact sheet with every view; the next single call gets the sheet (from the second turn on, the before and after sheets) and is told to fix what is wrong and add detail; repeat a fixed number of turns (20), since nothing decides when it is done. Variant: a fix call and an add call per turn, in parallel. The output is a page with a slider over the 20 frames, to see how the model evolved or got worse. In an app each frame replaces the model on screen, so the user watches it build itself. Best case: Sonnet-high quality at the same or lower time and price.
 
 - Mostly existing machinery: `refine` with `--views` sends the renders and takes SEARCH/REPLACE edits (`prompts/refine-critique.md`), so 20 chained `refine` rounds with `--model` Haiku are the driver. New: the before/after pair in the prompt, the slider page, and the fix/add pair (two edits from one base can collide; alternating fix and add turns avoids that).
 - Starting facts: Haiku streams ~210 tok/s. Haiku-100 (agentic, high effort) made complete but simpler builds, about half Sonnet's parts and triangles. Sonnet critique turns improved their input in phase 1, but by model judges, so that is unconfirmed.
+- **Verdict (Stefan, 2026-10-27): parked; not worth it as run in r33.** The final frames do look better than frame 0, but not enough to justify the ~200 s of turns, and frame 0 itself took ~100 s, so the first look was no faster. The result stays far from Sonnet's builds: the turns mostly move small pieces around. The progression itself could be good to watch in an app as the model morphs into a more detailed version of itself, so the idea stays on the list.
+- If it is picked up again:
+  - Start from Sonnet low in flat colour (the current favourite) or a two-stage first look (~21–24 s), so Haiku only runs the turns.
+  - A turn prompt that asks for bold improvement, structural changes included, while watching for parts that look wrong, instead of nudging small pieces.
+  - Run Haiku on the flat-colour, geometry-only variant too: flat colour improved Sonnet's geometry, and may do the same for Haiku.
+  - Give the views as separate images instead of one collage. r33 sent one 3×3 contact sheet per frame (`scripts/render-loop.ts`), so each view reached the model at roughly a third of the sheet's width.
 
 ## Zero-token prep (do before the next burn)
 

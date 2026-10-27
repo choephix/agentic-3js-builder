@@ -18,6 +18,8 @@ r32 tested four ideas at medium, each against a same-batch craft3 control: "deci
 
 r33 ran four follow-ups side by side, each with same-batch controls, low then medium (readings in `docs/SPEED.md`). Parallel parts in flat colour: 49 s at low (flat 24 s), 79 s at medium (par 123 s, craft3 160 s, flat 66 s), ~3× flat's triangles, 0 textures. Even work + a box check: the check fixes fit (parts outside their box 5–6 → 0) for ~20 s, but the even plan makes the heaviest part longer, so it's slower than plain par. Two-stage with requests: first pixel 58 s, final 79 s at medium (craft3 171 s, flat 63 s) with ~2× the triangles; at low 21 s / 38 s; writing the request list doesn't add thinking. Haiku render loop: 20 fix/add turns from a Haiku-low frame 0 take ~4–5.5 min and $0.3 per loop, a new frame every ~10 s. Looks are Stefan's call from the r33 sheets and the slider page.
 
+Haiku render loop: parked (Stefan, 2026-10-27). Not worth its time as run in r33: frame 0 took ~100 s and the 20 turns mostly move small pieces. Ideas for a retry (Sonnet-low flat base, a bolder turn prompt, separate view images) are under "Routes to explore" in `docs/SPEED.md`.
+
 ## r25fable: Fable 5.1 single-runs at low, 2026-10-25
 
 Five r24 briefs (ramen stall, mimic chest, alebrije, zeppelin, tin robot), one request each, run one at a time, `craft3` arm, low effort, through `npm run bakeoff -- run r25fable --model anthropic/claude-fable-5-1`. Medians 6.9 min, 28.9k output tokens, 22.8 KB, $1.47 (total $8.06); Sonnet at high on the same briefs: 7.4 min, $0.74. All 5 render; one type error. Routed to stefan@revoltage.io (Fable meter 28 → 30). Numbers and readings in `docs/SPEED.md`.
