@@ -8,7 +8,7 @@
 // ~/tmp/public/nilo/agentic-3js-builder/sheets/<first-slug>-<view>.jpg).
 //
 // Layout. The slug and view caption the harness burns into each shot are cut off. A bake-off build's tile is labelled
-// `model · effort` over `model time · output tokens · price` (time, tokens and price summed over its repair chain;
+// `model · effort` over `model time · output tokens · tok/s · price` (summed over its repair chain;
 // `≈$` marks a price worked out from list prices because the run recorded none), with its triangle count small in the
 // shot's bottom-right corner; anything else is labelled `slug · tag`. The title is --title in large type, then in
 // smaller type the models compared with the arm and effort they share, and the brief when all tiles share one.
@@ -182,6 +182,8 @@ const labels = builds.map((b, i) => {
   const facts = [
     duration(b.wallMs) + (b.repairs ? ` (${b.repairs} repair${b.repairs > 1 ? "s" : ""})` : ""),
     `${thousands(b.tokens)} tokens`,
+    // Output tokens over model time: streaming speed, with time to first token folded in.
+    `${Math.round(b.tokens / (b.wallMs / 1000))} tok/s`,
     `${b.estimated ? "≈" : ""}$${price}`,
   ];
   return [head.filter(Boolean).join(" · "), armLine, facts.join(" · ")].filter(Boolean).join("\n");
