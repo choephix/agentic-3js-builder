@@ -719,7 +719,8 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
           <p class="narrow">
             Each row is one brief. Dashed tiles are first drafts: what the user sees while the rest of the pipeline
             runs. The time under each tile is when that build was ready. Click any tile to see every angle and how the
-            time was spent. Each pipeline renders with its own viewer, so backgrounds and lighting differ.
+            time was spent. Each pipeline renders with its own viewer, so backgrounds and lighting differ. Low-poly's
+            first-round draft is hidden by default; switch it on with "Nilo today: first draft" below.
           </p>
           <div class="toolbar" role="toolbar" aria-label="Columns">
             <span class="lbl">Show:</span>
@@ -1148,13 +1149,13 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
         two: "Sonnet 5.5, medium",
         high: "Sonnet 5.5, high, textures",
       };
-      const shown = new Set(DATA.cols.map((c) => c[0]));
+      const shown = new Set(DATA.cols.map((c) => c[0]).filter((k) => k !== "lpDraft"));
       let cat = "All";
 
       function colToggles() {
         const box = $("#colToggles");
         for (const [k, a, b] of DATA.cols) {
-          const btn = el("button", { type: "button", "aria-pressed": "true", text: `${a}: ${b}` });
+          const btn = el("button", { type: "button", "aria-pressed": String(shown.has(k)), text: `${a}: ${b}` });
           btn.onclick = () => {
             if (shown.has(k) && shown.size > 1) shown.delete(k);
             else shown.add(k);
