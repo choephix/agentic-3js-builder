@@ -20,44 +20,47 @@ Estimate: billed completion tokens minus code chars ÷ 2.8 minus prose chars ÷ 
 
 What the past rounds say about the dials (medians; crash = failed first render, repair outcomes noted below):
 
-| Round       | Effort / prompt                             |                  Out tokens |                      Module |                                    Wall |                 Crash |                  Cost |
-| ----------- | ------------------------------------------- | --------------------------: | --------------------------: | --------------------------------------: | --------------------: | --------------------: |
-| r24         | high, craft3 + kits                         |                       63.8k |                     24.5 KB |                                 8.1 min |                 8/123 |                 $0.69 |
-| r24max      | max                                         |                        128k |                        none |                                  16 min |         10/10 no code |                 $1.29 |
-| r24opus     | Opus high                                   |                       84.3k |                       33 KB |                                13.4 min |                  1/10 |                 $2.02 |
-| r25fable    | Fable 5.1 low, 5 r24 briefs                 |                       28.9k |                     22.8 KB |                                 6.9 min |            0/5 (1 TS) |                 $1.47 |
-| r26         | low, craft3, 5 vehicle pitches              |                        3.7k |                        6 KB |                                    25 s |                   1/5 |                 $0.21 |
-| r26 sampler | low, craft3 + `catalogs/` + sampler.md      |                       11.4k |                       11 KB |                                    75 s |                   0/5 |                 $0.46 |
-| r27/r28     | low, craft3, 2 more draws (n = 15)          |                        3.5k |                      5.7 KB |                                    24 s |                  2/15 |                 $0.05 |
-| sampler2    | samplers as inspiration only                |                       10.7k |                     12.5 KB |                                    71 s |                  0/10 |                 $0.31 |
-| …nomat      | sampler2 without `materials2077.ts`         |                        4.9k |                      7.9 KB |                                    32 s |                  2/10 |                 $0.38 |
-| r30 …nomat  | high, same sampler2 without materials, n=10 |                       68.2k |                     30.1 KB |                                 8.4 min |                  2/10 |                 $1.01 |
-| samplermenu | only each sampler's header menu             |                        4.0k |                      6.5 KB |                                    26 s |                  1/10 |                 $0.23 |
-| r29 detail  | craft3 + `detail.md`, no samplers, n=20     |                       13.0k |                     10.9 KB |                                    95 s |                  2/20 |                 $0.31 |
-| detail4     | detail + 4 samplers + `sampler4.md`         |                        9.0k |                     11.1 KB |                                    61 s |                  5/20 |                 $0.40 |
-| r31m A      | medium, craft3, one batch with C/E/F, n=10  |                       19.8k |                     13.6 KB |                                   154 s |                  1/10 |                 $0.21 |
-| r31m C      | medium, + 4 samplers (`sampler2nomat`)      |                       21.2k |                     15.9 KB |                                   154 s |                  2/10 |                 $0.23 |
-| r31m E      | medium, + `detail.md`                       |                       23.5k |                     16.9 KB |                                   177 s |                  1/10 |                 $0.24 |
-| r31m F      | medium, + `detail.md` + 4 samplers          |                       27.2k |                     19.9 KB |                                   202 s |                  0/10 |                 $0.29 |
-| r32e9       | medium, craft3 + `decide.md` (E9)           |                       20.8k |                     14.1 KB |                                   158 s |                  3/10 |                 $0.22 |
-| r32plan     | medium, craft3 + `buildsheet.md` (E4)       |                       19.8k |                     14.0 KB |                                   153 s |                  1/10 |                 $0.21 |
-| r32flat     | medium, flat colours, no texture asks       |                       11.8k |                      9.3 KB |                                    89 s |                  0/10 |                 $0.13 |
-| r32par      | medium, plan + 5 parts in parallel          |                       28.4k |                     38.6 KB |                                    71 s |                  4/10 |                 $0.38 |
-| r33pf       | low, parflat (par on flat prompts)          |                       16.2k |                     23.7 KB |                                    49 s |                  2/10 |                 $0.21 |
-| r33pfm      | medium, parflat                             |                       25.2k |                     30.7 KB |                                    79 s |    3/9 (+1 no module) |                 $0.30 |
-| r33cohm     | medium, parfit (even plan + box check)      |                       48.0k |                     54.0 KB |                                   133 s |                  2/10 |                 $0.61 |
-| r33two      | low, two-stage final (stage 1 21 s)         |                       15.1k |                     23.4 KB |                                    38 s |                  3/10 |                 $0.22 |
-| r33twom     | medium, two-stage final (stage 1 58 s)      |                       24.2k |                     33.1 KB |                                    79 s |                  1/10 |                 $0.31 |
-| r33hl loop  | Haiku low, frame 0 + 20 fix/add turns       |                    ~50k sum |                    17–20 KB | 224–242 s model, 300–331 s with renders |            0/40 turns |            $0.15–0.17 |
-| r34dt A     | low, craft3, 20 r24 briefs × 2 draws        |                        4.6k |                      7.1 KB |                                    29 s |                 10/40 |                 $0.09 |
-| r34dt D     | low, craft3 + SDK type declarations         |                        4.0k |                      6.8 KB |                                    26 s |                  6/40 |                 $0.06 |
-| r35 Sonnet  | craft3 low / medium / high, 20 r24 briefs   |        4.5k / 22.6k / 65.6k |        7.3 / 13.7 / 24.9 KB |                    33 s / 171 s / 502 s |       4 / 1 / 1 of 20 | $0.07 / $0.22 / $0.64 |
-| r35 Terra   | GPT-6.1 Terra, same, + xhigh                | 4.3k / 6.5k / 17.0k / 31.0k | 9.8 / 12.3 / 22.8 / 26.9 KB |            74 s / 115 s / 298 s / 548 s | 11 / 8 / 14 / 8 of 20 |             Codex sub |
-| r20medcraft | medium                                      |                       43.2k |                     20.5 KB |                                 5.5 min |                  1/28 |                 $0.66 |
-| r20lowcraft | low                                         |                       32.0k |                     15.8 KB |                                 4.1 min |                  2/28 |                 $0.49 |
-| r22lean     | low, game-asset brief, no rig               |                       17.6k |                     11.5 KB |                                 2.4 min |                  2/25 |                 $0.26 |
-| r22nothink  | "thinking off" (see gateway note), low      |                       14.0k |                     24.3 KB |                             **1.5 min** |             **14/25** |                 $0.25 |
-| r2          | medium, the early docs-only prompt          |                        7.6k |                      6.6 KB |                                 0.9 min |                 9/280 |                 $0.09 |
+| Round       | Effort / prompt                              |                  Out tokens |                      Module |                                    Wall |                 Crash |                  Cost |
+| ----------- | -------------------------------------------- | --------------------------: | --------------------------: | --------------------------------------: | --------------------: | --------------------: |
+| r24         | high, craft3 + kits                          |                       63.8k |                     24.5 KB |                                 8.1 min |                 8/123 |                 $0.69 |
+| r24max      | max                                          |                        128k |                        none |                                  16 min |         10/10 no code |                 $1.29 |
+| r24opus     | Opus high                                    |                       84.3k |                       33 KB |                                13.4 min |                  1/10 |                 $2.02 |
+| r25fable    | Fable 5.1 low, 5 r24 briefs                  |                       28.9k |                     22.8 KB |                                 6.9 min |            0/5 (1 TS) |                 $1.47 |
+| r26         | low, craft3, 5 vehicle pitches               |                        3.7k |                        6 KB |                                    25 s |                   1/5 |                 $0.21 |
+| r26 sampler | low, craft3 + `catalogs/` + sampler.md       |                       11.4k |                       11 KB |                                    75 s |                   0/5 |                 $0.46 |
+| r27/r28     | low, craft3, 2 more draws (n = 15)           |                        3.5k |                      5.7 KB |                                    24 s |                  2/15 |                 $0.05 |
+| sampler2    | samplers as inspiration only                 |                       10.7k |                     12.5 KB |                                    71 s |                  0/10 |                 $0.31 |
+| …nomat      | sampler2 without `materials2077.ts`          |                        4.9k |                      7.9 KB |                                    32 s |                  2/10 |                 $0.38 |
+| r30 …nomat  | high, same sampler2 without materials, n=10  |                       68.2k |                     30.1 KB |                                 8.4 min |                  2/10 |                 $1.01 |
+| samplermenu | only each sampler's header menu              |                        4.0k |                      6.5 KB |                                    26 s |                  1/10 |                 $0.23 |
+| r29 detail  | craft3 + `detail.md`, no samplers, n=20      |                       13.0k |                     10.9 KB |                                    95 s |                  2/20 |                 $0.31 |
+| detail4     | detail + 4 samplers + `sampler4.md`          |                        9.0k |                     11.1 KB |                                    61 s |                  5/20 |                 $0.40 |
+| r31m A      | medium, craft3, one batch with C/E/F, n=10   |                       19.8k |                     13.6 KB |                                   154 s |                  1/10 |                 $0.21 |
+| r31m C      | medium, + 4 samplers (`sampler2nomat`)       |                       21.2k |                     15.9 KB |                                   154 s |                  2/10 |                 $0.23 |
+| r31m E      | medium, + `detail.md`                        |                       23.5k |                     16.9 KB |                                   177 s |                  1/10 |                 $0.24 |
+| r31m F      | medium, + `detail.md` + 4 samplers           |                       27.2k |                     19.9 KB |                                   202 s |                  0/10 |                 $0.29 |
+| r32e9       | medium, craft3 + `decide.md` (E9)            |                       20.8k |                     14.1 KB |                                   158 s |                  3/10 |                 $0.22 |
+| r32plan     | medium, craft3 + `buildsheet.md` (E4)        |                       19.8k |                     14.0 KB |                                   153 s |                  1/10 |                 $0.21 |
+| r32flat     | medium, flat colours, no texture asks        |                       11.8k |                      9.3 KB |                                    89 s |                  0/10 |                 $0.13 |
+| r32par      | medium, plan + 5 parts in parallel           |                       28.4k |                     38.6 KB |                                    71 s |                  4/10 |                 $0.38 |
+| r33pf       | low, parflat (par on flat prompts)           |                       16.2k |                     23.7 KB |                                    49 s |                  2/10 |                 $0.21 |
+| r33pfm      | medium, parflat                              |                       25.2k |                     30.7 KB |                                    79 s |    3/9 (+1 no module) |                 $0.30 |
+| r33cohm     | medium, parfit (even plan + box check)       |                       48.0k |                     54.0 KB |                                   133 s |                  2/10 |                 $0.61 |
+| r33two      | low, two-stage final (stage 1 21 s)          |                       15.1k |                     23.4 KB |                                    38 s |                  3/10 |                 $0.22 |
+| r33twom     | medium, two-stage final (stage 1 58 s)       |                       24.2k |                     33.1 KB |                                    79 s |                  1/10 |                 $0.31 |
+| r33hl loop  | Haiku low, frame 0 + 20 fix/add turns        |                    ~50k sum |                    17–20 KB | 224–242 s model, 300–331 s with renders |            0/40 turns |            $0.15–0.17 |
+| r34dt A     | low, craft3, 20 r24 briefs × 2 draws         |                        4.6k |                      7.1 KB |                                    29 s |                 10/40 |                 $0.09 |
+| r34dt D     | low, craft3 + SDK type declarations          |                        4.0k |                      6.8 KB |                                    26 s |                  6/40 |                 $0.06 |
+| r35 Sonnet  | craft3 low / medium / high, 20 r24 briefs    |        4.5k / 22.6k / 65.6k |        7.3 / 13.7 / 24.9 KB |                    33 s / 171 s / 502 s |       4 / 1 / 1 of 20 | $0.07 / $0.22 / $0.64 |
+| r35 Terra   | GPT-6.1 Terra, same, + xhigh                 | 4.3k / 6.5k / 17.0k / 31.0k | 9.8 / 12.3 / 22.8 / 26.9 KB |            74 s / 115 s / 298 s / 548 s | 11 / 8 / 14 / 8 of 20 |             Codex sub |
+| r37 Sol     | GPT-6.1 Sol, craft3 low / medium, same 20    |                 4.0k / 6.5k |               9.7 / 13.8 KB |                 123 s / 202 s (batched) |          8 / 13 of 20 |             Codex sub |
+| r37 Astra   | GPT-6 Astra, same                            |                 4.2k / 6.4k |               9.3 / 13.1 KB |                 132 s / 191 s (batched) |          7 / 12 of 20 |             Codex sub |
+| r37 Terra   | GPT-6.1 Terra, same (rerun in the r37 batch) |                 4.7k / 6.6k |               9.9 / 13.5 KB |                 123 s / 173 s (batched) |           7 / 9 of 20 |             Codex sub |
+| r20medcraft | medium                                       |                       43.2k |                     20.5 KB |                                 5.5 min |                  1/28 |                 $0.66 |
+| r20lowcraft | low                                          |                       32.0k |                     15.8 KB |                                 4.1 min |                  2/28 |                 $0.49 |
+| r22lean     | low, game-asset brief, no rig                |                       17.6k |                     11.5 KB |                                 2.4 min |                  2/25 |                 $0.26 |
+| r22nothink  | "thinking off" (see gateway note), low       |                       14.0k |                     24.3 KB |                             **1.5 min** |             **14/25** |                 $0.25 |
+| r2          | medium, the early docs-only prompt           |                        7.6k |                      6.6 KB |                                 0.9 min |                 9/280 |                 $0.09 |
 
 Readings:
 
@@ -97,6 +100,12 @@ Readings:
   - **Two-stage doesn't carry over to Terra:** stage 1 renders 13/20 at medium and 17/20 at high, but the merged final renders 2/20 and 7/20 (type errors in 19/20), against Sonnet's 16/20.
   - Codex meter 11% → 16% for ~460 Terra calls including repairs; Sonnet ~$33 at list prices, marcellus 7d 22% → 25%.
   - Looks are Stefan's call on the page; no verdicts yet. A forgiving `chain.tip` (falling back to the last span joint) would remove Terra's main crash; an API decision (P6).
+
+- **GPT models on the current SDK (r37, 2026-10-27; `r37ol/om/al/am/tl/tm`, repairs `<round>fix`, launcher and stats in `scratch/r37/`).** GPT-6.1 Sol, GPT-6 Astra and GPT-6.1 Terra, the 20 r35 briefs, craft3 and flat (`arms-r33two.json`), low and medium, one draw, all 240 builds in one batch (six runners × concurrency 10), then one low `refine --repair-only --types` with the build's own model. Codex 7-day meter 23% → 28%.
+  - **The three models behave alike.** Exact reasoning 0.2–0.4k tokens at low and ~0.9k at medium, 4–7k output tokens, 9–15 KB modules. Sol and Astra are no better than Terra: first-render crashes 7–13 of 20 per arm (Sonnet in r35: 1–4), type errors in 10–15 of 20, renders after one repair 8–17 of 20, type-clean after it 8–14 of 20 (Sonnet: 20/20).
+  - **Wall times are inflated by the batch:** ~30–35 output tokens/s for every model against Terra's 55/s alone in r35 (r37 Terra low 123 s vs r35's 74 s), so compare models within r37 only. Within it, none is faster than another by more than ~15%.
+  - **Flat saves no time on GPT models**, unlike Sonnet (−39% at medium, r32flat): they hardly think, so there is no texture thinking to cut. Flat does build more geometry: median triangles 4.9k vs 3.2k (Sol low), 6.1k vs 4.2k (Sol medium), 6.8k vs 4.7k (Astra medium), 7.5k vs 4.0k (Terra medium).
+  - This is the control for the "an SDK in GPT's own idiom" route below: on Claude's SDK, Sol and Astra fail as often as Terra.
 
 ## Stefan's hypotheses, answered
 
