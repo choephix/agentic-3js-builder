@@ -2,7 +2,7 @@
 
 Parts that face, tilt or turn the wrong way in model-built three.js. Stefan made this an official side quest on 2026-10-27. This file is where it starts and where its state lives. Read it whole before doing anything.
 
-The record at the bottom has every message of the conversation that started the quest, word for word: Stefan's (S1–S5) and Claude Opus 5.5's answers (C1–C4). The sections above cite them, and quote rather than paraphrase where the wording matters. When a section and the record disagree, the record is what was said; the section is the current reading.
+The record at the bottom has every message of the conversation that started the quest, word for word: Stefan's (S1–S7) and Claude Opus 5.5's answers (C1–C6). The sections above cite them, and quote rather than paraphrase where the wording matters. When a section and the record disagree, the record is what was said; the section is the current reading.
 
 Full web research, with links: `research/rotation-papers.md` (studies and benchmarks), `research/rotation-practice.md` (how tools and agent skills handle orientation), `research/rotation-conventions.md` (conventions per tool, from official docs).
 
@@ -24,6 +24,7 @@ From S4:
 - **Prompt first, other ideas welcome.** S4: "Mostly I assume by fiddling with the instruction prompt but if we come to a different idea then we should be able to apply that as well." SDK changes are such an idea; an API change is Stefan's call before it lands in `src/`.
 - **Reason as a member of the group.** S3: "don't guess what models will do as a third party, based on your internet knowledge, cutoff, and shit like that. Rather understand that you are in fact part of this group." Hypotheses come from your own habits as a model writing this code (C3 is the first round of that), and the runs decide.
 - **Measure, don't judge.** Whether a part points the right way is a fact a script can compute from the built scene, so scores here are mechanical. How a build looks overall stays Stefan's call (`AGENTS.md`).
+- **Stefan picks the models, and whether plain three.js runs, every round.** S7: "I should be asked every time because I'm going to make that decision depending on how much quota I have from any given provider." And: "I will specify which models I want to check as we go. I definitely don't want to automatically drain my usage with a given provider because I'm silently, while I'm trying to gauge another provider." Before each round, ask which models, which efforts and whether the plain three.js arm runs; run only what he names.
 - **Writing this file.** S5: Stefan's messages and the answers he got stay findable as they were said. Quote them; add new exchanges to the record when they shape the quest.
 
 ## The problem
@@ -101,32 +102,35 @@ From the three research files; details and links there.
 
 Causes proposed so far, each with what it predicts. None is tested yet.
 
-| ID  | Cause                                                                                                                                                                                                         | Source       | Predicts                                                                                                                                   |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| H1  | **Two pictures.** Position and orientation come from two different mental pictures (clock face vs maths graph) and nothing checks they agree.                                                                 | C3, truck    | Drifting errors on rings and anything placed by angle; they vanish when the direction is taken from the same vector as the position.       |
-| H2  | **Side and top views.** The front view (XY, turning about Z) matches school maths. Side (YZ, about X) and top (XZ, about Y) views are pictured from a side the model never chose, so the sign is a coin flip. | C3           | Errors cluster on X and Y rotations; a gable roof with its ridge along X (slopes turn about X) fails more than one with its ridge along Z. |
-| H3  | **Mirrored Euler pairs.** Mirroring across x = 0 flips the Y and Z angles but not X; the model flips all or none.                                                                                             | C3           | Mirrored pairs fail when their tilt has an X component; pairs given as directions (flip x, like positions) don't.                          |
-| H4  | **Three.js habit.** `mesh.rotation.x = …` is the most common three.js idiom and wins over `dir` even when `dir` is offered.                                                                                   | C3, counts   | Removing `rotation` from `b.part` moves some rotations to `part.mesh.rotation` instead of to `dir`.                                        |
-| H5  | **No doubt signal.** The wrong formula doesn't feel wrong, so a warning never fires at the moment it applies.                                                                                                 | C3           | A stern-warning arm scores like the baseline.                                                                                              |
-| H6  | **Convention mix.** Training material mixes three.js, Blender, Unity and CSS conventions.                                                                                                                     | C1, research | If this were the main cause, stating "three.js, right-handed, Y-up" would help. C3 expects it not to ("The truck code knew").              |
-| H7  | **Effort.** At low effort the model writes the formula without the one-value check ("at a = 0 the item sits at the top; does your rotation point it up?").                                                    | C3           | Error rate falls with effort, and a prompt that asks for the one-value check helps more at low effort than at high.                        |
+| ID  | Cause                                                                                                                                                                                                                                                                   | Source       | Predicts                                                                                                                                                               |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H1  | **Two pictures.** Position and orientation come from two different mental pictures (clock face vs maths graph) and nothing checks they agree.                                                                                                                           | C3, truck    | Drifting errors on rings and anything placed by angle; they vanish when the direction is taken from the same vector as the position.                                   |
+| H2  | **Side and top views.** The front view (XY, turning about Z) matches school maths. Side (YZ, about X) and top (XZ, about Y) views are pictured from a side the model never chose, so the sign is a coin flip.                                                           | C3           | Errors cluster on X and Y rotations; a gable roof with its ridge along X (slopes turn about X) fails more than one with its ridge along Z.                             |
+| H3  | **Mirrored Euler pairs.** Mirroring across x = 0 flips the Y and Z angles but not X; the model flips all or none.                                                                                                                                                       | C3           | Mirrored pairs fail when their tilt has an X component; pairs given as directions (flip x, like positions) don't.                                                      |
+| H4  | **Three.js habit.** `mesh.rotation.x = …` is the most common three.js idiom and wins over `dir` even when `dir` is offered.                                                                                                                                             | C3, counts   | Removing `rotation` from `b.part` moves some rotations to `part.mesh.rotation` instead of to `dir`.                                                                    |
+| H5  | **No doubt signal.** The wrong formula doesn't feel wrong, so a warning never fires at the moment it applies.                                                                                                                                                           | C3           | A stern-warning arm scores like the baseline.                                                                                                                          |
+| H6  | **Convention mix.** Training material mixes three.js, Blender, Unity and CSS conventions.                                                                                                                                                                               | C1, research | If this were the main cause, stating "three.js, right-handed, Y-up" would help. C3 expects it not to ("The truck code knew").                                          |
+| H7  | **Effort.** At low effort the model writes the formula without the one-value check ("at a = 0 the item sits at the top; does your rotation point it up?").                                                                                                              | C3           | Error rate falls with effort, and a prompt that asks for the one-value check helps more at low effort than at high.                                                    |
+| H8  | **Path of least resistance (the cost side of F6).** A model builds what is easy to express. Without angles, tilts need trig and an `up`, random orientations need a random direction and up, so the model tilts fewer parts and spends more tokens on the ones it does. | C6           | Removal arms write more output tokens per tilted part, have fewer tilted (non-axis-aligned) parts, and move some angles to `part.mesh.rotation` (radians), as H4 says. |
 
 ## Fix ideas to test
 
 Each idea is an arm; most are prompt files, two touch the SDK. C3 ranked what would help Claude itself, best first: directions or points instead of angles; worked examples of the risky patterns; the exact rule plus a one-value check; knowing it's three.js; a stern warning. That ranking is introspection, and the runs decide.
 
-| ID  | Idea                                                                                                                                                                 | Kind   | Tests   |
-| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ------- |
-| F0  | Baseline: the current `craft3` prompt with the SDK; plus plain three.js (`prompts/contract-plain.md`), since S1 says the error shows "with and without our SDK kit". | arm    | control |
-| F1  | One statement of the frame: three.js, right-handed, +Y up, model faces +Z, left is +X.                                                                               | prompt | H6      |
-| F2  | A stern warning about rotation.                                                                                                                                      | prompt | H5      |
-| F3  | The exact rule (positive X turns +Y toward +Z, Y turns +Z toward +X, Z turns +X toward +Y) plus "check one value" for every computed rotation.                       | prompt | H2, H7  |
-| F4  | Worked examples of the risky patterns built with `dir`, `ring` and points: a ring of pointing items, a gable roof, a mirrored pair.                                  | prompt | H1, H3  |
-| F5  | "Orient with `dir`/`aim`/`ring`, build slants from points, take a ring item's direction from the same numbers as its position", without examples.                    | prompt | H1      |
-| F6  | API: `rotation` removed from `b.part`, with a runtime error that names `dir` (today an unknown option is ignored silently, so the part would sit unrotated).         | SDK    | H4      |
-| F7  | Semantic helpers (for example a facing word such as "out" or "forward", a roof from its ridge and eaves); open for new ideas.                                        | SDK    | H1, H2  |
+| ID  | Idea                                                                                                                                                                                                                                                                                                                            | Kind   | Tests      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------- |
+| F0  | Baseline: the current `craft3` prompt with the SDK; plus plain three.js (`prompts/contract-plain.md`), since S1 says the error shows "with and without our SDK kit".                                                                                                                                                            | arm    | control    |
+| F1  | One statement of the frame: three.js, right-handed, +Y up, model faces +Z, left is +X.                                                                                                                                                                                                                                          | prompt | H6         |
+| F2  | A stern warning about rotation.                                                                                                                                                                                                                                                                                                 | prompt | H5         |
+| F3  | The exact rule (positive X turns +Y toward +Z, Y turns +Z toward +X, Z turns +X toward +Y) plus "check one value" for every computed rotation.                                                                                                                                                                                  | prompt | H2, H7     |
+| F4  | Worked examples of the risky patterns built with `dir`, `ring` and points: a ring of pointing items, a gable roof, a mirrored pair.                                                                                                                                                                                             | prompt | H1, H3     |
+| F5  | "Orient with `dir`/`aim`/`ring`, build slants from points, take a ring item's direction from the same numbers as its position", without examples.                                                                                                                                                                               | prompt | H1         |
+| F6a | `rotation` absent from the docs only: a copy of `docs/api.md` without it, the SDK unchanged. Counts how many builds write `rotation:` anyway.                                                                                                                                                                                   | prompt | H4, H8     |
+| F6b | `rotation` removed from `b.part` in an SDK copy, and a leftover `rotation:` throws an error that names `dir` (a crash in a single run).                                                                                                                                                                                         | SDK    | H4, H8     |
+| F6c | As F6b, but a leftover `rotation:` is ignored, as unknown options are today (the part sits unrotated).                                                                                                                                                                                                                          | SDK    | H4, H8     |
+| F7  | Semantic helpers. First candidate (C6): `tilt: { toward: [0, 0, 1], deg: 30 }`, "lean the part's top toward the front by 30°", which separates the sign (a direction) from the amount (an unsigned angle) and keeps plain and random angles. Others: a facing word such as "out" or "forward", a roof from its ridge and eaves. | SDK    | H1, H2, H8 |
 
-Combinations (F4 + F6 above all, per C3: "The API change takes away the habit; the examples give the right pattern to copy in its place") and effort levels come after the single arms.
+Combinations (F4 + F6 above all, per C3: "The API change takes away the habit; the examples give the right pattern to copy in its place") and effort levels come after the single arms. The API change is tested both ways (S7: "isn't that the kind of thing that we want to experiment with one way and then the other as well?"): every F6 and F7 arm runs against the baseline that keeps `rotation`, and is measured on its costs (H8) as well as its orientation scores.
 
 ## Platform: first draft
 
@@ -146,23 +150,32 @@ A starting point; the session that builds it owns the design.
 - spikes along curves and bodies: a stegosaurus's plates, porcupine quills, a mace;
 - items that must ignore their parent's turn: Ferris-wheel gondolas hanging straight down;
 - compound turns: tilt then yaw, a spiral staircase, a clock tower with four faces, windmill blades with pitch.
+- angle-friendly controls, where angles are harmless, so that removing them shows its cost: a random scatter of rocks or debris, a hat tilted at a jaunty angle, a 45° diamond pattern.
 
 **Scoring principles.**
 
 - Score from world-space geometry after the build, not from the rotation values in the code, so a score holds whatever the model wrote (`dir`, `rotation`, `mesh.rotation`, `geometry.rotateX`).
 - Each scored part has an expected direction (outward from a hub, along a ridge, mirrored from its twin); classify it as right, flipped, mirrored, quarter-turn, drifting or wrong axis (definitions above), with a tolerance.
 - Report per task, per family, per axis and per arm, with crash and missing-part counts kept apart from orientation errors.
+- Measure the costs next to the scores: output tokens, time, module size, part count, crashes, and the number of tilted (non-axis-aligned) parts, a mechanical stand-in for stiff builds. Renders of the nasty pitches go on sheets for Stefan.
 - `npm run preview` already builds a module in the shared Chromium in about a second and writes a parts table (`scripts/preview.ts`, `preview-page`); a scorer can read each named part's world matrix and vertices from there.
 
-**Runs.** The bakeoff tooling fits as it is: pitches in `bakeoff/pitches-*.json`, arms in `bakeoff/arms-*.json` (prompt files through `extra`, a three.js-only arm through `contract-plain.md`), rounds through `npm run bakeoff -- run <round> --model … --effort … --arm-set … --pitches … --subjects …`, typecheck and render through `npm run bakeoff -- check`. `bakeoff/README.md` has the details. Models through the gateway so far: Claude Sonnet, Opus, Haiku and Fable; GPT-6 Astra and GPT-6.1 Sol ran in rounds r1–r4. Sonnet 5.5 at low with the craft3 prompt ran about 26–29 s and $0.06–0.09 per build in r34dt; Opus at high was about 3× Sonnet's cost and Fable 5.1 at low about 2× Sonnet at high (`docs/SPEED.md`).
+**Runs.** The bakeoff tooling fits as it is: pitches in `bakeoff/pitches-*.json`, arms in `bakeoff/arms-*.json` (prompt files through `extra`, a three.js-only arm through `contract-plain.md`), rounds through `npm run bakeoff -- run <round> --model … --effort … --arm-set … --pitches … --subjects …`, typecheck and render through `npm run bakeoff -- check`. `bakeoff/README.md` has the details. Sonnet 5.5 at low with the craft3 prompt ran about 26–29 s and $0.06–0.09 per build in r34dt (`docs/SPEED.md` has the other models).
 
-**Accounts.** Runs use the nilo profile's Anthropic logins. Check `~/.local/bin/omp usage -p anthropic` before a batch: on 2026-10-27 stefan@revoltage.io was at 99% of its 7-day meter and marcellus@nilo.io at 20%.
+**Models.** Stefan names them per round (ground rules). Candidates so far:
 
-## Open questions for Stefan
+- Claude Sonnet 5.5, Opus 5.5 and Haiku 5.5 through the gateway.
+- GPT-6.1 Sol, GPT-6 Astra and GPT-6.1 Terra (Codex subscription). In r37 they crashed on 7–13 of 20 builds with the SDK (Sonnet 1–4 in r35), so crashes may bury their orientation scores in SDK arms.
+- Gemini, which Stefan wants tested (S7: "especially 3.8 Flash but also Argon"). `google-antigravity/gemini-3.8-flash` is in the nilo profile's model list. Gemini 4 Argon ran as `google-antigravity/gemini-4-argon` in r23 (`bakeoff/README.md`) but is missing from the profile's list on 2026-10-27, so check it before a round. Both run on the Antigravity subscription; the list also shows them under `cursor` and `openrouter-curated`, and those routes stay unused (Cursor is never used; OpenRouter only when Stefan names it).
+- Fable is out. S7: "Also just drop Fable from the running. No it is good. So far I haven't seen a reason to use it."
 
-- Whether the plain three.js arm (F0) runs alongside the SDK arms in every round.
-- F6 is an API change: it needs Stefan's go before it lands in `src/`, and it can be tried first on a copy for the experiment.
-- Which models beyond Sonnet: Opus and Fable cost more per build; Haiku and GPT are cheap comparisons.
+**Accounts.** Check the meters of the provider Stefan named before each batch (`~/.local/bin/omp usage -p <provider>`): on 2026-10-27 stefan@revoltage.io was at 99% of its Anthropic 7-day meter and marcellus@nilo.io at 20%.
+
+## Decisions and open questions
+
+- Plain three.js arm: Stefan decides per round (S7).
+- Models and efforts: Stefan names them per round; Fable is out; Gemini 3.8 Flash and Argon are on the list (S7).
+- API change: tested both ways, with its costs measured (S7, C6). Whether it ever lands in `src/` is Stefan's call after the data; the migration work is set aside for now (S7: "Forget the migration work").
 
 ## Record (verbatim)
 
@@ -407,4 +420,144 @@ Any later session reads that file first, so nothing depends on this chat.
 >
 > Also I don't want you to write a transcript of our conversation, right? That doesn't make sense as a handoff, not fully at least. I guess all this is to say, if you're going to err one way or the other, lean toward the latter.
 
-Then: "Write it up." This file is the result.
+Then: "Write it up." The first version of this file was the result; Stefan read its three open questions and asked for more.
+
+### S6, Stefan
+
+> Elaborate on the three questions.
+
+### C5, Claude
+
+Short version, then details on each:
+
+- **Plain three.js:** run it in the baseline round and on the prompt-only fixes, not in every round.
+- **API change:** test it first as a docs-only arm, with no change to `src/`. Removing it for real would break 196 sample files.
+- **Models:** Sonnet low does most of the work. Haiku, Opus, a higher Sonnet effort, GPT and Fable each get a smaller, targeted slice.
+
+#### 1. Should a plain three.js setup run alongside the SDK?
+
+**What it means:** the same tasks, but the model gets a prompt with no SDK at all (`bakeoff/prompts/contract-plain.md`) and writes raw three.js.
+
+**Why it matters:** in S1 you said the error shows up "with and without our SDK kit". A plain setup answers two questions:
+
+- **Does our SDK make the error rarer, or not?** The SDK already offers `dir` and `ring`. Without a plain baseline we can't tell whether they help.
+- **Does a fix work because of the model or because of our API?** If the rule-plus-one-value-check prompt (F3) helps in both setups, it's a fix in how the model writes code. It would then carry over to anything else that has models write three.js, Nilo included.
+
+**What it can and can't test:**
+
+| Fix                                                                 | Works in plain three.js?                                                                                |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| F0–F3 (baseline, "you're in three.js", stern warning, rule + check) | yes, unchanged                                                                                          |
+| F4–F5 (directions and points instead of angles)                     | yes, written with three.js's own tools: `lookAt`, `Quaternion.setFromUnitVectors`, building from points |
+| F6–F7 (SDK changes)                                                 | no, they only exist in our SDK                                                                          |
+
+**Cost:** the plain prompt is much smaller than craft3's ~84k tokens, so each plain build is cheaper. It does double the builds for every fix it runs on.
+
+**My recommendation:** run it in the first baseline round and for the prompt fixes (F0–F5). Leave it out of SDK-only rounds.
+
+#### 2. The API change
+
+**What it means:** F6 removes the `rotation` option from `b.part` (`/home/cx/noodlespace/agentic-3js-builder/src/parts.ts:76,132`). Parts would then be oriented only with `dir`/`aim` (plus `up`), `quat` or `frame`.
+
+**What I found when I checked:**
+
+- **Our prompt hardly teaches `rotation`.** `docs/api.md` mentions it 5 times, `docs/conventions.md` 3 times, and the kits never. Yet 73 of 123 r24 builds used angles. So the habit comes from three.js itself (H4), not from our docs.
+- **Removing it is a big migration.** 196 of the 496 files in `samples/` use `rotation: [`, 867 calls in all, plus 6 catalog files. The repo rule is that a `src/` change fixes every sample it breaks in the same commit.
+- **Angles stay reachable either way.** `part.rotation` and `part.mesh.rotation.x = …` are plain three.js, so the change removes one route, not angles altogether.
+- **Some legitimate uses would go too.** For example, spinning a hex nut 30° about its own axis. `up` can do that, but less directly. Separately, Fable reported a real gap: `part({ frame, rotation })` replaces the frame's orientation instead of adding to it.
+
+**Hard choice: what happens when a model still writes `rotation:` after removal?**
+
+| Behaviour                                                      | Result in a single run                      |
+| -------------------------------------------------------------- | ------------------------------------------- |
+| Throw an error naming `dir`                                    | a crash: nothing on screen                  |
+| Ignore it silently (what happens today with an unknown option) | the part sits unrotated: wrong, but visible |
+
+**Cheapest way to test, with no change to `src/`:** a docs-only arm. It gets a copy of `docs/api.md` with `rotation` removed and the risky patterns shown with `dir` and points (F4 + F5), and the scorer counts how many builds still write `rotation:` anyway. That answers the real question, whether the habit survives when our docs never mention angles, at zero migration cost.
+
+**Your call:**
+
+1. Is the docs-only arm fine as the first test? It touches only a prompt file.
+2. If the data points that way, may the side quest run builds against a modified SDK copy outside `src/`? That needs a little tooling to point imports at the copy. The real `src/` change, with the 196-sample migration, would wait for the results and your decision.
+
+#### 3. Which models
+
+Per-build figures from past rounds:
+
+| Model                       | Cost and time per build                                  | Role in this quest                                                                                                                                                                                                                                |
+| --------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sonnet 5.5 low              | $0.06–0.09, ~30 s (r34dt)                                | **the workhorse.** It's the production target, and cheap enough for hundreds of builds                                                                                                                                                            |
+| Sonnet 5.5 medium / high    | ~$0.21–0.31, ~2.5 min / $0.69, ~8 min                    | the effort axis (H7: does more thinking mean fewer errors?). Used on a subset                                                                                                                                                                     |
+| Haiku 5.5 low               | no single-build cost on record; fastest at ~210 tokens/s | the low end. If a fix lifts Haiku, that's a strong signal                                                                                                                                                                                         |
+| Opus 5.5                    | $1.96, 13 min at high (r24opus); low not yet measured    | your S3 point: is the error tied to model ability? A subset at low and high                                                                                                                                                                       |
+| GPT-6.1 Sol / Astra / Terra | Codex subscription                                       | a different model family, so it tests H6 (the convention mix) properly. But in r37 they crashed on 7–13 of 20 builds with our SDK (Sonnet: 1–4), so their crashes would bury the rotation scores there. Run them in the plain three.js setup only |
+| Fable 5.1                   | $1.47, 6.9 min at low (r25fable)                         | Fable at high, working with renders, still built the bumper ram turned the wrong way. Small subset, only if Opus still makes the error                                                                                                            |
+
+**Account limit:** all Claude runs go through marcellus. revoltage was at 99% of its weekly meter on 2026-10-27. The dollar figures are list prices; the real limit is the subscription meters.
+
+**My recommendation, in phases:**
+
+1. **Sonnet low only, baseline:** find which traps fire, and test the X/Y-axis prediction (H2).
+2. **Fixes:** run them on Sonnet low and Haiku low.
+3. **The best 2–3 fixes** on Sonnet high, a slice of Opus at low and high, and one GPT model in the plain setup.
+4. **Fable** only if the error survives Opus at high.
+
+When you've answered, I'll add your decisions to the open questions in `/home/cx/noodlespace/agentic-3js-builder/docs/ROTATION.md`, word for word, so the new session starts with them.
+
+### S7, Stefan
+
+> > Should a plain three.js setup run alongside the SDK?
+>
+> I should be asked every time because I'm going to make that decision depending on how much quota I have from any given provider.
+>
+> > The API change
+>
+> Forget the migration work. Tell me, what are the serious fallbacks of doing this? Are we limiting the models creatively or forcing them to write more code with this change? I assume the latter means, inherently, the former as well.
+>
+> Also isn't that the kind of thing that we want to experiment with one way and then the other as well?
+>
+> > Which models
+>
+> On models again, I will specify which models I want to check as we go. I definitely don't want to automatically drain my usage with a given provider because I'm silently, while I'm trying to gauge another provider.
+>
+> Also just drop Fable from the running. No it is good. So far I haven't seen a reason to use it.
+>
+> And we want to remember that we also want to test Gemini, especially 3.8 Flash but also Argon, on these as well.
+
+### C6, Claude
+
+**Yes to both: removing `rotation` would limit the models creatively, and the main way it does so is by making some things more code.** Here is what it costs, from my own habits.
+
+#### What gets harder without angles
+
+| What I want                                                                   | With `rotation`        | With `dir` only                                                                        |
+| ----------------------------------------------------------------------------- | ---------------------- | -------------------------------------------------------------------------------------- |
+| Lean a box 30° forward                                                        | `rotation: [30, 0, 0]` | `dir: [0, 0.87, 0.5]`, plus `up` so the box's width stays sideways                     |
+| Spin a hex nut 30° about its own axis                                         | `rotation: [0, 30, 0]` | no direct way: `up` sets the roll, so I'd derive an up vector from the angle with trig |
+| A 45° diamond pattern of tiles                                                | one angle, repeated    | the same trig for every tile                                                           |
+| Scatter rocks at random orientations                                          | three random angles    | a random direction and a random up                                                     |
+| Tilt, then turn (a windmill blade with pitch, a leaning sign on a yawed post) | one triple             | compose two turns into one vector by hand: the arithmetic that fails today, moved      |
+
+#### The serious drawbacks
+
+1. **Roll comes back as `up`.** `dir` says where the part's axis points. For cylinders and spikes that's all there is. For a box, a card or anything with a distinct width, the turn about that axis still matters, and the SDK takes it as an `up` vector. "Lean 30° forward, width sideways" is easy; "spin 30° about your own axis" means deriving `up` from an angle, so the trig and its sign come back by the side door.
+2. **The habit leaks to raw three.js.** `part.mesh.rotation.x = Math.PI / 6` stays available, and I would reach for it. That swaps degrees for radians, a new error class, and the SDK's frame no longer knows the part's orientation.
+3. **Path of least resistance.** A single run has a token budget and, at low effort, little patience. I build what is cheap to express. If every tilt costs a line of trig, I tilt fewer parts: posts stay vertical, signs stay square, debris lies flat. Builds get stiffer. That is the creative limit, and it's the cost I'd expect to see first. It can be counted: the number of parts whose axes aren't aligned with the world's.
+4. **Random and decorative angles are the natural case for angles.** Scatter, jitter, "a hat at a jaunty angle", a diamond pattern: angles are harmless there and the alternative is only more code.
+5. **It may only move the sign problem.** With `dir`, "forward" is a `+z` in the vector, a fact I know, instead of "positive X turns +Y toward +Z", a rule I have to apply. I believe that is one layer less (C3). But for compound turns and for `up`, I'd still be composing by hand, and the sign can go wrong there too.
+
+Where the change still helps: rings and anything placed by angle (the direction comes from the same numbers as the position), mirrored pairs (flip x, like a position), and anything that points at something.
+
+#### Testing it both ways
+
+Yes. Every arm that removes `rotation` runs against the baseline that keeps it, on the same tasks, and both sides are measured: the orientation errors, and the costs above: output tokens, module size, the tilted-part count, how often `mesh.rotation` appears, crashes. The tasks get a few angle-friendly controls (a scatter, a tilted hat, a diamond pattern) so the cost can show. Three removal variants: docs-only (the SDK unchanged; count how many builds write `rotation:` anyway), an SDK copy where a leftover `rotation:` throws an error naming `dir`, and one where it is ignored.
+
+A middle ground to put in the same test (F7): `tilt: { toward: [0, 0, 1], deg: 30 }`, "lean the part's top toward the front by 30°". The sign becomes a direction, the amount an unsigned angle, and plain and random angles stay.
+
+#### Your decisions, recorded
+
+- Which models, which efforts, and whether plain three.js runs: asked before every round, word for word in the ground rules.
+- Fable is out.
+- Gemini 3.8 Flash and Argon are on the list. `google-antigravity/gemini-3.8-flash` is in the nilo profile's model list today; Gemini 4 Argon ran in r23 as `google-antigravity/gemini-4-argon` but isn't in the list on 2026-10-27, so it needs a check before a round.
+
+The document is updated with all of this (hypothesis H8, arms F6a–c and the `tilt` idea under F7, the models list, the decisions) and committed.
