@@ -1,6 +1,19 @@
-# Status, 2026-10-14
+# Status, 2026-10-27
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
+
+## Where we stand on speed and quality, 2026-10-27
+
+The goal (`docs/SPEED.md`, "Goal"): a beautiful model from a text prompt as fast as possible, and something good on screen as early as possible, without breaking the bank. Numbers, rounds and readings are in `docs/SPEED.md`; this is the summary.
+
+- **Effort is the quality dial, and time follows thinking.** Sonnet 5.5 craft3: low ~25–33 s, medium ~2.5–3 min, high ~8.5 min (r30, r35). Stefan: high is night and day better than low; medium sits midway, leaning slightly towards high.
+- **Asking the model to think less does nothing** (decide-don't-draft, a visible build sheet, samplers in context: r26–r32). **Giving it less to do works:** flat colour cuts Sonnet's medium time 37% and thinking 39% (r32flat). **Splitting the work works:** parallel parts halves medium wall time with ~3× the triangles, but parts don't always fit (r32par, r33). **Showing something early works:** two-stage with requests gives a first look in ~21 s at low and ~58 s at medium, and the final in ~38 s and ~79 s (r33).
+- **Crashes are cheap for Sonnet:** one 3–6 s typecheck-gated edit repair fixes nearly all of them.
+- **Measure in one batch:** the same arm can run 2× slower in another batch; compare arms within one round, with medians and ranges. r37 also showed that ~60 concurrent Codex requests slow every GPT model to ~30–35 tokens/s.
+- **Dropped:** samplers / `catalogs/` (for good; kept as a record), the think-less prompts, Fable for 3D. **Parked:** the Haiku render loop (Stefan, 2026-10-27; retry ideas in `docs/SPEED.md`).
+- **GPT models on this SDK** (r35 Terra, r37 Sol/Astra/Terra): they think little, stream slowly, crash on about half of first renders (Sonnet 1–4 of 20), and flat colour saves them no time. 61 of r37's 106 crashes are one `null` joint error (the `chain.tip` guess). Proposed and not started: a GPT-written SDK in a separate repo; setup and Stefan's pending decisions under the "own idiom" route in `docs/SPEED.md`.
+- **Next, not started:** base-first (a bare base call that writes the parts list, then parts in parallel against its code); the box check alone on parflat; parflat as two-stage's stage 1; the forgiving API (P6, starting with a `chain.tip` that never returns null); shipping in Nilo (`docs/NILO.md`, N1–N3). All are in `docs/SPEED.md` under "Routes to explore".
+- **Waiting on Stefan:** looks on the r33 explorer (`r33/explore/`), the r37 page (`r37/`) and the idea map (`map/`), all under `~/tmp/public/nilo/agentic-3js-builder/`; the GPT-SDK decisions.
 
 ## r26: the part-family samplers at low, 2026-10-25
 
