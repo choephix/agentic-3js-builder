@@ -175,14 +175,16 @@ const titleLines = [heading, auto, brief && `Brief: ${brief}`].filter(Boolean);
 
 const labels = builds.map((b, i) => {
   if (!b) return `${args[i].split("@")[0]} · ${tiles[i].tag}`;
-  const head = [nameOf(b.run.model), !effort && b.run.effort, !subject && b.run.subject, !arm && b.armName];
+  const head = [nameOf(b.run.model), !effort && b.run.effort, !subject && b.run.subject];
+  // An arm that differs between tiles gets its own line, cut to what fits a 560 px tile at this type size.
+  const armLine = arm ? "" : b.armName.length > 50 ? `${b.armName.slice(0, 49)}…` : b.armName;
   const price = b.usd < 0.01 ? b.usd.toFixed(3) : b.usd.toFixed(2);
   const facts = [
     duration(b.wallMs) + (b.repairs ? ` (${b.repairs} repair${b.repairs > 1 ? "s" : ""})` : ""),
     `${thousands(b.tokens)} tokens`,
     `${b.estimated ? "≈" : ""}$${price}`,
   ];
-  return `${head.filter(Boolean).join(" · ")}\n${facts.join(" · ")}`;
+  return [head.filter(Boolean).join(" · "), armLine, facts.join(" · ")].filter(Boolean).join("\n");
 });
 
 const target = resolve(out ?? join(SNAPS, "..", "sheets", `${args[0].split("@")[0]}-${view}.jpg`));
