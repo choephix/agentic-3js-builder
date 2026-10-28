@@ -1,4 +1,4 @@
-# Status, 2026-10-27
+# Status, 2026-10-29
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
@@ -9,6 +9,19 @@ Claude calls from `scripts/bakeoff.ts`, `scripts/twostage.ts` and `scripts/rende
 Measured on 2026-10-28: 10,000 requests and 2M output tokens a minute per model, so `--concurrency 30` fits. Cache reads hit on this route (second call on a 25k-token prefix: 25,018 cached); the console's prompt-caching "Set up" card needs nothing.
 
 Credits, from the console on 2026-10-28: about $200 of promotional credits expire 2026-10-30 (UTC), another $200 expire 2026-11-30. Usage paid with those credits counts toward the organization's monthly spend limit ($50 when last checked; resets on the 1st, UTC). Raise it before a burn, or requests stop around $50 and the October grant dies unspent. Do not turn on auto-reload to drain these credits. When the account is refused (spend limit or tier cap, spent credits, a rejected key, a locked Aegis), the runner stops the round with that message and records nothing for the refused builds; fix the cause and rerun to resume.
+
+Spent on the October credits by 2026-10-28 23:42 (sum of `costUsd` over every Claude round since the switch, prices from the catalog, which match the published list; plus ~$0.5 of cache warm-ups): **~$141**, with no refused call, so the spend limit no longer stops at $50. About $59 of the October grant was left for E10 by that count; the console's balance is the authority.
+
+## Burn on the API credits, 2026-10-28
+
+Rounds r40–r44 on Sonnet 5.5 (r41 also Haiku 5.5), every experiment a fixed workflow of single, parallel or staged calls plus one typecheck-gated repair; nothing agentic. Readings in `docs/SPEED.md` ("Burn on the API credits"), reports in `scratch/r40/` … `scratch/r44/`, explainer pages (written before the results) under `burn/` in the public folder.
+
+- **Plan and part effort split (r40):** parflat with a high plan and low parts lands in 127 s against craft3 high's 447 s, for $0.43 vs $0.61. High-effort parts make parflat no faster than craft3 high at 3× the price. Blind page `r40/`.
+- **Base-first (r42):** a renderable base at 13.5 s, final 34.8 s at low, faster than parflat + box check (52.9 s) in 24 of 25 pairs; its parts stray from their boxes more (no box repair).
+- **Blockout + full (r43):** a 15 s, $0.03 blockout matches the medium build's size and placement (bounding-box ratio 1.00); silhouette IoU 0.57.
+- **Whole-module examples (r44):** three topology-matched examples cut low-effort wall time from 63 s to 28 s and thinking to a third in one batch, at 3–4× the price per build (the prompt differs per brief, so it isn't read from cache). Replacing `api.md` with them saves less (54 s).
+- **E1 / E7 / E8 (r41):** one low repair fixes nearly every crash; half the ambition target saves ~10 s; Haiku 5.5 thinks more than Sonnet at low and ends up no faster, at a tenth of the price.
+- Quality is Stefan's call on every page; none has a verdict yet.
 
 ## Rotation side quest, 2026-10-27
 
@@ -25,8 +38,8 @@ The goal (`docs/SPEED.md`, "Goal"): a beautiful model from a text prompt as fast
 - **Accounts:** since 2026-10-27 the nilo omp profile prefers marcellus@nilo.io for Anthropic (`auth.accountPolicies` in `~/.omp/profiles/nilo/agent/config.yml`: marcellus 100, revoltage 0). A running session keeps the account it started on.
 - **Dropped:** samplers / `catalogs/` (for good; kept as a record), the think-less prompts, Fable for 3D. **Parked:** the Haiku render loop (Stefan, 2026-10-27; retry ideas in `docs/SPEED.md`).
 - **GPT models on this SDK** (r35 Terra, r37 Sol/Astra/Terra): they think little, stream slowly, crash on about half of first renders (Sonnet 1–4 of 20), and flat colour saves them no time. 61 of r37's 106 crashes are one `null` joint error (the `chain.tip` guess). Proposed and not started: a GPT-written SDK in a separate repo; setup and Stefan's pending decisions under the "own idiom" route in `docs/SPEED.md`.
-- **Next, not started:** base-first (a bare base call that writes the parts list, then parts in parallel against its code); the box check alone on parflat; parflat as two-stage's stage 1; the forgiving API (P6, starting with a `chain.tip` that never returns null); shipping in Nilo (`docs/NILO.md`, N1–N3). All are in `docs/SPEED.md` under "Routes to explore".
-- **Waiting on Stefan:** looks on the r33 explorer (`r33/explore/`), the r35 page (`r35/`, blind picks; they are saved only in the browser that made them), the r37 page (`r37/`) and the idea map (`map/`), all under `~/tmp/public/nilo/agentic-3js-builder/`; the GPT-SDK decisions. No session transcript records a verdict on any of them as of 2026-10-27.
+- **Next, not started:** parflat as two-stage's stage 1; examples after a shared cached prefix (r44's cost); the forgiving API (P6, starting with a `chain.tip` that never returns null); shipping in Nilo (`docs/NILO.md`, N1–N3); E10, the gallery, on 2026-10-30 with the October credits that are left. Routes in `docs/SPEED.md` under "Routes to explore".
+- **Waiting on Stefan:** looks on the r33 explorer (`r33/explore/`), the r35 page (`r35/`, blind picks; they are saved only in the browser that made them), the r37 page (`r37/`), the r40 page (`r40/`) and the r42–r44 sheets, and the idea map (`map/`), all under `~/tmp/public/nilo/agentic-3js-builder/`; the GPT-SDK decisions; whether P3 may call the API directly, outside the omp gateway. No session transcript records a verdict on any of them as of 2026-10-29.
 
 ## r26: the part-family samplers at low, 2026-10-25
 
