@@ -1,0 +1,656 @@
+{
+  "slug": "r42fitFloatingIslandDioramaRichParflatFit",
+  "arm": "parflat-fit",
+  "subject": "floatingIslandDiorama",
+  "level": "rich",
+  "pitch": "Category: Diorama.\nSubject: floating sky island with ruins, waterfall and trees.\nStyle: Genshin Impact.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:19:11.574Z",
+  "wallMs": 44763,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 548443,
+    "completion_tokens": 13367,
+    "total_tokens": 561810,
+    "prompt_tokens_details": {
+      "cached_tokens": 525132
+    }
+  },
+  "costUsd": 0.2328052,
+  "hasCode": true,
+  "parallel": {
+    "planMs": 19720,
+    "slowestPartMs": 17256,
+    "critical": "ruins",
+    "elapsedMs": 36976,
+    "spec": {
+      "name": "Sky Island of the Windward Ruins",
+      "description": "A Genshin-style floating island: a grassy top with ruined stone arches, a waterfall spilling off the edge, stylized trees, and a crystalline rocky underside hanging in the sky.",
+      "builderName": "skyIslandRuins",
+      "size": [
+        4.6,
+        3.4,
+        4.2
+      ],
+      "layout": "A static diorama about 4 m across. The island is a round turf disc of radius about 2.0 with its top at y=1.6. Beneath it hangs an inverted cone of faceted rock tapering to a point at y=0, which is the lowest point and rests on the floor; the model is displayed as a floating-looking prop with its tip at the floor. Ruins sit at the back (-Z) and centre: a broken arch, standing pillars and a stepped stone platform with a glowing teal rune. The waterfall pours from a spring pool on the left (+X) edge at z=0.3, falls past the rock underside as a ribbon of pale blue slabs, and ends in a mist of small spheres and glowing droplets below the rim. Trees are in two clusters: a large round-canopy tree at the front right (-X, +Z) and two small trees at the back left. Genshin style means clean pastel flat colours with a warm top light and cool underside, thin dark outline-like trim parts, glowing cyan and gold accents, and chunky simplified shapes with small flower and crystal details.",
+      "palette": {
+        "grassLight": "#9fd45a",
+        "grassMid": "#6fb344",
+        "grassDark": "#3f8a3a",
+        "soil": "#8a5a3a",
+        "rockLight": "#a39a94",
+        "rockMid": "#7d7580",
+        "rockDark": "#4f4a5c",
+        "rockDeep": "#34314a",
+        "ruinStone": "#d9cfb8",
+        "ruinShade": "#b3a78e",
+        "ruinMoss": "#7fae52",
+        "ruinGold": "#e8b94a",
+        "runeTeal": "#5ff2e0",
+        "water": "#7fd6f2",
+        "waterFoam": "#e9fbff",
+        "waterDeep": "#3fa5d8",
+        "bark": "#6b4a32",
+        "barkDark": "#4a3224",
+        "leafPink": "#f5a9c0",
+        "leafGreen": "#58b04a",
+        "leafLight": "#a6dc6a",
+        "crystalBlue": "#6fb6ff",
+        "crystalPurple": "#a98aff",
+        "flowerWhite": "#fff6e0",
+        "flowerYellow": "#ffd54a"
+      },
+      "mounts": {
+        "islandTop": [
+          0,
+          1.6,
+          0
+        ],
+        "islandRim": [
+          0,
+          1.6,
+          2
+        ],
+        "rockTip": [
+          0,
+          0,
+          0
+        ],
+        "ruinCenter": [
+          0,
+          1.6,
+          -0.7
+        ],
+        "platformTop": [
+          0,
+          1.85,
+          -0.7
+        ],
+        "springPool": [
+          1.5,
+          1.62,
+          0.3
+        ],
+        "fallLip": [
+          2,
+          1.55,
+          0.3
+        ],
+        "fallBase": [
+          2.15,
+          0.2,
+          0.3
+        ],
+        "bigTree": [
+          -1.1,
+          1.6,
+          0.9
+        ],
+        "smallTreeA": [
+          -1.3,
+          1.6,
+          -1
+        ],
+        "smallTreeB": [
+          -0.4,
+          1.6,
+          -1.5
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "rockBase",
+          "builds": "The island body: the faceted inverted-cone underside made of stacked tapering hexagonal and octagonal lathe layers in rockLight, rockMid, rockDark and rockDeep (lighter on top, cooler and darker below), jutting rock chunks, hanging stalactite spikes, glowing crystalBlue and crystalPurple clusters on the underside, soil band and root tendrils beneath the turf, and the turf disc with a scalloped rim of grassLight/grassMid/grassDark blocks hanging over the edge.",
+          "box": [
+            [
+              -2.2,
+              0,
+              -2.2
+            ],
+            [
+              2.2,
+              1.65,
+              2.2
+            ]
+          ],
+          "attaches": "Top surface at islandTop (y=1.6) carries every other part; the tip sits at rockTip on the floor; the waterfall passes the rim at fallLip.",
+          "joints": [],
+          "floor": true,
+          "budget": 200
+        },
+        {
+          "id": "ruins",
+          "builds": "Ancient ruins in ruinStone and ruinShade: a stepped round platform at ruinCenter with a glowing runeTeal circular rune inlaid on top, a broken arch with one fallen keystone, 4 standing fluted pillars of different heights with gold ruinGold trim bands and cracked tops, scattered fallen blocks, moss patches in ruinMoss on top faces, a small gold-trimmed altar with a glowing teal orb, and thin vine strands.",
+          "box": [
+            [
+              -1.4,
+              1.6,
+              -1.8
+            ],
+            [
+              1.4,
+              3.3,
+              0.4
+            ]
+          ],
+          "attaches": "Stands on islandTop around ruinCenter and platformTop; keep clear of the waterfall pool on +X and the trees.",
+          "joints": [],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "waterfall",
+          "builds": "The spring pool at springPool (a flat lathe disc in water with a waterFoam rim and rocks round it), a small stream channel to the edge, then the waterfall as layered flat slabs in water, waterDeep and waterFoam falling from fallLip down past the rock to fallBase with a slight curve and glowing streak lines, foam blobs at the lip, and a mist cloud of small waterFoam spheres plus glowing droplets at the bottom, with a few lily pads and tiny flowers on the pool.",
+          "box": [
+            [
+              1,
+              0.1,
+              -0.3
+            ],
+            [
+              2.6,
+              1.7,
+              0.9
+            ]
+          ],
+          "attaches": "Pool sits on the turf at springPool; the fall leaves the rim at fallLip and hugs the rock face to fallBase, ending in mist.",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "trees",
+          "builds": "Stylized trees: a big tree at bigTree with a thick tapered bark trunk, buttress roots, branches, and a canopy of overlapping faceted icospheres in leafPink and leafLight with leafGreen undersides, plus falling petals; two small leafGreen/leafLight trees at smallTreeA and smallTreeB; bushes and grass tufts (cone clusters in grassDark and grassLight) scattered on the turf; flowers in flowerWhite and flowerYellow; a few glowing crystal shards in crystalBlue near the roots.",
+          "box": [
+            [
+              -2,
+              1.6,
+              -2
+            ],
+            [
+              0.4,
+              3.4,
+              2
+            ]
+          ],
+          "attaches": "Roots stand on the turf at bigTree, smallTreeA, smallTreeB; keep out of the ruins box and the waterfall pool.",
+          "joints": [],
+          "floor": false,
+          "budget": 200
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:19:11.574Z",
+        "wallMs": 19720,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75212,
+          "completion_tokens": 2442,
+          "total_tokens": 77654,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.034226900000000005,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "rockBase",
+        "effort": "low",
+        "started": "2026-10-28T21:19:31.294Z",
+        "wallMs": 13545,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77558,
+          "completion_tokens": 2161,
+          "total_tokens": 79719,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0361089,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "waterfall",
+        "effort": "low",
+        "started": "2026-10-28T21:19:31.294Z",
+        "wallMs": 13840,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77556,
+          "completion_tokens": 2249,
+          "total_tokens": 79805,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0369849,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "trees",
+        "effort": "low",
+        "started": "2026-10-28T21:19:31.294Z",
+        "wallMs": 14509,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77562,
+          "completion_tokens": 2449,
+          "total_tokens": 80011,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0389969,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "ruins",
+        "effort": "low",
+        "started": "2026-10-28T21:19:31.294Z",
+        "wallMs": 17256,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77539,
+          "completion_tokens": 2924,
+          "total_tokens": 80463,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0437009,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-ruins",
+        "effort": "low",
+        "started": "2026-10-28T21:19:49.856Z",
+        "wallMs": 4270,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 82374,
+          "completion_tokens": 545,
+          "total_tokens": 82919,
+          "prompt_tokens_details": {
+            "cached_tokens": 77535
+          }
+        },
+        "costUsd": 0.0228815,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-waterfall",
+        "effort": "low",
+        "started": "2026-10-28T21:19:49.857Z",
+        "wallMs": 5266,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80642,
+          "completion_tokens": 597,
+          "total_tokens": 81239,
+          "prompt_tokens_details": {
+            "cached_tokens": 77552
+          }
+        },
+        "costUsd": 0.0199052,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ],
+    "fit": {
+      "fitMs": 7787,
+      "checkMs": 1626,
+      "afterMs": 1208,
+      "repairMs": 5266,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "rockBase",
+          "meshes": 87,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -2.0967,
+              -0.0051,
+              -2.1025
+            ],
+            [
+              2.0664,
+              1.6501,
+              2.0856
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "ruins",
+          "meshes": 102,
+          "outside": 2,
+          "maxOver": 0.23,
+          "bounds": [
+            [
+              -1.265,
+              1.5364,
+              -2.0336
+            ],
+            [
+              1.2401,
+              3.4456,
+              0.3005
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.skyIslandRuins.75",
+              "bones": [],
+              "min": [
+                -0.2055,
+                1.5532,
+                -2.0336
+              ],
+              "max": [
+                0.0296,
+                1.8197,
+                -1.6957
+              ],
+              "over": 0.23,
+              "where": [
+                "0.23 m past the box's -z face (z = -1.8)"
+              ]
+            },
+            {
+              "name": "part.skyIslandRuins.79",
+              "bones": [],
+              "min": [
+                0.4469,
+                1.5364,
+                -1.9853
+              ],
+              "max": [
+                0.8315,
+                1.8602,
+                -1.632
+              ],
+              "over": 0.19,
+              "where": [
+                "0.19 m past the box's -z face (z = -1.8)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "waterfall",
+          "meshes": 97,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              1.0505,
+              0.1707,
+              -0.3003
+            ],
+            [
+              2.6504,
+              1.76,
+              0.901
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "trees",
+          "meshes": 240,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -2.0745,
+              1.53,
+              -1.8221
+            ],
+            [
+              0.294,
+              3.2565,
+              1.6925
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "rockBase",
+          "meshes": 87,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -2.0967,
+              -0.0051,
+              -2.1025
+            ],
+            [
+              2.0664,
+              1.6501,
+              2.0856
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "ruins",
+          "meshes": 102,
+          "outside": 2,
+          "maxOver": 0.23,
+          "bounds": [
+            [
+              -1.265,
+              1.5364,
+              -2.0336
+            ],
+            [
+              1.2401,
+              3.4456,
+              0.3005
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.skyIslandRuins.75",
+              "bones": [],
+              "min": [
+                -0.2055,
+                1.5532,
+                -2.0336
+              ],
+              "max": [
+                0.0296,
+                1.8197,
+                -1.6957
+              ],
+              "over": 0.23,
+              "where": [
+                "0.23 m past the box's -z face (z = -1.8)"
+              ]
+            },
+            {
+              "name": "part.skyIslandRuins.79",
+              "bones": [],
+              "min": [
+                0.4469,
+                1.5364,
+                -1.9853
+              ],
+              "max": [
+                0.8315,
+                1.8602,
+                -1.632
+              ],
+              "over": 0.19,
+              "where": [
+                "0.19 m past the box's -z face (z = -1.8)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "waterfall",
+          "meshes": 97,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              1.0505,
+              0.1707,
+              -0.3003
+            ],
+            [
+              2.6504,
+              1.76,
+              0.901
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "trees",
+          "meshes": 240,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -2.0745,
+              1.53,
+              -1.8221
+            ],
+            [
+              0.294,
+              3.2565,
+              1.6925
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "ruins",
+          "wallMs": 4270,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "waterfall",
+          "wallMs": 5266,
+          "edits": 3,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  },
+  "check": {
+    "slug": "r42fitFloatingIslandDioramaRichParflatFit",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "A",
+    "renderError": null,
+    "report": {
+      "parts": 526,
+      "triangles": 13212,
+      "colors": 25,
+      "textures": 0,
+      "joints": 0,
+      "size": [
+        4.747,
+        3.451,
+        4.188
+      ],
+      "issues": [],
+      "fine": 4
+    }
+  }
+}

@@ -1,0 +1,632 @@
+{
+  "slug": "r42fitAlchemistWorkbenchRichParflatFit",
+  "arm": "parflat-fit",
+  "subject": "alchemistWorkbench",
+  "level": "rich",
+  "pitch": "Category: Prop group.\nSubject: alchemist's workbench with potions, books, scales and herbs.\nStyle: Genshin Impact.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:18:52.488Z",
+  "wallMs": 47847,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 542706,
+    "completion_tokens": 18686,
+    "total_tokens": 561392,
+    "prompt_tokens_details": {
+      "cached_tokens": 521443
+    }
+  },
+  "costUsd": 0.2815303,
+  "hasCode": true,
+  "parallel": {
+    "planMs": 18934,
+    "slowestPartMs": 20236,
+    "critical": "scaleAndTools",
+    "elapsedMs": 39172,
+    "spec": {
+      "name": "Alchemist's Workbench",
+      "description": "A stylized Genshin-Impact-style alchemist's workbench: a sturdy carved wooden table with gilded trim, glowing potions, a distillation rig, stacked books, a brass balance scale and hanging and potted herbs.",
+      "builderName": "alchemistWorkbench",
+      "size": [
+        2.4,
+        1.9,
+        1
+      ],
+      "layout": "Static prop, +Z is the front where the alchemist stands. A heavy rectangular table (2.2 wide, 0.9 high, 0.85 deep) with chunky legs, a lower shelf at y=0.3 and a thick top. Front-facing trim is Genshin style: cream-gold borders, teal and gold inlays and small anemo/elemental swirl emblems on the front apron. On the tabletop from the viewer's left (+X) to right (-X): +X is the herb corner (potted plants, bundles) and a stack of books; the centre holds the brass balance scale with the mortar and pestle in front; -X holds the distillation rig (flask over a glowing burner, coil and receiving bottle) and a rack of glowing potions. A herb drying rail with hanging bundles and a small lantern hangs from a rear frame (rear posts at z=-0.4 reaching y=1.9) behind the tabletop. Shapes are chunky and rounded-faceted primitives, with warm woods, cool teal glass and glowing emissive liquids, gold edging on every piece.",
+      "palette": {
+        "woodDark": "#5a3a24",
+        "woodMid": "#8a5a36",
+        "woodLight": "#b98552",
+        "gold": "#e8bd4e",
+        "goldDark": "#a67a2a",
+        "cream": "#f4e8c8",
+        "teal": "#2fb8a8",
+        "tealDark": "#1c6b72",
+        "glass": "#bfe9ee",
+        "potionRed": "#ff5a6a",
+        "potionBlue": "#4aa8ff",
+        "potionGreen": "#7ae860",
+        "potionPurple": "#b070ff",
+        "flame": "#ffb040",
+        "leafGreen": "#4ea85a",
+        "leafDark": "#2c6e3c",
+        "bookRed": "#a83a3a",
+        "bookBlue": "#35508f",
+        "bookGreen": "#3b7a55",
+        "paper": "#efe2bd",
+        "iron": "#3a3c48",
+        "ink": "#22112f",
+        "clay": "#c4703c"
+      },
+      "mounts": {
+        "tableTop": [
+          0,
+          0.9,
+          0
+        ],
+        "shelfTop": [
+          0,
+          0.3,
+          0
+        ],
+        "rearFrameTop": [
+          0,
+          1.9,
+          -0.4
+        ],
+        "herbCorner": [
+          0.75,
+          0.9,
+          0.05
+        ],
+        "bookStack": [
+          0.8,
+          0.9,
+          -0.2
+        ],
+        "scaleBase": [
+          0,
+          0.9,
+          -0.05
+        ],
+        "mortarSpot": [
+          0.1,
+          0.9,
+          0.25
+        ],
+        "distillBase": [
+          -0.7,
+          0.9,
+          -0.05
+        ],
+        "potionRack": [
+          -0.3,
+          0.9,
+          -0.3
+        ],
+        "hangRail": [
+          0,
+          1.65,
+          -0.4
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "table",
+          "builds": "The table furniture: chunky legs with gold foot caps, thick top slab with cream-gold edge banding, front apron with carved teal and gold inlay panels and elemental swirl emblems, side stretchers, lower shelf with stored jars, sacks, a barrel and a crate, plus brackets and rivets.",
+          "box": [
+            [
+              -1.2,
+              0,
+              -0.45
+            ],
+            [
+              1.2,
+              0.9,
+              0.45
+            ]
+          ],
+          "attaches": "Top face at tableTop (y=0.9) carries all props; rear edge meets the rear frame posts at z=-0.4.",
+          "joints": [],
+          "floor": true,
+          "budget": 200
+        },
+        {
+          "id": "rearFrame",
+          "builds": "The tall rear frame: two posts and a crossbeam at hangRail with gold finials and carved caps, a herb drying rail with many hanging herb bundles tied with cords, a hanging brass lantern with a glowing flame, a pinned parchment recipe sheet with rune lines, and a shelf board with small jars.",
+          "box": [
+            [
+              -1.1,
+              0.9,
+              -0.5
+            ],
+            [
+              1.1,
+              1.9,
+              -0.3
+            ]
+          ],
+          "attaches": "Posts stand down to the table top at tableTop level behind the props (z around -0.4); rail at hangRail.",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "alchemyRig",
+          "builds": "The distillation corner on -X: iron tripod with a glowing burner flame, round-bottom glass flask with coloured liquid, neck, a swept coil tube, receiving bottle, a rack of 6 to 8 potions of varied shapes (round, tall, square) in red, blue, green and purple with corks and gold labels, and floating glowing droplets and sparkles.",
+          "box": [
+            [
+              -1.1,
+              0.9,
+              -0.4
+            ],
+            [
+              -0.1,
+              1.5,
+              0.35
+            ]
+          ],
+          "attaches": "Sits on tableTop at distillBase and potionRack.",
+          "joints": [],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "scaleAndTools",
+          "builds": "The centre of the table: a brass balance scale with a base column, a beam, two hanging pans on chains, weights and tiny glowing crystals in a pan, a mortar and pestle with crushed herbs, a glass vial tray, a small open grimoire on a stand with glowing runes, and a quill in an inkwell.",
+          "box": [
+            [
+              -0.1,
+              0.9,
+              -0.3
+            ],
+            [
+              0.5,
+              1.5,
+              0.4
+            ]
+          ],
+          "attaches": "Sits on tableTop at scaleBase and mortarSpot.",
+          "joints": [],
+          "floor": false,
+          "budget": 180
+        },
+        {
+          "id": "booksAndHerbs",
+          "builds": "The +X corner: a stack of 5 thick books in red, blue and green with gold corner caps, spine bands and emblems and cream page blocks, with an open book on top; clay pots with leafy herbs of faceted leaf blades, a mushroom cluster, a bundle of cut herbs, loose leaves and a flower with a glowing petal centre, plus a small glowing seed jar.",
+          "box": [
+            [
+              0.5,
+              0.9,
+              -0.4
+            ],
+            [
+              1.2,
+              1.5,
+              0.4
+            ]
+          ],
+          "attaches": "Sits on tableTop at bookStack and herbCorner.",
+          "joints": [],
+          "floor": false,
+          "budget": 170
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:18:52.488Z",
+        "wallMs": 18934,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75215,
+          "completion_tokens": 2309,
+          "total_tokens": 77524,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0329029,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "alchemyRig",
+        "effort": "low",
+        "started": "2026-10-28T21:19:11.422Z",
+        "wallMs": 15145,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77393,
+          "completion_tokens": 2468,
+          "total_tokens": 79861,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0388489,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "rearFrame",
+        "effort": "low",
+        "started": "2026-10-28T21:19:11.422Z",
+        "wallMs": 18332,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77388,
+          "completion_tokens": 3073,
+          "total_tokens": 80461,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0448889,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "booksAndHerbs",
+        "effort": "low",
+        "started": "2026-10-28T21:19:11.423Z",
+        "wallMs": 19360,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77405,
+          "completion_tokens": 3311,
+          "total_tokens": 80716,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0473029,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "table",
+        "effort": "low",
+        "started": "2026-10-28T21:19:11.422Z",
+        "wallMs": 19446,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77362,
+          "completion_tokens": 3296,
+          "total_tokens": 80658,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0470669,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "scaleAndTools",
+        "effort": "low",
+        "started": "2026-10-28T21:19:11.423Z",
+        "wallMs": 20236,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77381,
+          "completion_tokens": 3441,
+          "total_tokens": 80822,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0485549,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-alchemyRig",
+        "effort": "low",
+        "started": "2026-10-28T21:19:33.113Z",
+        "wallMs": 5665,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80562,
+          "completion_tokens": 788,
+          "total_tokens": 81350,
+          "prompt_tokens_details": {
+            "cached_tokens": 77389
+          }
+        },
+        "costUsd": 0.021964900000000002,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ],
+    "fit": {
+      "fitMs": 8677,
+      "checkMs": 1081,
+      "afterMs": 1559,
+      "repairMs": 5665,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "table",
+          "meshes": 175,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.2252,
+              0,
+              -0.4701
+            ],
+            [
+              1.2252,
+              0.91,
+              0.4701
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "rearFrame",
+          "meshes": 116,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.0601,
+              0.8995,
+              -0.4601
+            ],
+            [
+              1.0601,
+              1.9781,
+              -0.2299
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "alchemyRig",
+          "meshes": 62,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.9545,
+              0.8993,
+              -0.3751
+            ],
+            [
+              0.015,
+              1.55,
+              0.1301
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "scaleAndTools",
+          "meshes": 80,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2452,
+              0.8939,
+              -0.2176
+            ],
+            [
+              0.5452,
+              1.5201,
+              0.363
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "booksAndHerbs",
+          "meshes": 145,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              0.4999,
+              0.8096,
+              -0.3476
+            ],
+            [
+              1.1651,
+              1.312,
+              0.4063
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "table",
+          "meshes": 175,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.2252,
+              0,
+              -0.4701
+            ],
+            [
+              1.2252,
+              0.91,
+              0.4701
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "rearFrame",
+          "meshes": 116,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.0601,
+              0.8995,
+              -0.4601
+            ],
+            [
+              1.0601,
+              1.9781,
+              -0.2299
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "alchemyRig",
+          "meshes": 62,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.9545,
+              0.8993,
+              -0.3751
+            ],
+            [
+              0.015,
+              1.55,
+              0.1301
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "scaleAndTools",
+          "meshes": 80,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2452,
+              0.8939,
+              -0.2176
+            ],
+            [
+              0.5452,
+              1.5201,
+              0.363
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "booksAndHerbs",
+          "meshes": 145,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              0.4999,
+              0.8096,
+              -0.3476
+            ],
+            [
+              1.1651,
+              1.312,
+              0.4063
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "alchemyRig",
+          "wallMs": 5665,
+          "edits": 4,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  },
+  "check": {
+    "slug": "r42fitAlchemistWorkbenchRichParflatFit",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "A",
+    "renderError": null,
+    "report": {
+      "parts": 578,
+      "triangles": 16466,
+      "colors": 28,
+      "textures": 0,
+      "joints": 0,
+      "size": [
+        2.45,
+        1.978,
+        0.94
+      ],
+      "issues": [],
+      "fine": 80
+    }
+  }
+}

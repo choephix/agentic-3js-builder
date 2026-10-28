@@ -1,0 +1,905 @@
+{
+  "slug": "r42fitDesertOasisDioramaRichParflatFit",
+  "arm": "parflat-fit",
+  "subject": "desertOasisDiorama",
+  "level": "rich",
+  "pitch": "Category: Diorama.\nSubject: desert oasis with palms, tents and camels.\nStyle: low-poly whimsical mix.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:18:27.870Z",
+  "wallMs": 52592,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 713307,
+    "completion_tokens": 17117,
+    "total_tokens": 730424,
+    "prompt_tokens_details": {
+      "cached_tokens": 679662
+    }
+  },
+  "costUsd": 0.3064262,
+  "hasCode": true,
+  "parallel": {
+    "planMs": 19996,
+    "slowestPartMs": 23172,
+    "critical": "tents",
+    "elapsedMs": 43168,
+    "spec": {
+      "name": "Whimsical Desert Oasis",
+      "description": "A low-poly diorama of a desert oasis: a turquoise pond ringed by palms and reeds, striped nomad tents, and sandy dunes with camels resting and standing nearby.",
+      "builderName": "desertOasis",
+      "size": [
+        6,
+        2.6,
+        6
+      ],
+      "layout": "A round sandy island about 6 m across and 0.15 m thick, with soft dune bumps built as flattened faceted spheres and cones. The oasis pond is slightly left of centre (+X) at [0.3, 0.15, 0.2], radius about 1.1, a turquoise disc with a pale-sand rim of stones and reed clumps. Four to five palms ring the pond, with leaning faceted trunks of stacked frustums and 7-9 drooping leaf blades each, plus coconuts. Two striped tents stand at the back (-Z) left and right, with a campfire between them in front. Camels (one standing at the front right, one lying down at the front left, one small calf) are blocky with humps, long necks, tails and tassel details. Everything is chunky and low-poly, with bold stripes, bunting, pot and rug details, and a whimsical, slightly exaggerated lean to the palms and tents. Every surface is a flat colour and small details are separate parts.",
+      "palette": {
+        "sand": "#f0cf8a",
+        "sandLight": "#f8e2a8",
+        "sandDark": "#d9ad62",
+        "dune": "#e8be76",
+        "water": "#35c9d6",
+        "waterDeep": "#1f9fb8",
+        "stone": "#a89478",
+        "stoneDark": "#7d6a56",
+        "palmTrunk": "#9b6a3c",
+        "palmTrunkDark": "#744b28",
+        "palmLeaf": "#3fae4f",
+        "palmLeafDark": "#27823c",
+        "coconut": "#5a3a1e",
+        "reed": "#7cc04a",
+        "tentRed": "#d9453b",
+        "tentCream": "#fff0cf",
+        "tentBlue": "#2f6fc4",
+        "tentPole": "#6b4423",
+        "rug": "#8e2f5a",
+        "rugGold": "#f2b630",
+        "camelFur": "#c68f52",
+        "camelLight": "#e2b97c",
+        "camelDark": "#6b4528",
+        "fire": "#ff9a1f",
+        "fireCore": "#ffd84a",
+        "ink": "#2a1a12"
+      },
+      "mounts": {
+        "groundTop": [
+          0,
+          0.15,
+          0
+        ],
+        "pondCenter": [
+          0.3,
+          0.15,
+          0.2
+        ],
+        "tentLeft": [
+          -1.9,
+          0.15,
+          -1.7
+        ],
+        "tentRight": [
+          1.7,
+          0.15,
+          -2
+        ],
+        "campfire": [
+          -0.1,
+          0.15,
+          -1.1
+        ],
+        "camelStand": [
+          1.9,
+          0.15,
+          1.6
+        ],
+        "camelLie": [
+          -1.9,
+          0.15,
+          1.5
+        ],
+        "camelCalf": [
+          -0.6,
+          0.15,
+          2.2
+        ],
+        "palmA": [
+          -0.6,
+          0.15,
+          0.9
+        ],
+        "palmB": [
+          1.5,
+          0.15,
+          0.9
+        ],
+        "palmC": [
+          1.2,
+          0.15,
+          -0.7
+        ],
+        "palmD": [
+          -0.5,
+          0.15,
+          -0.5
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "terrain",
+          "builds": "Round faceted sand island base (cylinder, 12 sides) with a darker underside band, dune bumps from flattened spheres and cones in sand tones, scattered small pebbles, a pond basin (turquoise disc plus deeper inner disc, lily pads) ringed by stones in stone and stoneDark, reed clumps of thin cones in reed colour, and small tufts of dry grass.",
+          "box": [
+            [
+              -3,
+              0,
+              -3
+            ],
+            [
+              3,
+              0.5,
+              3
+            ]
+          ],
+          "attaches": "Top surface at groundTop; pond at pondCenter. All other parts stand on it.",
+          "joints": [],
+          "floor": true,
+          "budget": 170
+        },
+        {
+          "id": "palms",
+          "builds": "Four palms at palmA-palmD, heights 1.6-2.4 m, leaning differently. Trunks are stacked tapered segments alternating palmTrunk and palmTrunkDark with ring bands. Crown has a bulge, 8 drooping flat leaf blades (extruded, with a darker central rib), coconut clusters and a few dates. One palm is shorter with a small bird or an hanging lantern detail.",
+          "box": [
+            [
+              -1.2,
+              0.15,
+              -1.2
+            ],
+            [
+              2.2,
+              2.6,
+              1.6
+            ]
+          ],
+          "attaches": "Trunk bases at the palm mounts on groundTop.",
+          "joints": [],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "tents",
+          "builds": "Two nomad tents at tentLeft (red and cream stripes) and tentRight (blue and cream stripes): wedge or cone canopy built from alternating stripe panels, a visible door flap tied open with a darker interior, center pole with finial, guy ropes and pegs, a scalloped trim. Plus a patterned rug (rug with gold border and motif) in front of each tent, cushions, a clay pot and crate, bunting flags between the tents, and the campfire at campfire with ring stones, logs and glowing flame cones in fire and fireCore.",
+          "box": [
+            [
+              -3,
+              0.15,
+              -3
+            ],
+            [
+              3,
+              1.9,
+              -0.5
+            ]
+          ],
+          "attaches": "Tents sit on groundTop at tentLeft and tentRight. The campfire is at campfire.",
+          "joints": [],
+          "floor": false,
+          "budget": 270
+        },
+        {
+          "id": "camels",
+          "builds": "Three camels. Standing camel at camelStand facing diagonally toward the pond, about 1.5 m tall: boxy barrel body, two humps, long curved neck of stacked segments, wedge head with muzzle, nostrils, eyes with lashes, small ears, four jointed legs with knee bumps and pads, tail with tuft. Lying camel at camelLie with folded legs and a saddle blanket in rug colours with gold trim and tassels. Calf at camelCalf, small and cute, with a big head and a little bell. Fur in camelFur, with camelLight muzzle and belly and camelDark hooves, tuft and mane. Bridles and saddle straps are small parts.",
+          "box": [
+            [
+              -3,
+              0.15,
+              0.5
+            ],
+            [
+              3,
+              1.9,
+              3
+            ]
+          ],
+          "attaches": "Feet or bellies rest on groundTop at the camel mounts.",
+          "joints": [],
+          "floor": false,
+          "budget": 270
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:18:27.870Z",
+        "wallMs": 19996,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75212,
+          "completion_tokens": 2331,
+          "total_tokens": 77543,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.033116900000000005,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "palms",
+        "effort": "low",
+        "started": "2026-10-28T21:18:47.866Z",
+        "wallMs": 14278,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77380,
+          "completion_tokens": 2451,
+          "total_tokens": 79831,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.038652900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "terrain",
+        "effort": "low",
+        "started": "2026-10-28T21:18:47.866Z",
+        "wallMs": 16796,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77360,
+          "completion_tokens": 2880,
+          "total_tokens": 80240,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0429029,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "camels",
+        "effort": "low",
+        "started": "2026-10-28T21:18:47.866Z",
+        "wallMs": 22385,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77463,
+          "completion_tokens": 3559,
+          "total_tokens": 81022,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0498989,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tents",
+        "effort": "low",
+        "started": "2026-10-28T21:18:47.866Z",
+        "wallMs": 23172,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77430,
+          "completion_tokens": 3830,
+          "total_tokens": 81260,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.052542900000000003,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-palms",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.505Z",
+        "wallMs": 1731,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 81338,
+          "completion_tokens": 166,
+          "total_tokens": 81504,
+          "prompt_tokens_details": {
+            "cached_tokens": 77376
+          }
+        },
+        "costUsd": 0.0173216,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-tents",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.505Z",
+        "wallMs": 4944,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 82490,
+          "completion_tokens": 460,
+          "total_tokens": 82950,
+          "prompt_tokens_details": {
+            "cached_tokens": 77426
+          }
+        },
+        "costUsd": 0.022470599999999997,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-terrain",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.505Z",
+        "wallMs": 5058,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 81846,
+          "completion_tokens": 876,
+          "total_tokens": 82722,
+          "prompt_tokens_details": {
+            "cached_tokens": 77356
+          }
+        },
+        "costUsd": 0.025475599999999998,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-camels",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.506Z",
+        "wallMs": 6046,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 82788,
+          "completion_tokens": 564,
+          "total_tokens": 83352,
+          "prompt_tokens_details": {
+            "cached_tokens": 77459
+          }
+        },
+        "costUsd": 0.0240439,
+        "hasCode": true,
+        "reasoning": "The standing camel's head is exceeding the 1.9 height limit, so I need to scale it down—maybe around 0.75—to keep its top under the max height including the base offset.\n\n"
+      }
+    ],
+    "fit": {
+      "fitMs": 9424,
+      "checkMs": 1768,
+      "afterMs": 1909,
+      "repairMs": 6046,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "terrain",
+          "meshes": 161,
+          "outside": 1,
+          "maxOver": 0.45,
+          "bounds": [
+            [
+              -3.0001,
+              -0.07,
+              -3.4476
+            ],
+            [
+              3.0639,
+              0.467,
+              3.1473
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.desertOasis.21",
+              "bones": [],
+              "min": [
+                -0.5295,
+                -0.07,
+                -3.4476
+              ],
+              "max": [
+                1.0068,
+                0.41,
+                -1.5151
+              ],
+              "over": 0.45,
+              "where": [
+                "0.45 m past the box's -z face (z = -3)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "palms",
+          "meshes": 190,
+          "outside": 4,
+          "maxOver": 0.41,
+          "bounds": [
+            [
+              -1.0185,
+              0.1469,
+              -1.6119
+            ],
+            [
+              1.9695,
+              2.7201,
+              1.7091
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.desertOasis.199",
+              "bones": [],
+              "min": [
+                0.7132,
+                2.1461,
+                -1.6119
+              ],
+              "max": [
+                0.878,
+                2.388,
+                -1.2836
+              ],
+              "over": 0.41,
+              "where": [
+                "0.41 m past the box's -z face (z = -1.2)"
+              ]
+            },
+            {
+              "name": "extrude.desertOasis.22",
+              "bones": [],
+              "min": [
+                0.7484,
+                2.096,
+                -1.5361
+              ],
+              "max": [
+                1.0097,
+                2.5726,
+                -1.0068
+              ],
+              "over": 0.34,
+              "where": [
+                "0.34 m past the box's -z face (z = -1.2)"
+              ]
+            },
+            {
+              "name": "part.desertOasis.197",
+              "bones": [],
+              "min": [
+                1.2474,
+                2.242,
+                -1.4127
+              ],
+              "max": [
+                1.4938,
+                2.4354,
+                -1.1835
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's -z face (z = -1.2)"
+              ]
+            },
+            {
+              "name": "extrude.desertOasis.21",
+              "bones": [],
+              "min": [
+                1.0449,
+                2.1811,
+                -1.3638
+              ],
+              "max": [
+                1.4405,
+                2.5965,
+                -0.9926
+              ],
+              "over": 0.16,
+              "where": [
+                "0.16 m past the box's -z face (z = -1.2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tents",
+          "meshes": 156,
+          "outside": 2,
+          "maxOver": 0.22,
+          "bounds": [
+            [
+              -2.9222,
+              0.1278,
+              -2.998
+            ],
+            [
+              2.7177,
+              2.0401,
+              -0.2766
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "box.desertOasis.4",
+              "bones": [],
+              "min": [
+                -2.1092,
+                0.1505,
+                -1.1172
+              ],
+              "max": [
+                -1.0702,
+                0.1755,
+                -0.2766
+              ],
+              "over": 0.22,
+              "where": [
+                "0.22 m past the box's +z face (z = -0.5)"
+              ]
+            },
+            {
+              "name": "box.desertOasis.5",
+              "bones": [],
+              "min": [
+                -2.0465,
+                0.153,
+                -1.0546
+              ],
+              "max": [
+                -1.1329,
+                0.183,
+                -0.3392
+              ],
+              "over": 0.16,
+              "where": [
+                "0.16 m past the box's +z face (z = -0.5)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "camels",
+          "meshes": 182,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -2.6094,
+              0.145,
+              0.5099
+            ],
+            [
+              2.5035,
+              1.876,
+              3.0069
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "terrain",
+          "meshes": 161,
+          "outside": 1,
+          "maxOver": 0.45,
+          "bounds": [
+            [
+              -3.0001,
+              -0.07,
+              -3.4476
+            ],
+            [
+              3.0639,
+              0.467,
+              3.1473
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.desertOasis.21",
+              "bones": [],
+              "min": [
+                -0.5295,
+                -0.07,
+                -3.4476
+              ],
+              "max": [
+                1.0068,
+                0.41,
+                -1.5151
+              ],
+              "over": 0.45,
+              "where": [
+                "0.45 m past the box's -z face (z = -3)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "palms",
+          "meshes": 190,
+          "outside": 4,
+          "maxOver": 0.41,
+          "bounds": [
+            [
+              -1.0185,
+              0.1469,
+              -1.6119
+            ],
+            [
+              1.9695,
+              2.7201,
+              1.7091
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "part.desertOasis.199",
+              "bones": [],
+              "min": [
+                0.7132,
+                2.1461,
+                -1.6119
+              ],
+              "max": [
+                0.878,
+                2.388,
+                -1.2836
+              ],
+              "over": 0.41,
+              "where": [
+                "0.41 m past the box's -z face (z = -1.2)"
+              ]
+            },
+            {
+              "name": "extrude.desertOasis.22",
+              "bones": [],
+              "min": [
+                0.7484,
+                2.096,
+                -1.5361
+              ],
+              "max": [
+                1.0097,
+                2.5726,
+                -1.0068
+              ],
+              "over": 0.34,
+              "where": [
+                "0.34 m past the box's -z face (z = -1.2)"
+              ]
+            },
+            {
+              "name": "part.desertOasis.197",
+              "bones": [],
+              "min": [
+                1.2474,
+                2.242,
+                -1.4127
+              ],
+              "max": [
+                1.4938,
+                2.4354,
+                -1.1835
+              ],
+              "over": 0.21,
+              "where": [
+                "0.21 m past the box's -z face (z = -1.2)"
+              ]
+            },
+            {
+              "name": "extrude.desertOasis.21",
+              "bones": [],
+              "min": [
+                1.0449,
+                2.1811,
+                -1.3638
+              ],
+              "max": [
+                1.4405,
+                2.5965,
+                -0.9926
+              ],
+              "over": 0.16,
+              "where": [
+                "0.16 m past the box's -z face (z = -1.2)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "tents",
+          "meshes": 156,
+          "outside": 2,
+          "maxOver": 0.22,
+          "bounds": [
+            [
+              -2.9222,
+              0.1278,
+              -2.998
+            ],
+            [
+              2.7177,
+              2.0401,
+              -0.2766
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "box.desertOasis.4",
+              "bones": [],
+              "min": [
+                -2.1092,
+                0.1505,
+                -1.1172
+              ],
+              "max": [
+                -1.0702,
+                0.1755,
+                -0.2766
+              ],
+              "over": 0.22,
+              "where": [
+                "0.22 m past the box's +z face (z = -0.5)"
+              ]
+            },
+            {
+              "name": "box.desertOasis.5",
+              "bones": [],
+              "min": [
+                -2.0465,
+                0.153,
+                -1.0546
+              ],
+              "max": [
+                -1.1329,
+                0.183,
+                -0.3392
+              ],
+              "over": 0.16,
+              "where": [
+                "0.16 m past the box's +z face (z = -0.5)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "camels",
+          "meshes": 182,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -2.6094,
+              0.145,
+              0.5099
+            ],
+            [
+              2.5035,
+              1.876,
+              3.0069
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "terrain",
+          "wallMs": 5058,
+          "edits": 4,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "palms",
+          "wallMs": 1731,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "tents",
+          "wallMs": 4944,
+          "edits": 4,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "camels",
+          "wallMs": 6046,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  },
+  "check": {
+    "slug": "r42fitDesertOasisDioramaRichParflatFit",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "A",
+    "renderError": null,
+    "report": {
+      "parts": 689,
+      "triangles": 26640,
+      "colors": 29,
+      "textures": 0,
+      "joints": 0,
+      "size": [
+        6.064,
+        2.79,
+        6.595
+      ],
+      "issues": [
+        {
+          "level": "warning",
+          "message": "Lowest point is 70 mm below y = 0, deeper than 2% of the model's height (56 mm)"
+        }
+      ],
+      "fine": 204
+    }
+  }
+}

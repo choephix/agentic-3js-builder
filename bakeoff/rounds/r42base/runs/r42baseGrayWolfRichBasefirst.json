@@ -1,0 +1,434 @@
+{
+  "slug": "r42baseGrayWolfRichBasefirst",
+  "arm": "basefirst",
+  "subject": "grayWolf",
+  "level": "rich",
+  "pitch": "Category: Animal.\nSubject: gray wolf standing alert.\nStyle: Blizzard/Warcraft.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:17:32.791Z",
+  "wallMs": 33740,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 373563,
+    "completion_tokens": 10667,
+    "total_tokens": 384230,
+    "prompt_tokens_details": {
+      "cached_tokens": 370045
+    }
+  },
+  "costUsd": 0.1507105,
+  "hasCode": true,
+  "basefirst": {
+    "baseMs": 13300,
+    "slowestPartMs": 20440,
+    "critical": "legs",
+    "elapsedMs": 35825,
+    "parts": [
+      {
+        "id": "head",
+        "builds": "wolf head details: upper and lower jaw with teeth, tongue, ears with inner fur, eyes with brows, nose, cheek ruff fur blades, whiskers",
+        "box": [
+          [
+            -0.2,
+            0.65,
+            0.5
+          ],
+          [
+            0.2,
+            1.15,
+            1
+          ]
+        ],
+        "attaches": "the neck tip joint 'head' at the front top of the neck sweep; jaw hinges on joint jaw",
+        "joints": [
+          "head",
+          "jaw"
+        ],
+        "floor": false,
+        "budget": 220
+      },
+      {
+        "id": "legs",
+        "builds": "four legs: upper leg, knee/hock, digitigrade lower leg, paws with toes and claws, fur tufts on legs, dew claws",
+        "box": [
+          [
+            -0.3,
+            0,
+            -0.75
+          ],
+          [
+            0.3,
+            0.55,
+            0.6
+          ]
+        ],
+        "attaches": "the underside of the torso at shoulders (z~0.35) and hips (z~-0.35) joints shoulderL/R and hipL/R",
+        "joints": [
+          "hips",
+          "spine1",
+          "spine2"
+        ],
+        "floor": true,
+        "budget": 260
+      },
+      {
+        "id": "tail",
+        "builds": "bushy tail with chained joints, fur layers, dark tip, fur blades",
+        "box": [
+          [
+            -0.2,
+            0.2,
+            -1.4
+          ],
+          [
+            0.2,
+            0.8,
+            -0.6
+          ]
+        ],
+        "attaches": "the rump at the rear end of the torso, joint tailBase near hips",
+        "joints": [
+          "hips"
+        ],
+        "floor": false,
+        "budget": 150
+      },
+      {
+        "id": "coat",
+        "builds": "fur details on torso and neck: dorsal dark saddle patch, mane ruff blades on neck and shoulders, pale belly and chest fur, rump tufts",
+        "box": [
+          [
+            -0.3,
+            0.3,
+            -0.7
+          ],
+          [
+            0.3,
+            0.95,
+            0.75
+          ]
+        ],
+        "attaches": "the surface of the torso and neck sweeps (top and chest)",
+        "joints": [
+          "spine1",
+          "spine2",
+          "neck1"
+        ],
+        "floor": false,
+        "budget": 230
+      }
+    ],
+    "partsError": null,
+    "missingParts": [],
+    "fit": {
+      "checkMs": 1459,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "head",
+          "meshes": 58,
+          "outside": 4,
+          "maxOver": 1.14,
+          "bounds": [
+            [
+              -0.1736,
+              0.42,
+              -0.6402
+            ],
+            [
+              0.1736,
+              1.1443,
+              1.07
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sweep.spine1",
+              "bones": [
+                "spine1",
+                "spine2"
+              ],
+              "min": [
+                -0.1703,
+                0.4498,
+                -0.6402
+              ],
+              "max": [
+                0.1703,
+                0.87,
+                0.6613
+              ],
+              "over": 1.14,
+              "where": [
+                "0.2 m past the box's -y face (y = 0.65)",
+                "1.14 m past the box's -z face (z = 0.5)"
+              ]
+            },
+            {
+              "name": "sweep.spine1.2",
+              "bones": [
+                "spine1",
+                "spine2"
+              ],
+              "min": [
+                -0.1002,
+                0.42,
+                -0.3699
+              ],
+              "max": [
+                0.1002,
+                0.4997,
+                0.5516
+              ],
+              "over": 0.87,
+              "where": [
+                "0.23 m past the box's -y face (y = 0.65)",
+                "0.87 m past the box's -z face (z = 0.5)"
+              ]
+            },
+            {
+              "name": "sweep.spine1.3",
+              "bones": [
+                "spine1",
+                "spine2"
+              ],
+              "min": [
+                -0.1403,
+                0.7704,
+                -0.2991
+              ],
+              "max": [
+                0.1403,
+                0.9134,
+                0.5907
+              ],
+              "over": 0.8,
+              "where": [
+                "0.8 m past the box's -z face (z = 0.5)"
+              ]
+            },
+            {
+              "name": "sweep.neck1",
+              "bones": [
+                "neck1",
+                "neck2"
+              ],
+              "min": [
+                -0.1401,
+                0.5697,
+                0.2197
+              ],
+              "max": [
+                0.1401,
+                0.9735,
+                0.8536
+              ],
+              "over": 0.28,
+              "where": [
+                "0.28 m past the box's -z face (z = 0.5)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "legs",
+          "meshes": 60,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2002,
+              -0.0001,
+              -0.4916
+            ],
+            [
+              0.2002,
+              0.6296,
+              0.5737
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "tail",
+          "meshes": 58,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2166,
+              0.2108,
+              -1.37
+            ],
+            [
+              0.2166,
+              0.851,
+              -0.5601
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "coat",
+          "meshes": 129,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.1962,
+              0.2989,
+              -0.7057
+            ],
+            [
+              0.1962,
+              0.9769,
+              0.7022
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ]
+    },
+    "calls": [
+      {
+        "id": "base",
+        "effort": "low",
+        "started": "2026-10-28T21:17:32.791Z",
+        "wallMs": 13300,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74766,
+          "completion_tokens": 1903,
+          "total_tokens": 76669,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0279449,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tail",
+        "effort": "low",
+        "started": "2026-10-28T21:17:46.093Z",
+        "wallMs": 9864,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74666,
+          "completion_tokens": 1329,
+          "total_tokens": 75995,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0220049,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "coat",
+        "effort": "low",
+        "started": "2026-10-28T21:17:46.093Z",
+        "wallMs": 16652,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74705,
+          "completion_tokens": 2249,
+          "total_tokens": 76954,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0312829,
+        "hasCode": true,
+        "reasoning": "Since the base source wasn't actually provided, I'll need to build blindly using the spine1, spine2, and neck1 joints along with surface casting. I'm planning to cast rays downward from above the torso and neck region against the root surface to find reliable hit points, guarding against null results where rays miss.\n\nI'm filtering hits within the box bounds to avoid the head or legs, then placing saddle ellipsoids along the mid-spine, mane cone blades leaning back along the upper neck, belly patches from upward rays, chest patches from forward horizontal rays, and rump tufts from rear-facing downward rays. For the cones I'll skip trying to tilt the geometry itself and instead blend the surface normal with a backward direction vector so the spike naturally leans, keeping everything clamped to a small margin inside the box to avoid clipping outside the mesh.\n\n"
+      },
+      {
+        "id": "head",
+        "effort": "low",
+        "started": "2026-10-28T21:17:46.093Z",
+        "wallMs": 20011,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74709,
+          "completion_tokens": 2531,
+          "total_tokens": 77240,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0341109,
+        "hasCode": true,
+        "reasoning": "Since the base source given was just a placeholder with no real code, I'll have to guess at the joint structure, using named bones for \"head\" and \"jaw\" positioned in model-space coordinates since I can't look up existing joint positions directly.\n\nI'm sketching out the skull, snout, jaw, teeth, tongue, ears, eyes, brows, cheek ruff, and whiskers as separate parts placed within the head box bounds, building a helper function to place each piece with consistent geometry, color, position, and bone attachment, keeping proportions modest so everything stays inside the allowed box dimensions.\n\n"
+      },
+      {
+        "id": "legs",
+        "effort": "low",
+        "started": "2026-10-28T21:17:46.093Z",
+        "wallMs": 20440,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74717,
+          "completion_tokens": 2655,
+          "total_tokens": 77372,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0353669,
+        "hasCode": true,
+        "reasoning": "Since the base source isn't actually provided, I need to build somewhat blindly and robustly, avoiding dependence on named joints beyond hips, spine1, and spine2. I'll create my own named joints for legs and other parts, parenting them to the existing hip/spine joints by name string, and consider using spine2 as the parent for shoulder joints.\n\nNow I'm working out the wolf's leg geometry — placing shoulder and hip joints at approximate positions on the torso, then computing segment lengths for front and hind limb chains so they reach the paw/foot targets with appropriate bend angles (knee forward, hock back for the digitigrade hind legs). I'm settling on using arrays of four joint names per limb to define three-segment chains, adjusting lengths so the total reach slightly exceeds the actual target distance to allow natural bending.\n\nWriting paw and toe geometry...\n\n"
+      }
+    ]
+  },
+  "check": {
+    "slug": "r42baseGrayWolfRichBasefirst",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "B",
+    "renderError": null,
+    "report": {
+      "parts": 305,
+      "triangles": 6360,
+      "colors": 31,
+      "textures": 0,
+      "joints": 28,
+      "size": [
+        0.433,
+        1.144,
+        2.44
+      ],
+      "issues": [],
+      "fine": 14
+    }
+  }
+}

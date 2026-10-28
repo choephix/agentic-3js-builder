@@ -1,0 +1,617 @@
+{
+  "slug": "r42baseBarnstormerBiplaneRichBasefirst",
+  "arm": "basefirst",
+  "subject": "barnstormerBiplane",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: barnstormer biplane.\nStyle: whimsical.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:17:32.792Z",
+  "wallMs": 49277,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 522927,
+    "completion_tokens": 15818,
+    "total_tokens": 538745,
+    "prompt_tokens_details": {
+      "cached_tokens": 518063
+    }
+  },
+  "costUsd": 0.2197143,
+  "hasCode": true,
+  "basefirst": {
+    "baseMs": 20357,
+    "slowestPartMs": 28920,
+    "critical": "livery",
+    "elapsedMs": 50843,
+    "parts": [
+      {
+        "id": "wings",
+        "builds": "Upper and lower biplane wings with ribs, tips, struts, interplane struts, bracing wires, stripes and roundels",
+        "box": [
+          [
+            -4.2,
+            0.6,
+            -0.6
+          ],
+          [
+            4.2,
+            2.9,
+            1.9
+          ]
+        ],
+        "attaches": "Lower wing root at the fuselage underside saddle (y~0.95, z~0.5); upper wing on the cabane struts above the cockpit (y~2.2, z~0.6)",
+        "joints": [
+          "fuselage"
+        ],
+        "floor": false,
+        "budget": 260
+      },
+      {
+        "id": "propulsion",
+        "builds": "Propeller with hub and spinner, whimsical curved blades, engine exhaust stacks, cowling louvres and rivets, radiator front",
+        "box": [
+          [
+            -1.1,
+            0.3,
+            2.2
+          ],
+          [
+            1.1,
+            2.1,
+            3.1
+          ]
+        ],
+        "attaches": "Front face of the cowling at z~2.2 on the nose joint",
+        "joints": [
+          "nose"
+        ],
+        "floor": false,
+        "budget": 120
+      },
+      {
+        "id": "landingGear",
+        "builds": "Two main wheels with tyres and hubs, axle, V struts, shock springs, and a tail skid",
+        "box": [
+          [
+            -1,
+            0,
+            -3.4
+          ],
+          [
+            1,
+            1,
+            1.4
+          ]
+        ],
+        "attaches": "Underside of the fuselage at z~0.9 for main gear, and at the tail underside z~-3.1 for the skid",
+        "joints": [
+          "fuselage",
+          "tail"
+        ],
+        "floor": true,
+        "budget": 140
+      },
+      {
+        "id": "cockpit",
+        "builds": "Pilot with goggles, scarf and cap, passenger seat, windscreen, control stick, instrument panel, headrest fairing",
+        "box": [
+          [
+            -0.5,
+            1.2,
+            -0.9
+          ],
+          [
+            0.5,
+            2.1,
+            1.1
+          ]
+        ],
+        "attaches": "Open cockpit cavity cut into the fuselage top between z=-0.7 and z=0.9, resting on the coaming rim",
+        "joints": [
+          "fuselage"
+        ],
+        "floor": false,
+        "budget": 150
+      },
+      {
+        "id": "tailControl",
+        "builds": "Horizontal stabilisers, elevators, rudder with hinge and stripes, tail light, bracing wires",
+        "box": [
+          [
+            -1.5,
+            0.8,
+            -3.8
+          ],
+          [
+            1.5,
+            2.4,
+            -2.2
+          ]
+        ],
+        "attaches": "Tail stabiliser stubs at z~-3.0 and fin trailing edge on the tail joint",
+        "joints": [
+          "tail"
+        ],
+        "floor": false,
+        "budget": 130
+      },
+      {
+        "id": "livery",
+        "builds": "Fuselage stripes, lettering, patched panels, flower decals, mascot nose art, bunting, lantern, windsock and trim details",
+        "box": [
+          [
+            -0.8,
+            0.7,
+            -3.4
+          ],
+          [
+            0.8,
+            2.3,
+            2.4
+          ]
+        ],
+        "attaches": "Fuselage side flanks (x~±0.6) and cowling sides",
+        "joints": [
+          "fuselage",
+          "nose"
+        ],
+        "floor": false,
+        "budget": 100
+      }
+    ],
+    "partsError": null,
+    "missingParts": [],
+    "fit": {
+      "checkMs": 1230,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "wings",
+          "meshes": 89,
+          "outside": 15,
+          "maxOver": 2.65,
+          "bounds": [
+            [
+              -4.3739,
+              0.4357,
+              -3.2502
+            ],
+            [
+              4.3739,
+              2.7143,
+              2.5
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "box.tail",
+              "bones": [
+                "tail"
+              ],
+              "min": [
+                0.0498,
+                1.56,
+                -3.2502
+              ],
+              "max": [
+                0.5502,
+                1.64,
+                -2.5498
+              ],
+              "over": 2.65,
+              "where": [
+                "2.65 m past the box's -z face (z = -0.6)"
+              ]
+            },
+            {
+              "name": "box.tail.2",
+              "bones": [
+                "tail"
+              ],
+              "min": [
+                -0.5502,
+                1.56,
+                -3.2502
+              ],
+              "max": [
+                -0.0498,
+                1.64,
+                -2.5498
+              ],
+              "over": 2.65,
+              "where": [
+                "2.65 m past the box's -z face (z = -0.6)"
+              ]
+            },
+            {
+              "name": "sweep.nose",
+              "bones": [
+                "nose",
+                "tail",
+                "fuselage"
+              ],
+              "min": [
+                -0.6002,
+                0.7739,
+                -3.2237
+              ],
+              "max": [
+                0.6002,
+                2.0548,
+                2.5
+              ],
+              "over": 2.62,
+              "where": [
+                "2.62 m past the box's -z face (z = -0.6)",
+                "0.6 m past the box's +z face (z = 1.9)"
+              ]
+            },
+            {
+              "name": "extrude.tail",
+              "bones": [
+                "tail"
+              ],
+              "min": [
+                -0.05,
+                1.7002,
+                -3.0008
+              ],
+              "max": [
+                0.05,
+                2.7009,
+                -2.0001
+              ],
+              "over": 2.4,
+              "where": [
+                "2.4 m past the box's -z face (z = -0.6)"
+              ]
+            },
+            {
+              "name": "box.fuselage",
+              "bones": [
+                "fuselage"
+              ],
+              "min": [
+                -0.4506,
+                0.7199,
+                -1.9021
+              ],
+              "max": [
+                0.4506,
+                0.9201,
+                1.5021
+              ],
+              "over": 1.3,
+              "where": [
+                "1.3 m past the box's -z face (z = -0.6)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "propulsion",
+          "meshes": 62,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.8672,
+              0.1899,
+              2.2
+            ],
+            [
+              0.8672,
+              2.2101,
+              3.125
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "landingGear",
+          "meshes": 33,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.7202,
+              -0.0176,
+              -3.3847
+            ],
+            [
+              0.8101,
+              0.846,
+              1.2808
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "cockpit",
+          "meshes": 47,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.3507,
+              1.2,
+              -1.0336
+            ],
+            [
+              0.3507,
+              2.1003,
+              1.0014
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "tailControl",
+          "meshes": 27,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.48,
+              0.9953,
+              -3.7702
+            ],
+            [
+              1.48,
+              2.5002,
+              -2.3938
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "livery",
+          "meshes": 123,
+          "outside": 2,
+          "maxOver": 0.18,
+          "bounds": [
+            [
+              -0.8411,
+              1.0693,
+              -3.5801
+            ],
+            [
+              0.8411,
+              2.2989,
+              1.4009
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "box.tail.35",
+              "bones": [
+                "tail"
+              ],
+              "min": [
+                0.0275,
+                1.575,
+                -3.5801
+              ],
+              "max": [
+                0.0575,
+                1.625,
+                -3.4199
+              ],
+              "over": 0.18,
+              "where": [
+                "0.18 m past the box's -z face (z = -3.4)"
+              ]
+            },
+            {
+              "name": "box.tail.51",
+              "bones": [
+                "tail"
+              ],
+              "min": [
+                -0.0575,
+                1.575,
+                -3.5801
+              ],
+              "max": [
+                -0.0275,
+                1.625,
+                -3.4199
+              ],
+              "over": 0.18,
+              "where": [
+                "0.18 m past the box's -z face (z = -3.4)"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "calls": [
+      {
+        "id": "base",
+        "effort": "low",
+        "started": "2026-10-28T21:17:32.792Z",
+        "wallMs": 20357,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74760,
+          "completion_tokens": 2465,
+          "total_tokens": 77225,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.033552900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "landingGear",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.149Z",
+        "wallMs": 10715,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74686,
+          "completion_tokens": 1566,
+          "total_tokens": 76252,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0244149,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tailControl",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.149Z",
+        "wallMs": 11758,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74688,
+          "completion_tokens": 1622,
+          "total_tokens": 76310,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.024978900000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wings",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.149Z",
+        "wallMs": 11996,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74715,
+          "completion_tokens": 1832,
+          "total_tokens": 76547,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0271329,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "propulsion",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.149Z",
+        "wallMs": 13376,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74685,
+          "completion_tokens": 2026,
+          "total_tokens": 76711,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0290129,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cockpit",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.149Z",
+        "wallMs": 15333,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74705,
+          "completion_tokens": 2357,
+          "total_tokens": 77062,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0323629,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "livery",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.149Z",
+        "wallMs": 28920,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74688,
+          "completion_tokens": 3950,
+          "total_tokens": 78638,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0482589,
+        "hasCode": true,
+        "reasoning": "The base source isn't actually given, so I need to guess at its structure and build robustly without knowing it—using named bones like 'fuselage' and 'nose' since those joints are stated to exist, and positioning parts within the model space based on the box dimensions.\n\nSince I can't be sure where the fuselage flank actually is, I'll use a surface ray-cast from the side toward the center to find the real hit point, filtering results to stay within a reasonable fuselage width and falling back to a default offset if nothing's found. For the decorations themselves, I'm planning stripes and lettering as simple colored box strokes, flower decals built from disc-and-petal shapes, a nose-art mascot on the cowling, and bunting draped as a swag along the flank surface rather than strung freely in space to avoid floating geometry.\n\n"
+      }
+    ]
+  },
+  "check": {
+    "slug": "r42baseBarnstormerBiplaneRichBasefirst",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "B",
+    "renderError": null,
+    "report": {
+      "parts": 381,
+      "triangles": 10040,
+      "colors": 56,
+      "textures": 0,
+      "joints": 3,
+      "size": [
+        8.748,
+        2.732,
+        6.895
+      ],
+      "issues": [],
+      "fine": 26
+    }
+  }
+}

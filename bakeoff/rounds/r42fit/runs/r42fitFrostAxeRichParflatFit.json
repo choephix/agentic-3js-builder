@@ -1,0 +1,453 @@
+{
+  "slug": "r42fitFrostAxeRichParflatFit",
+  "arm": "parflat-fit",
+  "subject": "frostAxe",
+  "level": "rich",
+  "pitch": "Category: Fantasy weapon.\nSubject: frost-forged battle axe.\nStyle: League of Legends.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:18:19.371Z",
+  "wallMs": 33115,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 460689,
+    "completion_tokens": 12124,
+    "total_tokens": 472813,
+    "prompt_tokens_details": {
+      "cached_tokens": 444054
+    }
+  },
+  "costUsd": 0.1989154,
+  "hasCode": true,
+  "parallel": {
+    "planMs": 16635,
+    "slowestPartMs": 15169,
+    "critical": "headMain",
+    "elapsedMs": 31804,
+    "spec": {
+      "name": "Frost-Forged Battle Axe",
+      "description": "A two-handed League of Legends style battle axe with a rune-etched icy steel double-crescent head, glowing frost crystals, a dark wrapped haft and a spiked pommel, standing upright on its butt.",
+      "builderName": "frostForgedBattleAxe",
+      "size": [
+        1,
+        1.9,
+        0.14
+      ],
+      "layout": "Static prop standing vertically on its pommel spike at y=0, centred on x=0, facing +Z. Haft runs up the Y axis from the pommel (y 0) to the head collar (y about 1.55). The head is a large crescent blade on +X (left) with a smaller crescent and back-spike on -X, plus a crowning spear tip at the top (y 1.9). The blades are thin in Z (about 0.05) and are flat extrusions in the XY plane. Stylized heroic proportions: chunky, oversized blade, bold ornate trim in gold, hard-edged colour blocks, glowing cyan crystals and runes. Every surface is a flat colour; light edge bevel strips (iceEdge) run along blade rims, dark outline pieces sit under gold trim.",
+      "palette": {
+        "steelDark": "#2d3b52",
+        "steelMid": "#5d7ea3",
+        "iceBlade": "#a9e4f5",
+        "iceEdge": "#eafcff",
+        "frostGlow": "#38e4ff",
+        "gold": "#e0b244",
+        "goldDark": "#8a6422",
+        "haftWood": "#3a2a24",
+        "leather": "#5a3a2c",
+        "leatherDark": "#2c1c18",
+        "rune": "#7ff6ff",
+        "snow": "#f4fbff"
+      },
+      "mounts": {
+        "pommelBase": [
+          0,
+          0,
+          0
+        ],
+        "gripBottom": [
+          0,
+          0.18,
+          0
+        ],
+        "gripTop": [
+          0,
+          0.95,
+          0
+        ],
+        "collar": [
+          0,
+          1.5,
+          0
+        ],
+        "headCentre": [
+          0,
+          1.5,
+          0
+        ],
+        "spearBase": [
+          0,
+          1.72,
+          0
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "haft",
+          "builds": "The shaft: octagonal dark wood haft radius 0.028 from y=0.18 to 1.5 with tapered ends; spiral leather grip wraps (leather bands with leatherDark gaps) between y=0.3 and 0.95; gold ring bands at the grip ends and mid-shaft with goldDark rims; a few frost-rime snow patches near the head; small cyan rune diamonds inlaid on the upper shaft y 1.0-1.4; hanging leather strap tassel with a small ice-crystal charm at y~0.95.",
+          "box": [
+            [
+              -0.08,
+              0.18,
+              -0.08
+            ],
+            [
+              0.08,
+              1.5,
+              0.08
+            ]
+          ],
+          "attaches": "Bottom meets pommel at gripBottom; top enters the head collar at collar.",
+          "joints": [],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "pommel",
+          "builds": "Butt end: a gold faceted cap and goldDark cup from y=0 to 0.2, a downward steelMid spike tip touching y=0, an ice crystal cluster (3 faceted shards of iceBlade with frostGlow cores) splaying out near y 0.12, and small gold studs around the cap.",
+          "box": [
+            [
+              -0.1,
+              0,
+              -0.1
+            ],
+            [
+              0.1,
+              0.2,
+              0.1
+            ]
+          ],
+          "attaches": "Top meets haft at gripBottom.",
+          "joints": [],
+          "floor": true,
+          "budget": 90
+        },
+        {
+          "id": "headMain",
+          "builds": "Main (+X, left) blade: large crescent extrude, steelMid body with iceBlade inner face, iceEdge bevel strip along the curved cutting edge, gold trim border and goldDark under-outline, 3 jagged icicle teeth on the lower edge, engraved rune glyphs (rune colour, glowing) and a frostGlow crystal inset near the socket, snow tufts on the upper edge. Blade spans x 0.08 to 0.5, y 1.2 to 1.85.",
+          "box": [
+            [
+              0.06,
+              1.2,
+              -0.05
+            ],
+            [
+              0.5,
+              1.85,
+              0.05
+            ]
+          ],
+          "attaches": "Root plate bolts onto the collar at headCentre, on the +X side.",
+          "joints": [],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "headBack",
+          "builds": "Counterweight side (-X): smaller crescent blade x -0.38 to -0.06, y 1.3 to 1.75 in steelMid with iceEdge rim, gold trim, plus a long back spike pointing -X made of 3 stacked ice shards, matching rune glyphs mirrored; the same gold border motif as headMain.",
+          "box": [
+            [
+              -0.5,
+              1.25,
+              -0.05
+            ],
+            [
+              -0.06,
+              1.8,
+              0.05
+            ]
+          ],
+          "attaches": "Root plate on the collar at headCentre, -X side.",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "collarCrown",
+          "builds": "The central head hub and crown: gold octagonal collar y 1.42-1.62 with goldDark bands and rivets, a large frostGlow crystal gem set in front (+Z) in a gold bezel with four prongs, steelDark socket plates front and back, then a tall spear tip (iceBlade diamond extrude with iceEdge centre ridge, gold base ring) rising from spearBase to y 1.9, and two small side fins of ice beside it.",
+          "box": [
+            [
+              -0.08,
+              1.4,
+              -0.07
+            ],
+            [
+              0.08,
+              1.9,
+              0.07
+            ]
+          ],
+          "attaches": "Sits on haft top at collar; blades attach at its sides; spear tip rises from spearBase.",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:18:19.371Z",
+        "wallMs": 16635,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75206,
+          "completion_tokens": 2047,
+          "total_tokens": 77253,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0302649,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "haft",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.006Z",
+        "wallMs": 10987,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77138,
+          "completion_tokens": 1746,
+          "total_tokens": 78884,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0311189,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "pommel",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.006Z",
+        "wallMs": 11005,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77034,
+          "completion_tokens": 1544,
+          "total_tokens": 78578,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0288909,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "collarCrown",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.006Z",
+        "wallMs": 11503,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77123,
+          "completion_tokens": 1969,
+          "total_tokens": 79092,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0333189,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "headBack",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.006Z",
+        "wallMs": 14978,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77065,
+          "completion_tokens": 2357,
+          "total_tokens": 79422,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0370829,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "headMain",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.006Z",
+        "wallMs": 15169,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77123,
+          "completion_tokens": 2461,
+          "total_tokens": 79584,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0382389,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ],
+    "fit": {
+      "fitMs": 1311,
+      "checkMs": 1705,
+      "afterMs": null,
+      "repairMs": 0,
+      "error": null,
+      "threw": {
+        "headMain": "Cannot read properties of undefined (reading 'position')"
+      },
+      "before": [
+        {
+          "id": "haft",
+          "meshes": 64,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.0475,
+              0.1794,
+              -0.0475
+            ],
+            [
+              0.086,
+              1.5,
+              0.0475
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "pommel",
+          "meshes": 34,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.1344,
+              0,
+              -0.0902
+            ],
+            [
+              0.1055,
+              0.215,
+              0.1471
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "headMain",
+          "meshes": 16,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              0.0713,
+              1.1889,
+              -0.0371
+            ],
+            [
+              0.5087,
+              1.8659,
+              0.0371
+            ]
+          ],
+          "floats": null,
+          "threw": "Cannot read properties of undefined (reading 'position')",
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "headBack",
+          "meshes": 46,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.5512,
+              1.2324,
+              -0.045
+            ],
+            [
+              -0.02,
+              1.7451,
+              0.045
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "collarCrown",
+          "meshes": 44,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.0802,
+              1.415,
+              -0.0781
+            ],
+            [
+              0.0802,
+              1.9155,
+              0.134
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": null,
+      "afterError": null,
+      "afterThrew": null,
+      "repairs": [],
+      "reverted": []
+    }
+  },
+  "check": {
+    "slug": "r42fitFrostAxeRichParflatFit",
+    "typeErrors": 1,
+    "typecheckSkipped": false,
+    "typeErrorSample": [
+      "bakeoff/rounds/r42fit/builds/r42fitFrostAxeRichParflatFit.ts(199,92): error TS2339: Property 'mesh' does not exist on type 'Sweep'."
+    ],
+    "rendered": false,
+    "lane": null,
+    "renderError": "/home/cx/noodlespace/agentic-3js-builder/bakeoff/rounds/r42fit/builds/r42fitFrostAxeRichParflatFit.ts:199\n    b.spike([x, y, 0.0], [0, -1, 0], l * 0.6, 0.01, { color: P.iceEdge, sides: 4 } as any).mesh.position.z += 0.0;\n                                                                                           ^\n\nTypeError: Cannot read properties of undefined (reading 'position')\n    at buildHeadMain (/home/cx/noodlespace/agentic-3js-builder/bakeoff/rounds/r42fit/builds/r42fitFrostAxeRichParflatFit.ts:199:92)\n    at Module.build (/home/cx/noodlespace/agentic-3js-builder/bakeoff/rounds/r42fit/builds/r42fitFrostAxeRichParflatFit.ts:395:29)\n    at <anonymous> (/home/cx/noodlespace/agentic-3js-builder/scripts/snap.ts:44:50)\n\nNode.js v26.13.0",
+    "report": null
+  }
+}

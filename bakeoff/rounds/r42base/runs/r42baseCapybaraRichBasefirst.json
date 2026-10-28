@@ -1,0 +1,477 @@
+{
+  "slug": "r42baseCapybaraRichBasefirst",
+  "arm": "basefirst",
+  "subject": "capybara",
+  "level": "rich",
+  "pitch": "Category: Animal.\nSubject: capybara with a small bird on its head.\nStyle: whimsical.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:19:12.710Z",
+  "wallMs": 27250,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 448226,
+    "completion_tokens": 9942,
+    "total_tokens": 458168,
+    "prompt_tokens_details": {
+      "cached_tokens": 444054
+    }
+  },
+  "costUsd": 0.1521694,
+  "hasCode": true,
+  "basefirst": {
+    "baseMs": 12883,
+    "slowestPartMs": 14367,
+    "critical": "legs",
+    "elapsedMs": 28524,
+    "parts": [
+      {
+        "id": "head",
+        "builds": "capybara face details: big dark eyes with highlights, brows, blunt muzzle pad, nostrils, split mouth line, small round ears with inner tone, whisker dots, cheek tufts, lower jaw on the jaw joint",
+        "box": [
+          [
+            -0.22,
+            0.55,
+            0.45
+          ],
+          [
+            0.22,
+            0.95,
+            0.98
+          ]
+        ],
+        "attaches": "head skull and muzzle block on the head joint; jaw joint under the muzzle",
+        "joints": [
+          "head",
+          "jaw",
+          "neck"
+        ],
+        "floor": false,
+        "budget": 180
+      },
+      {
+        "id": "legs",
+        "builds": "four short stout legs with joints (hip, knee, ankle), chunky dark paws with toe nubs and claws, fur tufts at the leg tops",
+        "box": [
+          [
+            -0.3,
+            0,
+            -0.5
+          ],
+          [
+            0.3,
+            0.38,
+            0.5
+          ]
+        ],
+        "attaches": "underside of the barrel body at the shoulder and hip joints",
+        "joints": [
+          "hips",
+          "chest"
+        ],
+        "floor": true,
+        "budget": 220
+      },
+      {
+        "id": "bird",
+        "builds": "small whimsical bird perched on the head: round body, head, beak, eyes, wing pair, tail feathers, tiny feet gripping, crest tuft",
+        "box": [
+          [
+            -0.07,
+            0.93,
+            0.5
+          ],
+          [
+            0.07,
+            1.1,
+            0.72
+          ]
+        ],
+        "attaches": "flat top of the capybara skull at the head joint",
+        "joints": [
+          "head"
+        ],
+        "floor": false,
+        "budget": 150
+      },
+      {
+        "id": "furAndTail",
+        "builds": "fur detail: back tufts, rump stub tail, belly pale patch, fur ridge cards along spine and haunches, whisker-like bristles on the muzzle",
+        "box": [
+          [
+            -0.32,
+            0.2,
+            -0.75
+          ],
+          [
+            0.32,
+            0.8,
+            0.45
+          ]
+        ],
+        "attaches": "surface of the barrel body and the rump at the tail joint",
+        "joints": [
+          "tail",
+          "hips",
+          "chest"
+        ],
+        "floor": false,
+        "budget": 200
+      },
+      {
+        "id": "whimsy",
+        "builds": "whimsical accessories: a tiny flower garland or scarf around the neck, little leaf hat for the bird, a few petals drifting on the back",
+        "box": [
+          [
+            -0.3,
+            0.45,
+            0.2
+          ],
+          [
+            0.3,
+            0.85,
+            0.6
+          ]
+        ],
+        "attaches": "neck joint region and the upper back of the body",
+        "joints": [
+          "neck",
+          "chest"
+        ],
+        "floor": false,
+        "budget": 130
+      }
+    ],
+    "partsError": null,
+    "missingParts": [],
+    "fit": {
+      "checkMs": 1143,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "head",
+          "meshes": 38,
+          "outside": 3,
+          "maxOver": 1.34,
+          "bounds": [
+            [
+              -0.3354,
+              0.1699,
+              -0.8893
+            ],
+            [
+              0.3354,
+              0.97,
+              1.05
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sweep.hips",
+              "bones": [
+                "hips",
+                "chest"
+              ],
+              "min": [
+                -0.3354,
+                0.2,
+                -0.8893
+              ],
+              "max": [
+                0.3354,
+                0.7705,
+                0.6809
+              ],
+              "over": 1.34,
+              "where": [
+                "0.35 m past the box's -y face (y = 0.55)",
+                "1.34 m past the box's -z face (z = 0.45)"
+              ]
+            },
+            {
+              "name": "box.hips",
+              "bones": [
+                "hips"
+              ],
+              "min": [
+                -0.1804,
+                0.1699,
+                -0.5009
+              ],
+              "max": [
+                0.1804,
+                0.2301,
+                0.3009
+              ],
+              "over": 0.95,
+              "where": [
+                "0.38 m past the box's -y face (y = 0.55)",
+                "0.95 m past the box's -z face (z = 0.45)"
+              ]
+            },
+            {
+              "name": "cylinder.neck",
+              "bones": [
+                "neck"
+              ],
+              "min": [
+                -0.2402,
+                0.2969,
+                0.2872
+              ],
+              "max": [
+                0.2402,
+                0.8084,
+                0.7328
+              ],
+              "over": 0.25,
+              "where": [
+                "0.25 m past the box's -y face (y = 0.55)",
+                "0.16 m past the box's -z face (z = 0.45)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "legs",
+          "meshes": 56,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2552,
+              -0.0001,
+              -0.3825
+            ],
+            [
+              0.2668,
+              0.4449,
+              0.4346
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "bird",
+          "meshes": 25,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.0611,
+              0.93,
+              0.4626
+            ],
+            [
+              0.0611,
+              1.1197,
+              0.708
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "furAndTail",
+          "meshes": 33,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2269,
+              0.1374,
+              -0.6215
+            ],
+            [
+              0.2291,
+              0.8463,
+              0.4066
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "whimsy",
+          "meshes": 45,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.23,
+              0.58,
+              0.1878
+            ],
+            [
+              0.2298,
+              0.875,
+              0.6122
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ]
+    },
+    "calls": [
+      {
+        "id": "base",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.710Z",
+        "wallMs": 12883,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74761,
+          "completion_tokens": 1923,
+          "total_tokens": 76684,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0281349,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "head",
+        "effort": "low",
+        "started": "2026-10-28T21:19:25.594Z",
+        "wallMs": 9792,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74722,
+          "completion_tokens": 1457,
+          "total_tokens": 76179,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0233969,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "whimsy",
+        "effort": "low",
+        "started": "2026-10-28T21:19:25.599Z",
+        "wallMs": 10086,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74683,
+          "completion_tokens": 1359,
+          "total_tokens": 76042,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.022338900000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "furAndTail",
+        "effort": "low",
+        "started": "2026-10-28T21:19:25.599Z",
+        "wallMs": 11446,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74704,
+          "completion_tokens": 1646,
+          "total_tokens": 76350,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0252509,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bird",
+        "effort": "low",
+        "started": "2026-10-28T21:19:25.599Z",
+        "wallMs": 12240,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74676,
+          "completion_tokens": 1603,
+          "total_tokens": 76279,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.024764900000000003,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "legs",
+        "effort": "low",
+        "started": "2026-10-28T21:19:25.599Z",
+        "wallMs": 14367,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74680,
+          "completion_tokens": 1954,
+          "total_tokens": 76634,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.028282900000000003,
+        "hasCode": true,
+        "reasoning": "Since the base source wasn't actually given, I'll have to guess at joint names like hips and chest and position the legs using fixed coordinates parented to those names, placing them symmetrically along the x-axis and offsetting front/back in z.\n\nWriting leg chain and paw geometry...\n\n"
+      }
+    ]
+  },
+  "check": {
+    "slug": "r42baseCapybaraRichBasefirst",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "B",
+    "renderError": null,
+    "report": {
+      "parts": 197,
+      "triangles": 6054,
+      "colors": 35,
+      "textures": 0,
+      "joints": 18,
+      "size": [
+        0.671,
+        1.12,
+        1.939
+      ],
+      "issues": [],
+      "fine": 7
+    }
+  }
+}

@@ -1,0 +1,508 @@
+{
+  "slug": "r42baseChopperMotorbikeRichBasefirst",
+  "arm": "basefirst",
+  "subject": "chopperMotorbike",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: custom chopper motorbike.\nStyle: Overwatch.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:17:32.793Z",
+  "wallMs": 36412,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 448308,
+    "completion_tokens": 15823,
+    "total_tokens": 464131,
+    "prompt_tokens_details": {
+      "cached_tokens": 444054
+    }
+  },
+  "costUsd": 0.2111434,
+  "hasCode": true,
+  "basefirst": {
+    "baseMs": 16645,
+    "slowestPartMs": 19767,
+    "critical": "engineExhaust",
+    "elapsedMs": 37773,
+    "parts": [
+      {
+        "id": "frontWheelFork",
+        "builds": "front wheel with tire, rim, spokes, hub and brake disc, long raked chopper fork tubes, triple-tree clamp, front fender, headlight and orange Overwatch-style glow ring",
+        "box": [
+          [
+            -0.3,
+            0,
+            0.95
+          ],
+          [
+            0.3,
+            1.2,
+            1.75
+          ]
+        ],
+        "attaches": "steering head joint at the front of the frame neck (0, 0.95, 0.88)",
+        "joints": [
+          "steerHead"
+        ],
+        "floor": true,
+        "budget": 200
+      },
+      {
+        "id": "rearWheelSwing",
+        "builds": "fat rear wheel with tire, rim, hub, sprocket, swingarm plates, rear fender, chain guard and tail light",
+        "box": [
+          [
+            -0.3,
+            0,
+            -1.6
+          ],
+          [
+            0.3,
+            0.85,
+            -0.45
+          ]
+        ],
+        "attaches": "swingarm pivot at the rear of the frame (0, 0.5, -0.4)",
+        "joints": [
+          "swingPivot"
+        ],
+        "floor": true,
+        "budget": 180
+      },
+      {
+        "id": "engineExhaust",
+        "builds": "V-twin engine cylinders with fins, cases, chrome pipes, side exhaust, kickstand and footpegs, pulse-core glow details",
+        "box": [
+          [
+            -0.4,
+            0.2,
+            -0.35
+          ],
+          [
+            0.4,
+            0.75,
+            0.55
+          ]
+        ],
+        "attaches": "engine cradle underneath the frame spine and tank bottom, centred at (0, 0.45, 0.1)",
+        "joints": [
+          "frame"
+        ],
+        "floor": false,
+        "budget": 190
+      },
+      {
+        "id": "riderControls",
+        "builds": "ape-hanger handlebars, grips, levers, mirrors, speed gauge, throttle details, stylised leather saddle trim, and a rider seat tuck-and-roll pattern",
+        "box": [
+          [
+            -0.5,
+            0.9,
+            -0.7
+          ],
+          [
+            0.5,
+            1.6,
+            1.05
+          ]
+        ],
+        "attaches": "handlebar riser on the steering head top (0, 1.1, 0.85) and the seat pan top (0, 0.98, -0.3)",
+        "joints": [
+          "steerHead",
+          "frame"
+        ],
+        "floor": false,
+        "budget": 170
+      },
+      {
+        "id": "tankDecor",
+        "builds": "tank graphics, hex-pattern emblem stripes, side glowing energy vents, fuel cap, and decal trim along the tank and fender",
+        "box": [
+          [
+            -0.3,
+            0.9,
+            0
+          ],
+          [
+            0.3,
+            1.4,
+            0.8
+          ]
+        ],
+        "attaches": "fuel tank shell surface on the top of the frame spine",
+        "joints": [
+          "frame"
+        ],
+        "floor": false,
+        "budget": 160
+      }
+    ],
+    "partsError": null,
+    "missingParts": [],
+    "fit": {
+      "checkMs": 1391,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "frontWheelFork",
+          "meshes": 67,
+          "outside": 14,
+          "maxOver": 1.95,
+          "bounds": [
+            [
+              -0.2003,
+              0,
+              -1.0045
+            ],
+            [
+              0.2003,
+              1.2,
+              1.8
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sweep.swingPivot",
+              "bones": [
+                "swingPivot"
+              ],
+              "min": [
+                0.1101,
+                0.3902,
+                -1.0045
+              ],
+              "max": [
+                0.1702,
+                0.5298,
+                -0.396
+              ],
+              "over": 1.95,
+              "where": [
+                "1.95 m past the box's -z face (z = 0.95)"
+              ]
+            },
+            {
+              "name": "sweep.swingPivot.2",
+              "bones": [
+                "swingPivot"
+              ],
+              "min": [
+                -0.1702,
+                0.3902,
+                -1.0045
+              ],
+              "max": [
+                -0.1101,
+                0.5298,
+                -0.396
+              ],
+              "over": 1.95,
+              "where": [
+                "1.95 m past the box's -z face (z = 0.95)"
+              ]
+            },
+            {
+              "name": "sweep.frame",
+              "bones": [
+                "frame"
+              ],
+              "min": [
+                -0.0884,
+                0.6949,
+                -0.821
+              ],
+              "max": [
+                0.0884,
+                0.9977,
+                0.8786
+              ],
+              "over": 1.77,
+              "where": [
+                "1.77 m past the box's -z face (z = 0.95)"
+              ]
+            },
+            {
+              "name": "sweep.frame.4",
+              "bones": [
+                "frame"
+              ],
+              "min": [
+                0.0502,
+                0.4279,
+                -0.7234
+              ],
+              "max": [
+                0.1501,
+                0.7818,
+                -0.3782
+              ],
+              "over": 1.67,
+              "where": [
+                "1.67 m past the box's -z face (z = 0.95)"
+              ]
+            },
+            {
+              "name": "sweep.frame.7",
+              "bones": [
+                "frame"
+              ],
+              "min": [
+                -0.1501,
+                0.4279,
+                -0.7235
+              ],
+              "max": [
+                -0.0502,
+                0.7818,
+                -0.3782
+              ],
+              "over": 1.67,
+              "where": [
+                "1.67 m past the box's -z face (z = 0.95)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "rearWheelSwing",
+          "meshes": 57,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2163,
+              -0.029,
+              -1.61
+            ],
+            [
+              0.2175,
+              0.8964,
+              -0.3549
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "engineExhaust",
+          "meshes": 49,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.3951,
+              0.1966,
+              -0.381
+            ],
+            [
+              0.3951,
+              0.808,
+              0.4084
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "riderControls",
+          "meshes": 94,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.471,
+              0.96,
+              -0.6151
+            ],
+            [
+              0.471,
+              1.6247,
+              0.974
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "tankDecor",
+          "meshes": 69,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2516,
+              0.8644,
+              0.0234
+            ],
+            [
+              0.2516,
+              1.2561,
+              0.642
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ]
+    },
+    "calls": [
+      {
+        "id": "base",
+        "effort": "low",
+        "started": "2026-10-28T21:17:32.793Z",
+        "wallMs": 16645,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74762,
+          "completion_tokens": 2181,
+          "total_tokens": 76943,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.030716900000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "rearWheelSwing",
+        "effort": "low",
+        "started": "2026-10-28T21:17:49.438Z",
+        "wallMs": 16561,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74700,
+          "completion_tokens": 2765,
+          "total_tokens": 77465,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.036432900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "frontWheelFork",
+        "effort": "low",
+        "started": "2026-10-28T21:17:49.438Z",
+        "wallMs": 17997,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74717,
+          "completion_tokens": 2629,
+          "total_tokens": 77346,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0351069,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tankDecor",
+        "effort": "low",
+        "started": "2026-10-28T21:17:49.438Z",
+        "wallMs": 18064,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74684,
+          "completion_tokens": 2400,
+          "total_tokens": 77084,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0327509,
+        "hasCode": true,
+        "reasoning": "Since the base source wasn't actually provided, I need to work without seeing it directly. I'll try querying the model's surface with a downward ray from above the tank to find its top, falling back to an estimated height if that lookup returns nothing.\n\nWriting placement logic...\n\n"
+      },
+      {
+        "id": "riderControls",
+        "effort": "low",
+        "started": "2026-10-28T21:17:49.438Z",
+        "wallMs": 19372,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74734,
+          "completion_tokens": 3021,
+          "total_tokens": 77755,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0390609,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "engineExhaust",
+        "effort": "low",
+        "started": "2026-10-28T21:17:49.438Z",
+        "wallMs": 19767,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74711,
+          "completion_tokens": 2827,
+          "total_tokens": 77538,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0370749,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  },
+  "check": {
+    "slug": "r42baseChopperMotorbikeRichBasefirst",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "B",
+    "renderError": null,
+    "report": {
+      "parts": 336,
+      "triangles": 11728,
+      "colors": 46,
+      "textures": 0,
+      "joints": 7,
+      "size": [
+        0.942,
+        1.654,
+        3.41
+      ],
+      "issues": [],
+      "fine": 32
+    }
+  }
+}

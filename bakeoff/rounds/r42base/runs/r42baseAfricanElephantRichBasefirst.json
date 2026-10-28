@@ -1,0 +1,561 @@
+{
+  "slug": "r42baseAfricanElephantRichBasefirst",
+  "arm": "basefirst",
+  "subject": "africanElephant",
+  "level": "rich",
+  "pitch": "Category: Animal.\nSubject: adult African bush elephant.\nStyle: low-poly.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:18:23.919Z",
+  "wallMs": 26926,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 522709,
+    "completion_tokens": 11023,
+    "total_tokens": 533732,
+    "prompt_tokens_details": {
+      "cached_tokens": 518063
+    }
+  },
+  "costUsd": 0.1713283,
+  "hasCode": true,
+  "basefirst": {
+    "baseMs": 13001,
+    "slowestPartMs": 13925,
+    "critical": "trunk",
+    "elapsedMs": 28014,
+    "parts": [
+      {
+        "id": "head",
+        "builds": "skull cap details, brow, cheeks, eyes with lids and lashes, jaw/mouth, forehead dome and ear mounts",
+        "box": [
+          [
+            -0.75,
+            1.7,
+            1.5
+          ],
+          [
+            0.75,
+            3.7,
+            2.6
+          ]
+        ],
+        "attaches": "the head joint at the front of the neck and the front face of the body",
+        "joints": [
+          "neck",
+          "head"
+        ],
+        "floor": false,
+        "budget": 180
+      },
+      {
+        "id": "trunk",
+        "builds": "segmented trunk chain with joints, wrinkle rings, nostril tip and finger, and a lower lip",
+        "box": [
+          [
+            -0.3,
+            0,
+            2.2
+          ],
+          [
+            0.3,
+            2.6,
+            3.6
+          ]
+        ],
+        "attaches": "the front-bottom of the head joint, below the forehead",
+        "joints": [
+          "head"
+        ],
+        "floor": false,
+        "budget": 180
+      },
+      {
+        "id": "tusks",
+        "builds": "two curved ivory tusks with bands, tips and root sockets",
+        "box": [
+          [
+            -0.8,
+            1,
+            1.9
+          ],
+          [
+            0.8,
+            2.4,
+            3.3
+          ]
+        ],
+        "attaches": "the sides of the upper jaw on the head, either side of the trunk root",
+        "joints": [
+          "head"
+        ],
+        "floor": false,
+        "budget": 70
+      },
+      {
+        "id": "ears",
+        "builds": "two large Africa-map shaped ears with thickness, inner skin colour, veins and rim folds",
+        "box": [
+          [
+            -2,
+            1.8,
+            0.7
+          ],
+          [
+            2,
+            3.9,
+            1.8
+          ]
+        ],
+        "attaches": "the sides of the head joint behind the eyes",
+        "joints": [
+          "head"
+        ],
+        "floor": false,
+        "budget": 120
+      },
+      {
+        "id": "legs",
+        "builds": "four pillar legs with knees, toenails, foot pads, wrinkle rings and dust at the feet",
+        "box": [
+          [
+            -1,
+            0,
+            -1.7
+          ],
+          [
+            1,
+            1.6,
+            1.6
+          ]
+        ],
+        "attaches": "the underside of the torso at the shoulder and hip sockets",
+        "joints": [
+          "spine",
+          "hips"
+        ],
+        "floor": true,
+        "budget": 240
+      },
+      {
+        "id": "tail",
+        "builds": "tail chain with joints, hair tuft at the tip, plus rump wrinkles and back bristles",
+        "box": [
+          [
+            -0.3,
+            0.8,
+            -2.6
+          ],
+          [
+            0.3,
+            3,
+            -1.6
+          ]
+        ],
+        "attaches": "the rump at the rear of the torso, the hips joint",
+        "joints": [
+          "hips"
+        ],
+        "floor": false,
+        "budget": 100
+      }
+    ],
+    "partsError": null,
+    "missingParts": [],
+    "fit": {
+      "checkMs": 1180,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "head",
+          "meshes": 41,
+          "outside": 4,
+          "maxOver": 3.8,
+          "bounds": [
+            [
+              -0.8967,
+              1.2499,
+              -2.3017
+            ],
+            [
+              0.8967,
+              3.6,
+              2.7251
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sweep.hips",
+              "bones": [
+                "hips",
+                "neck",
+                "spine"
+              ],
+              "min": [
+                -0.8967,
+                1.3302,
+                -2.3017
+              ],
+              "max": [
+                0.8967,
+                3.2855,
+                2.3828
+              ],
+              "over": 3.8,
+              "where": [
+                "0.37 m past the box's -y face (y = 1.7)",
+                "3.8 m past the box's -z face (z = 1.5)"
+              ]
+            },
+            {
+              "name": "box.spine",
+              "bones": [
+                "spine"
+              ],
+              "min": [
+                -0.6009,
+                1.2499,
+                -1.3017
+              ],
+              "max": [
+                0.6009,
+                1.4501,
+                1.1017
+              ],
+              "over": 2.8,
+              "where": [
+                "0.45 m past the box's -y face (y = 1.7)",
+                "2.8 m past the box's -z face (z = 1.5)"
+              ]
+            },
+            {
+              "name": "sphere.spine",
+              "bones": [
+                "spine"
+              ],
+              "min": [
+                -0.7711,
+                2.6495,
+                -0.2113
+              ],
+              "max": [
+                0.7711,
+                3.3505,
+                1.6113
+              ],
+              "over": 1.71,
+              "where": [
+                "1.71 m past the box's -z face (z = 1.5)"
+              ]
+            },
+            {
+              "name": "sweep.neck",
+              "bones": [
+                "neck"
+              ],
+              "min": [
+                -0.5508,
+                1.9775,
+                0.7776
+              ],
+              "max": [
+                0.5508,
+                3.2228,
+                2.4235
+              ],
+              "over": 0.72,
+              "where": [
+                "0.72 m past the box's -z face (z = 1.5)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "trunk",
+          "meshes": 21,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2602,
+              0.2675,
+              2.0613
+            ],
+            [
+              0.2602,
+              2.2946,
+              3.4709
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "tusks",
+          "meshes": 14,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.6577,
+              1.1219,
+              1.8659
+            ],
+            [
+              0.6577,
+              1.6082,
+              3.2915
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "ears",
+          "meshes": 16,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -2.107,
+              1.7488,
+              1.0663
+            ],
+            [
+              2.1067,
+              4.0317,
+              1.6345
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "legs",
+          "meshes": 72,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.6882,
+              -0.0215,
+              -1.1799
+            ],
+            [
+              0.6825,
+              1.5313,
+              1.1128
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "tail",
+          "meshes": 24,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.3259,
+              0.7291,
+              -2.3102
+            ],
+            [
+              0.3259,
+              3.0483,
+              -1.6298
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ]
+    },
+    "calls": [
+      {
+        "id": "base",
+        "effort": "low",
+        "started": "2026-10-28T21:18:23.919Z",
+        "wallMs": 13001,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74758,
+          "completion_tokens": 1874,
+          "total_tokens": 76632,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0276389,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tusks",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.921Z",
+        "wallMs": 6728,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74651,
+          "completion_tokens": 944,
+          "total_tokens": 75595,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.018124900000000003,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tail",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.921Z",
+        "wallMs": 9685,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74658,
+          "completion_tokens": 1252,
+          "total_tokens": 75910,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.021218900000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "legs",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.921Z",
+        "wallMs": 11593,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74658,
+          "completion_tokens": 1683,
+          "total_tokens": 76341,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0255289,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "ears",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.921Z",
+        "wallMs": 12192,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74649,
+          "completion_tokens": 1620,
+          "total_tokens": 76269,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0248809,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "head",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.921Z",
+        "wallMs": 12211,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74673,
+          "completion_tokens": 1803,
+          "total_tokens": 76476,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.026758900000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "trunk",
+        "effort": "low",
+        "started": "2026-10-28T21:18:36.921Z",
+        "wallMs": 13925,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74662,
+          "completion_tokens": 1847,
+          "total_tokens": 76509,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0271769,
+        "hasCode": true,
+        "reasoning": "Since the base source wasn't actually provided, I'll have to guess at a reasonable structure: a head joint around the box region (x ±0.3, y 0 to 2.6, z 2.2 to 3.6), with a trunk hanging from the front-bottom of the head and curling forward toward the floor. I'll attach the trunk chain as a child of the head joint, estimating its attachment point since I don't know the exact head position.\n\nI'm sketching a curved path for the trunk from near the head down to a tip just above the floor, then building a chain of 8 trunk joints along that path with a swept, tapering radius. I'm adding wrinkle rings as small tori spaced along the sweep, oriented to the tangent direction at each point, plus a small spike at the tip for a nostril-like detail, all kept within the bounding box constraints.\n\n"
+      }
+    ]
+  },
+  "check": {
+    "slug": "r42baseAfricanElephantRichBasefirst",
+    "typeErrors": 3,
+    "typecheckSkipped": false,
+    "typeErrorSample": [
+      "bakeoff/rounds/r42base/builds/r42baseAfricanElephantRichBasefirst.ts(81,19): error TS2339: Property 'catmull' does not exist on type 'Builder'.",
+      "bakeoff/rounds/r42base/builds/r42baseAfricanElephantRichBasefirst.ts(81,31): error TS2339: Property 'catmull' does not exist on type 'Builder'.",
+      "bakeoff/rounds/r42base/builds/r42baseAfricanElephantRichBasefirst.ts(154,20): error TS2339: Property 'catmull' does not exist on type 'Builder'."
+    ],
+    "rendered": true,
+    "lane": "B",
+    "renderError": null,
+    "report": {
+      "parts": 188,
+      "triangles": 9492,
+      "colors": 32,
+      "textures": 0,
+      "joints": 31,
+      "size": [
+        4.214,
+        4.053,
+        5.781
+      ],
+      "issues": [],
+      "fine": 39
+    }
+  }
+}

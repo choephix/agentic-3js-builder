@@ -1,0 +1,815 @@
+{
+  "slug": "r42fitMonsterTruckRichParflatFit",
+  "arm": "parflat-fit",
+  "subject": "monsterTruck",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: monster truck with huge tyres.\nStyle: pixel art.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:19:20.480Z",
+  "wallMs": 55119,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 867220,
+    "completion_tokens": 17171,
+    "total_tokens": 884391,
+    "prompt_tokens_details": {
+      "cached_tokens": 832239
+    }
+  },
+  "costUsd": 0.3248959,
+  "hasCode": true,
+  "parallel": {
+    "planMs": 18433,
+    "slowestPartMs": 14713,
+    "critical": "hood",
+    "elapsedMs": 33146,
+    "spec": {
+      "name": "Pixel Monster Truck",
+      "description": "A chunky pixel-art monster truck with huge knobbly tyres, a lifted red pickup body, roll cage, light bar and exhaust stacks.",
+      "builderName": "pixelMonsterTruck",
+      "size": [
+        3.2,
+        3.3,
+        5.4
+      ],
+      "layout": "Pixel-art blocky style: everything is boxes with square-texel look (tileBox/cellPaint with a shared texel of 0.1 m). Four enormous tyres (radius 0.85, width 0.7) sit at the corners with their bottoms on y=0, rims in grey with gold hubs and bolts. A tall chassis frame of dark steel sits on two axles at y=0.85, with leaf-spring shocks and driveshafts. Above it, a red pickup body: hood and grille at the front (+Z), a cab with big windows in the middle, and an open bed at the back with a roll bar and a light bar on the cab roof. Flame decals on the body sides in orange and yellow. Exhaust stacks rise behind the cab. Tyres are chunky tread blocks in near-black with lighter tread-block highlights.",
+      "palette": {
+        "body": "#d81e1e",
+        "bodyDark": "#8f1010",
+        "flameOrange": "#ff8a1c",
+        "flameYellow": "#ffd93a",
+        "glass": "#6fd0ff",
+        "glassDark": "#2a6c96",
+        "tyre": "#1b1b1f",
+        "tyreTread": "#38383f",
+        "rim": "#b9bec8",
+        "hub": "#e7b814",
+        "chassis": "#3a3d46",
+        "steel": "#7b808c",
+        "shock": "#ffcf2a",
+        "spring": "#c7ccd6",
+        "grille": "#15151a",
+        "headlight": "#fff6b0",
+        "tail": "#ff3030",
+        "chrome": "#e8ecf2",
+        "exhaust": "#5a5e69",
+        "lightBar": "#ffffff",
+        "bumper": "#2a2c33"
+      },
+      "mounts": {
+        "axleFront": [
+          0,
+          0.85,
+          1.7
+        ],
+        "axleRear": [
+          0,
+          0.85,
+          -1.6
+        ],
+        "chassisTop": [
+          0,
+          1.55,
+          0
+        ],
+        "cabFloor": [
+          0,
+          1.55,
+          -0.1
+        ],
+        "hoodFront": [
+          0,
+          2.05,
+          2.4
+        ],
+        "bedFloor": [
+          0,
+          1.75,
+          -1.9
+        ],
+        "cabRoof": [
+          0,
+          3,
+          -0.2
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            1.55,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "body",
+          "at": [
+            -1.3,
+            0.85,
+            1.7
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "body",
+          "at": [
+            1.3,
+            0.85,
+            1.7
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRR",
+          "parent": "body",
+          "at": [
+            -1.3,
+            0.85,
+            -1.6
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        },
+        {
+          "name": "wheelRL",
+          "parent": "body",
+          "at": [
+            1.3,
+            0.85,
+            -1.6
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "wheels"
+        }
+      ],
+      "parts": [
+        {
+          "id": "tyres",
+          "builds": "Four huge pixel tyres (octagonal-cylinder or boxy chunks, radius 0.85, width 0.7) with tread blocks around the circumference in tyreTread, grey rims, gold hubs with 6 bolts each, and a dark sidewall ring. Each rides its wheel joint.",
+          "box": [
+            [
+              -1.65,
+              0,
+              -2.45
+            ],
+            [
+              1.65,
+              1.7,
+              2.55
+            ]
+          ],
+          "attaches": "Centres on the axleFront and axleRear lines at x=±1.3; joints wheelFR, wheelFL, wheelRR, wheelRL.",
+          "joints": [
+            "wheelFR",
+            "wheelFL",
+            "wheelRR",
+            "wheelRL"
+          ],
+          "floor": true,
+          "budget": 220
+        },
+        {
+          "id": "chassis",
+          "builds": "Dark steel ladder frame with two rails, cross members, front and rear axles with diff housings, yellow shocks with coil springs, leaf springs, driveshafts, steel front bumper with winch, rear bumper, skid plate, and tail lights on the rear bumper.",
+          "box": [
+            [
+              -1.1,
+              0.5,
+              -2.7
+            ],
+            [
+              1.1,
+              1.55,
+              2.8
+            ]
+          ],
+          "attaches": "Top face at chassisTop supports the bodywork; axles pass through axleFront and axleRear to the tyre hubs.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 180
+        },
+        {
+          "id": "cab",
+          "builds": "Red cab block with sloped windscreen, side windows in glass with darker frames, doors with handles and seams, side mirrors, roof with a white light bar of 6 lamps and a roll-cage-style visor, flame decals in orange and yellow stepped pixel flames on the doors, door number badge.",
+          "box": [
+            [
+              -1.05,
+              1.55,
+              -1.1
+            ],
+            [
+              1.05,
+              3.3,
+              1
+            ]
+          ],
+          "attaches": "Sits on cabFloor; the hood meets its front face at z=1.0, the bed meets its rear face at z=-1.1; roof carries the lightBar at cabRoof.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "hood",
+          "builds": "Front end: sloped red hood with a raised air scoop, fenders over the front tyres with wide arches, black grille with chrome bars, square headlights in headlight colour with dark rims, bull-bar, front lip, hood flame decals, hood stripe in bodyDark.",
+          "box": [
+            [
+              -1.1,
+              1.55,
+              1
+            ],
+            [
+              1.1,
+              2.5,
+              2.7
+            ]
+          ],
+          "attaches": "Back face at z=1.0 meets the cab; sits on chassisTop; front to hoodFront.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "bed",
+          "builds": "Open pickup bed behind the cab: floor, side walls with arched wheel wells for the rear tyres, tailgate with seam and handle, inner walls in bodyDark, roll bar hoops in steel with two tall exhaust stacks (exhaust colour with dark tips), spare tyre-free cargo, rear flame decal and tail lights.",
+          "box": [
+            [
+              -1.1,
+              1.55,
+              -2.7
+            ],
+            [
+              1.1,
+              3,
+              -1.1
+            ]
+          ],
+          "attaches": "Front face at z=-1.1 meets the cab; floor at bedFloor sits on the chassis.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:19:20.480Z",
+        "wallMs": 18433,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75203,
+          "completion_tokens": 2442,
+          "total_tokens": 77645,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0342089,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tyres",
+        "effort": "low",
+        "started": "2026-10-28T21:19:38.913Z",
+        "wallMs": 9727,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77665,
+          "completion_tokens": 1605,
+          "total_tokens": 79270,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.030762900000000003,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cab",
+        "effort": "low",
+        "started": "2026-10-28T21:19:38.913Z",
+        "wallMs": 12896,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77650,
+          "completion_tokens": 1927,
+          "total_tokens": 79577,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0339529,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bed",
+        "effort": "low",
+        "started": "2026-10-28T21:19:38.913Z",
+        "wallMs": 13966,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77643,
+          "completion_tokens": 2232,
+          "total_tokens": 79875,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0369889,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "chassis",
+        "effort": "low",
+        "started": "2026-10-28T21:19:38.913Z",
+        "wallMs": 14131,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77630,
+          "completion_tokens": 2257,
+          "total_tokens": 79887,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0372129,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "hood",
+        "effort": "low",
+        "started": "2026-10-28T21:19:38.913Z",
+        "wallMs": 14713,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77617,
+          "completion_tokens": 2118,
+          "total_tokens": 79735,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0357969,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-hood",
+        "effort": "low",
+        "started": "2026-10-28T21:19:54.978Z",
+        "wallMs": 2897,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80338,
+          "completion_tokens": 189,
+          "total_tokens": 80527,
+          "prompt_tokens_details": {
+            "cached_tokens": 77613
+          }
+        },
+        "costUsd": 0.0151013,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-cab",
+        "effort": "low",
+        "started": "2026-10-28T21:19:54.978Z",
+        "wallMs": 3105,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80449,
+          "completion_tokens": 324,
+          "total_tokens": 80773,
+          "prompt_tokens_details": {
+            "cached_tokens": 77646
+          }
+        },
+        "costUsd": 0.0166106,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-bed",
+        "effort": "low",
+        "started": "2026-10-28T21:19:54.978Z",
+        "wallMs": 3202,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80606,
+          "completion_tokens": 350,
+          "total_tokens": 80956,
+          "prompt_tokens_details": {
+            "cached_tokens": 77639
+          }
+        },
+        "costUsd": 0.017197900000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-chassis",
+        "effort": "low",
+        "started": "2026-10-28T21:19:54.978Z",
+        "wallMs": 6299,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 81147,
+          "completion_tokens": 1190,
+          "total_tokens": 82337,
+          "prompt_tokens_details": {
+            "cached_tokens": 77626
+          }
+        },
+        "costUsd": 0.0267046,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-tyres",
+        "effort": "low",
+        "started": "2026-10-28T21:19:54.978Z",
+        "wallMs": 18171,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 81272,
+          "completion_tokens": 2537,
+          "total_tokens": 83809,
+          "prompt_tokens_details": {
+            "cached_tokens": 77661
+          }
+        },
+        "costUsd": 0.0403581,
+        "hasCode": true,
+        "reasoning": "I realize the wheel geometry is off - the rim and hub extend beyond the measured bounding box, since the wheels need to stay within x ∈ [0.95, 1.65] given the centre and width constraints. I need to rescale the rims, hubs, and spokes to fit inside that range.\n\nWorking out wheel dimensions...\n\nChecking corner extents, I shrink the block's z-depth slightly so diagonal corners stay within the 0.85 radius, which should be fine given a 15cm tolerance anyway. For wheel height, I'll reference the axle front position directly.\n\n"
+      }
+    ],
+    "fit": {
+      "fitMs": 21973,
+      "checkMs": 1289,
+      "afterMs": 2449,
+      "repairMs": 18171,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "tyres",
+          "meshes": 252,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.665,
+              -0.0052,
+              -2.4552
+            ],
+            [
+              1.665,
+              1.7052,
+              2.5552
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "chassis",
+          "meshes": 124,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.1017,
+              0.5099,
+              -2.7902
+            ],
+            [
+              1.1017,
+              1.55,
+              2.8302
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "cab",
+          "meshes": 84,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.1001,
+              1.5492,
+              -1.1514
+            ],
+            [
+              1.1001,
+              3.3754,
+              1.0301
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "hood",
+          "meshes": 81,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.1204,
+              1.5299,
+              0.9481
+            ],
+            [
+              1.1204,
+              2.5101,
+              2.7005
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "bed",
+          "meshes": 75,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.0802,
+              1.5599,
+              -2.7851
+            ],
+            [
+              1.0802,
+              3.0101,
+              -1.0977
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "tyres",
+          "meshes": 252,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.665,
+              -0.0052,
+              -2.4552
+            ],
+            [
+              1.665,
+              1.7052,
+              2.5552
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "chassis",
+          "meshes": 124,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.1017,
+              0.5099,
+              -2.7902
+            ],
+            [
+              1.1017,
+              1.55,
+              2.8302
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "cab",
+          "meshes": 84,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.1001,
+              1.5492,
+              -1.1514
+            ],
+            [
+              1.1001,
+              3.3754,
+              1.0301
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "hood",
+          "meshes": 81,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.1204,
+              1.5299,
+              0.9481
+            ],
+            [
+              1.1204,
+              2.5101,
+              2.7005
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "bed",
+          "meshes": 75,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -1.0802,
+              1.5599,
+              -2.7851
+            ],
+            [
+              1.0802,
+              3.0101,
+              -1.0977
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "tyres",
+          "wallMs": 18171,
+          "edits": 0,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "chassis",
+          "wallMs": 6299,
+          "edits": 5,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "cab",
+          "wallMs": 3105,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "hood",
+          "wallMs": 2897,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "bed",
+          "wallMs": 3202,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  },
+  "check": {
+    "slug": "r42fitMonsterTruckRichParflatFit",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "B",
+    "renderError": null,
+    "report": {
+      "parts": 616,
+      "triangles": 9896,
+      "colors": 21,
+      "textures": 0,
+      "joints": 5,
+      "size": [
+        3.33,
+        3.381,
+        5.62
+      ],
+      "issues": [],
+      "fine": 16
+    }
+  }
+}

@@ -1,0 +1,518 @@
+{
+  "slug": "r42baseQilinRichBasefirst",
+  "arm": "basefirst",
+  "subject": "qilin",
+  "level": "rich",
+  "pitch": "Category: Fantastical creature.\nSubject: qilin, scaled hooved chimera with antlers and cloud mane.\nStyle: high-fantasy anime.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:18:55.910Z",
+  "wallMs": 34814,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 448353,
+    "completion_tokens": 12378,
+    "total_tokens": 460731,
+    "prompt_tokens_details": {
+      "cached_tokens": 444054
+    }
+  },
+  "costUsd": 0.1767834,
+  "hasCode": true,
+  "basefirst": {
+    "baseMs": 16584,
+    "slowestPartMs": 18230,
+    "critical": "faceAndJaw",
+    "elapsedMs": 36473,
+    "parts": [
+      {
+        "id": "antlersAndHorns",
+        "builds": "branching antlers on both sides of the skull, a central small horn, ear fins, brow ridges and gold tips",
+        "box": [
+          [
+            -0.45,
+            1.75,
+            0.9
+          ],
+          [
+            0.45,
+            2.55,
+            1.6
+          ]
+        ],
+        "attaches": "top of the skull sphere on the head joint, left and right of the crown",
+        "joints": [
+          "head"
+        ],
+        "floor": false,
+        "budget": 150
+      },
+      {
+        "id": "faceAndJaw",
+        "builds": "separate upper and lower jaw with teeth, whiskers, beard, nostrils, big anime eyes with highlights, brows",
+        "box": [
+          [
+            -0.35,
+            1.2,
+            1.2
+          ],
+          [
+            0.35,
+            1.95,
+            1.9
+          ]
+        ],
+        "attaches": "front of the skull and the muzzle block; jaw hinge under the head joint",
+        "joints": [
+          "head",
+          "jaw"
+        ],
+        "floor": false,
+        "budget": 180
+      },
+      {
+        "id": "cloudMane",
+        "builds": "swirling cloud-shaped mane tufts along the neck crest and down the chest, cloud puffs on shoulders, gold trim",
+        "box": [
+          [
+            -0.5,
+            1.1,
+            -0.2
+          ],
+          [
+            0.5,
+            2.2,
+            1.3
+          ]
+        ],
+        "attaches": "dorsal line of the neck cylinder, chest front and shoulder tops",
+        "joints": [
+          "neck1",
+          "neck2",
+          "chest"
+        ],
+        "floor": false,
+        "budget": 180
+      },
+      {
+        "id": "legsAndHooves",
+        "builds": "four slender legs with knees, fetlocks, gold hooves, cloud-wisp ankle tufts and scale plates on thighs",
+        "box": [
+          [
+            -0.6,
+            0,
+            -1
+          ],
+          [
+            0.6,
+            1,
+            1
+          ]
+        ],
+        "attaches": "underside of the body at shoulders and hips; leg tops rest at the body belly",
+        "joints": [
+          "chest",
+          "hips"
+        ],
+        "floor": true,
+        "budget": 220
+      },
+      {
+        "id": "tailAndScales",
+        "builds": "fan-shaped flowing tail with cloud-curl tip, back scale rows, belly plates, flame wisps along the flanks",
+        "box": [
+          [
+            -0.6,
+            0.6,
+            -1.9
+          ],
+          [
+            0.6,
+            1.8,
+            0.9
+          ]
+        ],
+        "attaches": "rump end of the body at the tail joint and the body's back and flank surfaces",
+        "joints": [
+          "hips",
+          "tail1"
+        ],
+        "floor": false,
+        "budget": 170
+      }
+    ],
+    "partsError": null,
+    "missingParts": [],
+    "fit": {
+      "checkMs": 1487,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "antlersAndHorns",
+          "meshes": 45,
+          "outside": 14,
+          "maxOver": 2.58,
+          "bounds": [
+            [
+              -0.4768,
+              -0.0001,
+              -1.6806
+            ],
+            [
+              0.4767,
+              2.5294,
+              1.82
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": true,
+          "worst": [
+            {
+              "name": "sweep.tail1",
+              "bones": [
+                "tail1"
+              ],
+              "min": [
+                -0.1303,
+                0.87,
+                -1.6806
+              ],
+              "max": [
+                0.1303,
+                1.13,
+                -0.9199
+              ],
+              "over": 2.58,
+              "where": [
+                "0.88 m past the box's -y face (y = 1.75)",
+                "2.58 m past the box's -z face (z = 0.9)"
+              ]
+            },
+            {
+              "name": "sweep.hips",
+              "bones": [
+                "hips",
+                "chest"
+              ],
+              "min": [
+                -0.361,
+                0.7104,
+                -1.3004
+              ],
+              "max": [
+                0.361,
+                1.5093,
+                1.1626
+              ],
+              "over": 2.2,
+              "where": [
+                "1.04 m past the box's -y face (y = 1.75)",
+                "2.2 m past the box's -z face (z = 0.9)"
+              ]
+            },
+            {
+              "name": "sweep.chest",
+              "bones": [
+                "chest"
+              ],
+              "min": [
+                -0.1696,
+                0.6902,
+                -0.9521
+              ],
+              "max": [
+                0.1696,
+                0.8096,
+                0.8505
+              ],
+              "over": 1.85,
+              "where": [
+                "1.06 m past the box's -y face (y = 1.75)",
+                "1.85 m past the box's -z face (z = 0.9)"
+              ]
+            },
+            {
+              "name": "cylinder.ankleFL",
+              "bones": [
+                "ankleFL"
+              ],
+              "min": [
+                0.1849,
+                -0.0001,
+                0.4649
+              ],
+              "max": [
+                0.3551,
+                0.1001,
+                0.6351
+              ],
+              "over": 1.75,
+              "where": [
+                "1.75 m past the box's -y face (y = 1.75)",
+                "0.44 m past the box's -z face (z = 0.9)"
+              ]
+            },
+            {
+              "name": "cylinder.ankleFR",
+              "bones": [
+                "ankleFR"
+              ],
+              "min": [
+                -0.3551,
+                -0.0001,
+                0.4649
+              ],
+              "max": [
+                -0.1849,
+                0.1001,
+                0.6351
+              ],
+              "over": 1.75,
+              "where": [
+                "1.75 m past the box's -y face (y = 1.75)",
+                "0.44 m past the box's -z face (z = 0.9)"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "faceAndJaw",
+          "meshes": 54,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.3354,
+              1.18,
+              1.3741
+            ],
+            [
+              0.3354,
+              1.9098,
+              1.89
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "cloudMane",
+          "meshes": 124,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.4421,
+              1.094,
+              0.2499
+            ],
+            [
+              0.4421,
+              2.1711,
+              1.2401
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "legsAndHooves",
+          "meshes": 68,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.284,
+              -0.0001,
+              -0.6158
+            ],
+            [
+              0.3038,
+              0.9601,
+              0.5662
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "tailAndScales",
+          "meshes": 90,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.4985,
+              0.705,
+              -1.9462
+            ],
+            [
+              0.4985,
+              1.7851,
+              0.7368
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ]
+    },
+    "calls": [
+      {
+        "id": "base",
+        "effort": "low",
+        "started": "2026-10-28T21:18:55.910Z",
+        "wallMs": 16584,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74781,
+          "completion_tokens": 2580,
+          "total_tokens": 77361,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0347449,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "legsAndHooves",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.495Z",
+        "wallMs": 11645,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74710,
+          "completion_tokens": 1693,
+          "total_tokens": 76403,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.025732900000000003,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "antlersAndHorns",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.495Z",
+        "wallMs": 12834,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74706,
+          "completion_tokens": 1691,
+          "total_tokens": 76397,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.025704900000000003,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tailAndScales",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.495Z",
+        "wallMs": 13090,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74717,
+          "completion_tokens": 1801,
+          "total_tokens": 76518,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0268269,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cloudMane",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.495Z",
+        "wallMs": 13295,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74721,
+          "completion_tokens": 1909,
+          "total_tokens": 76630,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.027914900000000003,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "faceAndJaw",
+        "effort": "low",
+        "started": "2026-10-28T21:19:12.495Z",
+        "wallMs": 18230,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 74718,
+          "completion_tokens": 2704,
+          "total_tokens": 77422,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0358589,
+        "hasCode": true,
+        "reasoning": "Since the base source wasn't provided, I'll work with the known joints \"head\" and \"jaw\" directly by name, positioning the head bounding box roughly within x[-0.35,0.35], y[1.2,1.95], z[1.2,1.9], assuming the head faces +Z with the snout toward z~1.9, centering it around (0,1.6,1.5).\n\nWriting part placement logic...\n\n"
+      }
+    ]
+  },
+  "check": {
+    "slug": "r42baseQilinRichBasefirst",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "B",
+    "renderError": null,
+    "report": {
+      "parts": 381,
+      "triangles": 22634,
+      "colors": 40,
+      "textures": 0,
+      "joints": 35,
+      "size": [
+        0.997,
+        2.53,
+        3.836
+      ],
+      "issues": [],
+      "fine": 117
+    }
+  }
+}

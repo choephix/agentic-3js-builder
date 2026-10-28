@@ -1,0 +1,548 @@
+{
+  "slug": "r42fitKoalaRichParflatFit",
+  "arm": "parflat-fit",
+  "subject": "koala",
+  "level": "rich",
+  "pitch": "Category: Animal.\nSubject: koala gripping a eucalyptus branch stand.\nStyle: pixel art.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:17:32.726Z",
+  "wallMs": 38891,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 463187,
+    "completion_tokens": 9908,
+    "total_tokens": 473095,
+    "prompt_tokens_details": {
+      "cached_tokens": 447147
+    }
+  },
+  "costUsd": 0.1758747,
+  "hasCode": true,
+  "parallel": {
+    "planMs": 18389,
+    "slowestPartMs": 13043,
+    "critical": "koalaHeadAndArms",
+    "elapsedMs": 31432,
+    "spec": {
+      "name": "Pixel Koala on Eucalyptus Stand",
+      "description": "A blocky pixel-art koala clinging to a vertical eucalyptus branch mounted on a small wooden stand, with leaves and bark detail.",
+      "builderName": "pixelKoala",
+      "size": [
+        0.7,
+        1.1,
+        0.6
+      ],
+      "layout": "A square wooden base plate sits on the floor at the back-centre. A thick eucalyptus trunk rises vertically at x=0, z=-0.05, with a side branch angling up and to the left (+X). The koala faces +Z, hugging the trunk from the front: its back is against the trunk at z about 0.0, body upright and slightly tilted, arms wrapped around the trunk (hands on the far side), legs bent with feet gripping the trunk lower down. The head sits on top of the torso, facing forward, with big round fluffy ears at both sides, a large dark oval nose and small eyes. Leaf clusters of blocky grey-green leaves hang on the branch and at the trunk top. Everything is built from boxes in a pixel-art grid with a texel size of 0.02 m: flat colours, stepped edges and square dithered-looking detail blocks (fur tufts, bark ridges) built as small separate parts.",
+      "palette": {
+        "furGrey": "#8d929b",
+        "furDark": "#6a6f78",
+        "furLight": "#b9bdc4",
+        "belly": "#e3e1da",
+        "earInner": "#f0d8d8",
+        "nose": "#1c1a1f",
+        "eye": "#14121a",
+        "eyeShine": "#ffffff",
+        "claw": "#3a3438",
+        "bark": "#8a6a4a",
+        "barkDark": "#5e4630",
+        "barkLight": "#b08d66",
+        "leaf": "#5f8f58",
+        "leafDark": "#3f6b44",
+        "leafLight": "#8fbb78",
+        "wood": "#a67c4e",
+        "woodDark": "#7a5733",
+        "ring": "#c9a36b"
+      },
+      "mounts": {
+        "baseTop": [
+          0,
+          0.08,
+          -0.05
+        ],
+        "trunkAxis": [
+          0,
+          0.5,
+          -0.05
+        ],
+        "trunkTop": [
+          0,
+          1,
+          -0.05
+        ],
+        "branchRoot": [
+          0.05,
+          0.75,
+          -0.05
+        ],
+        "branchTip": [
+          0.38,
+          0.98,
+          -0.05
+        ],
+        "torsoCentre": [
+          0,
+          0.5,
+          0.1
+        ],
+        "neck": [
+          0,
+          0.72,
+          0.12
+        ],
+        "shoulderL": [
+          0.14,
+          0.64,
+          0.08
+        ],
+        "shoulderR": [
+          -0.14,
+          0.64,
+          0.08
+        ],
+        "hipL": [
+          0.1,
+          0.36,
+          0.08
+        ],
+        "hipR": [
+          -0.1,
+          0.36,
+          0.08
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "standAndTrunk",
+          "builds": "Wooden base plate (stacked boxes, wood and woodDark with ring-colour edge trim and corner pegs), the thick square-ish eucalyptus trunk made of stacked offset boxes in bark/barkDark/barkLight with ridge and knot detail blocks, and the angled stepped side branch up to branchTip with a cut end.",
+          "box": [
+            [
+              -0.35,
+              0,
+              -0.3
+            ],
+            [
+              0.4,
+              1.05,
+              0.2
+            ]
+          ],
+          "attaches": "Trunk axis at trunkAxis passes through the koala's grip; branch ends at branchTip where foliage starts; the base top is baseTop.",
+          "joints": [],
+          "floor": true,
+          "budget": 200
+        },
+        {
+          "id": "koalaBody",
+          "builds": "Torso box in furGrey with a lighter belly patch (belly, furLight edge blocks) facing +Z, fur tuft blocks in furDark/furLight, round rump, and both legs: thick thighs and lower legs bent around the trunk with feet pads and claws (claw colour) gripping the trunk sides.",
+          "box": [
+            [
+              -0.25,
+              0.15,
+              -0.12
+            ],
+            [
+              0.25,
+              0.7,
+              0.3
+            ]
+          ],
+          "attaches": "Back presses to the trunk at z about 0.0; hips at hipL/hipR; neck mount at neck for the head; shoulders at shoulderL/shoulderR for the arms.",
+          "joints": [],
+          "floor": false,
+          "budget": 220
+        },
+        {
+          "id": "koalaHeadAndArms",
+          "builds": "Big boxy head with a stepped rounded silhouette in furGrey, light cheek tufts, large round ears (furGrey outer, furLight rim, earInner centre, furDark fluff blocks), huge dark nose block on a lighter muzzle, small eye blocks with white shine pixels, brow shading; both arms reaching forward-around the trunk from the shoulders, with hands and claws (claw) clasping the trunk edges.",
+          "box": [
+            [
+              -0.32,
+              0.55,
+              -0.15
+            ],
+            [
+              0.32,
+              0.95,
+              0.4
+            ]
+          ],
+          "attaches": "Head sits on the neck mount at the torso top; arms start at shoulderL/shoulderR and wrap to the trunk surface around trunkAxis.",
+          "joints": [],
+          "floor": false,
+          "budget": 250
+        },
+        {
+          "id": "foliage",
+          "builds": "Eucalyptus leaf clusters: elongated blocky leaves (thin boxes in leaf, leafDark, leafLight) hanging from the branch around branchTip and tufts at trunkTop, small stems in barkDark, a few leaves drooping in front of and beside the koala without covering its face, plus a couple of leaves on the base plate.",
+          "box": [
+            [
+              -0.3,
+              0.7,
+              -0.3
+            ],
+            [
+              0.7,
+              1.1,
+              0.2
+            ]
+          ],
+          "attaches": "Clusters root on branchRoot to branchTip and on trunkTop; small stems seated on the branch surface.",
+          "joints": [],
+          "floor": false,
+          "budget": 180
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:17:32.726Z",
+        "wallMs": 18389,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75207,
+          "completion_tokens": 2050,
+          "total_tokens": 77257,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0302969,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "foliage",
+        "effort": "low",
+        "started": "2026-10-28T21:17:51.115Z",
+        "wallMs": 10190,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77106,
+          "completion_tokens": 1590,
+          "total_tokens": 78696,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0294949,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "standAndTrunk",
+        "effort": "low",
+        "started": "2026-10-28T21:17:51.115Z",
+        "wallMs": 10915,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77119,
+          "completion_tokens": 1804,
+          "total_tokens": 78923,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0316609,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "koalaBody",
+        "effort": "low",
+        "started": "2026-10-28T21:17:51.115Z",
+        "wallMs": 10948,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77129,
+          "completion_tokens": 1710,
+          "total_tokens": 78839,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0307409,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "koalaHeadAndArms",
+        "effort": "low",
+        "started": "2026-10-28T21:17:51.115Z",
+        "wallMs": 13043,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77178,
+          "completion_tokens": 2274,
+          "total_tokens": 79452,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0364789,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-foliage",
+        "effort": "low",
+        "started": "2026-10-28T21:18:06.494Z",
+        "wallMs": 3271,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79448,
+          "completion_tokens": 480,
+          "total_tokens": 79928,
+          "prompt_tokens_details": {
+            "cached_tokens": 77102
+          }
+        },
+        "costUsd": 0.0172022,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ],
+    "fit": {
+      "fitMs": 7459,
+      "checkMs": 1331,
+      "afterMs": 1857,
+      "repairMs": 3271,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "standAndTrunk",
+          "meshes": 83,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.35,
+              0,
+              -0.3
+            ],
+            [
+              0.428,
+              1.08,
+              0.2
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "koalaBody",
+          "meshes": 90,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.25,
+              0.11,
+              -0.03
+            ],
+            [
+              0.25,
+              0.73,
+              0.235
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "koalaHeadAndArms",
+          "meshes": 69,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.285,
+              0.455,
+              -0.1101
+            ],
+            [
+              0.285,
+              1.045,
+              0.405
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "foliage",
+          "meshes": 404,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2688,
+              0.6986,
+              -0.1684
+            ],
+            [
+              0.5461,
+              1.0707,
+              0.1021
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "standAndTrunk",
+          "meshes": 83,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.35,
+              0,
+              -0.3
+            ],
+            [
+              0.428,
+              1.08,
+              0.2
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "koalaBody",
+          "meshes": 90,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.25,
+              0.11,
+              -0.03
+            ],
+            [
+              0.25,
+              0.73,
+              0.235
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "koalaHeadAndArms",
+          "meshes": 69,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.285,
+              0.455,
+              -0.1101
+            ],
+            [
+              0.285,
+              1.045,
+              0.405
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "foliage",
+          "meshes": 404,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2688,
+              0.6986,
+              -0.1684
+            ],
+            [
+              0.5461,
+              1.0707,
+              0.1021
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "foliage",
+          "wallMs": 3271,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  },
+  "check": {
+    "slug": "r42fitKoalaRichParflatFit",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "A",
+    "renderError": null,
+    "report": {
+      "parts": 646,
+      "triangles": 7752,
+      "colors": 18,
+      "textures": 0,
+      "joints": 0,
+      "size": [
+        0.896,
+        1.08,
+        0.705
+      ],
+      "issues": [],
+      "fine": 0
+    }
+  }
+}

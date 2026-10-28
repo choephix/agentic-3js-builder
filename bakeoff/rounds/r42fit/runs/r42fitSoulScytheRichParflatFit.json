@@ -1,0 +1,526 @@
+{
+  "slug": "r42fitSoulScytheRichParflatFit",
+  "arm": "parflat-fit",
+  "subject": "soulScythe",
+  "level": "rich",
+  "pitch": "Category: Fantasy weapon.\nSubject: dragonbone soul scythe.\nStyle: League of Legends.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:19:31.522Z",
+  "wallMs": 45613,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 463280,
+    "completion_tokens": 12105,
+    "total_tokens": 475385,
+    "prompt_tokens_details": {
+      "cached_tokens": 447027
+    }
+  },
+  "costUsd": 0.1982587,
+  "hasCode": true,
+  "parallel": {
+    "planMs": 18387,
+    "slowestPartMs": 21106,
+    "critical": "skullCrown",
+    "elapsedMs": 39494,
+    "spec": {
+      "name": "Dragonbone Soul Scythe",
+      "description": "A tall League of Legends style fantasy scythe: a vertebrae-segmented dragonbone haft, a dragon-skull crown, a huge curved bone blade and a floating soul-fire core, glowing teal.",
+      "builderName": "dragonboneSoulScythe",
+      "size": [
+        1.5,
+        2.6,
+        0.5
+      ],
+      "layout": "A static prop stood upright, its butt spike on y=0, haft running up the x=0, z=0 axis. The blade sweeps toward +X (the model's left) from the top of the haft, and its edge faces down and in (-X side). The dragon skull sits at the haft top with its snout aimed +Z and its jaws open, holding a glowing teal soul orb. The grip is wrapped in dark leather with bone rings. The blade curves from the skull outward and down to a hooked tip at about x=1.45, y=1.85. Style: bold, chunky, stylised bone shapes, with ivory bone, gold trim and glowing teal soul-fire in every part. Fine details such as ridges, teeth, runes and cracks are separate small parts. The blade has a pale ivory spine, a gold inlay line and a teal glowing edge strip.",
+      "palette": {
+        "boneIvory": "#e9e0c8",
+        "boneShade": "#b9ab8a",
+        "boneDark": "#6e6049",
+        "leather": "#2c2433",
+        "gold": "#e0a93a",
+        "goldDark": "#8a5d1c",
+        "soulTeal": "#35f2d0",
+        "soulDeep": "#0f9a94",
+        "soulWhite": "#d9fff6",
+        "void": "#141a24",
+        "ember": "#ff7a3a"
+      },
+      "mounts": {
+        "buttTip": [
+          0,
+          0,
+          0
+        ],
+        "gripBottom": [
+          0,
+          0.2,
+          0
+        ],
+        "gripTop": [
+          0,
+          1.55,
+          0
+        ],
+        "skullBase": [
+          0,
+          1.6,
+          0
+        ],
+        "skullCenter": [
+          0,
+          1.85,
+          0.05
+        ],
+        "orbCenter": [
+          0,
+          2,
+          -0.02
+        ],
+        "bladeRoot": [
+          0.1,
+          2.15,
+          -0.05
+        ],
+        "bladeTip": [
+          1.45,
+          1.85,
+          -0.05
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "haft",
+          "builds": "The lower shaft from the butt spike to the grip top. A bone spike tip, a cone and ring pommel in boneShade with gold bands, a haft of stacked vertebra segments (alternating boneIvory and boneShade, chunky 8-sided), a leather grip wrap section with diagonal strap parts and gold rings, soulTeal rune slivers set into the shaft, and small rib-spur fins near the grip. Ends at gripTop.",
+          "box": [
+            [
+              -0.12,
+              0,
+              -0.12
+            ],
+            [
+              0.12,
+              1.6,
+              0.12
+            ]
+          ],
+          "attaches": "Starts at buttTip, ends at gripTop/skullBase where the skull collar sits.",
+          "joints": [],
+          "floor": true,
+          "budget": 200
+        },
+        {
+          "id": "skullCrown",
+          "builds": "The dragon skull crown at the haft top. A gold collar over skullBase, a boxy chunky skull with a long snout (+Z), brow ridges, horns swept back, a separate upper and lower jaw opened slightly with rows of small teeth, glowing soulTeal eye sockets and nostrils, cheek spikes, a boneDark crack detail, and gold trim plates. Two small bone prongs cradle the orb at orbCenter.",
+          "box": [
+            [
+              -0.22,
+              1.6,
+              -0.35
+            ],
+            [
+              0.22,
+              2.2,
+              0.35
+            ]
+          ],
+          "attaches": "Sits on skullBase, cradles orbCenter, and the blade root meets its rear at bladeRoot.",
+          "joints": [],
+          "floor": false,
+          "budget": 220
+        },
+        {
+          "id": "bladeBone",
+          "builds": "The huge scythe blade: a curved sweep of tapering ivory bone swept from bladeRoot toward +X and down to the hooked bladeTip, built from stacked extruded segments or a swept tube plus a flat extruded blade plate. A thick boneShade spine on the upper edge with serrated spike ridges, a gold inlay line along the middle, boneDark notches, a glowing soulTeal cutting-edge strip along the lower inner edge, rune glyph slivers, and gold fittings at the root.",
+          "box": [
+            [
+              0.05,
+              1.7,
+              -0.12
+            ],
+            [
+              1.5,
+              2.6,
+              0.05
+            ]
+          ],
+          "attaches": "Root at bladeRoot beside the skull, tip at bladeTip.",
+          "joints": [],
+          "floor": false,
+          "budget": 250
+        },
+        {
+          "id": "soulFire",
+          "builds": "The glowing soul orb at orbCenter: a faceted soulTeal core, a soulWhite inner core, ring halos in gold and soulDeep, orbiting shard crystals, rising flame wisps (stacked cones of teal and soulWhite) and a few ember ghost-spirit shapes drifting along the blade. Also teal soul wisps trailing from the blade tip and ember sparks. All of it uses glow().",
+          "box": [
+            [
+              -0.3,
+              1.8,
+              -0.3
+            ],
+            [
+              1.3,
+              2.6,
+              0.3
+            ]
+          ],
+          "attaches": "Centered at orbCenter, held between the skull prongs. Wisps trail toward bladeRoot and bladeTip.",
+          "joints": [],
+          "floor": false,
+          "budget": 180
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:19:31.522Z",
+        "wallMs": 18387,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75207,
+          "completion_tokens": 1920,
+          "total_tokens": 77127,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.028996900000000003,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "soulFire",
+        "effort": "low",
+        "started": "2026-10-28T21:19:49.910Z",
+        "wallMs": 13149,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 76986,
+          "completion_tokens": 2070,
+          "total_tokens": 79056,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0340549,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "haft",
+        "effort": "low",
+        "started": "2026-10-28T21:19:49.910Z",
+        "wallMs": 13327,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 76962,
+          "completion_tokens": 2064,
+          "total_tokens": 79026,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0339469,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bladeBone",
+        "effort": "low",
+        "started": "2026-10-28T21:19:49.910Z",
+        "wallMs": 15243,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77002,
+          "completion_tokens": 2565,
+          "total_tokens": 79567,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0390369,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "skullCrown",
+        "effort": "low",
+        "started": "2026-10-28T21:19:49.910Z",
+        "wallMs": 21106,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 76993,
+          "completion_tokens": 3242,
+          "total_tokens": 80235,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0457889,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-soulFire",
+        "effort": "low",
+        "started": "2026-10-28T21:20:12.507Z",
+        "wallMs": 3134,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80130,
+          "completion_tokens": 244,
+          "total_tokens": 80374,
+          "prompt_tokens_details": {
+            "cached_tokens": 76982
+          }
+        },
+        "costUsd": 0.0164342,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ],
+    "fit": {
+      "fitMs": 6120,
+      "checkMs": 1234,
+      "afterMs": 1494,
+      "repairMs": 3134,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "haft",
+          "meshes": 75,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.1592,
+              0,
+              -0.1205
+            ],
+            [
+              0.1592,
+              1.6125,
+              0.1219
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "skullCrown",
+          "meshes": 94,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2667,
+              1.59,
+              -0.3451
+            ],
+            [
+              0.2667,
+              2.1487,
+              0.468
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "bladeBone",
+          "meshes": 90,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              0.0724,
+              1.7229,
+              -0.1267
+            ],
+            [
+              1.4762,
+              2.6035,
+              0.0267
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "soulFire",
+          "meshes": 73,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2347,
+              1.7809,
+              -0.2565
+            ],
+            [
+              1.2509,
+              2.469,
+              0.2199
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "haft",
+          "meshes": 75,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.1592,
+              0,
+              -0.1205
+            ],
+            [
+              0.1592,
+              1.6125,
+              0.1219
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "skullCrown",
+          "meshes": 94,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2667,
+              1.59,
+              -0.3451
+            ],
+            [
+              0.2667,
+              2.1487,
+              0.468
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "bladeBone",
+          "meshes": 90,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              0.0724,
+              1.7229,
+              -0.1267
+            ],
+            [
+              1.4762,
+              2.6035,
+              0.0267
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "soulFire",
+          "meshes": 73,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.2347,
+              1.7809,
+              -0.2565
+            ],
+            [
+              1.2509,
+              2.469,
+              0.2199
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "soulFire",
+          "wallMs": 3134,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  },
+  "check": {
+    "slug": "r42fitSoulScytheRichParflatFit",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "A",
+    "renderError": null,
+    "report": {
+      "parts": 332,
+      "triangles": 6590,
+      "colors": 12,
+      "textures": 0,
+      "joints": 0,
+      "size": [
+        1.743,
+        2.603,
+        0.813
+      ],
+      "issues": [],
+      "fine": 12
+    }
+  }
+}

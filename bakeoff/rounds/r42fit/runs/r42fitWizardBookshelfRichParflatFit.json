@@ -1,0 +1,707 @@
+{
+  "slug": "r42fitWizardBookshelfRichParflatFit",
+  "arm": "parflat-fit",
+  "subject": "wizardBookshelf",
+  "level": "rich",
+  "pitch": "Category: Prop group.\nSubject: wizard's bookshelf with tomes, scrolls, orbs and candles.\nStyle: high-fantasy anime.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:17:32.726Z",
+  "wallMs": 55135,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 782884,
+    "completion_tokens": 17251,
+    "total_tokens": 800135,
+    "prompt_tokens_details": {
+      "cached_tokens": 752706
+    }
+  },
+  "costUsd": 0.3081366,
+  "hasCode": true,
+  "parallel": {
+    "planMs": 21195,
+    "slowestPartMs": 16737,
+    "critical": "orbsCandles",
+    "elapsedMs": 37932,
+    "spec": {
+      "name": "Wizard's Bookshelf",
+      "description": "A tall, crooked high-fantasy anime bookshelf of dark carved wood crammed with glowing tomes, scrolls, crystal orbs and dripping candles.",
+      "builderName": "wizardBookshelf",
+      "size": [
+        1.8,
+        2.3,
+        0.5
+      ],
+      "layout": "A static prop standing on the floor, front facing +Z. A 1.8 m wide, 2.2 m tall carcass has two side panels, a back panel, a plinth, a carved arched crown with a crescent-moon and star emblem, and four shelves at y=0.42, 0.85, 1.28 and 1.7. The bottom bay is a tall tome row plus a chest-like stack. The second bay holds scrolls in a rack and a few leaning books. The third bay has a big crystal orb on a gold stand beside tilted book stacks. The top bay has candles with melted wax and flames, plus a small orb. Everything is chunky and blocky, with gold trim, rune bands and glowing teal/violet/amber accents. Books have coloured spines with gold bands and tiny gem clasps. Warm colours sit on top, cool tones below.",
+      "palette": {
+        "woodDark": "#3a2418",
+        "woodMid": "#6b4528",
+        "woodLight": "#9a6a3a",
+        "gold": "#e8b830",
+        "goldDark": "#a67a1c",
+        "backPanel": "#2a1a3a",
+        "bookRed": "#a8283a",
+        "bookBlue": "#2d4fa8",
+        "bookGreen": "#2f7a52",
+        "bookPurple": "#6a3a9a",
+        "bookTeal": "#2a8a9a",
+        "bookCream": "#efe0b8",
+        "parchment": "#f2e2b4",
+        "parchmentDark": "#c9a96a",
+        "ribbon": "#d83a5a",
+        "orbTeal": "#4ff0ff",
+        "orbViolet": "#b06aff",
+        "runeGlow": "#7affd8",
+        "candleWax": "#f6ecd2",
+        "flame": "#ffb43a",
+        "flameCore": "#fff2a0",
+        "ink": "#1a1024"
+      },
+      "mounts": {
+        "floor": [
+          0,
+          0,
+          0
+        ],
+        "plinthTop": [
+          0,
+          0.14,
+          0
+        ],
+        "shelf1": [
+          0,
+          0.42,
+          0
+        ],
+        "shelf2": [
+          0,
+          0.85,
+          0
+        ],
+        "shelf3": [
+          0,
+          1.28,
+          0
+        ],
+        "shelf4": [
+          0,
+          1.7,
+          0
+        ],
+        "crownBase": [
+          0,
+          2,
+          0
+        ],
+        "innerLeft": [
+          0.84,
+          0,
+          0
+        ],
+        "innerRight": [
+          -0.84,
+          0,
+          0
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "carcass",
+          "builds": "The furniture: plinth with chunky feet, two side panels with carved gold-trimmed edge strips, back panel in backPanel colour with faint runeGlow rune row, four shelf boards with gold front edge trim, top cornice, and rune-band inlays on the side panels.",
+          "box": [
+            [
+              -0.9,
+              0,
+              -0.25
+            ],
+            [
+              0.9,
+              2,
+              0.25
+            ]
+          ],
+          "attaches": "Shelves sit at the shelf1..shelf4 mounts between innerLeft and innerRight; the crown starts at crownBase.",
+          "joints": [],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "crown",
+          "builds": "The arched carved crown above crownBase: stepped wood arch, gold crescent moon and stars emblem, small pointed finials at both corners, a glowing violet gem at the centre, and hanging tassels with ribbon on both sides.",
+          "box": [
+            [
+              -0.95,
+              2,
+              -0.22
+            ],
+            [
+              0.95,
+              2.3,
+              0.22
+            ]
+          ],
+          "attaches": "Rests on the carcass cornice at crownBase.",
+          "joints": [],
+          "floor": false,
+          "budget": 110
+        },
+        {
+          "id": "tomes",
+          "builds": "Books on shelf1 and shelf2 and shelf3 left side: rows of varied-height books in the book colours with gold spine bands, gems, corner caps and page blocks in bookCream, some leaning or stacked flat, a couple with ribbon bookmarks and clasps, plus a chest-like giant tome at the bottom with a glowing rune cover.",
+          "box": [
+            [
+              -0.84,
+              0.42,
+              -0.22
+            ],
+            [
+              0.84,
+              1.7,
+              0.2
+            ]
+          ],
+          "attaches": "Stands on shelf1, shelf2 and shelf3 mounts; leaves the right half of shelf3 free for the orb.",
+          "joints": [],
+          "floor": false,
+          "budget": 250
+        },
+        {
+          "id": "scrolls",
+          "builds": "A scroll rack on shelf2 right side: wooden pigeonhole grid holding rolled parchment scrolls with gold end knobs, ribbon ties and wax seals, plus a few unrolled scrolls hanging over the shelf edge with rune lines, and loose ink bottles and a quill.",
+          "box": [
+            [
+              -0.84,
+              0.85,
+              -0.2
+            ],
+            [
+              0,
+              1.28,
+              0.22
+            ]
+          ],
+          "attaches": "Stands on the shelf2 mount, on the right side (x negative).",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "orbsCandles",
+          "builds": "Magic glow items: a large orbTeal crystal orb on a gold claw stand on shelf3 right side with inner swirl rings, a small orbViolet orb on a pedestal on shelf4 left, and a cluster of candles on shelf4 with varied heights, melted wax drips, flames with flameCore, a gold candle holder and a few floating sparkle diamonds. Orbs and flames are emissive.",
+          "box": [
+            [
+              -0.84,
+              1.28,
+              -0.2
+            ],
+            [
+              0.84,
+              2,
+              0.2
+            ]
+          ],
+          "attaches": "Orb on shelf3 mount (x<0), candles and small orb on shelf4 mount.",
+          "joints": [],
+          "floor": false,
+          "budget": 200
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:17:32.726Z",
+        "wallMs": 21195,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75221,
+          "completion_tokens": 2126,
+          "total_tokens": 77347,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.031084900000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "carcass",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.921Z",
+        "wallMs": 9369,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77159,
+          "completion_tokens": 1477,
+          "total_tokens": 78636,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0284709,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "crown",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.921Z",
+        "wallMs": 12912,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77128,
+          "completion_tokens": 2126,
+          "total_tokens": 79254,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.034898900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tomes",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.921Z",
+        "wallMs": 13531,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77199,
+          "completion_tokens": 2222,
+          "total_tokens": 79421,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0360009,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "scrolls",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.921Z",
+        "wallMs": 15992,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77163,
+          "completion_tokens": 2653,
+          "total_tokens": 79816,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0402389,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "orbsCandles",
+        "effort": "low",
+        "started": "2026-10-28T21:17:53.921Z",
+        "wallMs": 16737,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77218,
+          "completion_tokens": 2834,
+          "total_tokens": 80052,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0421589,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-carcass",
+        "effort": "low",
+        "started": "2026-10-28T21:18:12.395Z",
+        "wallMs": 2693,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79802,
+          "completion_tokens": 201,
+          "total_tokens": 80003,
+          "prompt_tokens_details": {
+            "cached_tokens": 77155
+          }
+        },
+        "costUsd": 0.0150195,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-orbsCandles",
+        "effort": "low",
+        "started": "2026-10-28T21:18:12.395Z",
+        "wallMs": 4066,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80814,
+          "completion_tokens": 365,
+          "total_tokens": 81179,
+          "prompt_tokens_details": {
+            "cached_tokens": 77214
+          }
+        },
+        "costUsd": 0.018571400000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-scrolls",
+        "effort": "low",
+        "started": "2026-10-28T21:18:12.395Z",
+        "wallMs": 8496,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80957,
+          "completion_tokens": 1217,
+          "total_tokens": 82174,
+          "prompt_tokens_details": {
+            "cached_tokens": 77159
+          }
+        },
+        "costUsd": 0.0274819,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-crown",
+        "effort": "low",
+        "started": "2026-10-28T21:18:12.395Z",
+        "wallMs": 13973,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80223,
+          "completion_tokens": 2030,
+          "total_tokens": 82253,
+          "prompt_tokens_details": {
+            "cached_tokens": 77124
+          }
+        },
+        "costUsd": 0.0342104,
+        "hasCode": true,
+        "reasoning": "I notice the tassels are hanging below the box boundary at y=2, extending too far down to 1.75, so they need to be raised to sit within the crown area between y=2 and 2.2. I also need to lower the gem since its top at 2.47 exceeds the 2.3 limit. I'll shift the tassel positioning upward by adding an offset constant to bring them inside the valid range.\n\nI'll simplify by removing the gem's base cylinder and repositioning the octahedron gem lower and forward, keeping it tucked within the arch. The side cones are poking above the box top, so I'm lowering their y-position to keep everything within bounds.\n\n"
+      }
+    ],
+    "fit": {
+      "fitMs": 17203,
+      "checkMs": 1140,
+      "afterMs": 1494,
+      "repairMs": 13973,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "carcass",
+          "meshes": 165,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.9506,
+              0,
+              -0.285
+            ],
+            [
+              0.9506,
+              2,
+              0.285
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "crown",
+          "meshes": 46,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.9507,
+              2,
+              -0.2302
+            ],
+            [
+              0.9507,
+              2.3651,
+              0.2302
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "tomes",
+          "meshes": 244,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.8103,
+              0.4448,
+              -0.1802
+            ],
+            [
+              0.8271,
+              1.6342,
+              0.218
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "scrolls",
+          "meshes": 119,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.832,
+              0.8479,
+              -0.2174
+            ],
+            [
+              0.0354,
+              1.185,
+              0.3067
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "orbsCandles",
+          "meshes": 108,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.6708,
+              1.292,
+              -0.3208
+            ],
+            [
+              0.6708,
+              2.0689,
+              0.3208
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "carcass",
+          "meshes": 165,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.9506,
+              0,
+              -0.285
+            ],
+            [
+              0.9506,
+              2,
+              0.285
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "crown",
+          "meshes": 46,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.9507,
+              2,
+              -0.2302
+            ],
+            [
+              0.9507,
+              2.3651,
+              0.2302
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "tomes",
+          "meshes": 244,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.8103,
+              0.4448,
+              -0.1802
+            ],
+            [
+              0.8271,
+              1.6342,
+              0.218
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "scrolls",
+          "meshes": 119,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.832,
+              0.8479,
+              -0.2174
+            ],
+            [
+              0.0354,
+              1.185,
+              0.3067
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "orbsCandles",
+          "meshes": 108,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.6708,
+              1.292,
+              -0.3208
+            ],
+            [
+              0.6708,
+              2.0689,
+              0.3208
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "carcass",
+          "wallMs": 2693,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "crown",
+          "wallMs": 13973,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "scrolls",
+          "wallMs": 8496,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "orbsCandles",
+          "wallMs": 4066,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  },
+  "check": {
+    "slug": "r42fitWizardBookshelfRichParflatFit",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "A",
+    "renderError": null,
+    "report": {
+      "parts": 682,
+      "triangles": 12976,
+      "colors": 27,
+      "textures": 0,
+      "joints": 0,
+      "size": [
+        1.901,
+        2.365,
+        0.642
+      ],
+      "issues": [],
+      "fine": 14
+    }
+  }
+}

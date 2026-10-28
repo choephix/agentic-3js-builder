@@ -1,0 +1,672 @@
+{
+  "slug": "r42fitChopperMotorbikeRichParflatFit",
+  "arm": "parflat-fit",
+  "subject": "chopperMotorbike",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: custom chopper motorbike.\nStyle: Overwatch.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:17:32.732Z",
+  "wallMs": 54218,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 627650,
+    "completion_tokens": 15112,
+    "total_tokens": 642762,
+    "prompt_tokens_details": {
+      "cached_tokens": 602143
+    }
+  },
+  "costUsd": 0.26234830000000003,
+  "hasCode": true,
+  "parallel": {
+    "planMs": 20236,
+    "slowestPartMs": 25853,
+    "critical": "frontEnd",
+    "elapsedMs": 46090,
+    "spec": {
+      "name": "Overwatch Chopper",
+      "description": "A stylized Overwatch-look custom chopper motorcycle with a long front fork, teardrop tank, fat rear tire, chrome exhaust and glowing cyan accents.",
+      "builderName": "owChopper",
+      "size": [
+        0.9,
+        1.25,
+        2.9
+      ],
+      "layout": "Low, long chopper facing +Z. Raked front fork with a 21 inch spoked wheel at the front (z about +1.25), a fat rear wheel at the back (z about -1.0), the engine and frame between them on the floor line, a teardrop tank above the engine, a solo seat behind it, high ape-hanger handlebars up front. Overwatch style: bold chunky shapes, a dark steel base with orange and white trim panels, hex and chevron motifs, glowing cyan energy strips on the engine, wheel hubs and exhaust tips, thin dark outline bands between colour zones. Both wheels touch y=0. Everything is built from primitives with flat colours.",
+      "palette": {
+        "frameDark": "#2b313d",
+        "steel": "#8c97a8",
+        "chrome": "#d9e2ee",
+        "tankOrange": "#f2791f",
+        "trimWhite": "#f4f6f8",
+        "outline": "#14171d",
+        "rubber": "#1b1d22",
+        "seatLeather": "#4a2f22",
+        "neonCyan": "#3cf0ff",
+        "engineGrey": "#515b6b",
+        "brass": "#c8963c",
+        "lampGlass": "#fff1b0"
+      },
+      "mounts": {
+        "frontAxle": [
+          0,
+          0.33,
+          1.25
+        ],
+        "rearAxle": [
+          0,
+          0.33,
+          -1
+        ],
+        "headstock": [
+          0,
+          0.82,
+          0.62
+        ],
+        "tankTop": [
+          0,
+          0.92,
+          0.2
+        ],
+        "seatTop": [
+          0,
+          0.78,
+          -0.45
+        ],
+        "engineCentre": [
+          0,
+          0.4,
+          0.05
+        ],
+        "swingarmPivot": [
+          0,
+          0.42,
+          -0.35
+        ],
+        "handlebarCentre": [
+          0,
+          1.15,
+          0.55
+        ]
+      },
+      "joints": [
+        {
+          "name": "frame",
+          "at": [
+            0,
+            0.5,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "steering",
+          "parent": "frame",
+          "at": [
+            0,
+            0.82,
+            0.62
+          ],
+          "dir": [
+            0,
+            0.5,
+            1
+          ],
+          "role": "hinge",
+          "group": "front"
+        },
+        {
+          "name": "wheelF",
+          "parent": "steering",
+          "at": [
+            0,
+            0.33,
+            1.25
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "front"
+        },
+        {
+          "name": "swingarm",
+          "parent": "frame",
+          "at": [
+            0,
+            0.42,
+            -0.35
+          ],
+          "dir": [
+            0,
+            0,
+            -1
+          ],
+          "role": "hinge",
+          "group": "rear"
+        },
+        {
+          "name": "wheelR",
+          "parent": "swingarm",
+          "at": [
+            0,
+            0.33,
+            -1
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "rear"
+        }
+      ],
+      "parts": [
+        {
+          "id": "frontEnd",
+          "builds": "Raked springer fork (two chrome tubes with outline collars and orange fork sleeves), triple tree, 21 inch front wheel with thin tyre, chrome spokes, cyan hex hub glow, disc brake with caliper, round headlamp with lampGlass lens and white ring, ape-hanger handlebars with grips, mirrors, brake lever, front fender in orange with white chevron stripe.",
+          "box": [
+            [
+              -0.45,
+              0,
+              0.5
+            ],
+            [
+              0.45,
+              1.25,
+              1.55
+            ]
+          ],
+          "attaches": "Rides steering and wheelF joints; fork top at headstock, wheel at frontAxle, bars at handlebarCentre.",
+          "joints": [
+            "steering",
+            "wheelF"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "frameTank",
+          "builds": "Tubular dark steel frame (backbone, down tubes, cradle) with outline-colour welds, large teardrop tankOrange tank with white racing stripe, Overwatch hex emblem on each side, cyan edge strip, thin outline band at tank seams, filler cap in chrome, solo seat in seatLeather with orange piping and rear tail lamp, small rear fender struts.",
+          "box": [
+            [
+              -0.3,
+              0.3,
+              -0.9
+            ],
+            [
+              0.3,
+              1.05,
+              0.65
+            ]
+          ],
+          "attaches": "Rides frame joint; neck meets steering at headstock, tank sits at tankTop, seat at seatTop, rear frame ends at swingarmPivot.",
+          "joints": [
+            "frame"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "engineDrive",
+          "builds": "V-twin engine (two angled cylinders with ribbed fins, engineGrey and steel, brass bolts), crankcase with glowing cyan energy core under a hex window, primary chain cover with white chevron, footpegs and shifter, kickstand, side chain run to rear sprocket, belt guard.",
+          "box": [
+            [
+              -0.35,
+              0.12,
+              -0.45
+            ],
+            [
+              0.35,
+              0.75,
+              0.55
+            ]
+          ],
+          "attaches": "Rides frame joint (and swingarm for the chain); centred at engineCentre.",
+          "joints": [
+            "frame",
+            "swingarm"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "rearEnd",
+          "builds": "Fat 240 rear wheel with rubber tyre and white sidewall ring, chrome spokes, cyan hub glow, brake disc, swingarm arms in frameDark with orange tips, orange rear fender with white stripe and tail lamp, two long chrome drag-pipe exhausts running back along the right side with heat-shield bands and glowing cyan tips, license plate with hex logo.",
+          "box": [
+            [
+              -0.45,
+              0,
+              -1.45
+            ],
+            [
+              0.45,
+              0.85,
+              -0.3
+            ]
+          ],
+          "attaches": "Rides swingarm and wheelR joints; wheel at rearAxle, arms pivot at swingarmPivot, exhaust headers start at engineCentre.",
+          "joints": [
+            "swingarm",
+            "wheelR",
+            "frame"
+          ],
+          "floor": true,
+          "budget": 190
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:17:32.732Z",
+        "wallMs": 20236,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75203,
+          "completion_tokens": 2154,
+          "total_tokens": 77357,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0313289,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "rearEnd",
+        "effort": "low",
+        "started": "2026-10-28T21:17:52.969Z",
+        "wallMs": 13600,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77391,
+          "completion_tokens": 2159,
+          "total_tokens": 79550,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0357549,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "engineDrive",
+        "effort": "low",
+        "started": "2026-10-28T21:17:52.969Z",
+        "wallMs": 13628,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77343,
+          "completion_tokens": 2156,
+          "total_tokens": 79499,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0356289,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "frameTank",
+        "effort": "low",
+        "started": "2026-10-28T21:17:52.969Z",
+        "wallMs": 16222,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77384,
+          "completion_tokens": 2777,
+          "total_tokens": 80161,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.041920900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "frontEnd",
+        "effort": "low",
+        "started": "2026-10-28T21:17:52.969Z",
+        "wallMs": 25853,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77376,
+          "completion_tokens": 4390,
+          "total_tokens": 81766,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0580349,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-rearEnd",
+        "effort": "low",
+        "started": "2026-10-28T21:18:20.146Z",
+        "wallMs": 2979,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80165,
+          "completion_tokens": 236,
+          "total_tokens": 80401,
+          "prompt_tokens_details": {
+            "cached_tokens": 77387
+          }
+        },
+        "costUsd": 0.0156547,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-engineDrive",
+        "effort": "low",
+        "started": "2026-10-28T21:18:20.146Z",
+        "wallMs": 3520,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80265,
+          "completion_tokens": 486,
+          "total_tokens": 80751,
+          "prompt_tokens_details": {
+            "cached_tokens": 77339
+          }
+        },
+        "costUsd": 0.0184459,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fit-frontEnd",
+        "effort": "low",
+        "started": "2026-10-28T21:18:20.146Z",
+        "wallMs": 5403,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 82523,
+          "completion_tokens": 754,
+          "total_tokens": 83277,
+          "prompt_tokens_details": {
+            "cached_tokens": 77372
+          }
+        },
+        "costUsd": 0.0255792,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ],
+    "fit": {
+      "fitMs": 8129,
+      "checkMs": 1132,
+      "afterMs": 1402,
+      "repairMs": 5403,
+      "error": null,
+      "threw": {},
+      "before": [
+        {
+          "id": "frontEnd",
+          "meshes": 108,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.44,
+              0,
+              0.4979
+            ],
+            [
+              0.44,
+              1.2405,
+              1.6593
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "frameTank",
+          "meshes": 64,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.176,
+              0.2706,
+              -0.93
+            ],
+            [
+              0.176,
+              1.0325,
+              0.6945
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "engineDrive",
+          "meshes": 51,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.3651,
+              0.1175,
+              -0.5204
+            ],
+            [
+              0.4351,
+              0.8209,
+              0.3844
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "rearEnd",
+          "meshes": 56,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.3356,
+              -0.0104,
+              -1.3975
+            ],
+            [
+              0.1552,
+              0.8099,
+              -0.2692
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "after": [
+        {
+          "id": "frontEnd",
+          "meshes": 108,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.44,
+              0,
+              0.4979
+            ],
+            [
+              0.44,
+              1.2405,
+              1.6593
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "frameTank",
+          "meshes": 64,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.176,
+              0.2706,
+              -0.93
+            ],
+            [
+              0.176,
+              1.0325,
+              0.6945
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "engineDrive",
+          "meshes": 51,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.3651,
+              0.1175,
+              -0.5204
+            ],
+            [
+              0.4351,
+              0.8209,
+              0.3844
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        },
+        {
+          "id": "rearEnd",
+          "meshes": 56,
+          "outside": 0,
+          "maxOver": 0,
+          "bounds": [
+            [
+              -0.3356,
+              -0.0104,
+              -1.3975
+            ],
+            [
+              0.1552,
+              0.8099,
+              -0.2692
+            ]
+          ],
+          "floats": null,
+          "threw": null,
+          "misfit": false,
+          "worst": []
+        }
+      ],
+      "afterError": null,
+      "afterThrew": {},
+      "repairs": [
+        {
+          "id": "frontEnd",
+          "wallMs": 5403,
+          "edits": 2,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "engineDrive",
+          "wallMs": 3520,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        },
+        {
+          "id": "rearEnd",
+          "wallMs": 2979,
+          "edits": 1,
+          "failedEdits": 0,
+          "changed": true
+        }
+      ],
+      "reverted": []
+    }
+  },
+  "check": {
+    "slug": "r42fitChopperMotorbikeRichParflatFit",
+    "typeErrors": 0,
+    "typecheckSkipped": false,
+    "typeErrorSample": [],
+    "rendered": true,
+    "lane": "B",
+    "renderError": null,
+    "report": {
+      "parts": 279,
+      "triangles": 10898,
+      "colors": 13,
+      "textures": 0,
+      "joints": 5,
+      "size": [
+        0.88,
+        1.251,
+        3.057
+      ],
+      "issues": [],
+      "fine": 19
+    }
+  }
+}
