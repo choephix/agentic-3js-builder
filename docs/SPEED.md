@@ -4,7 +4,7 @@ The goal and the experiment queue for the next token-burning session. Read this 
 
 ## Paying for the next burn (2026-10-28)
 
-Claude calls from the runners bill the Anthropic API key in Aegis (promotional credits), not the subscription meters; `ANTHROPIC_PROVIDER` in `scripts/bakeoff.ts` switches back. Credit expiry, the spend limit and what a refused call leaves behind are in `docs/STATUS.md`.
+Claude calls from the runners bill the subscription logins (since 2026-10-29). On 2026-10-28 they billed the Anthropic API key in Aegis (promotional credits); `ANTHROPIC_PROVIDER` in `scripts/bakeoff.ts` switches between the two. That route, its limits and what a refused call leaves behind are in `docs/STATUS.md`.
 
 ## Goal (Stefan, 2026-10-24)
 

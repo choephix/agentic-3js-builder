@@ -333,7 +333,7 @@ function systemPrompt(arm: Arm, subject?: Subject) {
  * The omp provider that answers `anthropic/…` models. "anthropic-api" bills the Console API key in Aegis
  * (`anthropic-api-key`); "anthropic" bills the subscription logins. Records keep the `anthropic/…` id either way.
  */
-const ANTHROPIC_PROVIDER: "anthropic-api" | "anthropic" = "anthropic-api";
+const ANTHROPIC_PROVIDER: "anthropic-api" | "anthropic" = "anthropic";
 const routed = (model: string) => model.replace(/^anthropic\//, `${ANTHROPIC_PROVIDER}/`);
 
 type GatewayReply = { id: number; status: number; body: any };

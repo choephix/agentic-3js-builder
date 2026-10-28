@@ -2,9 +2,13 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
-## Claude calls bill the Anthropic API key, 2026-10-28
+## Claude calls bill the subscription again, 2026-10-29
 
-Claude calls from `scripts/bakeoff.ts`, `scripts/twostage.ts` and `scripts/render-loop.ts` go to omp's `anthropic-api` provider, which fetches the general-purpose Aegis key `anthropic-api-key` itself. Do not read, print or copy the value. The switch is `ANTHROPIC_PROVIDER` in `scripts/bakeoff.ts`: `"anthropic-api"` now, `"anthropic"` for the subscription logins (marcellus / revoltage). Commands and records still say `anthropic/claude-…`; the gateway call rewrites the id, so rounds on either side of the switch compare as the same model. A round whose model the provider lacks stops before its first call. The provider is in both omp profiles' `models.yml` (default and nilo) with Haiku 5.5, Sonnet 5.5, Opus 5.5 and Fable 5.1. GPT, Gemini and OpenRouter routes are unchanged.
+Stefan, 2026-10-29: back to the subscription logins. `ANTHROPIC_PROVIDER` in `scripts/bakeoff.ts` is `"anthropic"` again; E10 (the gallery) did not run on the credits. The API-key route below stays available behind that switch.
+
+### The API-key route, 2026-10-28
+
+Claude calls from `scripts/bakeoff.ts`, `scripts/twostage.ts` and `scripts/render-loop.ts` went to omp's `anthropic-api` provider, which fetches the general-purpose Aegis key `anthropic-api-key` itself. Do not read, print or copy the value. The switch is `ANTHROPIC_PROVIDER` in `scripts/bakeoff.ts`: `"anthropic-api"` for this route, `"anthropic"` for the subscription logins (marcellus / revoltage). Commands and records still say `anthropic/claude-…`; the gateway call rewrites the id, so rounds on either side of the switch compare as the same model. A round whose model the provider lacks stops before its first call. The provider is in both omp profiles' `models.yml` (default and nilo) with Haiku 5.5, Sonnet 5.5, Opus 5.5 and Fable 5.1. GPT, Gemini and OpenRouter routes are unchanged.
 
 Measured on 2026-10-28: 10,000 requests and 2M output tokens a minute per model, so `--concurrency 30` fits. Cache reads hit on this route (second call on a 25k-token prefix: 25,018 cached); the console's prompt-caching "Set up" card needs nothing.
 
