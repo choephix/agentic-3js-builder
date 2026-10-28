@@ -495,6 +495,8 @@ Per-build figures from past rounds:
 
 **Account limit:** all Claude runs go through marcellus. revoltage was at 99% of its weekly meter on 2026-10-27. The dollar figures are list prices; the real limit is the subscription meters.
 
+**2026-10-28:** Claude runs no longer go through marcellus. They bill the Anthropic API key (`docs/STATUS.md`). S7 still stands for every other provider, and for which Claude models and efforts a rotation round runs: ask, don't pick a slice because the key has room.
+
 **My recommendation, in phases:**
 
 1. **Sonnet low only, baseline:** find which traps fire, and test the X/Y-axis prediction (H2).

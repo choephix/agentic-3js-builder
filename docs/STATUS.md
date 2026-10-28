@@ -2,6 +2,14 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## Claude calls bill the Anthropic API key, 2026-10-28
+
+Claude calls from `scripts/bakeoff.ts`, `scripts/twostage.ts` and `scripts/render-loop.ts` go to omp's `anthropic-api` provider, which fetches the general-purpose Aegis key `anthropic-api-key` itself. Do not read, print or copy the value. The switch is `ANTHROPIC_PROVIDER` in `scripts/bakeoff.ts`: `"anthropic-api"` now, `"anthropic"` for the subscription logins (marcellus / revoltage). Commands and records still say `anthropic/claude-…`; the gateway call rewrites the id, so rounds on either side of the switch compare as the same model. A round whose model the provider lacks stops before its first call. The provider is in both omp profiles' `models.yml` (default and nilo) with Haiku 5.5, Sonnet 5.5, Opus 5.5 and Fable 5.1. GPT, Gemini and OpenRouter routes are unchanged.
+
+Measured on 2026-10-28: 10,000 requests and 2M output tokens a minute per model, so `--concurrency 30` fits. Cache reads hit on this route (second call on a 25k-token prefix: 25,018 cached); the console's prompt-caching "Set up" card needs nothing.
+
+Credits, from the console on 2026-10-28: about $200 of promotional credits expire 2026-10-30 (UTC), another $200 expire 2026-11-30. Usage paid with those credits counts toward the organization's monthly spend limit ($50 when last checked; resets on the 1st, UTC). Raise it before a burn, or requests stop around $50 and the October grant dies unspent. Do not turn on auto-reload to drain these credits. A call refused for the spend limit, spent credits or a locked Aegis comes back as an error that `run` records as a failed build, and a resumed round skips it: fix the cause, then delete those `runs/<slug>.json`.
+
 ## Rotation side quest, 2026-10-27
 
 Stefan started a side quest on parts that face, tilt or turn the wrong way (wheel stripes, spikes, roofs that come out as a V). Problem, ground rules, hypotheses, a first platform draft and the verbatim record of the conversation that started it: `docs/ROTATION.md`. Research in `docs/research/rotation-*.md`. Nothing built or run yet.

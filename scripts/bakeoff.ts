@@ -1,7 +1,7 @@
 // Prompt bake-off: the same pitches through different system prompts (arms), one model reply each, as an app would
 // run it: one system prompt, one pitch, one TypeScript module back. `refine` adds the app's feedback turns: the error
 // when a module fails, its renders and measurements when it builds. Calls go through `omp auth-gateway stdio`, which
-// uses the stored omp logins and adds almost nothing to the prompt.
+// uses the stored omp logins and adds almost nothing to the prompt; `anthropic/…` models go to `ANTHROPIC_PROVIDER`.
 //
 //   npm run bakeoff -- prompt <arm>                       write the arm's system prompt to scratch/ and print its size
 //   npm run bakeoff -- run <round> [options]              ask the model for every missing (arm, subject, level) build
@@ -202,8 +202,16 @@ function systemPrompt(arm: Arm) {
 // ---------------------------------------------------------------------------------------------------------------
 // The gateway: one JSON request per line on stdin, one response per line on stdout, answered in completion order.
 
+/**
+ * The omp provider that answers `anthropic/…` models. "anthropic-api" bills the Console API key in Aegis
+ * (`anthropic-api-key`); "anthropic" bills the subscription logins. Records keep the `anthropic/…` id either way.
+ */
+const ANTHROPIC_PROVIDER: "anthropic-api" | "anthropic" = "anthropic-api";
+const routed = (model: string) => model.replace(/^anthropic\//, `${ANTHROPIC_PROVIDER}/`);
+
 type GatewayReply = { id: number; status: number; body: any };
-type Gateway = { send(path: string, body: unknown): Promise<GatewayReply>; close(): void };
+type Request = { model: string; [field: string]: unknown };
+type Gateway = { send(path: string, body: Request): Promise<GatewayReply>; close(): void };
 type Rates = { input: number; output: number; cacheRead: number; cacheWrite: number };
 type Pricing = (Rates & { longContext?: Rates & { inputThreshold: number } }) | undefined;
 
@@ -236,12 +244,12 @@ function gateway(): Gateway {
       resolve({ id: 0, status: 599, body: { error: `gateway exited ${code}: ${stderr}` } });
   });
   return {
-    async send(path: string, body: unknown): Promise<GatewayReply> {
+    async send(path: string, body: Request): Promise<GatewayReply> {
       await isReady;
       const id = next++;
       return new Promise((resolve) => {
         waiting.set(id, resolve);
-        child.stdin.write(`${JSON.stringify({ id, path, body })}\n`);
+        child.stdin.write(`${JSON.stringify({ id, path, body: { ...body, model: routed(body.model) } })}\n`);
       });
     },
     close: () => child.stdin.end(),
@@ -252,11 +260,16 @@ async function pricing(model: string): Promise<Pricing> {
   const out = await capture(OMP, ["models", "--json"]);
   type Entry = { selector: string; cost?: Pricing };
   const list: Entry[] | { models: Entry[] } = JSON.parse(out.stdout);
-  return (Array.isArray(list) ? list : list.models).find((entry) => entry.selector === model)?.cost;
+  const entry = (Array.isArray(list) ? list : list.models).find((e) => e.selector === routed(model));
+  if (!entry && routed(model) !== model)
+    throw new Error(
+      `${routed(model)} is not in \`omp models\`: add it to the profile's ${ANTHROPIC_PROVIDER} provider.`,
+    );
+  return entry?.cost;
 }
 
 /** One chat completion through the gateway, retried on overload, with its estimated cost. */
-async function ask(gw: Gateway, body: unknown, cost: Pricing) {
+async function ask(gw: Gateway, body: Request, cost: Pricing) {
   let reply: GatewayReply | undefined;
   const started = Date.now();
   for (let attempt = 1; attempt <= 3; attempt++) {

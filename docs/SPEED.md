@@ -2,6 +2,10 @@
 
 The goal and the experiment queue for the next token-burning session. Read this when Stefan says "let's burn some tokens" or asks about build time.
 
+## Paying for the next burn (2026-10-28)
+
+Claude calls from the runners bill the Anthropic API key in Aegis (promotional credits), not the subscription meters; `ANTHROPIC_PROVIDER` in `scripts/bakeoff.ts` switches back. Credit expiry, the spend limit and what a refused call leaves behind are in `docs/STATUS.md`.
+
 ## Goal (Stefan, 2026-10-24)
 
 - A single-run build an app can show in about **one minute**, and **something on screen as early as possible** even if the full model arrives later. Cut anything that doesn't change what ends up on screen.

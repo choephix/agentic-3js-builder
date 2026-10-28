@@ -125,6 +125,6 @@ npm run lab-export                         # static /lab copy on webshare (rerun
 
 - `run` only asks for builds that have no run record yet, so an interrupted round resumes where it stopped. To retry a build, delete its `runs/<slug>.json`.
 - Round ids are letters and digits. Slugs are camel case, e.g. `r1FennecTerseDocsSdk`.
-- Calls go through `omp auth-gateway stdio`, which uses the stored omp logins and adds about 50 tokens to the prompt. Any model `omp models` lists works.
-- `costUsd` is estimated from `omp models --json` prices: uncached input, cached input and output. Cache writes aren't reported, so they're priced as plain input.
+- Calls go through `omp auth-gateway stdio`, which uses the stored omp logins and adds about 50 tokens to the prompt. Any model `omp models` lists works. `anthropic/…` models go to the provider in `ANTHROPIC_PROVIDER` (`scripts/bakeoff.ts`): `anthropic-api`, the Anthropic API key in Aegis, since 2026-10-28; `anthropic` for the subscription. Records keep `anthropic/…`. Credits and limits: `docs/STATUS.md`.
+- `costUsd` is estimated from `omp models --json` prices: uncached input, cached input and output. Cache writes aren't reported, so they're priced as plain input; the API bills them at 1.25×.
 - `check` renders with `SNAP_RENDER_ON_ERROR=1`: a build the creature lab would reject (say, meshes on no bone) still renders, as a static mesh when its skeleton fails, the way an app would show it. Its report keeps the errors.
