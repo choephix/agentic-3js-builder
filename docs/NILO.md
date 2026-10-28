@@ -71,6 +71,24 @@ Nilo's own loop on the same 20 r24 `rich` briefs as `r35sm` (Sonnet 5.5 medium: 
 - Production numbers (`LowPolyGenerationTasks`) weren't read: this machine has no Firestore access.
 - **Quota:** the 77 calls took stefan.ginev@nilo.io's Antigravity Gemini weekly meter from 0% to 100% (resets 2026-11-02). N2 waits for the reset or another Gemini route (OpenRouter).
 
+## Same model, both engines (N1s + r39, 2026-10-28)
+
+N1's comparison changed model and engine together. This batch holds the model fixed: Sonnet 5.5 on both engines, the same 20 r24 rich briefs, all four arms launched together (15:18:55–15:32:06 +02). Low-poly runs `bakeoff/n1/run.ts` with `N1_MODEL`/`N1_EFFORT` (`3a8583e7`) at Nilo `0c4fd24d71` with the production settings an admin's Sonnet pick sends (no temperature, adaptive thinking, caps 8k/64k/4k, high-detail critique images; audited against `origin/main`). The SDK arms are r35sm's `flat` prompt verbatim with one low repair (`r39sfl`, `r39sfm`).
+
+| Medians (ranges)  | Low-poly, Sonnet low | SDK flat, Sonnet low | Low-poly, Sonnet medium | SDK flat, Sonnet medium |
+| ----------------- | -------------------- | -------------------- | ----------------------- | ----------------------- |
+| First draft       | 41 s (25–56)         | = final              | 51 s (33–269)           | = final                 |
+| Final             | 115 s (59–219)       | 22 s (12–245)        | 174 s (85–473)          | 134 s (51–292)          |
+| Calls             | 4                    | 1 (3 of 20 repaired) | 4                       | 1 (3 of 20 repaired)    |
+| Triangles         | 7.3k                 | 3.2k                 | 10.8k                   | 9.6k                    |
+| Cost              | $0.24                | $0.04                | $0.30                   | $0.19                   |
+| Textures in source | not allowed         | 0/20                 | not allowed             | 5/20                    |
+
+- On the same model the SDK still finishes sooner and cheaper at both efforts. At medium, low-poly's first draft lands 83 s before the SDK's model; at low the SDK's final beats low-poly's draft.
+- At low, the SDK's models are less than half as dense (3.2k vs 7.3k triangles); at medium the two are close.
+- Remaining asymmetries (iteration and critique images vs one call; ~74k-token SDK prompt; 120k vs 64k caps; triangle/part budgets; rigging; texture leaks) are listed on the brief page under "How we measured". Looks are Stefan's call.
+- Data: `bakeoff/rounds/r39sf{l,m}{,fix}`, `scratch/n1s/{low,medium}` (untracked, like N1's), renders under `~/tmp/public/nilo/agentic-3js-builder/n1s-{low,medium}/`. Spend ~$18.3 including a discarded partial launch and smokes.
+
 ## Folding the SDK in: the options
 
 1. **New engine behind the existing tool.** `generate_low_poly_model` keeps its schema; the client executor picks the engine by flag (per user or admin), and the GLB's document records `engine: "sdk"` so `edit_low_poly_model` dispatches on it. The agent's routing, skills and tool docs don't change, and the flag gives an A/B on real prompts.
