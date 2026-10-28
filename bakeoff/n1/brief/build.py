@@ -249,22 +249,26 @@ def render_n1s(row, render_root, bid, name):
 
 
 
+# Gallery and toggle order: Nilo's loop first, then the SDK; within each, by model and effort, draft before final.
 COLS = [
-    ("lpDraft", "Nilo today", "first draft"),
-    ("lpFinal", "Nilo today", "final"),
-    ("flat", "SDK, one call", "final"),
-    ("low", "SDK, low effort (context)", "final"),
-    ("two1", "SDK, two-stage", "first draft"),
-    ("two", "SDK, two-stage", "final"),
-    ("high", "SDK, high effort", "final"),
+    (key, a, b)
+    for key, a, b, present in [
+        ("lpDraft", "Nilo today", "first draft", True),
+        ("lpFinal", "Nilo today", "final", True),
+        ("n1sLowDraft", "Nilo on Sonnet, low", "first draft", "n1sLow" in N1S_DATA),
+        ("n1sLow", "Nilo on Sonnet, low", "final", "n1sLow" in N1S_DATA),
+        ("n1sMediumDraft", "Nilo on Sonnet, medium", "first draft", "n1sMedium" in N1S_DATA),
+        ("n1sMedium", "Nilo on Sonnet, medium", "final", "n1sMedium" in N1S_DATA),
+        ("sfl", "SDK, low effort, flat", "final", "sfl" in SDK_DATA),
+        ("low", "SDK, low effort (context)", "final", True),
+        ("sfm", "SDK, medium effort, flat", "final", "sfm" in SDK_DATA),
+        ("flat", "SDK, one call", "final", True),
+        ("two1", "SDK, two-stage", "first draft", True),
+        ("two", "SDK, two-stage", "final", True),
+        ("high", "SDK, high effort", "final", True),
+    ]
+    if present
 ]
-for key, label, effort in [("sfl", "SDK, low effort, flat", "low"), ("sfm", "SDK, medium effort, flat", "medium")]:
-    if key in SDK_DATA:
-        COLS.append((key, label, "final"))
-for key, label in [("n1sLow", "Nilo on Sonnet, low"), ("n1sMedium", "Nilo on Sonnet, medium")]:
-    if key in N1S_DATA:
-        COLS.append((key, label, "final"))
-        COLS.append((key + "Draft", label, "first draft"))
 
 
 briefs = []
