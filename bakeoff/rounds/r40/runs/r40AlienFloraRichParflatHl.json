@@ -1,0 +1,336 @@
+{
+  "slug": "r40AlienFloraRichParflatHl",
+  "arm": "parflat-hl",
+  "subject": "alienFlora",
+  "level": "rich",
+  "pitch": "Category: Plant.\nSubject: bioluminescent alien plant.\nStyle: Avatar.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "high",
+  "started": "2026-10-28T21:09:03.469Z",
+  "wallMs": 64831,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 473863,
+    "completion_tokens": 16111,
+    "total_tokens": 489974,
+    "prompt_tokens_details": {
+      "cached_tokens": 444054
+    }
+  },
+  "costUsd": 0.26513339999999996,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 49812,
+    "slowestPartMs": 15019,
+    "critical": "frondCrown",
+    "elapsedMs": 64831,
+    "spec": {
+      "name": "Pandoran Glow-Spire",
+      "description": "A 3.4 m bioluminescent alien plant in the Avatar/Pandora style: a mossy root mound, a twisting vein-lit stalk, a crown of arching teal fronds with glowing tips, curtains of drooping light-tendrils, and a glowing spore bloom.",
+      "builderName": "pandoranGlowSpire",
+      "size": [
+        2.8,
+        3.4,
+        2.8
+      ],
+      "layout": "Radially symmetric around the Y axis, standing on y=0, with a slight lean toward +Z so the front reads. From the ground up: a low dark mossy mound (r about 1.2, height 0.4) with buttress roots splayed out and tiny glowing mushrooms. A thick S-curving stalk (radius 0.32 at the base to 0.12 at the top, centre line (0,0.35,0) -> (0.08,1.0,0.05) -> (-0.06,1.7,-0.04) -> (0,2.35,0)) with spiral ridges and glowing vein lines winding round it. Two side branches carry glowing pod-bulbs at y 1.2-1.6. At the top (y 2.3) sits a crown of 9 big arching fan fronds in two tiers, rising and curving outward to about r 1.3, each with a darker teal body, light-teal midrib, and a glowing cyan edge and tip. A skirt of long thin tendrils hangs from the crown ring and branch nodes down to y 0.9, each ending in a glowing bulb that alternates cyan, magenta and violet. A glowing bloom of petals and a bright core sits in the crown centre (y 2.4-3.0), with floating spore motes up to y 3.4. Avatar style: lots of dark, cool blue-teal-violet base colours with saturated neon glows concentrated on veins, edges, tips and bulbs, soft rounded organic shapes made from primitives, and tendril curls. All glow pieces are small own-colour parts wrapped in glow(). Nothing else is in the scene: no ground plane beyond the mound.",
+      "palette": {
+        "soil": "#161a26",
+        "mossDark": "#143536",
+        "moss": "#24634f",
+        "mossLight": "#3f9a6a",
+        "trunk": "#2a2748",
+        "trunkMid": "#3b3664",
+        "trunkLight": "#5a54a0",
+        "frond": "#1a5468",
+        "frondLight": "#2c8a98",
+        "frondDeep": "#12384f",
+        "glowCyan": "#2ff3e0",
+        "glowBlue": "#3aa0ff",
+        "glowMagenta": "#ee4bff",
+        "glowViolet": "#9b5cff",
+        "glowGreen": "#7dff9a",
+        "petal": "#b640d6",
+        "petalLight": "#e58bff",
+        "core": "#fff4b0",
+        "podShell": "#34306a"
+      },
+      "mounts": {
+        "groundCenter": [
+          0,
+          0.4,
+          0
+        ],
+        "stalkBase": [
+          0,
+          0.35,
+          0
+        ],
+        "stalkMid": [
+          0,
+          1.35,
+          0
+        ],
+        "stalkTop": [
+          0,
+          2.35,
+          0
+        ],
+        "branchL": [
+          0.2,
+          1.25,
+          0.05
+        ],
+        "branchR": [
+          -0.15,
+          1.6,
+          -0.05
+        ],
+        "crownRingCenter": [
+          0,
+          2.3,
+          0
+        ],
+        "crownRingRadius": 0.2,
+        "bloomCenter": [
+          0,
+          2.5,
+          0
+        ],
+        "tendrilRingY": 2.25,
+        "tendrilRingRadius": 0.55,
+        "tendrilBottomY": 0.9
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "rootMound",
+          "builds": "The ground-hugging base. A flattened faceted mound (lathe or squashed sphere, soil colour with mossDark on top, moss and mossLight patches on upward faces as small separate caps) about r 1.2 and 0.4 high. 6-7 buttress roots as tapered sweeps in trunk/trunkMid that start against the stalk base (r 0.32 at y 0.5) and splay out and down over the mound, 0.8-1.2 m long, ending in the soil at y about 0. Glowing rootlet lines (thin sweeps in glowCyan) run along the tops of the roots. Around the mound sit 12-16 tiny glowing mushrooms or bulb-caps (little lathe domes with a short stem; glowGreen, glowCyan and glowBlue caps, a few magenta) of different sizes (0.05-0.14 m tall), plus 5-8 small moss tufts built of tiny cones in moss/mossLight, 2 small rocks in soil/trunk. All glow parts use glow(). Nothing taller than 0.45 m except the roots where they climb the stalk base.",
+          "box": [
+            [
+              -1.3,
+              0,
+              -1.3
+            ],
+            [
+              1.3,
+              0.55,
+              1.3
+            ]
+          ],
+          "attaches": "Roots end against the stalk at stalkBase (r 0.32); the mound top is at groundCenter. The stalk part starts at y 0.35 and is buried in the mound.",
+          "joints": [],
+          "floor": true,
+          "budget": 170
+        },
+        {
+          "id": "stalk",
+          "builds": "The central trunk and its side branches. A sweep along the S-curve (0,0.35,0) -> (0.08,1.0,0.05) -> (-0.06,1.7,-0.04) -> (0,2.35,0), radius 0.32 at the base falling to 0.12 at the top, section ngon 7-8 for facets, in trunk colour with trunkMid sectors. Spiral ridges: 2-3 helical thin sweeps in trunkLight winding round the stalk and following its surface (use surface hits, loop or sweep.at with a rotating angle). Glowing veins: 2 helical thin sweeps in glowCyan and glowBlue, pulsing in beads: small glowing spheres every 0.18 m along the vein. 5-6 swollen node rings (torus-like sweeps or lathe rings in trunkLight) along the height. Two side branches (sprout or sweep) at the mounts branchL (curving out to +X and up, 0.55 m long) and branchR (to -X and -Z, 0.5 m long). Each ends in a pod-bulb cluster: a podShell sphere of r 0.1 shell with a glowing core inside (magenta or violet) and 3-4 little glow buds around it, plus a tiny curling tendril. A few small leaf stubs (extruded leaf blades in frond/frondLight, 0.2 m) on the lower stalk with glowGreen edges. Top of the stalk finishes in a flared cup collar (lathe, trunkLight, r 0.22) at stalkTop for the crown to sit in.",
+          "box": [
+            [
+              -0.85,
+              0.3,
+              -0.6
+            ],
+            [
+              0.85,
+              2.45,
+              0.6
+            ]
+          ],
+          "attaches": "Starts buried in the rootMound at stalkBase; ends at stalkTop where the crown and bloom attach; branch tips at branchL and branchR, where hanging tendrils may attach.",
+          "joints": [],
+          "floor": false,
+          "budget": 180
+        },
+        {
+          "id": "frondCrown",
+          "builds": "The big arching fan fronds. Nine fronds around crownRingCenter (0,2.3,0) at radius 0.2: a lower tier of 5 (azimuths 0, 72, 144, 216, 288 degrees, elevation about 35 degrees above horizontal, reach about 1.3 m radially, arching tips drooping slightly, so tips reach about r 1.3 at y 2.5-2.9) and an upper tier of 4 (azimuths 36+90k, elevation about 65 degrees, reach 0.9, tips at about y 3.1-3.2, r 0.6). Each frond is a gently curved midrib sweep (frondLight, taper 0.035 to 0) plus a wide leaf blade built from an extrude (outline: a broad teardrop fan 0.5 m wide, curved by assembling 3-4 segments of slabs or extrudes along the midrib; frond colour with frondDeep on the underside side segments and frondLight inner segments). 5-7 vein sweeps per frond fanning out from the base to the edge in glowCyan (thin, glow), the outer rim edge as a thin sweep in glowCyan, and a bright glowBlue or glowGreen tip bead (sphere r 0.04, glow). Ruffled scallop edge: small teardrop extrudes along the edges. One frond in the lower tier (azimuth 0, pointing +Z toward the front) is the largest and gets magenta tipped edges as a signature. No hanging tendrils here (those are in another part).",
+          "box": [
+            [
+              -1.4,
+              2,
+              -1.4
+            ],
+            [
+              1.4,
+              3.3,
+              1.4
+            ]
+          ],
+          "attaches": "Frond roots sit in the collar at crownRingCenter (radius crownRingRadius around the Y axis). Bloom and spores sit inside the frond circle above bloomCenter; do not fill the cylinder r<0.25 above y 2.4.",
+          "joints": [],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "lightTendrils",
+          "builds": "The hanging curtain of glowing tendrils. 22-28 thin drooping tendrils hang from a ring at tendrilRingY 2.25 and radius tendrilRingRadius 0.55 (angles evenly spread plus jitter, from an rng), plus 4-6 from the branch tips at branchL/branchR. Each is a catmull sweep that starts out of the collar, arches outward 0.1-0.3 m and falls in a lazy curve to a bottom y between tendrilBottomY 0.9 and 1.8 (varying lengths, the front ones longer), radius tapering 0.022 to 0.008, coloured in trunkMid with a bead-spaced glowing stripe: small glow spheres every 0.12 m along the tendril in glowCyan / glowBlue (alternating), brighter towards the tips. Every tendril ends in a glowing bulb (sphere or teardrop r 0.04-0.07; glowCyan, glowMagenta, glowViolet in rotation, plus a smaller pale halo-ring of 4-5 mini beads around the largest ones). 6-8 longer tendrils curl at the tip in a small spiral (spiral path). The tendrils sit clear of the stalk (stay at least 0.3 m from the trunk axis below y 2.0) and don't touch the ground.",
+          "box": [
+            [
+              -1.1,
+              0.85,
+              -1.1
+            ],
+            [
+              1.1,
+              2.4,
+              1.1
+            ]
+          ],
+          "attaches": "Start points on the ring at tendrilRingY / tendrilRingRadius, around the crown collar of the stalk; a few start from the pod clusters at branchL and branchR.",
+          "joints": [],
+          "floor": false,
+          "budget": 180
+        },
+        {
+          "id": "sporeBloom",
+          "builds": "The glowing flower and drifting spores in the middle of the crown. A bud/bloom centred on bloomCenter (0,2.5,0): a bright core (icosahedron or sphere r 0.11, core colour, glow strength 2) in a halo of 2-3 glowing shells (glowCyan, glowGreen small spheres or rings), surrounded by 3 rings of petals: inner ring 8 petals (petalLight, extruded rounded petals 0.2 m, raised about 35 degrees), middle ring 8 (petal, 0.28 m, open 55 degrees), outer ring 6 (glowMagenta-edged, 0.34 m, open 70 degrees); the petals have glowMagenta or glowViolet rim lines and tips. Stamens: 12-16 thin sweeps rising out of the core up to about y 3.0, with a glowing bead at each tip (alternating core and glowCyan). Above it float 30-45 spore motes (tiny spheres r 0.012-0.03, scattered by rng between y 2.7 and 3.4 inside r 0.9, glowCyan, glowGreen, glowViolet, core) and a few seedling puffs (small star-shaped bursts of 6 thin spikes with a glowing centre) at the top. All glow bits are wrapped in glow().",
+          "box": [
+            [
+              -0.9,
+              2.3,
+              -0.9
+            ],
+            [
+              0.9,
+              3.4,
+              0.9
+            ]
+          ],
+          "attaches": "Sits in the collar at stalkTop / bloomCenter inside the ring of fronds; petals stay below the upper frond tips and clear of the frond blades.",
+          "joints": [],
+          "floor": false,
+          "budget": 170
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "high",
+        "started": "2026-10-28T21:09:03.469Z",
+        "wallMs": 49812,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75201,
+          "completion_tokens": 5615,
+          "total_tokens": 80816,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.06593489999999999,
+        "hasCode": true,
+        "reasoning": "I'm envisioning a Pandora-style bioluminescent plant, something like a Helicoradian with spiraling glowing fronds, hanging tendrils, and bulbous mushroom-like bases, roughly 3 meters tall, and now considering whether it should have static form or articulated joints.\n\nSince this is more scenery than creature, I'll skip joints entirely and keep everything in model space. I'm breaking it into parts: a mossy rooted base with glowing rootlets and small mushrooms, a twisting spiral-ridged trunk with glowing veins, a large fan-shaped crown of radial fronds at the top, drooping bioluminescent tendrils with bulb tips cascading from the crown and lower branches, and a central glowing flower bud with seed pods crowning the whole structure.\n\nI'm now working out the spatial layout -- overall dimensions, mount points at the base, stalk top, crown center, and bloom center, plus anchor points for side branches and the hanging tendril ring -- and settling on a dark violet-teal Pandoran palette for the soil, moss, and trunk colors.\n\nI'm expanding that palette to around two dozen glow and accent colors for the fronds, petals, core, and seed pods, then budgeting part complexity so five main parts stay within the total limit while leaving room to specify spiral parameters and a shared trunk radius function.\n\nI'm defining the trunk's centerline with a gentle S-curve through four points, tapering its radius from base to tip, and establishing it as the parent structure that other parts mount to via a shared \"stalkTop\" reference and crown ring radius—now ready to write the full spec.\n\n"
+      },
+      {
+        "id": "lightTendrils",
+        "effort": "low",
+        "started": "2026-10-28T21:09:53.281Z",
+        "wallMs": 10931,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79723,
+          "completion_tokens": 1831,
+          "total_tokens": 81554,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0371389,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "sporeBloom",
+        "effort": "low",
+        "started": "2026-10-28T21:09:53.282Z",
+        "wallMs": 11683,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79713,
+          "completion_tokens": 1924,
+          "total_tokens": 81637,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.038048900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "rootMound",
+        "effort": "low",
+        "started": "2026-10-28T21:09:53.281Z",
+        "wallMs": 12350,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79628,
+          "completion_tokens": 1949,
+          "total_tokens": 81577,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0381289,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "stalk",
+        "effort": "low",
+        "started": "2026-10-28T21:09:53.281Z",
+        "wallMs": 13564,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79793,
+          "completion_tokens": 2332,
+          "total_tokens": 82125,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.042288900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "frondCrown",
+        "effort": "low",
+        "started": "2026-10-28T21:09:53.281Z",
+        "wallMs": 15019,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79805,
+          "completion_tokens": 2460,
+          "total_tokens": 82265,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.043592900000000004,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

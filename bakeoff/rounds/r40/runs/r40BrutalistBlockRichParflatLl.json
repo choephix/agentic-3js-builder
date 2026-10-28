@@ -1,0 +1,321 @@
+{
+  "slug": "r40BrutalistBlockRichParflatLl",
+  "arm": "parflat-ll",
+  "subject": "brutalistBlock",
+  "level": "rich",
+  "pitch": "Category: Architecture.\nSubject: brutalist housing block.\nStyle: raw concrete brutalism.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "high",
+  "started": "2026-10-28T21:09:03.456Z",
+  "wallMs": 41057,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 460222,
+    "completion_tokens": 12750,
+    "total_tokens": 472972,
+    "prompt_tokens_details": {
+      "cached_tokens": 444054
+    }
+  },
+  "costUsd": 0.2042414,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 21262,
+    "slowestPartMs": 19795,
+    "critical": "roof",
+    "elapsedMs": 41057,
+    "spec": {
+      "name": "Brutalist Housing Block",
+      "description": "A slab-style raw concrete housing block with a stepped, cantilevered facade of deep balconies, a pilotis podium, a stair and lift core tower, and a roof terrace with plant.",
+      "builderName": "brutalistHousingBlock",
+      "size": [
+        30,
+        22,
+        12
+      ],
+      "layout": "A long east-west slab, about 30 m wide (x) and 12 m deep (z), 22 m high, standing on y = 0. The ground level is an open pilotis podium of chunky board-marked concrete columns with a recessed glazed lobby. Above it, five residential storeys of 3 m each, with deep egg-crate balcony boxes on the front (+Z) facade, staggered so the silhouette reads as stepped. A taller windowless stair and lift core tower rises at the left end (+X) to 22 m with slit windows. The roof carries a plant room box, a parapet and chimney-like vents. Every surface is flat grey concrete in a few tones, with darker recessed window and balcony voids, thin board-marked seams as small dark strips, rusty steel rails, and a few warm lit windows. No ground, trees or props beyond the block.",
+      "palette": {
+        "concreteLight": "#a9a69d",
+        "concreteMid": "#8c8a83",
+        "concreteDark": "#6b6a65",
+        "concreteStain": "#575650",
+        "seam": "#4a4944",
+        "void": "#2b2c2f",
+        "glass": "#5f7a86",
+        "glassLit": "#f2c36b",
+        "rust": "#8a4a2a",
+        "steel": "#55585c",
+        "door": "#c0452b",
+        "moss": "#6b7352",
+        "slab": "#b8b5ab"
+      },
+      "mounts": {
+        "podiumTop": [
+          0,
+          4.5,
+          0
+        ],
+        "slabFrontFace": [
+          0,
+          11,
+          4
+        ],
+        "slabBackFace": [
+          0,
+          11,
+          -4
+        ],
+        "coreBase": [
+          11.5,
+          0,
+          0
+        ],
+        "coreFrontFace": [
+          11.5,
+          11,
+          5
+        ],
+        "roofDeck": [
+          0,
+          19.5,
+          0
+        ],
+        "coreRoof": [
+          11.5,
+          22,
+          0
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "podium",
+          "builds": "Ground level pilotis: 14 chunky square concrete columns in two rows with board-marked seam strips, a thick transfer slab on top (podiumTop), a recessed glazed lobby with a red door, a concrete canopy, entrance steps and a ramp in lighter slab colour, and stained dark bands at column feet.",
+          "box": [
+            [
+              -15,
+              0,
+              -6
+            ],
+            [
+              15,
+              4.5,
+              6
+            ]
+          ],
+          "attaches": "Top face at podiumTop supports the residential slab; the core base at coreBase stands beside the podium and shares its x edge.",
+          "joints": [],
+          "floor": true,
+          "budget": 200
+        },
+        {
+          "id": "slabBody",
+          "builds": "The main residential volume from y 4.5 to 19.5: a concrete box 24 m wide, 8 m deep, five storeys with dark void window bands, glass panes, scattered warm lit windows, horizontal floor-edge seams, vertical board-marked seam strips, a back facade with small windows and access-deck walkways with rust railings, and end walls with weathering stains.",
+          "box": [
+            [
+              -14,
+              4.5,
+              -4
+            ],
+            [
+              10,
+              19.5,
+              4
+            ]
+          ],
+          "attaches": "Sits on podiumTop. Its front face slabFrontFace receives the balconies. Its right end meets the core tower. Roof at roofDeck.",
+          "joints": [],
+          "floor": false,
+          "budget": 220
+        },
+        {
+          "id": "balconies",
+          "builds": "The egg-crate front facade: staggered deep concrete balcony boxes projecting from z 4 to 6 on the slab front, each with a dark inner void, a thick concrete frame, a rust steel rail, a slab floor, and occasional potted moss plants, plus fins between bays and a deeper cantilevered block at the top two storeys giving a stepped profile.",
+          "box": [
+            [
+              -14,
+              4.5,
+              4
+            ],
+            [
+              10,
+              19.5,
+              6
+            ]
+          ],
+          "attaches": "Back sits flush on slabFrontFace; the lowest row starts at podiumTop.",
+          "joints": [],
+          "floor": false,
+          "budget": 220
+        },
+        {
+          "id": "coreTower",
+          "builds": "The stair and lift tower: a tall 8 by 10 m windowless concrete shaft from the floor to 22 m at coreBase, with narrow vertical slit windows glowing warmly, board-marked seams, a heavy overhanging cap slab at coreRoof, a projecting vertical stair fin, bridge walkways linking to the slab, a rust steel door at ground, and dark stain streaks.",
+          "box": [
+            [
+              10,
+              0,
+              -5
+            ],
+            [
+              15,
+              22,
+              5
+            ]
+          ],
+          "attaches": "Stands at coreBase beside the podium and slab; the walkway bridges touch the slab end at x 10.",
+          "joints": [],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "roof",
+          "builds": "Roof terrace at roofDeck: thick parapet ring, a plant room box with louvres and a steel door, three chunky ventilation chimneys, water tank cylinder on legs, skylight boxes, rust ladders, moss patches, and drainage spouts jutting from the parapet.",
+          "box": [
+            [
+              -14,
+              19.5,
+              -4.5
+            ],
+            [
+              10,
+              22,
+              4.5
+            ]
+          ],
+          "attaches": "Rests on top of slabBody at roofDeck; adjacent to the core cap at coreRoof.",
+          "joints": [],
+          "floor": false,
+          "budget": 100
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:09:03.456Z",
+        "wallMs": 21262,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75204,
+          "completion_tokens": 1971,
+          "total_tokens": 77175,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0295009,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "balconies",
+        "effort": "low",
+        "started": "2026-10-28T21:09:24.718Z",
+        "wallMs": 10956,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77005,
+          "completion_tokens": 1727,
+          "total_tokens": 78732,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0306629,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "podium",
+        "effort": "low",
+        "started": "2026-10-28T21:09:24.718Z",
+        "wallMs": 11959,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 76986,
+          "completion_tokens": 1826,
+          "total_tokens": 78812,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0316149,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "slabBody",
+        "effort": "low",
+        "started": "2026-10-28T21:09:24.718Z",
+        "wallMs": 12935,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77033,
+          "completion_tokens": 1954,
+          "total_tokens": 78987,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0329889,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "coreTower",
+        "effort": "low",
+        "started": "2026-10-28T21:09:24.718Z",
+        "wallMs": 14566,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77012,
+          "completion_tokens": 2133,
+          "total_tokens": 79145,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0347369,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "roof",
+        "effort": "low",
+        "started": "2026-10-28T21:09:24.718Z",
+        "wallMs": 19795,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 76982,
+          "completion_tokens": 3139,
+          "total_tokens": 80121,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0447369,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

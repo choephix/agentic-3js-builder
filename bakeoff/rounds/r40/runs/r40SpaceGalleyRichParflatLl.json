@@ -1,0 +1,366 @@
+{
+  "slug": "r40SpaceGalleyRichParflatLl",
+  "arm": "parflat-ll",
+  "subject": "spaceGalley",
+  "level": "rich",
+  "pitch": "Category: Prop group.\nSubject: spaceship galley kitchen.\nStyle: Alien (1979) Nostromo.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "high",
+  "started": "2026-10-28T21:09:03.453Z",
+  "wallMs": 56851,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 540109,
+    "completion_tokens": 20741,
+    "total_tokens": 560850,
+    "prompt_tokens_details": {
+      "cached_tokens": 518063
+    }
+  },
+  "costUsd": 0.30330830000000003,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 33564,
+    "slowestPartMs": 23287,
+    "critical": "wallCabinets",
+    "elapsedMs": 56852,
+    "spec": {
+      "name": "Nostromo Galley",
+      "description": "A cramped, grimy 1979 industrial-spaceship galley kitchen: a steel counter with hob and sink, wall cabinets, a cold storage locker, a dining table with stools, and a pipe-filled ceiling lit by sickly amber and cyan indicators.",
+      "builderName": "nostromoGalley",
+      "size": [
+        4,
+        2.6,
+        3.6
+      ],
+      "layout": "A walk-in galley bay in a retro-industrial utilitarian style. Floor deck plate at y=0 (a slab 4.0 x 0.1 x 3.6). The back wall (z=-1.8) carries the long steel counter run (hob, sink, prep surface) with wall cabinets above. The left wall (+X) holds a tall cold-storage locker and a bulkhead hatch. A round-cornered dining table with four stools sits in the front-centre. The ceiling (y=2.6) is crowded with pipes, conduits, a vent and strip lights. Everything is worn grey-beige plastic, stained steel, hazard-yellow stencils, amber and cyan glowing indicators, and dark grime where surfaces meet. Blocky, chunky, practical forms with small details (knobs, labels, rivets, handles, screens) built as separate small parts in their own colours.",
+      "palette": {
+        "deck": "#2b2d2e",
+        "deckPlate": "#3a3c3d",
+        "wallBeige": "#b3a98f",
+        "wallDirty": "#8a816b",
+        "steel": "#8d9296",
+        "steelDark": "#555a5e",
+        "grime": "#1d1b17",
+        "hazard": "#d9a812",
+        "ink": "#15130f",
+        "amber": "#ffb23a",
+        "cyan": "#49e6e0",
+        "red": "#c2332a",
+        "green": "#5fbf6a",
+        "pipeGrey": "#6c6f6b",
+        "pipeOrange": "#b5622a",
+        "plastic": "#cfc6aa",
+        "screen": "#0d2a22",
+        "rubber": "#222222"
+      },
+      "mounts": {
+        "floorTop": [
+          0,
+          0.1,
+          0
+        ],
+        "counterTop": [
+          0,
+          0.95,
+          -1.4
+        ],
+        "backWall": [
+          0,
+          1.3,
+          -1.8
+        ],
+        "leftWall": [
+          1.95,
+          1.3,
+          0
+        ],
+        "ceiling": [
+          0,
+          2.5,
+          0
+        ],
+        "tableTop": [
+          -0.2,
+          0.78,
+          0.5
+        ],
+        "lockerFront": [
+          1.5,
+          1,
+          -0.6
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "shell",
+          "builds": "Floor deck slab with plate seams, bolt heads and hazard-yellow edge stripes and grime stains; back wall, left wall and right wall panels in wallBeige with riveted seam strips, dirty streaks (wallDirty) and stencilled labels; a bulkhead hatch with wheel and yellow-black frame on the left wall near the front; corner trim and skirting.",
+          "box": [
+            [
+              -2,
+              0,
+              -1.8
+            ],
+            [
+              2,
+              2.6,
+              1.8
+            ]
+          ],
+          "attaches": "Provides floorTop, backWall, leftWall surfaces the other parts rest on.",
+          "joints": [],
+          "floor": true,
+          "budget": 170
+        },
+        {
+          "id": "counterRun",
+          "builds": "Steel counter along the back wall: base cabinet boxes in steelDark with plastic doors, handles, grime kick plate; steel worktop; recessed sink with tap and drain; four-burner hob with knobs and amber glowing rings; a small oven with window and dial; a rack of utensils and pots (cylinders, ladle) on the counter; a cyan-screen timer.",
+          "box": [
+            [
+              -1.9,
+              0.1,
+              -1.8
+            ],
+            [
+              1.2,
+              1.1,
+              -1
+            ]
+          ],
+          "attaches": "Sits on floorTop, backs onto backWall at counterTop height; wall cabinets above start at y=1.45.",
+          "joints": [],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "wallCabinets",
+          "builds": "Upper cabinet row on the back wall above the counter: three to four plastic-beige boxes with latch handles, hazard stencil numbers, ink label plates, a recessed shelf with tins and mugs, a small monitor with green glowing text lines, an extractor hood above the hob with grille and a red indicator, and a cluster of switch panels with amber and cyan lights.",
+          "box": [
+            [
+              -1.9,
+              1.4,
+              -1.8
+            ],
+            [
+              1.5,
+              2.3,
+              -1.3
+            ]
+          ],
+          "attaches": "Mounted on backWall above counterTop; hood sits over the hob.",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "coldLocker",
+          "builds": "Tall cold-storage locker on the left side: steel body, two doors with heavy chrome latch bars, rubber door seals, frost-warning hazard stripes, a digital temperature display glowing cyan, indicator lights red and green, a drain vent grille at the bottom, pipe conduits running up the side into the ceiling. Next to it, a wall-mounted ration dispenser box with tray and buttons.",
+          "box": [
+            [
+              1,
+              0.1,
+              -1.5
+            ],
+            [
+              1.95,
+              2.2,
+              0.3
+            ]
+          ],
+          "attaches": "Stands on floorTop against leftWall at lockerFront; pipes connect to the ceiling mount.",
+          "joints": [],
+          "floor": false,
+          "budget": 140
+        },
+        {
+          "id": "diningSet",
+          "builds": "Dining table in front-centre: plastic-top rounded rectangle slab with steel rim, a central pedestal and base plate bolted to the floor; four fixed swivel stools with rubber-black cushions on steel stems; on the table trays, cups, a bowl, cutlery, a ration pack, and a small amber lamp; scuff marks and a spilled stain as thin dark parts.",
+          "box": [
+            [
+              -1.5,
+              0.1,
+              -0.3
+            ],
+            [
+              1,
+              0.9,
+              1.6
+            ]
+          ],
+          "attaches": "Base plate on floorTop; table surface at tableTop.",
+          "joints": [],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "ceilingRig",
+          "builds": "Ceiling plate with a dense run of pipes (pipeGrey and pipeOrange) along z and x with flanges, valves, bolt rings and clamp brackets; fluorescent strip lights with two glowing panels and one dead dark one; air vent grille with fins; cable bundles hanging in loops; hazard stencil numbers; a small red warning beacon and a speaker grille.",
+          "box": [
+            [
+              -2,
+              2.1,
+              -1.8
+            ],
+            [
+              2,
+              2.6,
+              1.8
+            ]
+          ],
+          "attaches": "Spans ceiling mount; vertical pipe drops reach the coldLocker and wallCabinets.",
+          "joints": [],
+          "floor": false,
+          "budget": 140
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:09:03.453Z",
+        "wallMs": 33564,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75210,
+          "completion_tokens": 2418,
+          "total_tokens": 77628,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0339829,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "diningSet",
+        "effort": "low",
+        "started": "2026-10-28T21:09:37.018Z",
+        "wallMs": 17304,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77474,
+          "completion_tokens": 2956,
+          "total_tokens": 80430,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.043890900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "ceilingRig",
+        "effort": "low",
+        "started": "2026-10-28T21:09:37.018Z",
+        "wallMs": 17424,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77495,
+          "completion_tokens": 2680,
+          "total_tokens": 80175,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0411729,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "shell",
+        "effort": "low",
+        "started": "2026-10-28T21:09:37.017Z",
+        "wallMs": 17669,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77457,
+          "completion_tokens": 3041,
+          "total_tokens": 80498,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0447069,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "coldLocker",
+        "effort": "low",
+        "started": "2026-10-28T21:09:37.018Z",
+        "wallMs": 18514,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77498,
+          "completion_tokens": 2762,
+          "total_tokens": 80260,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0419989,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "counterRun",
+        "effort": "low",
+        "started": "2026-10-28T21:09:37.017Z",
+        "wallMs": 18911,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77491,
+          "completion_tokens": 3124,
+          "total_tokens": 80615,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.045604900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wallCabinets",
+        "effort": "low",
+        "started": "2026-10-28T21:09:37.018Z",
+        "wallMs": 23287,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77484,
+          "completion_tokens": 3760,
+          "total_tokens": 81244,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0519509,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

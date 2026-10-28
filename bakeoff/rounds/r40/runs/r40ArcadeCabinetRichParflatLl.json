@@ -1,0 +1,326 @@
+{
+  "slug": "r40ArcadeCabinetRichParflatLl",
+  "arm": "parflat-ll",
+  "subject": "arcadeCabinet",
+  "level": "rich",
+  "pitch": "Category: Object.\nSubject: 1980s arcade cabinet.\nStyle: synthwave.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "high",
+  "started": "2026-10-28T21:09:03.446Z",
+  "wallMs": 40027,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 461147,
+    "completion_tokens": 12728,
+    "total_tokens": 473875,
+    "prompt_tokens_details": {
+      "cached_tokens": 444054
+    }
+  },
+  "costUsd": 0.20587139999999998,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 22941,
+    "slowestPartMs": 17086,
+    "critical": "controlPanel",
+    "elapsedMs": 40027,
+    "spec": {
+      "name": "Neon Cabinet 1984",
+      "description": "A synthwave 1980s upright arcade cabinet with a glowing magenta and cyan marquee, angled screen, joystick control panel, and neon side art.",
+      "builderName": "neonArcadeCabinet",
+      "size": [
+        0.76,
+        1.84,
+        0.95
+      ],
+      "layout": "Classic upright cabinet. A tapered side-profile body stands on the floor with a recessed kick plate. The front (+Z) has a slanted control panel at about y 0.95 that juts forward, a vertical coin door below it, and a bezel with a screen leaning slightly back above it. A marquee box tops the cabinet and overhangs the front a little. The body is dark indigo-black, with hot magenta and cyan neon stripes, a sunset-gradient side decal built from stacked small plates, a grid and palm motif, and chrome trim. Screen, marquee, buttons and coin slot glow. No ground or extra props.",
+      "palette": {
+        "body": "#14102b",
+        "bodyLight": "#241a4a",
+        "kick": "#07060f",
+        "neonMagenta": "#ff2bd6",
+        "neonCyan": "#2ff3ff",
+        "sunYellow": "#ffd23f",
+        "sunOrange": "#ff7a3d",
+        "sunPink": "#ff4f8b",
+        "purple": "#7a2cff",
+        "chrome": "#c9d3e6",
+        "darkMetal": "#2a2a38",
+        "screenGlass": "#0a1a2e",
+        "screenGlow": "#3affc8",
+        "buttonRed": "#ff3355",
+        "buttonBlue": "#3b8bff",
+        "buttonYellow": "#ffe14a",
+        "white": "#f4f1ff",
+        "black": "#050509"
+      },
+      "mounts": {
+        "cabFloorFront": [
+          0,
+          0.08,
+          0.38
+        ],
+        "panelFront": [
+          0,
+          0.98,
+          0.47
+        ],
+        "screenCentre": [
+          0,
+          1.3,
+          0.28
+        ],
+        "marqueeBase": [
+          0,
+          1.62,
+          0.1
+        ],
+        "coinDoor": [
+          0,
+          0.62,
+          0.38
+        ],
+        "sideLeft": [
+          0.37,
+          0.9,
+          0
+        ],
+        "sideRight": [
+          -0.37,
+          0.9,
+          0
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "carcass",
+          "builds": "Main cabinet body: two extruded side panels with the classic stepped profile (tall back, forward-leaning control shelf, notched kick base) in body colour, back panel, front lower panel, top cap, kick plate in kick colour, chrome T-molding strips along the side edges, small feet. Cyan and magenta neon edge strips along the front edges. Overall stays inside its box and rests on the floor.",
+          "box": [
+            [
+              -0.38,
+              0,
+              -0.45
+            ],
+            [
+              0.38,
+              1.62,
+              0.4
+            ]
+          ],
+          "attaches": "Top meets marquee at marqueeBase; front meets the control panel at panelFront and the coin door at coinDoor; sides carry the decal at sideLeft/sideRight.",
+          "joints": [],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "controlPanel",
+          "builds": "Slanted control deck jutting forward: sloped purple-black top plate with chrome front lip, a joystick (dark base, chrome shaft, red ball top), six glowing round buttons in red, blue and yellow with dark rims, two coin-style player-start buttons, small neon cyan outline trace and printed-style label stripes as thin parts. Includes the lower coin door: dark plate with two glowing slots, return cups, small chrome plates, and a pink neon frame.",
+          "box": [
+            [
+              -0.36,
+              0.5,
+              0.3
+            ],
+            [
+              0.36,
+              1.05,
+              0.48
+            ]
+          ],
+          "attaches": "Rests against the carcass front at panelFront and coinDoor.",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "screenAssembly",
+          "builds": "Screen area: bezel box frame in black with a recessed tilted CRT glass, glow-green screen face with a small pixel-art scene as parts (alien invaders rows, a ship, score text bars in cyan and magenta), chrome corner bolts, a cyan neon frame inside the bezel, speaker grille slits below the marquee as thin dark bars.",
+          "box": [
+            [
+              -0.34,
+              1.05,
+              0.05
+            ],
+            [
+              0.34,
+              1.6,
+              0.4
+            ]
+          ],
+          "attaches": "Sits on the control deck rear edge at screenCentre and is bounded above by the marquee at marqueeBase.",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "marquee",
+          "builds": "Top marquee box with a slightly overhanging front: dark housing, glowing backlit front sign in magenta with a cyan outline, a stacked striped sun (yellow, orange, pink bands) with a perspective grid and a pair of palm silhouettes as small parts, a chrome top trim, lit LED dots along the bottom edge, and the cabinet name as blocky letter bars.",
+          "box": [
+            [
+              -0.38,
+              1.58,
+              -0.45
+            ],
+            [
+              0.38,
+              1.84,
+              0.46
+            ]
+          ],
+          "attaches": "Rests on the carcass top at marqueeBase.",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "sideArt",
+          "builds": "Synthwave decals on both side panels, mirrored, built as thin plates seated 4 mm off the sides: a big sunset sun made of horizontal bands in yellow to pink, a purple mountain silhouette, a magenta and cyan perspective grid of lines at the bottom, and diagonal neon stripes with a small star field of white dots. Also a rear back-panel vent grille and an AC power plate with a cord.",
+          "box": [
+            [
+              -0.4,
+              0.1,
+              -0.47
+            ],
+            [
+              0.4,
+              1.55,
+              0.35
+            ]
+          ],
+          "attaches": "Plates sit on sideLeft and sideRight surfaces of the carcass; the back items on its rear face.",
+          "joints": [],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:09:03.446Z",
+        "wallMs": 22941,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75201,
+          "completion_tokens": 2132,
+          "total_tokens": 77333,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0311049,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "carcass",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.387Z",
+        "wallMs": 10456,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77196,
+          "completion_tokens": 1555,
+          "total_tokens": 78751,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0293249,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "marquee",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.387Z",
+        "wallMs": 11778,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77165,
+          "completion_tokens": 1912,
+          "total_tokens": 79077,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0328329,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "sideArt",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.387Z",
+        "wallMs": 13011,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77196,
+          "completion_tokens": 1985,
+          "total_tokens": 79181,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0336249,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "screenAssembly",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.387Z",
+        "wallMs": 14906,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77187,
+          "completion_tokens": 2332,
+          "total_tokens": 79519,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0370769,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "controlPanel",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.387Z",
+        "wallMs": 17086,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77202,
+          "completion_tokens": 2812,
+          "total_tokens": 80014,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.041906900000000004,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

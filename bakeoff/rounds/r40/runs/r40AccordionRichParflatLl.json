@@ -1,0 +1,337 @@
+{
+  "slug": "r40AccordionRichParflatLl",
+  "arm": "parflat-ll",
+  "subject": "accordion",
+  "level": "rich",
+  "pitch": "Category: Object.\nSubject: piano accordion.\nStyle: Italian mother-of-pearl.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "high",
+  "started": "2026-10-28T21:09:03.468Z",
+  "wallMs": 43105,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 385084,
+    "completion_tokens": 10548,
+    "total_tokens": 395632,
+    "prompt_tokens_details": {
+      "cached_tokens": 370045
+    }
+  },
+  "costUsd": 0.1725625,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 23069,
+    "slowestPartMs": 20036,
+    "critical": "trebleBody",
+    "elapsedMs": 43105,
+    "spec": {
+      "name": "Piano Accordion (Italian Mother-of-Pearl)",
+      "description": "A full-size 41-key piano accordion standing upright on its bass end, in a pearly celluloid finish with gold trim, a red bellows and a chrome grille.",
+      "builderName": "pearlAccordion",
+      "size": [
+        0.5,
+        0.42,
+        0.24
+      ],
+      "layout": "The accordion stands upright on the floor, resting on its bass-end foot pads (the tabs of the left-hand end), in its rest pose with the bellows half-open. Y is the long axis of the instrument. From the bottom (y=0) up: the bass (left-hand) box on the floor, with the grille and bass buttons facing +Z; the bellows in the middle, whose pleats run along y and are red with white pearl-edged gold-trimmed corners; the treble (right-hand) box on top, whose front face (+Z) carries the piano keyboard (white keys with black sharps, a fine gold keyboard rail), with the treble grille on the +X side and the register switches on the top. The piano keyboard is in the front face, the player's side. Straps (red leather with gold buckles) run on the back (-Z). Mother-of-pearl style: the box bodies are a creamy iridescent pearl in flat colours, using a pale cream, a pink-lilac and an aqua-blue as inlaid swirl or diamond bands, chased with gold filigree and rhinestone-like small studs. Every part wears the pearl with gold edging and a crimson bellows, to read as Italian.",
+      "palette": {
+        "pearl": "#f4efe6",
+        "pearlPink": "#ecd3dc",
+        "pearlAqua": "#bfe3e6",
+        "pearlShadow": "#cfc6b8",
+        "gold": "#d9a93a",
+        "goldDark": "#8f6a1c",
+        "bellowsRed": "#a3121f",
+        "bellowsDark": "#5e0a12",
+        "keyWhite": "#fffdf6",
+        "keyBlack": "#16131a",
+        "chrome": "#c9ced6",
+        "grilleDark": "#2a2630",
+        "leather": "#4a1b14",
+        "strapRed": "#8c1a1a",
+        "stud": "#8fd3ff",
+        "buttonPearl": "#faf6ee"
+      },
+      "mounts": {
+        "floorFoot": [
+          0,
+          0,
+          0
+        ],
+        "bassTop": [
+          0,
+          0.125,
+          0
+        ],
+        "bellowsBottom": [
+          0,
+          0.125,
+          0
+        ],
+        "bellowsTop": [
+          0,
+          0.295,
+          0
+        ],
+        "trebleBottom": [
+          0,
+          0.295,
+          0
+        ],
+        "keyboardFront": [
+          0,
+          0.35,
+          0.115
+        ],
+        "gridBass": [
+          0,
+          0.06,
+          0.1
+        ]
+      },
+      "joints": [
+        {
+          "name": "bassBox",
+          "at": [
+            0,
+            0.06,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "bellows",
+          "parent": "bassBox",
+          "at": [
+            0,
+            0.125,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "trebleBox",
+          "parent": "bellows",
+          "at": [
+            0,
+            0.295,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        }
+      ],
+      "parts": [
+        {
+          "id": "bassBox",
+          "builds": "Left-hand bass box, 0.38 wide (x) by 0.22 deep (z) by 0.125 tall, as a faceted pearl box with bevelled gold edge trim, four little foot pads on the floor, the front +Z face carrying 6 rows of round pearl bass buttons with gold rims, a grille of dark slats with a chrome frame on the +X side, inlaid pink and aqua diamond panels, gold filigree corner pieces and a cluster of studs, plus a leather wrist strap on the -X side.",
+          "box": [
+            [
+              -0.2,
+              0,
+              -0.115
+            ],
+            [
+              0.2,
+              0.125,
+              0.115
+            ]
+          ],
+          "attaches": "Top face at bassTop meets the bellows bottom. Rides joint bassBox.",
+          "joints": [
+            "bassBox"
+          ],
+          "floor": true,
+          "budget": 200
+        },
+        {
+          "id": "bellowsPart",
+          "builds": "Red bellows with about 14 pleats stacked along y between y=0.125 and 0.295, each pleat a thin trapezoid box in bellowsRed alternating with bellowsDark folds, tapering slightly at the ends, with white pearl and gold corner protectors on all 4 vertical edges, gold pleat-edge lines, and a pair of leather bellows straps with gold buckles on the -Z side.",
+          "box": [
+            [
+              -0.19,
+              0.125,
+              -0.108
+            ],
+            [
+              0.19,
+              0.295,
+              0.108
+            ]
+          ],
+          "attaches": "Bottom at bellowsBottom, top at bellowsTop. Rides joint bellows.",
+          "joints": [
+            "bellows"
+          ],
+          "floor": false,
+          "budget": 200
+        },
+        {
+          "id": "trebleBody",
+          "builds": "Right-hand treble box, 0.4 wide by 0.23 deep by 0.125 tall, the pearl shell with pink and aqua inlaid bands, gold edge trim, the +X side carrying a chrome grille with slats, and the top with a gold-edged cap. Its back face has a leather back plate and two red shoulder straps with gold slides and buckles hanging down the -Z side. Includes the pearl inlay patterns, studs and gold filigree swirls on the sides and top, and a chrome logo plate with a small gold emblem.",
+          "box": [
+            [
+              -0.205,
+              0.295,
+              -0.12
+            ],
+            [
+              0.205,
+              0.42,
+              0.11
+            ]
+          ],
+          "attaches": "Bottom at trebleBottom; keyboard overhang is built by the keyboard part. Rides joint trebleBox.",
+          "joints": [
+            "trebleBox"
+          ],
+          "floor": false,
+          "budget": 250
+        },
+        {
+          "id": "keyboard",
+          "builds": "Piano keyboard on the front +Z face of the treble box: 26 white keys 0.0125 wide across x from -0.16 to 0.16 and 0.075 long (y), with a gold rail along the top and bottom, 18 black sharp keys in the 2-3 groups, a pearl key bed, a row of 5 register switches in pearl above the keys with gold tips, and a little gold-lettered nameplate drawn as a small gold slab.",
+          "box": [
+            [
+              -0.175,
+              0.31,
+              0.105
+            ],
+            [
+              0.175,
+              0.415,
+              0.13
+            ]
+          ],
+          "attaches": "Sits on the treble box front at keyboardFront. Rides joint trebleBox.",
+          "joints": [
+            "trebleBox"
+          ],
+          "floor": false,
+          "budget": 200
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:09:03.468Z",
+        "wallMs": 23069,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75202,
+          "completion_tokens": 2307,
+          "total_tokens": 77509,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0328569,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bellowsPart",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.537Z",
+        "wallMs": 8598,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77453,
+          "completion_tokens": 1338,
+          "total_tokens": 78791,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0276689,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "keyboard",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.537Z",
+        "wallMs": 9063,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77455,
+          "completion_tokens": 1275,
+          "total_tokens": 78730,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0270429,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bassBox",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.537Z",
+        "wallMs": 13663,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77468,
+          "completion_tokens": 2265,
+          "total_tokens": 79733,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0369689,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "trebleBody",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.537Z",
+        "wallMs": 20036,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77506,
+          "completion_tokens": 3363,
+          "total_tokens": 80869,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0480249,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,424 @@
+{
+  "slug": "r40BauhausBirdRichParflatLl",
+  "arm": "parflat-ll",
+  "subject": "bauhausBird",
+  "level": "rich",
+  "pitch": "Category: Animal.\nSubject: songbird on a branch.\nStyle: Bauhaus primary-colour geometry.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "high",
+  "started": "2026-10-28T21:09:03.454Z",
+  "wallMs": 34396,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 385895,
+    "completion_tokens": 10020,
+    "total_tokens": 395915,
+    "prompt_tokens_details": {
+      "cached_tokens": 370045
+    }
+  },
+  "costUsd": 0.1689045,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 21047,
+    "slowestPartMs": 13349,
+    "critical": "branch",
+    "elapsedMs": 34397,
+    "spec": {
+      "name": "Bauhaus Songbird on a Branch",
+      "description": "A stylized songbird made of circles, triangles and rectangles in red, yellow, blue, black and cream, perched on a straight wooden branch with a few geometric leaves.",
+      "builderName": "bauhausSongbird",
+      "size": [
+        0.34,
+        0.3,
+        0.5
+      ],
+      "layout": "Branch: a thin rod running along X at y 0.02-0.05, resting on the floor with a small wooden base block at each end. The bird perches on top, facing +Z, with its feet gripping the branch at x=0. Body is a big blue sphere-like egg (tilted slightly up at the front), cream circular belly disc on the front, a red round head with a big yellow circle eye ringed in black, and a yellow triangular beak split into upper and lower jaw. Wings are flat extruded red triangles/quarter circles on each side, with black and cream stripe bars. Tail is a long flat black rectangle with a yellow tip, angled back and down. Legs are thin black rods with three forward toes and one rear toe, each wrapped around the branch. Every part is flat primary colour with cream, black and white details. Geometry is blocky, with hard primitive shapes (cones, boxes, discs) and a few circle and triangle emblems.",
+      "palette": {
+        "red": "#d62d20",
+        "yellow": "#f6c500",
+        "blue": "#1f4fb4",
+        "black": "#151515",
+        "cream": "#f2e8d0",
+        "wood": "#8a5a32",
+        "woodDark": "#5e3b20",
+        "leaf": "#2f8f4e",
+        "white": "#ffffff"
+      },
+      "mounts": {
+        "branchTop": [
+          0,
+          0.05,
+          0
+        ],
+        "perch": [
+          0,
+          0.15,
+          0
+        ],
+        "neckBase": [
+          0,
+          0.2,
+          0.06
+        ],
+        "headCenter": [
+          0,
+          0.26,
+          0.1
+        ],
+        "beakBase": [
+          0,
+          0.255,
+          0.16
+        ],
+        "wingRoot": [
+          0.08,
+          0.2,
+          -0.01
+        ],
+        "tailRoot": [
+          0,
+          0.17,
+          -0.1
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            0.19,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "neck",
+          "parent": "body",
+          "at": [
+            0,
+            0.2,
+            0.06
+          ],
+          "dir": [
+            0,
+            0.5,
+            1
+          ],
+          "role": "neck"
+        },
+        {
+          "name": "head",
+          "parent": "neck",
+          "at": [
+            0,
+            0.26,
+            0.1
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "head"
+        },
+        {
+          "name": "jaw",
+          "parent": "head",
+          "at": [
+            0,
+            0.25,
+            0.15
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "jaw"
+        },
+        {
+          "name": "wingL",
+          "parent": "body",
+          "at": [
+            0.08,
+            0.2,
+            -0.01
+          ],
+          "dir": [
+            1,
+            0,
+            -0.3
+          ],
+          "role": "wing"
+        },
+        {
+          "name": "wingR",
+          "parent": "body",
+          "at": [
+            -0.08,
+            0.2,
+            -0.01
+          ],
+          "dir": [
+            -1,
+            0,
+            -0.3
+          ],
+          "role": "wing"
+        },
+        {
+          "name": "tail1",
+          "parent": "body",
+          "at": [
+            0,
+            0.17,
+            -0.1
+          ],
+          "dir": [
+            0,
+            -0.2,
+            -1
+          ],
+          "role": "tail"
+        },
+        {
+          "name": "legL",
+          "parent": "body",
+          "at": [
+            0.03,
+            0.14,
+            0
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg"
+        },
+        {
+          "name": "legR",
+          "parent": "body",
+          "at": [
+            -0.03,
+            0.14,
+            0
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg"
+        }
+      ],
+      "parts": [
+        {
+          "id": "branch",
+          "builds": "The wooden branch: a long 8-sided rod along X (wood) with darker ring knots, two short side twigs ending in cut ends, one dark wood base block under each end resting on the floor, and three flat geometric leaves (green triangles and a circle disc) on the twigs, plus a small red circle berry on one twig.",
+          "box": [
+            [
+              -0.17,
+              0,
+              -0.06
+            ],
+            [
+              0.17,
+              0.14,
+              0.08
+            ]
+          ],
+          "attaches": "Top surface at mount branchTop; the bird's feet grip it at x=0.",
+          "joints": [],
+          "floor": true,
+          "budget": 120
+        },
+        {
+          "id": "bodyAndLegs",
+          "builds": "Blue egg-shaped body (stretched sphere, faceted) tilted up at front, a cream circular belly disc seated on the front-lower surface with a thin black ring outline, a yellow triangle emblem on the chest, a black collar stripe band near the neck, a rump of red cap. Plus legs: black thin rods from hips to branchTop, each with an ankle knob, three forward toes and one rear toe wrapped over the branch, tiny yellow claw tips.",
+          "box": [
+            [
+              -0.07,
+              0.05,
+              -0.1
+            ],
+            [
+              0.07,
+              0.25,
+              0.1
+            ]
+          ],
+          "attaches": "Legs end at branchTop at x=+-0.03; body meets the neck at neckBase, the wings at wingRoot and the tail at tailRoot.",
+          "joints": [
+            "body",
+            "legL",
+            "legR"
+          ],
+          "floor": false,
+          "budget": 180
+        },
+        {
+          "id": "headAndBeak",
+          "builds": "Red round head (faceted sphere) on a short blue neck, large yellow disc eyes with black ring and pupil and white highlight on both sides facing forward-out, black eyebrow bars angled, a yellow triangular beak as separate upper cone/wedge and lower smaller wedge on the jaw joint, with a black line between, a blue triangle crest of 3 flat blades on top, a cream cheek circle behind each eye.",
+          "box": [
+            [
+              -0.06,
+              0.2,
+              0.04
+            ],
+            [
+              0.06,
+              0.3,
+              0.2
+            ]
+          ],
+          "attaches": "Neck base at neckBase on the body, centred on headCenter; beak at beakBase.",
+          "joints": [
+            "neck",
+            "head",
+            "jaw"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "wingsAndTail",
+          "builds": "Two mirrored wings: flat extruded red quarter-circle/triangle slabs with stacked feather bars in yellow, black and cream along the trailing edge, a blue circle emblem at the shoulder; separated and slightly spread. Tail of three long flat feather rectangles fanned (black, blue, black) with yellow tip squares and a red base block, angled back and slightly down.",
+          "box": [
+            [
+              -0.17,
+              0.1,
+              -0.25
+            ],
+            [
+              0.17,
+              0.25,
+              0
+            ]
+          ],
+          "attaches": "Wings root at wingRoot (+-x) on the body joint wingL/wingR; tail at tailRoot on tail1.",
+          "joints": [
+            "wingL",
+            "wingR",
+            "tail1"
+          ],
+          "floor": false,
+          "budget": 190
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:09:03.454Z",
+        "wallMs": 21047,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75208,
+          "completion_tokens": 2345,
+          "total_tokens": 77553,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.033248900000000005,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wingsAndTail",
+        "effort": "low",
+        "started": "2026-10-28T21:09:24.502Z",
+        "wallMs": 10910,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77683,
+          "completion_tokens": 1782,
+          "total_tokens": 79465,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.032568900000000005,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bodyAndLegs",
+        "effort": "low",
+        "started": "2026-10-28T21:09:24.502Z",
+        "wallMs": 12531,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77723,
+          "completion_tokens": 1853,
+          "total_tokens": 79576,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.033358900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "headAndBeak",
+        "effort": "low",
+        "started": "2026-10-28T21:09:24.502Z",
+        "wallMs": 12975,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77682,
+          "completion_tokens": 1962,
+          "total_tokens": 79644,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0343669,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "branch",
+        "effort": "low",
+        "started": "2026-10-28T21:09:24.502Z",
+        "wallMs": 13349,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77599,
+          "completion_tokens": 2078,
+          "total_tokens": 79677,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0353609,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

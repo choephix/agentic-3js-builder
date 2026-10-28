@@ -1,0 +1,418 @@
+{
+  "slug": "r40AlienFloraRichParflatLl",
+  "arm": "parflat-ll",
+  "subject": "alienFlora",
+  "level": "rich",
+  "pitch": "Category: Plant.\nSubject: bioluminescent alien plant.\nStyle: Avatar.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "high",
+  "started": "2026-10-28T21:09:03.470Z",
+  "wallMs": 35290,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 464377,
+    "completion_tokens": 11739,
+    "total_tokens": 476116,
+    "prompt_tokens_details": {
+      "cached_tokens": 444054
+    }
+  },
+  "costUsd": 0.2024414,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 22772,
+    "slowestPartMs": 12518,
+    "critical": "spiralFlower",
+    "elapsedMs": 35291,
+    "spec": {
+      "name": "Sporeglow Hometree Bloom",
+      "description": "An Avatar-style Pandora bioluminescent plant: a twisting trunk with glowing fan-leaf fronds, a giant helicoid spiral-flower, drooping tendrils and a root-and-mushroom base.",
+      "builderName": "sporeglowBloom",
+      "size": [
+        2.6,
+        3.2,
+        2.6
+      ],
+      "layout": "A stout, gently S-curved trunk rises from a buttressed root flare at the floor to a crown at about y=2.1. From the crown, 6 big fan fronds arc outward and down in a ring, each with glowing veins and rim dots. A tall helicoid spiral-flower (a Pandora 'helicoid spiral' that retracts when touched) rises from the crown centre to y=3.2, its coiled petals glowing cyan. Long thin tendrils hang from the crown and trunk with glowing tips. The base has glowing mushroom and sprout clusters between the roots. Everything is blocky and faceted, with a dark blue-violet body and cyan, magenta and teal glow accents as small parts: veins, dots, rings and tips. Warmer tones on top, cooler below.",
+      "palette": {
+        "trunkDark": "#1d1a3a",
+        "trunkMid": "#2d2a5c",
+        "bark": "#3b3470",
+        "rootMoss": "#1f5a63",
+        "leafBlue": "#1e4f9a",
+        "leafTeal": "#18857f",
+        "leafEdge": "#0f2f5e",
+        "glowCyan": "#33f5ff",
+        "glowTeal": "#2cffc0",
+        "glowMagenta": "#ff4fd8",
+        "glowViolet": "#a06bff",
+        "glowPale": "#d8fdff",
+        "petalPink": "#d65cff",
+        "petalDeep": "#6a2fb8",
+        "stamen": "#fff27a",
+        "dirt": "#14122a"
+      },
+      "mounts": {
+        "rootBase": [
+          0,
+          0,
+          0
+        ],
+        "trunkBase": [
+          0,
+          0.45,
+          0
+        ],
+        "trunkMid": [
+          0.12,
+          1.2,
+          -0.05
+        ],
+        "crown": [
+          0,
+          2.05,
+          0
+        ],
+        "flowerBase": [
+          0,
+          2.1,
+          0
+        ],
+        "flowerTop": [
+          0,
+          3.15,
+          0
+        ],
+        "frondRing": [
+          0,
+          2,
+          0
+        ],
+        "tendrilRing": [
+          0,
+          1.9,
+          0
+        ]
+      },
+      "joints": [
+        {
+          "name": "root",
+          "at": [
+            0,
+            0.1,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "trunk1",
+          "parent": "root",
+          "at": [
+            0,
+            0.45,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "trunk2",
+          "parent": "trunk1",
+          "at": [
+            0.12,
+            1.2,
+            -0.05
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "crown",
+          "parent": "trunk2",
+          "at": [
+            0,
+            2.05,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "flower",
+          "parent": "crown",
+          "at": [
+            0,
+            2.1,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine",
+          "group": "flower"
+        }
+      ],
+      "parts": [
+        {
+          "id": "baseRoots",
+          "builds": "Ground-level base: 7 buttress roots flaring from the trunk foot (trunkDark/bark, tapered sweeps sinking slightly into the floor), moss patches (rootMoss) on top faces, a dirt disc (dirt), glowing mushroom caps and small sprout cones scattered between roots (glowTeal, glowMagenta, glowPale dots) and thin glowing root veins (glowCyan).",
+          "box": [
+            [
+              -1.3,
+              0,
+              -1.3
+            ],
+            [
+              1.3,
+              0.6,
+              1.3
+            ]
+          ],
+          "attaches": "Top meets trunk at mount trunkBase; rides joint root.",
+          "joints": [
+            "root"
+          ],
+          "floor": true,
+          "budget": 190
+        },
+        {
+          "id": "trunk",
+          "builds": "S-curved faceted trunk swept from trunkBase through trunkMid to crown, radius tapering 0.38 to 0.2 with a swelling at the crown. Ring bands, bark ridges and knots (bark, trunkMid), glowing spiral vein lines and dot rows (glowCyan, glowViolet), moss on upward faces, and a crown collar ring of glowing nodules where fronds, tendrils and flower attach.",
+          "box": [
+            [
+              -0.5,
+              0.4,
+              -0.5
+            ],
+            [
+              0.5,
+              2.3,
+              0.5
+            ]
+          ],
+          "attaches": "Starts at trunkBase, ends at crown collar at mount crown; rides root, trunk1, trunk2, crown.",
+          "joints": [
+            "trunk1",
+            "trunk2",
+            "crown"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "fronds",
+          "builds": "Six large fan-leaf fronds around frondRing, spaced 60 degrees apart, each a thick stalk sweeping up and out then arcing down, ending in a broad extruded leaf blade up to 1.2 m across (leafBlue with leafTeal centre, leafEdge rim). Each leaf has a glowing midrib and 4 pairs of side veins (glowCyan, glowTeal), rim dots (glowPale), and a magenta tip. Fronds reach about x/z +-1.3 and droop to y about 1.4.",
+          "box": [
+            [
+              -1.3,
+              1.4,
+              -1.3
+            ],
+            [
+              1.3,
+              2.9,
+              1.3
+            ]
+          ],
+          "attaches": "Stalks root at the crown collar, mount frondRing; rides joint crown.",
+          "joints": [
+            "crown"
+          ],
+          "floor": false,
+          "budget": 200
+        },
+        {
+          "id": "spiralFlower",
+          "builds": "Helicoid spiral-flower on joint flower: a short green-teal stem from flowerBase, then 10 overlapping curved petals arranged in a helix rising to flowerTop, each tapering from a wide base to a point (petalPink outer, petalDeep inner), glowing edge lines (glowMagenta), a glowing core bulb (glowCyan), a ring of yellow stamen spikes with glowing tips (stamen, glowPale) at the top, and floating spore dots (glowPale, glowCyan) above.",
+          "box": [
+            [
+              -0.6,
+              2.05,
+              -0.6
+            ],
+            [
+              0.6,
+              3.2,
+              0.6
+            ]
+          ],
+          "attaches": "Base seated at flowerBase on crown collar; rides joint flower.",
+          "joints": [
+            "flower"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "tendrils",
+          "builds": "About 14 long drooping tendrils hanging from tendrilRing at the crown collar and from trunk nodules lower down, thin catmull sweeps (bark, trunkMid) curving outward and down to y about 0.6, each with a glowing bead sequence (glowViolet, glowTeal) and a bright tip bulb (glowCyan or glowMagenta). A few small side tendrils and hanging seed pods (glowPale).",
+          "box": [
+            [
+              -1.1,
+              0.5,
+              -1.1
+            ],
+            [
+              1.1,
+              2,
+              1.1
+            ]
+          ],
+          "attaches": "Roots at mount tendrilRing and trunk nodules; rides joint crown and trunk2.",
+          "joints": [
+            "crown",
+            "trunk2"
+          ],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:09:03.470Z",
+        "wallMs": 22772,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75201,
+          "completion_tokens": 2586,
+          "total_tokens": 77787,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0356449,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "trunk",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.243Z",
+        "wallMs": 10686,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77844,
+          "completion_tokens": 1602,
+          "total_tokens": 79446,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0310909,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "baseRoots",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.243Z",
+        "wallMs": 11512,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77800,
+          "completion_tokens": 1873,
+          "total_tokens": 79673,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.033712900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tendrils",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.243Z",
+        "wallMs": 11606,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77829,
+          "completion_tokens": 1791,
+          "total_tokens": 79620,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0329509,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fronds",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.243Z",
+        "wallMs": 12423,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77849,
+          "completion_tokens": 1961,
+          "total_tokens": 79810,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.034690900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "spiralFlower",
+        "effort": "low",
+        "started": "2026-10-28T21:09:26.243Z",
+        "wallMs": 12518,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77854,
+          "completion_tokens": 1926,
+          "total_tokens": 79780,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.034350900000000004,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,424 @@
+{
+  "slug": "r40BlueprintSpitfireRichParflatLl",
+  "arm": "parflat-ll",
+  "subject": "blueprintSpitfire",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: Spitfire fighter plane.\nStyle: cyanotype blueprint.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "high",
+  "started": "2026-10-28T21:09:03.457Z",
+  "wallMs": 45803,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 464725,
+    "completion_tokens": 17642,
+    "total_tokens": 482367,
+    "prompt_tokens_details": {
+      "cached_tokens": 444054
+    }
+  },
+  "costUsd": 0.2621674,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 24507,
+    "slowestPartMs": 21296,
+    "critical": "wings",
+    "elapsedMs": 45804,
+    "spec": {
+      "name": "Spitfire Blueprint",
+      "description": "A Supermarine Spitfire Mk I fighter drawn as a cyanotype blueprint: deep Prussian-blue airframe with white-line panel seams, rivets, roundels as outline rings and a chalk-white annotation frame of ribs and spars.",
+      "builderName": "spitfireBlueprint",
+      "size": [
+        11.2,
+        3.5,
+        9.1
+      ],
+      "layout": "Single-engine low-wing monoplane on its tail-wheel undercarriage, nose toward +Z. Long Merlin nose with a three-blade propeller and spinner at z=+3.6, radiator scoops under each wing, bubble canopy at about z=0.3 to -0.9 above the wing root, a tapering fuselage to a fin and tailplane at z=-4.5, elliptical wings spanning x=+-5.6 with gull dihedral and cannon barrels. The main wheels sit under the wings and the tail wheel under the tail. Cyanotype style: every surface is one of a few blues (deep Prussian body, mid blue panels, pale cyan highlights); white linework is built as thin parts seated on the surface: panel seams, rivet rows, rib lines on the wings, roundels as concentric rings, outline stripes along wing edges, and a faint grid of white thin rods under the model as drafting marks. Keep the style consistent in every part: no other hues except white and pale cyan. Nothing is glossy; contrast comes from dark vs. light blue.",
+      "palette": {
+        "prussian": "#0b3a73",
+        "deepBlue": "#082a56",
+        "midBlue": "#1c5ba6",
+        "paleBlue": "#5d9ad6",
+        "cyanLine": "#a9dcff",
+        "chalk": "#f2f8ff",
+        "inkBlue": "#051c3a",
+        "glass": "#7fb8ec",
+        "rubber": "#06182f"
+      },
+      "mounts": {
+        "noseTip": [
+          0,
+          1.55,
+          3
+        ],
+        "propHub": [
+          0,
+          1.55,
+          3.6
+        ],
+        "cockpitCenter": [
+          0,
+          1.95,
+          -0.3
+        ],
+        "wingRootL": [
+          0.5,
+          1.35,
+          0.2
+        ],
+        "wingRootR": [
+          -0.5,
+          1.35,
+          0.2
+        ],
+        "tailRoot": [
+          0,
+          1.6,
+          -3.6
+        ],
+        "fuselageEnd": [
+          0,
+          1.75,
+          -4.5
+        ],
+        "gearL": [
+          1.4,
+          1,
+          0.7
+        ],
+        "gearR": [
+          -1.4,
+          1,
+          0.7
+        ],
+        "tailWheel": [
+          0,
+          0.3,
+          -4
+        ]
+      },
+      "joints": [
+        {
+          "name": "fuselage",
+          "at": [
+            0,
+            1.5,
+            0
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "propeller",
+          "parent": "fuselage",
+          "at": [
+            0,
+            1.55,
+            3.6
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "prop"
+        },
+        {
+          "name": "gearL",
+          "parent": "fuselage",
+          "at": [
+            1.4,
+            1.2,
+            0.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "gear"
+        },
+        {
+          "name": "gearR",
+          "parent": "fuselage",
+          "at": [
+            -1.4,
+            1.2,
+            0.7
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "gear"
+        },
+        {
+          "name": "tailWheel",
+          "parent": "fuselage",
+          "at": [
+            0,
+            0.6,
+            -4
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "gear"
+        }
+      ],
+      "parts": [
+        {
+          "id": "fuselage",
+          "builds": "Lofted fuselage from nose to tail: deepBlue/prussian skin, countershaded paler belly, cowling panel seams and rivet rows in cyanLine, exhaust stacks (six small spikes each side), cockpit canopy frame in chalk with glass-coloured bubble, headrest, gunsight, pilot-less seat, a white-outline roundel ring set on each side, and fuselage station lines as thin chalk rings.",
+          "box": [
+            [
+              -0.7,
+              0.9,
+              -4.5
+            ],
+            [
+              0.7,
+              2.5,
+              3
+            ]
+          ],
+          "attaches": "Root joint fuselage; wings meet it at wingRootL/R, nose meets propeller at propHub, tail group begins at tailRoot and fuselageEnd.",
+          "joints": [
+            "fuselage"
+          ],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "wings",
+          "builds": "Two elliptical wings built with extrudes from wingRootL/R out to x=+-5.6 with slight dihedral and washout; midBlue top, paleBlue underside; chalk rib lines, spar lines and leading-edge outline, aileron and flap hinge seams, cannon barrels (3 per wing) poking from the leading edge, wingtip cap, roundel rings in chalk on the top surface, two underwing radiator scoops, and landing-gear bay outlines.",
+          "box": [
+            [
+              -5.6,
+              1,
+              -1.2
+            ],
+            [
+              5.6,
+              1.7,
+              1.6
+            ]
+          ],
+          "attaches": "Root edges at wingRootL and wingRootR on the fuselage; gear legs hang from gearL and gearR mounts.",
+          "joints": [
+            "fuselage"
+          ],
+          "floor": false,
+          "budget": 200
+        },
+        {
+          "id": "tail",
+          "builds": "Tail assembly: swept fin and rudder (extruded, rudder with chalk hinge line and rib lines), two elliptical tailplanes with elevators and seams, tail cone end cap, tail lamp, tailwheel strut, small tailwheel and its fork, chalk outlines and rivet rows throughout.",
+          "box": [
+            [
+              -1.6,
+              0.25,
+              -4.7
+            ],
+            [
+              1.6,
+              3.2,
+              -3.3
+            ]
+          ],
+          "attaches": "Starts at tailRoot and fuselageEnd on the fuselage; tail wheel hangs on the tailWheel joint.",
+          "joints": [
+            "fuselage",
+            "tailWheel"
+          ],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "gear",
+          "builds": "Main undercarriage: two legs with oleo strut, fork, scissor link, rubber tyres (rubber colour with chalk wheel hub rings and spokes) and thin chalk lines at the edge of the gear doors that hang from the legs, with small chocks. Each leg splays outward slightly in the rest pose.",
+          "box": [
+            [
+              -1.8,
+              0,
+              0.3
+            ],
+            [
+              1.8,
+              1.4,
+              1.1
+            ]
+          ],
+          "attaches": "Leg tops at gearL and gearR mounts under the wings; wheels rest on the floor.",
+          "joints": [
+            "gearL",
+            "gearR"
+          ],
+          "floor": true,
+          "budget": 120
+        },
+        {
+          "id": "propNose",
+          "builds": "Propeller group: spinner cone in midBlue with chalk spiral line, three twisted blades (extruded, paleBlue with chalk tip stripe and root outline) spread 120 degrees apart, hub ring of bolts, plus nose details: cowl front ring, six exhaust nubs, and the Merlin oil cooler chin intake under the nose. Below the whole model a flat blueprint drafting sheet is NOT built; instead small chalk dimension-line rods with end ticks float along the wingspan and length beside the model at floor level.",
+          "box": [
+            [
+              -1.5,
+              0,
+              2.8
+            ],
+            [
+              1.5,
+              3.1,
+              3.9
+            ]
+          ],
+          "attaches": "Spinner base at propHub on the fuselage nose; blades ride the propeller joint.",
+          "joints": [
+            "propeller",
+            "fuselage"
+          ],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "effort": "low",
+        "started": "2026-10-28T21:09:03.457Z",
+        "wallMs": 24507,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 75208,
+          "completion_tokens": 2651,
+          "total_tokens": 77859,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0363089,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "propNose",
+        "effort": "low",
+        "started": "2026-10-28T21:09:27.964Z",
+        "wallMs": 14883,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77942,
+          "completion_tokens": 2527,
+          "total_tokens": 80469,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0405369,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "gear",
+        "effort": "low",
+        "started": "2026-10-28T21:09:27.964Z",
+        "wallMs": 17453,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77851,
+          "completion_tokens": 2924,
+          "total_tokens": 80775,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0443249,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tail",
+        "effort": "low",
+        "started": "2026-10-28T21:09:27.964Z",
+        "wallMs": 18602,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77869,
+          "completion_tokens": 3040,
+          "total_tokens": 80909,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0455209,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "fuselage",
+        "effort": "low",
+        "started": "2026-10-28T21:09:27.964Z",
+        "wallMs": 19453,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77932,
+          "completion_tokens": 3031,
+          "total_tokens": 80963,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.045556900000000004,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wings",
+        "effort": "low",
+        "started": "2026-10-28T21:09:27.964Z",
+        "wallMs": 21296,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 77923,
+          "completion_tokens": 3469,
+          "total_tokens": 81392,
+          "prompt_tokens_details": {
+            "cached_tokens": 74009
+          }
+        },
+        "costUsd": 0.0499189,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}
