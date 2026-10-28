@@ -1,0 +1,26 @@
+{
+  "slug": "r41haikuChopperMotorbikeRichCraft3",
+  "arm": "craft3",
+  "subject": "chopperMotorbike",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: custom chopper motorbike.\nStyle: Overwatch.",
+  "model": "anthropic/claude-haiku-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:11:26.479Z",
+  "wallMs": 48432,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 84101,
+    "completion_tokens": 9894,
+    "total_tokens": 93995,
+    "prompt_tokens_details": {
+      "cached_tokens": 84061
+    }
+  },
+  "costUsd": 0.00579161,
+  "hasCode": true,
+  "reasoning": "I'm planning to build a single TypeScript module for a chopper-style motorbike using the SDK's builder functions—joints, chains, sweeps, parts, sticks, extrusions, lathes, paints, and rng—keeping to APIs I'm confident about for correctness while giving it an Overwatch-inspired aesthetic.\n\nNow I'm working through the physical layout: a chassis joint, front fork for steering, and separate wheel joints positioned at realistic radii and spacing for a chopper's long wheelbase, with cylinders rotated to serve as wheels along the bike's axis.\n\nI'm building the fork legs as rods running from a raked head tube down to the front axle, plus frame tubes connecting the head to the seat and down-tube area, using simple rod/capsule primitives for structure. For the tank I'm planning a swept shape with a chunky profile, styled in a white-ceramic-with-orange-accent palette echoing an Overwatch-style design language.\n\nI'm defining the color palette as hex constants (white, navy, orange, cyan, black, chrome, dark grey) and setting up a custom paint function for the body that shades by surface normal (white on top, navy underneath) with an orange stripe band based on vertical position, while tires stay solid black and rims use chrome metal shading.\n\nNow I'm adding decal details: an emblem texture (orange chevron in a circle) placed on the tank's side via an SVG texture on a flat plane, a glowing cyan headlight sphere, and working out how to extrude a fender shape as a side-profile outline swept along the correct axis.\n\nFor the fender, I'm constructing a half-annulus outline centered over the wheel by generating arc points for the outer radius and inner radius, forming a closed ring shape to extrude into the fender geometry.\n\nFor the rear fender, I'll use a similar arc approach near the rear wheel center, with a slightly tapered, kicked-up tail shape. Then I move on to the tank, planning to build it as a swept/lathed profile.\n\nDefining loft stations...\n\nBuilding the chopper frame with rods for the down tube, rear section, and frame loops, then adding the long raked front fork tubes with chrome finish converging at the front wheel hub.\n\nNow I'm setting up wheel joints parented to root for both front and rear wheels, and planning the handlebar structure with a steering joint at the head position plus bars sweeping out to the sides for that chopper-style stance.\n\nFor the wheels, I'm sizing the front tire smaller (0.27 radius) and rear larger (0.32), modeling each as layered cylinders — an outer tire, a chrome inner rim, and an orange hub disc.\n\nNow I'm adding cyan glowing light strips along the tank sides as thin boxes, plus a glowing headlight sphere mounted on the front fairing and a chrome exhaust pipe running from the engine back to a tip ring.\n\nFor the chopper's extended proportions, I'm stretching the front forks so the front wheel hub sits further forward at z=1.3 with a long fork rod connecting it to the headstock, keeping the fender wrapped around it and the rear wheel centered lower and back. I'm making sure all wheel bottoms rest exactly at y=0 so nothing clips through the ground, then moving to extrude the fender geometry.\n\nWriting arc and loft code...\n\nI should add a glow import for highlighting parts, and set up the joint hierarchy: hips as root, a steering joint for the fork and handlebars so they rotate together, with the front wheel attached as a child of the steering joint for realistic steering behavior.\n\nWriting the tire-building helper function...\n\nFor the engine, I'm deciding to use a dark box for the block instead of cylinders since bike engine blocks sit more naturally as a rectangular shape, placed near the front-center with a chrome exhaust piece, keeping an eye on how much length budget remains.\n\n",
+  "plan": null
+}
