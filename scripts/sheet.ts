@@ -111,7 +111,8 @@ const duration = (ms: number) => {
 };
 const thousands = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : `${n}`);
 
-/** A build summed over its repair chain (model time, output tokens, price), its triangles and its arm's name. */
+/** A build summed over its repair chain (model time, output tokens, price), its triangles, its arm's name and the
+ *  effort of the build that started the chain (a repair's own effort is not the build's). */
 const stats = (slug: string) => {
   const found = record(slug);
   if (!found) return null;
@@ -121,11 +122,13 @@ const stats = (slug: string) => {
   let usd = 0;
   let estimated = false;
   let repairs = -1;
+  let effort = run.effort;
   for (let step: Run | undefined = run; step; step = step.from ? record(step.from)?.run : undefined) {
     const out = step.usage?.completion_tokens ?? step.usage?.output_tokens ?? 0;
     wallMs += step.wallMs;
     tokens += out;
     repairs++;
+    effort = step.effort;
     if (step.costUsd) usd += step.costUsd;
     else {
       // Subscription runs record no price; work it out from today's list prices (per million tokens).
@@ -144,7 +147,7 @@ const stats = (slug: string) => {
     readFileSync(join(ROUNDS, round, "round.json"), "utf8"),
   ).arms;
   const armName = arms.find((a) => a.id === run.arm)?.name ?? run.arm;
-  return { run, wallMs, tokens, usd, estimated, repairs, triangles, armName };
+  return { run, wallMs, tokens, usd, estimated, repairs, triangles, armName, effort };
 };
 
 const builds = args.map((arg) => stats(arg.split("@")[0]));
@@ -154,7 +157,7 @@ const shared = (pick: (b: NonNullable<(typeof builds)[number]>) => string) => {
 };
 const subject = shared((b) => b.run.subject);
 const arm = shared((b) => b.armName);
-const effort = shared((b) => b.run.effort);
+const effort = shared((b) => b.effort);
 const pitch = shared((b) => b.run.pitch ?? "");
 const nameOf = (model: string) => models.get(model)?.name ?? model.split("/").pop()!;
 
@@ -175,7 +178,7 @@ const titleLines = [heading, auto, brief && `Brief: ${brief}`].filter(Boolean);
 
 const labels = builds.map((b, i) => {
   if (!b) return `${args[i].split("@")[0]} · ${tiles[i].tag}`;
-  const head = [nameOf(b.run.model), !effort && b.run.effort, !subject && b.run.subject];
+  const head = [nameOf(b.run.model), !effort && b.effort, !subject && b.run.subject];
   // An arm that differs between tiles gets its own line, cut to what fits a 560 px tile at this type size.
   const armLine = arm ? "" : b.armName.length > 50 ? `${b.armName.slice(0, 49)}…` : b.armName;
   const price = b.usd < 0.01 ? b.usd.toFixed(3) : b.usd.toFixed(2);
