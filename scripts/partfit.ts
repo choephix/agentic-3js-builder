@@ -44,15 +44,18 @@ export type PartFit = {
 /** The assembled module with each part's call wrapped: its meshes get `<id>§` name prefixes, a throw is caught and
  *  noted on `meta.fitThrew`, and the next part runs. `ids` are the parts in `PARTS` order. */
 function probeModule(module: string, ids: string[]) {
-  const line = "  for (const part of PARTS) part({ b, J, P, M });";
-  if (!module.includes(line)) throw new Error("not an assembled parallel-parts module");
+  const parallelLine = "  for (const part of PARTS) part({ b, J, P, M });";
+  const baseFirstLine = "  for (const add of PARTS) add(b);";
+  const line = module.includes(parallelLine) ? parallelLine : module.includes(baseFirstLine) ? baseFirstLine : null;
+  if (!line) throw new Error("not an assembled parts module");
+  const call = line === parallelLine ? "part({ b, J, P, M });" : "part(b);";
   const probe = [
     `  const fitIds = ${JSON.stringify(ids)};`,
     "  const fitSeen = new Set<unknown>();",
     "  const fitThrew: Record<string, string> = {};",
     "  PARTS.forEach((part, i) => {",
     "    try {",
-    "      part({ b, J, P, M });",
+    `      ${call}`,
     "    } catch (error) {",
     "      fitThrew[fitIds[i]] = error instanceof Error ? error.message : String(error);",
     "    }",
@@ -62,7 +65,7 @@ function probeModule(module: string, ids: string[]) {
     `      node.name = fitIds[i] + ${JSON.stringify(TAG)} + node.name;`,
     "    });",
     "  });",
-    "  (meta as Record<string, unknown>).fitThrew = fitThrew;",
+    '  if (typeof meta !== "undefined") (meta as Record<string, unknown>).fitThrew = fitThrew;',
   ].join("\n");
   return module.replace(line, probe);
 }

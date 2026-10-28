@@ -61,12 +61,26 @@ type Arm = {
   samplerMenu?: boolean;
   /** A prompt file in bakeoff/prompts/: the model first writes a build sheet from it, then the module. */
   plan?: string;
+  /** Base-first parts: one base module exports BASE_PARTS, then concurrent functions append against its real geometry. */
+  basefirst?: { base: string; part: string };
+  /** Whole-module examples from a tagged library, selected deterministically per brief. */
+  examples?: { library: string; pick: "struct3" | "near"; replacesApi?: boolean };
   /** Parallel parts: a planning call writes a shared spec from `plan`, then one call per part writes a function from
    *  `part`, all at once; the runner assembles one module (see `parallelBuild`). With `fit` (a prompt file) the
    *  runner then measures every part against its box and gives each one that sticks out one edit call from it.
    *  `planEffort` / `partEffort` override the round's `--effort` for the planning call / the part calls. */
   parallel?: { plan: string; part: string; fit?: string; planEffort?: string; partEffort?: string };
 };
+type ExampleEntry = {
+  id: string;
+  source: string;
+  brief: string;
+  topology: string;
+  style: string;
+  features: string[];
+};
+type ExampleLibrary = { examples: ExampleEntry[] };
+type ExampleSelection = { entries: ExampleEntry[]; topology: string };
 type Subject = { id: string; kind: string; terse: string; rich: string };
 type Level = "terse" | "rich";
 type Job = { slug: string; arm: Arm; subject: Subject; level: Level };
@@ -110,6 +124,117 @@ function context(kind: Arm["context"]) {
   if (kind === "brief")
     return `# SDK reference\n\n${api.slice(0, api.indexOf("\n## Frames")).replace(/^# API\n\n/, "")}`;
   return `# SDK reference\n\n${api.replace(/^# API\n\n/, "")}\n\n${cleanDoc(read("docs/conventions.md")).replace(/^# Conventions/, "## Conventions")}`;
+}
+
+function conventionsContext() {
+  return `# SDK conventions\n\n${cleanDoc(read("docs/conventions.md")).replace(/^# Conventions/, "## Conventions")}`;
+}
+
+const subjectTopology: Record<string, string> = {
+  redPanda: "quadruped",
+  koala: "quadruped",
+  wizardBookshelf: "prop-group",
+  grayWolf: "quadruped",
+  phoenix: "winged",
+  nineTailedKitsune: "quadruped",
+  barnstormerBiplane: "vehicle",
+  chopperMotorbike: "vehicle",
+  swampTroll: "biped",
+  lavaGolem: "biped",
+  frostAxe: "prop-weapon",
+  lanternShrine: "prop-group",
+  dwarfRifleman: "biped",
+  desertOasisDiorama: "diorama",
+  pixelDungeonProps: "prop-group",
+  africanElephant: "quadruped",
+  alchemistWorkbench: "prop-group",
+  ancientTreant: "biped",
+  floatingIslandDiorama: "diorama",
+  kraken: "serpentine",
+  monsterTruck: "vehicle",
+  qilin: "quadruped",
+  soulScythe: "prop-weapon",
+  treasureHoard: "prop-group",
+  capybara: "quadruped",
+};
+
+function topologyFamilies(topology: string) {
+  const families = new Set<string>();
+  for (const family of [
+    "quadruped",
+    "biped",
+    "serpentine",
+    "winged",
+    "vehicle",
+    "prop-weapon",
+    "prop-group",
+    "building",
+    "diorama",
+  ])
+    if (topology.includes(family)) families.add(family);
+  return families;
+}
+
+const words = (text: string) =>
+  new Set(
+    text
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((word) => word.length > 2),
+  );
+
+function exampleLibrary(config: NonNullable<Arm["examples"]>) {
+  const library = readJson<ExampleLibrary>(join(ROOT, config.library));
+  if (!library.examples.length) throw new Error(`Example library "${config.library}" is empty.`);
+  return library.examples;
+}
+
+/** Stable subject-aware selection; ties are broken by the library order and then id. */
+function selectExamples(arm: Arm, subject: Subject): ExampleSelection | null {
+  const config = arm.examples;
+  if (!config) return null;
+  const targetTopology = subjectTopology[subject.id] ?? subject.kind.toLowerCase().replace(/\s+/g, "-");
+  const targetWords = words(subject.rich);
+  const targetStyle = (subject.rich.match(/Style:\s*([^.\n]+)/i)?.[1] ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+  const library = exampleLibrary(config);
+  const score = (entry: ExampleEntry) => {
+    const family = topologyFamilies(entry.topology).has(targetTopology) ? 100 : 0;
+    const style = entry.style === targetStyle ? 30 : 0;
+    const overlap = [...targetWords].filter((word) =>
+      words(`${entry.brief} ${entry.features.join(" ")}`).has(word),
+    ).length;
+    return family + style + overlap;
+  };
+  const ranked = library
+    .map((entry, index) => ({ entry, index, score: score(entry) }))
+    .sort((a, b) => b.score - a.score || a.index - b.index || a.entry.id.localeCompare(b.entry.id));
+  const matching = ranked.filter(({ entry }) => topologyFamilies(entry.topology).has(targetTopology));
+  const struct = (matching.length >= 3 ? matching : ranked).slice(0, 3).map(({ entry }) => entry);
+  if (config.pick === "struct3") return { entries: struct, topology: targetTopology };
+  const selected = new Set(struct.map((entry) => entry.id));
+  const near = ranked.find(({ entry }) => !selected.has(entry.id))?.entry;
+  return { entries: near ? [...struct, near] : struct, topology: targetTopology };
+}
+
+function examplesContext(arm: Arm, subject: Subject) {
+  const selection = selectExamples(arm, subject);
+  if (!selection) return { text: "", ids: [] as string[] };
+  const body = selection.entries
+    .map((entry) => {
+      const source = cleanDoc(read(entry.source))
+        .replace(/(["'])\.\.\/src\/[a-z]+\1/g, `"${SDK_NAME}"`)
+        .replace(/(["'])\.\.\/kits\/([a-z]+)\1/g, `"${SDK_NAME}/kits/$2"`);
+      return `## Example: ${entry.id}\n\nBrief: ${entry.brief}\nTopology: ${entry.topology}\nStyle family: ${entry.style}\nNotable features: ${entry.features.join(", ")}\n\n\`\`\`ts\n${source.trimEnd()}\n\`\`\``;
+    })
+    .join("\n\n");
+  const mode =
+    arm.examples?.pick === "near"
+      ? "three structural matches plus one nearest different subject"
+      : "three structural matches";
+  return {
+    text: `# Whole-module examples\n\nThese are complete, typecheck-clean reference modules. They are examples, not templates: design the requested subject yourself, reuse API shapes and construction techniques where useful, and do not copy a reference subject or its composition. The picker supplied ${mode} for topology ${selection.topology}.\n\n${body}`,
+    ids: selection.entries.map((entry) => entry.id),
+  };
 }
 
 /** Kit docs and sources as a model outside this repo reads them: kits import from `agentic-3js-builder/kits/<name>`. */
@@ -187,16 +312,17 @@ function samplersContext(names: string[], menu = false) {
   return `# Samplers\n\nReference only. Your module imports \`three\` and the SDK.\n\n${body}`;
 }
 
-function systemPrompt(arm: Arm) {
+function systemPrompt(arm: Arm, subject?: Subject) {
   const parts = [read(`bakeoff/prompts/${arm.contract}`)];
   if (arm.taste) parts.push(read(`bakeoff/prompts/${arm.taste}`));
   for (const file of arm.extra ?? []) parts.push(read(`bakeoff/prompts/${file}`));
-  const ref = context(arm.context);
+  const ref = arm.examples?.replacesApi ? conventionsContext() : context(arm.context);
   if (ref) parts.push(ref);
   if (arm.kits) parts.push(kitsContext());
   if (arm.sources?.length) parts.push(sourcesContext(arm.sources));
   if (arm.declarations) parts.push(declarationsContext());
   if (arm.samplers?.length) parts.push(samplersContext(arm.samplers, arm.samplerMenu));
+  if (arm.examples && subject) parts.push(examplesContext(arm, subject).text);
   return `${parts.map((part) => part.trim()).join("\n\n")}\n`;
 }
 
@@ -402,16 +528,21 @@ async function run(round: string, args: string[]) {
     subjects: pitches(),
   });
   for (const arm of new Set(todo.map((job) => job.arm))) {
-    const path = join(dir, "prompts", `${arm.id}.md`);
-    mkdirSync(dirname(path), { recursive: true });
-    // `--prompts-from <round>` reuses that round's exact system prompts, to compare models on identical input.
+    const armJobs = todo.filter((job) => job.arm.id === arm.id);
     const from = option(args, "prompts-from", "");
-    writeFileSync(
-      path,
-      from ? readFileSync(join(BAKEOFF, "rounds", from, "prompts", `${arm.id}.md`), "utf8") : systemPrompt(arm),
-    );
-    // A parallel-parts arm keeps its plan, part and fit prompts next to the system prompt they extend.
-    for (const file of arm.parallel ? [arm.parallel.plan, arm.parallel.part, arm.parallel.fit] : [])
+    const promptJobs = arm.examples ? [...new Map(armJobs.map((job) => [job.subject.id, job])).values()] : [armJobs[0]];
+    for (const job of promptJobs) {
+      const promptName = arm.examples ? `${arm.id}-${job.subject.id}.md` : `${arm.id}.md`;
+      const path = join(dir, "prompts", promptName);
+      mkdirSync(dirname(path), { recursive: true });
+      const source = from ? join(BAKEOFF, "rounds", from, "prompts", promptName) : null;
+      writeFileSync(path, source && existsSync(source) ? readFileSync(source, "utf8") : systemPrompt(arm, job.subject));
+    }
+    // Parallel and base-first arms keep auxiliary prompts next to the system prompt they extend.
+    for (const file of [
+      ...(arm.parallel ? [arm.parallel.plan, arm.parallel.part, arm.parallel.fit] : []),
+      ...(arm.basefirst ? [arm.basefirst.base, arm.basefirst.part] : []),
+    ])
       if (file) writeFileSync(join(dir, "prompts", file), read(`bakeoff/prompts/${file}`));
   }
   console.log(`${todo.length} builds to ask ${model} (${effort}) for, ${concurrency} at a time.`);
@@ -420,8 +551,14 @@ async function run(round: string, args: string[]) {
   let done = 0;
   await pool(todo, concurrency, async (job) => {
     if (existsSync(join(dir, "runs", `${job.slug}.json`))) return; // another runner got it first
-    const system = readFileSync(join(dir, "prompts", `${job.arm.id}.md`), "utf8");
+    const promptName = job.arm.examples ? `${job.arm.id}-${job.subject.id}.md` : `${job.arm.id}.md`;
+    const system = readFileSync(join(dir, "prompts", promptName), "utf8");
     const pitch = job.subject[job.level];
+    if (job.arm.basefirst) {
+      const line = await baseFirstBuild({ gw, cost, dir, job, system, pitch, model, effort, maxTokens });
+      console.log(`[${++done}/${todo.length}] ${job.slug}: ${line}`);
+      return;
+    }
     if (job.arm.parallel) {
       const line = await parallelBuild({ gw, cost, dir, job, system, pitch, model, effort, maxTokens });
       console.log(`[${++done}/${todo.length}] ${job.slug}: ${line}`);
@@ -453,12 +590,17 @@ async function run(round: string, args: string[]) {
       mkdirSync(dirname(buildFile), { recursive: true });
       writeFileSync(buildFile, wireImports(code, buildFile));
     }
+    const selectedExamples = job.arm.examples ? selectExamples(job.arm, job.subject) : null;
     writeJson(join(dir, "runs", `${job.slug}.json`), {
       slug: job.slug,
       arm: job.arm.id,
       subject: job.subject.id,
       level: job.level,
       pitch,
+      promptFile: job.arm.examples ? `${job.arm.id}-${job.subject.id}.md` : `${job.arm.id}.md`,
+      examplesShown: selectedExamples
+        ? { topology: selectedExamples.topology, ids: selectedExamples.entries.map((entry) => entry.id) }
+        : null,
       model,
       effort,
       started: new Date(started).toISOString(),
@@ -663,6 +805,280 @@ function assemble(spec: Spec, parts: { part: SpecPart; code: string | null }[]) 
     "",
   ].join("\n");
   return { module, missing };
+}
+type BaseFirstPart = SpecPart;
+
+/** Extract an exported array literal without asking the base call to return JSON instead of TypeScript. */
+function arrayLiteral(code: string, name: string) {
+  const at = code.search(new RegExp(`export\\s+const\\s+${name}\\b`));
+  if (at < 0) return null;
+  const open = code.indexOf("[", code.indexOf("=", at));
+  if (open < 0) return null;
+  let depth = 0;
+  let quote: string | null = null;
+  for (let i = open; i < code.length; i++) {
+    const ch = code[i];
+    if (quote) {
+      if (ch === "\\") i++;
+      else if (ch === quote) quote = null;
+    } else if (ch === '"' || ch === "'" || ch === "`") quote = ch;
+    else if (ch === "/" && code[i + 1] === "/") i = code.indexOf("\n", i);
+    else if (ch === "/" && code[i + 1] === "*") i = code.indexOf("*/", i + 2) + 1;
+    else if (ch === "[") depth++;
+    else if (ch === "]" && --depth === 0) return code.slice(open, i + 1);
+  }
+  return null;
+}
+
+function parseBaseParts(code: string): BaseFirstPart[] {
+  const literal = arrayLiteral(code, "BASE_PARTS");
+  if (!literal) throw new Error("base exports no BASE_PARTS array");
+  let raw: unknown;
+  try {
+    raw = new Function(`return (${literal.replace(/\s+as\s+const\b/g, "")});`)();
+  } catch (error) {
+    throw new Error(`BASE_PARTS is not a literal: ${String(error)}`);
+  }
+  if (!Array.isArray(raw) || !raw.length) throw new Error("BASE_PARTS is empty");
+  const seen = new Set<string>();
+  return raw.map((entry: unknown, i) => {
+    const value = (entry && typeof entry === "object" ? entry : {}) as Record<string, unknown>;
+    let id = String(value.id ?? "").replace(/[^A-Za-z0-9]/g, "") || `part${i + 1}`;
+    if (!/^[A-Za-z]/.test(id)) id = `p${id}`;
+    while (seen.has(id)) id += i + 1;
+    seen.add(id);
+    return {
+      id,
+      builds: String(value.builds ?? ""),
+      box: (Array.isArray(value.box)
+        ? value.box
+        : [
+            [-1, 0, -1],
+            [1, 1, 1],
+          ]) as [Vec, Vec],
+      attaches: String(value.attaches ?? ""),
+      joints: Array.isArray(value.joints) ? value.joints.map(String) : [],
+      floor: Boolean(value.floor),
+      budget: Number(value.budget ?? Math.floor(900 / raw.length)),
+    };
+  });
+}
+
+function baseFirstPartPrompt(template: string, base: string, part: BaseFirstPart, total: number) {
+  const values: Record<string, string> = {
+    base,
+    id: part.id,
+    fn: `build${part.id[0].toUpperCase()}${part.id.slice(1)}`,
+    builds: part.builds,
+    box: JSON.stringify(part.box),
+    attaches: part.attaches,
+    joints: part.joints.length ? part.joints.map((name) => `\`${name}\``).join(", ") : "none",
+    floor: part.floor
+      ? "Its lowest points rest on the floor, y = 0."
+      : "It sits above the floor, inside its box; the base or another part supports it.",
+    budget: String(part.budget || Math.floor(900 / total)),
+    triangles: String(Math.floor(60_000 / total / 500) * 500),
+  };
+  return template.replace(/\{(\w+)\}/g, (whole, key: string) => values[key] ?? whole);
+}
+
+/** Appends base-first part functions immediately before the base's return, preserving the base's actual geometry. */
+function assembleBaseFirst(base: string, parts: { part: BaseFirstPart; code: string | null }[]) {
+  const missing: string[] = [];
+  const named = parts.flatMap(({ part, code }) => {
+    const fn = code?.match(/export\s+(?:async\s+)?function\s+([A-Za-z_$][\w$]*)|export\s+const\s+([A-Za-z_$][\w$]*)/);
+    const name = fn?.[1] ?? fn?.[2] ?? code?.match(/function\s+([A-Za-z_$][\w$]*)/)?.[1];
+    if (!code || !name) {
+      missing.push(part.id);
+      return [];
+    }
+    return [{ part, code, name }];
+  });
+  const { importLines, bodies } = mergeImports(
+    [base, ...named.map((n) => n.code)],
+    [{ from: SDK_NAME, item: "Builder", typeOnly: true }],
+  );
+  const baseBody = bodies[0].trim();
+  const returns = [...baseBody.matchAll(/return\s+([A-Za-z_$][\w$]*)\.root\s*;/g)];
+  const last = returns.at(-1);
+  if (!last) throw new Error("base build has no `return b.root`");
+  const addCalls = `  for (const add of PARTS) add(${last[1]});\n  `;
+  const metadata = /\b(?:export\s+)?const\s+meta\b/.test(baseBody) ? "" : "const meta = {};\n";
+  const body = metadata + baseBody.slice(0, last.index) + addCalls + baseBody.slice(last.index);
+  const scopes = named.map(({ part, name }, i) => {
+    const fnBody = bodies[i + 1].replace(/^export\s+(?=(?:async\s+)?function|const|let|class)/gm, "").trim();
+    return `  // ${part.id}\n  (() => {\n${fnBody}\n    return ${name};\n  })(),`;
+  });
+  const module = [
+    ...importLines,
+    "",
+    "type BasePartFn = (b: Builder) => void;",
+    `const PARTS: BasePartFn[] = [\n${scopes.join("\n")}\n];`,
+    "",
+    body,
+    "",
+  ].join("\n");
+  return { module, missing };
+}
+
+type BaseFirstCall = {
+  id: string;
+  effort: string;
+  started: string;
+  wallMs: number;
+  status: number | null;
+  error: string | null;
+  finishReason: string | null;
+  usage: Asked["usage"];
+  costUsd: number | null;
+  hasCode: boolean;
+  text: string;
+  reasoning: string | null;
+};
+
+/** One base-first build: write/render the base, then write every add-on against that exact source concurrently. */
+async function baseFirstBuild(o: {
+  gw: Gateway;
+  cost: Pricing;
+  dir: string;
+  job: Job;
+  system: string;
+  pitch: string;
+  model: string;
+  effort: string;
+  maxTokens: number;
+}) {
+  const { gw, cost, dir, job, system, pitch, model, effort, maxTokens } = o;
+  const files = job.arm.basefirst!;
+  const prompt = (file: string) => readFileSync(join(dir, "prompts", file), "utf8").trim();
+  const body = (messages: unknown[]) => ({ model, reasoning_effort: effort, max_tokens: maxTokens, messages });
+  const call = (id: string, asked: Asked, hasCode: boolean): BaseFirstCall => ({
+    id,
+    effort,
+    started: new Date(asked.started).toISOString(),
+    wallMs: asked.wallMs,
+    status: asked.reply?.status ?? null,
+    error: asked.reply?.status === 200 ? null : JSON.stringify(asked.reply?.body).slice(0, 2000),
+    finishReason: asked.reply?.body?.choices?.[0]?.finish_reason ?? null,
+    usage: asked.usage,
+    costUsd: asked.costUsd,
+    hasCode,
+    text: asked.text,
+    reasoning: asked.message?.reasoning_content ?? null,
+  });
+  const started = Date.now();
+  const first = await ask(
+    gw,
+    body([
+      { role: "system", content: system },
+      { role: "user", content: `${pitch}\n\n${prompt(files.base)}` },
+    ]),
+    cost,
+  );
+  const base = first.text ? extractCode(first.text) : null;
+  let parts: BaseFirstPart[] = [];
+  let partsError: string | null = null;
+  if (base)
+    try {
+      parts = parseBaseParts(base);
+    } catch (error) {
+      partsError = String(error);
+    }
+  else partsError = "base returned no code";
+  const calls: BaseFirstCall[] = [call("base", first, Boolean(base))];
+  const partResults = base
+    ? await Promise.all(
+        parts.map(async (part) => {
+          const asked = await ask(
+            gw,
+            body([
+              { role: "system", content: system },
+              {
+                role: "user",
+                content: `${pitch}\n\n${baseFirstPartPrompt(prompt(files.part), base, part, parts.length)}`,
+              },
+            ]),
+            cost,
+          );
+          const code = asked.text ? extractCode(asked.text) : null;
+          calls.push(call(part.id, asked, Boolean(code)));
+          return { part, code, wallMs: asked.wallMs };
+        }),
+      )
+    : [];
+  const assembled = base ? assembleBaseFirst(base, partResults) : null;
+  const buildFile = join(dir, "builds", `${job.slug}.ts`);
+  if (assembled) {
+    mkdirSync(dirname(buildFile), { recursive: true });
+    writeFileSync(buildFile, wireImports(assembled.module, buildFile));
+  }
+  // Measure base-first parts too, without a repair pass; this records the same >15 cm box metric as parflat-fit.
+  let fit: Record<string, unknown> | null = null;
+  if (assembled && parts.length) {
+    const ids = parts.map((part) => part.id);
+    const measured = await probe(buildFile, ids, "basefirst");
+    const fits = measured.error ? [] : measure(parts, measured);
+    fit = {
+      checkMs: measured.ms,
+      error: measured.error,
+      threw: measured.threw,
+      before: fits.map(({ worst, ...rest }) => ({ ...rest, worst: worst.slice(0, 5) })),
+    };
+  }
+  calls.sort((a, b) => (a.id === "base" ? -1 : b.id === "base" ? 1 : 0));
+  const sum = (get: (c: BaseFirstCall) => number | undefined) => calls.reduce((total, c) => total + (get(c) ?? 0), 0);
+  const usage = {
+    prompt_tokens: sum((c) => c.usage?.prompt_tokens),
+    completion_tokens: sum((c) => c.usage?.completion_tokens),
+    total_tokens: sum((c) => c.usage?.total_tokens),
+    prompt_tokens_details: { cached_tokens: sum((c) => c.usage?.prompt_tokens_details?.cached_tokens) },
+  };
+  const costUsd = calls.every((c) => c.costUsd != null) ? sum((c) => c.costUsd!) : null;
+  const slowest = calls.slice(1).reduce<BaseFirstCall | null>((a, c) => (!a || c.wallMs > a.wallMs ? c : a), null);
+  const failed = calls.find((c) => c.status !== 200);
+  const wallMs = first.wallMs + (slowest?.wallMs ?? 0);
+  writeJson(join(dir, "runs", `${job.slug}.json`), {
+    slug: job.slug,
+    arm: job.arm.id,
+    subject: job.subject.id,
+    level: job.level,
+    pitch,
+    model,
+    effort,
+    started: new Date(first.started).toISOString(),
+    wallMs,
+    status: failed ? failed.status : 200,
+    error: failed ? `${failed.id}: ${failed.error}` : partsError,
+    finishReason: calls.every((c) => c.finishReason === "stop") ? "stop" : calls.map((c) => c.finishReason).join(","),
+    usage,
+    costUsd,
+    hasCode: Boolean(assembled),
+    reasoning: null,
+    basefirst: {
+      baseMs: first.wallMs,
+      slowestPartMs: slowest?.wallMs ?? null,
+      critical: slowest?.id ?? null,
+      elapsedMs: Date.now() - started,
+      parts,
+      partsError,
+      missingParts: assembled?.missing ?? [],
+      ...(fit ? { fit } : {}),
+      calls: calls.map(({ text: _text, ...rest }) => rest),
+    },
+  });
+  writeFileSync(
+    join(dir, "runs", `${job.slug}.md`),
+    calls.map((c) => `<!-- call: ${c.id} -->\n\n${c.text}`).join("\n\n"),
+  );
+  const times = calls
+    .filter((c) => c.id !== "base")
+    .map((c) => `${c.id} ${(c.wallMs / 1000).toFixed(0)}`)
+    .join(", ");
+  return (
+    `${failed ? failed.status : 200} ${assembled ? "code" : `NO CODE (${partsError})`}` +
+    `${assembled?.missing.length ? ` MISSING ${assembled.missing.join(",")}` : ""}, base ${(first.wallMs / 1000).toFixed(0)} s + parts [${times}]` +
+    ` → ${(wallMs / 1000).toFixed(0)} s, ${usage.completion_tokens} out${costUsd != null ? `, $${costUsd.toFixed(3)}` : ""}`
+  );
 }
 
 type Asked = Awaited<ReturnType<typeof ask>>;
@@ -1010,6 +1426,8 @@ type RunRecord = {
   subject: string;
   level: Level;
   pitch: string;
+  promptFile?: string;
+  examplesShown?: { topology: string; ids: string[] } | null;
   costUsd: number | null;
   chainCostUsd?: number;
 };
@@ -1119,12 +1537,14 @@ async function refine(round: string, args: string[]) {
     const previous = readJson<RunRecord>(join(src, "runs", `${slug}.json`));
     const checked = readJson<CheckRecord>(join(src, "checks", `${slug}.json`));
     const override = option(args, "system-prompt", "");
-    const system = readFileSync(
-      override ? resolve(ROOT, override) : join(src, "prompts", `${previous.arm}.md`),
-      "utf8",
-    );
+    const promptFile =
+      previous.promptFile ??
+      (existsSync(join(src, "prompts", `${previous.arm}-${previous.subject}.md`))
+        ? `${previous.arm}-${previous.subject}.md`
+        : `${previous.arm}.md`);
+    const system = readFileSync(override ? resolve(ROOT, override) : join(src, "prompts", promptFile), "utf8");
     mkdirSync(join(dir, "prompts"), { recursive: true });
-    writeFileSync(join(dir, "prompts", `${previous.arm}.md`), system);
+    writeFileSync(join(dir, "prompts", promptFile), system);
     const current = readFileSync(join(src, "builds", `${slug}.ts`), "utf8")
       .replace(/(["'])(?:\.\.\/)+kits\/([a-z]+)\1/g, `"${SDK_NAME}/kits/$2"`)
       .replace(/(["'])(?:\.\.\/)+src\/index\1/g, `"${SDK_NAME}"`);
