@@ -63,8 +63,9 @@ type Arm = {
   plan?: string;
   /** Parallel parts: a planning call writes a shared spec from `plan`, then one call per part writes a function from
    *  `part`, all at once; the runner assembles one module (see `parallelBuild`). With `fit` (a prompt file) the
-   *  runner then measures every part against its box and gives each one that sticks out one edit call from it. */
-  parallel?: { plan: string; part: string; fit?: string };
+   *  runner then measures every part against its box and gives each one that sticks out one edit call from it.
+   *  `planEffort` / `partEffort` override the round's `--effort` for the planning call / the part calls. */
+  parallel?: { plan: string; part: string; fit?: string; planEffort?: string; partEffort?: string };
 };
 type Subject = { id: string; kind: string; terse: string; rich: string };
 type Level = "terse" | "rich";
@@ -683,17 +684,18 @@ async function parallelBuild(o: {
   const { gw, cost, dir, job, system, pitch, model, effort, maxTokens } = o;
   const files = job.arm.parallel!;
   const prompt = (file: string) => readFileSync(join(dir, "prompts", file), "utf8").trim();
-  const body = (user: string) => ({
+  const body = (user: string, callEffort: string) => ({
     model,
-    reasoning_effort: effort,
+    reasoning_effort: callEffort,
     max_tokens: maxTokens,
     messages: [
       { role: "system", content: system },
       { role: "user", content: user },
     ],
   });
-  const call = (id: string, asked: Asked, hasCode: boolean) => ({
+  const call = (id: string, asked: Asked, hasCode: boolean, callEffort: string) => ({
     id,
+    effort: callEffort,
     started: new Date(asked.started).toISOString(),
     wallMs: asked.wallMs,
     status: asked.reply?.status ?? null,
@@ -705,7 +707,9 @@ async function parallelBuild(o: {
     text: asked.text,
     reasoning: asked.message?.reasoning_content ?? null,
   });
-  const planned = await ask(gw, body(`${pitch}\n\n${prompt(files.plan)}`), cost);
+  const planEffort = files.planEffort ?? effort;
+  const partEffort = files.partEffort ?? effort;
+  const planned = await ask(gw, body(`${pitch}\n\n${prompt(files.plan)}`, planEffort), cost);
   let spec: Spec | null = null;
   let specError: string | null = null;
   try {
@@ -713,14 +717,14 @@ async function parallelBuild(o: {
   } catch (error) {
     specError = String(error);
   }
-  const calls = [call("plan", planned, Boolean(spec))];
+  const calls = [call("plan", planned, Boolean(spec), planEffort)];
   const parts = spec
     ? await Promise.all(
         spec.parts.map(async (part) => {
           const partUser = `${pitch}\n\n${partPrompt(prompt(files.part), spec!, part)}`;
-          const asked = await ask(gw, body(partUser), cost);
+          const asked = await ask(gw, body(partUser, partEffort), cost);
           const code = asked.text ? extractCode(asked.text) : null;
-          calls.push(call(part.id, asked, Boolean(code)));
+          calls.push(call(part.id, asked, Boolean(code), partEffort));
           return { part, code, wallMs: asked.wallMs, partUser };
         }),
       )
@@ -777,7 +781,7 @@ async function parallelBuild(o: {
           );
           const edited = applyEdits(p.code!, asked.text);
           const code = edited.blocks ? edited.code : (extractCode(asked.text) ?? p.code!);
-          calls.push(call(`fit-${m.id}`, asked, code !== p.code));
+          calls.push(call(`fit-${m.id}`, asked, code !== p.code, "low"));
           return {
             id: m.id,
             code,
