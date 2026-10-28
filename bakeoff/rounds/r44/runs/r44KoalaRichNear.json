@@ -1,0 +1,36 @@
+{
+  "slug": "r44KoalaRichNear",
+  "arm": "near",
+  "subject": "koala",
+  "level": "rich",
+  "pitch": "Category: Animal.\nSubject: koala gripping a eucalyptus branch stand.\nStyle: pixel art.",
+  "promptFile": "near-koala.md",
+  "examplesShown": {
+    "topology": "quadruped",
+    "ids": [
+      "wildBoarSonnet",
+      "rhinocerosBeetleSonnet",
+      "hippopotamusSonnet",
+      "pegasusSonnet"
+    ]
+  },
+  "model": "anthropic/claude-sonnet-5-5",
+  "effort": "low",
+  "started": "2026-10-28T21:34:01.285Z",
+  "wallMs": 51472,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 134884,
+    "completion_tokens": 6800,
+    "total_tokens": 141684,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "costUsd": 0.337768,
+  "hasCode": true,
+  "reasoning": "I'm planning a koala gripping a eucalyptus branch stand in pixel art style, using the pixel kit with cellPaint for the fur and boxes for the trunk structure, aiming for a compact but detailed scene around real-world proportions.\n\nI'm working out the pose: a horizontal branch running along X held up by a vertical trunk stand, with the koala sitting centered on top, body upright facing forward, arms wrapped down around the branch to grip it, and legs straddling either side for a natural clinging look.\n\nNow I'm planning the rig and construction approach—joints for hips, spine, head, jaw, arms, legs, and ears, built from simple boxes with a small fur-cell texel size, plus a base disc, vertical support post, and branch geometry positioned so the koala sits naturally gripping it.\n\nLaying out the torso, head, ears, nose, eyes, jaw, and belly as individual boxes with specific sizes, positions, and colors to build the koala's face and body shape.\n\nFor the limbs, I'm planning a jointed chain structure with shoulder-elbow-hand for arms and hip-knee-foot for legs, positioning hands and feet to wrap around the branch without overlapping each other, keeping grip points at the branch's radius.\n\nFor fingers, I'll add a few small boxes per hand curled over the branch, skip a tail, and add eucalyptus leaves as extruded crescent shapes in grey-green hanging around the branch ends and post top, varying their direction randomly. I'm also setting up a single root joint at the base for static props since only one root is allowed, assigning the stand/branch parts explicitly to that root bone.\n\nNow I'm defining fur and belly paints using cell-based noise coloring along a grey ramp, and writing a helper function for building colored boxes attached to bones. For the arms, I'm setting up a shoulder-elbow-hand joint chain with specific points, sweeping a box section along it with the fur color, parented to the spine joint.\n\nLegs follow a similar hip-knee-foot chain, with a darker pad-grey box for the foot and claw details planned for the toes. I'm keeping the eye texture simple with flat boxes rather than pixel art, importing helper functions for color picking and snapping, and placing head and jaw joints relative to the spine for aiming. Now I'm moving on to writing the leaf outline function, extruding along the leaf's directional axis.\n\nFor the leaves I'm deciding to make them hang downward like eucalyptus foliage, orienting the main axis vertically and the perpendicular width axis horizontally, which should read more naturally than flat horizontal leaves.\n\nFor the branch itself I'll sweep a curve from the post top through a midpoint up to a higher endpoint, giving it a bark-textured hexagonal cross-section with painted cells, then attach side twigs bearing leaves along its length.\n\n",
+  "plan": null
+}

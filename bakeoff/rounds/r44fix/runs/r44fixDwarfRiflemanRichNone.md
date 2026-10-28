@@ -1,0 +1,3 @@
+The error comes from the Playwright browser harness attaching to a Chrome extension service worker, not from the module, so nothing in the model code throws. The module has no fault that matches that stack trace, so I'm making no edits to it. Re-run the app with a clean Chromium profile and no extensions (for example, launch Playwright without `--load-extension` and without a persistent user profile that has extensions installed).
+
+One risk remains in the module: `import { metal } from "agentic-3js-builder/kits/clockwork"` could fail if the kit path doesn't resolve in your setup. I can't confirm that from this error, so I've left it as is.
