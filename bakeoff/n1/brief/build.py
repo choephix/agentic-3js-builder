@@ -12,10 +12,117 @@ OUT = PUB / "nilo-brief"
 IMG = OUT / "img"
 IMG.mkdir(parents=True, exist_ok=True)
 HERE = Path(__file__).resolve().parent
+REPO = HERE.parents[2]
+ROUNDS = HERE.parents[1] / "rounds"
+
+
+def load_json(path):
+    try:
+        return json.loads(path.read_text())
+    except (OSError, ValueError):
+        return None
+
 
 n1 = json.load(open(PUB / "n1/results.json"))
 r35 = json.load(open(PUB / "r35/data.json"))
 rows35 = {r["id"]: r for r in r35["rows"]}
+N1S = {
+    "n1sLow": (REPO / "scratch/n1s/low/results.json", PUB / "n1s-low"),
+    "n1sMedium": (REPO / "scratch/n1s/medium/results.json", PUB / "n1s-medium"),
+}
+SDK_ROUNDS = {
+    "sfl": ("r39sfl", "Flat", "low"),
+    "sfm": ("r39sfm", "Flat", "medium"),
+}
+SDK_SOURCE_ROUNDS = {
+    "s:low": "r35sl",
+    "s:medium": "r35sm",
+    "s:high": "r35sh",
+    "s:flat": "r35sm",
+    "s:two1": "r35sm",
+    "s:two": "r35sm",
+}
+
+
+def snapshot(slug):
+    for lane in ("A", "B"):
+        p = PUB / "snaps" / slug / lane / "snaps"
+        if (p / "v01-three-quarter.png").exists():
+            return p / "v01-three-quarter.png", p / "v01-sheet.jpg"
+    return None, None
+
+
+def sdk_round_cell(round_id, subject, arm):
+    slug = f"{round_id}{subject[0].upper()}{subject[1:]}Rich{arm}"
+    run = load_json(ROUNDS / round_id / "runs" / f"{slug}.json")
+    if not run:
+        return None
+    chk = load_json(ROUNDS / round_id / "checks" / f"{slug}.json")
+    img, sheet = snapshot(slug)
+    report = (chk or {}).get("report") or {}
+    state = (
+        "failed"
+        if run.get("status") != 200 or not run.get("hasCode")
+        else "rendering"
+        if not chk
+        else "ok"
+        if chk.get("rendered") and img
+        else "crashed"
+    )
+    fix = None
+    fix_round = f"{round_id}fix"
+    fix_slug = slug.replace(round_id, fix_round, 1)
+    frun = load_json(ROUNDS / fix_round / "runs" / f"{fix_slug}.json")
+    if frun:
+        fchk = load_json(ROUNDS / fix_round / "checks" / f"{fix_slug}.json")
+        fimg, fsheet = snapshot(fix_slug)
+        freport = (fchk or {}).get("report") or {}
+        fstate = (
+            "failed"
+            if not frun.get("hasCode")
+            else "rendering"
+            if not fchk
+            else "ok"
+            if fchk.get("rendered") and fimg
+            else "crashed"
+        )
+        fix = {
+            "state": fstate,
+            "img": fimg,
+            "sheet": fsheet,
+            "wall": round((frun.get("wallMs") or 0) / 1000),
+            "tris": freport.get("triangles"),
+        }
+    if state != "ok" and fix and fix["img"]:
+        img, sheet, report = fix["img"], fix["sheet"], {
+            **report,
+            "triangles": fix["tris"],
+        }
+    wall = round((run.get("wallMs") or 0) / 1000)
+    return {
+        "slug": slug,
+        "img": img,
+        "sheet": sheet,
+        "t": wall + (fix["wall"] if state != "ok" and fix and fix["img"] else 0),
+        "tris": report.get("triangles"),
+        "cost": run.get("costUsd"),
+        "repaired": bool(fix and fix.get("img") and state != "ok"),
+        **texture_info(round_id, slug),
+    }
+
+
+def sdk_round_cells(round_id, arm):
+    return {s["id"]: sdk_round_cell(round_id, s["id"], arm) for s in n1["subjects"]}
+def texture_info(round_id, slug):
+    path = ROUNDS / round_id / "builds" / f"{slug}.ts"
+    text = path.read_text() if path.exists() else ""
+    svgs = len(re.findall(r"\bsvg\s*\(", text))
+    options = len(re.findall(r"\btexture\s*:", text))
+    return {
+        "svgCalls": svgs,
+        "textureOptions": options,
+        "textures": bool(svgs or options),
+    }
 
 
 def fx(c):
@@ -80,19 +187,91 @@ def brief_text(b):
         "style": (style.group(1).rstrip(".") if style else ""),
         "category": (cat.group(1).rstrip(".") if cat else ""),
     }
+SDK_DATA = {}
+for key, (round_id, arm, _) in SDK_ROUNDS.items():
+    if not (ROUNDS / round_id / "runs").exists():
+        continue
+    cells = sdk_round_cells(round_id, arm)
+    if len(cells) == len(n1["subjects"]) and all(c and c["img"] for c in cells.values()):
+        SDK_DATA[key] = cells
+N1S_DATA = {}
+for key, (path, render_root) in N1S.items():
+    data = load_json(path)
+    if not data or len(data.get("subjects", [])) != len(n1["subjects"]):
+        continue
+    if not all((r.get("final") or {}).get("renderPaths") for r in data["subjects"]):
+        continue
+    N1S_DATA[key] = (data, render_root)
+N1S_ROWS = {key: {r["id"]: r for r in data["subjects"]} for key, (data, _) in N1S_DATA.items()}
+
+
+def render_sdk_round(c, bid, name):
+    return {
+        "img": thumb(c["img"], f"{bid}-{name}.webp", trim=True),
+        "full": sdk_sheet(c["img"].parent, f"{bid}-{name}.jpg"),
+        "t": c["t"],
+        "tris": c["tris"],
+        "cost": c["cost"],
+        "repaired": c["repaired"],
+        "textures": c.get("textures", False),
+        "svgCalls": c.get("svgCalls", 0),
+        "textureOptions": c.get("textureOptions", 0),
+    }
+
+
+def render_n1s(row, render_root, bid, name):
+    fin = row.get("final") or {}
+    draft_paths = [render_root / p for p in fin.get("draftRenderPaths", [])]
+    final_paths = [render_root / p for p in fin.get("renderPaths", [])]
+    calls = [
+        {"role": c["role"] + (f" {c['round']}" if c.get("round") else ""), "s": round(c["latencyMs"] / 1000, 1)}
+        for c in row.get("calls", [])
+    ]
+    patch_repairs = row.get("patchRepairs") or 0
+    run_failures = row.get("runFailures") or 0
+    repair_note = (
+        f"{patch_repairs} patch repair(s)" if patch_repairs else f"{run_failures} sandbox retry(ies)" if run_failures else ""
+    )
+    return {
+        "img": thumb(final_paths[0], f"{bid}-{name}.webp"),
+        "full": quad(final_paths, f"{bid}-{name}.jpg"),
+        "draftImg": thumb(draft_paths[0], f"{bid}-{name}-draft.webp") if draft_paths else None,
+        "draftFull": quad(draft_paths, f"{bid}-{name}-draft.jpg") if draft_paths else None,
+        "draftT": round((row.get("firstValidMs") or 0) / 1000),
+        "t": round((row.get("wallMs") or 0) / 1000),
+        "tris": fin.get("triangles"),
+        "cost": round(row.get("costUsd") or 0, 3),
+        "calls": calls,
+        "repaired": bool(repair_note),
+        "repairNote": repair_note,
+        "textures": False,
+    }
+
 
 
 COLS = [
     ("lpDraft", "Nilo today", "first draft"),
     ("lpFinal", "Nilo today", "final"),
     ("flat", "SDK, one call", "final"),
+    ("low", "SDK, low effort (context)", "final"),
     ("two1", "SDK, two-stage", "first draft"),
     ("two", "SDK, two-stage", "final"),
     ("high", "SDK, high effort", "final"),
 ]
+for key, label, effort in [("sfl", "SDK, low effort, flat", "low"), ("sfm", "SDK, medium effort, flat", "medium")]:
+    if key in SDK_DATA:
+        COLS.append((key, label, "final"))
+for key, label in [("n1sLow", "Nilo on Sonnet, low"), ("n1sMedium", "Nilo on Sonnet, medium")]:
+    if key in N1S_DATA:
+        COLS.append((key, label, "final"))
+        COLS.append((key + "Draft", label, "first draft"))
+
 
 briefs = []
-vals = {k: {"look": [], "final": [], "tris": [], "cost": [], "calls": []} for k in ["lp", "flat", "two", "high", "medium", "low"]}
+vals = {
+    k: {"look": [], "final": [], "tris": [], "cost": [], "calls": [], "textures": []}
+    for k in ["lp", "flat", "two", "high", "medium", "low", *SDK_DATA, *N1S_DATA]
+}
 
 for s in n1["subjects"]:
     bid = s["id"]
@@ -136,14 +315,20 @@ for s in n1["subjects"]:
             "tris": c["tris"],
             "cost": c["cost"],
             "repaired": c["repaired"],
+            **texture_info(SDK_SOURCE_ROUNDS[key], c.get("slug")),
         }
 
-    for key, name, bucket in [("s:flat", "flat", "flat"), ("s:high", "high", "high")]:
+    for key, name, bucket in [
+        ("s:flat", "flat", "flat"),
+        ("s:low", "low", "low"),
+        ("s:high", "high", "high"),
+    ]:
         c, cell = sdk(key, name)
         cells[name] = cell
         vals[bucket]["final"].append(c["toWorking"])
         vals[bucket]["tris"].append(c["tris"])
         vals[bucket]["cost"].append(c["cost"])
+        vals[bucket]["textures"].append(cell.get("textures", False))
     c1, cells["two1"] = sdk("s:two1", "two1")
     c2, cells["two"] = sdk("s:two", "two")
     s2 = r["cells"]["s:two"]["stage2"]
@@ -156,11 +341,38 @@ for s in n1["subjects"]:
     vals["two"]["final"].append(c2["toWorking"])
     vals["two"]["tris"].append(c2["tris"])
     vals["two"]["cost"].append(c2["cost"])
-    for key, bucket in [("s:medium", "medium"), ("s:low", "low")]:
-        c = fx(r["cells"][key])
-        vals[bucket]["final"].append(c["toWorking"])
-        vals[bucket]["tris"].append(c["tris"])
-        vals[bucket]["cost"].append(c["cost"])
+    vals["two"]["textures"].append(cells["two"].get("textures", False))
+    c = fx(r["cells"]["s:medium"])
+    vals["medium"]["final"].append(c["toWorking"])
+    vals["medium"]["tris"].append(c["tris"])
+    vals["medium"]["cost"].append(c["cost"])
+    vals["medium"]["textures"].append(texture_info(SDK_SOURCE_ROUNDS["s:medium"], c.get("slug"))["textures"])
+    for key, (round_id, arm, _) in SDK_ROUNDS.items():
+        if key not in SDK_DATA:
+            continue
+        c = SDK_DATA[key][bid]
+        if not c or not c["img"]:
+            continue
+        cells[key] = render_sdk_round(c, bid, key)
+        vals[key]["final"].append(c["t"])
+        vals[key]["tris"].append(c["tris"])
+        vals[key]["cost"].append(c["cost"])
+        vals[key]["textures"].append(c.get("textures", False))
+    for key, (data, render_root) in N1S_DATA.items():
+        row = N1S_ROWS[key][bid]
+        cells[key] = render_n1s(row, render_root, bid, key)
+        cells[key + "Draft"] = {
+            "img": cells[key]["draftImg"],
+            "full": cells[key]["draftFull"],
+            "t": cells[key]["draftT"],
+            "note": "First valid build shown while later loop rounds run.",
+        }
+        vals[key]["look"].append((row.get("firstValidMs") or 0) / 1000)
+        vals[key]["final"].append(row.get("wallMs", 0) / 1000)
+        vals[key]["tris"].append((row.get("final") or {}).get("triangles"))
+        vals[key]["cost"].append(row.get("costUsd"))
+        vals[key]["calls"].append(row.get("callCount"))
+        vals[key]["textures"].append(False)
     briefs.append({"id": bid, **brief_text(r["brief"]), "cells": cells})
 
 
@@ -182,6 +394,13 @@ for k, v in vals.items():
         "tris": {"med": tk(st.median(v["tris"])), "range": f"{tk(min(v['tris']))}–{tk(max(v['tris']))}"},
         "cost": mr(v["cost"], money=True),
     }
+    S[k]["textures"] = {
+        "count": sum(v["textures"]),
+        "total": len(v["textures"]),
+        "summary": f"{sum(v['textures'])} of {len(v['textures'])} builds",
+    }
+    if v["calls"]:
+        S[k]["calls"] = mr(v["calls"])
     if v["look"]:
         S[k]["look"] = mr(v["look"], " s")
 
@@ -197,6 +416,14 @@ for b in briefs:
     for i, w in enumerate(ws):
         lanes.setdefault(i, []).append(w)
 two_lanes = [round(st.median(v), 1) for _, v in sorted(lanes.items())]
+def n1s_timeline(key):
+    roles = {}
+    for row in N1S_DATA[key][0]["subjects"]:
+        for call in row.get("calls", []):
+            roles.setdefault(call["role"] + str(call.get("round", "")), []).append(call["latencyMs"] / 1000)
+    return {k: round(st.median(v), 1) for k, v in roles.items()}
+
+
 
 TIMELINE = {
     "lp": lp_seg,
@@ -210,17 +437,31 @@ TIMELINE = {
     "low": S["low"]["final"]["raw"],
     "high": S["high"]["final"]["raw"],
 }
+for key in SDK_DATA:
+    TIMELINE[key] = {"look": S[key]["final"]["raw"], "final": S[key]["final"]["raw"], "segments": {}}
+for key in N1S_DATA:
+    TIMELINE[key] = {
+        "look": S[key]["look"]["raw"],
+        "final": S[key]["final"]["raw"],
+        "segments": n1s_timeline(key),
+    }
 
 data = {"cols": COLS, "briefs": briefs, "stats": S, "timeline": TIMELINE}
 html = (HERE / "template.html").read_text()
-for k in ["lp", "flat", "two", "high", "medium", "low"]:
-    for m in ["final", "look", "tris", "cost"]:
+for k in ["lp", "flat", "two", "high", "medium", "low", *SDK_DATA, *N1S_DATA]:
+    for m in ["final", "look", "tris", "cost", "calls"]:
         if m in S[k]:
             html = html.replace(f"{{{{{k}.{m}}}}}", S[k][m]["med"]).replace(f"{{{{{k}.{m}.range}}}}", S[k][m]["range"])
+    html = html.replace(f"{{{{{k}.textures}}}}", S[k]["textures"]["summary"])
 html = html.replace("/*DATA*/", "const DATA = " + json.dumps(data, separators=(",", ":")) + ";")
 left = re.findall(r"\{\{[^}]+\}\}", html)
 assert not left, left
 (OUT / "index.html").write_text(html)
 print(OUT / "index.html", sum(f.stat().st_size for f in IMG.iterdir()) // 1024, "KB images")
-print(json.dumps({k: {m: x["med"] + " (" + x["range"] + ")" for m, x in v.items()} for k, v in S.items()}, indent=1))
+print(
+    json.dumps(
+        {k: {m: x["med"] + " (" + x["range"] + ")" for m, x in v.items() if "med" in x} for k, v in S.items()},
+        indent=1,
+    )
+)
 print(TIMELINE)

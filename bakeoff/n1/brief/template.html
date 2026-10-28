@@ -355,6 +355,10 @@
         color: var(--nilo);
         font-weight: 650;
       }
+      .tile .texture {
+        color: #7a4c20;
+        font-weight: 650;
+      }
       .tile.look {
         border-style: dashed;
       }
@@ -519,17 +523,19 @@
       <header>
         <h1>Text to 3D model, faster: an SDK engine for Nilo's model generator</h1>
         <p class="lead narrow">
-          We built a TypeScript library of modelling helpers that a language model writes code against, and ran it on 20
-          briefs next to Nilo's current low-poly generator. One Sonnet 5.5 call against the SDK delivers a finished
-          model in a median of <strong>{{flat.final}}</strong>. Nilo's loop takes <strong>{{lp.final}}</strong> to its
-          final model and shows a first draft at {{lp.look}}. We propose adding the SDK as a second engine behind the
-          existing <code>generate_low_poly_model</code> tool, behind a flag, starting with the one-call version.
+          We ran Nilo's current low-poly loop and the SDK on the same 20 briefs with Sonnet 5.5, at low and medium
+          reasoning. In the new batch, Nilo's loop reaches a first draft in <strong>{{n1sLow.look}}</strong> and a final
+          model in <strong>{{n1sLow.final}}</strong> at low; at medium it reaches a first draft in
+          <strong>{{n1sMedium.look}}</strong> and a final model in <strong>{{n1sMedium.final}}</strong>. The SDK's
+          one-call flat arms finish in <strong>{{sfl.final}}</strong> and <strong>{{sfm.final}}</strong> (their first
+          look is their final). Which looks better is judged by eye from the renders below; this page makes no visual
+          verdict.
         </p>
         <div class="callout narrow small">
-          <strong>Read the comparison with one caveat.</strong> Low-poly ran on Gemini 3.8 Flash, its production model,
-          and the SDK on Sonnet 5.5, so the engine and the model changed at once. Running each engine on the other's
-          model is the first item under <a href="#next">next steps</a>. The looks are yours to judge in the
-          <a href="#gallery">side-by-side renders</a>.
+          <strong>Compare within the new batch.</strong> The matched columns use Sonnet 5.5 at the same effort, but batch
+          speed can drift. The textured SDK-low column is gallery context only, and the older Gemini-vs-Sonnet cards are
+          labelled as an earlier batch on different models. See the <a href="#method">measurement caveats</a> and the
+          <a href="#gallery">side-by-side renders</a>; this page makes no visual verdict.
         </div>
         <nav class="toc" aria-label="Sections">
           <a href="#stand">At a glance</a><a href="#what">What the SDK is</a
@@ -541,18 +547,92 @@
 
       <main>
         <section id="stand" aria-labelledby="h-stand">
-          <h2 id="h-stand">At a glance: the same 20 briefs, four ways</h2>
+          <h2 id="h-stand">At a glance: same model, both engines</h2>
+          <p class="narrow">
+            These four cards are the matched comparison: Sonnet 5.5 at the same effort, on the same 20 briefs, in the
+            new batch. The SDK side is the flat-colour one-call arm. The renders are yours to judge; these numbers do not
+            say which looks better.
+          </p>
           <div class="cards">
             <div class="card nilo">
-              <h3>Nilo low-poly, today</h3>
-              <div class="who">Gemini 3.8 Flash, medium reasoning. Design, build, critique, build.</div>
+              <h3>Nilo loop, Sonnet low</h3>
+              <div class="who">Today's design → build → critique → build loop; low reasoning.</div>
+              <dl>
+                <dt>First draft</dt>
+                <dd>{{n1sLow.look}}<span class="r">{{n1sLow.look.range}}</span></dd>
+                <dt>Final model</dt>
+                <dd>{{n1sLow.final}}<span class="r">{{n1sLow.final.range}}</span></dd>
+                <dt>Model calls</dt>
+                <dd>{{n1sLow.calls}}</dd>
+                <dt>Triangles</dt>
+                <dd>{{n1sLow.tris}}</dd>
+                <dt>Cost per model</dt>
+                <dd>{{n1sLow.cost}}</dd>
+              </dl>
+            </div>
+            <div class="card sdk">
+              <h3>SDK, Sonnet low</h3>
+              <div class="who">One call, flat colour, low reasoning; at most one repair.</div>
+              <dl>
+                <dt>First draft</dt>
+                <dd>same as final</dd>
+                <dt>Final model</dt>
+                <dd>{{sfl.final}}<span class="r">{{sfl.final.range}}</span></dd>
+                <dt>Model calls</dt>
+                <dd>1 (+ repair if needed)</dd>
+                <dt>Triangles</dt>
+                <dd>{{sfl.tris}}</dd>
+                <dt>Cost per model</dt>
+                <dd>{{sfl.cost}}</dd>
+              </dl>
+            </div>
+            <div class="card nilo">
+              <h3>Nilo loop, Sonnet medium</h3>
+              <div class="who">Today's design → build → critique → build loop; medium reasoning.</div>
+              <dl>
+                <dt>First draft</dt>
+                <dd>{{n1sMedium.look}}<span class="r">{{n1sMedium.look.range}}</span></dd>
+                <dt>Final model</dt>
+                <dd>{{n1sMedium.final}}<span class="r">{{n1sMedium.final.range}}</span></dd>
+                <dt>Model calls</dt>
+                <dd>{{n1sMedium.calls}}</dd>
+                <dt>Triangles</dt>
+                <dd>{{n1sMedium.tris}}</dd>
+                <dt>Cost per model</dt>
+                <dd>{{n1sMedium.cost}}</dd>
+              </dl>
+            </div>
+            <div class="card sdk">
+              <h3>SDK, Sonnet medium</h3>
+              <div class="who">One call, flat colour, medium reasoning; at most one repair.</div>
+              <dl>
+                <dt>First draft</dt>
+                <dd>same as final</dd>
+                <dt>Final model</dt>
+                <dd>{{sfm.final}}<span class="r">{{sfm.final.range}}</span></dd>
+                <dt>Model calls</dt>
+                <dd>1 (+ repair if needed)</dd>
+                <dt>Triangles</dt>
+                <dd>{{sfm.tris}}</dd>
+                <dt>Cost per model</dt>
+                <dd>{{sfm.cost}}</dd>
+              </dl>
+            </div>
+          </div>
+          <h3>Earlier batch, different models</h3>
+          <p class="narrow small">
+            These are retained as context, not as the fair head-to-head: Gemini 3.8 Flash drove Nilo while Sonnet 5.5
+            drove the SDK, and batch speed drifted. Column A is the SDK's Sonnet-low one-call run with textures.
+          </p>
+          <div class="cards">
+            <div class="card nilo">
+              <h3>Nilo low-poly, Gemini</h3>
+              <div class="who">Earlier batch; medium reasoning, quality 2.</div>
               <dl>
                 <dt>First draft</dt>
                 <dd>{{lp.look}}<span class="r">{{lp.look.range}}</span></dd>
                 <dt>Final model</dt>
                 <dd>{{lp.final}}<span class="r">{{lp.final.range}}</span></dd>
-                <dt>Model calls</dt>
-                <dd>3–4</dd>
                 <dt>Triangles</dt>
                 <dd>{{lp.tris}}</dd>
                 <dt>Cost per model</dt>
@@ -560,63 +640,37 @@
               </dl>
             </div>
             <div class="card sdk">
-              <h3>SDK, one call</h3>
-              <div class="who">Sonnet 5.5, medium effort, flat colours (no textures).</div>
+              <h3>SDK, low effort, textures</h3>
+              <div class="who">Gallery context only; earlier batch, one Sonnet call.</div>
               <dl>
-                <dt>First draft</dt>
-                <dd>same as final</dd>
                 <dt>Final model</dt>
-                <dd>{{flat.final}}<span class="r">{{flat.final.range}}</span></dd>
-                <dt>Model calls</dt>
-                <dd>1</dd>
+                <dd>{{low.final}}<span class="r">{{low.final.range}}</span></dd>
                 <dt>Triangles</dt>
-                <dd>{{flat.tris}}</dd>
+                <dd>{{low.tris}}</dd>
+                <dt>Texture code</dt>
+                <dd>{{low.textures}}</dd>
                 <dt>Cost per model</dt>
-                <dd>{{flat.cost}}</dd>
+                <dd>{{low.cost}}</dd>
               </dl>
-              <span class="pick">Proposed first step</span>
             </div>
             <div class="card sdk">
-              <h3>SDK, two-stage</h3>
-              <div class="who">
-                Sonnet 5.5, medium. A flat draft that lists what it wants added, then 7 calls at once add parts and
-                textures.
-              </div>
+              <h3>SDK, one call, medium flat</h3>
+              <div class="who">Earlier batch; shown for context beside the matched medium arm.</div>
               <dl>
-                <dt>First draft</dt>
-                <dd>{{two.look}}<span class="r">{{two.look.range}}</span></dd>
                 <dt>Final model</dt>
-                <dd>{{two.final}}<span class="r">{{two.final.range}}</span></dd>
-                <dt>Model calls</dt>
-                <dd>8</dd>
+                <dd>{{flat.final}}<span class="r">{{flat.final.range}}</span></dd>
                 <dt>Triangles</dt>
-                <dd>{{two.tris}}</dd>
+                <dd>{{flat.tris}}</dd>
+                <dt>Texture code</dt>
+                <dd>{{flat.textures}}</dd>
                 <dt>Cost per model</dt>
-                <dd>{{two.cost}}</dd>
-              </dl>
-            </div>
-            <div class="card top">
-              <h3>SDK, high effort</h3>
-              <div class="who">
-                Sonnet 5.5, high effort, one call with textures. The best looks we have, and the slowest.
-              </div>
-              <dl>
-                <dt>First draft</dt>
-                <dd>same as final</dd>
-                <dt>Final model</dt>
-                <dd>{{high.final}}<span class="r">{{high.final.range}}</span></dd>
-                <dt>Model calls</dt>
-                <dd>1</dd>
-                <dt>Triangles</dt>
-                <dd>{{high.tris}}</dd>
-                <dt>Cost per model</dt>
-                <dd>{{high.cost}}</dd>
+                <dd>{{flat.cost}}</dd>
               </dl>
             </div>
           </div>
           <p class="mute small narrow">
-            Medians, with the fastest and slowest brief underneath. Every pipeline ended with a usable model on all 20
-            briefs. SDK times include the repair call when a first build crashed.
+            Medians, with the fastest and slowest brief underneath. Every completed pipeline produced a usable model on
+            all 20 briefs. Times include the repair call when a first build crashed.
           </p>
         </section>
 
@@ -723,6 +777,8 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
             runs. The time under each tile is when that build was ready. Click any tile to see every angle and how the
             time was spent. Each pipeline renders with its own viewer, so backgrounds and lighting differ. Low-poly's
             first-round draft is hidden by default; switch it on with "Nilo today: first draft" below.
+            The matched columns are Nilo on Sonnet low/medium and the SDK flat low/medium; the SDK-low textured column is
+            context only and is labelled in its toggle.
           </p>
           <div class="toolbar" role="toolbar" aria-label="Columns">
             <span class="lbl">Show:</span>
@@ -871,12 +927,12 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
               <tbody>
                 <tr>
                   <td class="num">1</td>
-                  <td><span class="tag t-int">integration</span> Sonnet 5.5 on today's low-poly loop</td>
+                  <td><span class="tag t-int">done</span> Sonnet 5.5 on today's low-poly loop</td>
                   <td>
-                    Whether the gap comes from the SDK or from the model. The World Agent's admin model menu already
-                    supports this, so it needs no code.
+                    Whether the gap comes from the SDK or from the model. The low and medium matched runs are now in
+                    the gallery; they use the same model and effort on both engines.
                   </td>
-                  <td class="num">~$5</td>
+                  <td class="num">$16.72 new batch</td>
                 </tr>
                 <tr>
                   <td class="num">2</td>
@@ -988,31 +1044,66 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
             <summary>Setup, caveats and the full numbers</summary>
             <ul>
               <li>
-                <strong>Briefs.</strong> 20 gallery briefs, each a category, a subject and a style, for example "piano
-                accordion, Italian mother-of-pearl". Two per category for most of 12 categories: animals, monsters,
-                humanoid characters, fantastical creatures, architecture, dioramas, abstract pieces, objects, plants, a
-                vehicle, a weapon and a prop group.
+                <strong>Briefs and batch.</strong> All four new arms used the same 20 r24 <code>rich</code> briefs and ran
+                together from 15:18:55 to 15:32:06 +02. Compare within this batch: another batch can be up to twice as
+                slow.
               </li>
               <li>
-                <strong>Low-poly.</strong> Nilo's own builder loop and prompts, imported from the Nilo repo, run through
-                its real sandbox harness on a desktop NVIDIA GPU. Gemini 3.8 Flash at medium reasoning,
-                <code>quality: 2</code>, <code>scope: prop</code>. Model calls went through a local gateway rather than
-                the Firebase callable, so network and queueing differ from production. Production latencies weren't
-                available.
+                <strong>More visual iteration favours today's loop.</strong> Low-poly gets a design call, up to two build
+                rounds and a critique between rounds; the critic and next builder see four high-detail renders. The SDK
+                gets one generation call and at most one repair, with no visual feedback.
               </li>
               <li>
-                <strong>SDK.</strong> Sonnet 5.5 through the Anthropic API, all SDK columns in one batch. Times run from
-                the request to a working model, including any repair.
+                <strong>Different correctness gates.</strong> Low-poly uses Nilo's runtime and scene validation; its
+                failed sandbox result becomes feedback for the next round. SDK builds use an explicit TypeScript check
+                and typecheck-gated repair, plus the SDK packing harness.
               </li>
               <li>
-                <strong>Batches drift.</strong> The same setup can run up to twice as slow in a different batch. This
-                SDK batch ran next to other experiments and came out slower than earlier ones: one call in flat colour
-                took 109 s here and 63–66 s in an earlier batch of vehicle briefs. Compare numbers within this page, not
-                with numbers from elsewhere.
+                <strong>Prompt context differs.</strong> The SDK prompt includes about 74k tokens of library/API/style
+                reference, mostly cached. Low-poly gets Nilo's smaller instruction pack, but its separate design answer
+                supplies extra planning context.
               </li>
               <li>
-                <strong>Cost.</strong> Per model, as billed in these runs: Sonnet with its prompt prefix cached, Gemini
-                at list price.
+                <strong>Output headroom differs.</strong> These SDK runs allowed a 120k output cap; Nilo's shipped
+                low-poly build turns use a 64k cap (with design and critique caps below that). Actual outputs were far
+                below either cap. PR #13860 repairs after a failed sandbox run and has no typecheck; these bakeoff SDK
+                arms used typecheck-gated repair.
+              </li>
+              <li>
+                <strong>Geometry budgets differ.</strong> Nilo guides props toward about 10k triangles and warns above
+                24 directly articulated entities (hard fail at 100k triangles). SDK docs target 180–340 parts, allow
+                1,000 parts and a 60k soft triangle budget (120k lab ceiling). That gives the SDK more geometry/detail
+                headroom.
+              </li>
+              <li>
+                <strong>Rigging differs.</strong> The SDK prompt supports joints and skinned creature parts; Nilo's
+                low-poly contract forbids <code>SkinnedMesh</code> and animation. The page shows static renders either
+                way, and makes no visual verdict.
+              </li>
+              <li>
+                <strong>Textures are not the matched comparison.</strong> The fair pairs are SDK flat low/medium against
+                Nilo Sonnet low/medium. The existing SDK Sonnet-low textured column is gallery context only. Low-poly
+                forbids texture code; the table and tile markers count SDK <code>svg()</code> calls and
+                <code>texture:</code> options, including leaks in flat prompts.
+              </li>
+              <li>
+                <strong>Caching and call count differ.</strong> Both use the local auth gateway and prefix caching. The SDK
+                has a large static cached prefix; low-poly repeats role prompts and transcripts. Low-poly normally spends
+                3–4 or more turns per prop; SDK spends one plus a rare repair.
+              </li>
+              <li>
+                <strong>Runtime contracts differ.</strong> SDK modules are TypeScript imported and packed by the SDK
+                harness; low-poly is import-free JavaScript run by Nilo's three.js sandbox. Neither is a neutral shared
+                checker, so failures are not directly equivalent.
+              </li>
+              <li>
+                <strong>Rendering environment.</strong> Chromium renders used the NVIDIA RTX 3060. Model calls went
+                through <code>omp auth-gateway stdio</code> rather than the Firebase callable, so production queueing and
+                network latency are not measured.
+              </li>
+              <li>
+                <strong>Cost.</strong> Costs are list-price equivalents recorded by the gateway, with Sonnet's prompt
+                prefix cache reads. The new batch totals about $16.72 across four arms; looks remain Stefan's call.
               </li>
             </ul>
             <div class="scroll">
@@ -1023,15 +1114,49 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
                     <th scope="col">First draft</th>
                     <th scope="col">Final</th>
                     <th scope="col">Triangles</th>
+                    <th scope="col">Texture code</th>
                     <th scope="col">Cost</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
+                    <th scope="row">Nilo loop, Sonnet low</th>
+                    <td class="num">{{n1sLow.look}} ({{n1sLow.look.range}})</td>
+                    <td class="num">{{n1sLow.final}} ({{n1sLow.final.range}})</td>
+                    <td class="num">{{n1sLow.tris}} ({{n1sLow.tris.range}})</td>
+                    <td class="num">forbidden</td>
+                    <td class="num">{{n1sLow.cost}} ({{n1sLow.cost.range}})</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">SDK, Sonnet low, flat</th>
+                    <td class="num">—</td>
+                    <td class="num">{{sfl.final}} ({{sfl.final.range}})</td>
+                    <td class="num">{{sfl.tris}} ({{sfl.tris.range}})</td>
+                    <td class="num">{{sfl.textures}}</td>
+                    <td class="num">{{sfl.cost}} ({{sfl.cost.range}})</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Nilo loop, Sonnet medium</th>
+                    <td class="num">{{n1sMedium.look}} ({{n1sMedium.look.range}})</td>
+                    <td class="num">{{n1sMedium.final}} ({{n1sMedium.final.range}})</td>
+                    <td class="num">{{n1sMedium.tris}} ({{n1sMedium.tris.range}})</td>
+                    <td class="num">forbidden</td>
+                    <td class="num">{{n1sMedium.cost}} ({{n1sMedium.cost.range}})</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">SDK, Sonnet medium, flat</th>
+                    <td class="num">—</td>
+                    <td class="num">{{sfm.final}} ({{sfm.final.range}})</td>
+                    <td class="num">{{sfm.tris}} ({{sfm.tris.range}})</td>
+                    <td class="num">{{sfm.textures}}</td>
+                    <td class="num">{{sfm.cost}} ({{sfm.cost.range}})</td>
+                  </tr>
+                  <tr>
                     <th scope="row">Low-poly, Gemini 3.8 Flash</th>
                     <td class="num">{{lp.look}} ({{lp.look.range}})</td>
                     <td class="num">{{lp.final}} ({{lp.final.range}})</td>
                     <td class="num">{{lp.tris}} ({{lp.tris.range}})</td>
+                    <td class="num">forbidden</td>
                     <td class="num">{{lp.cost}} ({{lp.cost.range}})</td>
                   </tr>
                   <tr>
@@ -1039,6 +1164,7 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
                     <td class="num">—</td>
                     <td class="num">{{low.final}} ({{low.final.range}})</td>
                     <td class="num">{{low.tris}} ({{low.tris.range}})</td>
+                    <td class="num">{{low.textures}}</td>
                     <td class="num">{{low.cost}} ({{low.cost.range}})</td>
                   </tr>
                   <tr>
@@ -1046,6 +1172,7 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
                     <td class="num">—</td>
                     <td class="num">{{flat.final}} ({{flat.final.range}})</td>
                     <td class="num">{{flat.tris}} ({{flat.tris.range}})</td>
+                    <td class="num">{{flat.textures}}</td>
                     <td class="num">{{flat.cost}} ({{flat.cost.range}})</td>
                   </tr>
                   <tr>
@@ -1053,6 +1180,7 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
                     <td class="num">—</td>
                     <td class="num">{{medium.final}} ({{medium.final.range}})</td>
                     <td class="num">{{medium.tris}} ({{medium.tris.range}})</td>
+                    <td class="num">{{medium.textures}}</td>
                     <td class="num">{{medium.cost}} ({{medium.cost.range}})</td>
                   </tr>
                   <tr>
@@ -1060,6 +1188,7 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
                     <td class="num">{{two.look}} ({{two.look.range}})</td>
                     <td class="num">{{two.final}} ({{two.final.range}})</td>
                     <td class="num">{{two.tris}} ({{two.tris.range}})</td>
+                    <td class="num">{{two.textures}}</td>
                     <td class="num">{{two.cost}} ({{two.cost.range}})</td>
                   </tr>
                   <tr>
@@ -1067,6 +1196,7 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
                     <td class="num">—</td>
                     <td class="num">{{high.final}} ({{high.final.range}})</td>
                     <td class="num">{{high.tris}} ({{high.tris.range}})</td>
+                    <td class="num">{{high.textures}}</td>
                     <td class="num">{{high.cost}} ({{high.cost.range}})</td>
                   </tr>
                 </tbody>
@@ -1079,19 +1209,23 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
           <h2 id="h-glance" style="border: none; margin: 0 0 0.3rem; padding: 0; font-size: 1.1rem">In short</h2>
           <ul>
             <li>
-              An SDK engine builds a finished model from text in about {{flat.final}} with one Sonnet call, against
-              {{lp.final}} for today's low-poly loop. Model and engine changed together, so the first experiment
-              separates them.
+              The fair runs now hold the model and effort constant: Nilo's loop finishes in
+              {{n1sLow.final}} at low and {{n1sMedium.final}} at medium; the SDK flat one-call arms finish in
+              {{sfl.final}} and {{sfm.final}}. The matched numbers answer the model-versus-engine question; the looks are
+              still Stefan's call.
             </li>
             <li>
-              Proposal: a second engine behind <code>generate_low_poly_model</code>, behind a flag, one call in flat
-              colour at medium effort.
+              Next step 1 is done: both engines ran through the same Sonnet 5.5 model on the same 20 briefs. The proposed
+              integration remains a flag on <code>generate_low_poly_model</code>; the page does not choose an engine.
             </li>
             <li>
-              Higher reasoning effort looks clearly better and costs minutes; flat colour and parallel calls are the two
-              things that cut time.
+              The SDK-low textured run is gallery context only. For fairness, compare flat SDK low with Nilo Sonnet low,
+              and flat SDK medium with Nilo Sonnet medium.
             </li>
-            <li>Five decisions are open, listed under <a href="#ask" style="color: #9cc3ff">Decisions we need</a>.</li>
+            <li>
+              The open decisions are listed under <a href="#ask" style="color: #9cc3ff">Decisions we need</a>; no visual
+              verdict is implied by these timings, costs or triangle counts.
+            </li>
           </ul>
         </section>
       </main>
@@ -1142,16 +1276,38 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
         return e;
       };
       const fmtK = (n) => (n == null ? "—" : (n / 1000).toFixed(1) + "k");
-      const GROUP = { lpDraft: "g-nilo", lpFinal: "g-nilo", flat: "g-sdk", two1: "g-sdk", two: "g-sdk", high: "g-top" };
+      const GROUP = {
+        lpDraft: "g-nilo",
+        lpFinal: "g-nilo",
+        n1sLow: "g-nilo",
+        n1sLowDraft: "g-nilo",
+        n1sMedium: "g-nilo",
+        n1sMediumDraft: "g-nilo",
+        flat: "g-sdk",
+        low: "g-sdk",
+        sfl: "g-sdk",
+        sfm: "g-sdk",
+        two1: "g-sdk",
+        two: "g-sdk",
+        high: "g-top",
+      };
       const SUB = {
         lpDraft: "Gemini 3.8 Flash",
         lpFinal: "Gemini 3.8 Flash",
+        n1sLow: "Sonnet 5.5, low, Nilo loop",
+        n1sLowDraft: "Sonnet 5.5, low, Nilo loop",
+        n1sMedium: "Sonnet 5.5, medium, Nilo loop",
+        n1sMediumDraft: "Sonnet 5.5, medium, Nilo loop",
         flat: "Sonnet 5.5, medium, flat",
+        low: "Sonnet 5.5, low, textures · gallery context",
+        sfl: "Sonnet 5.5, low, flat",
+        sfm: "Sonnet 5.5, medium, flat",
         two1: "Sonnet 5.5, medium",
         two: "Sonnet 5.5, medium",
         high: "Sonnet 5.5, high, textures",
       };
-      const shown = new Set(DATA.cols.map((c) => c[0]).filter((k) => k !== "lpDraft"));
+      const HIDDEN_BY_DEFAULT = new Set(["lpDraft", "low", "n1sLowDraft", "n1sMediumDraft"]);
+      const shown = new Set(DATA.cols.map((c) => c[0]).filter((k) => !HIDDEN_BY_DEFAULT.has(k)));
       let cat = "All";
 
       function colToggles() {
@@ -1215,7 +1371,15 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
               el("span", { class: "t", text: `${c.t} s` }),
             );
             if (!isLook) cap.append(el("br"), `${fmtK(c.tris)} tris · $${c.cost.toFixed(2)}`);
-            if (c.repaired) cap.append(el("br"), el("span", { class: "fix", text: "crashed once, repaired" }));
+            if (c.repaired) cap.append(el("br"), el("span", { class: "fix", text: c.repairNote || "crashed once, repaired" }));
+            if (c.textures)
+              cap.append(
+                el("br"),
+                el("span", {
+                  class: "texture",
+                  text: `texture code (${c.svgCalls} svg, ${c.textureOptions} texture)`,
+                }),
+              );
             const btn = el(
               "button",
               {
@@ -1386,6 +1550,39 @@ glb = await exportGlb(mesh)                       // then the existing upload, s
             segs: [{ a: 0, b: T.high, fill: "#3d3a36" }],
           },
         ];
+        const fairRows = [
+          ["n1sLow", "Nilo loop, Sonnet low", "low"],
+          ["sfl", "SDK, one call, low, flat", "sdk"],
+          ["n1sMedium", "Nilo loop, Sonnet medium", "medium"],
+          ["sfm", "SDK, one call, medium, flat", "sdk"],
+        ]
+          .filter(([k]) => T[k])
+          .map(([k, name, kind]) => {
+            const t = T[k];
+            if (kind === "sdk")
+              return {
+                name,
+                sub: `final ${Math.round(t.final)} s`,
+                look: t.final,
+                final: t.final,
+                segs: [{ a: 0, b: t.final, fill: "#3d3a36" }],
+              };
+            let at = 0;
+            const segs = Object.entries(t.segments).map(([label, seconds]) => {
+              const fill = label.startsWith("build") ? "#b06a1d" : "#e0b27a";
+              const seg = { a: at, b: at + seconds, fill, label: label.replace(/[0-9]/g, "") };
+              at += seconds;
+              return seg;
+            });
+            return {
+              name,
+              sub: `first draft ${Math.round(t.look)} s · final ${Math.round(t.final)} s`,
+              look: t.look,
+              final: t.final,
+              segs,
+            };
+          });
+        rows.unshift(...fairRows);
         const H = top + rows.length * RH + 6;
         const x = (t) => L + (Math.min(t, MAX) / MAX) * (W - L - R);
         const s = sv("svg", {
