@@ -64,9 +64,6 @@
     <div class="bar" id="status"></div>
     <div class="bar" style="margin-top:8px">
       <span class="tabs"><button data-tab="board" class="on">Builds</button> <button data-tab="numbers">Numbers</button> <button data-tab="grid">Contact grid</button></span>
-      <button class="tool" id="blind">Blind</button>
-      <button class="tool" id="unblind">Unblind</button>
-      <button class="tool" id="export">Export picks</button>
     </div>
   </header>
   <main id="main"></main>
@@ -78,6 +75,7 @@
     let ui = { tab:"board", blind:false, cur:0 };
     try { picks = JSON.parse(localStorage.getItem(PICK_KEY) || "{}"); } catch (_) { picks = {}; }
     try { ui = Object.assign(ui, JSON.parse(localStorage.getItem(UI_KEY) || "{}")); } catch (_) {}
+    ui.blind = false;
     const save = () => { localStorage.setItem(PICK_KEY, JSON.stringify(picks)); localStorage.setItem(UI_KEY, JSON.stringify(ui)); };
     const esc = (s) => String(s ?? "").replace(/[&<>\"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[c]));
     const fmt = (v,d=0) => v == null ? "–" : Number(v).toLocaleString("en", {maximumFractionDigits:d});
@@ -91,7 +89,7 @@
     function chips(c) {
       if (!c || c.state === "queued" || ui.blind) return "";
       const a=[];
-      if (c.wall != null) a.push(`<span class=chip>wall <b>${c.wall}s</b></span>`);
+      if (c.wall != null) a.push(`<span class=chip>took <b>${c.wall}s</b></span>`);
       if (c.parallel && c.planMs != null) a.push(`<span class=chip>plan <b>${fmt(c.planMs)}ms</b></span>`);
       if (c.parallel && c.slowestPartMs != null) a.push(`<span class=chip>slow part <b>${fmt(c.slowestPartMs)}ms</b></span>`);
       if (c.out != null) a.push(`<span class=chip>out <b>${k(c.out)}</b></span>`);
@@ -122,7 +120,7 @@
       return `<div class=brief><b>${esc(subj)}</b><span class=style>${esc(style)}</span><details><summary>brief</summary><p>${esc(row.brief)}</p></details></div>`;
     }
     function board() {
-      return `<p class=note>Blind mode hides setup names and all measurements, then shuffles the eight columns independently for each brief. Pick one <b>best</b> and any number that are <b>as good</b> as best. <kbd>j</kbd>/<kbd>k</kbd> move rows; <kbd>b</kbd> toggles blind.</p><div class=board>${D.rows.map((row,i) => {
+      return `<p class=note>Each row is one brief. The first three columns are r35's single-call builds at low, medium and high, for reference. Then r40: the same single call at high (the control), and parallel flat parts with the planning call and the part calls at high or low (high/high, high/low, low/high, low/low). Click a picture for its labelled sheet. <kbd>j</kbd>/<kbd>k</kbd> move rows.</p><div class=board>${D.rows.map((row,i) => {
         const vs = ui.blind ? order(row) : Object.keys(D.variants), p=picks[row.id] || {};
         return `<div class="row ${ui.blind ? "blind" : ""}" data-sub="${row.id}" data-i="${i}">${brief(row)}${vs.map((vid,j) => {
           const c=row.cells[vid], label=ui.blind ? String.fromCharCode(65+j) : D.variants[vid];
@@ -131,11 +129,10 @@
       }).join("")}</div>`;
     }
     function numbers() {
-      const metrics=[["toWorking","working s",0],["wall","wall s",0],["planMs","plan ms",0],["slowestPartMs","slow part ms",0],["think","est. thinking",0],["out","output tokens",0],["tps","tokens/s",0],["kb","KB",1],["parts","parts",0],["tris","triangles",0],["tex","textures",0]];
+      const metrics=[["toWorking","s to working",0],["wall","s total",0],["planMs","plan ms",0],["slowestPartMs","slow part ms",0],["think","est. thinking",0],["out","output tokens",0],["tps","tokens/s",0],["kb","KB",1],["parts","parts",0],["tris","triangles",0],["tex","textures",0]];
       let h=`<div class=sec><h2>Medians across available run records. Parts and triangles use rendered, successful first attempts. Plan and slow-part medians apply to parallel arms; cost is the run-record sum.</h2><table><tr><th>column</th><th>replied</th><th>rendered</th><th>repaired/usable</th><th>crashed</th><th>type-error builds</th>${metrics.map(x=>`<th>${x[1]}</th>`).join("")}<th>$/build</th><th>cost sum</th></tr>`;
       for (const [vid,label] of Object.entries(D.variants)) { const s=D.summary[vid]; h+=`<tr><td class=v>${esc(label)}</td><td>${s.n}/${D.rows.length}</td><td>${s.ok}</td><td>${s.repaired ? s.repaired+" / " : ""}${s.usable}</td><td>${s.crashed || ""}</td><td>${s.typeErr || ""}</td>${metrics.map(([key,,d])=>`<td>${key === "think" && vid.startsWith("r35") && s[key] != null ? "~" : ""}${fmt(s[key],d)}</td>`).join("")}<td>${s.cost == null ? "–" : "$"+Number(s.cost).toFixed(2)}</td><td>${s.costSum ? "$"+s.costSum.toFixed(2) : ""}</td></tr>`; }
-      h+=`</table><p class=note>Thinking is estimated from billed output for these Sonnet records. A repair is shown as the repair image when the first attempt did not render. Rendering time is not included in model wall time.</p></div>`;
-      if (!ui.blind) h+=aggregate();
+      h+=`</table><p class=note>Thinking is estimated from billed output for these Sonnet records. A repair is shown as the repair image when the first attempt did not render. Times are model time only; rendering is not included.</p></div>`;
       return h;
     }
     function aggregate() {
@@ -151,8 +148,7 @@
     }
     function status() {
       const done=Object.values(D.summary).reduce((a,s)=>a+s.n,0), rendered=Object.values(D.summary).reduce((a,s)=>a+s.ok,0), count=Object.keys(picks).length;
-      document.getElementById("status").innerHTML=`<span class=pill>updated <b>${D.updated}</b></span><span class=pill>records <b>${done}</b> · rendered <b>${rendered}</b></span><span class=pill>your picks <b>${count}/${D.rows.length}</b></span>`;
-      document.getElementById("blind").classList.toggle("on",ui.blind); document.getElementById("unblind").classList.toggle("on",!ui.blind);
+      document.getElementById("status").innerHTML=`<span class=pill>updated <b>${D.updated}</b></span><span class=pill>records <b>${done}</b> · rendered <b>${rendered}</b></span>`;
       document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===ui.tab));
     }
     function render() { if (!D) return; const y=scrollY; status(); document.getElementById("main").innerHTML=ui.tab === "board" ? board() : ui.tab === "numbers" ? numbers() : grid(); scrollTo(0,y); }
@@ -172,7 +168,7 @@
       else if (t.dataset.sheet) { const lb=document.getElementById("lightbox"), im=lb.querySelector("img"); im.src=ui.blind ? t.src : t.dataset.sheet; lb.style.display="grid"; }
       else if (t.closest("#lightbox")) document.getElementById("lightbox").style.display="none";
     });
-    document.addEventListener("keydown",(e)=>{ if(e.key === "Escape") document.getElementById("lightbox").style.display="none"; if(ui.tab !== "board" || e.target.tagName === "INPUT") return; const rows=document.querySelectorAll(".row"); if(e.key === "j" || e.key === "k") { ui.cur=Math.max(0,Math.min(rows.length-1,ui.cur+(e.key === "j" ? 1 : -1))); save(); rows[ui.cur]?.scrollIntoView({block:"start"}); } if(e.key === "b") { ui.blind=!ui.blind; save(); render(); } });
+    document.addEventListener("keydown",(e)=>{ if(e.key === "Escape") document.getElementById("lightbox").style.display="none"; if(ui.tab !== "board" || e.target.tagName === "INPUT") return; const rows=document.querySelectorAll(".row"); if(e.key === "j" || e.key === "k") { ui.cur=Math.max(0,Math.min(rows.length-1,ui.cur+(e.key === "j" ? 1 : -1))); save(); rows[ui.cur]?.scrollIntoView({block:"start"}); } });
     load(); setInterval(load,30000);
   </script>
 </html>
