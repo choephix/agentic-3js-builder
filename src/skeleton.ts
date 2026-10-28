@@ -75,7 +75,7 @@ export class Joint extends Frame {
     return [[this, 1]];
   }
 
-  get bone(): Joint {
+  override get bone(): Joint {
     return this;
   }
 }

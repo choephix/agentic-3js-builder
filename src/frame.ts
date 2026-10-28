@@ -99,7 +99,7 @@ export class Spot extends Frame {
     return this.capture.turn(this.weights).multiply(this.bindQuat);
   }
 
-  get axis() {
+  override get axis() {
     return this.dir(this.facing).normalize();
   }
 }
