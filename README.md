@@ -23,7 +23,7 @@ Agents get the guidance docs, not this README:
 - [`docs/conventions.md`](docs/conventions.md): coordinates, sections, paint coordinates, cards and bounds, the behaviours to know before building.
 - [`kits/pixel.md`](kits/pixel.md), [`kits/toon.md`](kits/toon.md), [`kits/clockwork.md`](kits/clockwork.md): one per style kit. [`kits/glow.md`](kits/glow.md): self-lit parts in any style.
 
-For people: [`docs/DESIGN.md`](docs/DESIGN.md) explains why each helper exists, with the evidence from the builds that shaped it; [`docs/STATUS.md`](docs/STATUS.md) is the project history and to-do list.
+For people: [`docs/LEARNINGS.md`](docs/LEARNINGS.md) is what the speed and quality experiments have settled; [`docs/DESIGN.md`](docs/DESIGN.md) explains why each helper exists, with the evidence from the builds that shaped it; [`docs/STATUS.md`](docs/STATUS.md) is the project history and to-do list.
 
 A production app with its own agent setup hands its agents `docs/api.md`, `docs/conventions.md` and any kit docs it uses, plus its own brief in place of `GUIDE.md`.
 
