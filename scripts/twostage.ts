@@ -26,6 +26,7 @@ import {
   extractCode,
   gateway,
   mergeImports,
+  pool,
   pricing,
   results,
   systemPrompt,
@@ -468,15 +469,10 @@ async function run(round: string, args: string[]) {
   console.log(`${todo.length} two-stage builds to ask ${model} (${effort}) for, ${concurrency} at a time.`);
   const gw = gateway();
   let done = 0;
-  const queue = [...todo];
-  await Promise.all(
-    Array.from({ length: Math.min(concurrency, queue.length) }, async () => {
-      for (let job = queue.shift(); job; job = queue.shift()) {
-        const line = await twoStageBuild({ gw, cost, dir, ...job, model, effort, maxTokens });
-        console.log(`[${++done}/${todo.length}] ${job.slug}: ${line}`);
-      }
-    }),
-  );
+  await pool(todo, concurrency, async (job) => {
+    const line = await twoStageBuild({ gw, cost, dir, ...job, model, effort, maxTokens });
+    console.log(`[${++done}/${todo.length}] ${job.slug}: ${line}`);
+  });
   gw.close();
   manifest(); // a `bakeoff run` of the other arms may have rewritten it meanwhile
   results(round);

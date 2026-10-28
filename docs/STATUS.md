@@ -8,7 +8,7 @@ Claude calls from `scripts/bakeoff.ts`, `scripts/twostage.ts` and `scripts/rende
 
 Measured on 2026-10-28: 10,000 requests and 2M output tokens a minute per model, so `--concurrency 30` fits. Cache reads hit on this route (second call on a 25k-token prefix: 25,018 cached); the console's prompt-caching "Set up" card needs nothing.
 
-Credits, from the console on 2026-10-28: about $200 of promotional credits expire 2026-10-30 (UTC), another $200 expire 2026-11-30. Usage paid with those credits counts toward the organization's monthly spend limit ($50 when last checked; resets on the 1st, UTC). Raise it before a burn, or requests stop around $50 and the October grant dies unspent. Do not turn on auto-reload to drain these credits. A call refused for the spend limit, spent credits or a locked Aegis comes back as an error that `run` records as a failed build, and a resumed round skips it: fix the cause, then delete those `runs/<slug>.json`.
+Credits, from the console on 2026-10-28: about $200 of promotional credits expire 2026-10-30 (UTC), another $200 expire 2026-11-30. Usage paid with those credits counts toward the organization's monthly spend limit ($50 when last checked; resets on the 1st, UTC). Raise it before a burn, or requests stop around $50 and the October grant dies unspent. Do not turn on auto-reload to drain these credits. When the account is refused (spend limit or tier cap, spent credits, a rejected key, a locked Aegis), the runner stops the round with that message and records nothing for the refused builds; fix the cause and rerun to resume.
 
 ## Rotation side quest, 2026-10-27
 

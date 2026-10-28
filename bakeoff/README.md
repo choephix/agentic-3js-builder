@@ -124,6 +124,7 @@ npm run lab-export                         # static /lab copy on webshare (rerun
 ```
 
 - `run` only asks for builds that have no run record yet, so an interrupted round resumes where it stopped. To retry a build, delete its `runs/<slug>.json`.
+- A refused account (401/402/403, spend limit or cap, spent credits, no key because Aegis is locked) is not a failed build: the round starts nothing new, lets running builds finish, records nothing for the refused ones, and exits with the provider's message. Other errors are retried only when the upstream status is transient (429, 5xx); the gateway reports upstream 4xx as 502 with the real status in the message.
 - Round ids are letters and digits. Slugs are camel case, e.g. `r1FennecTerseDocsSdk`.
 - Calls go through `omp auth-gateway stdio`, which uses the stored omp logins and adds about 50 tokens to the prompt. Any model `omp models` lists works. `anthropic/…` models go to the provider in `ANTHROPIC_PROVIDER` (`scripts/bakeoff.ts`): `anthropic-api`, the Anthropic API key in Aegis, since 2026-10-28; `anthropic` for the subscription. Records keep `anthropic/…`. Credits and limits: `docs/STATUS.md`.
 - `costUsd` is estimated from `omp models --json` prices: uncached input, cached input and output. Cache writes aren't reported, so they're priced as plain input; the API bills them at 1.25×.

@@ -268,13 +268,39 @@ async function pricing(model: string): Promise<Pricing> {
   return entry?.cost;
 }
 
+/**
+ * The provider refused the account rather than the request: spend limit or tier cap reached, credits spent, key
+ * rejected, or no key at all (Aegis locked). Every later call fails the same way, so the round stops without a record.
+ */
+class Refused extends Error {}
+
+type UpstreamError = { status: number; message: string; raw: string };
+
+/** The gateway reports an upstream error under its own 429 or 502, as `<upstream status> <upstream body>`. */
+function upstream(reply: GatewayReply): UpstreamError {
+  const raw: string = reply.body?.error?.message ?? "";
+  const status = Number(raw.match(/^(\d{3}) /)?.[1]) || reply.status;
+  let message = raw;
+  try {
+    message = JSON.parse(raw.slice(4).split("\n")[0]).error.message;
+  } catch {}
+  return { status, message, raw };
+}
+
+const refused = ({ status, raw }: UpstreamError) =>
+  [401, 402, 403].includes(status) || /usage limits|credit balance|enforced_spend_limit/i.test(raw);
+
 /** One chat completion through the gateway, retried on overload, with its estimated cost. */
 async function ask(gw: Gateway, body: Request, cost: Pricing) {
   let reply: GatewayReply | undefined;
   const started = Date.now();
   for (let attempt = 1; attempt <= 3; attempt++) {
     reply = await gw.send("/v1/chat/completions", body);
-    if (reply.status === 200 || ![429, 500, 502, 503, 529, 599].includes(reply.status)) break;
+    if (reply.status === 200) break;
+    const error = upstream(reply);
+    if (refused(error))
+      throw new Refused(`${routed(body.model)} refused the account (${error.status}): ${error.message}`);
+    if (![429, 500, 502, 503, 529, 599].includes(error.status)) break;
     await sleep(20_000 * attempt);
   }
   const message = reply?.body?.choices?.[0]?.message;
@@ -336,13 +362,17 @@ function jobs(round: string, args: string[]): Job[] {
   return out;
 }
 
+/** Runs `work` over `items`, `size` at a time. After the first error no item starts; the running ones finish. */
 async function pool<T>(items: T[], size: number, work: (item: T) => Promise<void>) {
   const queue = [...items];
+  const errors: unknown[] = [];
   await Promise.all(
     Array.from({ length: Math.min(size, queue.length) }, async () => {
-      for (let item = queue.shift(); item !== undefined; item = queue.shift()) await work(item);
+      for (let item = queue.shift(); item !== undefined && !errors.length; item = queue.shift())
+        await work(item).catch((error) => errors.push(error));
     }),
   );
+  if (errors.length) throw errors[0];
 }
 
 async function run(round: string, args: string[]) {
@@ -1250,6 +1280,7 @@ export {
   capture,
   systemPrompt,
   pricing,
+  pool,
   check,
   applyEdits,
   extractCode,
