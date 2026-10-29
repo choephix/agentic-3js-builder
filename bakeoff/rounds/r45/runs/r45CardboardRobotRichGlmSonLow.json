@@ -1,0 +1,422 @@
+{
+  "slug": "r45CardboardRobotRichGlmSonLow",
+  "arm": "glm-son-low",
+  "subject": "cardboardRobot",
+  "level": "rich",
+  "pitch": "Category: Humanoid character.\nSubject: kid in a cardboard-box robot costume.\nStyle: cardboard craft.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "planModel": "openrouter-curated/z-ai/glm-5.3-flash",
+  "effort": "high",
+  "started": "2026-10-29T00:43:53.843Z",
+  "wallMs": 120026,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 453174,
+    "completion_tokens": 18520,
+    "total_tokens": 471694,
+    "prompt_tokens_details": {
+      "cached_tokens": 398665
+    }
+  },
+  "costUsd": 0.22598564999999998,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 99338,
+    "slowestPartMs": 20688,
+    "critical": "headBox",
+    "elapsedMs": 120027,
+    "spec": {
+      "name": "Cardboard Bot Kid",
+      "description": "A kid wearing a homemade cardboard-box robot costume: a big appliance-box torso with a drawn-on control panel, a smaller box head with a cut-out visor showing the kid's eyes, cardboard tube arms with mitten hands, jeans and cardboard boots peeking below.",
+      "builderName": "cardboardBotKid",
+      "size": [
+        1.85,
+        1.65,
+        0.7
+      ],
+      "layout": "A standing child in a craft-robot costume, front facing +Z, centred on x = 0. Chunky silhouette: the torso is a big cardboard box (0.88 wide, 0.68 tall, 0.62 deep) from y 0.5 to 1.2; the head is a smaller box (0.5 wide, 0.46 tall, 0.5 deep) from y 1.18 to 1.64, slightly narrower than the body; total height ~1.64 m. Front view, top to bottom: box head with a square visor hole showing the kid's face (skin, big white eyes with ink pupils, brown hair), antenna with a red bottle-cap ball on top, marker rivets and a tape cross on the box front; below, the torso box front carries a navy control panel with two cream dial gauges, three coloured buttons, a lever and a taped dark 'screen'; at the shoulders, round armholes with tape rims where the cardboard tube arms emerge and hang down-outward to mitten hands near hip height; below the box, blue denim legs and cardboard boot covers with lighter toe caps and tape straps rest on y = 0. Back view: a taped vertical seam with a corrugated stripe and a packing-tape patch. The style reads on every part: corrugated cardboard tones with lighter inner-flute edges, silver duct tape wraps at every seam, marker doodles and torn/hand-cut flap edges everywhere; nothing is smooth or factory-made.",
+      "palette": {
+        "cardboard": "#c9a06b",
+        "cardboardDark": "#a8814f",
+        "corrugatedLight": "#e6c791",
+        "tape": "#b8b3a8",
+        "packingTape": "#e8d8a8",
+        "panelNavy": "#3f4a63",
+        "cream": "#f2e9d4",
+        "buttonRed": "#e0453a",
+        "buttonGreen": "#3fae5c",
+        "buttonYellow": "#f0b429",
+        "visorDark": "#2a2438",
+        "skin": "#f5cfa0",
+        "hair": "#6b4a2f",
+        "ink": "#2b2233",
+        "denim": "#5a76a8",
+        "denimDark": "#4a628c",
+        "mitten": "#e0453a",
+        "sticker": "#f2ede2"
+      },
+      "mounts": {
+        "neck": [
+          0,
+          1.19,
+          0.02
+        ],
+        "shoulderL": [
+          0.44,
+          1.1,
+          0
+        ],
+        "shoulderR": [
+          -0.44,
+          1.1,
+          0
+        ],
+        "hips": [
+          0,
+          0.56,
+          0
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            0.9,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "head",
+          "parent": "body",
+          "at": [
+            0,
+            1.2,
+            0.02
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "head"
+        },
+        {
+          "name": "armL",
+          "parent": "body",
+          "at": [
+            0.44,
+            1.1,
+            0
+          ],
+          "dir": [
+            0.75,
+            -0.55,
+            0.1
+          ],
+          "role": "arm"
+        },
+        {
+          "name": "armR",
+          "parent": "body",
+          "at": [
+            -0.44,
+            1.1,
+            0
+          ],
+          "dir": [
+            -0.75,
+            -0.55,
+            0.1
+          ],
+          "role": "arm"
+        },
+        {
+          "name": "legL",
+          "parent": "body",
+          "at": [
+            0.17,
+            0.56,
+            0.02
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg"
+        },
+        {
+          "name": "legR",
+          "parent": "body",
+          "at": [
+            -0.17,
+            0.56,
+            0.02
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg"
+        }
+      ],
+      "parts": [
+        {
+          "id": "boots",
+          "builds": "The kid's legs below the torso box: denim jeans and cardboard boot covers. Two straight denim cylinders (denim) from y 0.56 (the hips mount, tucked slightly inside the body box bottom) down to y 0.14, at x = ±0.17, radius ~0.085; each gets a rolled cuff ring (denimDark) at the bottom y 0.14–0.19. Each foot wears a cardboard boot cover: a box roughly 0.24 wide × 0.14 tall × 0.34 deep, front edge at z +0.17, sitting on y = 0 (these are the only floor parts; keep their lowest faces exactly at y = 0). Each boot: main body in cardboard, a lighter corrugated toe-cap panel (corrugatedLight) on the front face slightly proud, a tape strap running over the top front to back (tape), and a small round sticker (sticker) on the side with a marker dash. A fold-over cardboard cuff (cardboardDark, a slightly larger open box ring y 0.14–0.2) hides the boot-to-pants join, its torn top edge visible. Use thin boxes, frustum boxes or low-segment cylinders; keep everything blocky, like taped boxes on feet.",
+          "box": [
+            [
+              -0.34,
+              0,
+              -0.2
+            ],
+            [
+              0.34,
+              0.56,
+              0.2
+            ]
+          ],
+          "attaches": "Leg cylinders start at the hips mount [0, 0.56, 0] and rise into the bottom face of the bodyBox part; boot cuffs overlap the denim at y 0.14–0.2.",
+          "joints": [
+            "legL",
+            "legR"
+          ],
+          "floor": true,
+          "budget": 130
+        },
+        {
+          "id": "bodyBox",
+          "builds": "The appliance-box torso, the hero piece. One big cardboard box from y 0.5 to 1.2, x ±0.44, z ±0.31, in cardboard, built as slabs/frustum boxes with slightly irregular edges so it reads as hand-cut. Front face (z +): a navy control panel plate (panelNavy, a thin box ~0.5 wide × 0.34 tall, centred at [0, 0.88, 0.315]) with a taped border (packingTape strips along its edges); on the panel: two dial gauges — cream cylinder faces (cream) radius ~0.05 with ink marker tick marks (tiny flat boxes) and a needle each, and a small tape rim; three chunky buttons in buttonRed, buttonGreen and buttonYellow, small cylinders standing proud with cardboard rims around them; a lever: a thin stick with a yellow knob poking out at an angle, seated through a small slot; and a dark 'screen' rectangle (visorDark) with a small green blob (buttonGreen) showing through, sealed over with a flat of packingTape. Around the box: a vertical duct-tape seam (tape strip) up the back centre flanked by a corrugated stripe (corrugatedLight narrow strip) showing the flutes; a packing-tape patch (a small crossed rectangle of packingTape) on the lower right side; marker rivet dots (tiny ink discs) along all four front corners; a white sticker (sticker) low on the front-left with two ink dashes. Top face: a torn square hole around the neck mount [0, 1.19, 0.02] with a jagged rim ring (cardboardDark, small uneven tabs of boxes around the opening) and four short cut flaps splayed outward (cardboard, thin slabs angled up-out, not covering the hole). Side armholes at shoulderL/shoulderR mounts: circular hole rims made of tape rings (tape) at the side faces, y ~1.1, radius ~0.09, open. Bottom face: open (legs come through). The box's lowest edge sits at y 0.5, just above the boots part's denim top.",
+          "box": [
+            [
+              -0.44,
+              0.5,
+              -0.31
+            ],
+            [
+              0.44,
+              1.2,
+              0.31
+            ]
+          ],
+          "attaches": "Sits over the boots part at the hips mount; the head box overlaps its top face at the neck mount; arm tubes emerge from its side armholes at shoulderL/shoulderR.",
+          "joints": [
+            "body"
+          ],
+          "floor": false,
+          "budget": 260
+        },
+        {
+          "id": "headBox",
+          "builds": "The smaller box head, y 1.18–1.64, x ±0.3, z from -0.28 to +0.3 (slightly front-biased on the neck mount). Main box in cardboard with the front face a touch brighter; every edge gets a thin corrugatedLight trim strip on the front face only, like exposed flutes. Front face: a square visor hole roughly 0.22 wide × 0.14 tall centred at [0, 1.42, 0.3]; inside the hole a recessed visorDark backing plate, and the kid's face peeking through: a skin-coloured flat face shape just behind the hole, with two big oval eyes (sticker white ovals with ink pupils looking slightly to one side), thin ink eyebrows, and brown hair (hair) visible as a fringe peeking over the top of the hole and small tufts at the sides — build hair as a few small flat cards/boxes in front of the hole's top edge. Torn hole edge: a jagged rim of tiny uneven cardboardDark tabs around the opening. Antenna: on the box top at [0.12, 1.64, 0], a thin slightly tilted rod (~0.16 tall, tape colour like a coat-hanger wire) with a red bottle-cap ball (buttonRed, small cylinder with a rim) on top, and a small tape wrap (tape ring) at its base. Side 'ear' bolts: at x ±0.3, y 1.42, flat cylinders sticking out (cardboardDark disc radius 0.06 with a cream centre disc and an ink ring). Top face: a tape cross (two packingTape strips crossed) like a handle. Front corners: marker rivet dots (ink discs). A small packing-tape patch on the right side. Head box bottom edge overlaps the body box top by ~0.02 so the two boxes read as stacked.",
+          "box": [
+            [
+              -0.3,
+              1.18,
+              -0.28
+            ],
+            [
+              0.3,
+              1.64,
+              0.3
+            ]
+          ],
+          "attaches": "Sits on the bodyBox top face over the neck mount [0, 1.19, 0.02]; its bottom flaps skirt over the body box's torn top edge.",
+          "joints": [
+            "head"
+          ],
+          "floor": false,
+          "budget": 250
+        },
+        {
+          "id": "armL",
+          "builds": "The kid's left arm (+X side), from the shoulderL mount [0.44, 1.1, 0]. At the mount: a cardboard shoulder disc (cardboard, flat cylinder radius ~0.11, thickness 0.02, facing outward, covering the armhole rim from outside) with a tape ring edge. Upper arm: a cardboard tube (low-segment cylinder, cardboard) radius ~0.055 running from the shoulder down-outward along the armL joint direction (about [0.75, -0.55, 0.1] normalized) for ~0.24; at the elbow a chunky duct-tape wrap (tape, a slightly fatter short cylinder radius 0.065, length 0.05). Forearm: a slightly narrower cardboard tube (radius 0.05) continuing down and angling slightly forward, total arm reaching to about [0.78, 0.72, 0.12]; the forearm wears one marker doodle — an ink zigzag dash line as a small flat decal strip. Wrist: a packingTape cuff ring. Hand: a mitten (mitten red) built as a rounded chunky box ~0.13 wide × 0.15 tall × 0.11 deep plus a thumb (small capsule sticking forward-inward) and a simple cuff of cardboard; mitten sits at the end of the forearm. The whole arm keeps a slight outward hang so the mitten ends near hip height, clear of the body box.",
+          "box": [
+            [
+              0.38,
+              0.6,
+              -0.12
+            ],
+            [
+              0.92,
+              1.12,
+              0.24
+            ]
+          ],
+          "attaches": "Shoulder disc at shoulderL mount [0.44, 1.1, 0] over the bodyBox armhole; the arm hangs outside the body box's side face.",
+          "joints": [
+            "armL"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "armR",
+          "builds": "The kid's right arm (-X side), the exact mirror of armL: cardboard shoulder disc at shoulderR mount [-0.44, 1.1, 0], cardboard tube upper arm along the armR joint direction ([-0.75, -0.55, 0.1]), tape elbow wrap, narrower forearm with the same ink zigzag marker doodle on the outer face, packingTape wrist cuff, and a mitten red rounded hand with a thumb, ending near [-0.78, 0.72, 0.12]. Mirror every detail, keeping the mitten thumb pointing inward-forward on both sides.",
+          "box": [
+            [
+              -0.92,
+              0.6,
+              -0.12
+            ],
+            [
+              -0.38,
+              1.12,
+              0.24
+            ]
+          ],
+          "attaches": "Shoulder disc at shoulderR mount [-0.44, 1.1, 0] over the bodyBox armhole; the arm hangs outside the body box's side face.",
+          "joints": [
+            "armR"
+          ],
+          "floor": false,
+          "budget": 130
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "model": "openrouter-curated/z-ai/glm-5.3-flash",
+        "effort": "high",
+        "started": "2026-10-29T00:43:53.843Z",
+        "wallMs": 99338,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 52295,
+          "completion_tokens": 6536,
+          "total_tokens": 58831,
+          "prompt_tokens_details": {
+            "cached_tokens": 28505
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 3259
+          }
+        },
+        "costUsd": 0.0076916499999999995,
+        "hasCode": true,
+        "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants me to write a TypeScript module using the `agentic-3js-builder` SDK to create a specific 3D model: a kid in a cardboard-box robot costume.\n2.  **Analyze the Constraints/Style:**\n    *   **Let me design a kid in a cardboard-box robot costume. The model: a child wearing a big cardboard box as robot body, a smaller box as head, cardboard arms with mitten hands, boxy feet. Style: cardboard craft — cardboard brown, tape, drawn-on gauges, antenna, paint splashes, marker lines.\n\nThe model: humanoid character. Standing on y=0. Front faces +Z.\n\nSizes: kid maybe 1.5m tall with costume. Let's define:\n- Legs/feet: shoes visible below box body. Body box from y~0.55 to y~1.15 (box body). Head box y~1.15 to ~1.5. Total ~1.5-1.6m. Arms out to sides.\n\nLet me lay out:\n- Feet: two cardboard \"boots\" (tissue-box style shoe covers) at y 0–0.14, x ±0.22.\n- Legs: small gap, or legs inside box body — visible pants legs from y 0.14 to 0.55.\n- Body: big cardboard box (appliance box) x ±0.42, y 0.55–1.2, z ±0.3. With a control panel on front, drawn gauges, dials, flaps.\n- Arms: cardboard tubes from shoulders (y~1.1) down/out, with mitten hands. Maybe arms in rest pose slightly out.\n- Head: smaller cardboard box with cut-out eye hole window (dark inside with eyes peeking), drawn-on robot face? Classic: the box head has a square visor window with kid's eyes visible. Antenna with ball on top. Maybe side \"ears\" of taped-on circles.\n- Kids' costume: body box worn, straps maybe hidden.\n\nShoulders at y ~1.15, arms angled out/down. Hands mittens (or foam gloves).\n\nPalette (≤24):\n- cardboard: \"#c9a06b\" or \"#cfa468\"\n- cardboardDark: \"#a8814f\"\n- cardboardEdge/corrugated: \"#e3c290\" (inner corrugation lighter)\n- tape: \"#d9d3c7\" (silver duct tape grey) \"#b8b3a8\"\n- packingTape: \"#e8d8a8\" translucent-ish flat\n- panel: \"#3f4a63\" (drawn navy panel)\n- gaugeLight/cream: \"#f2e9d4\"\n- red button: \"#e0453a\"\n- green button: \"#3fae5c\"\n- yellow button: \"#f0b429\"\n- antennaBall: \"#e0453a\"\n- visorDark: \"#2a2438\" (inside of head hole)\n- skin/face: \"#f5cfa0\" (kid's face peeking)\n- hair: \"#6b4a2f\" brown\n- eyeInk: \"#2b2233\"\n- jeans: \"#5a76a8\" (kid's jeans visible below box)\n- shoeRed: \"#d0453a\" sneakers\n- shoeWhite: \"#f2ede2\"\n- hoodie sleeve? Under box, sleeves come out at shoulders: hoodie \"#4f8f7a\" teal? Let's add sleeve teal \"#4f8f7a\".\n- mitten: \"#e07a3f\" orange? or red. Let's mitten red \"#e0453a\" reuse. Or keep separate: mitten \"#f0b429\" yellow? Buttons yellow too. Fine.\n- marker black lines: \"#2b2233\"\n- paint accent: maybe white paint \"#f2ede2\".\n- flame decal? Keep simple.\n\nCount colors: cardboard, cardboardDark, corrugatedLight, tape, panelNavy, cream, red, green, yellow, visorDark, skin, hair, jeans, teal, mittenRed? Actually let me count ~16. Under 24. Good.\n\nJoints: could be static or lightly rigged. Spec asks humanoid; joints list: body(root spine), head, armL, armR, legL, legR. Simple skeleton so it's riggable. Keep it minimal:\n- root \"body\" at [0, 0.85, 0], dir [0,1,0], role \"spine\"\n- \"head\" parent body at [0, 1.2, 0] dir [0,1,0] role \"head\"\n- \"armL\" parent body at [0.45, 1.05, 0], dir [1,-0.15,0.1] role \"arm\"\n- \"armR\" mirrored\n- \"legL\" parent body at [0.18, 0.55, 0], dir [0,-1,0] role \"leg\"\n- \"legR\" mirrored\n\nEach part lists the joints its geometry rides.\n\nParts (3-6, even richness, similar): Let me do 5:\n1. legs+feet: \"boots\" — jeans legs and cardboard boots. budget ~140\n2. \"bodyBox\" — the big cardboard box torso with flaps, control panel, gauges, tape. budget ~240\n3. \"headBox\" — head box with visor hole, face, eyes, hair, antenna, ear bolts. budget ~220\n4. \"armL\" — left arm tube, elbow, mitten hand, shoulder flap. budget ~150\n5. \"armR\" — mirror. budget ~150\n\nSum = 900. Good. Actually make budgets sum ≤900: 140+240+220+150+150=900. \n\nMounts:\n- shouldersL: [0.44, 1.08, 0], shouldersR: [-0.44, 1.08, 0] — where arms meet box.\n- neck: [0, 1.18, 0] — head sits on body top (through a hole).\n- hips: [0, 0.56, 0] — legs inside body bottom.\n\nBoxes:\n- boots: [[-0.32, 0.0, -0.18], [0.32, 0.56, 0.18]]\n- bodyBox: [[-0.44, 0.52, -0.3], [0.44, 1.2, 0.32]]\n- headBox: [[-0.3, 1.16, -0.3], [0.3, 1.62, 0.32]]\n- armL: [[0.4, 0.62, -0.16], [0.85, 1.16, 0.16]] — arm angled out and down, hand at ~y 0.68? Arms rest slightly out. Hand mitten at about [0.78, 0.72, 0.1].\n\nLayout text: describe silhouette: chunky box torso wider than head, small head box with square visor showing kid's eyes, arms as cardboard tubes with kitchen-glove hands, jeans peeking below, cardboard boots. Front: control panel with drawn gauges, buttons, marker doodles. Back: taped flap seams. Antenna with bottle-cap ball.\n\nHeight total ~1.62m. Width: arms out ~1.7? With hands at x ±0.8, width ~1.7. Let's size [1.7, 1.65, 0.75]. Depth z: body 0.62, head 0.62 → z extent ~0.64. Size z maybe 0.7.\n\nActually arms: kid arms come out of armholes at box upper sides. Tube from shoulder downward-out, elbow bent, mitten. Let's put hand near hip: mitten at [0.72, 0.75, 0.12]. Arm hangs mostly down with slight outward angle.\n\nWrite the spec JSON. Keep descriptions detailed so each builder can build independently and consistently.\n\nDetails per part:\n\n**boots part**: \n- Jeans legs: two cylinders (blue denim \"#5a76a8\") from y 0.56 down to 0.14, at x ±0.18, radius 0.09. Cuff at bottom darker.\n- Cardboard boots: each a box \"shoe cover\" — a box around foot: size 0.24 wide × 0.14 tall × 0.34 deep, sitting y 0–0.14, with a lighter corrugated inset panel on the toe front, tape strip over the top, marker outline. Fold-over cuff of cardboard at the ankle: a slightly bigger box ring y 0.14–0.2.\n- Toe cap lighter cardboard.\n\n**bodyBox**:\n- Main box: cardboard, ~0.88 wide × 0.68 tall × 0.62 deep, from y 0.52 to 1.2. Slight taper? Keep box. Panels: front face carries a \"control panel\" — a navy rectangle plate inset (thin box) with:\n  - two dial gauges (cylinder face cream, marker needle, rim tape)\n  - three buttons (red, green, yellow) as small cylinders with cardboard rims\n  - a slider lever (stick with knob) sticking out\n  - a taped \"screen\": a rectangle of packing tape over a dark rectangle with a green blob (screen)\n- Head hole on top: the box top has a square hole with a cut flap pulled up (4 small flaps around neck) — actually the head box covers it. Add a torn hole edge (jagged cardboard rim ring) at neck mount.\n- Armholes on both sides at shoulders: round-ish holes with tape rims (rings).\n- Side flaps: on the back, a vertical taped seam with corrugated stripe (lighter strip showing corrugation).\n- Marker doodles: a few marker bolts drawn as small flat circles, a \"ROBO\" lettering? Letters are hard; instead a paper sticker label: white rectangle with dark \"on/off\"? Keep as: cream sticker with ink dashes.\n- Bottom edge sits above legs: box bottom at 0.52, jeans top at 0.56 overlap slightly — attach at hips mount.\n\n**headBox**:\n- Box ~0.5 wide × 0.44 tall × 0.5 deep, y 1.18–1.62. Leaning slightly? No, straight.\n- Front square visor hole: ~0.2×0.12 at eye height, dark inside (visorDark backing plate recessed), kid's face peeking: skin-colored face shape behind hole with two big eyes (white ellipse + ink pupil), eyebrows, and maybe a bit of brown hair over forehead and around edges.\n- Alternatively drawn-on robot eyes on the box plus real eyes? Classic craft: hole with eyes peeking. Do both: hole with face peeking.\n- Antenna: on top, a thin rod (or a bendy clothes hanger style wire — use thin cylinder slightly bent? just a cylinder) with a red bottle-cap ball on top. Maybe with a small coil at base (tape).\n- Side \"ear\" bolts: two cardboard circles on the sides (flat cylinders sticking out) with marker rings.\n- Front corners: marker rivets; a taped cross on top like a handle.\n- Cardboard flaps at bottom of head overlapping body top (like the head box's bottom flaps) — a skirt of 4 flap slabs overlapping the body's top, giving craft look.\n\n**armL/armR**:\n- Shoulder flap disc (cardboard ring covering armhole from outside).\n- Upper arm: cardboard tube (cylinder) from shoulder down-out; elbow joint (tape wrap ring in silver duct tape); forearm tube slightly narrower, angled forward a bit.\n- Mitten hand: a rounded box (box with rounded look — use a slightly smaller box or a squashed sphere? primitives: box 0.16 cube with a thumb stick) in teal? Actually mitten color: let's do foam mitten in red \"#e0453a\" — matches buttons/antenna. Thumb: small capsule.\n- Cuff: tape ring at wrist.\n- A marker stripe/doodle on forearm: painted-on \"gauge\" drawn as flat circle sticker on forearm? Keep small: an ink zigzag marker line.\n\nMirror for armR; both ride armL/armR joints.\n\nArm geometry rides arm joint; hand could be separate hinge joint but we only defined arm joints — fine, hand is part of arm (static relative to arm).\n\nJoints list ordering: parents first. body (root), head, armL, armR, legL, legR.\n\nLet me finalize positions:\n- body root at [0, 0.9, 0]? The box center. dir [0,1,0].\n- head at [0, 1.2, 0.02] dir [0,1,0].\n- armL at [0.44, 1.1, 0], dir [0.75, -0.55, 0.1] (down-out-forward slight).\n- armR at [-0.44, 1.1, 0], dir [-0.75, -0.55, 0.1].\n- legL at [0.17, 0.56, 0.02], dir [0,-1,0].\n- legR at [-0.17, 0.56, 0.02].\n\nMounts:\n- neck: [0, 1.19, 0.02]\n- shoulderL: [0.44, 1.1, 0], shoulderR: [-0.44, 1.1, 0]\n- hips: [0, 0.56, 0]\n\nBoxes:\n- boots: [[-0.34, 0, -0.2], [0.34, 0.56, 0.2]]\n- bodyBox: [[-0.44, 0.5, -0.31], [0.44, 1.2, 0.31]]\n- headBox: [[-0.3, 1.18, -0.28], [0.3, 1.64, 0.3]]\n- armL: [[0.38, 0.6, -0.12], [0.92, 1.12, 0.24]]\n- armR: mirrored.\n\nSize: width: arms to x 0.92 → 1.84; say [1.85, 1.65, 0.7].\n\nBudgets: boots 130, bodyBox 260, headBox 250, armL 130, armR 130 → 900. Good.\n\nFloor: boots true; everything else false.\n\nWrite descriptions richly but concisely. Each part's \"builds\" field: detailed instructions including which colors each piece wears, referencing palette keys and mounts/joints."
+      },
+      {
+        "id": "boots",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:45:33.182Z",
+        "wallMs": 9122,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80105,
+          "completion_tokens": 1448,
+          "total_tokens": 81553,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.034029199999999996,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "armR",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:45:33.182Z",
+        "wallMs": 10552,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79900,
+          "completion_tokens": 1818,
+          "total_tokens": 81718,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0373192,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "armL",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:45:33.182Z",
+        "wallMs": 12228,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80168,
+          "completion_tokens": 2091,
+          "total_tokens": 82259,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.040585199999999995,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "bodyBox",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:45:33.182Z",
+        "wallMs": 19566,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80407,
+          "completion_tokens": 3421,
+          "total_tokens": 83828,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0543632,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "headBox",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:45:33.182Z",
+        "wallMs": 20688,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80299,
+          "completion_tokens": 3206,
+          "total_tokens": 83505,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0519972,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

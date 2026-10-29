@@ -1,0 +1,569 @@
+{
+  "slug": "r45CardboardRobotRichGlmSolLow",
+  "arm": "glm-sol-low",
+  "subject": "cardboardRobot",
+  "level": "rich",
+  "pitch": "Category: Humanoid character.\nSubject: kid in a cardboard-box robot costume.\nStyle: cardboard craft.",
+  "model": "openai-codex/gpt-6.1-sol",
+  "planModel": "openrouter-curated/z-ai/glm-5.3-flash",
+  "effort": "high",
+  "started": "2026-10-29T00:44:18.517Z",
+  "wallMs": 294579,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 333424,
+    "completion_tokens": 29768,
+    "total_tokens": 363192,
+    "prompt_tokens_details": {
+      "cached_tokens": 283865
+    }
+  },
+  "costUsd": 0.23055015,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 199506,
+    "slowestPartMs": 95073,
+    "critical": "torsoBox",
+    "elapsedMs": 294580,
+    "spec": {
+      "name": "Cardboard Robo-Kid",
+      "description": "A kid in a homemade cardboard robot costume: a taped-up kraft box torso with drawn dials and a bottle-cap jetpack, a box helmet with the kid's real face peeking through a cutout window, cardboard tube arms with box mitts, and craft boots.",
+      "builderName": "cardboardRoboKid",
+      "size": [
+        1.9,
+        2.2,
+        0.9
+      ],
+      "layout": "A stylized kid stands centred on x=0 facing +Z, feet on y=0. The visible kid is short: legs (y 0.14-0.62) in denim pants and cardboard craft boots, then the big cardboard box torso (y 0.56-1.38, half-width 0.44, half-depth 0.30) that dwarfs the body, then the box helmet (y 1.38-1.88, half-size 0.26) with one antenna on top reaching y 2.17. Arms run from shoulder holes at [±0.45, 1.18] angled down and slightly out to wristL/wristR at [±0.76, 0.72], ending in chunky box mitts beside the hips. From the front: the helmet's cutout window shows the kid's real face (eyes, brows, blush, smile, hair fringe), the torso front carries a drawn dial gauge, three round buttons, a red paper heart and a scribbled name label over a central tape seam. The back carries a cardboard jetpack with two yellow-banded booster cylinders. Cardboard-craft style on every part: kraft box surfaces with kraftDark corrugated strips along every cut edge, tan tape seams and collars, silver brad rivets at corners, and hand-drawn ink marker doodles.",
+      "palette": {
+        "kraft": "#c99a5f",
+        "kraftPale": "#ddb87f",
+        "kraftDark": "#a1733c",
+        "tape": "#e6d3ab",
+        "silver": "#a9b2b8",
+        "ink": "#3a2c1c",
+        "red": "#e04a35",
+        "blue": "#2f6fbe",
+        "denim": "#56789f",
+        "yellow": "#f0c23c",
+        "green": "#3f9d4f",
+        "white": "#f4efe4",
+        "skin": "#efbd96",
+        "hair": "#6b4a2e",
+        "blush": "#f2a07c",
+        "tee": "#e07a3c",
+        "sole": "#5c4630"
+      },
+      "mounts": {
+        "neckHole": [
+          0,
+          1.36,
+          0.05
+        ],
+        "shoulderL": [
+          0.45,
+          1.18,
+          0.02
+        ],
+        "shoulderR": [
+          -0.45,
+          1.18,
+          0.02
+        ],
+        "legL": [
+          0.2,
+          0.57,
+          0
+        ],
+        "legR": [
+          -0.2,
+          0.57,
+          0
+        ]
+      },
+      "joints": [
+        {
+          "name": "hips",
+          "at": [
+            0,
+            0.78,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "chest",
+          "parent": "hips",
+          "at": [
+            0,
+            1,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "neck",
+          "parent": "chest",
+          "at": [
+            0,
+            1.3,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "neck"
+        },
+        {
+          "name": "head",
+          "parent": "neck",
+          "at": [
+            0,
+            1.42,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "head"
+        },
+        {
+          "name": "jaw",
+          "parent": "head",
+          "at": [
+            0,
+            1.53,
+            0.2
+          ],
+          "dir": [
+            0,
+            -0.25,
+            1
+          ],
+          "role": "jaw"
+        },
+        {
+          "name": "shoulderL",
+          "parent": "chest",
+          "at": [
+            0.45,
+            1.18,
+            0.02
+          ],
+          "dir": [
+            0.7,
+            -0.7,
+            0
+          ],
+          "role": "arm",
+          "group": "armL"
+        },
+        {
+          "name": "elbowL",
+          "parent": "shoulderL",
+          "at": [
+            0.65,
+            0.98,
+            0.02
+          ],
+          "dir": [
+            0.4,
+            -0.9,
+            0
+          ],
+          "role": "arm",
+          "group": "armL"
+        },
+        {
+          "name": "wristL",
+          "parent": "elbowL",
+          "at": [
+            0.76,
+            0.72,
+            0.03
+          ],
+          "dir": [
+            0.15,
+            -0.98,
+            0
+          ],
+          "role": "arm",
+          "group": "armL"
+        },
+        {
+          "name": "shoulderR",
+          "parent": "chest",
+          "at": [
+            -0.45,
+            1.18,
+            0.02
+          ],
+          "dir": [
+            -0.7,
+            -0.7,
+            0
+          ],
+          "role": "arm",
+          "group": "armR"
+        },
+        {
+          "name": "elbowR",
+          "parent": "shoulderR",
+          "at": [
+            -0.65,
+            0.98,
+            0.02
+          ],
+          "dir": [
+            -0.4,
+            -0.9,
+            0
+          ],
+          "role": "arm",
+          "group": "armR"
+        },
+        {
+          "name": "wristR",
+          "parent": "elbowR",
+          "at": [
+            -0.76,
+            0.72,
+            0.03
+          ],
+          "dir": [
+            -0.15,
+            -0.98,
+            0
+          ],
+          "role": "arm",
+          "group": "armR"
+        },
+        {
+          "name": "hipL",
+          "parent": "hips",
+          "at": [
+            0.2,
+            0.62,
+            0
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "legL"
+        },
+        {
+          "name": "kneeL",
+          "parent": "hipL",
+          "at": [
+            0.2,
+            0.34,
+            0
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "legL"
+        },
+        {
+          "name": "footL",
+          "parent": "kneeL",
+          "at": [
+            0.2,
+            0.11,
+            0.05
+          ],
+          "dir": [
+            0,
+            0.15,
+            1
+          ],
+          "role": "leg",
+          "group": "legL"
+        },
+        {
+          "name": "hipR",
+          "parent": "hips",
+          "at": [
+            -0.2,
+            0.62,
+            0
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "legR"
+        },
+        {
+          "name": "kneeR",
+          "parent": "hipR",
+          "at": [
+            -0.2,
+            0.34,
+            0
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "leg",
+          "group": "legR"
+        },
+        {
+          "name": "footR",
+          "parent": "kneeR",
+          "at": [
+            -0.2,
+            0.11,
+            0.05
+          ],
+          "dir": [
+            0,
+            0.15,
+            1
+          ],
+          "role": "leg",
+          "group": "legR"
+        }
+      ],
+      "parts": [
+        {
+          "id": "torsoBox",
+          "builds": "The big cardboard box torso the kid wears. The box spans x -0.44..0.44, y 0.56..1.38, z -0.30..0.30, built as kraft panels with kraftPale inner faces, kraftDark corrugated strips (thin fluted strips, ~0.025 wide) along every edge, and a tape seam: a vertical tape strip ~0.06 wide down the centre of the front face from y 0.56 to 1.38. Front panel details, all seated on the front face z 0.30: a paper dial gauge (white circle r 0.11 centred [-0.15, 1.08], an ink ring, yellow tick marks, an ink needle pointing to one red tick, a small ink pivot dot); a vertical row of three round buttons (cylinders r 0.035 protruding 0.03, small silver bases, ink outline rings) in red, yellow, green from top to bottom at [0.20, 1.16 / 1.02 / 0.88]; a red paper heart ~0.09 tall at [-0.15, 0.84]; a white paper label plate 0.2 x 0.07 at [0.16, 0.72] with three short ink scribble strokes as marker writing. Silver brad rivets (discs r 0.012) at the corners of every face. Side arm holes centred at the shoulderL and shoulderR mounts (hole r 0.09) with tape rims; the arm parts plug into these. Back: a kraft back plate (~0.5 x 0.55) on z -0.30..-0.34 carrying a jetpack of two kraft cylinders (r 0.09, centred [±0.16, 0.92, -0.38], length 0.24 along z) each with a yellow band, a kraftDark nozzle cone at its lower end, and small ink doodles; reach no further back than z -0.52. A tape collar ring around the top opening at the neckHole mount. Add a small corrugated flap on the top face.",
+          "attaches": "Worn over the legs part: the box bottom (y 0.56) hangs over the pants at legL and legR. The helmet rests on the top face at neckHole. The arms root in the side arm holes at shoulderL and shoulderR; their tape rims meet the torso's hole rims.",
+          "joints": [
+            "hips",
+            "chest"
+          ],
+          "floor": false,
+          "budget": 250
+        },
+        {
+          "id": "helmet",
+          "builds": "The kid's cardboard robot helmet. The box spans x -0.26..0.26, y 1.38..1.88, z -0.27..0.27 in kraft, with kraftDark corrugated strips along every edge, a tape rim band around the bottom (meeting the torso collar at neckHole), silver brad rivets at the corners of each face, and two kraft side bolts (cylinders r 0.04 sticking out at [±0.26, 1.66, 0.06]) with ink rings around their bases. On the front face, a rounded window 0.30 wide x 0.24 tall centred [0, 1.63, 0.27] with a kraftDark cut edge, through which the kid's real face shows: a skin face plane just inside at z 0.245; two white eye ovals (~0.05 x 0.06) at [±0.08, 1.65, 0.252] with ink pupils, small white glints and thin ink lash lines; ink brows at y 1.70; blush ovals (~0.035) at [±0.10, 1.60]; a small skin nose bump at [0, 1.62, 0.26]. The lower face below y 1.575 (chin and mouth area, a rounded skin piece filling the window's bottom) is built as a separate piece riding the jaw joint so the smile can open, with an ink smile line on it. Hair-coloured fringe tufts (3-4 small pointed flaps in hair) hang over the window's top edge from y 1.74 down to ~1.71. A thin antenna (rod r 0.008) rises from [0, 1.88, 0] to y 2.12 with a red ball (r 0.045) on top and a tape wrap at its base. Nothing else covers the face window.",
+          "attaches": "Sits on the torso box's top face at the neckHole mount, its bottom tape rim meeting the torso's tape collar.",
+          "joints": [
+            "neck",
+            "head",
+            "jaw"
+          ],
+          "floor": false,
+          "budget": 230
+        },
+        {
+          "id": "armL",
+          "builds": "The left cardboard tube arm with a box mitt, reading as a kid's arm in a costume sleeve. Upper arm tube (r 0.07, kraft) from the shoulderL mount [0.45, 1.18, 0.02] to elbowL [0.65, 0.98, 0.02]; forearm tube (r 0.065, kraft) from elbowL down to wristL [0.76, 0.72, 0.03]. At the shoulder end: a tee-coloured sleeve ring (r 0.085, short) showing the kid's t-shirt inside the arm hole, capped by a tape rim. At the elbow: a kraftDark corrugated ring (short cylinder r 0.075 with flutes). At the wrist: a tape cuff. The mitt is a kraft box 0.2 x 0.2 x 0.16 centred [0.78, 0.62, 0.03] with kraftDark corrugated edge strips, a small thumb lump (box ~0.05) on the body-facing side, and three short ink knuckle lines drawn on its front face; it rides the wristL joint. Everything derives from the shoulderL, elbowL and wristL joints.",
+          "attaches": "Roots in the torso box's left arm hole at the shoulderL mount; its tape rim meets the torso's hole rim.",
+          "joints": [
+            "shoulderL",
+            "elbowL",
+            "wristL"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "armR",
+          "builds": "The right cardboard tube arm with a box mitt, mirroring armL: upper arm tube (r 0.07, kraft) from the shoulderR mount [-0.45, 1.18, 0.02] to elbowR [-0.65, 0.98, 0.02]; forearm tube (r 0.065, kraft) down to wristR [-0.76, 0.72, 0.03]. Tee-coloured sleeve ring and tape rim at the shoulder end, kraftDark corrugated ring at the elbow, tape cuff at the wrist. The mitt is a kraft box 0.2 x 0.2 x 0.16 centred [-0.78, 0.62, 0.03] with kraftDark corrugated edge strips, a small thumb lump on the body-facing side, three ink knuckle lines on its front face, riding wristR. Everything derives from the shoulderR, elbowR and wristR joints.",
+          "attaches": "Roots in the torso box's right arm hole at the shoulderR mount; its tape rim meets the torso's hole rim.",
+          "joints": [
+            "shoulderR",
+            "elbowR",
+            "wristR"
+          ],
+          "floor": false,
+          "budget": 130
+        },
+        {
+          "id": "legs",
+          "builds": "The kid's legs and boots under the box, the only part touching the floor. Two denim pants tubes (r 0.07) from under the box bottom at the legL and legR mounts [±0.2, 0.57, 0] down to y 0.14, each with a white sock band (~0.03 tall) at y 0.16 above the boot. Cardboard craft boots: kraft boxes 0.22 wide x 0.13 tall x 0.32 deep centred [±0.2, 0.065, 0.06], standing on y 0, each with a sole slab in sole (0.24 x 0.02 x 0.34 at y 0.01), a kraftDark corrugated strip along the toe edge, three ink lace crosses drawn on the front of the boot, a tape strap around the ankle, and a small red paper patch (~0.04) with an ink doodle on the outer side of each boot. Rides the hipL/kneeL/footL and hipR/kneeR/footR joints.",
+          "attaches": "Emerges from under the torso box bottom at the legL and legR mounts, the pant tops tucking inside the box's lower edge.",
+          "joints": [
+            "hipL",
+            "kneeL",
+            "footL",
+            "hipR",
+            "kneeR",
+            "footR"
+          ],
+          "floor": true,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "model": "openrouter-curated/z-ai/glm-5.3-flash",
+        "effort": "high",
+        "started": "2026-10-29T00:44:18.517Z",
+        "wallMs": 199506,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 52295,
+          "completion_tokens": 15645,
+          "total_tokens": 67940,
+          "prompt_tokens_details": {
+            "cached_tokens": 28505
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 11842
+          }
+        },
+        "costUsd": 0.012246149999999999,
+        "hasCode": true,
+        "reasoning": "The user wants me to act as an orchestrator/designer, notI need to write a spec JSON for a kid in a cardboard-box robot costume, cardboard craft style. Humanoid character. I'm the spec writer, not the module writer.\n\nLet me design the model:\n\n- A kid (~1.2m tall) wearing a big cardboard box as a robot torso costume, a cardboard box helmet (robot head), cardboard tube arms with box mitts, box boots/legs, painted dials, antennas, rivets, tape seams, crayon-drawn panel lines, blinking LED buttons.\n\nProportions: kid maybe 1.25 m tall total with helmet. Boxes are oversized. Let's say:\n- Box torso: roughly 0.9 wide × 0.8 tall × 0.6 deep, from y≈0.5 to 1.3.\n- Head box (helmet): 0.5 cube-ish, y 1.3–1.85, with antenna to ~2.1.\n- Arms: cardboard tubes from shoulders out, box gauntlet hands.\n- Legs: kid legs in box boots, feet on floor.\n\nTotal size: width ~1.5 m (arms out or at sides? Rest pose for rigging — arms extended is T-pose, but for a humanoid kid maybe slightly out). The system prompt says rest pose: limbs separated and extended. Let's do arms angled outward-down slightly, or straight out? Rest pose like T-pose but arms can go slightly down-out. Width with arms extended: ~1.9 m. Let's keep arms angled down ~20° so width ~1.7.\n\nHeight: antenna top ~2.1 m. So size [1.8, 2.1, 1.0].\n\nFront faces +Z. Cardboard palette: kraft tan #c8955a / #d2a86e, darker corrugated edges #a87944, brown tape #b5773a, painted panels: robot blue-grey? Cardboard craft style — kid drew markers: red buttons, silver paint? Keep palette ≤24.\n\nPalette ideas:\n- kraft: \"#c99559\" main cardboard\n- kraftLight: \"#e0b57a\" \n- kraftDark: \"#9c6f3c\" corrugated edges, shadows\n- tape: \"#b07a3e\" packing tape? Actually tape often tan/brown; maybe silver duct tape \"#9aa3ad\"\n- silver: \"#a8b0b8\" duct tape / robot accents\n- red: \"#e23b2e\" painted buttons, heart\n- blue: \"#2f6fd0\" marker paint\n- yellow: \"#f2c230\"\n- green: \"#3fa34d\"\n- ink: \"#3a2a1c\" crayon lines\n- white: \"#f5efe2\" paper\n- skin: \"#e8b48c\" kid skin at face opening? But head is a box helmet with a face cutout showing the kid's face! That's charming — the kid's face visible through a cutout window in the helmet.\n- hair: \"#5a3826\"\n- sock/stripe...\n\nYes — signature: the kid's real face peeking through a cut window in the box head. Face: skin, eyes (big anime-ish or simple eyes), smile, cheeks, hair fringe poking out.\n\nJoints skeleton: humanoid. Root at hips. Order parents first:\n- root \"hips\" at [0, 0.75, 0] role spine (root joint, no parent)\n- spine at [0, 0.95, 0] role spine, parent hips\n- chest at [0, 1.15, 0] role spine, parent spine\n- neck at [0, 1.32, 0] role neck, parent chest\n- head at [0, 1.42, 0] role head\n- jaw at ... kid face — could have jaw for mouth. role jaw, parent head.\n- shoulderL at [0.45, 1.25, 0] role arm parent chest; armL... For rest pose arms out: armL dir [1, 0, 0]? Let's do arms straight out sideways (T-pose) for clean rigging — but the box torso is wide, arms out at shoulder height. Arm tube from shoulder outward. Joints: shoulderL, elbowL, wristL, handL? Keep chains simple: each part lists joints it rides.\n\nArm chain L: shoulderL [0.48, 1.22, 0], elbowL [0.85, 1.22, 0], wristL [1.15, 1.22, 0], handL [1.28, 1.22, 0] dir [1,0,0]. Total arm reach ~1.28; width then 2.56? Too wide. Make arms angled down: dir [0.9, -0.45, 0] roughly 26° below horizontal. Arm length 0.8: shoulder [0.42, 1.25, 0.05], elbow at [0.42+0.36, 1.25-0.18] = [0.78, 1.07], wrist [1.14, 0.89]? That's reach 1.14 half-width plus mitt ~1.3. Width 2.6. Hmm, maybe arms bent at elbow downward (like a kid holding arms slightly out): shoulder out to elbow horizontal 0.3, then forearm down. So elbow [0.75, 1.22], wrist [0.78, 0.8]? That puts hands near hips — good \"kid in costume\" pose but rest pose wants limbs separated. Hands at sides but separated from body by being out 0.15+ mitt half. Actually a natural A-pose: arms angled out 30° down.\n\nLet me simplify: shoulderL at [0.5, 1.25, 0.05], elbowL at [0.86, 1.12, 0.05], wristL/handL at [0.98, 0.72, 0.08]. Mitt box around [0.98, 0.6-0.85]. Arm x extent to ~1.15 with mitt. Width 2.4? Total size width — arms at sides, mitts outside hips: x max ~1.05+0.12 = 1.17. Size width 2.4 would be for T-pose. Let's set size [1.7, 2.1, 1.1]. Box torso 0.95 wide each side? No: torso box half-width ~0.45. Arms out at ~45° down: wrist at x 0.75.\n\nLet me settle concrete numbers.\n\nKid proportions (stylized, chunky):\n- Feet: box boots, each 0.24 wide, 0.14 tall, 0.34 deep, at x ±0.22, y 0–0.14.\n- Legs: cardboard tube legs (or kid pants with box boots), y 0.14–0.75. Legs slightly apart: x ±0.2.\n- Hips root at [0, 0.78, 0].\n- Torso box: outer 0.95 w × 0.75 h × 0.6 d → x ±0.475, y 0.75–1.5, z ±0.3. Hmm total height then head above 1.5.\n\nWait — helmet on top of torso box: head box 0.55×0.5×0.5, y 1.5–2.0, antenna to 2.15. Size height 2.2. Let me use size [1.7, 2.2, 1.0].\n\nHmm, but a 6-8 year old kid is ~1.2 m. With the costume, the kid stands inside a big box; legs of the kid show below the box, feet in box boots. So visible kid: legs (short, maybe 0.55 m from floor to box bottom at 0.55), arms from sleeve holes, face in head box.\n\nDesign:\n- Kid legs: pants legs (denim blue or brown) from y 0.1 to 0.6, box boots on feet.\n- Torso box bottom at y 0.55, top at 1.35 (0.8 tall), half-w 0.42, half-d 0.28. \n- Head box: half 0.26, y 1.35–1.87, plus antenna to 2.15.\n\nHmm, head 0.52 wide is wider than shoulders proportionally — good for cute chunky.\n\nShoulders/arm holes on torso box sides at y ~1.15. Arms: cardboard tube arms radius 0.07, from shoulder [±0.45, 1.18] angled down-out to elbow [±0.62, 0.98], then forearm to wrist [±0.72, 0.7]. Box mitts 0.16 cubes at wrist.\n\nKid's hands inside mitts — mitts are box cubes.\n\nFace: window in head box front (z+ face), cutout ~0.3 wide × 0.24 tall, showing kid's face: skin plane inside, eyes, brows, smile, cheeks, hair fringe above window. Eyes as parts (white + ink pupils), or animeEye decal? Keep as parts for other builders to build — spec them explicitly.\n\nAntenna: on head top, thin rod with a red ball. Maybe two antennas side, or one center. One center antenna with ball, height 0.28.\n\nBackpack: a backpack on the kid's back? But torso box covers back. Maybe cardboard jetpack on the box back with fins? Fun: crayon-drawn rocket boosters / cardboard backpack with wings? Keep it simple: cardboard backpack \"jetpack\" with two cylinder boosters on the back of the torso box.\n\nDetails per box craft style:\n- Corrugated edges: exposed corrugation along cut edges — thin strips of fluted cardboard (tiny ridged strips) along box edges. Represent as darker thin boxes along edges.\n- Packing tape: strips of shiny tape across seams, slightly different tone.\n- Marker/crayon doodles: drawn gauge on torso front, \"robot heart\" button, knobs, panel lines in ink.\n- Buttons: big red/blue plastic buttons stuck on torso front (from kid's shirt? no—on the box: drawn dials).\n- Rivets: small paper fasteners (brads) — silver circles at corners.\n- Costume strap: duct tape straps over shoulders? Or visible kid's t-shirt collar at neck.\n\nSplit into 3–6 parts:\n\n1. \"torsoBox\" — the big cardboard box torso with all its details: corrugated edges, tape seams, front panel with drawn gauge + buttons + knob, rivets, side flaps, jetpack boosters on back. Rides chest/spine joints. Budget ~220.\n\n2. \"helmet\" — head box with face window, kid's face inside (skin, eyes, brows, smile, cheeks, hair), antenna with ball, ear muffs? side knobs, rivets, tape. Rides head/neck. Budget ~220.\n\n3. \"armsL\" and \"armsR\" — or one part \"arms\" both sides? Parts should split work evenly, each a self-contained piece. Could do \"armL\" and \"armR\" separately, each with tube arm, elbow bend, box mitt with drawn fingers/knuckle lines, tape ring at shoulder. Budget ~120 each. But 3-6 parts total; we have torso, helmet, armL, armR = 4. Then legs.\n\n4. \"legs\" — kid legs both: pants tubes, box boots with toe caps, socks? Rides leg joints. Budget ~140.\n\nThat's 5 parts. Or combine arms into one part \"arms\" (both) budget 240. I think separate L/R is fine — 5 parts: torsoBox, helmet, armL, armR, legs. Legs is one part building both legs.\n\nJoint list (created in order, parents first):\n- \"hips\" at [0, 0.78, 0] dir [0,1,0] role spine (root)\n- \"chest\" at [0, 1.0, 0] role spine, parent hips\n- \"neck\" at [0, 1.3, 0] role neck, parent chest\n- \"head\" at [0, 1.4, 0] role head, parent neck\n- \"jaw\" at [0, 1.47, 0.14]? role jaw, parent head — kid's mouth inside face window. dir [0,-0.2,1]? Jaw at chin of the face. Face window center at [0, 1.62, frontZ]. Head box front z = +0.26 (half-d 0.26 if head box z half 0.26). Face plane at z 0.26. Jaw at [0, 1.52, 0.2] dir [0,0,1].\n\nHmm — the kid's face is inside the helmet, riding the head joint; jaw rides jaw joint.\n\n- \"shoulderL\" at [0.46, 1.18, 0.02] dir [1,-0.45,0] role arm, parent chest, group \"armL\"\n- \"elbowL\" at [0.64, 1.0, 0.02] role arm, parent shoulderL\n- \"wristL\" at [0.74, 0.74, 0.04] role arm, parent elbowL\n- \"handL\" tip at wrist end? The mitt could be the hand joint: \"handL\" at [0.76, 0.68, 0.04] role digit? Spec says hand is tip of arm chain. Let's define wristL then handL as mitt center [0.75, 0.66, 0.04].\n\nActually simpler: shoulderL, elbowL, wristL (mitt rides wristL). Use role \"arm\" for all; mitt is tip.\n\n- Same for R with negative x.\n- \"hipL\" at [0.2, 0.72, 0] dir [0,-1,0] role leg, parent hips\n- \"kneeL\" at [0.2, 0.42, 0] role leg, parent hipL\n- \"footL\" at [0.2, 0.12, 0.05] dir [0,0,1] role leg, parent kneeL — foot/boot.\n- Same R.\n\nCount: hips, chest, neck, head, jaw = 5; arm L/R = 3×2 = 6; leg L/R = 3×2 = 6. Total 17 joints. Fine.\n\nMounts: shared points where parts meet:\n- \"neckHole\": [0, 1.35, 0] — where helmet sits on torso box top (tape collar).\n- \"shoulderL\": [0.44, 1.18, 0.02] — arm tube root at torso box side wall.\n- \"shoulderR\": [-0.44, 1.18, 0.02].\n- \"hipL\" [0.2, 0.6, 0] — where legs emerge under torso box bottom (box bottom y 0.58). \"hipR\" [-0.2, 0.6, 0].\n- Maybe \"boosterBase\" for jetpack? That's within torso part only.\n\nMounts entries: neckHole, shoulderL, shoulderR, legL, legR.\n\nBoxes per part (min/max corners in model space):\n- torsoBox: [[-0.46, 0.56, -0.3], [0.46, 1.38, 0.32]] — includes jetpack sticking back z to -0.42? Booster cylinders stick out back to z -0.5. Box is the space the part fills: extend z max to -0.52: [[-0.46, 0.56, -0.52], [0.46, 1.38, 0.32]]. Hmm, but boxes that meet share faces — helmet box starts at y 1.38. Arms attach at side x 0.46.\n\nWait, arms: shoulder at x 0.44 inside torso box edge 0.46. Arm part box: [[0.44, 0.52, -0.12], [1.05, 1.24, 0.18]]. Mitt at x 0.74+0.11=0.85 max... let me recompute arm geometry.\n\nArm: shoulder joint at [0.45, 1.18, 0.02]. Upper arm tube to elbow [0.66, 0.98, 0.02] (length ~0.29). Forearm to wrist [0.76, 0.72, 0.03]. Mitt box cube 0.2: centered [0.78, 0.62, 0.03], so extends x to 0.88, y 0.52–0.72. Arm part box: [[0.40, 0.50, -0.10], [0.92, 1.24, 0.18]]. Total model width ~1.84? Hmm, I said 1.7 earlier. Arms slightly out from body; mitt outer x 0.88 → width 1.76. Fine, size [1.8, 2.2, 1.1].\n\nAntenna top: head box top y 1.88 + antenna 0.25 = 2.13, ball to 2.2. Height 2.2. Torso box front z 0.32, jetpack back z -0.52. Depth 0.84 → size z 0.9. But feet stick forward z 0.17. Size [1.8, 2.2, 0.9].\n\nLegs part box: [[-0.3, 0, -0.12], [0.3, 0.62, 0.2]].\n\nHelmet box: [[-0.3, 1.36, -0.3], [0.3, 1.9, 0.3]].\n\nCheck overlap: torsoBox top y 1.38, helmet bottom 1.36 — shared region ok (tape collar at neckHole).\n\nParts list with budgets summing ≤900: torsoBox 260, helmet 240, armL 140, armR 140, legs 160 → 940. Over. Reduce: torso 240, helmet 220, armL 130, armR 130, legs 150 = 870. Good.\n\nNow write the parts' \"builds\" descriptions in detail — each builder reads only the pitch, system prompt, and this spec. They need to know construction: geometry primitives, positions relative to mounts/joints, colors by palette names.\n\nPalette (≤24):\n- kraft: \"#c99a5f\" main box cardboard\n- kraftPale: \"#ddb87f\" inside faces / lighter panels\n- kraftDark: \"#a1733c\" corrugated cut edges, flaps underside\n- flap: \"#b5854a\" darker outer flaps? maybe skip\n- tape: \"#e8d5b0\" packing tape pale tan? Tape usually translucent tan: \"#d9c49a\"\n- ductSilver: \"#a9b2b8\" duct tape straps\n- ink: \"#40301f\" dark brown marker lines\n- blackMarker: \"#33281c\"? merge into ink.\n- red: \"#e04a35\" buttons, antenna ball, heart\n- blue: \"#2f6fbe\" drawn panel accents, kid's jeans? Kid's jeans denim \"#4a6fa5\"\n- denim: \"#5b7fae\"\n- yellow: \"#f0c23c\" warning stripe on jetpack? gauge\n- green: \"#3f9d4f\" status LED\n- white: \"#f4efe4\" paper face, eye whites\n- skin: \"#efbd96\" kid skin\n- hair: \"#6b4a2e\" brown hair\n- sock: \"#e8e4d8\"? boots... boots are cardboard. Maybe red sneakers drawn on boots.\n- glow: \"#7cf7a2\"? Keep simple.\n- screen/gauge dial: \"#f7e9c4\" paper dial face.\n\nLet me finalize palette entries (aim ~16):\n- kraft \"#c99a5f\"\n- kraftPale \"#ddb87f\"\n- kraftDark \"#a1733c\"\n- tape \"#e6d3ab\"\n- silver \"#a9b2b8\" (duct tape + rivets)\n- ink \"#3a2c1c\"\n- red \"#e04a35\"\n- blue \"#2f6fbe\"\n- denim \"#56789f\"\n- yellow \"#f0c23c\"\n- green \"#3f9d4f\"\n- white \"#f4efe4\"\n- skin \"#efbd96\"\n- hair \"#6b4a2e\"\n- blush \"#f2a07c\"\n- shirt \"#c94f3d\"? Kid's shirt collar peeking at neck — orange tee \"#e07a3c\"? Use \"tee\" \"#e07a3c\".\n\n17 colors. Good.\n\nNow the joints spec: model space at each joint. Note the SDK builds joints per spec order before parts run, per the team description. Each part lists which joints it rides.\n\nLet me nail down joint coordinates:\n\nRoot: hips [0, 0.78, 0], dir [0,1,0], role spine.\n- chest [0, 1.0, 0], dir [0,1,0], role spine, parent hips.\n- neck [0, 1.3, 0], dir [0,1,0], role neck, parent chest.\n- head [0, 1.42, 0], dir [0,1,0], role head, parent neck.\n- jaw [0, 1.5, 0.16], dir [0,-0.15,1], role jaw, parent head. Hmm jaw bone direction: pointing down-forward. The kid's face is inside window; jaw at chin: [0, 1.52, 0.2].\n- shoulderL [0.45, 1.18, 0.02], dir [0.55,-0.6,0] normalized-ish; role arm, parent chest, group armL.\n- elbowL [0.65, 0.98, 0.02], dir [0.35,-0.85,0], role arm, parent shoulderL.\n- wristL [0.76, 0.72, 0.03], dir [0.1,-0.9,0], role arm, parent elbowL.\n- Mirror for R.\n- hipL [0.2, 0.6, 0], dir [0,-1,0], role leg, parent hips.\n- kneeL [0.2, 0.34, 0], dir [0,-1,0], role leg, parent hipL.\n- footL [0.2, 0.1, 0.04], dir [0,0,1], role leg, parent kneeL. Foot/boot joint.\n- Mirror R.\n\nLegs: pants tube from y 0.6 (under box) down to 0.12, radius 0.075. Boots: box 0.2 w × 0.12 h × 0.3 d, centered z +0.06, floor y 0.\n\nWait — torso box bottom: I said 0.56. Legs emerge from under box at y 0.56. hipL at 0.6 slightly above box bottom — fine, inside box. mount \"legL\" at [0.2, 0.58, 0].\n\nFace window: head box front face z = +0.27 (head half-d 0.27). Window: rounded rect 0.3 w × 0.26 h, centered [0, 1.63, 0.27]. Kid's face plane inside at z 0.24: skin oval, eyes at [±0.075, 1.65, 0.25], nose small, smile at [0, 1.58], cheeks blush, hair fringe at top of window [0, 1.75, 0.25], ears poking? The kid's actual head — maybe a small skin dome behind window. Hair fringe: brown strips across window top.\n\nHead box details: \n- Corrugated edges along all box edges: thin strips (0.02 wide) of kraftDark with tiny flutes — builder decides; spec says thin corrugated strips along edges.\n- Tape: an X of tape across the top? Or tape band around helmet rim. \n- Rivets (brads): silver discs at corners of each face.\n- Side knobs: two cardboard bolts on sides (cylinders sticking out).\n- Antenna: center top, thin rod with red ball.\n- Eyes drawn on the box outside? No — real face is the charm. But maybe the box also has painted eyes higher up? Could be cute: the robot's \"drawn eyes\" on the box above the window. Actually the window is the face. Keep: gauge dial on chest, robot face is the kid's face.\n\nTorso box details:\n- Front: big drawn gauge (circle dial with needle, paper dial), three buttons (red, yellow, green) as chunky plastic-looking cylinders or drawn circles with ink rings; a \"heart\" button; drawn control panel lines in ink; small typed label \"ROBO-KID\"? SVG-ish? Spec says builder constructs: a paper label plate with marker text — hard for them to write text without svg. They can use svg texture! But the spec shouldn't over-constrain. I'll mention \"a paper label plate with marker-drawn letters\" and let them build letters as small extruded parts or just dashes. Keep it as \"a name plate with marker scribbles\" — maybe safer: build small ink strokes as parts.\n\nKeep each part's builds description concrete but leaving construction freedom.\n\n- Tape seam: vertical tape strip down front center where flaps meet (the box front made from flaps? typically a box has flaps). Cardboard craft: front panel + tape.\n- Side: arm holes with tape rims.\n- Back: jetpack — two cardboard cylinders (booster) with yellow band and cone nozzles, plus a small cardboard fin. \n- Bottom: box bottom sits above knees; cardboard skirt? no.\n\nAlso a duct tape shoulder strap over the right shoulder? That crosses torso and arm — belongs where? Assign to torsoBox: strap over torso from front waist to back over shoulder, and armL/R could have the strap continuing? That creates cross-part dependency. Skip strap; instead tape collars at each part boundary (each builder adds tape rim at their own mount).\n\nArm details:\n- Tube arm: cardboard cylinder, radius 0.075, from shoulder to elbow to wrist, with slight bend.\n- Corrugated rings at elbow? Elbow: tape ring at joint, corrugated edge.\n- Box mitt: cube 0.2 with rounded? Box cube with drawn knuckle lines (ink), thumb: small box lump on inner side, corrugated cuff ring at wrist, tape cuff.\n- Maybe the kid's sleeve? Arms are cardboard tubes with the kid's shirt visible at shoulder hole? Keep simple.\n\nLegs details:\n- Pants: denim tubes, both legs, cuff at bottom.\n- Boots: cardboard boxes painted? Craft boots: kraft boxes with corrugated toe edge, ink laces drawn (crisscross strokes), red toe cap? Let's give: kraft boot box, tape band at ankle, ink lace crosses, dark sole.\n\nNow write layout, mounts, joints, parts.\n\nSize check: width 1.8 (mitt x 0.92 each side → 1.84; say size 1.9). Let me set mitt center x 0.78, half 0.11 → 0.89. Size width 1.9. Height 2.2. Depth: z -0.52 (booster) to +0.32 (torso front)... booster back z -0.5; feet front z 0.19; torso front 0.32. Size z 0.9. size [1.9, 2.2, 0.9].\n\nFloor: legs part floor: true. Everything else floor false. Antenna ball at top — no.\n\nMounts:\n- neckHole [0, 1.36, 0.05] — helmet sits on torso box top face; tape collar ring.\n- shoulderL [0.45, 1.18, 0.02]\n- shoulderR [-0.45, 1.18, 0.02]\n- legL [0.2, 0.57, 0]\n- legR [-0.2, 0.57, 0]\n- gaugeCenter? Not shared. Just the 5 mounts.\n\nEach part lists its joints:\n- torsoBox: [\"hips\", \"chest\", \"neck\"]? Neck joint at 1.3 is inside torso box top (torso top 1.38, neck 1.3). Hmm neck joint then belongs to torso box region? The helmet rides head/neck. Torso box top at 1.38; neck joint 1.3 within box. Helmet rides neck+head. Torso rides chest (and hips). Set torso: hips, chest. Neck: helmet. But the collar tape at neckHole — torso builder builds it on chest. OK.\n- helmet: [\"neck\", \"head\", \"jaw\"].\n- armL: [\"shoulderL\", \"elbowL\", \"wristL\"]. armR mirror.\n- legs: [\"hips\", \"hipL\", \"kneeL\", \"footL\", \"hipR\", \"kneeR\", \"footR\"] — pants tops ride hips? Pants from y 0.6 down; hipL at 0.6 is the top of pants. Pants ride hipL/kneeL; boots ride footL. hips joint listed for pants top? Pants top at box bottom — ride hipL. So legs: [\"hipL\",\"kneeL\",\"footL\",\"hipR\",\"kneeR\",\"footR\"].\n\nBudgets: torso 250, helmet 230, armL 130, armR 130, legs 150 = 890. Good.\n\nNow write \"builds\" for each part with enough detail: positions, sizes, colors, details. Must be self-contained; the builder reads pitch, system prompt, this spec. Reference mounts and joints by name.\n\nLet me define key geometry numbers centrally in the spec (mounts + a \"layout\" section) so builders align:\n\nTorso box: x ±0.44, y 0.56–1.38, z ±0.30 (front +0.30, back −0.30). Actually earlier I said front z 0.32. Let's fix: torso box half-d 0.30, so front z=0.30, back z=-0.30. Boosters on back protrude to z −0.52. Half-w 0.44, half-h 0.41 (y 0.56–1.38... height 0.82). OK.\n\nHead box: x ±0.26, y 1.38–1.88, z ±0.27. Face window on +z face: center [0, 1.63, 0.27], 0.30 wide × 0.24 tall.\n\nAntenna: base at [0, 1.88, 0], rod to 2.12, ball r 0.045 at 2.12 → top 2.165. Size height 2.2. OK.\n\nBoot: box 0.22 w × 0.13 h × 0.32 d, centered x ±0.2, y 0.065, z +0.06 (front z 0.22). Pants: tube radius 0.07, from y 0.62 to 0.13, centered x ±0.2.\n\nGauge: on torso front face z 0.30, center [−0.14, 1.05, 0.30]? Gauge circle r 0.11 at [-0.13, 1.06]. Buttons: red, yellow, green at x 0.12–0.26, y 1.0–1.15. Heart at [-0.14, 0.85]? Let me lay out the front panel:\n- Dial gauge: circle r 0.11 centered [-0.15, 1.08, 0.30], paper face white, ink ring, ink needle, red tick marks.\n- Three buttons in a vertical row at [0.20, 1.16 / 1.02 / 0.88, 0.30]: red, yellow, green, r 0.035 cylinders protruding 0.025 with ink outline rings.\n- Heart decal: red paper heart at [-0.15, 0.84, 0.30] size 0.09.\n- Label plate: paper rect 0.2 × 0.07 at [0.16, 0.72, 0.30] with ink scribbles.\n- Tape vertical strip: x 0, width 0.06, from y 0.56 to 1.38 on front face — the flap seam.\n- Corrugated edges: strips along the 4 vertical edges and top/bottom edges, kraftDark, 0.025 wide with flute lines.\n- Rivets: silver discs r 0.012 at corners of each face.\n- Arm hole rims at shoulderL/R: tape rings around holes on side faces.\n- Jetpack: two cylinders r 0.09, centers [±0.16, 0.92, -0.38], length 0.24 along z, kraft, with yellow band and darker nozzle cones at bottom; mounted on a cardboard back plate 0.42×0.5 at z -0.34.\n\nHmm wait, back plate z -0.30 to -0.34. Boosters from z -0.34 to -0.52.\n\nHelmet details:\n- Tape band around helmet bottom rim (neckHole collar) — torso builder builds collar on top of torso box; helmet builder builds its own bottom tape rim.\n- Side bolts: cylinders sticking out x ±0.26 at [±0.26, 1.66, 0.06], r 0.04, kraft with ink rings.\n- Antenna with red ball, small tape wrap at base.\n- Face window: cutout; kid's face: skin rounded plane at z 0.245; eyes: white ovals 0.05×0.06 at [±0.08, 1.65, 0.252], ink pupils 0.02 with white glint; brows ink strokes above at y 1.70; smile ink arc at [0, 1.575]; blush ovals at [±0.10, 1.60]; nose small skin bump at [0, 1.62, 0.26]; hair fringe: brown flaps hanging over window top from y 1.74 down to 1.72 (a few triangular tufts), plus hair cap visible inside top of window? The kid's head inside: maybe small hair tuft. Ears: kid's ears poking? They'd be hidden by box. Skip ears.\n- Jaw joint: the smile could ride jaw? Simpler: jaw joint exists; helmet builder puts lower lip/smile on jaw? The face is mostly one plane; jaw as a small chin piece inside the window so it can open: skin chin/cheek lower piece at [0, 1.545, 0.25] riding jaw joint with mouth opening. I'll spec: the lower face (chin + lower lip) is a separate piece riding jaw, so the smile can open.\n\nHmm, but the window is small; fine — jaw piece: lower face oval below y 1.575.\n\nArm details:\n- Upper arm tube: from shoulderL mount [0.45, 1.18, 0.02] to elbowL [0.65, 0.98, 0.02], r 0.07, kraft; corrugated ring at mid? Add tape wrap at shoulder end (tube cap). \n- Forearm: elbow to wrist [0.76, 0.72, 0.03], r 0.065, kraft.\n- Elbow: corrugated ring (a short wider cylinder of kraftDark flutes) at elbow.\n- Mitt: box 0.2×0.2×0.16 centered [0.78, 0.62, 0.03], kraft; thumb lump box 0.06 on front? Thumb at inner side (toward body, -x for L): small box 0.05 at [0.70, 0.60, 0.03]. Knuckle lines: 3 ink strokes on mitt front. Corrugated cuff at wrist: short cylinder r 0.085 kraftDark at [0.76, 0.70, 0.03].\n- Tape ring at wrist.\n\nLegs:\n- Pants: two tubes r 0.07 from y 0.62 (tucked under box) to 0.14, denim; cuff ring at 0.16.\n- Boots: box 0.22×0.13×0.32 centered [±0.2, 0.065, 0.06]; kraft; corrugated edge at toe; ink laces: 3 cross strokes on top front; tape strap at ankle; dark sole slab 0.24×0.02×0.34 at y 0.01.\n- Maybe a sock stripe: white sock band at y 0.15 above boot.\n\nNow joint list order: hips, chest, neck, head, jaw, shoulderL, elbowL, wristL, shoulderR, elbowR, wristR, hipL, kneeL, footL, hipR, kneeR, footR. 17 joints.\n\ndir values: \n- hips [0,1,0]\n- chest [0,1,0]\n- neck [0,1,0]\n- head [0,1,0]\n- jaw [0,-0.25,1] (normalize)\n- shoulderL [0.5,-0.5,0] (normalize [0.7,-0.7,0]) — from shoulder to elbow direction: (0.2, -0.2, 0) → [0.7,-0.7,0]. \n- elbowL dir to wrist: (0.11, -0.26, 0.01) → [0.4,-0.9,0].\n- wristL dir to hand: [0.1,-0.9,0]? wrist to mitt center: (0.02, -0.1, 0) → [0.2,-0.98,0] ≈ [0.15,-0.98,0]. Use [0,-1,0].\n- hipL [0,-1,0], kneeL [0,-1,0], footL [0,0.2,1]→ foot dir [0,0,1].\n- Mirror R.\n\nRoles: hips/chest = spine, neck = neck, head = head, jaw = jaw, shoulders/elbows/wrists = arm, hips/knee/foot = leg.\n\nGroups: armL/armR groups optional; add \"group\": \"armL\" etc. for L/R chain grouping — the schema example includes \"group\". I'll include groups for armL, armR, legL, legR.\n\nDescription: one sentence.\n\nNow the layout field: describe silhouette front to back, floor contact, style.\n\nAlso note style on every part: corrugated edges, tape, marker doodles, rivets everywhere.\n\nWrite \"builds\" fields richly. Also mention that geometry should use b.joint-created skeleton (joints pre-created in order per the joints array — actually per team instructions, joints are created before any part runs? \"joints is the skeleton, created in this order before any part runs\" — yes the harness creates them; parts reference by name).\n\nLet me also double check boxes don't wrongly overlap other parts' exclusive regions: armL box [[0.40, 0.50, -0.12], [0.92, 1.24, 0.18]] — overlaps torsoBox box x up to 0.46? torsoBox x max 0.46; armL box x min 0.40 — overlap 0.40–0.46 for y 0.56–1.24. Parts that meet share box faces; slight overlap is fine where they meet. I'll set armL box x min 0.44 to meet the torso face: [[0.44, 0.50, -0.12], [0.92, 1.24, 0.18]]. Torso box [[-0.44, 0.56, -0.52], [0.44, 1.38, 0.30]]. Hmm jetpack z -0.52, but feet z? legs box [[-0.3, 0, -0.12], [0.3, 0.58, 0.22]].\n\nHelmet box: [[-0.28, 1.36, -0.29], [0.28, 1.90, 0.29]] — slightly larger than head box to include window bits? The face is inside head box, fine. Antenna ball up to y 2.17: helmet box [[-0.28, 1.36, -0.29], [0.28, 2.18, 0.29]]. Good, includes antenna.\n\nlegs box [[-0.3, 0, -0.12], [0.3, 0.58, 0.22]] floor true.\n\nCheck arm box y range 0.50–1.24: mitt bottom y 0.62-0.1=0.52. Good.\n\nSize: width 1.9 (mitts 0.92+0.92=1.84, round 1.9), height 2.18, depth 0.9? z: -0.52 to +0.32 = 0.84 → 0.9. size [1.9, 2.2, 0.9].\n\nNow write all the descriptions. Keep each \"builds\" detailed but readable. Include palette key names in each.\n\nOne more consideration: the kid's face — \"eyes that read from the front\" per system prompt. The window with real face is the identity cue. Also add drawn robot eyes on the helmet? No — the charm is the kid's face. Maybe add a small drawn robot face on the torso box? No, keep it clean.\n\nAlso a kid's shirt collar visible at neckHole? The helmet covers the neck; torso box top is closed. Skip.\n\nWrite the JSON now. Be careful with valid JSON (no trailing commas, escape nothing weird). Include comments? No — JSON must be valid; keep descriptions as strings.\n\nPalette final (17):\nkraft, kraftPale, kraftDark, tape, silver, ink, red, blue, denim, yellow, green, white, skin, hair, blush, tee, sole.\n\nWhere's tee used? Maybe the kid's tee collar not visible... Actually the arms: cardboard tubes hide the shirt. Could add: kid's shirt sleeve visible at shoulder — the arm hole shows a bit of orange tee sleeve at the top of the arm tube. Nice touch: tee sleeve ring at shoulder. Or keep tee unused — better to remove unused. Instead use tee for... hmm, mitts could have the kid's sweater cuffs? Simpler: keep tee for the sleeve ring at the shoulder holes (torsoBox and armL/armR each build half? The sleeve belongs to arm part — arm builder adds tee sleeve ring at the tube's shoulder end, inside the tape rim). Good, use tee.\n\nCount colors: kraft, kraftPale, kraftDark, tape, silver, ink, red, blue, denim, yellow, green, white, skin, hair, blush, tee, sole = 17 ≤ 24. \n\nJoints array JSON:\n\n[\n {\"name\":\"hips\",\"at\":[0,0.78,0],\"dir\":[0,1,0],\"role\":\"spine\"},\n {\"name\":\"chest\",\"parent\":\"hips\",\"at\":[0,1.0,0],\"dir\":[0,1,0],\"role\":\"spine\"},\n {\"name\":\"neck\",\"parent\":\"chest\",\"at\":[0,1.3,0],\"dir\":[0,1,0],\"role\":\"neck\"},\n {\"name\":\"head\",\"parent\":\"neck\",\"at\":[0,1.42,0],\"dir\":[0,1,0],\"role\":\"head\"},\n {\"name\":\"jaw\",\"parent\":\"head\",\"at\":[0,1.53,0.2],\"dir\":[0,-0.25,1],\"role\":\"jaw\"},\n {\"name\":\"shoulderL\",\"parent\":\"chest\",\"at\":[0.45,1.18,0.02],\"dir\":[0.7,-0.7,0],\"role\":\"arm\",\"group\":\"armL\"},\n {\"name\":\"elbowL\",\"parent\":\"shoulderL\",\"at\":[0.65,0.98,0.02],\"dir\":[0.4,-0.9,0],\"role\":\"arm\",\"group\":\"armL\"},\n {\"name\":\"wristL\",\"parent\":\"elbowL\",\"at\":[0.76,0.72,0.03],\"dir\":[0.15,-0.98,0],\"role\":\"arm\",\"group\":\"armL\"},\n {\"name\":\"shoulderR\",\"parent\":\"chest\",\"at\":[-0.45,1.18,0.02],\"dir\":[-0.7,-0.7,0],\"role\":\"arm\",\"group\":\"armR\"},\n {\"name\":\"elbowR\",\"parent\":\"shoulderR\",\"at\":[-0.65,0.98,0.02],\"dir\":[-0.4,-0.9,0],\"role\":\"arm\",\"group\":\"armR\"},\n {\"name\":\"wristR\",\"parent\":\"elbowR\",\"at\":[-0.76,0.72,0.03],\"dir\":[-0.15,-0.98,0],\"role\":\"arm\",\"group\":\"armR\"},\n {\"name\":\"hipL\",\"parent\":\"hips\",\"at\":[0.2,0.62,0],\"dir\":[0,-1,0],\"role\":\"leg\",\"group\":\"legL\"},\n {\"name\":\"kneeL\",\"parent\":\"hipL\",\"at\":[0.2,0.34,0],\"dir\":[0,-1,0],\"role\":\"leg\",\"group\":\"legL\"},\n {\"name\":\"footL\",\"parent\":\"kneeL\",\"at\":[0.2,0.11,0.05],\"dir\":[0,0.15,1],\"role\":\"leg\",\"group\":\"legL\"},\n {\"name\":\"hipR\",\"parent\":\"hips\",\"at\":[-0.2,0.62,0],\"dir\":[0,-1,0],\"role\":\"leg\",\"group\":\"legR\"},\n {\"name\":\"kneeR\",\"parent\":\"hipR\",\"at\":[-0.2,0.34,0],\"dir\":[0,-1,0],\"role\":\"leg\",\"group\":\"legR\"},\n {\"name\":\"footR\",\"parent\":\"kneeR\",\"at\":[-0.2,0.11,0.05],\"dir\":[0,0.15,1],\"role\":\"leg\",\"group\":\"legR\"}\n]\n\nNow the parts.\n\nPart 1: torsoBox.\nbuilds: \"The big cardboard box torso the kid wears: a box x -0.44..0.44, y 0.56..1.38, z -0.30..0.30 in kraft, with kraftDark corrugated strips along every edge, kraftPale inner faces and tape (#e6d3ab) seams. Front panel: vertical tape strip down the centre (flap seam), a paper dial gauge (white circle r 0.11 at [-0.15, 1.08, 0.30], ink ring, ink needle pointing to a red tick, yellow tick marks), a vertical row of three round buttons at [0.20, 1.16/1.02/0.88, 0.30] in red, yellow, green with ink rings and small silver bases, a red paper heart at [-0.15, 0.84, 0.30], and a white paper label plate 0.2×0.07 at [0.16, 0.72, 0.30] with ink scribbles. Silver brad rivets (r 0.012 discs) at the corners of every face. Side arm holes at shoulderL/shoulderR mounts with tape rims. Back: cardboard back plate and a jetpack of two kraft cylinders (r 0.09, centers [±0.16, 0.92, -0.38], length 0.24) with yellow bands, kraftDark nozzle cones and ink scribbles. Tape collar ring around the top opening at neckHole. Rides chest and hips.\"\n\nattaches: \"Sits over the legs part (box bottom at y 0.56 over the pants at legL/legR mounts); helmet rests on the top face at neckHole; arms plug into the side holes at shoulderL and shoulderR.\"\njoints: [\"hips\",\"chest\"]\nfloor false, budget 250.\n\nPart 2: helmet.\nbuilds: \"The kid's cardboard robot helmet: a box x -0.26..0.26, y 1.38..1.88, z -0.27..0.27 in kraft with kraftDark corrugated edge strips, tape rim at the bottom, silver rivets at corners, and two kraft side bolts (cylinders sticking out at [±0.26, 1.66, 0.06]) with ink rings. On the front face a rounded window 0.30 wide × 0.24 tall centred [0, 1.63, 0.27] showing the kid's real face: skin face plane at z 0.245, white eye ovals at [±0.08, 1.65, 0.252] with ink pupils and white glints, ink brows at y 1.70, blush ovals at [±0.10, 1.60], a small skin nose bump at [0, 1.62, 0.26]; the lower face (chin and mouth area below y 1.575) is a separate skin piece riding the jaw joint so the smile can open, with an ink smile line on it. Hair: hair-coloured fringe tufts hanging over the window's top edge. A thin antenna (r 0.008 rod) rises from [0, 1.88, 0] to 2.12 with a red ball (r 0.045) on top and a tape wrap at its base. Rides neck, head and jaw.\"\n\nattaches: \"Sits on the torso box's top face at neckHole, its tape rim meeting the torso's collar.\"\njoints: [\"neck\",\"head\",\"jaw\"], budget 230.\n\nPart 3: armL.\nbuilds: \"The left cardboard tube arm with box mitt: upper arm tube (r 0.07, kraft) from shoulderL [0.45, 1.18, 0.02] to elbowL [0.65, 0.98, 0.02], forearm tube (r 0.065) down to wristL [0.76, 0.72, 0.03]; a tee-coloured sleeve ring (r 0.085) and tape rim at the shoulder end, a kraftDark corrugated elbow ring at elbowL, and a tape cuff at the wrist. The mitt is a kraft box 0.2×0.2×0.16 centred [0.78, 0.62, 0.03] with a small thumb lump on the body side, three ink knuckle lines on its front face, kraftDark corrugated edge strips and a tape cuff at the wrist; the wrist rides wristL, the mitt the same arm chain.\" Hmm — mitt rides wristL.\n\nattaches: \"Roots in the torso box's left arm hole at shoulderL; the tape rim meets the torso's hole rim.\"\njoints: [\"shoulderL\",\"elbowL\",\"wristL\"], budget 130.\n\nPart 4: armR — mirror.\n\nPart 5: legs.\nbuilds: \"The kid's legs under the box: two denim pants tubes (r 0.07) from the box bottom at legL/legR mounts [±0.2, 0.57, 0] down to y 0.14, with white sock bands at y 0.16, and cardboard craft boots: kraft boxes 0.22 wide × 0.13 tall × 0.32 deep centred [±0.2, 0.065, 0.06] standing on y 0, each with a dark sole slab, a corrugated toe edge, three ink lace crosses on the front, a tape strap at the ankle and a small drawn star or patch in blue/red on the side. Rides hipL/kneeL/footL and hipR/kneeR/footR.\"\n\nHmm \"drawn star or patch\" — pick one: a red patch. Budget 150.\n\nfloor: legs true.\n\nDescription: \"A kid in a homemade cardboard robot costume: a big taped-up kraft box torso with drawn dials and a bottle-cap jetpack, a box helmet with the kid's real face peeking through a window, tube arms with box mitts and cardboard boots.\"\n\nbuilderName: \"cardboardRoboKid\".\n\nLayout string: describe silhouette and proportions.\n\nLet me also verify joint `dir` for footL: [0,0.15,1] — pointing up-forward slightly; fine.\n\nDouble-check the harness: \"joints created in this order before any part runs\" — yes.\n\nWrite the JSON."
+      },
+      {
+        "id": "legs",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:47:38.024Z",
+        "wallMs": 43595,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56140,
+          "completion_tokens": 1576,
+          "total_tokens": 57716,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 308
+          }
+        },
+        "costUsd": 0.0310032,
+        "hasCode": true,
+        "reasoning": "**Designing bone-based geometry construction**\n\n**Planning detailed geometry placement and sizing**"
+      },
+      {
+        "id": "armR",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:47:38.024Z",
+        "wallMs": 60133,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56107,
+          "completion_tokens": 2094,
+          "total_tokens": 58201,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 343
+          }
+        },
+        "costUsd": 0.036117199999999995,
+        "hasCode": true,
+        "reasoning": "**Planning bone rod construction**\n\n**Designing arm ring and edge geometry**"
+      },
+      {
+        "id": "armL",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:47:38.024Z",
+        "wallMs": 70978,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56168,
+          "completion_tokens": 2734,
+          "total_tokens": 58902,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 314
+          }
+        },
+        "costUsd": 0.042639199999999995,
+        "hasCode": true,
+        "reasoning": "**Designing output function with bone chains**\n\n**Refining geometry with oriented cylinders**"
+      },
+      {
+        "id": "helmet",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:47:38.024Z",
+        "wallMs": 94168,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56313,
+          "completion_tokens": 3504,
+          "total_tokens": 59817,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 248
+          }
+        },
+        "costUsd": 0.0506292,
+        "hasCode": true,
+        "reasoning": "**Planning geometry assembly using bones and primitives**\n\n**Detailing helmet and face geometry with overlays**"
+      },
+      {
+        "id": "torsoBox",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:47:38.024Z",
+        "wallMs": 95073,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56401,
+          "completion_tokens": 4215,
+          "total_tokens": 60616,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 92
+          }
+        },
+        "costUsd": 0.0579152,
+        "hasCode": true,
+        "reasoning": "**Designing output function with inferred types**"
+      }
+    ]
+  }
+}

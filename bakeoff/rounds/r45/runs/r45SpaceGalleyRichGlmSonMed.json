@@ -1,0 +1,326 @@
+{
+  "slug": "r45SpaceGalleyRichGlmSonMed",
+  "arm": "glm-son-med",
+  "subject": "spaceGalley",
+  "level": "rich",
+  "pitch": "Category: Prop group.\nSubject: spaceship galley kitchen.\nStyle: Alien (1979) Nostromo.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "planModel": "openrouter-curated/z-ai/glm-5.3-flash",
+  "effort": "high",
+  "started": "2026-10-29T00:36:13.993Z",
+  "wallMs": 54843,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 448574,
+    "completion_tokens": 23627,
+    "total_tokens": 472201,
+    "prompt_tokens_details": {
+      "cached_tokens": 370160
+    }
+  },
+  "costUsd": 0.2943795,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 22909,
+    "slowestPartMs": 31934,
+    "critical": "aftCounterWall",
+    "elapsedMs": 54843,
+    "spec": {
+      "name": "Nostromo Galley",
+      "description": "The cramped commercial-towing-crew galley of a 1979 retro-futurist starfreighter: gridded deck, cream panel walls with dark seams, a counter run with coffee maker and CRT, a central mess table and overhead ductwork.",
+      "builderName": "nostromoGalley",
+      "size": [
+        2.4,
+        2.3,
+        4.8
+      ],
+      "layout": "A single room module, +Z is the open end where crew enters, -Z the aft wall. Standing on y = 0 is the deck: full-width plating, checker plate, open grating strips and yellow-black hazard stripes at the entry. Against the aft wall (-Z) runs the work counter: lower cabinets, a worktop with a coffee maker, a food heater, a sink basin, and above it upper lockers, a cathode monitor on an articulated arm, pipes and conduits. Left and right walls (x = ±1.2) carry ribbed cream panels with dark seam lines, a vent grille, a switch panel with chunky toggles, a wall lamp and a small shelf with mugs. Centred on the deck sits the mess table with stools, trays, cups and a cutlery caddy, leaving ~0.5 m walkway on each side. Overhead, a ceiling soffit spans wall to wall at y = 2.05 with a recessed light tray, fat ribbed ducts running fore-aft and cable bundles dropping to the walls. The style on every part: chunky beige-cream panels inset in dark trim, exposed fasteners and greebles, matte industrial greens and greys for machines, amber indicator lamps, one green-glowing CRT, hazard yellow where feet meet equipment — flat colours, no gradients, everything boxy and riveted.",
+      "palette": {
+        "deckPlate": "#2e3238",
+        "deckChecker": "#4a5058",
+        "hull": "#3b4250",
+        "panelCream": "#cfc4ac",
+        "panelCreamLit": "#e2d8c0",
+        "trimDark": "#26231e",
+        "hazard": "#e7b814",
+        "greebleGrey": "#8a8f94",
+        "machineGreen": "#4f6450",
+        "steel": "#7d838c",
+        "rubber": "#1c1a18",
+        "amberLamp": "#ffb020",
+        "crtGlow": "#57ff7a",
+        "warningRed": "#ff3b2f",
+        "copper": "#a4703c",
+        "tableTop": "#6e6a5e",
+        "utensil": "#d9d2c2",
+        "shadowInk": "#14120f"
+      },
+      "mounts": {
+        "deckTop": [
+          0,
+          0.12,
+          0
+        ],
+        "aftWallFace": [
+          0,
+          1.2,
+          -2.2
+        ],
+        "sideWallFaceL": [
+          -1,
+          1.2,
+          0
+        ],
+        "sideWallFaceR": [
+          1,
+          1.2,
+          0
+        ],
+        "ceilingSoffit": [
+          0,
+          2.05,
+          0
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "deck",
+          "builds": "The galley floor of the Nostromo: a full-width base slab in deckPlate from x = -1.2 to 1.2 and z = -2.4 to 2.4, its top face at y = 0.12 (mount deckTop). On top sit raised checker-plate panels in deckChecker with visible bolt heads around each panel edge, and two open grating strips (dark recessed slots with cross ribs) running fore-aft along the walkways at x = ±0.65. At the entry end (z = +2.2 to 2.4) lay a yellow-black hazard stripe strip in hazard and trimDark. Add floor greebles: a low cable conduit box in trimDark running along one wall base with a rubber cable in rubber lying beside it, a circular deck drain in steel, a small hatch plate with a folding handle, and a scuffed dark patch near the table where boots land (a shadowInk flat decal plate). Keep everything flush or nearly flush — nothing stands higher than 0.06 above deckTop.",
+          "box": [
+            [
+              -1.2,
+              0,
+              -2.4
+            ],
+            [
+              1.2,
+              0.18,
+              2.4
+            ]
+          ],
+          "attaches": "Owns y = 0. Its top face is mount deckTop; walls, table and stools all start at deckTop.",
+          "joints": [],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "aftCounterWall",
+          "builds": "The aft wall (-Z) and its full work-counter run, the galley's hero piece. The wall itself is chunky cream panels (panelCream) inset in a grid of trimDark seam frames with rivet studs, facing +Z at z = -2.4 (mount aftWallFace at its mid-line). In front of it, from z = -2.4 forward to z = -1.7: lower cabinets in machineGreen with trimDark kick plates, chunky handles and a yellow hazard stripe along the toe line; a steel worktop at y = 0.95. On the worktop, left to right: a coffee maker — a boxy machineGreen body with a steel spout, a glass pot (utensil, slightly translucent-looking pale fill), amber indicator lamp and a cup resting on its drip tray; a food heater — a riveted steel box with a dark door window, red warning lamp and hazard-edged door handle; a sink basin in steel with a pipe faucet and a stack of two tin trays. Above the worktop: a row of upper lockers in panelCream with trimDark latches, then a CRT monitor in a greebleGrey housing on a jointed steel arm, its screen a glowing crtGlow green rectangle set in trimDark bezel with a small amber power lamp; a backboard of conduit in trimDark carrying copper pipes and a red valve wheel; a paper printout pinned up (a small white panel with trimDark marks). Every lamp is a small separate glowing part: amber for status, warningRed for the heater.",
+          "box": [
+            [
+              -1.2,
+              0.12,
+              -2.4
+            ],
+            [
+              1.2,
+              2.3,
+              -1.7
+            ]
+          ],
+          "attaches": "Sits on mount deckTop (cabinet bases at y = 0.12), wall back plane at z = -2.4 meets the deck's aft edge; side edges at x = ±1.2 meet the side walls' aft ends.",
+          "joints": [],
+          "floor": false,
+          "budget": 230
+        },
+        {
+          "id": "sideWalls",
+          "builds": "Both side walls of the galley, mirrored left and right, each a plane of ribbed cream panels at x = ±1.2 with frames of trimDark seams, rivets and one big recessed access panel per wall. Built as one part: build the left wall, then mirror. Each wall carries, fore to aft: a wall lamp — a steel hood with an amber-tinted underside lens; a ribbed vent grille in greebleGrey with trimDark frame; a switch panel in panelCream holding six chunky toggle switches (steel levers, trimDark bases) with one amberLamp and one warningRed indicator beside them; a small steel shelf near the aft end holding three mismatched mugs (greebleGrey, machineGreen, copper) and a spoon caddy; and low down, a floor-level cable clamp plate in trimDark with two rubber cable loops entering the wall. The right wall swaps the shelf for a wall-mounted fire extinguisher (warningRed body, steel nozzle, hazard band). Panels use panelCream with the lit variant panelCreamLit on surfaces angled toward the ceiling light tray. Wall plane at x = ±1.0 toward the interior (mounts sideWallFaceL / sideWallFaceR) so deck conduit and table clear it.",
+          "box": [
+            [
+              -1.2,
+              0.12,
+              -2.4
+            ],
+            [
+              1.2,
+              2.3,
+              2.4
+            ]
+          ],
+          "attaches": "Bases sit on mount deckTop at y = 0.12; interior wall planes are the mounts sideWallFaceL and sideWallFaceR where the ceiling soffit ends and counter run abuts; aft ends butt against the aft wall at z = -2.4.",
+          "joints": [],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "messTable",
+          "builds": "The central mess table and stools, the room's social heart, echoing the iconic crew-table scene. A heavy cylindrical pedestal base in trimDark standing on mount deckTop, a chunky fluted column in hull grey, and a round table top in tableTop at y = 0.78 with a steel rim ring and bolt heads around its edge. On the tabletop, arranged mid-meal: two steel food trays (greebleGrey) with inset compartments — one holding a wedge of dark food and a pale blob, the other empty; two mugs (one machineGreen, one utensil white) with tiny amber steam wisps as thin standing spikes; a cutlery caddy (trimDark) with steel utensil handles sticking out; a small stack of paper printouts in white with trimDark line marks; and a dented cup knocked on its side. Around the table, three stools: each a trimDark base on deckTop, a thick cylinder seat in hull with a panelCream cushion pad, and a slight height stagger. One stool is pushed back and turned a little, as if someone just left. Add a low profile — the whole part stays under y = 1.0 so sightlines to the counter stay open.",
+          "box": [
+            [
+              -0.85,
+              0.12,
+              -0.75
+            ],
+            [
+              0.85,
+              1,
+              0.9
+            ]
+          ],
+          "attaches": "Stands alone on mount deckTop, centred near [0, 0.12, 0.05]; clear of the counter front (z = -1.7) by ~0.8 m and of both walls by ~0.35 m.",
+          "joints": [],
+          "floor": false,
+          "budget": 160
+        },
+        {
+          "id": "ceiling",
+          "builds": "The overhead: a soffit slab in hull spanning wall to wall from x = -1.2 to 1.2 and z = -2.4 to 2.4, its underside at y = 2.05 (mount ceilingSoffit), boxed in trimDark perimeter frame. Recessed into its underside, centred, a long rectangular light tray: a trimDark frame, a bright panelCreamLit diffuser and a steel grille over it — the galley's main light. Running fore-aft alongside it, two fat ribbed ducts in greebleGrey with steel ring ribs every 0.25 m and a slight sag of character; they hang to y = 1.95, low enough to feel oppressive. Where ducts meet the aft wall, a square plenum box in machineGreen with copper pipe stubs and a red valve. Along one side, a bundle of rubber cables in rubber clamped in steel saddles, dropping from soffit to the switch-panel area of the side walls. Add greebles: a hanging chain hook (steel links) from the soffit above the table, an amber rotating-beacon dome (amberLamp, glowing) near the entry end, and a small speaker grille in trimDark. Everything above y = 1.9 except the beacon and hook.",
+          "box": [
+            [
+              -1.2,
+              1.9,
+              -2.4
+            ],
+            [
+              1.2,
+              2.3,
+              2.4
+            ]
+          ],
+          "attaches": "Its edge beams land on the side walls' tops at the mounts sideWallFaceL / sideWallFaceR and on the aft wall top at aftWallFace; soffit underside at ceilingSoffit, y = 2.05.",
+          "joints": [],
+          "floor": false,
+          "budget": 170
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "model": "openrouter-curated/z-ai/glm-5.3-flash",
+        "effort": "high",
+        "started": "2026-10-29T00:36:13.993Z",
+        "wallMs": 22909,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 52280,
+          "completion_tokens": 4107,
+          "total_tokens": 56387,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1394
+          }
+        },
+        "costUsd": 0.0098955,
+        "hasCode": true,
+        "reasoning": "We need to write a spec JSON for a spaceship galley kitchen, Alien (1979) Nostromo style. Prop group, 3-6 parts. No joints needed probably (static model), joints: []. Size: galley kitchen room module — think Nostromo galley: retro-futuristic industrial, beige/cream interiors with dark green/black trim, CRT monitors, coffee machine, food trays, cables, yellow warning stripes.\n\nNostromo interior palette: off-white/cream panels, dark brown/black trim, yellow/beige, red warning lights, CRT amber/green glow, grey-green machinery.\n\nLet's design: a galley corridor section, roughly 2.4m wide, 2.3m tall, 4.5m long. Floor deck at y=0 with grating. Back wall with counters, coffee maker, microwave/food heater, CRT monitor, pipes. A central galley table (like the iconic eating scene table? That's the mess table). Props: coffee cups, trays, hanging lamp, wall panels, switches, vents.\n\nParts (3-6):\n1. deck floor + lower wall panels + ceiling frame? Actually split:\n- deckFloor: floor plate, grating, floor panels, warning stripes, floor cable conduit.\n- backWall: aft wall with counters, cabinets, control panels, CRT monitor, pipes, coffee machine, food heater.\n- sideWallL / sideWallR: side walls with panels, vents, blinking lights, shelves.\n- galleyTable: central mess table with stools, trays, cups, playing cards maybe.\n- ceiling: overhead ducts, lamps, cable bundles.\n\nBudgets sum ≤ 900. Say 5 parts × ~170.\n\nSize: width 2.4, height 2.3, length 4.8.\n\nPalette (≤24): cream panels #d8cfc0, dark trim #2a2620, yellow trim (Nostromo yellow-beige #e0c9a0?), warning stripes #e7b814, hull grey-green #5c6258, dark deck #3b4250, amber light, green CRT #4aff6e, red warning #ff3b2f, etc.\n\nMounts: deckTop [0, 0.12, 0], wallLine etc. Wall-floor joint: walls sit on deck; counters mount on wall; table sits on deck.\n\nJoints: static model → \"joints\": [].\n\nParts list with boxes:\n- deck: box [[-1.2, 0, -2.4], [1.2, 0.12, 2.4]], floor: true.\n- aftWall (back wall at -Z): [[-1.2, 0, -2.4], [1.2, 2.3, -2.2]]. Box includes counters extending forward a bit: [[-1.2, 0.12, -2.4], [1.2, 2.3, -1.7]].\n- sideWalls: could be one part building both side walls (mirrored): [[-1.2, 0.12, -2.4], [-1.0, 2.3, 2.4]]? But box should encompass both sides: [[-1.2, 0.12, -2.4], [1.2, 2.3, 2.4]] minus interior... box is just the space it fills; two walls at x=±1.2, so box spanning full width but only walls. Fine.\n- galleyTable: central, [[-0.8, 0.12, -0.6], [0.8, 1.0, 0.8]].\n- ceiling: [[-1.2, 2.05, -2.4], [1.2, 2.3, 2.4]] with ducts hanging lower, lamps.\n\nHmm ceiling lamps hang below 2.05? Say ducts down to 1.95.\n\nMounts: deckTop [0, 0.12, 0]; aftWallFace at z=-1.7? sideWallFace x=±1.0? ceilingLine [0, 2.05, 0]? Let's define:\n- deckTop: [0, 0.12, 0]\n- aftCounterFront: [0, 0.95, -1.7] (counter top edge front)\n- ceilingSoffit: [0, 2.05, 0]\n\nWrite the JSON carefully: name, description, builderName \"nostromoGalley\", size [2.4, 2.3, 4.8], layout string, palette with ≤24 keys.\n\nLayout description: front (+Z) is the open end of the galley where crew enters; the aft wall at -Z carries the counter run, coffee maker, food heater, CRT monitor; side walls left and right carry paneled lockers, vents, switches; central mess table with stools; overhead light trays and ducts; deck of grating and checker plate with yellow hazard stripes.\n\nBudgets: deck 140, aftWall 220, sideWalls 200, table 160, ceiling 140 → total 860. Good.\n\nPalette entries (≤24):\n- deck: \"#2e3238\"\n- deckPlate: \"#4a5058\"\n- hull: \"#3b4250\"\n- panelCream: \"#cfc4ac\"\n- panelCreamLit: \"#e2d8c0\"\n- trimDark: \"#26231e\"\n- hazard: \"#e7b814\"\n- stripeRed: \"#b3402c\" maybe\n- greebleGrey: \"#8a8f94\"\n- pipeGreen: \"#4f6450\"\n- rubber: \"#1c1a18\"\n- amber: \"#ffb020\"\n- crtGlow: \"#57ff7a\"\n- warningRed: \"#ff3b2f\"\n- steel: \"#7d838c\"\n- copper: \"#a4703c\"\n- tableTop: \"#6e6a5e\"\n- shadowInk: \"#14120f\"\n\nGood.\n\nEach part spec: id, builds (detailed description), box, attaches, joints [], floor flags, budget.\n\nGive rich descriptions so builders make cohesive parts: mention Nostromo style cues: chunky beige panels with dark seams, ribbed ducts, chunky toggle switches, cathode screens, cables, hazard stripes, trolley-style furniture.\n\nWrite it."
+      },
+      {
+        "id": "deck",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:36.902Z",
+        "wallMs": 17913,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79129,
+          "completion_tokens": 2907,
+          "total_tokens": 82036,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0466672,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "sideWalls",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:36.902Z",
+        "wallMs": 19585,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79300,
+          "completion_tokens": 3218,
+          "total_tokens": 82518,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.050119199999999996,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "messTable",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:36.902Z",
+        "wallMs": 23091,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79229,
+          "completion_tokens": 3878,
+          "total_tokens": 83107,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.056577199999999994,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "ceiling",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:36.902Z",
+        "wallMs": 26784,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79267,
+          "completion_tokens": 4041,
+          "total_tokens": 83308,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0582832,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "aftCounterWall",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:36.902Z",
+        "wallMs": 31934,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79369,
+          "completion_tokens": 5476,
+          "total_tokens": 84845,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.07283719999999999,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

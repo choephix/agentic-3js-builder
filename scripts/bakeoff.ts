@@ -68,8 +68,17 @@ type Arm = {
   /** Parallel parts: a planning call writes a shared spec from `plan`, then one call per part writes a function from
    *  `part`, all at once; the runner assembles one module (see `parallelBuild`). With `fit` (a prompt file) the
    *  runner then measures every part against its box and gives each one that sticks out one edit call from it.
-   *  `planEffort` / `partEffort` override the round's `--effort` for the planning call / the part calls. */
-  parallel?: { plan: string; part: string; fit?: string; planEffort?: string; partEffort?: string };
+   *  `planEffort` / `partEffort` override the round's `--effort` for the planning call / the part calls, and
+   *  `planModel` / `partModel` the round's `--model` (the box check's edits run on the part model). */
+  parallel?: {
+    plan: string;
+    part: string;
+    fit?: string;
+    planEffort?: string;
+    partEffort?: string;
+    planModel?: string;
+    partModel?: string;
+  };
 };
 type ExampleEntry = {
   id: string;
@@ -510,6 +519,11 @@ async function run(round: string, args: string[]) {
   const concurrency = Number(option(args, "concurrency", "8"));
   const todo = jobs(round, args).filter((job) => !existsSync(join(dir, "runs", `${job.slug}.json`)));
   const cost = await pricing(model);
+  // Parallel arms may plan or build on other models than the round's; every call is priced on its own model.
+  const prices = new Map<string, Pricing>([[model, cost]]);
+  for (const job of todo)
+    for (const other of [job.arm.parallel?.planModel, job.arm.parallel?.partModel])
+      if (other && !prices.has(other)) prices.set(other, await pricing(other));
 
   const manifestPath = join(dir, "round.json");
   const manifest = existsSync(manifestPath)
@@ -560,7 +574,7 @@ async function run(round: string, args: string[]) {
       return;
     }
     if (job.arm.parallel) {
-      const line = await parallelBuild({ gw, cost, dir, job, system, pitch, model, effort, maxTokens });
+      const line = await parallelBuild({ gw, prices, dir, job, system, pitch, model, effort, maxTokens });
       console.log(`[${++done}/${todo.length}] ${job.slug}: ${line}`);
       return;
     }
@@ -1085,10 +1099,11 @@ type Asked = Awaited<ReturnType<typeof ask>>;
 
 /** One parallel-parts build: plan, then every part at once, then the module and a run record shaped like `run`'s.
  *  `wallMs` is the plan's time plus the slowest part's (plus the box check and its repairs with `fit`); tokens and
- *  cost are summed over the calls and listed per call. */
+ *  cost are summed over the calls and listed per call. The record's `model` is the part model, `planModel` the
+ *  planner's. */
 async function parallelBuild(o: {
   gw: Gateway;
-  cost: Pricing;
+  prices: Map<string, Pricing>;
   dir: string;
   job: Job;
   system: string;
@@ -1097,11 +1112,13 @@ async function parallelBuild(o: {
   effort: string;
   maxTokens: number;
 }) {
-  const { gw, cost, dir, job, system, pitch, model, effort, maxTokens } = o;
+  const { gw, prices, dir, job, system, pitch, effort, maxTokens } = o;
   const files = job.arm.parallel!;
+  const planModel = files.planModel ?? o.model;
+  const model = files.partModel ?? o.model;
   const prompt = (file: string) => readFileSync(join(dir, "prompts", file), "utf8").trim();
-  const body = (user: string, callEffort: string) => ({
-    model,
+  const body = (user: string, callEffort: string, callModel = model) => ({
+    model: callModel,
     reasoning_effort: callEffort,
     max_tokens: maxTokens,
     messages: [
@@ -1109,8 +1126,9 @@ async function parallelBuild(o: {
       { role: "user", content: user },
     ],
   });
-  const call = (id: string, asked: Asked, hasCode: boolean, callEffort: string) => ({
+  const call = (id: string, asked: Asked, hasCode: boolean, callEffort: string, callModel = model) => ({
     id,
+    model: callModel,
     effort: callEffort,
     started: new Date(asked.started).toISOString(),
     wallMs: asked.wallMs,
@@ -1125,7 +1143,11 @@ async function parallelBuild(o: {
   });
   const planEffort = files.planEffort ?? effort;
   const partEffort = files.partEffort ?? effort;
-  const planned = await ask(gw, body(`${pitch}\n\n${prompt(files.plan)}`, planEffort), cost);
+  const planned = await ask(
+    gw,
+    body(`${pitch}\n\n${prompt(files.plan)}`, planEffort, planModel),
+    prices.get(planModel),
+  );
   let spec: Spec | null = null;
   let specError: string | null = null;
   try {
@@ -1133,12 +1155,12 @@ async function parallelBuild(o: {
   } catch (error) {
     specError = String(error);
   }
-  const calls = [call("plan", planned, Boolean(spec), planEffort)];
+  const calls = [call("plan", planned, Boolean(spec), planEffort, planModel)];
   const parts = spec
     ? await Promise.all(
         spec.parts.map(async (part) => {
           const partUser = `${pitch}\n\n${partPrompt(prompt(files.part), spec!, part)}`;
-          const asked = await ask(gw, body(partUser, partEffort), cost);
+          const asked = await ask(gw, body(partUser, partEffort), prices.get(model));
           const code = asked.text ? extractCode(asked.text) : null;
           calls.push(call(part.id, asked, Boolean(code), partEffort));
           return { part, code, wallMs: asked.wallMs, partUser };
@@ -1193,7 +1215,7 @@ async function parallelBuild(o: {
                 { role: "user", content: feedback },
               ],
             },
-            cost,
+            prices.get(model),
           );
           const edited = applyEdits(p.code!, asked.text);
           const code = edited.blocks ? edited.code : (extractCode(asked.text) ?? p.code!);
@@ -1264,6 +1286,7 @@ async function parallelBuild(o: {
     level: job.level,
     pitch,
     model,
+    planModel,
     effort,
     started: new Date(planned.started).toISOString(),
     wallMs,

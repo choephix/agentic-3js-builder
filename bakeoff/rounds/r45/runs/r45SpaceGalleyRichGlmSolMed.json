@@ -1,0 +1,383 @@
+{
+  "slug": "r45SpaceGalleyRichGlmSolMed",
+  "arm": "glm-sol-med",
+  "subject": "spaceGalley",
+  "level": "rich",
+  "pitch": "Category: Prop group.\nSubject: spaceship galley kitchen.\nStyle: Alien (1979) Nostromo.",
+  "model": "openai-codex/gpt-6.1-sol",
+  "planModel": "openrouter-curated/z-ai/glm-5.3-flash",
+  "effort": "high",
+  "started": "2026-10-29T00:36:35.262Z",
+  "wallMs": 154302,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 379030,
+    "completion_tokens": 33435,
+    "total_tokens": 412465,
+    "prompt_tokens_details": {
+      "cached_tokens": 357632
+    }
+  },
+  "costUsd": 0.3656697,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 20397,
+    "slowestPartMs": 133905,
+    "critical": "messTable",
+    "elapsedMs": 154302,
+    "spec": {
+      "name": "Nostromo Galley",
+      "description": "A retro-futuristic spaceship mess and galley corner from the USCSS Nostromo (Alien, 1979): ribbed bone-coloured walls, a cream counter with beverage and warming equipment, a wall bank of glowing CRT monitors, the iconic molded mess table with attached stools, and a bristling ceiling of pipes and conduit over a steel deck.",
+      "builderName": "nostromoGalley",
+      "size": [
+        4.6,
+        2.7,
+        5
+      ],
+      "layout": "A cut-away room section: the viewer looks in through the open +Z face. A steel deck plate floor covers the whole footprint and rests on y = 0 (only floor-touching part). The back wall (z = -2.5) carries the galley: a counter run 0.95 m high with equipment, and above it a wall-mounted CRT monitor bank. The left wall (x = -2.3) carries lockers and stacked storage crates; the right wall (x = +2.3) carries a ribbed panel section and a round pressure hatch. A ceiling slab closes the top with pipes, conduit runs and two cone lamps hanging over the mess table, which stands centre-front with its cluster of attached swivel stools. Style on every part: warm bone and cream molded-plastic surfaces like airliner interiors, dark olive-grey machinery, corrugated ribbing on every flat wall, warning-yellow stripe accents, rust and copper fittings, amber and green glowing CRT screens, everything chunky, functional and 1979-industrial.",
+      "palette": {
+        "floor": "#3f4038",
+        "wall": "#c2bcab",
+        "rib": "#8f8a7c",
+        "machine": "#aeb2ac",
+        "cabinet": "#d6cfc0",
+        "tabletop": "#e8e2d2",
+        "stool": "#cfc6b2",
+        "iron": "#4c5054",
+        "pipeCopper": "#6e5a3c",
+        "pipeSteel": "#7a8088",
+        "warning": "#e7b814",
+        "rust": "#8a4a26",
+        "orange": "#c46a2c",
+        "olive": "#6b6a4c",
+        "brass": "#b08d3e",
+        "black": "#22221f",
+        "rubber": "#2c2c28",
+        "screenAmber": "#ffb23e",
+        "screenGreen": "#5cff8a",
+        "lampGlow": "#fff3c8",
+        "chalk": "#efe9db"
+      },
+      "mounts": {
+        "deckTop": [
+          0,
+          0.06,
+          0
+        ],
+        "backWallFace": [
+          0,
+          1.25,
+          -2.44
+        ],
+        "leftWallFace": [
+          -2.28,
+          1.2,
+          0.5
+        ],
+        "ceilingLine": [
+          0,
+          2.66,
+          0
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "roomShell",
+          "builds": "The room section itself. Steel deck floor of rectangular plates with seam grooves, a raised grating strip near the back, all in floor colour with rust stains and a warning-yellow painted stripe across the doorway end. Three walls: back wall, left wall, right wall, built as chunky ribbed panel walls — flat wall-coloured panels with repeated vertical rib slats in rib colour, dark seam lines, corner posts in iron, a black kick skirting at the bottom and a pipe-and-conduit raceway band at mid height with small valve wheels in brass and rust. The right wall holds a round pressure hatch: lathe-built ring, rivet ring, spokes, a warning-yellow and black chevron stripe band around it and a small stencil-style plate. The ceiling slab closes the top with recessed panel frames and two square light-well openings the ceiling-services part drops into. Wall edges frame the open +Z face with a thick girder border so the cut-away reads as a ship section.",
+          "box": [
+            [
+              -2.3,
+              0,
+              -2.5
+            ],
+            [
+              2.3,
+              2.7,
+              2.5
+            ]
+          ],
+          "attaches": "Owns the whole footprint; its floor top is mount deckTop that galleyCounter, messTable and lockersShelf stand on; its back wall face is mount backWallFace for galleyCounter and monitorBank; its left wall face is mount leftWallFace for lockersShelf; its ceiling underside is mount ceilingLine for ceilingServices.",
+          "joints": [],
+          "floor": true,
+          "budget": 200
+        },
+        {
+          "id": "ceilingServices",
+          "builds": "Everything under the ceiling: a dense overhead services run. Two large parallel copper pipes (pipeCopper) running front-to-back with flanged ring joints every metre and elbow bends, a bundle of steel conduit pipes (pipeSteel) in a cable tray, a smaller olive cable duct, hanging black cable loops with clip rings, and two cone pendant lamps in iron hanging on short stems over the mess table position, each with a glowing warm lampGlow shade disc. Add a small junction box in machine grey with an orange stripe, a hanging hose reel with a coiled rubber hose, and riveted mounting brackets in iron connecting everything to mount ceilingLine. Pipes must not drop below y = 2.05 so the room stays open.",
+          "box": [
+            [
+              -2.3,
+              2.05,
+              -2.5
+            ],
+            [
+              2.3,
+              2.7,
+              2.5
+            ]
+          ],
+          "attaches": "Hangs from mount ceilingLine on the roomShell ceiling underside; its lamp cones hang above the messTable footprint.",
+          "joints": [],
+          "floor": false,
+          "budget": 110
+        },
+        {
+          "id": "galleyCounter",
+          "builds": "The galley counter run along the back wall, standing on mount deckTop and backing onto mount backWallFace. A machine-grey cabinet base with cream cabinet doors (thin seam gaps, small black pulls), a chunky ivory worktop with a raised lip, and equipment across it: a tall beverage dispenser tower in chalk with an orange stripe band, two brass dispensing nozzles and a small drip tray; a countertop warming oven with a dark glass door, rust handle and amber indicator jewel lights; a sink recess with a steel tap and drying rack; a wall shelf above the worktop holding mugs and canisters in olive, rust and chalk. A tiled-ish backsplash strip in machine grey with a warning-yellow stripe, a rubber floor mat in front, and a small wall-mounted extinguisher in rust. Details read as seated parts: indicator lights, valve knobs, seams, stripe bands each their own colour.",
+          "box": [
+            [
+              -2.2,
+              0.06,
+              -2.5
+            ],
+            [
+              2.2,
+              1.3,
+              -1.45
+            ]
+          ],
+          "attaches": "Stands on mount deckTop, backs onto mount backWallFace; its worktop height 1.2 m leaves clear wall above for monitorBank.",
+          "joints": [],
+          "floor": false,
+          "budget": 180
+        },
+        {
+          "id": "monitorBank",
+          "builds": "The wall-mounted monitor console above the galley counter, meeting mount backWallFace. An iron mounting frame bolted to the wall carries a bank of four CRT screens in dark casings: two larger green glowing screens with scanline frames and surrounding bezels, one amber glowing screen, one small amber data readout, all with glow (self-lit) treatment on the screen faces only. Below and beside the screens: a chunky control panel in machine grey with rows of chunky switches (black toggles with orange and warning-coloured caps), push buttons in brass and rust, and a stencil-style data placard. Cable ducts in black run from the frame into the wall, and a small reel of coiled cable hangs at one end. Everything sits between y 1.35 and 2.15, clear of the counter below.",
+          "box": [
+            [
+              -2.2,
+              1.3,
+              -2.44
+            ],
+            [
+              1.2,
+              2.2,
+              -2
+            ]
+          ],
+          "attaches": "Bolts onto mount backWallFace above the galleyCounter worktop line; nothing below y 1.35 so the counter's shelf clears it.",
+          "joints": [],
+          "floor": false,
+          "budget": 140
+        },
+        {
+          "id": "messTable",
+          "builds": "The iconic Nostromo mess table, centre-front, standing on mount deckTop. A chunky ivory molded table top (rounded octagon-ish slab, tabletop colour) on a heavy dark iron pedestal base with a ribbed column and a round foot. Around it, six attached-style swivel stools: each a molded beige stool seat (stool colour) on a slim dark column with a weighted black base, arranged around the table at varied heights and slight rotations so it feels lived-in. On the table: small cream cups, a metal tray with recessed eating compartments, a small brass ashtray, a lidded beaker, and a pack of cards fan in chalk with black pips. A floor mat in rubber under the stool cluster. Keep the silhouette bold and readable from the front view.",
+          "box": [
+            [
+              -1.7,
+              0,
+              -1
+            ],
+            [
+              1.7,
+              1.05,
+              1.7
+            ]
+          ],
+          "attaches": "Stands on mount deckTop in the open centre of the room; its stools stay inside its box, clear of the counter at z < -1.45.",
+          "joints": [],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "lockersShelf",
+          "builds": "Left-wall storage against mount leftWallFace, standing on mount deckTop. A row of four tall crew lockers in olive with cream door frames, vent slats in black, small number plates and black latches; above them a wall-mounted rack of equipment cases in orange and rust with warning-yellow stripes. Beside the lockers a floor-standing stack: two olive supply crates with stencil-style plates and strap bands, a small drum in machine grey with a rust ring, and a few individually placed props — a black toolbox with a brass clasp, a stack of metal ration tins in chalk and machine grey, a hanging clip lamp in iron with a warm lampGlow bulb. All details (slats, plates, latches, bands) as small parts in their own colours.",
+          "box": [
+            [
+              -2.3,
+              0,
+              -1.3
+            ],
+            [
+              -1.15,
+              2.3,
+              2.1
+            ]
+          ],
+          "attaches": "Stands on mount deckTop and backs onto mount leftWallFace on the roomShell's left wall; keeps its right face at x = -1.15 clear of the messTable.",
+          "joints": [],
+          "floor": false,
+          "budget": 100
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "model": "openrouter-curated/z-ai/glm-5.3-flash",
+        "effort": "high",
+        "started": "2026-10-29T00:36:35.262Z",
+        "wallMs": 20397,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 52280,
+          "completion_tokens": 4385,
+          "total_tokens": 56665,
+          "prompt_tokens_details": {
+            "cached_tokens": 51200
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1967
+          }
+        },
+        "costUsd": 0.0038905,
+        "hasCode": true,
+        "reasoning": "I need to write a spec JSON for a spaceship galley kitchen in Alien (1979) Nostromo style. The Nostromo's galley is famous: the long table with raw eggs? Actually the iconic scene is the crew eating breakfast around the table, and the alien emerging. The galley has: white/cream plastic molded chairs and table, muted industrial interiors, retro-futuristic CRT screens, amber/green monitors, pipes, corrugated walls, storage lockers, coffee machine, hanging lamps.\n\nThe model: a galley kitchen corner/section of the Nostromo. Elements: table with attached stools, galley counter with equipment, wall panels with CRT monitors, pipes on the ceiling, a hatch, lockers, a coffee/beverage dispenser. Retro-futuristic 1979 industrial: beige/off-white molded furniture, muted olive/brown tones, corrugated ribbed walls, warning stripes, CRT amber screens.\n\nSize: it's a prop group — a room section. Maybe 4.2 m wide, 2.6 m tall, 5 m long. Stands on floor y=0.\n\nParts (3-6): \n1. deck and walls / room shell (floor plates, ribbed wall panels, ceiling with pipes) — floor true.\n2. galley counter block with equipment (dispenser, sink, warming oven, knobs, lights).\n3. mess table with attached stools (the iconic Nostromo mess table).\n4. monitor wall / terminal console with CRT screens (glowing).\n5. ceiling truss with pipes and hanging lamps? Could combine with walls.\n\nStatic model: joints = [] likely, but maybe a couple of hinge joints for a hatch? Keep it static — \"joints\": []. Actually maybe give a couple of joints for a screen or a door? Static models may omit joints entirely. Keep static for simplicity.\n\nMounts: floorDeck [0,0.25,0] where counter and table stand; wallLine? Counter attaches to wall at back. Table on floor.\n\nLet me define size: [4.6, 2.7, 5.0]. Room section: floor, back wall (at -z?), walls. The front faces +Z — so the open side is +Z (viewer looks in). Back wall at z=-2.5.\n\nBoxes:\n- shell (deck + walls + ceiling): x [-2.3,2.3], y [0,2.7], z [-2.5,2.5]. floor: true.\n- counter run along the back wall: x [-2.3,2.3]? Counter could run along left wall. Let's put counter along the back wall (z from -2.5 to -1.6), x from -2.2 to 2.2, y 0 to 1.0 (counter top at ~0.95). Hmm, but the monitor wall also on back wall — put monitors above counter (y 1.2-2.2). Or monitors on left wall.\n\nLet me plan the room:\n- Back wall (z = -2.5) has the galley counter with equipment, and above it monitors/CRT.\n- Left wall (x = -2.3): lockers and cabinets.\n- Right wall (x = +2.3): doorway/hatch? Maybe ribbed panels + hatch.\n- Ceiling: pipes and conduit running, hanging cone lamps.\n- Mess table in the middle-front, with the iconic attached swivel stools.\n\nParts:\n1. `roomShell` — floor plates, ribbed walls, ceiling, hatch on right wall, wall trims, warning stripes. Budget ~220.\n2. `pipeCeiling` — could merge into shell. Better split: ceiling pipes & conduit & lamps as one part (the \"services\"). x [-2.3,2.3], y [1.9,2.7], z [-2.5,2.5]. Budget ~140.\n3. `galleyCounter` — counter along back wall: cabinets, worktop, beverage dispenser, warming cabinet, sink, controls, amber lights, coffee urn. y 0-1.15, z [-2.5,-1.5]. Budget ~200.\n4. `monitorBank` — wall-mounted CRT console above counter plus side terminal: glowing green/amber screens, casings, switches. y [1.2,2.1], z [-2.5,-2.1]. Budget ~150.\n5. `messTable` — table + stools, iconic. Center-front: x [-1.6,1.6], y [0,1.0], z [-0.8,1.6]. Budget ~180.\n6. `lockersShelf` — left wall lockers + storage crates, kettle props? x [-2.3,-1.2], y [0,2.3], z [-1.2,2.2]. Budget ~130.\n\nTotal: 220+140+200+150+180+130 = 1020. Too much; cap at 900. Trim: shell 200, services 120, counter 190, monitors 140, table 180, lockers 110 = 940. Trim to 200+110+180+140+170+100 = 900. Good.\n\nMounts: \n- `deck` [0, 0.25, 0] — raised floor plate top where furniture stands? Or floor at y=0. Let floor plates be thin, top at y=0.06. Mount deckTop [0, 0.06, 0].\n- `wallBack` [0, 1.2, -2.5]? Counter attaches to back wall: mount backWallFace [0, 0, -2.5] plane. Simpler: mounts are points: `counterFootline` [0, 0.06, -2.45], `counterTop` [0, 1.15, -2.0] where monitors sit above.\n- `tableDeck` [0,0.06,0.4].\n- `ceilingLine` [0, 2.7, 0] — services attach to ceiling.\n\nMounts required: every place two parts touch has a mount. So:\n- deckTop: [0, 0.06, 0] — floor surface (shell owns floor; counter, table, lockers stand on it).\n- backWall: [0, 1.25, -2.44] — where counter & monitor bank meet the shell's back wall.\n- leftWall: [-2.28, 1.15, 0.5] — lockers against left wall.\n- ceiling: [0, 2.66, 0] — services attach to ceiling.\n\nPalette (max 24): Nostromo colours: off-white/beige plastic, warm grey walls, olive drab, dark iron, amber CRT glow, green screen glow, warning yellow, rust orange, copper pipes, black rubber, cream molded seats.\n\n- deckPlate \"#4a4a48\" dark grey floor\n- wallPanel \"#b8b2a4\" warm off-white\n- wallRib \"#7d7a70\" grey rib\n- shellTrim \"#8a7340\"? Let me name clearly:\n  - hullGrey: \"#9aa0a2\" machine grey? Nostromo interior is mostly white/cream with grey.\n  \nPalette entries:\n1. \"floor\": \"#3f4038\" dark olive-grey deck plates\n2. \"wall\": \"#c2bcab\" warm bone wall panels\n3. \"rib\": \"#8f8a7c\" ribbed panel grey\n4. \"machine\": \"#aeb2ac\" pale appliance grey\n5. \"cabinet\": \"#d6cfc0\" cream cabinet front\n6. \"tabletop\": \"#e8e2d2\" ivory molded table top\n7. \"stool\": \"#cfc6b2\" beige stool seat\n8. \"iron\": \"#4c5054\" dark iron frame\n9. \"pipe\": \"#6e5a3c\" copper pipe\n10. \"pipeCold\": \"#7a8088\" steel conduit\n11. \"warning\": \"#e7b814\" warning yellow\n12. \"rust\": \"#8a4a26\" rust accent\n13. \"screenAmber\": \"#ffb23e\" amber CRT glow\n14. \"screenGreen\": \"#5cff8a\" green monitor glow\n15. \"black\": \"#22221f\" black trim\n16. \"rubber\": \"#2c2c28\" dark rubber\n17. \"lampGlow\": \"#fff3c8\" warm lamp glow\n18. \"olive\": \"#6b6a4c\" olive storage\n19. \"brass\": \"#b08d3e\" brass fitting\n20. \"backsplash\": \"#9aa08a\"? maybe skip\n21. \"orange\": \"#c46a2c\" equipment orange\n\n21 colours fine.\n\nJoints: static — empty array. But spec example shows joints; a static model has \"joints\": []. Keep [].\n\nBuilder name: \"nostromoGalley\".\n\nLayout description must specify silhouette, front-to-back, floor contact, style.\n\nWrite the JSON carefully."
+      },
+      {
+        "id": "monitorBank",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:55.659Z",
+        "wallMs": 32688,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 54451,
+          "completion_tokens": 4319,
+          "total_tokens": 58770,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1000
+          }
+        },
+        "costUsd": 0.0550552,
+        "hasCode": true,
+        "reasoning": "**Designing monitor bank geometry with CRT layout**\n\n**Planning detailed CRT casing and mounting geometry**\n\n**Refining CRT silhouette with combined geometries****Validating CRT screen layout and colors**\n\n**Planning control panel and geometry setup**"
+      },
+      {
+        "id": "lockersShelf",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:55.659Z",
+        "wallMs": 106105,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 54449,
+          "completion_tokens": 4204,
+          "total_tokens": 58653,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 516
+          }
+        },
+        "costUsd": 0.053901199999999996,
+        "hasCode": true,
+        "reasoning": "**Designing TypeScript block function with b.part primitives**\n\n**Constructing detailed lockers and rack with b.part and palette**\n\n**Deciding optional RNG for variations**"
+      },
+      {
+        "id": "ceilingServices",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:55.659Z",
+        "wallMs": 115313,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 54427,
+          "completion_tokens": 4878,
+          "total_tokens": 59305,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 781
+          }
+        },
+        "costUsd": 0.0605972,
+        "hasCode": true,
+        "reasoning": "**Planning geometry parts and orientations**\n\n**Defining lamp and coil geometries****Designing 3D lamp and hose reel models**\n\n**Planning geometry and color setup**"
+      },
+      {
+        "id": "galleyCounter",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:55.659Z",
+        "wallMs": 123697,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 54471,
+          "completion_tokens": 5402,
+          "total_tokens": 59873,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 645
+          }
+        },
+        "costUsd": 0.0659252,
+        "hasCode": true,
+        "reasoning": "**Planning modular furniture parts generation**\n\n**Defining geometry placement and colors**\n\n**Designing dispenser nozzle components****Planning 3D component placement**"
+      },
+      {
+        "id": "roomShell",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:55.659Z",
+        "wallMs": 131218,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 54510,
+          "completion_tokens": 5267,
+          "total_tokens": 59777,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 864
+          }
+        },
+        "costUsd": 0.0646532,
+        "hasCode": true,
+        "reasoning": "**Planning TS block function with geometry parts**\n\n**Designing hatch with concentric torus rings**\n\n**Structuring ceiling panels with frame and holes****Planning 3D model component assembly**\n\n**Designing lathe ring profile and part utilities**"
+      },
+      {
+        "id": "messTable",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "medium",
+        "started": "2026-10-29T00:36:55.659Z",
+        "wallMs": 133905,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 54442,
+          "completion_tokens": 4980,
+          "total_tokens": 59422,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 928
+          }
+        },
+        "costUsd": 0.0616472,
+        "hasCode": true,
+        "reasoning": "**Planning SDK-based 3D primitives function**\n\n**Designing octagonal tabletop and stool placements**\n\n**Finalizing table and stool geometry placements****Planning 3D part geometries and placements**\n\n**Designing table and stool dimensions with positioning**"
+      }
+    ]
+  }
+}

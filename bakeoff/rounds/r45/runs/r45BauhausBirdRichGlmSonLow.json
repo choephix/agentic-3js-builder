@@ -1,0 +1,407 @@
+{
+  "slug": "r45BauhausBirdRichGlmSonLow",
+  "arm": "glm-son-low",
+  "subject": "bauhausBird",
+  "level": "rich",
+  "pitch": "Category: Animal.\nSubject: songbird on a branch.\nStyle: Bauhaus primary-colour geometry.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "planModel": "openrouter-curated/z-ai/glm-5.3-flash",
+  "effort": "high",
+  "started": "2026-10-29T00:37:41.422Z",
+  "wallMs": 81442,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 370787,
+    "completion_tokens": 14810,
+    "total_tokens": 385597,
+    "prompt_tokens_details": {
+      "cached_tokens": 348352
+    }
+  },
+  "costUsd": 0.14714897,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 68387,
+    "slowestPartMs": 13055,
+    "critical": "birdBody",
+    "elapsedMs": 81442,
+    "spec": {
+      "name": "Songbird on a Branch",
+      "description": "A stylized songbird with a black cap, red breast disc and blue wings perched on a charcoal branch dressed with primary-coloured leaf discs, in flat Bauhaus geometry.",
+      "builderName": "songbirdBranch",
+      "size": [
+        0.85,
+        0.55,
+        0.55
+      ],
+      "layout": "The model is small and real-world sized: a chunky charcoal branch lies horizontally along X from x=-0.40 to x=+0.40, resting on the floor at its butt end (cut face at x=-0.40) and dipping to the floor at its tapered tip (x=+0.40), centreline about y=0.085, so the perch top at x=0 is y=0.17. The bird stands at the branch centre facing the viewer (+Z), centred on x=0. From front to back: a yellow conical beak at z≈0.13..0.21; a round black-capped head at [0, 0.44, 0.07] with cream cheek discs and big side-set ring eyes; a short blue egg body from y≈0.22 to 0.38 leaning slightly forward, with a bold red breast disc on the chest front, cream belly below and folded blue wing slabs on each flank; black fanned tail feathers rising up-back to about [0, 0.40, -0.26]; two slate legs dropping from the body underside to the branch top with black toes gripping the bark. A forked twig rises from the branch near x=0.26 up to y≈0.30 carrying flat circular leaf discs in yellow, red and blue plus two red berries; the branch wears cream painted ring bands and a growth-ring cut face. Every part is flat-coloured Bauhaus geometry: bold circles, discs and egg/cone primitives in red, blue, yellow, cream and ink on charcoal, with trim as small seated parts (eye rings, wingbar, painted branch rings, leg bands).",
+      "palette": {
+        "red": "#e2372e",
+        "blue": "#20549c",
+        "yellow": "#f5b81c",
+        "cream": "#f7f0e0",
+        "ink": "#1d1d22",
+        "bark": "#3a3540",
+        "slate": "#5a6070",
+        "white": "#ffffff"
+      },
+      "mounts": {
+        "perchTop": [
+          0,
+          0.17,
+          -0.02
+        ],
+        "neckSeat": [
+          0,
+          0.37,
+          0.04
+        ],
+        "tailRoot": [
+          0,
+          0.32,
+          -0.08
+        ],
+        "hipL": [
+          0.035,
+          0.24,
+          0
+        ],
+        "hipR": [
+          -0.035,
+          0.24,
+          0
+        ]
+      },
+      "joints": [
+        {
+          "name": "body",
+          "at": [
+            0,
+            0.3,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "head",
+          "parent": "body",
+          "at": [
+            0,
+            0.37,
+            0.04
+          ],
+          "dir": [
+            0,
+            0.3,
+            1
+          ],
+          "role": "head"
+        },
+        {
+          "name": "jaw",
+          "parent": "head",
+          "at": [
+            0,
+            0.41,
+            0.115
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "jaw"
+        },
+        {
+          "name": "tail",
+          "parent": "body",
+          "at": [
+            0,
+            0.32,
+            -0.08
+          ],
+          "dir": [
+            0,
+            0.45,
+            -1
+          ],
+          "role": "tail"
+        },
+        {
+          "name": "legL",
+          "parent": "body",
+          "at": [
+            0.035,
+            0.24,
+            0
+          ],
+          "dir": [
+            0,
+            -1,
+            0.15
+          ],
+          "role": "leg"
+        },
+        {
+          "name": "legR",
+          "parent": "body",
+          "at": [
+            -0.035,
+            0.24,
+            0
+          ],
+          "dir": [
+            0,
+            -1,
+            0.15
+          ],
+          "role": "leg"
+        },
+        {
+          "name": "footL",
+          "parent": "legL",
+          "at": [
+            0.035,
+            0.165,
+            -0.02
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "digit"
+        },
+        {
+          "name": "footR",
+          "parent": "legR",
+          "at": [
+            -0.035,
+            0.165,
+            -0.02
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "digit"
+        }
+      ],
+      "parts": [
+        {
+          "id": "branch",
+          "builds": "The perch and its dressing, all static geometry on the root (list no joints). Build the branch as one low-poly sweep along X: centreline catmull from the butt [-0.40, 0.10, -0.02] through [0, 0.085, -0.02] (gentle sag) to the tip [0.40, 0.05, -0.02], radius tapering 0.10 → 0.05, section with about 8 sides, flat end cap at the butt, colour bark. At the butt end seat a cream lathe disc showing growth rings: cream disc plus three thin ink ring parts inset. Two cream painted band rings wrap the branch (thin swept loops around the tube) at x≈-0.12 and x≈0.20. From the branch top at [0.26, 0.14, -0.02] sprout a forked charcoal twig rising to [0.30, 0.29, -0.10] with one shorter sub-twig; on its tip three flat circular leaf discs (thin cylinders, roughly 0.05 radius, 0.008 thick) angled in different directions: yellow, red and blue, each with a tiny ink stem rod. Two red berry spheres (r≈0.02) hang on short ink stalks from the sub-twig. One flattened cream lichen patch (squashed sphere, r≈0.03) sits on the branch top near x=-0.2, and 2-3 small charcoal bark knot bumps (low spheres) dot the underside.",
+          "box": [
+            [
+              -0.42,
+              0,
+              -0.12
+            ],
+            [
+              0.42,
+              0.3,
+              0.1
+            ]
+          ],
+          "attaches": "Stands on the floor at the butt end (x=-0.40) and at the tapered tip (x=+0.40); the bird's feet grip the perchTop mount [0, 0.17, -0.02].",
+          "joints": [],
+          "floor": true,
+          "budget": 150
+        },
+        {
+          "id": "birdBody",
+          "builds": "The torso, wings and tail riding the body and tail joints. Body: a blue egg built as a loft or scaled sphere, centre [0, 0.30, 0], about 0.19 long along Z, 0.15 wide, 0.17 tall, slightly leaning forward (belly down at z≈0.02, shoulders up at z≈-0.04). Belly: a cream lower sweep or a second slightly smaller egg squashed and seated under the front half, reading as pale underside. Breast: the signature detail — a bold flat red disc (thin cylinder, r≈0.055, 0.012 thick) stuck on the chest front at [0, 0.29, 0.075], facing out along +Z and tilted to hug the chest curve, with a thin cream rim ring around it. Neck: a yellow collar band (short swept ring) at the neckSeat mount [0, 0.37, 0.04] where the head part meets the body. Wings, one per side (mirror with s=1/-1): a flat teardrop slab built as an extrude or slab, root at the shoulder [s*0.075, 0.34, -0.01], lying along the flank back to [s*0.06, 0.26, -0.16], blue, with a cream wingbar stripe (small thin box seated across the wing at 60% length) and an ink tip section (small slab over the last 25%); add 2-3 stepped feather notches at the wing tip as small overlapping ink slabs. Tail riding the tail joint: a fan of 5 black feather slabs (extrudes about 0.035 wide, 0.008 thick) spreading ±14 degrees, from the tailRoot mount [0, 0.32, -0.08] up-back to tips around [0, 0.40, -0.26], each with a cream tip cap (small slab at the last 15%). A small cream rump patch sits above the tail root.",
+          "box": [
+            [
+              -0.14,
+              0.16,
+              -0.28
+            ],
+            [
+              0.14,
+              0.42,
+              0.12
+            ]
+          ],
+          "attaches": "Bottom of the egg overlaps the perch region above hipL/hipR at y≈0.24; the yellow collar band meets the head part at the neckSeat mount [0, 0.37, 0.04]; the tail feathers root at the tailRoot mount [0, 0.32, -0.08].",
+          "joints": [
+            "body",
+            "tail"
+          ],
+          "floor": false,
+          "budget": 230
+        },
+        {
+          "id": "birdHead",
+          "buildings": "",
+          "builds": "The head riding the head and jaw joints. Skull: an ink (black) sphere, centre [0, 0.44, 0.07], radius 0.075, about 14x10 segments, smooth. Cheeks: one cream disc per side (flat cylinder, r≈0.042, 0.008 thick) stuck on the head surface at [s*0.055, 0.43, 0.095], facing outward sideways and slightly forward. Eyes on top of the cheeks, one per side: a white ring disc (r≈0.028 with an ink pupil disc r≈0.017 seated in its centre) plus a tiny white glint sphere (r≈0.006) offset up-forward on the pupil; keep the eyes large and readable from the front. A thin cream brow line (small slab) arcs above each eye. Beak riding the jaw joint as two separate pieces so the mouth can open: upper mandible a yellow cone (base r≈0.022, length 0.08) from [0, 0.425, 0.125] pointing +Z and slightly down, with two tiny ink nostril dots near its base; lower mandible a smaller yellow frustum (base r≈0.018, length 0.065) seated just under it at [0, 0.408, 0.125] on the jaw joint, with a thin ink mouth line part between the two. Crown: a small red circular crest dot (r≈0.014 disc) on top of the black cap at [0, 0.515, 0.06] as the single red accent up high.",
+          "box": [
+            [
+              -0.1,
+              0.34,
+              0.02
+            ],
+            [
+              0.1,
+              0.53,
+              0.24
+            ]
+          ],
+          "attaches": "Head sphere bottom overlaps the body's yellow collar band at the neckSeat mount [0, 0.37, 0.04]; the beak jaws hang forward over the body's red breast disc.",
+          "joints": [
+            "head",
+            "jaw"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "legsFeet",
+          "builds": "Legs and feet riding the leg and foot joints, gripping the branch. Per side (mirror with s=1/-1): a slate tarsus rod (r≈0.011, about 6 sides) from the hip mount [s*0.035, 0.24, 0] down to the ankle [s*0.035, 0.19, -0.015], then a short ink foot segment to the perchTop at [s*0.035, 0.165, -0.02]. A yellow birding band (thin cylinder ring, r≈0.014, 0.012 tall) sits on each tarsus at mid-height. Foot riding the foot joint: three forward toes built as small bent capsules or short 2-point sweeps (r≈0.008, length ≈0.045) fanning ±20 degrees around the branch front at z≈-0.02..0.02, each curving down the branch flank and tipped with a tiny ink claw cone; one back toe curls around the branch rear at z≈-0.07. Toes should visibly wrap the branch surface radius (about 0.085 at x=0), toes seated on the bark.",
+          "box": [
+            [
+              -0.09,
+              0.14,
+              -0.09
+            ],
+            [
+              0.09,
+              0.26,
+              0.05
+            ]
+          ],
+          "attaches": "Hips tuck into the body egg bottom at the hipL/hipR mounts [±0.035, 0.24, 0]; toes grip the branch at the perchTop mount [0, 0.17, -0.02].",
+          "joints": [
+            "legL",
+            "legR",
+            "footL",
+            "footR"
+          ],
+          "floor": false,
+          "budget": 110
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "model": "openrouter-curated/z-ai/glm-5.3-flash",
+        "effort": "high",
+        "started": "2026-10-29T00:37:41.422Z",
+        "wallMs": 68387,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 52277,
+          "completion_tokens": 8095,
+          "total_tokens": 60372,
+          "prompt_tokens_details": {
+            "cached_tokens": 52224
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 5046
+          }
+        },
+        "costUsd": 0.00562217,
+        "hasCode": true,
+        "reasoning": "I need to write a spec JSON for a songbird on a branch, Bauhaus primary-colour geometry style. Team of builders, 3-6 parts, skeleton joints, palette ≤24 colors, mounts, boxes, budgets ≤900 total.\n\nLet me design: a stylized songbird (like a robin/chaffinch) perched on a branch, Bauhaus style: primary red, blue, yellow, plus black, white/cream circles and geometric shapes. Think Kandinsky/Bauhaus poster colors.\n\nSize: songbird ~0.16m body, but \"real-world size for the subject\" — a songbird is about 15cm tall. Branch maybe a short log section. Let's scale: overall model maybe 0.6m wide? Actually real-world size: bird ~0.15m tall, branch ~0.5m long. But should the model be small? Real-world size unless pitch says otherwise. A songbird is small: total model ~0.6m x 0.35m x 0.5m. Hmm, that's fine but tiny. Maybe scale up slightly for readability? The instructions say real-world size. A perched songbird: height ~0.15-0.2m. Branch length 0.5m. Size [0.45, 0.35, 0.6]. That's fine.\n\nActually maybe make it a bit more generous: branch 0.6m long, bird perched near center, tail extending. Size: width 0.5 (tail feathers, wing spread slightly), height 0.4 (branch base to head top), length 0.7.\n\nLayout: branch as a chunky cylinder running along X? Or along Z? Model faces +Z. The bird faces +Z. Branch could run along X (left-right) so the bird faces out of the model. That reads well: branch along X at some height, bird perched on it facing viewer.\n\nWait — \"its lowest points touch the floor\": branch floats? A branch on the floor... The pitch is \"songbird on a branch\" — a branch could rest on floor or be a cut branch lying with a stump? Better: branch as a thick branch lying on the ground with a cut end / roots hint, floor: true. Or a freestanding branch on a small base. Let's make the branch rest on the floor: a thick branch running horizontally along X, sagging to touch y=0 at both ends, with the bird perch point raised slightly (branch is slightly curved). Simplest: branch axis at y≈0.09, radius 0.09, touching floor. Add a smaller twig fork and a couple of leaves/buds. Maybe a cut stump under one end? Keep simple: branch rests on ground.\n\nBauhaus style: bold geometric primitives — sphere head, egg body, cone beak, flat discs, circles for eyes, flat colour planes. Colors: red #E23A2E, blue #2255A4, yellow #F2C230, black #1B1B1F, cream #F5EFE2, plus maybe teal? Keep primary palette: red, blue, yellow, black, off-white, plus grey/wood tone for branch? Bauhaus — the branch could be black or a warm brown? Maybe keep the branch as black/graphite with cream bands — geometric. Or wood brown would break the Bauhaus purity. Let's make branch deep black with a cream ring detail and yellow buds — that keeps primaries. Actually a dark brown-black is fine. Palette:\n\n- red: \"#e03531\"\n- blue: \"#20549c\" \n- yellow: \"#f2b705\"\n- black: \"#1d1d22\"\n- cream: \"#f6efdf\"\n- orange (beak/feet secondary)? red can serve beak. Feet: black or yellow. Let's add \"ink\" and \"line\" maybe same black.\n- Maybe a mid-grey for branch shadow.\n\nPalette entries (~8): red, blue, yellow, cream, black, charcoal (branch), white (eye highlight), pink? Keep it Bauhaus: primaries + black + cream + white.\n\nJoints: static model could have joints: [] — but spec says joints for rigging. A perched bird could be static, but a rig skeleton adds quality. Give simple skeleton: root \"body\" (spine) at bird body center, \"head\", \"jaw\" (beak upper/lower? beak hinge), \"tail\", \"legL/legR\" (leg role), \"toes\"? Keep modest: body root, neck? Let's do:\n\n- \"body\" root at bird center, dir [0,0,1]? Joint dir is bone direction. role \"spine\".\n- \"head\" parent body, role \"head\"\n- \"jaw\" parent head, role \"jaw\" (lower beak)\n- \"tail\" parent body, role \"tail\"\n- \"legL\", \"legR\" parent body, role \"leg\"\n- \"footL\"/\"footR\"? maybe skip; toes as digits could be part of leg chains. Keep legs simple: legL/legR with role \"leg\", feet grip branch (no separate toe joints, or add footL/footR role \"digit\"). Let's add foot joints for grip.\n\nOrder: parents first. body, then head, jaw, tail, legL, legR, footL, footR.\n\nJoints coordinates: bird perched at branch center x≈0, branch top at y≈0.17 (branch center y 0.085, radius 0.085). Bird body center y≈0.30. Legs from body bottom y≈0.22 down to feet on branch at y≈0.18.\n\nLet me lay out numbers:\n- Branch: cylinder along X, center [0, 0.085, -0.02], radius 0.085, length 0.7. Top at y=0.17. Slight variation: use a sweep with varying radius, plus a forked twig rising at x≈0.28 with leaves (yellow/cream leaf discs? Bauhaus circles as leaves!). Great: leaves as flat circles in yellow and red, one blue — Bauhaus mobile feel.\n- Bird: perched at x=0, z slightly? Bird faces +Z, stands on branch top at z≈0. Body: egg shape (loft/sphere scaled) center [0, 0.30, 0.0], body length along z ~0.20, height ~0.16. \n- Head: sphere center [0, 0.42, 0.07], radius 0.075. Beak at [0, 0.42, 0.14] cone pointing +Z, red or yellow. \n- Eye discs: cream ring + black pupil, white glint, on both sides of head, flat circles (decal or small disc parts).\n- Breast: red breast patch (robin!) — perfect Bauhaus red circle on cream/blue body. Body cream/blue with red breast circle.\n- Wings: folded, flat blue teardrop slabs on each side.\n- Tail: black/blue geometric fan extending back-up, from [0, 0.30, -0.10] to [0, 0.36, -0.24], narrow extrude.\n- Legs: black thin rods from body bottom to branch; feet wrap around branch.\n\nTotal height: head top ≈ 0.50. Tail tip x-spread small. Size [0.6, 0.55, 0.75]? Branch length 0.8 maybe. Let's set: branch from x=-0.4 to x=0.4, length 0.8. Size [0.6, 0.55, 0.8]... tail extends z to -0.24 plus branch in z is only radius ~0.085 so z extent from branch is small; bird body z from -0.2 to +0.16. So z extent ~0.4 total. Size [0.62, 0.52, 0.5]. Hmm branch along X so z extent dominated by bird: body 0.36 plus beak. Size: x 0.85 (branch 0.8), y 0.52, z 0.45.\n\nActually beak forward: head at z 0.07, beak tip z ~0.20. Tail tip z -0.26. So z span ~0.46. Fine.\n\nParts (3-6), split evenly:\n1. \"branch\" — the branch, twig fork, leaf discs, lichen dot, floor: true. budget ~120.\n2. \"birdBody\" — body egg, red breast, belly cream, wings blue folded slabs, tail fan. budget ~180.\n3. \"birdHead\" — head sphere, crest? eyes, beak upper+lower (jaw), cheek disc, crown cap. budget ~130.\n4. \"legsFeet\" — legs, feet gripping branch, claws. budget ~90.\n\nThat's 4 parts. Maybe add \"songNotes\"? No — stay on subject. Could add small ground pebble? \"nothing else added\". Keep 4 parts. Maybe split wings into own part? 4 is fine; budgets sum ≤900: 120+200+140+90 = 550. Could enrich: budget 160/240/160/120 = 680.\n\nMounts: \"perchTop\" [0, 0.17, -0.02] — top of branch where feet grip; \"neckSeat\" [0, 0.38, 0.05] where head meets body; \"tailRoot\" [0, 0.31, -0.09]; \"hipL\" [0.03, 0.23, -0.01], \"hipR\" [-0.03, 0.23, -0.01].\n\nJoints list with at/dir:\n- body: at [0, 0.30, 0.0], dir [0, 1, 0], role spine (root, no parent)\n- head: parent body, at [0, 0.39, 0.05], dir [0, 0.35, 1] (leaning forward-up), role head\n- jaw: parent head, at [0, 0.405, 0.115], dir [0, 0, 1], role jaw\n- tail: parent body, at [0, 0.32, -0.08], dir [0, 0.45, -1], role tail\n- legL: parent body, at [0.035, 0.24, 0.0], dir [0, -1, 0.1], role leg\n- legR: mirrored x=-0.035\n- footL: parent legL, at [0.035, 0.165, 0.0], dir [0, -1, 0], role digit? role \"digit\" is for fingers/toes. Fine.\n- footR.\n\nWhich joints does each part use? All geometry rides nearest joint by default; parts list joints: birdBody → body, tail; birdHead → head, jaw; legsFeet → legL, legR, footL, footR; branch → none (static, rides root/nearest — body joint is nearest... hmm). Branch geometry would attach to nearest joint (body) which is odd but harmless; better give it no joints and note geometry rides the root. Actually with a root joint \"body\", builder geometry without bones goes to nearest joint. Branch parts should ideally ride root. I can note in the part description: build with explicit bone or static; but spec JSON only has \"joints\" array per part. I'll list [] for branch and mention in builds text that it stays static on the root.\n\nEach part description should be detailed: construction, colors.\n\nPalette (≤24): \n- red \"#e2372e\", blue \"#1f5aa8\", yellow \"#f5b81c\", cream \"#f7f0e0\", black \"#20201f\", charcoal \"#3a3a3e\" (branch base? maybe branch is black), white \"#ffffff\", olive? Let's do:\n  - \"red\", \"blue\", \"yellow\", \"cream\", \"ink\" (black), \"slate\" (dark blue-grey for branch and shadow tones), \"white\" (eye glint), \"gold\"? skip. \n  - wing could be blue with cream wingbar. Breast red. Head black cap (like a chickadee/great tit → black head, yellow cheek, blue... ) A Bauhaus great-tit? Cute: black head, cream cheek disc, blue body, yellow breast? But robin red breast is iconic. Mix: black cap head, red breast, blue wings, cream belly, yellow beak ring/eye ring. That reads \"songbird\" and is very Bauhaus.\n\nLet me finalize bird design: \n- Body: egg (sphere scaled) blue.\n- Belly/breast: cream lower, red breast circle plate seated on front.\n- Head: black sphere (cap) with cream cheek discs both sides, eye = white ring + ink pupil + white glint dot.\n- Beak: yellow cone/frustum two-part, upper and lower jaw.\n- Wings: blue darker? We only have blue; wing could be red? Hmm red breast + blue wings is nice Kandinsky. Wing slab blue with cream stripe bar (wingbar) and black tip.\n- Tail: black fan of 3-5 feathers (extrudes) with cream tips? Maybe blue tail with black band. Keep black tail with yellow tip spots? Simpler: black tail feathers.\n- Legs: slate/black rods; feet black toes wrapping branch.\n- Branch: charcoal with cream ring bands (painted rings — Bauhaus!), small twig with three leaf discs: yellow, red, blue. Plus 2-3 small cream berries/spheres? Berries red spheres on twig — nice.\n\nLayout text should describe front-to-back silhouette.\n\nWrite the JSON. Sizes:\n- branch part box: [[-0.42, 0, -0.11], [0.42, 0.30, 0.07]] — includes twig rising to 0.30 with leaves at up to y 0.30, x 0.30ish. Leaves might be at y up to 0.28. Box: [[-0.42, 0, -0.12], [0.42, 0.30, 0.10]].\n- birdBody box: [[-0.14, 0.16, -0.28], [0.14, 0.42, 0.12]] — body plus tail (tail tip z -0.26, y ~0.38).\n- birdHead box: [[-0.10, 0.34, 0.02], [0.10, 0.52, 0.24]].\n- legsFeet box: [[-0.09, 0.15, -0.04], [0.09, 0.26, 0.05]].\n\nMounts: \"perchTop\": [0, 0.17, -0.02]; \"neckSeat\": [0, 0.37, 0.04]; \"tailRoot\": [0, 0.32, -0.08]; \"hipL\": [0.035, 0.25, 0], \"hipR\": [-0.035, 0.25, 0].\n\nWait consistency: legL joint at [0.035, 0.24, 0], foot at branch top 0.17. Legs: from hip inside body bottom (y 0.24 within body egg bottom ~0.22) to foot 0.17.\n\nBranch top at x=0: branch center y=0.085, r=0.085 → top 0.17. Good. Foot joints at [±0.035, 0.165, -0.02]? Feet sit on branch top slightly forward. Let's set feet at z = 0.0 too, branch center z = -0.02. Foot at [±0.035, 0.17, -0.02] gripping. Legs drop from hips [±0.035, 0.24, 0] to feet [±0.035, 0.17, -0.02]. Hmm feet at z -0.02 vs hips z 0: fine.\n\nAdjust joint list accordingly: footL at [0.035, 0.165, -0.02].\n\nHead joint at neck seat [0, 0.37, 0.04], dir [0, 0.3, 1]. Head sphere center ~[0, 0.44, 0.07], r 0.075 → top 0.515. Beak tip z 0.22? head front at z = 0.07+0.075=0.145; beak from 0.13 to 0.21. birdHead box max z 0.24 ok.\n\nSize overall: x: branch 0.84 wide → size x 0.85. y: 0.52 (head top) but leaves at 0.30 — head top 0.52. size y 0.55. z: from tail -0.28 to beak 0.24 → 0.52; plus branch z extent ±0.085 around -0.02 → -0.105..0.065, inside. Size z 0.55, centered? z range -0.28..0.24, center at -0.02. Model should be \"centred on x = 0\" only for x; z center not required. Size z 0.55.\n\nSize: [0.85, 0.55, 0.55].\n\nBudgets: branch 150, body 230, head 170, legs 110 → 660.\n\nNow write detailed builds text for each part.\n\nPart \"branch\": A chunky low-poly branch of charcoal lying along X from x=-0.40 to x=0.40, swept with a radius that tapers from 0.10 at the butt end (x=-0.40, resting on floor) to 0.055 at the tip (x=0.40, lifted off the floor... wait lowest points must touch floor — \"floor: true marks the parts whose lowest points rest on y=0\". If branch is tapered, only butt end touches floor. That's fine — lowest points touch. But then branch would tilt? Keep branch mostly horizontal resting: butt end y-center 0.10 (radius 0.10 → touches 0), tip end center y 0.06 (radius 0.055 → touches 0.005). Slight droop, natural. But then at x=0 center y ≈ 0.082, top ≈ 0.13. Recompute perch top. Let me simplify: keep branch level, radius constant-ish 0.085, center y 0.085, both a cut flat end (butt at x=-0.40, flat end cap showing cream growth rings! nice lathe/extrude detail) and a tapering tip at x=+0.40 that dips to the floor. So tip radius 0.05 at y 0.05 → touches floor at tip region. Slight downward curve toward tip via a sweep path with sag. Keep numbers: perch top at x=0 is y 0.17.\n\nSimplify for spec: branch centreline runs from [-0.40, 0.10, -0.02] to [0.40, 0.05, -0.02] with gentle sag, radius 0.10 tapering to 0.05; perch point at x=0 is [0, 0.17, -0.02]. Good enough; spec gives builders freedom.\n\nDetails on branch: two cream painted rings (thin bands) around it near x=-0.12 and x=0.20; a forked twig rising from the top at x=0.26 going up-back to [0.30, 0.30, -0.10], charcoal, carrying three flat circular leaf discs (yellow, red, blue) and two red berry spheres; a small cream lichen patch (flattened sphere) on the bark; growth-ring disc on the cut butt end (cream with charcoal ring lines — a lathe disc with concentric ring parts, maybe 3 thin rings).\n\nPart \"birdBody\": blue egg body via loft/sphere, perched leaning forward; cream belly underside sweep; red breast: a bold circular disc/plate seated on the chest front (like robin); wings folded: on each side a flat teardrop extrude slab in blue (darker? use same blue with cream wingbar and ink tip edge), lying along the flank from shoulder to tail; a few layered feather steps at wing tip; tail: fan of 4-5 black feather slabs (extrudes) spreading slightly, rising up-back from tailRoot to around [0, 0.40, -0.26], with cream tips or yellow tips? Choose cream tips. Back: maybe a yellow collar band between head and body? Could be part of head (neck ring). Put a yellow collar ring on body at neck seat.\n\nPart \"birdHead\": black head sphere at [0, 0.44, 0.07] r 0.075; cream cheek discs both sides (flat circles stuck on); big side eyes: white ring disc + ink pupil + white glint dot per side; yellow beak: upper jaw cone (yellow) and lower jaw (slightly smaller, darker? use red? no — keep yellow upper, cream lower? Let's do yellow upper mandible, ink lower? Hmm. Upper yellow cone, lower smaller yellow cone under it, separated for jaw joint). A small yellow crest/forehead plate? Maybe a red crown dot? Keep black head with cream brow line above eye. Nostril dots.\n\nPart \"legsFeet\": two slate legs: thin rods (tarsus) from hips down-forward to branch top; black feet with three toes front wrapping the branch (small bent capsules around the branch surface) and one back toe; claw tips ink. Small yellow leg ring bands (like bird bands! a birding ring — nice detail): one yellow band ring on each tarsus. \n\nColors palette keys: red, blue, yellow, cream, ink, slate (leg grey-blue), white, bark (charcoal). 8 colors.\n\nLayout description: front view: branch runs left-right along X resting on floor, slight sag; bird perched at centre facing the viewer; black head with cream cheeks and side-set round eyes above a yellow conical beak; red breast circle on cream belly over a blue egg body; blue folded wings with cream wingbar; black fanned tail rising behind; twig fork with primary-coloured leaf discs rising to the right of the bird.\n\nJoints array in order with parent references. Note dir for each.\n\nRoles: spine, head, jaw, tail, leg, digit.\n\nOne concern: joints are created \"in this order before any part runs\" — parents first. Root = body.\n\nLeg joints dir [0,-1,0]? Bone direction pointing down. Fine.\n\nWrite JSON now. Keep within one json code block, no extra text."
+      },
+      {
+        "id": "legsFeet",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:38:49.810Z",
+        "wallMs": 8748,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79516,
+          "completion_tokens": 1348,
+          "total_tokens": 80864,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0318512,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "birdHead",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:38:49.810Z",
+        "wallMs": 11595,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79627,
+          "completion_tokens": 1482,
+          "total_tokens": 81109,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0334132,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "branch",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:38:49.809Z",
+        "wallMs": 11802,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79584,
+          "completion_tokens": 1826,
+          "total_tokens": 81410,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0367672,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "birdBody",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:38:49.809Z",
+        "wallMs": 13055,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79783,
+          "completion_tokens": 2059,
+          "total_tokens": 81842,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.039495199999999994,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

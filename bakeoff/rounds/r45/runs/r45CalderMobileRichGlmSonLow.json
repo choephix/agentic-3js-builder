@@ -1,0 +1,444 @@
+{
+  "slug": "r45CalderMobileRichGlmSonLow",
+  "arm": "glm-son-low",
+  "subject": "calderMobile",
+  "level": "rich",
+  "pitch": "Category: Abstract.\nSubject: hanging mobile.\nStyle: Alexander Calder.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "planModel": "openrouter-curated/z-ai/glm-5.3-flash",
+  "effort": "high",
+  "started": "2026-10-29T00:49:01.945Z",
+  "wallMs": 233645,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 454974,
+    "completion_tokens": 22031,
+    "total_tokens": 477005,
+    "prompt_tokens_details": {
+      "cached_tokens": 398665
+    }
+  },
+  "costUsd": 0.1890696,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 220985,
+    "slowestPartMs": 12660,
+    "critical": "finials",
+    "elapsedMs": 233645,
+    "spec": {
+      "name": "Calder Standing Mobile",
+      "description": "A Calder-style standing mobile: a black pedestal and curving stem carry a crown of sweeping wire arms from which three tiers of flat red, orange, yellow, white and black sheet-metal shapes hang in balanced suspension.",
+      "builderName": "calderMobile",
+      "size": [
+        2.1,
+        2.2,
+        1
+      ],
+      "layout": "Front view (+Z): a low black pedestal disc sits on the floor at the origin; a slightly S-curved black stem rises 2.0 m to mount mastTop. From mastTop the wire crown sweeps one arm out left-forward to hookL [0.55, 1.94, 0.2] and one arm right-back to hookR [-0.5, 1.8, -0.1], with a short central branch bearing a small yellow triangle finial at the very top (~2.14). From each hook a thin vertical wire drop hangs the upper tier (canopy): on the left a big black leaf and a red petal, on the right a big white fan and a small orange disc; the drops continue down to pivotA (right-forward) and pivotB (left-back). The middle tier (midSwags) hangs from those pivots: an orange leaf forward-right and a black triangle behind it, a yellow half-moon and a small red disc to the left-back; the drops continue to pivotC and pivotD. The bottom tier (finials) hangs lowest: a large black blob-leaf on a balance arm with a solid counterweight sphere and a white disc at right-forward, and the model's boldest accent — a big red petal — with a yellow triangle and a single small cerulean disc at left-back. Lowest shape edges hover ~0.23 m above the floor; only the pedestal touches y = 0. Style on every part: nothing straight — every wire is one confident sweeping catmull curve in near-black; every shape is a flat cutout with visible 2-3 cm thickness so it reads as painted sheet metal seen both face-on and edge-on; hard-edged matte colours, asymmetric balance (heavy black mass left, bold red note right), black calligraphy lines holding coloured notes in the air.",
+      "palette": {
+        "wire": "#17171a",
+        "sheetBlack": "#232327",
+        "pedestal": "#26262b",
+        "white": "#f5efe3",
+        "red": "#d63a2b",
+        "orange": "#e9742e",
+        "yellow": "#f3b71f",
+        "cerulean": "#2f6fb2"
+      },
+      "mounts": {
+        "mastTop": [
+          0,
+          2,
+          0
+        ],
+        "hookL": [
+          0.55,
+          1.94,
+          0.2
+        ],
+        "hookR": [
+          -0.5,
+          1.8,
+          -0.1
+        ],
+        "pivotA": [
+          0.85,
+          1.45,
+          0.3
+        ],
+        "pivotB": [
+          -0.8,
+          1.25,
+          -0.05
+        ],
+        "pivotC": [
+          0.55,
+          0.85,
+          0.15
+        ],
+        "pivotD": [
+          -0.45,
+          0.7,
+          -0.1
+        ]
+      },
+      "joints": [
+        {
+          "name": "stem",
+          "at": [
+            0,
+            0.16,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "pivotL",
+          "parent": "stem",
+          "at": [
+            0.55,
+            1.94,
+            0.2
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge"
+        },
+        {
+          "name": "pivotR",
+          "parent": "stem",
+          "at": [
+            -0.5,
+            1.8,
+            -0.1
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge"
+        },
+        {
+          "name": "pivotA",
+          "parent": "pivotL",
+          "at": [
+            0.85,
+            1.45,
+            0.3
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge"
+        },
+        {
+          "name": "pivotB",
+          "parent": "pivotR",
+          "at": [
+            -0.8,
+            1.25,
+            -0.05
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge"
+        },
+        {
+          "name": "pivotC",
+          "parent": "pivotA",
+          "at": [
+            0.55,
+            0.85,
+            0.15
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge"
+        },
+        {
+          "name": "pivotD",
+          "parent": "pivotB",
+          "at": [
+            -0.45,
+            0.7,
+            -0.1
+          ],
+          "dir": [
+            0,
+            -1,
+            0
+          ],
+          "role": "hinge"
+        }
+      ],
+      "parts": [
+        {
+          "id": "pedestal",
+          "builds": "The floor-standing base and stem, everything below mastTop [0, 2.0, 0]. The foot: b.lathe a low disc profile r 0.42, height 0.07, with a rounded lip and a shallow dome top, colour pedestal, resting on y = 0; on its top a small raised collar disc r 0.16, h 0.05, same colour, carrying a thin 2 mm white inlay ring (colour white) around its rim. The stem: b.sweep along catmull [[0,0.12,0],[0.025,0.7,0],[-0.02,1.35,0.02],[0,2.0,0]], radius [0.024, 0.015], colour wire — a gentle S-curve, never straight. A small side twig near the base: b.rod from the stem at [0.03, 0.5, 0.0] to [0.2, 0.52, 0.05], r 0.008, colour wire, carrying one tiny white oval leaf (b.extrude outline ~0.10 x 0.16, smoothing 2, thickness 0.02, colour white, facing mostly +Z tilted ~20 degrees) — a quiet Calder whisper near the ground. At mastTop the stem ends in a tiny upturned hook: a half-torus (tube r 0.005, ring r 0.018, colour wire) opening upward, so the armature's attachment ring hangs in it; both parts build their meeting hardware at mastTop.",
+          "box": [
+            [
+              -0.45,
+              0,
+              -0.45
+            ],
+            [
+              0.45,
+              2,
+              0.45
+            ]
+          ],
+          "attaches": "Rises to mount mastTop [0, 2.0, 0], where the armature's ring hangs in the stem's terminal hook.",
+          "joints": [
+            "stem"
+          ],
+          "floor": true,
+          "budget": 130
+        },
+        {
+          "id": "armature",
+          "builds": "The black wire crown above the stem, from mastTop [0, 2.0, 0]. Two main curved arms, each one b.sweep along a catmull, colour wire: the left arm r 0.014 from [0, 2.0, 0] rising through [0.12, 2.06, 0.04] and curving out left-forward to hookL [0.55, 1.94, 0.2]; the right arm r 0.013 from [0, 2.0, 0] through [-0.14, 2.07, -0.03] curving out right-back to hookR [-0.5, 1.8, -0.1]. A short central branch up to [0, 2.12, 0.01] carrying the crown finial: a small yellow triangle (b.extrude outline ~0.09 per side, thickness 0.02, colour yellow, facing +Z). At hookL and hookR each arm ends in a closed attachment ring: b.part TorusGeometry(0.02, 0.005) in the vertical plane of the coming drop, colour wire — the canopy's top wire loops through it. Two small spacer spheres r 0.012 (colour wire) seated on the arms at mid-span. Style: every arm a single confident curved line, no straight segments, the whole crown reading as black calligraphy against the air.",
+          "box": [
+            [
+              -0.7,
+              1.7,
+              -0.35
+            ],
+            [
+              0.75,
+              2.2,
+              0.45
+            ]
+          ],
+          "attaches": "Roots at mount mastTop [0, 2.0, 0] on the stem's terminal hook; ends at mounts hookL and hookR with its closed rings, which the canopy hangs from.",
+          "joints": [
+            "stem"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "canopy",
+          "builds": "The upper tier of hanging sheet shapes, suspended from hookL [0.55, 1.94, 0.2] and hookR [-0.5, 1.8, -0.1]. Left drop: b.sweep along catmull from hookL down through [0.62, 1.75, 0.22] to mount pivotA [0.85, 1.45, 0.3], r 0.010, colour wire, ending in a small closed ring (torus 0.016 / 0.004, colour wire) for the next tier. On it, short twigs (r 0.006, colour wire) carry: a big black leaf — b.extrude an organic 3-4 point outline ~0.34 wide x 0.50 tall, smoothing 2, thickness 0.03, colour sheetBlack — hung at [0.78, 1.62, 0.26], facing mostly +Z tilted ~25 degrees; a red petal ~0.20 x 0.28, thickness 0.025, colour red, at [0.58, 1.78, 0.12], facing forward with a slight jaunty tilt. Right drop: b.sweep from hookR down through [-0.62, 1.5, -0.03] to mount pivotB [-0.8, 1.25, -0.05], r 0.010, ring at pivotB. On it: a big white fan/petal ~0.30 x 0.40, thickness 0.028, colour white, at [-0.55, 1.58, -0.02], facing forward-right (normal ~[0.4, 0, 0.85]); a small orange disc r 0.09, thickness 0.03, colour orange, at [-0.4, 1.72, 0.02], facing mostly +Z. Spacer balls r 0.012 (colour wire) where twigs join the drops. Every shape hangs with its own slight tilt; no two planes coplanar, so edges and faces alternate down the tier.",
+          "box": [
+            [
+              -1,
+              1.15,
+              -0.4
+            ],
+            [
+              1.05,
+              2,
+              0.55
+            ]
+          ],
+          "attaches": "Hangs from mounts hookL and hookR (the armature's rings) and ends at mounts pivotA and pivotB, where midSwags hangs below.",
+          "joints": [
+            "pivotL",
+            "pivotR"
+          ],
+          "floor": false,
+          "budget": 220
+        },
+        {
+          "id": "midSwags",
+          "builds": "The middle tier, hanging from pivotA [0.85, 1.45, 0.3] and pivotB [-0.8, 1.25, -0.05]. Left branch: b.sweep along catmull [0.85,1.45,0.3] -> [0.7,1.15,0.35] -> [0.6,1.02,0.33] -> pivotC [0.55,0.85,0.15], r 0.009, colour wire, small closed ring at pivotC. Twigs (r 0.006): a big orange leaf — organic outline ~0.30 x 0.42, thickness 0.03, smoothing 2, colour orange — hung at [0.72, 0.92, 0.45] on a forward twig, facing +Z tilted ~20 degrees; a small black triangle ~0.16 per side, thickness 0.025, colour sheetBlack, at [0.48, 1.08, 0.12] on a backward twig, angled ~40 degrees off +Z. Right branch: b.sweep along catmull [-0.8,1.25,-0.05] -> [-0.6,1.0,0.0] -> pivotD [-0.45,0.7,-0.1], r 0.009, ring at pivotD. Twigs: a yellow half-moon ~0.26 x 0.30, thickness 0.028, colour yellow, at [-0.55, 0.95, 0.02], facing +Z with a slight roll; a small red disc r 0.07, thickness 0.025, colour red, at [-0.85, 1.08, -0.18], facing forward-left. Spacer balls r 0.010 at twig junctions, colour wire.",
+          "box": [
+            [
+              -1,
+              0.55,
+              -0.45
+            ],
+            [
+              1.05,
+              1.55,
+              0.5
+            ]
+          ],
+          "attaches": "Hangs from mounts pivotA and pivotB (the canopy's rings) and ends at mounts pivotC and pivotD, where finials hangs below.",
+          "joints": [
+            "pivotA",
+            "pivotB"
+          ],
+          "floor": false,
+          "budget": 220
+        },
+        {
+          "id": "finials",
+          "builds": "The bottom tier, hanging from pivotC [0.55, 0.85, 0.15] and pivotD [-0.45, 0.7, -0.1]. Right cluster: b.sweep from pivotC down to [0.55, 0.55, 0.18], r 0.008, colour wire, then a gentle horizontal balance arm r 0.008 from [0.42, 0.52, 0.16] to [0.72, 0.5, 0.24]; at its left end a solid black counterweight sphere r 0.05 (colour wire); from the arm's middle a 0.06 twig holds a large black blob-leaf — rounded organic outline ~0.40 x 0.34, thickness 0.032, smoothing 2, colour sheetBlack — at [0.55, 0.42, 0.2], facing +Z tilted ~15 degrees; another twig up to a small white disc r 0.06, thickness 0.02, colour white, at [0.7, 0.62, 0.3]. Left cluster: b.sweep from pivotD down to [-0.4, 0.45, -0.06], r 0.008; the model's boldest accent: a big red petal — organic outline ~0.30 wide x 0.34 tall, thickness 0.03, smoothing 2, colour red — at [-0.42, 0.40, -0.04], facing mostly +Z tilted ~30 degrees; a twig up to a small yellow triangle ~0.14 per side, thickness 0.02, colour yellow, at [-0.58, 0.52, -0.14]; a tiny cerulean disc r 0.045, thickness 0.02, colour cerulean, at [-0.28, 0.5, 0.02] — the single blue note in the whole composition. All shape bottoms stay at or above y = 0.23, floating free of the pedestal top.",
+          "box": [
+            [
+              -0.85,
+              0.2,
+              -0.35
+            ],
+            [
+              0.9,
+              0.95,
+              0.4
+            ]
+          ],
+          "attaches": "Hangs from mounts pivotC and pivotD (the midSwags rings); nothing below it, its shapes hover ~0.23 m above the floor.",
+          "joints": [
+            "pivotC",
+            "pivotD"
+          ],
+          "floor": false,
+          "budget": 180
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "model": "openrouter-curated/z-ai/glm-5.3-flash",
+        "effort": "high",
+        "started": "2026-10-29T00:49:01.945Z",
+        "wallMs": 220985,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 52288,
+          "completion_tokens": 14498,
+          "total_tokens": 66786,
+          "prompt_tokens_details": {
+            "cached_tokens": 28505
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 10788
+          }
+        },
+        "costUsd": 0.011671599999999999,
+        "hasCode": true,
+        "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants me to generate a JSON specification for a complex object (a hanging mobile) that will be built collaboratively by multiple builders using an external SDK (`agentic-3js-builder`).\n2.  **Analyze the Subject & Style:**\n    *   **Subject:** Hanging mobile.\n    *   **Category:** Abstract.\n    *   **Style:** Alexander Calder (fluid, balanced, kinetic, minimal forms, often contrasting shapes).\n3.  **Determine Scale and Structure (Calder Mobile):**\n    *   A mobile needs a central hanging point and several articulated arms with various shapes.\n    *   Dimensions: Needs to be large enough to look significant, but abstract. Let's aim for a moderate size.\n    *   The structure should involve several interconnected elements: a main hanging ring/bar, and several arms/shapes suspended from it.\n    *   We need 3-6 parts. A mobile can be divided into:\n        1.  Main suspension structure (the top bar/ring).\n        2.  The main arms/structural elements.\n        3.  The suspended abstract shapes (the \"blobs\").\n        4.  Small decorative/counterbalancing elements.\n4.  **Define Constraints & Parameters:**\n    *   `size`: Overall dimensions (X, Y, Z). Let's estimate X=3m, Y=3m, Z=3m for a balanced, spreading mobile.\n    *   `layout`: How the mobile spreads out (e.g., flat against the X-Z plane, suspended at Y=H/2).\n    *   `palette`: Needs a few distinct, bold, flat colors suitable for a minimalist/abstract art piece.\n    *   `mount`s: The primary hanging point.\n    *   `joints`: The skeletal structure (pivots, connections).\n    *   `parts`: The geometry groups.\n\n5.  **Develop the Structure (Joint/Skeleton first):**\n    *   Root: Central hanging point (`body`).\n    *   Arms: Several arms hang from the `body`.\n    *   Elements: Shapes hang from the ends of the arms.\n\n6.  **Fleshing out the JSON (Iterative design):**\n\n    *   **Size:** [3.0, 3.0, 3.0] (X, Y, Z)\n    *   **Palette:** Needs contrasting, appealing colors. Perhaps muted tones with a pop of bright color.\n        *   `hull`: Muted gray/metal (#A0A0A0)\n        *   `shape1`: Bright primary (Yellow/Orange #FFD700)\n        *   `shape2`: Cool primary (Cyan/Blue #00BFFF)\n        *   `detail`: Dark contrasting line/core (#222222)\n    *   **Layout:** Focus on X-Z plane expansion, centered at Y=0 (or a fixed suspension height). Since it's a hanging mobile, the root won't rest on the floor (`floor: false` implicitly for everything).\n    *   **Mount:** The single point where it's hung.\n    *   **Joint:** The main pivot structure.\n\n7.  **Refining Parts (6 parts for even split):**\n\n    *   P1: Suspension Hardware (The top connector/ring).\n    *   P2: Primary Arms (The main structural pieces).\n    *   P3: Large Abstract Shapes (The dominant visual elements).\n    *   P4: Secondary Arms/Connectors (Smaller supports).\n    *   P5: Small Elements/Ornaments (Counterbalances).\n    *   P6: Background/Connecting elements (If necessary, but let's stick to the mobile components).\n\n8.  **Final Review against Prompt Requirements:**\n    *   JSON format only.\n    *   `name`, `description`, `builderName` (must be camelCase).\n    *   `size`, `layout`, `palette`, `mount`s, `joints`, `parts` structure is correct.\n    *   Style adherence (Calder: Abstract, balanced, simple forms, kinetic feel).\n\n*(Self-Correction during drafting: Ensure the joints are defined before parts use them. The mobile structure must be purely defined by its joints.)*\n\nLet's assemble the final JSON.The user wants me to design a shared specification (a JSON object) for a multi-builder system to create a single model.\nThe model is a \"hanging mobile\" in the style of \"Alexander Calder.\"\nThe style dictates bold, readable, stylized shapes, low-poly look, and clear color palettes.\nThe model must be built using primitive shapes and the SDK constraints (flat colors, etc.).\n\nSince it's a \"hanging mobile,\" there will be several suspended parts connected by wires or arms, creating dynamic, abstract shapes.\n\n**Model Analysis (Calder Mobile):**\n1.  **Structure:** A central hanging point (top) and several suspended elements (wings, flat shapes, kinetic elements).\n2.  **Shape:** Abstract, biomorphic, often utilizing simple, recognizable forms (circles, ovals, thin rectangles) but rendered in a dynamic composition.\n3.  **Style:** Use of balance, movement, and color contrast. Low-poly, stylized.\n\n**Translating to Specification:**\n*   **Name/Description:** Hanging Mobile, Abstract Calder style.\n*   **Size:** Needs to fit the scope of a large mobile, perhaps 1.5m wide, 2m high, 0.5m deep.\n*   **Layout:** The primary structure is a central suspension point, and the elements hang down and out.\n*   **Palette:** Needs colors suitable for a stylized abstract sculpture. Maybe contrasting, bold, flat colors.\n*   **Mounts/Joints:** The primary joint will be the central suspension point. The moving elements are attached via thin rods/wires (which act as joints/chains).\n*   **Parts:** I'll define 3-4 major parts:\n    1.  The central suspension apparatus/arm structure.\n    2.  A large, flat upper plate/wing (Part 1).\n    3.  A suspended, detailed kinetic cluster (Part 2).\n    4.  A final, small, whimsical element (Part 3).\n\nLet's refine the dimensions and structure.\n\n**Dimensions:**\n*   Width (X): ~1.8m (to spread the arms)\n*   Height (Y): ~2.0m (from central suspension point down)\n*   Length/Depth (Z): ~1.0m (for the elements to be three-dimensional)\n*   Overall Size: `[1.8, 2.0, 1.0]`\n\n**Colors:**\n*   A few contrasting, bold colors.\n*   `hull`: A neutral/dark color for the structure (e.g., dark grey/bronze).\n*   `primary`: A vibrant color (e.g., bright blue).\n*   `secondary`: A contrasting color (e.g., sunny yellow).\n*   `trim`: Accent color (e.g., crimson).\n\n**Joint Structure:**\n*   A main anchor point (off-screen, top of the builder's object). Let's define a `root` joint for the entire assembly's attachment point.\n*   `center`: The main structural connection point.\n\n**Parts Definition:**\n\n1.  **Center/Suspension Hub:** The core piece from which all elements hang.\n2.  **Upper Wing:** A large, flat, stylized plate.\n3.  **Mid-Cluster:** A collection of smaller, interconnected, sweeping shapes.\n4.  **Lower Element:** A simple, distinct geometric shape hanging lowest.\n\nI need to ensure the descriptions are detailed enough for multiple builders to interpret them as one cohesive model based on the shared vision.\n\n---\n**Drafting the JSON:**The user wants me to design a shared specification (JSON format) for building a model, specifically a hanging mobile in the style of Alexander Calder.\n\nThe final output must be a JSON specification, not the actual three.js module.\nThe model needs to be split into 3-6 parts.\n\n**Model Description:**\n*   **Category:** Abstract\n*   **Subject:** Hanging mobile (Alexander Calder style).\n*   **Style:** Abstract, Calder-esque (dynamic, balanced, simple geometric forms, usually hanging with wires/arms).\n\n**Design Considerations for Calder Mobile:**\n1.  **Structure:** It needs a central hanging point (arm/suspension).\n2.  **Shapes:** Simple, planar, often asymmetric shapes (circles, ovals, lenticular, geometric abstractions).\n3.  **Balance:** Visual weight and balance are crucial.\n4.  **Movement:** The parts imply movement and delicate suspension.\n5.  **Palette:** Limited, bold, contrasting colors.\n\n**Constraints Check:**\n*   Output: Single JSON block. No external text.\n*   Structure: `name`, `description`, `builderName`, `size`, `layout`, `palette`, `mount`, `joints`, `parts`.\n*   `parts`: 3-6 parts, self-contained, budget divided.\n*   `palette`: Max 24 colors.\n*   `joints`: Skeleton definition.\n*   `box`: Min/Max corners.\n*   `floor`: Boolean.\n\n**Plan:**\n1.  Define overall size and layout for a mobile.\n2.  Define the skeleton (joints) for the suspension mechanism.\n3.  Divide the mobile into 3-4 distinct parts: Central Arm/Suspension, Large Primary Elements, Medium Secondary Elements, and Small Accent Elements.\n4.  Assign a palette.\n\n**Execution:**\n\n**1. Size and Layout:**\nA mobile needs enough vertical space and lateral swing. Let's aim for a manageable size, say 2m tall, 2m wide, and depth determined by the arm length.\n\n**2. Joints:**\nThe root must be the hanging point. Subsequent joints attach to the primary arms.\n\n*   `root` (The main suspension point).\n*   `arm1` (Primary structural element 1, attached to root).\n*   `arm2` (Primary structural element 2, attached to root).\n*   `element1` (Attaches to `arm1`).\n*   `element2` (Attaches to `arm2`).\n\nLet's simplify the joints for the JSON spec, focusing on the attachment points for the parts.\n\n**3. Palette:**\nWe need bold, Calder-like contrasts.\n*   Primary: Bright Cyan (`#00BFFF`), Red (`#FF4500`), Yellow (`#FFFF00`).\n*   Secondary/Structural: Matte Grey (`#AAAAAA`), Dark Navy (`#1A237E`).\n\n**4. Parts Definition (Target 4 parts for good division):**\n\n*   **Part 1: Main Suspension Arm (The central boom).** Defines the structure holding everything.\n*   **Part 2: Large Primary Element (The biggest shape, defining the main plane).**\n*   **Part 3: Medium Cluster (A group of smaller, swinging shapes).**\n*   **Part 4: Accent/Counterbalance (A small, delicate element).**\n\nLet's refine the coordinates and budgets.\n\n*   Total Budget: 900 parts. Let's target ~225 parts per main part.\n\n*(Self-Correction during drafting: Since it's an abstract mobile, the joints are more like attachment points on arms, not traditional skeletal movement. I will define the primary suspension structure as the core system.)*\n\n**Finalizing the JSON structure:**The user wantsI need to write a spec for a Calder hanging mobile. The builders will build one part each. A Calder mobile: a hanging kinetic sculpture with black flat shapes (organic leaf-like and geometric shapes), red/orange/yellow accents, thin black rods, suspended from a ceiling... but the model stands on y=0 floor? \"A model the pitch places off the ground (a bird in flight, a hanging lantern) keeps that height.\" So the mobile hangs — but where does it hang from? A mobile needs a mount point. In a model space, we could hang it from a tall thin pole/stand (Calder made standing mobiles too — \"stabiles\" are static; \"standing mobiles\" exist). A standing mobile on a base would let it rest on the floor and be fully self-contained. That's a good choice: a Calder standing mobile — a black base, a vertical stem, curving black wire arms, with painted shapes (black, red, orange, yellow, white) suspended.\n\nSize: maybe 2.2 m tall, width 2.0 m, depth 0.7 m. Size [2.0, 2.2, 0.9].\n\nSplit into 3-6 parts: \n1. base + stem (mast): black base cylinder, vertical stem, maybe with a white/red stripe? Calder base is usually black. Budget ~120.\n2. the upper wire tree / armature: curved black rods branching out — first tier arms. Budget ~150.\n3. lower branch cluster (left side shapes + connecting wires): shapes hanging on wires with small wire connectors, spacers. Budget ~200.\n4. middle cluster. Budget ~200.\n5. right/top cluster. Budget ~200.\n\nTotal ~870.\n\nJoints: static model? A mobile is kinetic but we can have joints for rotation — actually joints could be nice for animation (each mobile tier rotating slowly). The rig: joints at pivot points for each arm so it can sway. But spec says static models may omit joints. For a mobile, having joints at each pivot would be great for a rig that animates the rotation. Let's include joints: root at base? A static model has \"joints\": []. But a mobile that rotates is a good candidate for joints. Let me define:\n\n- root \"base\" at [0, 0, 0], dir [0,1,0] — hmm, root joint. Actually the mast could sway? Keep base static.\n- \"mast\" at [0, 0.12, 0] dir [0,1,0] — the stem, so a gentle sway is possible.\n- Pivot joints at each arm branch point: \"pivotTop\" etc. Each cluster hangs from a pivot and can rotate about vertical axis. That's the classic mobile motion — rotation about the vertical wire axis. So joints at each vertical hanging point, dir [0,1,0], role \"hinge\".\n\nLet me lay out geometry. Standing mobile, 2.2 m tall:\n\n- Base: black disc/cylinder r=0.42, h=0.06, at floor. Plus a smaller pedestal disc r=0.18, h=0.10.\n- Mast: vertical black rod from y=0.16 to y=2.05, r=0.025, tapering. Maybe slightly curved (Calder stems often curve). Let's make it a catmull curve leaning slightly.\n- Top of mast at ~2.0. From there arms branch.\n\nArmature structure (wire tree): \nFrom mast top (~2.0), a curved arm sweeps forward-left to about [0.55, 1.85, 0.25], with a hanging point. Another arm sweeps right to [-0.6, 1.7, -0.1]. Classic Calder:不平衡 balance with counterweights.\n\nStructure plan (three tiers):\n\nTier A (top, y≈1.85–2.1): from mast top, a horizontal-ish curved arm crossing left-to-right; at each end a vertical wire drops to a shape or a second-tier pivot.\n\nTier B (middle, y≈1.2–1.6): two sub-arms each carrying shapes and a lower pivot.\n\nTier C (lower, y≈0.4–1.0): shapes directly hanging.\n\nShapes: flat organic cutouts, thickness ~0.02–0.04, standing vertically (planes roughly vertical, facing various directions), like Calder's sheet metal leaves and petals, and some geometric (circle, triangle, half-moon). Colors: mostly black, with red, orange, yellow, white accents (Calder palette: black, white, red, orange, yellow).\n\nLet me define mounts:\n- mastTop: [0, 2.0, 0] — where stem ends and armature begins.\n- pivotL / pivotR: where first-tier arms end and vertical drops hang... Actually the drops belong to clusters.\n- Mounts are where two parts touch. Parts: mast (base+stem), armature (wire tree first tier), clusterLeft, clusterRight, clusterLower? Let me use 5 parts:\n\n1. \"pedestal\" — base + stem. Owns floor. Budget 120.\n2. \"armature\" — the crown: curved arms from mastTop, first-tier horizontal wires, ending in hanging points with small rings/hooks. Mount: mastTop. Budget 160.\n3. \"canopy\" — top tier: shapes hanging directly from armature hooks (big leaf shapes + small counterweights), plus its own sub-wires and drops to middle pivots. Mount: armature hooks (armHookL, armHookR). Budget 190.\n4. \"midSwags\" — middle tier: arms/pivots with shapes and drops to lower hooks. Budget 200.\n5. \"finials\" — bottom tier: final shapes, counterweight spheres/discs, small spacers. Budget 180.\n\nHmm, that's reasonable. Mounts: mastTop [0, 2.0, 0]; hookL [0.55, 1.92, 0.22]; hookR [-0.5, 1.78, -0.12]; pivotMidL, pivotMidR, pivotLowL, pivotLowR... Mounts are shared points where parts meet; each place two parts touch has a mount. So:\n\n- mastTop [0, 2.0, 0] — pedestal ↔ armature.\n- hookL [0.55, 1.94, 0.2] — armature ↔ canopy (canopy hangs from this).\n- hookR [-0.5, 1.8, -0.1] — armature ↔ canopy.\n- pivotA [0.85, 1.45, 0.3] — canopy ↔ midSwags (mid part hangs from canopy's sub-wire).\n- pivotB [-0.8, 1.25, -0.05] — canopy ↔ midSwags.\n- pivotC [0.55, 0.85, 0.15] — midSwags ↔ finials.\n- pivotD [-0.45, 0.7, -0.1] — midSwags ↔ finials.\n\nParts boxes: since it's hanging, boxes are generous regions:\n- pedestal: [[-0.45, 0, -0.45], [0.45, 2.0, 0.45]]\n- armature: [[-0.7, 1.7, -0.35], [0.75, 2.2, 0.45]]\n- canopy: [[-1.0, 1.15, -0.4], [1.05, 2.0, 0.55]]\n- midSwags: [[-1.0, 0.55, -0.45], [1.05, 1.55, 0.5]]\n- finials: [[-0.85, 0.25, -0.35], [0.9, 0.95, 0.4]]\n\nTotal size: width 2.1, height 2.2, depth 0.9. Size [2.1, 2.2, 0.9].\n\nJoints: root at base? For a static model joints: []. But a mobile wants rotating tiers. Let's give joints:\n\n- \"stem\" at [0, 0.16, 0], dir [0,1,0], role spine, parent none (root). Rides: pedestal. Hmm — root joint must be first. The stem joint is the root; everything hangs from chain... Actually if I make a joint chain, the armature could sway slightly. Simple set:\n- \"stem\" (root) at [0,0.16,0] dir [0,1,0] role spine\n- \"pivotL\" at hookL, dir [0,1,0], role hinge, parent stem — canopy left cluster rotates about vertical.\n- \"pivotR\" at hookR, dir [0,1,0], role hinge, parent stem\n- \"pivotA\" at pivotA, parent pivotL, role hinge\n- \"pivotB\" at pivotB, parent pivotR, role hinge\n- \"pivotC\" at pivotC, parent pivotA, role hinge\n- \"pivotD\" at pivotD, parent pivotB, role hinge\n\nThat's 7 joints. Each part lists which joints its geometry rides: armature rides \"stem\"; canopy rides pivotL/pivotR; midSwags rides pivotA/pivotB; finials rides pivotC/pivotD.\n\nWait — the parent chain: pivotA is at [0.85, 1.45, 0.3] and its parent is pivotL at [0.55,1.94,0.2]. Bone direction from parent to child... The joint's dir is the bone direction. For a hanging pivot, dir [0,1,0] means the bone points up — but the child is below. Hmm, bones point from joint to children. Actually in the SDK, the joint's bone is +Y of the joint and children joints... the dir is where the bone points. For a hanging pivot, the geometry hangs below, so maybe dir should be [0,-1,0] pointing down toward the hanging weight? The bone runs from a joint to each child joint. Child pivotA is below pivotL, so the bone direction from pivotL to pivotA is downward: dir [0,-1,0]... Actually pivotL's children could be geometry hanging below (canopy shapes attached to this pivot via the vertical wire). Let me just set dir [0,-1,0] for the hanging pivots, so the +Y axis points down toward the hanging cluster — makes sense for \"hinge\" pivots that carry the drop below.\n\nHmm, but actually, for rotating about the vertical wire, the joint axis is vertical. Three.js rotation is about the joint's Y axis. So dir [0,1,0] or [0,-1,0] both give vertical rotation axis. dir defines the bone direction to children. For pivots whose child is below, dir [0,-1,0]. For stem (root), children are the armature at the top and pivots... The armature is at mastTop [0,2.0,0], above stem. So stem's dir [0,1,0] pointing up to the armature. Good.\n\nActually wait: does the armature ride \"stem\" joint? The armature is rigid with the stem — both belong to the static top. Fine.\n\nShould the pedestal be part of the stem joint? The root joint at [0,0.16,0] — base disc is below it. Static model might be simpler, but joints give animation potential (rotating tiers = mobile motion). I'll include them.\n\nPalette (Calder):\n- black: \"#1a1a1c\" (wire + most shapes)\n- white: \"#f4efe6\"\n- red: \"#d43a2a\"\n- orange: \"#e8722c\"\n- yellow: \"#f2b722\"\n- steelGray?: maybe not. Keep 6-7 colors. Add \"wire\" maybe same black. Add \"brass\" no. Calder palette: black, white, red, yellow, orange, sometimes blue. Let me include:\n  - \"black\": \"#1c1c1e\"\n  - \"sheetBlack\": \"#242428\" (slightly different for shapes? Calder shapes and wires are same black; but two blacks add depth) — maybe keep one black and one \"inkBlack\" for outlines. Keep simple: black wire, black shapes same. But having two close blacks gives subtle variation. I'll include both.\n  - \"white\": \"#f5f0e6\"\n  - \"red\": \"#d6392c\"\n  - \"orange\": \"#e8732e\"\n  - \"yellow\": \"#f4b81f\"\n  - \"baseDark\": \"#2e2e34\" for the pedestal (slightly warmer black)\n  - maybe \"cerulean\": \"#2a6bb5\" — Calder did use blue occasionally. Include as accent.\n\nThat's 8 colors. Fine.\n\nNow write each part's builds description in detail. Each part spec must be self-contained since builders don't see each other's code. Include exact geometry guidance: wire radii, shape sizes, colors per piece, use of b.sweep for curved wires, b.extrude for flat shapes with thickness, b.slab or extrude for organic leaf shapes, b.lathe for base disc, spacers (small spheres/discs on wires like Calder's little balls), hooks (small rings).\n\nImportant style notes to put in layout: flat sheet-metal shapes seen edge-on and face-on; curved black wires; asymmetric balance; shapes distributed so the mobile reads as floating; the style shows as: matte black wire lines, bold flat primary shapes with thickness ~0.03, slight glossy? No — flat colors, MeshStandard default.\n\nLayout description: a standing mobile on a low black pedestal disc; a slightly curving black stem rises 2.0 m; from its top, two curved arms reach out left-forward and right-back; from hooks, drops of black wire carry flat Calder shapes — organic leaf and petal cutouts and a few geometric discs and triangles — mostly black with red, orange, yellow, white accents; each tier hangs below and slightly out from the one above; lowest shapes hover ~0.25 m above the pedestal; nothing touches the floor except the pedestal.\n\nFloor: only pedestal part floor: true.\n\nBudgets: pedestal 130, armature 150, canopy 220, midSwags 220, finials 180 = 900. Good.\n\nNow describe each part carefully:\n\n**pedestal** (budget 130):\n- Base disc: lathe or cylinder, r 0.42, h 0.07, at y 0..0.07, color baseDark (black). Top face slightly beveled. Add a thin red ring inlay on top? Calder bases are plain black. Maybe a small red disc accent on top — a Calder touch: a red disc mounted on the base? Actually Calder sometimes had a small shape on the base. Keep: black base, plus a tiny white label? no.\n- Stem: vertical rod, r 0.024 at bottom tapering to 0.016 at top, from y 0.07 to mastTop y 2.0. Slightly curved: catmull through [0,0.07,0], [0.02,0.7,0], [-0.02,1.4,0.02], [0,2.0,0] — a gentle S. color black.\n- Stem collar: small brass? no — a small black collar ring at y 0.09, and a subtle red band? Calder: keep black. Add one accent: a small red disc \"flag\" low on the stem? Could be nice: a tiny red leaf on a short arm near the base is a Calder-like touch. I'll spec: a short side arm at y ~0.5 pointing forward-right (+Z a bit, +X), carrying one small white leaf and one tiny red disc — actually that might collide with canopy parts' boxes. Box of pedestal is only up to 2.0 but narrow. A small side arm at [0.12, 0.5, 0] to [0.3, 0.52, 0.05] with a tiny white oval leaf — adds charm within box.\n- Mount: mastTop at [0, 2.0, 0]; stem's top ends in a tiny upturned hook/ring to which the armature attaches. Both parts build to it: pedestal makes the terminal ring; armature makes its own hook that overlaps.\n\n**armature** (budget 150): the crown.\n- From mastTop, a curved main arm (sweep along catmull bezier) r 0.014: from [0,2.0,0] rising slightly to [0.1,2.08,0.05], then sweeping left-forward to hookL at [0.55,1.94,0.2]. \n- A second branch: from mastTop, sweep to the right-back: through [-0.1,2.06,-0.02] to hookR at [-0.5,1.8,-0.1], r 0.013.\n- A third small branch: short central arm up to [0, 2.12, 0.02] carrying a tiny white disc or a small red triangle finial at the very top (the crown accent).\n- At hookL and hookR: small closed wire rings (torus r 0.02, tube 0.004) as attachment loops — both armature (ring) and canopy (its top wire passes through/attaches) build to the mount.\n- Maybe a couple of small spacers (little black spheres r 0.015) on the arms.\n- Colors: black wire; the top finial accent yellow or white.\n\n**canopy** (budget 220): upper tier of hanging shapes, hangs from hookL and hookR.\n- From hookL: vertical wire drop (r 0.010) down to pivotA mount at [0.85,1.45,0.3]... wait, hookL is at [0.55,1.94,0.2]; the drop should be mostly vertical but can have a slight curve. Along the drop: two flat shapes attached sideways via short horizontal wire twigs: a large black leaf (extruded organic outline, ~0.34 wide × 0.5 tall, thickness 0.03, facing mostly +Z, slightly angled) hanging at [0.75,1.62,0.26]; a red petal (~0.2 × 0.28) at [0.55,1.75,0.1]. Then the drop continues to pivotA at [0.85,1.45,0.3] with a small loop.\n- From hookR: drop to pivotB at [-0.8,1.25,-0.05], with a big white fan/petal shape (~0.3×0.4) at [-0.6,1.6,-0.05] facing forward-left, a small orange disc (r 0.09, thickness 0.03) at [-0.42,1.7,0.0].\n- Little wire spacer balls between shape attachment points (black spheres r 0.012).\n- Every shape slightly tilted, edge-on variety: some nearly facing +Z, some angled 30–60°.\n\n**midSwags** (budget 220): middle tier, hangs from pivotA and pivotB.\n- From pivotA: a curved horizontal sub-arm sweeping down-left to a lower hook... hmm, actually Calder mid tier: below pivotA the wire continues down, then splits: one twig to a shape, one continues to pivotC. From pivotA: drop continues down-forward to [0.6,1.1,0.35] where a curved arm goes forward to hang a big orange leaf (0.3×0.42) at [0.75,0.95,0.5], plus a twig backward to a small black triangle at [0.5,1.05,0.1]; the main drop continues to pivotC at [0.55,0.85,0.15] with loop.\n- From pivotB: drop with a yellow half-moon shape (0.26×0.3) at [-0.55,0.95,0.0], a small red disc r 0.07 at [-0.85,1.1,-0.15], continues to pivotD at [-0.45,0.7,-0.1].\n- Spacers, tiny wire loops at mount points.\n\n**finials** (budget 180): bottom tier, hangs from pivotC and pivotD.\n- From pivotC: a short drop to a cluster: a large black rounded-blob leaf (0.4×0.34) at [0.55,0.45,0.2], a small white disc r 0.06 at [0.7,0.6,0.3] on a twig, and a counterweight: a small solid black sphere r 0.05 at the arm's other end for balance. Lowest point ~0.28 (shape bottom) — must stay above floor per floor:false; box min y 0.25.\n- From pivotD: a drop to a bold red petal (0.3×0.38) at [-0.4,0.35,-0.05] — the big red accent, facing mostly +Z tilted; a small yellow triangle (0.14 side) at [-0.6,0.5,-0.15]; tiny spacer balls.\n- Shapes' lowest edges ~0.25–0.3 above the pedestal top (pedestal top at 0.07; so gap ~0.2). Good.\n\nJoints list with names/roles:\n1. stem — root, at [0,0.16,0], dir [0,1,0], role \"spine\". Hmm — role list: spine neck head jaw hinge tail leg arm wing digit tentacle fan. \"spine\" ok for root.\n2. pivotL — parent stem, at [0.55,1.94,0.2], dir [0,-1,0], role \"hinge\".\n3. pivotR — parent stem, at [-0.5,1.8,-0.1], dir [0,-1,0], role \"hinge\".\n4. pivotA — parent pivotL, at [0.85,1.45,0.3], dir [0,-1,0], role \"hinge\".\n5. pivotB — parent pivotR, at [-0.8,1.25,-0.05], dir [0,-1,0], role \"hinge\".\n6. pivotC — parent pivotA, at [0.55,0.85,0.15], dir [0,-1,0], role \"hinge\".\n7. pivotD — parent pivotB, at [-0.45,0.7,-0.1], dir [0,-1,0], role \"hinge\".\n\nWait — the pedestal part rides \"stem\"; armature rides \"stem\"; canopy rides pivotL & pivotR; midSwags rides pivotA & pivotB; finials rides pivotC & pivotD.\n\nHmm, but pivotL is at hookL which is where armature meets canopy. The armature builds the ring there; canopy's wire attaches. Canopy geometry rides pivotL (rotation about vertical = mobile spin). Good.\n\nMounts: mastTop [0,2.0,0]; hookL [0.55,1.94,0.2]; hookR [-0.5,1.8,-0.1]; pivotA [0.85,1.45,0.3]; pivotB [-0.8,1.25,-0.05]; pivotC [0.55,0.85,0.15]; pivotD [-0.45,0.7,-0.1].\n\nCheck overlap of boxes with mounts: hookL at [0.55,1.94,0.2] — armature box max x 0.75, y up to 2.2, z 0.45: contains it. Canopy box [[-1.0,1.15,-0.4],[1.05,2.0,0.55]] contains hookL. Good. pivotA [0.85,1.45,0.3] inside canopy box and midSwags box ([[-1.0,0.55,-0.45],[1.05,1.55,0.5]] — x 0.85 ok, y 1.45 ≤1.55 ok, z 0.3 ok). pivotC [0.55,0.85,0.15] inside midSwags and finials box [[-0.85,0.25,-0.35],[0.9,0.95,0.4]]. Good. pivotD [-0.45,0.7,-0.1] inside both. Good.\n\nbuilderName: \"calderMobile\".\n\nName: \"Calder Standing Mobile\" / display name \"Red Accordian\"? Use \"Calder Mobile — Poetic Gravity\"? Keep simple: \"Standing Mobile (after Calder)\". Name: \"Calder Standing Mobile\".\n\nDescription: \"A Calder-style standing mobile: a black pedestal and curving stem carry a crown of wire arms from which tiers of flat red, orange, yellow, white and black sheet shapes hang in balanced suspension.\"\n\nPalette keys: black \"#1c1c1e\", wireBlack \"#2a2a2e\"? Actually wires should read as same black family; give \"wire\": \"#141416\" (darker) and \"sheet\": \"#222226\"? Hmm Calder wires and sheets are the same black; but for the model, slightly different blacks help read. Let me define:\n- \"wire\": \"#17171a\" — rods and drops\n- \"sheetBlack\": \"#232327\" — flat shapes\n- \"white\": \"#f5efe3\"\n- \"red\": \"#d63a2b\"\n- \"orange\": \"#e9742e\"\n- \"yellow\": \"#f3b71f\"\n- \"pedestal\": \"#26262b\" — base\n- \"cerulean\": \"#2f6fb2\" — one small accent shape\n\n8 colors, ≤24. \n\nNow write layout text (front +Z view, what's where, style). Keep it thorough but readable.\n\nAlso note in each part: wire radius values, use b.sweep along catmull/bezier paths, b.extrude for organic shapes with smoothing 2 and thickness ~0.03, b.lathe for base, small spacer spheres b.part, mount loops as torus (TorusGeometry via b.part, or b.ring? builders may use plain THREE.TorusGeometry with b.part). Spec says attach by mount names.\n\nAlso mention that all shapes are vertical planes (thin thickness along their local z), slight random tilts as specified, and each shape gets a tiny top-edge hole/loop? Not needed—wire tucks behind.\n\nWrite budgets sum: 130+150+220+220+180 = 900.\n\nPart box check for pedestal: stem curve sways within ±0.03; base disc r 0.42 fits [-0.45,0.45]. Fine.\n\nOne more consideration: \"floor: true\" only pedestal. finials lowest at y≈0.25 (box min 0.25) above floor — fine, and gap above pedestal top (0.07). Good.\n\nWrite the JSON. Include \"joints\" array and per-part \"joints\" lists. Also mounts. Make sure joints parents first: stem (root), pivotL (parent stem), pivotR (parent stem), pivotA (parent pivotL), pivotB (parent pivotR), pivotC (parent pivotA), pivotD (parent pivotB). Order ok (parents before children).\n\nDetailed builds text per part:\n\n**pedestal**: \"The floor-standing base and stem, everything below mastTop [0,2.0,0]. A low foot: b.lathe disc profile — r 0.42 with a rounded lip and a shallow dome top, height 0.07, color pedestal; on its top a thin raised collar disc r 0.16 h 0.05, same colour, with a 2 mm white inlay ring. The stem: b.sweep along catmull [[0,0.12,0],[0.025,0.7,0],[-0.02,1.35,0.02],[0,2.0,0]], radius [0.024,0.015], color wire. A small side twig at y 0.5: short b.rod from the stem to [0.2,0.52,0.04] r 0.008 carrying a tiny white oval leaf (b.extrude outline ~0.10×0.16, thickness 0.02, color white, facing mostly +Z tilted ~20°) — a Calder whisper near the base. At the top, mastTop: the stem ends in a tiny upturned hook — a half-torus of tube r 0.005, radius 0.018, color wire, opening upward, so the armature's ring hangs in it. Mount mastTop is the point both parts build to.\"\n\nBudget 130 fits: base (~6 pieces), stem, collar, inlay ring, twig, leaf, hook ≈ 12-20 parts. Budgets are shares, not exact counts; fine.\n\n**armature**: \"The black wire crown above the stem, from mastTop [0,2.0,0]. Two main curved arms, each b.sweep along a catmull: the left arm r 0.014 from [0,2.0,0] rising through [0.12,2.06,0.04] and curving out left-forward to hookL [0.55,1.94,0.2]; the right arm r 0.013 from [0,2.0,0] through [-0.14,2.07,-0.03] out right-back to hookR [-0.5,1.8,-0.1], color wire. A short central branch up to [0,2.12,0.01] carrying the crown finial: a small yellow triangle (b.extrude, ~0.09 side, thickness 0.02, color yellow, facing +Z). At hookL and hookR each arm ends in a closed attachment ring: b.part TorusGeometry(0.02, 0.005) in the vertical plane of the drop, color wire — the canopy's wire loops through it. Two small spacer spheres r 0.012 on the arms, color wire. Style: every arm a single confident curved line, no straight segments.\"\n\n**canopy** (upper tier, hangs from hookL/hookR, rides pivotL/pivotR): drops and shapes:\n- Left drop: b.sweep catmull from hookL [0.55,1.94,0.2] down through [0.62,1.75,0.22] to pivotA mount [0.85,1.45,0.3], r 0.010, color wire; ends in a small ring (torus 0.016/0.004) at pivotA.\n- Shapes on the left drop: short twigs: a big black leaf — b.extrude organic outline 0.34 wide × 0.5 tall, thickness 0.03, smoothing 2, color sheetBlack, hung at [0.78,1.62,0.26] on a 0.06 twig, facing mostly +Z tilted ~25° (its plane's normal ~[0.3,0,0.9]); a red petal 0.20×0.28, thickness 0.025, color red at [0.58,1.78,0.12], facing forward tilted; spacer balls r 0.012 where twigs meet the drop.\n- Right drop: sweep from hookR down to pivotB [-0.8,1.25,-0.05] r 0.010 with ring; a big white fan/petal 0.30×0.40 thickness 0.028 color white at [-0.55,1.58,-0.02] facing forward-right ~[0.4,0,0.85]; a small orange disc b.extrude circle-ish r 0.09 thickness 0.03 color orange at [-0.4,1.72,0.02] facing mostly +Z.\n- All shapes hang with a slight jaunty tilt; nothing coplanar.\n\n**midSwags** (middle tier, rides pivotA/pivotB):\n- From pivotA: drop continues down-forward: catmull [0.85,1.45,0.3] → [0.7,1.15,0.35] → [0.6,1.02,0.33] → pivotC [0.55,0.85,0.15], r 0.009, ring at pivotC. Twigs: a big orange leaf 0.30×0.42 thickness 0.03 color orange at [0.72,0.92,0.45] on a 0.07 forward twig, facing +Z tilted; a small black triangle 0.16 side thickness 0.025 color sheetBlack at [0.48,1.08,0.12] on a backward twig.\n- From pivotB: drop [−0.8,1.25,−0.05] → [−0.6,1.0,0.0] → pivotD [−0.45,0.7,−0.1], r 0.009, ring. Twigs: yellow half-moon 0.26×0.30 thickness 0.028 color yellow at [-0.55,0.95,0.02] facing +Z; a small red disc r 0.07 thickness 0.025 color red at [-0.85,1.08,-0.18] facing forward-left.\n- Spacers r 0.010 at twig junctions.\n\n**finials** (bottom tier, rides pivotC/pivotD):\n- From pivotC: short drop to [0.55,0.55,0.18], then a balance arm: a gentle horizontal curve r 0.008 from [0.42,0.52,0.16] to [0.72,0.5,0.24]; at the left end a solid black counterweight sphere r 0.05; hung from the arm's middle a large black blob-leaf 0.40×0.34 thickness 0.032 color sheetBlack at [0.55,0.42,0.2] facing +Z tilted ~15°; a twig to a small white disc r 0.06 thickness 0.02 color white at [0.7,0.62,0.3].\n- From pivotD: drop to [-0.4,0.42,-0.06]; the big red petal — the model's boldest accent: 0.30×0.38, thickness 0.03, color red, at [-0.42,0.33,-0.04], facing mostly +Z tilted ~30°; a twig up to a small yellow triangle 0.14 color yellow at [-0.58,0.52,-0.14]; a tiny cerulean disc r 0.045 thickness 0.02 color cerulean at [-0.28,0.5,0.02] — the single blue note. Lowest edges ~0.25, well above floor.\n\nWait — finials box min y 0.25; big black blob-leaf at y 0.42 with height 0.34 → bottom 0.25. Red petal at y 0.33 with 0.38 → bottom 0.14 — below box min 0.25. Adjust: red petal center [-0.42, 0.35, -0.04], height 0.38 → bottom 0.16. Hmm. Set petal 0.30 wide × 0.30 tall at y 0.42 → bottom 0.27. Or raise box min to 0.2. Let me set finials box [[-0.85, 0.2, -0.35], [0.9, 0.95, 0.4]] and petal at y 0.40 (0.34 tall → bottom 0.23). Fine.\n\nAlso total height: crown finial top ~2.14; size height 2.2 ok. Width: canopy/mid shapes to x ±1.0/1.05 → width 2.1. Depth: shapes at z up to 0.55 → total z span from -0.45 to 0.55 = 1.0. Set size [2.1, 2.2, 1.0].\n\nHmm size z: midSwags box z -0.45..0.5; canopy z -0.4..0.55; so span -0.45..0.55 = 1.0. OK size [2.1, 2.2, 1.0].\n\nNow also give style guidance in layout: \"The style shows on every part: nothing straight, every wire a single sweeping catmull curve; every shape a flat cutout with visible thickness (2–3 cm) so it reads as painted sheet metal seen edge-on and face-on; hard-edged matte colors; asymmetric balance — heavy black leaf left, bold red petal right; the whole reads as black calligraphy lines holding colored notes in the air.\"\n\nWrite the JSON now. Keep description one sentence.\n\nCheck mounts keys and that each part references them in \"attaches\"."
+      },
+      {
+        "id": "pedestal",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:52:42.930Z",
+        "wallMs": 5583,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80455,
+          "completion_tokens": 953,
+          "total_tokens": 81408,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.029779200000000002,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "armature",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:52:42.930Z",
+        "wallMs": 7808,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80430,
+          "completion_tokens": 1183,
+          "total_tokens": 81613,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0320292,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "midSwags",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:52:42.930Z",
+        "wallMs": 9786,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80559,
+          "completion_tokens": 1772,
+          "total_tokens": 82331,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.038177199999999994,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "canopy",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:52:42.930Z",
+        "wallMs": 10041,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80625,
+          "completion_tokens": 1601,
+          "total_tokens": 82226,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0365992,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "finials",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:52:42.930Z",
+        "wallMs": 12660,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80617,
+          "completion_tokens": 2024,
+          "total_tokens": 82641,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.040813199999999994,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

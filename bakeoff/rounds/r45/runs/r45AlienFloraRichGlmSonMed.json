@@ -1,0 +1,485 @@
+{
+  "slug": "r45AlienFloraRichGlmSonMed",
+  "arm": "glm-son-med",
+  "subject": "alienFlora",
+  "level": "rich",
+  "pitch": "Category: Plant.\nSubject: bioluminescent alien plant.\nStyle: Avatar.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "planModel": "openrouter-curated/z-ai/glm-5.3-flash",
+  "effort": "high",
+  "started": "2026-10-29T00:52:07.607Z",
+  "wallMs": 83460,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 450302,
+    "completion_tokens": 18669,
+    "total_tokens": 468971,
+    "prompt_tokens_details": {
+      "cached_tokens": 421104
+    }
+  },
+  "costUsd": 0.23682567,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 35427,
+    "slowestPartMs": 48033,
+    "critical": "crownFronds",
+    "elapsedMs": 83460,
+    "spec": {
+      "name": "Lumen Spiral — Pandora Glow Plant",
+      "description": "A bioluminescent alien specimen in the Avatar style: a dark teal spiral-crowned stalk with curling cyan-fringed fronds, hanging luminous seed pods and a glowing undergrowth bed.",
+      "builderName": "bioluminescentAlienPlant",
+      "size": [
+        2.2,
+        2.4,
+        1.9
+      ],
+      "layout": "The plant reads as one hero stalk rising from a dark rocky soil bed at the centre front (+Z faces the viewer). The bed (part 1) is a low mound about 0.3 m tall and 2.0 m across, resting on y = 0, dressed with moss tufts, faceted rocks with glowing cyan veins, and clusters of small glowing bulbs and stumpy undergrowth. The main stalk (part 2) rises from the mound's centre at [0, 0.3, 0.05] on a gentle forward lean, tapering from 0.11 m to 0.05 m, ringed with pale bands and a spiral of glowing vein studs. At its top (mount crownBase at y ≈ 1.9) the crown (part 3) opens into 8–10 large curling fronds in a spiral — each a broad tapered blade arcing outward and curling under at the tip, dark teal on top with pale undersides, inked midribs and a glowing cyan fringe row along every edge; the tallest frond tips reach y ≈ 2.4. From the same crown, hanging tendrils (part 4) dangle down with glowing teardrop seed pods at different heights, plus a few orb clusters wired onto the stalk's mid-section by thin glowing filaments. Two shorter side stalks (part 5) lean out left and right from the bed, each crowned with a fan of narrow blue-green leaves with magenta-glow tips, framing the main stalk. The Avatar style shows everywhere: deep teal–blue foliage against near-black soil, flat pale countershading under every leaf, and every vein, rim, fringe, pod and undergrowth tip carrying its own bright emissive-glow colour part (cyan, spring-green and magenta) so the plant reads lit from within; all surfaces are faceted low-poly primitives.",
+      "palette": {
+        "soilDark": "#1c262c",
+        "soilMid": "#263238",
+        "rock": "#39464e",
+        "rockVein": "#49e6ff",
+        "bark": "#22362c",
+        "stalkGreen": "#2a7a5a",
+        "stalkPale": "#bfe8c8",
+        "foliageDeep": "#123a3e",
+        "foliageMid": "#1e6b5e",
+        "foliageLight": "#3fae8c",
+        "leafUnderside": "#c9efe4",
+        "frondFringe": "#3ff0d6",
+        "veinGlow": "#7dfcf0",
+        "moss": "#2f6b3a",
+        "mossGlow": "#5affc4",
+        "podShell": "#5a3f8f",
+        "podGlow": "#ffb8f2",
+        "magentaTip": "#e050ff",
+        "ink": "#0b1e24",
+        "stemBlue": "#3d8fb0"
+      },
+      "mounts": {
+        "soilTop": [
+          0,
+          0.32,
+          0.08
+        ],
+        "stalkBase": [
+          0,
+          0.3,
+          0.05
+        ],
+        "crownBase": [
+          0,
+          1.9,
+          0.32
+        ],
+        "sideStalkRootL": [
+          0.55,
+          0.22,
+          0.15
+        ],
+        "sideStalkRootR": [
+          -0.55,
+          0.22,
+          0.15
+        ]
+      },
+      "joints": [
+        {
+          "name": "stalkBase",
+          "at": [
+            0,
+            0.3,
+            0.05
+          ],
+          "dir": [
+            0,
+            1,
+            0.12
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "stalkMid",
+          "parent": "stalkBase",
+          "at": [
+            0,
+            1.05,
+            0.2
+          ],
+          "dir": [
+            0,
+            1,
+            0.3
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "crown",
+          "parent": "stalkMid",
+          "at": [
+            0,
+            1.9,
+            0.32
+          ],
+          "dir": [
+            0,
+            1,
+            0.25
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "frondL",
+          "parent": "crown",
+          "at": [
+            0.08,
+            2.05,
+            0.36
+          ],
+          "dir": [
+            1,
+            0.55,
+            0.6
+          ],
+          "role": "fan",
+          "group": "fronds"
+        },
+        {
+          "name": "frondR",
+          "parent": "crown",
+          "at": [
+            -0.08,
+            2.05,
+            0.36
+          ],
+          "dir": [
+            -1,
+            0.55,
+            0.6
+          ],
+          "role": "fan",
+          "group": "fronds"
+        },
+        {
+          "name": "tendrilFL",
+          "parent": "crown",
+          "at": [
+            0.22,
+            1.98,
+            0.22
+          ],
+          "dir": [
+            0.85,
+            -0.5,
+            0.2
+          ],
+          "role": "tentacle",
+          "group": "tendrils"
+        },
+        {
+          "name": "tendrilFR",
+          "parent": "crown",
+          "at": [
+            -0.22,
+            1.98,
+            0.22
+          ],
+          "dir": [
+            -0.85,
+            -0.5,
+            0.2
+          ],
+          "role": "tentacle",
+          "group": "tendrils"
+        },
+        {
+          "name": "sideStalkL",
+          "parent": "stalkBase",
+          "at": [
+            0.55,
+            0.22,
+            0.15
+          ],
+          "dir": [
+            1,
+            0.8,
+            0.2
+          ],
+          "role": "spine",
+          "group": "sides"
+        },
+        {
+          "name": "sideStalkR",
+          "parent": "stalkBase",
+          "at": [
+            -0.55,
+            0.22,
+            0.15
+          ],
+          "dir": [
+            -1,
+            0.8,
+            0.2
+          ],
+          "role": "spine",
+          "group": "sides"
+        }
+      ],
+      "parts": [
+        {
+          "id": "groundBed",
+          "builds": "The soil mound and undergrowth: a low irregular dome of faceted soil lumps (soilDark to soilMid, lighter on top, moss green patches) spanning the full footprint and rising to about 0.34 m at centre, sloping to thin edges at y = 0. Seated on it: 4–6 faceted angular rocks (rock) with thin glowing vein lines (rockVein) running down their faces as tiny stick strips, several moss tufts made of small cross cards or low cones (moss with mossGlow tips), and 8–12 small undergrowth stalks — short tapered rods (bark) capped with single glowing teardrop bulbs (frondFringe, podGlow and magentaTip mixed) that read as glowing buds. Scatter stays within the bed's radius; everything sits on or slightly sunk into y = 0.",
+          "box": [
+            [
+              -1.1,
+              0,
+              -0.95
+            ],
+            [
+              1.1,
+              0.36,
+              0.95
+            ]
+          ],
+          "attaches": "Rests on the floor (y = 0). The mound's top surface meets the mainStalk at mount stalkBase and the sideStalks' roots at sideStalkRootL / sideStalkRootR; keep the mound top under those mounts solid so their stalks bury into it.",
+          "joints": [],
+          "floor": true,
+          "budget": 200
+        },
+        {
+          "id": "mainStalk",
+          "builds": "The hero stalk: one smooth sweep along the joints stalkBase → stalkMid → crown (the crown joint is the shared end), tapering from r ≈ 0.11 at the base to r ≈ 0.05 at the top, coloured stalkGreen with a countershade of stalkPale on the front-lit side. Details seated on the tube: 4 pale horizontal band rings (stalkPale) at even heights, a helical row of small glowing vein studs (veinGlow) winding twice around the stalk between the bands, and 3 thin vertical seam ridges (bark) running base to crown. The base flares slightly wider where it sinks into the mound. Nothing hangs off it except what glowPods attaches.",
+          "box": [
+            [
+              -0.22,
+              0.3,
+              -0.12
+            ],
+            [
+              0.22,
+              1.92,
+              0.52
+            ]
+          ],
+          "attaches": "Roots at mount stalkBase (sunk into groundBed's mound top), rides joints stalkBase, stalkMid and ends exactly at joint crown / mount crownBase where crownFronds begins.",
+          "joints": [
+            "stalkBase",
+            "stalkMid",
+            "crown"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "crownFronds",
+          "builds": "The signature spiral crown: 8–10 large curling fronds sprouted around mount crownBase / joint crown, each built as a tapered sweep that arcs outward and up then spirals over so the tip curls under (like a helicoradian), staggered heights and outward angles so no two overlap the face of the plant from +Z. Each frond blade is foliageDeep on the upper face, leafUnderside pale on the lower face (countershade), with a bold ink (ink) midrib running root to tip as a thin seated rod, 3–5 short vein ribs (foliageLight) branching off it, and a row of small glowing fringe studs (frondFringe, a few magentaTip) seated along both edges of the blade. The two lowest fronds ride joints frondL and frondR for rigging; the rest ride the crown joint. Tallest tips reach y ≈ 2.4.",
+          "box": [
+            [
+              -0.95,
+              1.72,
+              -0.5
+            ],
+            [
+              0.95,
+              2.4,
+              0.8
+            ]
+          ],
+          "attaches": "All fronds sprout from mount crownBase / joint crown (the top of mainStalk) and hang over the glowPods volume without touching it.",
+          "joints": [
+            "crown",
+            "frondL",
+            "frondR"
+          ],
+          "floor": false,
+          "budget": 230
+        },
+        {
+          "id": "glowPods",
+          "builds": "The hanging life of the plant: from joints tendrilFL and tendrilFR at the crown, 2 thin drooping tendrils per side (stemBlue rods) that sway down 0.8–1.2 m, each ending in one large teardrop seed pod — podShell cap (faceted lathe or frustum) with a glowing podGlow lower body, tipped with a small magentaGlow stud — and 2–3 smaller orb pods strung partway down each tendril on tiny glowing filament rods (veinGlow). Additionally, 3 orb clusters attach to the mainStalk's mid-section (needing joint stalkMid or stalkBase): 3–4 spheres of graded glow colours (frondFringe, podGlow, rockVein) nested and seated on short stalks poking out from the bark. All glowing pieces use the glow treatment on their own parts.",
+          "box": [
+            [
+              -0.95,
+              0.5,
+              -0.55
+            ],
+            [
+              0.95,
+              2.1,
+              0.6
+            ]
+          ],
+          "attaches": "Tendrils root at joints tendrilFL / tendrilFR under the crown; the stalk orb clusters seat directly on mainStalk's tube surface between its bands; nothing touches groundBed or the fronds.",
+          "joints": [
+            "crown",
+            "tendrilFL",
+            "tendrilFR",
+            "stalkMid"
+          ],
+          "floor": false,
+          "budget": 150
+        },
+        {
+          "id": "sideStalks",
+          "builds": "Two framing side stalks: each a curved sweep from its root mount (sideStalkRootL / sideStalkRootR on the mound) leaning outward and up, r ≈ 0.05 tapering to 0.02, bark-coloured with a spiral of stemBlue vein studs and one pale band near the tip. Each is crowned with a fan of 5–7 narrow upright leaves (extruded blades, foliageMid to stemBlue gradient base to tip) fanning around the tip, each leaf edged with a thin magentaTip glow rim and a ink midrib; one shorter inner leaf per fan carries a small glowing bulb at its tip (veinGlow). Height reaches about 1.35 m.",
+          "box": [
+            [
+              -1,
+              0.15,
+              -0.7
+            ],
+            [
+              1,
+              1.35,
+              0.55
+            ]
+          ],
+          "attaches": "Roots at mounts sideStalkRootL and sideStalkRootR, sunk into groundBed's mound; rides joints sideStalkL / sideStalkR; leaf fans clear the glowPods volume and mainStalk.",
+          "joints": [
+            "sideStalkL",
+            "sideStalkR"
+          ],
+          "floor": false,
+          "budget": 150
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "model": "openrouter-curated/z-ai/glm-5.3-flash",
+        "effort": "high",
+        "started": "2026-10-29T00:52:07.607Z",
+        "wallMs": 35427,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 52273,
+          "completion_tokens": 4668,
+          "total_tokens": 56941,
+          "prompt_tokens_details": {
+            "cached_tokens": 50944
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 1684
+          }
+        },
+        "costUsd": 0.00406167,
+        "hasCode": true,
+        "reasoning": "I need to write a spec JSON for a bioluminescent alien plant, Avatar-style (Pandora). Team of builders, 3–6 parts, spec only.\n\nDesign: a glowing alien plant — think Pandora: a large central stalk with glowing fronds, spiral helicoradian-like leaves, glowing ground pods, dangling luminous tendrils. Style: Avatar = bioluminescent blues/purples/magentas/cyans, dark teal foliage, glowing vein details.\n\nStructure: one main plant with:\n- root base / ground mound with secondary stalks (floor)\n- central stalk curving up (~2.2m tall) with joints for slight sway\n- spiral crown of fronds at top (helicoradian style, curling leaves)\n- glowing seed pods / orbs hanging\n- undergrowth: smaller glowing bulbs, moss tufts, tendrils around the base\n\nSize: maybe width 2.2, height 2.4, depth 1.8. Let's say [2.2, 2.4, 1.9].\n\nParts (4-5):\n1. baseGround — root mound, rocks/moss, small glowing bulbs and tendrils (floor: true). box roughly [-1.1, 0, -0.9] to [1.1, 0.35, 0.9].\n2. trunkStalk — central stalk chain from mound top up to crown, with glowing rings/veins. attaches at mount stalkBase [0, 0.3, 0].\n3. crownFronds — spiral fronds at top, joints for fronds. mount crownBase [0, 1.9, 0].\n4. glowPods — hanging pods/orbs along the fronds, glow kit.\n5. sideVines — secondary curved stalks with leaves, one per side.\n\nBudgets sum ≤ 900: e.g., 200 + 200 + 220 + 140 + 140 = 900.\n\nJoints: root \"stem\" at base? For a plant, gentle sway rig: root at [0,0.3,0] \"stalk\" spine chain; simpler: joints list with root stalk, stalk2, crown, frondL/frondR hinge groups, tendril joints. Keep moderate: \n- stalk1 (root, role spine, at [0,0.3,0], dir [0,1,0.15])\n- stalk2 (parent stalk1, at [0,1.1,0.25], role spine)\n- crown (parent stalk2, at [0,1.9,0.25], role spine)\n- frondL (parent crown, at [0.1,2.0,0.3], dir [1,0.4,0.5], role fan, group fronds)\n- frondR mirrored\n- tendrilFL etc — maybe keep a few hinge joints for tendrils/pods.\n\nKeep joints to ~8. Each part lists joints it rides.\n\nPalette (max 24): \n- foliageDeep \"#123a3e\" dark teal\n- foliageMid \"#1e6b5e\"\n- foliageLight \"#3fae8c\"\n- leafCyan \"#3ff0d6\" (glow)\n- veinGlow \"#7dfcf0\"\n- magentaGlow \"#e050ff\"\n- purpleGlow \"#8b4dff\"\n- stalkGreen \"#2a7a5a\"\n- stalkPale \"#bfe8c8\"\n- bark \"#2b3a30\"\n- moss \"#2f6b3a\"\n- mossGlow \"#5affc4\"\n- podShell \"#5a3f8f\"\n- podGlow \"#ffd166\"? Avatar mostly cyan/magenta. podGlow \"#ffb8f2\"\n- soil \"#23303a\"\n- rock \"#3a4750\"\n- rockGlow \"#49e6ff\"\n- ink \"#0b1e24\"\n- cream \"#e8fff4\"\n- coral \"#ff7a5c\" for tips? Avatar has bioluminescent accents; fine.\n- stemBlue \"#3d8fb0\"\n\nKeep ~16.\n\nMounts: soilTop [0,0.32,0.1], stalkBase [0,0.3,0.05], stalkTop/crownBase [0,1.9,0.28], podAnchor? Mounts where parts touch: ground mound top where stalk meets; crown base; side stalk roots at ground (sideStalkRootL [-0.55,0.2,0.15], sideStalkRootR ...).\n\nParts:\n1. groundBed (floor true) box [[-1.1,0,-0.95],[1.1,0.34,0.95]] budget 200 — soil mound, rocks with glowing veins, moss tufts, small glowing bulbs.\n2. mainStalk box [[-0.22,0.3,-0.1],[0.22,1.92,0.5]] budget 170 — sweep chain along joints stalk1, stalk2; ribbed bands, glowing vein spirals.\n3. crownFronds box [[-0.9,1.75,-0.5],[0.9,2.4,0.75]] budget 230 — spiral of curling fronds from crown mount, gradient leaves with glow edges; maybe should center around [0,1.9,0.28]. Fine.\n4. glowPods box [[-0.95,0.5,-0.55],[0.95,2.2,0.6]] budget 150 — hanging tendrils with luminous orbs, on joints tendrils.\n5. sideStalks box [[-1.0,0.15,-0.7],[1.0,1.35,0.55]] budget 150 — two shorter curved stalks with fans of blue leaves.\n\nSum = 200+170+230+150+150 = 900. Good.\n\nJoints list:\n- stalkBase (root, at [0,0.30,0.05], dir [0,1,0.12], role spine)\n- stalkMid (parent stalkBase, at [0,1.05,0.2], dir [0,1,0.3], role spine)\n- crown (parent stalkMid, at [0,1.9,0.32], dir [0,1,0.25], role spine)\n- frondL (parent crown, at [0.06,2.05,0.34], dir [1,0.55,0.6], role fan, group fronds)\n- frondR (parent crown, at [-0.06,2.05,0.34], dir [-1,0.55,0.6], role fan, group fronds)\n- tendrilFL (parent crown, at [0.2,2.0,0.2], dir [0.9,-0.5,0.2], role tentacle, group tendrils)\n- tendrilFR (parent crown, at [-0.2,2.0,0.2], dir [-0.9,-0.5,0.2], role tentacle, group tendrils)\n- sideStalkL (parent stalkBase, at [0.55,0.25,0.15], dir [1,0.8,0.2], role stem? role list: spine neck head jaw hinge tail leg arm wing digit tentacle fan. Use \"spine\".)\n- sideStalkR\n\nWait, sideStalks should be parented to root since they emerge from ground. stalkBase is root. Fine.\n\nLayout text: describe silhouette from front.\n\nName: \"Lumen Spiral — Pandora Helicoradian\"? builderName \"bioluminescentAlienPlant\". Name: \"Glowspiral Sentinel\". Description one sentence.\n\nWrite the JSON."
+      },
+      {
+        "id": "mainStalk",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:52:43.034Z",
+        "wallMs": 6944,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79583,
+          "completion_tokens": 1085,
+          "total_tokens": 80668,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0293552,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "sideStalks",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:52:43.034Z",
+        "wallMs": 11604,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79585,
+          "completion_tokens": 1875,
+          "total_tokens": 81460,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0372592,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "groundBed",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:52:43.034Z",
+        "wallMs": 14811,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79608,
+          "completion_tokens": 2492,
+          "total_tokens": 82100,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0434752,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "glowPods",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:52:43.034Z",
+        "wallMs": 15421,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79645,
+          "completion_tokens": 2521,
+          "total_tokens": 82166,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.043839199999999995,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "crownFronds",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "medium",
+        "started": "2026-10-29T00:52:43.034Z",
+        "wallMs": 48033,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 79608,
+          "completion_tokens": 6028,
+          "total_tokens": 85636,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0788352,
+        "hasCode": true,
+        "reasoning": "I'm writing buildCrownFronds with the Ctx type the module already supplies, so I won't import or redeclare it. The next step is laying out nine fronds around the crown's position.\n\nStill working out the frond geometry: each one is a sweep along a path that rises from the crown and curls under at the tip, with a thin box blade that's dark on top and pale underneath.\n\nStill working out the frond curve: each one rises out of the crown, pushes outward and up, then curls back under at the tip, kept inside the crown's bounding box.\n\nStill shaping the frond profile: each one follows a rough arc that climbs outward, peaks, then dips and curls under at the tip, with the peak height scaled per frond and the base sitting just above the crown.\n\nStill laying out the azimuths for the fronds, starting with the two lowest ones at ±59 degrees and staggering the front ones at lower heights so they don't overlap.\n\nStill working on the frond placement: I'm checking the remaining azimuths and heights so the back fronds stay inside the crown's z-range. Then I'll set the blade width taper.\n\nStill settling the blade's width taper and how the sweep's roll should be oriented, so its wide side stays in the radial-up plane of each frond.\n\nStill settling the blade's orientation: I want the normal to sit in the plane between the outward direction and up, so the curl stays consistent, and the sectors follow the world-up direction.\n\nStill working on the blade's surface detail: I'm adding a thin midrib sweep along the frond's path, offset slightly on top, and considering rib lines that branch from the blade's center toward its edges.\n\nStill working on the rib lines: I'm placing them at points along the blade and pulling each one from the center out toward a point on the edge, lifted slightly off the surface.\n\nStill working on the blade: I'm merging the stud geometry so each frond gets one cyan and one magenta mesh, which keeps the piece count under budget.\n\nStill wiring up the fronds: nine total, with stud accents merged into one cyan and one magenta mesh per frond, a magenta bulb at each tip, and a few vein rods running out from the blade's center.\n\nStill adding the finishing touches: a faceted bud at the crown and a short collar, and I'm weighing whether the blade's sweep should use a flat section or a circle to keep the geometry simple.\n\nStill shaping the frond's ellipse section: eight sides, flat on the outward face, with the edge points landing mid-face at the blade's sides.\n\nStill wiring the frond meshes: I'm setting the sample points along each frond path and tying them to the bone, then looking at whether to tint the margin with a lighter sector or leave the blade uniformly deep.\n\nStill wiring the frond geometry: merging the tip-bulb and stud pieces, and sorting out which glow helper and merge utility to import.\n\n"
+      }
+    ]
+  }
+}

@@ -1,0 +1,399 @@
+{
+  "slug": "r45SpaceGalleyRichGlmSolLow",
+  "arm": "glm-sol-low",
+  "subject": "spaceGalley",
+  "level": "rich",
+  "pitch": "Category: Prop group.\nSubject: spaceship galley kitchen.\nStyle: Alien (1979) Nostromo.",
+  "model": "openai-codex/gpt-6.1-sol",
+  "planModel": "openrouter-curated/z-ai/glm-5.3-flash",
+  "effort": "high",
+  "started": "2026-10-29T00:36:49.340Z",
+  "wallMs": 154345,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 388876,
+    "completion_tokens": 27764,
+    "total_tokens": 416640,
+    "prompt_tokens_details": {
+      "cached_tokens": 357632
+    }
+  },
+  "costUsd": 0.30534819999999996,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 33351,
+    "slowestPartMs": 120994,
+    "critical": "prepCounter",
+    "elapsedMs": 154345,
+    "spec": {
+      "name": "Nostromo Galley",
+      "description": "The cramped, worn mess galley of a 1970s commercial towing vessel: a grated deck, a central mess table under a lit dome, a beverage dispenser wall, a prep counter and a hatch, all in worn beige panels with yellow trim and glowing green screens.",
+      "builderName": "nostromoGalley",
+      "size": [
+        3.2,
+        2.85,
+        4.8
+      ],
+      "layout": "A one-room interior: +Z is the way a crew member faces when seated at the table looking at the dispenser wall. A grated metal deck platform (0.16 m thick) covers the whole footprint and is the only part on the floor; everything else stands on its top at y = 0.16. Centered at x = 0, z = 0.4 sits the mess table: a chunky pedestal with an octagonal top, an angled console wedge with glowing screens, and a curved bench seat around it; directly above at y = 2.3 a lit acrylic dome on a yellow rim frame reaches up to the ceiling. The back wall (z = -2.4) carries the beverage dispenser machine with cup shelf and glowing indicator lights, tall lockers and a conduit run. The port side wall (x = -1.6) carries a steel prep counter with overhead cabinets, an urn and hanging mugs. The starboard side wall (x = +1.6) carries the entry hatch frame, wall panels, a valve-and-pipe run and a wall lamp. A beam-grid ceiling with light strips and fat conduits closes the room at y = 2.3-2.85. Every part reads as worn 1979 industrial: beige and olive rectangular panels with recessed seams, yellow trim strips and hazard chevrons on edges, rivet rows on plate joins, glass screens glowing flat green or amber, all built from blocky primitives with the detail seated on top as small parts of their own colours.",
+      "palette": {
+        "deckPlate": "#4a4f58",
+        "deckGrate": "#2b2e36",
+        "deckEdge": "#6a6f78",
+        "hullBeige": "#b8b09a",
+        "panelOlive": "#7a7a62",
+        "panelBrown": "#5c5044",
+        "trimYellow": "#e7b814",
+        "trimOrange": "#d97a1e",
+        "hazardBlack": "#1c1c1c",
+        "steelPipe": "#8a8d94",
+        "pipeRust": "#8a5a32",
+        "machineGrey": "#6d7480",
+        "tableTop": "#555a64",
+        "consoleInk": "#22262e",
+        "seatCushion": "#3c3a45",
+        "domeRim": "#9aa0a8",
+        "ventDark": "#3a3f4a",
+        "cupWhite": "#d8d4c8",
+        "canisterRed": "#b03a2a",
+        "screenGreen": "#7dffa0",
+        "screenAmber": "#ffc247",
+        "lightWhite": "#eef2ff"
+      },
+      "mounts": {
+        "deckTop": [
+          0,
+          0.16,
+          0
+        ],
+        "tableAnchor": [
+          0,
+          0.16,
+          0.4
+        ],
+        "domeRing": [
+          0,
+          2.3,
+          0.4
+        ],
+        "backPlane": [
+          0,
+          1.3,
+          -2.4
+        ],
+        "portPlane": [
+          -1.4,
+          1.3,
+          0
+        ],
+        "starPlane": [
+          1.4,
+          1.3,
+          0
+        ],
+        "ceilingUnder": [
+          0,
+          2.4,
+          0
+        ]
+      },
+      "joints": [],
+      "parts": [
+        {
+          "id": "floorDeck",
+          "builds": "The grated deck platform of the whole room, one slab from x = -1.6..1.6, z = -2.4..2.4, 0.16 m thick, top surface exactly at y = 0.16 (mount deckTop). Build it as a dark plate (deckPlate) with its walking surface carrying a grating pattern: repeated transverse grate strips (deckGrate, about 0.1 m wide, every 0.25 m along z) laid as thin inset plates 2-3 mm proud of a darker base slab, so the walkway reads as perforated metal from above. Border the whole platform with a chamfered edge trim (deckEdge) 0.08 m wide on all four sides. At the front edge (z = 2.4) add a small ramp/step down strip and a hazard chevron band: alternating trimYellow and hazardBlack corner blocks angled at 45 degrees. Scatter 8-10 small floor details seated on the surface: two square drain grates (ventDark with cross slats) at (-0.9, 0.16, -1.4) and (0.8, 0.16, 1.3), three scuffed plate patches (panelBrown thin plates 0.3-0.5 m across, 2 mm proud), two round stanchion sockets with hinged cleat lugs (steelPipe rings, 0.06 m radius) near the table, and four small hex bolts (hazardBlack) at each corner plate join. Keep the underside simple: a plain slab (deckGrate) resting on six short foot blocks so the lowest points touch y = 0.",
+          "box": [
+            [
+              -1.6,
+              0,
+              -2.4
+            ],
+            [
+              1.6,
+              0.16,
+              2.4
+            ]
+          ],
+          "attaches": "Rests on the floor alone; its top face is mount deckTop, which every other part stands on.",
+          "joints": [],
+          "floor": true,
+          "budget": 120
+        },
+        {
+          "id": "messTable",
+          "builds": "The hero of the room, built around mount tableAnchor [0, 0.16, 0.4]. The table: a heavy cylindrical pedestal (machineGrey, 0.22 m radius, flanged with two trimYellow rings) rising to an octagonal tabletop (tableTop, 0.72 m across, top at y = 0.9) with a deckEdge bevel strip around its rim. On the tabletop sits the angled console wedge: a frustum slab of consoleInk tilted about 20 degrees toward -Z, carrying three small glass screens as separate thin plates that glow (screenGreen, screenAmber), a row of six amber push buttons (screenAmber studs, hazardBlack bezels) and one yellow-outline diagram plate (trimYellow on consoleInk). Around the table, four backless bench seats at 90 degree spacing, each a chunky curved-back form: a boxy seat block (seatCushion, 0.5 m wide, 0.45 m high) on a steelPipe leg frame, with a reclining back slab tilted 15 degrees and a trimYellow edge piping strip; keep them clear of the port and starboard walls (their outer edge no closer than x = 1.15). Above, hanging from the ceiling, the dome: at mount domeRing [0, 2.3, 0.4] a shallow acrylic dome (domeRim, a faceted hemisphere about 0.55 m radius, flat-shaded, 10 segments) facing down, with its rim frame a torus-like ring of trimYellow carrying six small steelPipe armature lugs and a ring of eight tiny lightWhite studs on the frame. Add two thin cable whips (hazardBlack) running from the dome rim up to the ceiling plane and one worn decal plate (canisterRed square, 0.1 m) on the pedestal.",
+          "box": [
+            [
+              -1.15,
+              0.16,
+              -0.85
+            ],
+            [
+              1.15,
+              2.32,
+              1.65
+            ]
+          ],
+          "attaches": "Pedestal foot planted on mount deckTop at tableAnchor; dome rim meets the ceiling part at mount domeRing.",
+          "joints": [],
+          "floor": false,
+          "budget": 180
+        },
+        {
+          "id": "dispenserWall",
+          "builds": "The back wall at z = -2.4, standing on mount deckTop, spanning the full width x = -1.6..1.6 and up to y = 2.5. Build the wall itself as a grid of rectangular panels: large hullBeige field panels 0.55-0.7 m wide separated by 0.03 m recessed seams (panelBrown), with a horizontal trimYellow stripe 0.05 m tall running the whole width at y = 1.9, and a second thin panelOlive stripe at y = 0.6. Every panel gets one row of tiny rivet studs (deckEdge, 8 mm spheres) along its top and bottom seams. The centerpiece is the beverage dispenser machine, mounted on the wall centered at x = -0.5, protruding to z = -1.7: a boxy machineGrey cabinet 0.9 m wide, 1.1 m tall on a hazardBlack plinth, with a recessed dark face (consoleInk), three dispenser nozzles (steelPipe spouts over a stainless drip tray of deckEdge), a vertical row of four glowing indicator lights (screenGreen and screenAmber cylinders), a small green data screen plate (screenGreen on consoleInk, 0.2 m wide), and a cup shelf below holding five upturned mugs (cupWhite cylinders 0.05 m). To the right of the machine, two tall lockers (x = 0.3..1.1): panelOlive cabinets with vertical trimYellow handle strips, ventDark louvre slots at the top of each door, and a canisterRed stencil plate. Between and beside them, a conduit run: three vertical steelPipe pipes with pipeRust clamp collars every 0.4 m, rising from deckTop to the ceiling, plus a wall-mounted junction box (machineGrey with a trimYellow warning band) and a clipboard-sized pale data panel (cupWhite on panelBrown) at x = 1.3.",
+          "box": [
+            [
+              -1.6,
+              0.16,
+              -2.4
+            ],
+            [
+              1.6,
+              2.5,
+              -1.7
+            ]
+          ],
+          "attaches": "Back face at plane z = -2.4 (mount backPlane); sides meet the port and starboard wall parts at x = -1.6 and +1.6; base stands on mount deckTop; pipe tops reach mount ceilingUnder.",
+          "joints": [],
+          "floor": false,
+          "budget": 190
+        },
+        {
+          "id": "prepCounter",
+          "builds": "The port side wall and its galley prep counter, along plane x = -1.6, standing on mount deckTop, running the full length z = -2.4..2.4 up to y = 2.5. The wall: same panel language as the back wall (hullBeige field panels with panelBrown recessed seams, rivet stud rows), a trimYellow stripe at y = 1.9 and corner post strips of panelBrown at both z ends. The counter occupies z = -1.9..0.9, protruding to x = -1.2: a machineGrey cabinet base 0.9 m tall with two panelBrown drawer fronts each carrying a steelPipe pull bar, topped by a deckEdge worktop 0.04 m thick at y = 1.1 with a small raised backsplash. On the worktop: a squat boiler urn (steelPipe cylinder 0.18 m radius with trimYellow band and a screenAmber pilot lamp), a stack of two tray plates (cupWhite), and a squeeze-bottle pair (canisterRed). Above the counter, an overhead cabinet block (panelOlive, 0.5 m tall) hanging on the wall at y = 1.7..2.2 with three trimYellow handle strips and ventDark louvres, and below it a rail (steelPipe rod) from which six mugs (cupWhite) hang by their handles. To the front of the wall (z = 1.2..2.2) add a tall narrow storage rack: three deckEdge shelves on steelPipe uprights holding four canisterRed canisters and one cupWhite box, with a hazardBlack-and-trimYellow chevron plate at its base. A small wall lamp housing near the rack throws a lightWhite glow strip.",
+          "box": [
+            [
+              -1.6,
+              0.16,
+              -2.4
+            ],
+            [
+              -1.2,
+              2.5,
+              2.4
+            ]
+          ],
+          "attaches": "Wall face at plane x = -1.6 (mount portPlane); meets the dispenser wall at z = -2.4 and the ceiling part above at y = 2.5; base stands on mount deckTop.",
+          "joints": [],
+          "floor": false,
+          "budget": 160
+        },
+        {
+          "id": "hatchWall",
+          "builds": "The starboard side wall along plane x = +1.6, standing on mount deckTop, running the full length z = -2.4..2.4 up to y = 2.5. The wall: hullBeige panels with panelBrown seams and rivet rows as on the other walls, trimYellow stripe at y = 1.9. Its centerpiece is the entry hatch at z = 0.6..1.6: a heavy round-cornered frame of machineGrey 0.15 m thick protruding to x = 1.2, with trimYellow-and-hazardBlack chevron warning plates on both jambs, a recessed hatch door (panelOlive) carrying a circular steelPipe wheel latch (0.12 m radius spoked wheel on a hub) at x = 1.2, a small screenGreen status lamp above the wheel and a stencil plate (cupWhite on hazardBlack) beside it. Along the rest of the wall: a horizontal pipe run at y = 2.05 (two parallel steelPipe pipes, one with a pipeRust hand valve: a spoked wheel on a T-junction), supported by panelBrown clamp brackets every 0.5 m; below it at y = 1.4 a wall-mounted first-aid box (cupWhite cabinet 0.3 m wide with a canisterRed cross plate) and a folded map/chart holder (panelBrown slim box). At the back corner (z near -2.0) a floor-standing_tool rack: a ventDark upright frame with two deckEdge hooks holding one long wrench (steelPipe) and one pry bar (pipeRust). A wall lamp with a lightWhite glow strip above the hatch lights it.",
+          "box": [
+            [
+              1.2,
+              0.16,
+              -2.4
+            ],
+            [
+              1.6,
+              2.5,
+              2.4
+            ]
+          ],
+          "attaches": "Wall face at plane x = +1.6 (mount starPlane); meets the dispenser wall at z = -2.4 and the ceiling part above at y = 2.5; base stands on mount deckTop.",
+          "joints": [],
+          "floor": false,
+          "budget": 160
+        },
+        {
+          "id": "ceiling",
+          "builds": "The overhead structure closing the room at y = 2.3..2.85, spanning the full footprint x = -1.6..1.6, z = -2.4..2.4. Build it as a grid of deep box beams (deckPlate) running along z at x = -0.8, 0, 0.8, plus two cross beams along x at z = -1.2 and 1.2, each beam 0.2 m tall with a trimYellow edge line and rivet stud rows (deckEdge), the panel infill between beams being thin slabs of panelBrown. Under the beams, the services: two fat conduit runs (steelPipe cylinders 0.06 m radius) following the beams with pipeRust collars and one hanging cable catenary (hazardBlack thin tube sagging between beams), plus two vent grilles (ventDark recessed plates 0.5 x 0.3 m with cross slats). Lighting: four recessed light strips (lightWhite glow, thin rectangular plates 0.7 x 0.12 m) set between the beams over the table and over both side counters, each in a machineGrey housing with a trimYellow rim. Critically, build the dome mount at domeRing [0, 2.3, 0.4]: a circular trimYellow collar ring 0.6 m radius recessed into a machineGrey ceiling plate, with six steelPipe radial arms and a short open throat of ventDark rising into the ceiling, so the messTable dome visibly hangs from it. Keep the top face plain (deckPlate) since nothing is seen above.",
+          "box": [
+            [
+              -1.6,
+              2.3,
+              -2.4
+            ],
+            [
+              1.6,
+              2.85,
+              2.4
+            ]
+          ],
+          "attaches": "Sits above every other part: its underside at y = 2.3-2.4 meets the tops of the dispenser wall (mount backPlane at z = -2.4), the port and starboard walls, and carries mount domeRing over the messTable dome.",
+          "joints": [],
+          "floor": false,
+          "budget": 130
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "model": "openrouter-curated/z-ai/glm-5.3-flash",
+        "effort": "high",
+        "started": "2026-10-29T00:36:49.340Z",
+        "wallMs": 33351,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 52280,
+          "completion_tokens": 6838,
+          "total_tokens": 59118,
+          "prompt_tokens_details": {
+            "cached_tokens": 51200
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 3006
+          }
+        },
+        "costUsd": 0.005117,
+        "hasCode": true,
+        "reasoning": "I need to write a spec JSON for a spaceship galley kitchen in Alien (1979) Nostromo style. This is a prop group — a galley/kitchen interior from the Nostromo: the iconic mess table with dome overhead, lockers, coffee/beverage dispensers, cabinets, floor grating, pipes, panels.\n\nKey Nostromo galley features:\n- The main mess table: cylindrical pedestal table with angled console top, green screens? Actually the galley has a low round table with reclining chairs around it\n- The overhead dome (skylight dome over the table)\n- Wall lockers/cabinets with yellow-trim panels, beverage dispensers\n- Floor: grated metal decking\n- Beige/grey/brown utilitarian panels, keystone/frets\n- The famous drink dispenser machine (the \"juice machine\" with glasses)\n- Bunker-like seating benches around the table\n- Overhead pipes and conduit\n\nDesign: size maybe 3.2 wide, 2.6 tall, 4.5 long. Static model, joints [].\n\nParts (3-6):\n1. floorDeck — grated floor plating, raised platform, floor grating, scatter details. box [[-1.6,0,−2.4],[1.6,0.15,2.4]] floor:true\n2. messTable — the central table with pedestal, dome overhead, seating bench. Attaches to floor.\n3. galleyWallBack — back wall with lockers, cabinets, beverage dispenser, panel details.\n4. sideWallLeft/right — side walls with panels, pipe conduits, overhead. Maybe combine as \"portAndStarboardWalls\" with pipe run.\n5. ceiling — overhead structure: the dome sits over table, ceiling pipes, lighting strips.\n\nBudgets sum ≤900, e.g. 180+220+220+200+160 = 980 — too much. Keep ≤900: 160+220+210+180+150 = 920. Adjust: 150+200+200+180+140 = 870.\n\nLayout: front (+Z) is where the food preparation counter / dispenser machine? The galley table sits center. Back wall (−Z) with lockers. Front could have the drink dispenser station.\n\nMounts: tableCenter [0,0.15,0.3], domeRing [0,2.3,0.3], wallBackZ=-2.4, wallSideX=±1.6, deckTop y=0.15.\n\nJoints: static, []. Roles list: spine neck head jaw hinge tail leg arm wing digit tentacle fan. For a static prop, empty joints.\n\nPalette (≤24): deckPlate dark grey, deckGrate darker, hullBeige, panelOlive, trimYellow (Nostromo's yellow-orange trim), screenGreen, screenAmber, pipeRust, pipeSteel, seatBlack, cushionDark, lightWhite (glow), dispenserRed, coneWhite? Keep ~16.\n\nColors Nostromo: greys, beiges, olive greens, yellow trim, brown leather-ish seats, glowing screens pale green.\n\nLet me write mounts: deckFloor (the platform top surface), tableAnchor, domeAnchor, ceilingHeight.\n\nParts:\n\n1. `floorDeck`: grated platform 3.2×4.8, raised 0.12 on plinths, grating pattern as inset strips, edge ramps at +Z front, hazard stripes at front edge, small drain grates, stanchion sockets. box [[-1.6,0,-2.4],[1.6,0.16,2.4]], floor:true, budget 150.\n\n2. `messTable`: pedestal table centered at [0, deck, 0.4], round octagonal tabletop ~1.4 diameter at 0.75 high, angled console wedge at center with green screen inset, amber buttons; four reclining-style seats? Actually the galley has curved bench. Add bench ring or 4 chairs around. Overhead dome: the acrylic dome hangs from ceiling at [0,2.3,0.4], a shallow clear dome with rim frame, armature arms. Dome attaches to ceiling part via domeAnchor. box: [[-1.2,0.16,-0.9],[1.2,2.35,1.7]] includes dome. budget 210.\n\n3. `backWall`: rear wall at z=-2.4 up to y 2.55: paneled wall (beige/olive panels, yellow trim lines), lockers (tall cabinets with handles), the beverage dispenser machine (boxy machine with spouts, cup shelf, glowing amber/green indicator lights), shelf with canisters, conduit run. box [[-1.6,0,-2.4],[1.6,2.55,-1.6]]. budget 210.\n\n4. `sideWalls`: both side walls x=±1.6, panels, a window porthole? Nostromo galley has no window; have door frame at starboard, piping, hazard-striped corner posts, wall-mounted rail, first-aid box. box: combine both: [[-1.6,0,-2.4],[1.6,2.55,2.4]] minus center... boxes are bounding boxes; parts should not overlap. Side walls occupy x from 1.3 to 1.6 and -1.6 to -1.3. But box must be min/max corners, so a combined box would cover center too. Better split: sideWalls box [[-1.6,0.0,-2.4],[-1.2,2.55,2.4]]... but then two walls in one part with a box spanning. That's fine — box is the space filled; a part owning both side walls has box spanning the gap which overlaps messTable. The rule: parts that meet share box faces; overlapping boxes for two walls is probably acceptable but messy. Alternative: one part \"portSideWall\" and one \"starboardWall\". That gives 6 parts total: floor, table, backWall, portWall, starboardWall, ceiling. Good — 6 parts max.\n\n5. `starboardWall` (x=+1.6 side): entry hatch/door frame at front, wall panels, overhead pipe run with valves, wall lamp glow, small table? budget 180. box [[1.25,0,-2.4],[1.6,2.55,2.4]].\n\n6. `portWall` (x=-1.6): food preparation counter with sink? Galley prep counter: metal counter along wall, overhead cabinets, warming drawers, kettle/urn, hanging mugs, panel with toggles. budget 200. box [[-1.6,0,-2.4],[-1.25,2.55,2.4]].\n\n7. `ceiling`: overhead at y 2.4–2.75: beam grid, pipe conduits, light strips (glow white/cyan), dome mount ring at [0,2.3,0.4] — wait dome is in messTable part. Ceiling provides domeAnchor ring. box [[-1.6,2.4,-2.4],[1.6,2.8,2.4]]. budget 160.\n\nBudgets: 150+210+210+180+200+160 = 1110 > 900. Trim: 130+190+190+160+170+130 = 970. Still over. 120+180+180+150+160+120=910. 110+170+170+140+150+110=850. OK: floor 110, table 170, backWall 180, portWall 150, starboard 140, ceiling 110 = 860.\n\nSize: [3.2, 2.8, 4.8].\n\nJoints: [] (static). Then each part's \"joints\": [].\n\nMounts:\n- deckTop: [0, 0.16, 0] — top of platform.\n- tableAnchor: [0, 0.16, 0.4]\n- domeRing: [0, 2.28, 0.4]\n- wallBack: [0, 0, -2.35]? Mounts as points. backWallPlane: [0, 1.2, -2.4]\n- sidePlanePort: [-1.55, 1.2, 0], sidePlaneStar: [1.55, 1.2, 0]\n- ceilingLine: [0, 2.4, 0]\n\nBuilder name: \"galleyBuilder\"? The spec says \"builderName\": \"camelCaseName\" — a name identifying the builder. Probably the name of the builder function. I'll write \"nostromoGalley\".\n\nPalette ≤24, named by use:\n- deckPlate: \"#4a4f58\" dark blue-grey\n- deckGrate: \"#2b2e36\"\n- deckEdge: \"#6a6f78\"\n- hullBeige: \"#b8b09a\" (panel walls)\n- panelOlive: \"#7a7a62\"\n- panelBrown: \"#5c5044\"\n- trimYellow: \"#e7b814\"\n- trimOrange: \"#d97a1e\"\n- hazardBlack: \"#1c1c1c\"\n- steelPipe: \"#8a8d94\"\n- pipeRust: \"#8a5a32\"\n- screenGreen: \"#7dffa0\" (glow)\n- screenAmber: \"#ffc247\" (glow)\n- lightWhite: \"#eef2ff\" (glow)\n- machineGrey: \"#6d7480\"\n- seatCushion: \"#3c3a45\"\n- tableTop: \"#555a64\"\n- consoleInk: \"#22262e\"\n- cupWhite: \"#d8d4c8\"\n- canisterRed: \"#b03a2a\"\n- domeRim: \"#9aa0a8\"\n- ventDark: \"#3a3f4a\"\n\nThat's 22. Fine.\n\nLayout description: a self-contained galley room: grated deck platform, central mess table under acrylic dome, dispenser wall at back, prep counter port, hatch starboard, ceiling with pipes and lights. Style: worn industrial, beige panels, yellow trim, glowing screens.\n\nWrite descriptions per part detailed: construction, details, colours. Attaches: mounts and joints.\n\nAlso each part lists joints (empty). floor flags: floorDeck true; walls rest on floor too? \"floor: true marks the parts whose lowest points rest on y=0\". Walls stand on the deck (y 0.16) or floor? The deck is raised platform; walls could rise from deck top. Simpler: walls start at y=0 behind/around the deck? The deck spans the full footprint. Let walls sit on top of deck: their lowest points at 0.16, so floor:false, but their boxes start at y 0.16. Or walls go to floor with deck fitted between? Simpler: deck spans whole footprint 0..0.16; everything else sits on deckTop mount. Walls box min y = 0.16.\n\nBut then nothing else touches y=0 — fine, floor:true only floorDeck.\n\nBoxes:\n- floorDeck: [[-1.6, 0.0, -2.4], [1.6, 0.16, 2.4]]\n- messTable: [[-1.15, 0.16, -0.85], [1.15, 2.45, 1.65]] — includes dome hanging at top from ceiling; dome ring mount at 2.28. Table box top 2.45 slightly overlapping ceiling at 2.4 — adjust ceiling box min 2.35. Let dome top attach at domeRing [0,2.3,0.4]; ceiling box [[-1.6,2.3,-2.4],[1.6,2.85,2.4]].\n- backWall: [[-1.6, 0.16, -2.4], [1.6, 2.5, -1.7]] (machines protrude to z=-1.7)\n- portWall: [[-1.6, 0.16, -2.4], [-1.2, 2.5, 2.4]] (counter protrudes 0.4 to x=-1.2)\n- starboardWall: [[1.2, 0.16, -2.4], [1.6, 2.5, 2.4]] (hatch frame protrudes to x=1.2)\n- ceiling: [[-1.6, 2.3, -2.4], [1.6, 2.85, 2.4]]\n\nTable box overlaps port/starboard wall boxes in corners (x -1.15..-1.2 no; port wall max -1.2, table min -1.15 — no overlap. Good. Table z -0.85..1.65 within room.\n\nMounts:\n- deckTop: [0, 0.16, 0] (everything above sits on it)\n- tableAnchor: [0, 0.16, 0.4]\n- domeRing: [0, 2.3, 0.4] — dome rim meets ceiling\n- backPlane: [0, 1.3, -2.4]\n- portPlane: [-1.4, 1.3, 0]\n- starPlane: [1.4, 1.3, 0]\n- ceilingUnder: [0, 2.4, 0]\n\nWrite the layout text. Ensure valid JSON, no code block? Instruction: \"Your reply is that shared spec: one ```json block\". Yes, json code block.\n\nDescriptions should be detailed enough for parallel builders to make cohesive parts: give dimensions, motif repeats, colours per piece.\n\nLet me write it."
+      },
+      {
+        "id": "dispenserWall",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:37:22.691Z",
+        "wallMs": 27854,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56156,
+          "completion_tokens": 3657,
+          "total_tokens": 59813,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 227
+          }
+        },
+        "costUsd": 0.051845199999999994,
+        "hasCode": true,
+        "reasoning": "**Designing TS function for parts**\n\n**Defining part orientations and rotations**"
+      },
+      {
+        "id": "floorDeck",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:37:22.691Z",
+        "wallMs": 63134,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56052,
+          "completion_tokens": 2453,
+          "total_tokens": 58505,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 225
+          }
+        },
+        "costUsd": 0.0395972,
+        "hasCode": true,
+        "reasoning": "**Designing output function with b.part primitives**\n\n**Applying rotation and positioning details**"
+      },
+      {
+        "id": "ceiling",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:37:22.692Z",
+        "wallMs": 65110,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56085,
+          "completion_tokens": 2991,
+          "total_tokens": 59076,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 144
+          }
+        },
+        "costUsd": 0.0450432,
+        "hasCode": true,
+        "reasoning": "**Planning geometry construction and exports**"
+      },
+      {
+        "id": "hatchWall",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:37:22.692Z",
+        "wallMs": 72229,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56093,
+          "completion_tokens": 3238,
+          "total_tokens": 59331,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 111
+          }
+        },
+        "costUsd": 0.047529199999999994,
+        "hasCode": true,
+        "reasoning": "**Implementing b.part primitives with orientation**"
+      },
+      {
+        "id": "messTable",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:37:22.691Z",
+        "wallMs": 80947,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56101,
+          "completion_tokens": 3439,
+          "total_tokens": 59540,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 262
+          }
+        },
+        "costUsd": 0.049555199999999994,
+        "hasCode": true,
+        "reasoning": "**Designing dome geometry with SphereGeometry**\n\n**Adjusting dome as downward hemisphere**"
+      },
+      {
+        "id": "prepCounter",
+        "model": "openai-codex/gpt-6.1-sol",
+        "effort": "low",
+        "started": "2026-10-29T00:37:22.691Z",
+        "wallMs": 120994,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 56109,
+          "completion_tokens": 5148,
+          "total_tokens": 61257,
+          "prompt_tokens_details": {
+            "cached_tokens": 51072
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 151
+          }
+        },
+        "costUsd": 0.0666612,
+        "hasCode": true,
+        "reasoning": "**Designing geometry primitives and placements**"
+      }
+    ]
+  }
+}

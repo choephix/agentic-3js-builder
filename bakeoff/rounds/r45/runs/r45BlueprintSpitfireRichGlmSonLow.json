@@ -1,0 +1,559 @@
+{
+  "slug": "r45BlueprintSpitfireRichGlmSonLow",
+  "arm": "glm-son-low",
+  "subject": "blueprintSpitfire",
+  "level": "rich",
+  "pitch": "Category: Vehicle.\nSubject: Spitfire fighter plane.\nStyle: cyanotype blueprint.",
+  "model": "anthropic/claude-sonnet-5-5",
+  "planModel": "openrouter-curated/z-ai/glm-5.3-flash",
+  "effort": "high",
+  "started": "2026-10-29T00:39:26.358Z",
+  "wallMs": 245628,
+  "status": 200,
+  "error": null,
+  "finishReason": "stop",
+  "usage": {
+    "prompt_tokens": 538662,
+    "completion_tokens": 28857,
+    "total_tokens": 567519,
+    "prompt_tokens_details": {
+      "cached_tokens": 472697
+    }
+  },
+  "costUsd": 0.28827624999999996,
+  "hasCode": true,
+  "reasoning": null,
+  "parallel": {
+    "planMs": 228474,
+    "slowestPartMs": 17154,
+    "critical": "tail",
+    "elapsedMs": 245657,
+    "spec": {
+      "name": "Blueprint Spitfire Mk V",
+      "description": "A Supermarine Spitfire fighter built as a living cyanotype blueprint: deep Prussian-blue surfaces traced with pale-cyan panel lines, glowing cyan roundels and bright technical linework on every part.",
+      "builderName": "cyanotypeSpitfire",
+      "size": [
+        11.4,
+        3.5,
+        9.8
+      ],
+      "layout": "A low-wing single-seat fighter standing on its undercarriage, level on the floor: main wheels at z≈2.35 and a small tailwheel at z≈-4.35 touch y=0; everything else hangs above the floor. From front to back: a pointed brass-capped spinner with three wide propeller blades (tips banded in glowing cyan) at z≈4.1-4.9, then the rounded engine cowling with cooling gills and exhaust stubs (z 2.55-4.1), the elliptical monocoque fuselage with a flat spine deck under the bubble canopy (z -3.45 to 2.55), then the tapered rear fuselage into the tall swept fin (top y 3.45) and horizontal tailplanes (z -3.45 to -4.95). The elliptical wings span x ±5.6 at y≈1.5, root chord about 3 m tapering to 1.1 m at the rounded tips, with a slight dihedral. The style shows on every part: all main surfaces wear the deep Prussian blue of blueprint paper; every seam, panel line, rivet row, control-surface edge and stencil is a separate thin part in pale cyan or bright cyan, so the whole plane reads as a technical drawing made solid; roundels, walkway trim and the gun-sight glow provide the only strong accents (white, red, brass, glowing cyan).",
+      "palette": {
+        "paper": "#16324f",
+        "paperShade": "#0f2438",
+        "panel": "#234e7a",
+        "line": "#cfeaff",
+        "glow": "#5fe8ff",
+        "ink": "#081524",
+        "steel": "#9fc2e0",
+        "steelDark": "#5d7fa0",
+        "brass": "#e3c06a",
+        "white": "#f5fbff",
+        "red": "#d85050",
+        "roundelBlue": "#3a7ec2",
+        "glass": "#8fd8ff",
+        "seat": "#5a4638",
+        "trim": "#e0c25a"
+      },
+      "mounts": {
+        "firewall": [
+          0,
+          1.8,
+          2.55
+        ],
+        "deckTop": [
+          0,
+          2.15,
+          1
+        ],
+        "wingRootL": [
+          0.6,
+          1.5,
+          1.8
+        ],
+        "wingRootR": [
+          -0.6,
+          1.5,
+          1.8
+        ],
+        "tailRoot": [
+          0,
+          1.7,
+          -3.45
+        ],
+        "gearMountL": [
+          1.05,
+          1.3,
+          2.5
+        ],
+        "gearMountR": [
+          -1.05,
+          1.3,
+          2.5
+        ],
+        "tailWheelMount": [
+          0,
+          0.55,
+          -4.3
+        ]
+      },
+      "joints": [
+        {
+          "name": "airframe",
+          "at": [
+            0,
+            1.7,
+            0
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "spine"
+        },
+        {
+          "name": "propHub",
+          "parent": "airframe",
+          "at": [
+            0,
+            2.05,
+            4.15
+          ],
+          "dir": [
+            0,
+            0,
+            1
+          ],
+          "role": "hinge",
+          "group": "prop"
+        },
+        {
+          "name": "aileronL",
+          "parent": "airframe",
+          "at": [
+            2.9,
+            1.55,
+            0.95
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "controls"
+        },
+        {
+          "name": "aileronR",
+          "parent": "airframe",
+          "at": [
+            -2.9,
+            1.55,
+            0.95
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "controls"
+        },
+        {
+          "name": "rudderHinge",
+          "parent": "airframe",
+          "at": [
+            0,
+            2.4,
+            -4.45
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "controls"
+        },
+        {
+          "name": "elevatorL",
+          "parent": "airframe",
+          "at": [
+            1.1,
+            2.1,
+            -4.3
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "controls"
+        },
+        {
+          "name": "elevatorR",
+          "parent": "airframe",
+          "at": [
+            -1.1,
+            2.1,
+            -4.3
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "controls"
+        },
+        {
+          "name": "wheelFL",
+          "parent": "airframe",
+          "at": [
+            1.15,
+            0.33,
+            2.35
+          ],
+          "dir": [
+            1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "gear"
+        },
+        {
+          "name": "wheelFR",
+          "parent": "airframe",
+          "at": [
+            -1.15,
+            0.33,
+            2.35
+          ],
+          "dir": [
+            -1,
+            0,
+            0
+          ],
+          "role": "hinge",
+          "group": "gear"
+        },
+        {
+          "name": "tailWheel",
+          "parent": "airframe",
+          "at": [
+            0,
+            0.16,
+            -4.35
+          ],
+          "dir": [
+            0,
+            1,
+            0
+          ],
+          "role": "hinge",
+          "group": "gear"
+        }
+      ],
+      "parts": [
+        {
+          "id": "nose",
+          "builds": "Engine section and propeller. Cowling: a lofted tube from the firewall mount (z 2.55, radius ~0.62, slightly taller than wide) tapering to radius 0.42 at the spinner base (z 4.1), wearing paper blue; a row of ~10 vertical cooling-gill slats on each side between z 2.9 and 3.6, each slat a thin paperShade plate with a pale line-colour edge strip; two small raised access panels on the cowling top in panel blue with line-colour outlines. Exhaust stubs: three short faired stacks per side at z 2.8-3.4, x ±0.62, steelDark with a line-colour rim on each outlet. Spinner: a lathe cone from z 4.1 (r 0.42) to z 4.78 (r 0.07) in paper blue with a brass hub cap and a thin glow-colour ring where cowling meets spinner. Propeller: three blades on propHub, each a tapered, slightly twisted blade 0.95 long from the hub, paperShade with a line-colour leading-edge strip and the outer 0.12 banded in glow cyan; a thin glowing cyan arc ring of radius 0.95 at z 4.2 traces the prop disc like a blueprint annotation. Add thin line-colour panel-seam strips around the cowling at two frame stations.",
+          "box": [
+            [
+              -0.95,
+              1.1,
+              2.55
+            ],
+            [
+              0.95,
+              3,
+              4.9
+            ]
+          ],
+          "attaches": "Cowling back face meets the fuselage at the firewall mount (z 2.55); spinner and blades ride the propHub joint at [0, 2.05, 4.15].",
+          "joints": [
+            "airframe",
+            "propHub"
+          ],
+          "floor": false,
+          "budget": 140
+        },
+        {
+          "id": "fuselage",
+          "builds": "Monocoque hull. A loft along z from the firewall (z 2.55) back to the tailRoot mount (z -3.45): elliptical sections ~0.62 wide at the firewall, widest (~0.66) at the cockpit z≈1.0, tapering to ~0.30 at the tail, centreline y ~1.8-2.0 with a rounded belly; flat-ish spine deck at y 2.15 from the cockpit back (the deckTop mount plane), wearing paper blue with two or three large subtle panel-tone patches in panel blue inset on the flanks. Blueprint linework: thin line-colour frame-station strips wrapping the hull at 7-8 stations, two longitudinal stringer lines each side, and a spine ridge strip on the deck; a few tiny ink-colour vent and filler dots. Markings: RAF roundels on both flanks at z≈0.3, y≈1.85 — concentric flat discs (roundelBlue r 0.22, white r 0.15, red r 0.07) each with a hairline ink rim, seated slightly proud of the skin. A small steel antenna mast on the deck just behind the cockpit with a short ink antenna wire stub running back. Underside: two small ink-colour breather scoops under the belly near the wing root.",
+          "box": [
+            [
+              -0.7,
+              0.85,
+              -3.45
+            ],
+            [
+              0.7,
+              2.2,
+              2.55
+            ]
+          ],
+          "attaches": "Front face closes onto the nose at the firewall mount; rear face closes onto the tail at the tailRoot mount; top deck carries the cockpit at the deckTop mount; wing roots bury into the flanks at the wingRoot mounts.",
+          "joints": [
+            "airframe"
+          ],
+          "floor": false,
+          "budget": 170
+        },
+        {
+          "id": "wings",
+          "builds": "Elliptical cantilever wings, mirrored left and right about x=0. Each wing runs from the root (x ±0.6, buried into the fuselage flanks at the wingRoot mounts) to a rounded tip at x ±5.6; root chord ~3.0 m (z 0.5-3.1 at the root, narrowing to ~1.1 m at the tip), thickness ~13% of chord at the root, a slight dihedral lifting the tip ~0.25 m. Build each as a loft of airfoil sections along the span, paper blue on top and bottom, with panel-blue panel patches on the upper surface, ink-colour rib lines running chordwise every ~0.5 m out to mid-span, a line-colour spanwise spar strip, and a row of tiny line-colour rivet dots along the root. Armament: two Hispano cannon per wing whose steel barrels (r 0.045, length 0.55) protrude forward from the leading edge at x ±1.7 and ±2.6, each with a brass muzzle ring and a tiny glow-colour muzzle cap; gun ports as small ink-colour oval plates on the wing top above each barrel. Markings: upper-surface roundels at x ±2.4, z≈2.3 (roundelBlue r 0.30, white r 0.20, red r 0.09, ink rim), a trim-colour walkway strip along the inboard leading edge, and a small glow-colour landing light set flush in the leading edge near the root (x ±1.2). A thin steel pitot tube under the left wing tip leading edge, 0.35 long with a glow tip.",
+          "box": [
+            [
+              -5.7,
+              1.05,
+              0.5
+            ],
+            [
+              5.7,
+              2,
+              3.6
+            ]
+          ],
+          "attaches": "Roots bury into the fuselage flanks at the wingRootL and wingRootR mounts, sharing the fuselage box at z 0.5-3.1; undersides at x ±1.05, y 1.3, z 2.5 carry the gearMounts.",
+          "joints": [
+            "airframe",
+            "aileronL",
+            "aileronR"
+          ],
+          "floor": false,
+          "budget": 220
+        },
+        {
+          "id": "tail",
+          "builds": "Empennage. Fin: a swept curved fin from the tailRoot mount deck (z -3.45) up to y 3.45, built as an extruded slab ~0.09 thick with a rounded leading edge, paper blue with a line-colour outline strip around its edges; the fin flash near the top leading edge — three vertical stripes (roundelBlue, white, roundelBlue) each ~0.10 wide, seated flat on the fin. Rudder: the rear half of the fin from the rudderHinge line (z -4.45) aft, a thinner slab with a small horn balance at its bottom, panel blue with a line-colour edge, riding the rudderHinge joint, plus a small trim tab at its base. Tailplanes: two horizontal slabs spanning x ±1.9 from the rear fuselage, chord ~0.9 tapering to a rounded tip, slight dihedral, paper blue with ink-colour edge lines. Elevators: the outboard rear halves riding elevatorL and elevatorR, panel blue with a line-colour edge and a small horn balance each. A tiny glow-colour tail lamp at the very tip of the fin, and three thin line-colour frame-station strips wrapping the fin.",
+          "box": [
+            [
+              -2,
+              0.6,
+              -4.95
+            ],
+            [
+              2,
+              3.45,
+              -3.45
+            ]
+          ],
+          "attaches": "Front faces close onto the fuselage rear at the tailRoot mount (z -3.45); control surfaces ride the rudderHinge, elevatorL and elevatorR joints.",
+          "joints": [
+            "airframe",
+            "rudderHinge",
+            "elevatorL",
+            "elevatorR"
+          ],
+          "floor": false,
+          "budget": 120
+        },
+        {
+          "id": "cockpit",
+          "builds": "Canopy and cockpit furniture sitting on the deckTop mount plane (y 2.15). Canopy framing: a windscreen frame of thin steel arcs at z≈0.5 with a flat framed glass pane in glass colour, then two hoop frames at z≈0.95 and z≈1.35, all steel, with glass-colour panes between, the bubble roof peaking at y 2.65 and fairing down to the deck at z≈1.75; a line-colour seam strip follows the canopy base rail. Interior hints (readable through the side panes): a seat-colour seat slab with an ink-colour frame rail at z 0.9-1.2, and a small headrest fairing. Ahead of the windscreen: a dark ink-colour instrument panel cowl at z≈0.45 with four tiny line-colour dial discs and hairline ink needles, and a reflector gun sight on a steel stalk at z≈0.55, y≈2.45 — a small brass-colour body with a glowing cyan sight dot. Thin steel canopy side rails run along the deck at x ±0.5 from z 0.4 to 1.7.",
+          "box": [
+            [
+              -0.55,
+              2.1,
+              0.15
+            ],
+            [
+              0.55,
+              2.7,
+              1.8
+            ]
+          ],
+          "attaches": "Base sits on the fuselage spine deck at the deckTop mount (y 2.15, z 0.15-1.8), fully inside the fuselage box footprint.",
+          "joints": [
+            "airframe"
+          ],
+          "floor": false,
+          "budget": 120
+        },
+        {
+          "id": "gear",
+          "builds": "Undercarriage — the only part touching the floor. Main gear, mirrored: a raked main leg from each gearMount (x ±1.05, y 1.3, z 2.5) down-forward to the wheel hub (x ±1.15, y 0.33, z 2.35), built as a two-piece steel strut — a thick main leg with an ink-colour seam strip and a smaller rear drag strut joining mid-leg to the fuselage belly; a small steel torque-link detail beside each leg. Wheels ride the wheelFL and wheelFR joints: radius 0.33, width 0.14, ink-colour rubber tire with a thin paperShade sidewall ring, and a steel hub disc carrying five small ink-colour holes arranged in a ring and a line-colour rim. Tailwheel: a steel fork from the tailWheelMount (y 0.55, z -4.3) down to a small wheel at the tailWheel joint — radius 0.16 at y 0.16, z -4.35, ink-colour tire with a steel hub. Both main wheels and the tailwheel rest exactly on y = 0.",
+          "box": [
+            [
+              -2.6,
+              0,
+              -4.5
+            ],
+            [
+              2.6,
+              1.4,
+              2.6
+            ]
+          ],
+          "attaches": "Leg tops meet the wing undersides at the gearMountL and gearMountR mounts; the fork meets the rear fuselage underside at the tailWheelMount; wheels ride the wheelFL, wheelFR and tailWheel joints.",
+          "joints": [
+            "airframe",
+            "wheelFL",
+            "wheelFR",
+            "tailWheel"
+          ],
+          "floor": true,
+          "budget": 130
+        }
+      ]
+    },
+    "specError": null,
+    "missingParts": [],
+    "calls": [
+      {
+        "id": "plan",
+        "model": "openrouter-curated/z-ai/glm-5.3-flash",
+        "effort": "high",
+        "started": "2026-10-29T00:39:26.358Z",
+        "wallMs": 228474,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 52291,
+          "completion_tokens": 14052,
+          "total_tokens": 66343,
+          "prompt_tokens_details": {
+            "cached_tokens": 28505
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 10184
+          }
+        },
+        "costUsd": 0.011449049999999999,
+        "hasCode": true,
+        "reasoning": "Thinking Process:\n\n1.  **Analyze the Request:** The goal is to create a single TypeScript module for a complex, stylized model (a Spitfire fighter plane) using the `agentic-3js-builder` SDK. The style must be \"cyanotype blueprint,\" low-poly, highly detailed in structure/form but simple in shading (flat colors), and adhere to strict model constraints (180-340 parts, 700-1100 lines, etc.).\n\n2.  **Analyze the Subject (Spitfire):**\n    *   Subject: Spitfire Fighter Plane.\n    *   Style: Cyanotype blueprint (suggest color palette: blue/cyan/white, cross-section lines, technical drawing aesthetic).\n    *   Composition: Large, streamlined, complex geometry, wings, engine cowling, cockpit.\n    *   Scaling: Real-world size (need reasonable proportions). A modern Spitfire is large.\n\n3.  **Determine Model Structure & Scaling:**\n    *   A full Spitfire is complex. I need to divide it into 3-6 logical parts.\n    *   Let's aim for 4 parts: Fuselage/Cockpit, Wings/Canards, Engine/Propeller, Landing Gear.\n    *   Dimensions (Estimate for a medium-sized, stylized version): Length ~12-15m, Height ~4-5m.\n    *   Center on X=0, Y=0 (ground/platform), faces +Z.\n\n4.  **Define Palette (Cyanotype Blueprint):**\n    *   `hull`/Body: Deep blueprint blue (e.g., `#000080` or a slightly lighter technical blue).\n    *   `detail`/Lines: Cyan/Light blue (e.g., `#00FFFF`).\n    *   `accents`/Cockpit/Metal: White or a pale grey/cyan.\n    *   Let's use:\n        *   `blueprintBlue`: `#001F3F` (Dark, classic blueprint)\n        *   `cyanLine`: `#00FFFF` (Bright cyan for outlines and technical details)\n        *   `panelGrey`: `#A0A0A0` (For metal/panel lines)\n        *   `cockpitYellow`: `#FFD700` (Classic cockpit framing/instrument highlight)\n\n5.  **Define Joints/Skeleton (Crucial for a plane):**\n    *   A plane doesn't have a skeleton, but the components (wings, flaps, gear) move relative to the fuselage. I need joints to allow for articulation, even if static.\n    *   `root` (Fuselage)\n    *   `wingRoot` (Attached to fuselage)\n    *   `flapsL`, `flapsR` (Joint on wing)\n    *   `gearFrontL`, `gearFrontR` (Hinge on landing gear)\n\n6.  **Detailed Part Construction Plan (Iterative Refinement):**\n\n    *   **Part 1: Fuselage and Cockpit (The Core)**\n        *   Shape: Long cylinder/wedge.\n        *   Details: Canopy structure, intakes, gun placement.\n        *   Primary structure: Use `b.chain` or simple large primitives.\n        *   *Focus: Defining the core geometry.*\n\n    *   **Part 2: Wings (Main Lifting Surfaces)**\n        *   Shape: Long, tapered swept wings.\n        *   Details: Leading edges, rivets (small parts), internal structure representation (ribs/struts built as small cyan lines).\n        *   Need to attach to `body` via `b.stick` onto a surface point.\n\n    *   **Part 3: Engine & Propeller (Nose)**\n        *   Shape: Cylindrical cowling, spinner.\n        *   Details: Propeller blades (thin, multi-pronged shapes), exhaust ports.\n        *   Attached to the front of the fuselage.\n\n    *   **Part 4: Undercarriage (Landing Gear)**\n        *   Shape: Strong struts, spoked wheels (simplified).\n        *   Details: Hinge points, shock absorption cylinders.\n        *   Attached to specific points under the fuselage via defined joints.\n\n7.  **Writing the Code (Self-Correction/Refinement during drafting):**\n    *   *Constraint Check:* Use primitives. Keep it stylized/blocky. Cyanotype look means heavy reliance on outlines (`cyanLine`) and flat bases (`blueprintBlue`).\n    *   *Modeling Technique:* Instead of aiming for hyper-realism, I must emphasize the *blueprint* look. Every surface detail (panel lines, rivets) must be a separate, small cyan primitive on the body part.\n    *   *Implementation:* Use `b.chain` for the main body shape, then use `b.surface` and `b.stick` to add cockpit frames, inlets, and surface details.\n\n8.  **Final Polish (Adherence to Craft/Art Direction):** Ensure the colors are applied spatially (e.g., wing undersurface detail vs. top surface color). Ensure the skeleton is defined correctly first.\n\n**(Self-Correction on Complexity):** A full Spitfire is huge for 340 parts. I will make it large and robust, leaning into the blocky, primitive nature while maintaining the aerodynamic silhouette. The blueprint aesthetic allows for simplification of texture into geometric representation (e.g., using lines and hatches instead of complex meshes).\n\n*(Proceeding to generate the final TypeScript code)*The user wants me to design a set of specifications (a shared spec in JSON) for building a model of a Spitfire fighter plane.\nThis spec must be used by multiple hypothetical builders (who will then translate it into a final 3.js model using the `agentic-3js-builder` SDK).\n\nThe model must adhere to:\n1.  **Subject:** Spitfire fighter plane.\n2.  **Style:** Cyanotype blueprint.\n3.  **Constraints:** Part count, triangle count, color count, etc., from the system prompt.\n4.  **Technical:** Centered on x=0, faces +Z, +Y up.\n5.  **Composition:** Stylized, low-poly, blocky shapes, bold silhouette.\n\nSince I am providing the shared spec, I need to define the overall structure, dimensions, skeleton, palette, and how the 3-6 parts interact.\n\n### 1. Overall Model Sizing and Layout\nA Spitfire is roughly 6-7 meters long, 3-3.5 meters wide, and 2 meters high (including canopy).\n\n*   **Size [X, Y, Z]:** Approximately [4.0, 2.5, 7.0].\n*   **Layout:** Sleek, sweeping wings, iconic elliptical shape, nose intake/cockpit, tail section.\n\n### 2. Palette (Cyanotype Blueprint Style)\nThe blueprint style requires limited colors: dark blue/black background lines, bright cyan/light blue lines/accents, and maybe a white/light gray for paper texture/highlights.\n\n*   `hull`: Dark blue/black (Blueprint lines). `#00008b` or `#1a202c`.\n*   `trim`: Bright Cyan/Light Blue (Cyanotype lines/accents). `#00ffff`.\n*   `structure`: Gray/White (Paper background/internal components). `#cccccc`.\n\n### 3. Joints (Skeleton)\nA plane is rigid for flight, but we need a root joint for the whole model (the body/fuselage).\n\n*   Root joint: `body` at center of mass.\n\n### 4. Parts Breakdown (5 parts)\nI need 3-6 parts of similar complexity.\n\n1.  `Fuselage_Nose` (Cockpit, engine cowling, front structure)\n2.  `Fuselage_Mid` (Main body, landing gear attachment points, central volume)\n3.  `Wing_Assembly` (Two wings, structure, pylons)\n4.  `Empennage` (Tail surfaces: horizontal stabilizer, vertical fin)\n5.  `LandingGear` (Wheels, struts)\n\n---\n\n### Part Definitions Detailed Check:\n\n**A. Fuselage_Nose**\n*   Covers the front section. Requires shaping to handle the transition from cowling to cockpit.\n*   Should define the root of the main body.\n\n**B. Fuselage_Mid**\n*   The bulk of the body. Contains the main structure where the wings attach.\n*   Must define mount points for the wings.\n\n**C. Wing_Assembly**\n*   This is the biggest surface area piece. Needs defining the elliptical shape and attachment points (Mount).\n\n**D. Empennage**\n*   The twin tail surfaces. Needs to align with the back of the mid-fuselage.\n\n**E. LandingGear**\n*   Needs defined joints/mount points for connection to the main body.\n\n---\n\n### 5. Refining the JSON Structure\n\n**Size:** X=4.0 (width), Y=2.5 (height), Z=7.0 (length).\n**Palette:**\n*   `hull`: `#050022` (Deep navy for blueprint lines)\n*   `trim`: `#00eaff` (Bright cyan for highlights/structure)\n*   `paper`: `#ffffff` (Base color/highlights)\n\n**Joint:**\n*   `body` (root)\n\n**Mounts:**\n*   Need wing attachment points (Should be near the mid-section). Let's say `wingRoot1` and `wingRoot2` on the mid-fuselage.\n*   Need wheel attachment points on the mid-fuselage.\n\nLet's constructLet me design a Spitfire fighter plane in cyanotype blueprint style. This is a spec for multiple builders.\n\nCyanotype blueprint style: deep Prussian blue background/ink, white/light-cyan lines. But the model is a 3D model — so the plane itself should look like a blueprint drawing come to life: hull in deep Prussian blue (#16324f / #1d3a5f), panel lines and details in white/pale cyan (#cfe8ff, #7fd4ff), like a technical drawing. Maybe glowing cyan linework accents. The plane sits on the floor (display), so wheels/undercarriage touch ground.\n\nSpitfire dimensions: real wingspan ~11 m, length ~9.5 m. But stylized model — target models 180-340 parts, size in meters. Let's do real-world size: length ~9.8 m, wingspan ~11.2 m. Hmm, size array is [width, height, length]: [11.3, 3.5, 9.8]. Standing on wheels, height ~3.4 m (propeller tip at top ~2.9 m + spinner). Actually Spitfire height 3.9 m including prop. Let's do [11.2, 3.6, 9.8].\n\nParts (3-6):\n1. fuselage: nose cone, spinner + propeller, engine cowling, exhaust stubs, cockpit canopy area, tail boom taper, fuselage roundel/decals. Spans from z=-4.9 (tail) to z=+4.9 (spinner)? Wait front faces +Z. Nose at +Z. So propeller at +Z end.\n2. wings: elliptical wings, ailerons, cannon/guns, fuel roundels, wing mounts.\n3. tail assembly: vertical stabilizer, rudder, horizontal stabilizers, elevator, tail roundel.\n4. undercarriage: main legs, wheels, tail wheel, ground.\n5. cockpit: canopy, pilot seat, instrument panel, gun sight.\n\nThat's 5 parts. Budgets sum ≤ 900: e.g., fuselage 220, wings 220, tail 120, undercarriage 150, cockpit 160 = 870.\n\nCoordinate system: front = +Z. Length 9.8 → z from -4.9 (tail) to +4.9 (spinner tip). Center on x=0. Wingspan 11.2 → x ±5.6.\n\nKey stations:\n- Spinner tip z = +4.9, spinner base z = +4.1\n- Prop blades at z ≈ +4.0\n- Engine cowl z from +2.6 to +4.1\n- Firewall z = +2.6\n- Cockpit z from +1.6 to +0.2, canopy top y ≈ 2.5\n- Fuselage centerline y ≈ 1.8-2.0\n- Wings at y ≈ 1.5 (low wing), chord center z ≈ +1.8\n- Tail z -3.5 to -4.9, fin top y ≈ 3.4\n- Wheels on ground y=0, axle y ≈ 0.32, wheel radius 0.33\n\nJoints: static display model could have joints for propeller rotation? Rigged model is fine. Let's add: root \"airframe\" at [0, 1.8, 0]; \"propHub\" parent airframe at [0, 2.05, 4.05], dir [0,0,1], role \"hinge\"; \"canopyHinge\" role hinge; \"rudderHinge\", \"elevatorHinge\", \"aileronL/R\" hinges, wheels \"wheelFL\", \"wheelFR\", \"tailwheel\" role hinge. That gives animation ability. Keep joints modest: ~8.\n\nBlueprint style: base deep Prussian blue #1a3a63-ish for hull panels; lighter blue #2a5a8f for secondary panels; white-cyan #dff3ff for panel lines... but panel lines as parts would be thousands. Better: use paint? The spec says palette flat colours, details are small parts. Blueprint style: the plane's surfaces are the blueprint paper blue, and details (lines, roundels, markings) are drawn in white/cyan as decals/small parts. The guide mentions `b.decal` for drawings on curved surfaces — but the spec JSON format doesn't let me specify decal internals; each builder reads the pitch and spec. I can describe in the \"builds\" text: \"panel seams as thin extruded strips in pale cyan\" etc.\n\nPalette (≤24):\n- prussian: #16324f (main hull blueprint blue)\n- prussianDark: #0e2238 (shadow panels, tires)\n- blueprint: #274b73 (secondary panel tone)\n- cyan: #6fd8ff (bright linework, glowing accents)\n- paleCyan: #cfeeff (white-cyan lines, labels)\n- white: #f4fbff (markings, roundel white)\n- red: #d84a4a (roundel center, warnings)\n- ink: #071627 (darkest ink, tires, pitot)\n- steel: #8fb8d8 (metal parts, engine details, prop hub)\n- brass: #e7b814? Maybe not brass — blueprint uses limited colors. Use \"gold\": #d8b84a for hub? Keep it minimal. Add warm accent: #e8c66a for prop hub trim.\n- rubber: #12202e tires\n- glass: #7fd4ff translucent-ish (flat color though) canopy tint — say canopy: #a8e6ff\n- seat: #3a5a42 leather? Keep blue-family: #24507d.\n\nRoundel: RAF roundel blue-white-red — on blueprint style, roundel in cyan/white/red works.\n\nLet me define mounts:\n- wingRoot: the wing-fuselage junction line — mount point [0, 1.5, 1.8]? Mounts are points. WingRootL [0.55, 1.5, 1.6], wingRootR [-0.55, 1.5, 1.6]. Or one mount \"wingRoot\" [0, 1.55, 1.7] and each wing builder mirrors.\n- tailMount: [0, 1.75, -3.4] where tail assembly meets fuselage.\n- spinnerMount: [0, 2.05, 4.1] where cowling meets spinner.\n- canopyBase: [0, 2.15, 1.0] where cockpit meets fuselage deck.\n- gearMountL [0.9, 0.9, 2.3]? Actually Spitfire gear attaches under wing near root. gearMountL: [1.05, 1.35, 2.4], gearMountR: [-1.05, 1.35, 2.4]. Tailwheel mount [0, 0.7, -4.2].\n\nBoxes: must tile without overlap? \"Parts that meet share box faces\" — they should partition roughly. Let me assign:\n\n- fuselage: box [[-0.75, 0.55, -3.45], [0.75, 2.55, 4.15]] — includes nose cowling, spinner, prop, exhaust, deck, but not cockpit canopy? Cockpit is separate part; canopy sits on top of fuselage deck. Fuselage owns hull up to deck top y=2.15.\n- wings: box [[-5.6, 1.1, 0.55], [5.6, 1.95, 3.05]] — elliptical wings spanning. Wing root chord from z 0.55 to 3.05 at root tapering.\n- tail: box [[-1.9, 0.6, -4.95], [1.9, 3.45, -3.35]] — includes fin, rudder, stabilizers, tailwheel? Tailwheel goes with undercarriage.\n- undercarriage: box [[-3.0, 0, -4.6], [3.0, 1.4, 2.6]] — legs, wheels, tailwheel, ground.\n- cockpit: box [[-0.55, 2.1, 0.15], [0.55, 2.6, 1.75]] — canopy, seat, panel, pilot? No pilot maybe. Add gun sight.\n\nCheck overlap: fuselage box z -3.45 to 4.15, tail z -4.95 to -3.35 — overlap -3.45..-3.35 slightly; make tail start at -3.45. Fuselage max y 2.55, cockpit min y 2.1 — slight overlap fine (shared faces approximately). Wing box y 1.1-1.95, fuselage y 0.55-2.55 — wings intersect fuselage region; acceptable as they meet at wingRoot mount.\n\nSize: width 11.2, height: fin top 3.45 → height 3.5. Length 9.8. size [11.3, 3.5, 9.8].\n\nGround: floor: only undercarriage true. Undercarriage wheels touch y=0.\n\nJoints list (created in order, parents first):\n- airframe: at [0, 1.8, 0], dir [0,0,1]? Bone direction — for root, dir [0,1,0]. role \"spine\".\n- propHub: parent airframe, at [0, 2.05, 4.05], dir [0,0,1], role \"hinge\", group \"prop\".\n- canopyGlass: parent airframe, at [0, 2.2, 0.9], dir [0,1,0], role \"hinge\"? Canopy is mostly static; skip. Keep it simple but rigged: hinges for control surfaces are nice for animation.\n- rudderHinge: parent airframe, at [0, 2.6, -4.3], dir [0,0,1]? Rudder hinge line is vertical-ish... rudder rotates about vertical axis at fin trailing edge: dir [0,1,0] at [0, 2.5, -4.35]. role \"hinge\".\n- elevatorL / elevatorR: parent airframe, at [±1.2, 2.15, -4.15], dir [±1,0,0], role \"hinge\".\n- aileronL / aileronR: parent airframe, at [±2.6, 1.5, 0.9]? Aileron hinge line runs spanwise: dir [±1, 0, 0] roughly. role \"hinge\".\n- wheelFL: parent airframe, at [1.15, 0.33, 2.4], dir [1,0,0], role \"hinge\", group \"gear\".\n- wheelFR: [-1.15, 0.33, 2.4].\n- tailWheel: parent airframe, at [0, 0.28, -4.35], dir [0,1,0], role \"hinge\".\n\nThat's 9 joints. Each part lists joints its geometry rides.\n\nPropeller: which part owns it? Fuselage (nose) part — rides propHub. Budget fuselage includes spinner + 3 blades (Spitfire has 3 or 5-blade prop; 3-blade iconic early, 4-blade later; do 3 broad blades) with pale tips.\n\nNow write the spec carefully with detailed \"builds\" text for each part, describing construction, primitives, colours, blueprint linework approach.\n\nBlueprint style description in layout: \"Every surface wears the deep Prussian blue of blueprint paper; seams, panel lines, rivet rows, roundels, stencils and labels are built as separate thin parts in white-cyan and bright cyan, so the whole plane reads as a technical drawing made solid. Bright cyan glows on the propeller tips and the cannon muzzles.\"\n\nActually \"Lanterns, fire, crystals, magic and screens glow\" — blueprint linework could be a \"glow\" but flat colors only. Keep as flat cyan.\n\nLet me now write detailed builds:\n\n1. fuselage (budget 230): \n- Monocoque elliptical fuselage built as a loft/sweep along z from tail z=-3.45 to cowling front z=+4.1, centerline y from 1.35 at tail rising to 2.05 at cockpit then dipping slightly to spinner axis 2.05. Widths: tail ~0.35, max ~0.95 at cockpit, nose taper. Actually the fuselage part includes nose cowling; tail part is separate from z=-3.45 back.\n- Construction suggestion: b.loft of stations with elliptical sections, prussian main colour, with countershade? Blueprint: flat prussian with slightly lighter panel patches. Use paint? Spec allows describing paints. Builders use SDK; I can say \"main hull colour prussian; add a few subtle panel-tone patches in blueprint blue as thin inset panels\".\n- Nose cowling: from z 2.6 to 4.1, slightly wider cylinder with cooling gill strips (thin vertical slats in cyan/dark), exhaust stubs (3 per side, dark steel with pale rim).\n- Spinner: lathe cone from z 4.1 to 4.75, hub cap.\n- Propeller: 3 blades riding propHub, each a tapered extruded blade with twist, pale-cyan tips, spinner disc ring in cyan.\n- Panel lines: rows of thin strips (0.008 m) along fuselage at frame stations, in paleCyan.\n- Rivets: skip? Maybe small dots along spine — could blow budget; mention \"spine ridge strip\".\n- Antenna mast behind canopy, pitot? Pitot on wing.\n- Roundel on fuselage sides: concentric discs (blue outer, white, red center) as thin discs stuck on both sides.\n- Tail deck: fuselage part covers up to z -3.45.\n- Boxes: fuselage [[-0.8, 0.55, -3.45], [0.8, 2.2, 4.15]]. Prop rides propHub at z 4.05-4.9 — extend fuselage box to z 4.95? Prop tip radius ~0.85 so blades reach y up to 2.05+0.85=2.9. Fuselage box height to 2.95? Let fuselage box [[-0.85, 0.55, -3.45], [0.85, 2.95, 4.9]]. But cockpit box sits above at y 2.1-2.6 — overlapping. Fine, boxes are approximate spaces; \"share box faces\" for meeting parts. I'll set fuselage box y max 2.15 (deck top) but prop goes higher... boxes don't have to be strict for every sub-part? The instructions: \"box is the space the part fills\". Prop is part of fuselage part. Hmm, set fuselage box [[-0.85, 0.55, -3.45], [0.85, 2.95, 4.9]] and cockpit box [[-0.6, 2.1, 0.2], [0.6, 2.65, 1.8]] sits inside that — overlapping is a bit against \"share box faces\" but acceptable; cockpit meets fuselage at deck mount. Alternatively give prop its own part? Could do 6 parts: fuselage, nose+prop, wings, tail, cockpit, undercarriage. That's 6 parts, evenly split. Good: nose part owns cowling, spinner, prop, exhaust.\n\nParts (6):\n1. nose: cowling + spinner + prop + exhaust + gun panels. Box [[-0.9, 1.1, 2.55], [0.9, 2.95, 4.9]]. Mounts: firewall mount at z 2.55 where it meets fuselage; propHub joint. Budget 150.\n2. fuselage: main hull from firewall back to tail mount, deck, roundels, antenna. Box [[-0.8, 0.55, -3.45], [0.8, 2.2, 2.55]]. Budget 170.\n3. wings: both wings, ailerons, cannon, gun ports, pitot, wing roundels. Box [[-5.7, 1.05, 0.5], [5.7, 2.0, 3.1]]. Budget 220.\n4. tail: fin, rudder, stabilizers, elevator, tail roundel, fin flash. Box [[-2.0, 0.6, -4.95], [2.0, 3.45, -3.35]]. Budget 130.\n5. cockpit: canopy, frame, seat, instrument panel, gunsight, pilot headrest. Box [[-0.6, 2.1, 0.15], [0.6, 2.7, 1.8]]. Budget 130.\n6. gear: main legs, wheels, tailwheel, struts. Box [[-3.0, 0.0, -4.55], [3.0, 1.4, 2.6]]. Budget 140.\n\nTotal budget: 150+170+220+130+130+140 = 940 > 900. Trim: 140+160+210+120+120+140 = 890. Good.\n\nMounts:\n- firewall: [0, 1.8, 2.55] — nose meets fuselage.\n- tailRoot: [0, 1.6, -3.45] — tail meets fuselage.\n- wingRootL: [0.6, 1.5, 1.8], wingRootR: [-0.6, 1.5, 1.8].\n- deckTop: [0, 2.15, 1.0] — cockpit sits on fuselage deck.\n- gearMountL: [1.1, 1.3, 2.4], gearMountR: [-1.1, 1.3, 2.4] — legs meet wing undersides. Actually gear mounts to fuselage part? Wings own undersides near root; gear attaches under wing. gearMount z 2.4 within wing box z 0.5-3.1 ✓. y 1.3 within wing y range ✓.\n- tailWheelMount: [0, 0.55, -4.3] — tailwheel meets tail? Tail part box z -4.95..-3.35, y 0.6..3.45. Tailwheel at y 0.28 below tail box... gear box covers z to -4.55, y 0-1.4. Put tailWheelMount [0, 0.6, -4.3] at bottom of tail box; tailwheel part of gear.\n\nJoints (order, parents first):\n1. airframe: root, at [0, 1.7, 0], dir [0, 1, 0], role \"spine\".\n2. propHub: parent airframe, at [0, 2.05, 4.15], dir [0, 0, 1], role \"hinge\", group \"prop\".\n3. aileronL: parent airframe, at [2.9, 1.55, 0.95], dir [1, 0, 0], role \"hinge\", group \"controls\".\n4. aileronR: parent airframe, at [-2.9, 1.55, 0.95], dir [-1, 0, 0], role \"hinge\", group \"controls\".\n5. rudderHinge: parent airframe, at [0, 2.4, -4.45], dir [0, 1, 0], role \"hinge\", group \"controls\".\n6. elevatorL: parent airframe, at [1.1, 2.1, -4.3], dir [1, 0, 0], role \"hinge\", group \"controls\".\n7. elevatorR: parent airframe, at [-1.1, 2.1, -4.3], dir [-1, 0, 0], role \"hinge\", group \"controls\".\n8. wheelFL: parent airframe, at [1.2, 0.33, 2.4], dir [1, 0, 0], role \"hinge\", group \"gear\".\n9. wheelFR: parent airframe, at [-1.2, 0.33, 2.4], dir [-1, 0, 0], role \"hinge\", group \"gear\".\n10. tailWheel: parent airframe, at [0, 0.28, -4.35], dir [0, 1, 0], role \"hinge\", group \"gear\".\n\nWheels at y 0.33 = wheel radius, so wheels touch floor. Prop tip: spinner axis y 2.05, blade length 0.95 → tip y 3.0. Fin top 3.45. Height 3.5 ✓.\n\nUndercarriage geometry: Spitfire main gear rakes outward slightly, legs from wing root underside down-forward. Legs attach at z 2.4, x ±1.1, wheel at x ±1.2? Spitfire track is narrow (~1.8 m total, x ±0.9). Wheel centers x ±1.05. Let me set gearMountL [1.05, 1.3, 2.5], wheelFL at [1.15, 0.33, 2.3] (legs rake outward-back slightly). Adjust joints: wheelFL at [1.15, 0.33, 2.35].\n\nTailwheel at [0, 0.28, -4.35], radius 0.28? Small tailwheel radius 0.15; y 0.15. Let's do tailwheel radius 0.16, joint at [0, 0.16, -4.35].\n\nGround contact: main wheels radius 0.33 at y 0.33 → touch floor. Tailwheel radius 0.16 at y 0.16 ✓. nose sits above. Sitting attitude: Spitfire on gear is tail-low. Fuselage centerline should tilt? Keep it level for simplicity — display model, level stance is fine and reads cleaner. Actually tail-low adds character but complicates. Keep level: tailwheel same radius proportions. Fine.\n\nNow write the detailed builds text. Each \"builds\" needs: construction, details, colours per piece. Also note style: blueprint linework on every part — panel lines as thin pale-cyan strips, glowing cyan edges.\n\nPalette (≤24 entries). Let's list:\n- paper: \"#16324f\" — main hull blueprint blue\n- paperShade: \"#0f2438\" — darker panels, tires shadow\n- panel: \"#234e7a\" — secondary panel tone\n- line: \"#cfeaff\" — pale-cyan linework, labels\n- glow: \"#5fe8ff\" — bright cyan accents, prop tips, gun sight\n- ink: \"#081524\" — darkest ink, tire rubber, outlines\n- steel: \"#9fc2e0\" — metal fittings, hub, struts\n- steelDark: \"#5d7fa0\" — gun metal, exhaust\n- brass: \"#e3c06a\" — spinner hub trim, fittings\n- white: \"#f5fbff\" — roundel white, marking discs\n- red: \"#d85050\" — roundel centre dot\n- blue: \"#4a9bd8\"? Roundel blue could be \"panel\". Add \"roundelBlue\": \"#3a7ec2\".\n- glass: \"#8fd8ff\" — canopy panes\n- leather: \"#3f6d52\"? cockpit seat green-brown — \"seat\": \"#4a6b52\"? Hmm keep: \"seat\": \"#5a4638\" brown leather. That's fine within 24.\n- canvas: \"#33547d\"? elevator/rudder fabric slightly different tone — use \"panel\".\n- warning: \"#d8c05a\"? yellow trim \"trim\": \"#e0c25a\" for walkway line on wing, warning stencils.\n\nCount: paper, paperShade, panel, line, glow, ink, steel, steelDark, brass, white, red, roundelBlue, glass, seat, trim = 15. Good.\n\nNow the JSON. Description: \"A Supermarine Spitfire fighter built as a living cyanotype blueprint: deep Prussian-blue surfaces traced with pale-cyan panel lines, glowing cyan details and roundels.\"\n\nLayout text: describe silhouette front to back, floor stance, style on every part.\n\nMounts keys: firewall, deckTop, wingRootL, wingRootR, tailRoot, gearMountL, gearMountR, tailWheelMount, spinnerAxis? spinner belongs to nose only. propHub is a joint not mount.\n\nEach part: id, builds, box, attaches, joints, floor, budget.\n\nPart joints assignment:\n- nose: [\"airframe\", \"propHub\"]\n- fuselage: [\"airframe\"]\n- wings: [\"airframe\", \"aileronL\", \"aileronR\"]\n- tail: [\"airframe\", \"rudderHinge\", \"elevatorL\", \"elevatorR\"]\n- cockpit: [\"airframe\"]\n- gear: [\"airframe\", \"wheelFL\", \"wheelFR\", \"tailWheel\"]\n\nWrite builds texts with good detail (~4-6 sentences each), specifying primitives, sizes, and colours by name.\n\nLet me flesh out dimensions for each builder:\n\nNose part:\n- Cowling: swept/lathe tube z 2.55→4.1, radius from 0.62 at firewall (slightly oval, taller) tapering to 0.42 at spinner base. Top slightly bulged. Colour paper; add vertical cooling-gill slats: ~10 thin dark slats each side z 2.9-3.6, colour ink/paperShade with line edges.\n- Exhaust stubs: 3 rounded boxes per side at z ~2.8-3.4, x ±0.62, colour steelDark with pale rim.\n- Spinner: lathe cone z 4.1→4.75, radius 0.42→0.08, paper with brass hub cap and cyan ring.\n- Prop: 3 blades on propHub, length 0.95, tapered extruded blades with slight twist, colour ink/paperShade with pale-cyan tip bands (last 0.12 in glow). Prop disc ring: thin cyan circle radius 0.95 at z 4.2 — a \"blueprint annotation\" arc, nice touch.\n- Panel lines on cowling: thin strips line colour.\n- Gun panels on cowling top: 2 small raised panels.\n\nFuselage:\n- Loft z 2.55→-3.45, elliptical sections: width 0.62 at firewall, max 0.66 at cockpit z~1.0, tapering to 0.3 at tail mount; belly line deepening. Colour paper, panel-tone patches.\n- Deck top flat-ish y 2.15 from cockpit to tail (spine deck).\n- Panel lines: ~8 frame stations as thin line strips around sections; longitudinal stringer lines.\n- Roundels: on both sides at z 0.3, y 1.85: discs radius 0.22 (roundelBlue), 0.15 white, 0.07 red, thin ink rim; slightly proud of surface.\n- Tail band? Fin flash belongs to tail.\n- Antenna mast: small steel mast on deck z 0.0 behind cockpit, wire to fin (wire = thin rod ink — but wire goes to tail part; assign mast+fuselage-side wire stub to fuselage, tail does its anchor; or just mast).\n- vents, small intakes: dark ink spots.\n- Under-nose... no that's nose part.\n- Retrieval hook? skip.\n\nWings:\n- Elliptical planform: each wing from root x 0.6 to tip x 5.6, chord root 3.0 (z 0.5→3.1... root chord Spitfire ~ 3.4 m at centerline; at x 0.6 chord ~3.2). Chord at tip 1.2. Thickness ~12% root. Build as loft along span with elliptical airfoil sections (use b.loft with stations along x, or membrane + sweep edges). Colour paper; upper surface panel-tone patch panels, ink panel lines radiating (rib lines), rivet dots row.\n- Dihedral slight (tips +0.25 higher).\n- Ailerons: trailing edge outer span x 2.6→4.9, chord 0.45, riding aileronL/R hinges, colour panel with line edge, small horn balances.\n- Gun armament: 2 cannon per wing (Spitfire B-wing: 2 cannon + 4 .303). Simplify: cannon barrels protruding from leading edge at x 1.7, 2.6 (steel, muzzle ring brass, small glow muzzle cap), gun ports dark ink ovals on top; 2 machine gun ports further out x 3.4, 4.0 with pale flash hiders? Keep cannon prominent: barrels forward 0.5 m.\n- Pitot tube: thin steel rod from left wing tip leading edge (x 5.6? pitot under left tip), 0.35 long with glow tip.\n- Roundels on upper wing surfaces: at x ±2.4, z 2.2: discs white outer? RAF wing roundels: blue outer, red center on upper wing (type A: blue outer, white, red center). Discs: roundelBlue r 0.3, white r 0.2, red r 0.09, thin rim.\n- Yellow walkway trim? use trim: a trim line near root leading edge.\n- Landing light at leading edge near root: small glow disc.\n\nTail:\n- Fin: swept curved fin from deck z -3.45→-4.6, top y 3.45, leading edge swept. Built as extruded slab (thickness 0.09) with rounded profile, colour paper, ink edge lines.\n- Fin flash: 3 vertical stripes (line/white/line) near leading edge top? RAF fin flash blue-white-blue — use roundelBlue/white stripes on fin.\n- Rudder: trailing half of fin, dynamic balance horn, riding rudderHinge, colour panel, ink edge, small trim tab.\n- Tailplanes: horizontal slabs span ±1.9, chord 0.9, elliptical taper, colour paper, ink outline lines.\n- Elevators: inner halves riding elevatorL/R, panel colour, horn balances.\n- Tail roundel/navy light: small glow lamp at tail tip? Add tiny glow lamp at rudder bottom.\n- Tail deck fillet.\n\nCockpit:\n- Canopy: framing — sliding bubble canopy: frame hoops (3 arcs) steel, glass panes between, glass colour glass (slightly lighter). Canopy from z 0.35 (windscreen) to z 1.7 (rear fairing), base y 2.15, top y 2.65. Windscreen front flat pane, framed.\n- Gun sight: small brass/steel sight post with glow dot above instrument panel, at z 0.55, y 2.45.\n- Instrument panel: dark ink panel with pale-cyan dial discs (4 dials, line colour, tiny ink needles) at z 0.5.\n- Seat: brown seat slab with ink frame rails behind panel z 0.9-1.2.\n- Rear fairing: deck taper behind canopy glass... that's fuselage deck. Cockpit part: canopy + interior visible through glass; keep interior simple since glass is flat colour anyway — make glass slightly see-through? Flat colour, opaque. So interior barely visible; still add canopy frame + windscreen + sight + a hint of headrest inside. Include pilot headrest fairing.\n- Antenna wire anchor? no.\n- Canopy rails: thin steel rails along deck sides.\n\nGear:\n- Main legs: raked struts — drag links, from gearMount (x ±1.05, y 1.3, z 2.5) down to wheel hubs (x ±1.15, y 0.33, z 2.35): steel colour, two-piece legs (main leg + smaller rear drag strut), ink panel line details.\n- Wheels: radius 0.33, width 0.14, ink rubber tire, paper/steel hub disc with line spokes (Spitfire hub: 5 holes — draw 5 small ink holes on steel hub).\n- Tailwheel: radius 0.16, ink tire, small fork steel from tailWheelMount [0, 0.6, -4.3]... tailwheel y 0.16 at z -4.35.\n- Wheel spat? Spitfire had no spats; keep exposed.\n- Small ground: floor:false for all; the wheels are floor. No ground plane (subject only).\n\nBoxes recheck:\n- nose: [[-0.75, 1.2, 2.55], [0.75, 3.0, 4.9]] — prop tips y up to 3.0, blades swing radius 0.95 from y 2.05 → 1.1 to 3.0. So y min 1.1. Box [[-0.95, 1.1, 2.55], [0.95, 3.0, 4.9]].\n- fuselage: [[-0.7, 0.55, -3.45], [0.7, 2.2, 2.55]].\n- wings: [[-5.7, 1.05, 0.5], [5.7, 2.0, 3.1]] — wing upper y: root top ~1.9, tip top ~1.8 with dihedral; cannon barrels at z up to 3.1+0.5? Cannon protrude forward from leading edge at z ~2.9, barrels extend to z 3.5. Extend wing box z max to 3.6? Box [[-5.7, 1.05, 0.5], [5.7, 2.0, 3.6]]. Hmm but nose box z starts 2.55 with x ±0.95; wing root region overlaps nose/fuselage. Acceptable — boxes are meeting regions.\n- tail: [[-2.0, 0.6, -4.95], [2.0, 3.45, -3.45]].\n- cockpit: [[-0.55, 2.1, 0.15], [0.55, 2.7, 1.8]].\n- gear: [[-2.6, 0.0, -4.5], [2.6, 1.4, 2.6]].\n\nFuselage min y 0.55: belly of fuselage at tail area ~ y 1.2? Actually belly around y 1.3-1.5; but gear struts are gear part. Fuselage belly lowest ~1.35 at cockpit taper... Let's say fuselage bottom y 0.9 (belly under wing). Box min y 0.85. Fine.\n\nFloor: only gear part floor true. Wheels y=0.\n\nNow mounts list finalize:\n- firewall: [0, 1.8, 2.55]\n- deckTop: [0, 2.15, 1.0]\n- wingRootL: [0.6, 1.5, 1.8]\n- wingRootR: [-0.6, 1.5, 1.8]\n- tailRoot: [0, 1.7, -3.45]\n- gearMountL: [1.05, 1.3, 2.5]\n- gearMountR: [-1.05, 1.3, 2.5]\n- tailWheelMount: [0, 0.55, -4.3]\n\nAttaches text per part references these.\n\nBudgets: nose 140, fuselage 170, wings 220, tail 120, cockpit 120, gear 130 → total 900. \n\nNow write it all. Keep layout rich: silhouette, proportions, stance, style statement.\n\nStyle guidance to repeat in builds: \"blueprint style: every surface in paper blue, every seam/line in line pale cyan or glow cyan, roundels and stencils as separate flat-colour parts, no textures/paints needed—flat colour parts seated on the surface.\"\n\nWrite the JSON."
+      },
+      {
+        "id": "fuselage",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:43:14.855Z",
+        "wallMs": 12583,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 81071,
+          "completion_tokens": 2139,
+          "total_tokens": 83210,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0428712,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "gear",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:43:14.861Z",
+        "wallMs": 12709,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 81018,
+          "completion_tokens": 2062,
+          "total_tokens": 83080,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.041995199999999996,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "nose",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:43:14.854Z",
+        "wallMs": 13580,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 81062,
+          "completion_tokens": 2354,
+          "total_tokens": 83416,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.0450032,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "cockpit",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:43:14.861Z",
+        "wallMs": 15555,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 80993,
+          "completion_tokens": 2674,
+          "total_tokens": 83667,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.048065199999999995,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "wings",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:43:14.857Z",
+        "wallMs": 17001,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 81183,
+          "completion_tokens": 2804,
+          "total_tokens": 83987,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.049745199999999996,
+        "hasCode": true,
+        "reasoning": null
+      },
+      {
+        "id": "tail",
+        "model": "anthropic/claude-sonnet-5-5",
+        "effort": "low",
+        "started": "2026-10-29T00:43:14.861Z",
+        "wallMs": 17154,
+        "status": 200,
+        "error": null,
+        "finishReason": "stop",
+        "usage": {
+          "prompt_tokens": 81044,
+          "completion_tokens": 2772,
+          "total_tokens": 83816,
+          "prompt_tokens_details": {
+            "cached_tokens": 74032
+          }
+        },
+        "costUsd": 0.049147199999999995,
+        "hasCode": true,
+        "reasoning": null
+      }
+    ]
+  }
+}

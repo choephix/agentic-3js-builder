@@ -2,6 +2,10 @@
 
 Where the work stands. The API is in `docs/api.md`, the reasons behind it in `docs/DESIGN.md`.
 
+## r45: a fast planner with strong part builders, 2026-10-29
+
+GLM 5.3 Flash planned at high, Sonnet 5.5 or GPT-6.1 Sol built the parts at medium or low, against Sonnet-planned controls; r40's 20 briefs. Stefan, 2026-10-29: these saved nothing; slower and uglier than the Sonnet plan. Not pursued. Numbers in `docs/SPEED.md` (r45 bullet), report `scratch/r45/REPORT.md`, page `r45/` in the public folder. The runner now takes `parallel.planModel` / `partModel` per arm (`bakeoff/README.md`).
+
 ## Claude calls bill the subscription again, 2026-10-29
 
 Stefan, 2026-10-29: back to the subscription logins. `ANTHROPIC_PROVIDER` in `scripts/bakeoff.ts` is `"anthropic"` again; E10 (the gallery) did not run on the credits. The API-key route below stays available behind that switch.

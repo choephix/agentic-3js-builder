@@ -91,6 +91,8 @@ The run record has the usual fields, so `check`, `refine` and the stats read it 
 
 `parallel.planEffort` and `parallel.partEffort` (`arms-r40.json`) override the round's `--effort` for the planning call and for the part calls; each call in the record carries its `effort`, and box-fit calls stay at low.
 
+`parallel.planModel` and `parallel.partModel` (`arms-r45.json`) override the round's `--model` for the planning call and for the part calls (box-fit edits run on the part model). Each call is priced on its own model; the run record's `model` is the part model and `planModel` the planner's.
+
 ## Base-first parts
 
 An arm with `basefirst: { base, part }` (`arms-r42.json`, with `prompts/basefirst-base.md` and `basefirst-part.md`) builds with no planning call. The base call writes a module that renders on its own (the bare chassis, hull or body in flat colour) and exports `BASE_PARTS`: 3–6 add-on parts with the plan's fields (what it builds, box, where it attaches, joints, floor, budget). Then one call per part runs at once, each given the base's source, and the assembler appends the part functions to the base's build. `wallMs` is the base's time plus the slowest part's; the `basefirst` record field holds `baseMs`, `slowestPartMs`, `critical`, `elapsedMs`, the parsed parts, missing parts and per-call records. The runner measures every part against its box as the box check does (`scripts/partfit.ts`) and records it under `basefirst.fit`, with no repair call.
