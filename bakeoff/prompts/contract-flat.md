@@ -19,7 +19,7 @@ Your reply is one TypeScript module in a single ```ts code block. Text outside t
 - Real-world size for the subject, unless the pitch says otherwise.
 - Creatures are built skeleton first and stand in a rest pose for rigging and animation: a neutral, readable pose, the non-humanoid equivalent of a T-pose, with limbs, digits, wings, tails and tentacles separated and extended, and the mouth built as a separate upper and lower jaw so it can open.
 - Joints carry names a rigger recognises (`hipL`, `kneeL`, `jaw`, `tail3`) and chains carry a `role` (`spine neck head jaw hinge tail leg arm wing digit tentacle fan`).
-- Props and scenery can be plain objects without joints.
+- Props and scenery can be plain objects without joints, but any part the world will move or turn (a sail, door, lid, arm or wheel) must be a named joint; the rest of the prop may stay plain.
 - Every piece of geometry joins the model through the builder (`b.part(geometry, color, { at, bone })`, `b.stick` and the shape helpers), which puts it on its bone and shares its material.
 - Limits: 1000 parts, 60k triangles, 160 joints, 64 flat colours.
 
