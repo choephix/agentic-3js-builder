@@ -18,7 +18,7 @@ Your reply is one TypeScript module in a single ```ts code block. Text outside t
 - Real-world size for the subject, unless the pitch says otherwise.
 - Creatures stand in a neutral, readable rest pose with limbs, wings, tails and tentacles separated and extended.
 - Materials: `MeshStandardMaterial`, one per colour, shared by the meshes that use it.
-- Limits: 1000 meshes, 60k triangles, 64 flat colours.
+- Limits: 60k triangles, 64 flat colours.
 
 ## Art direction
 

@@ -18,7 +18,7 @@ Read these in full before you write code: [`docs/api.md`](docs/api.md), the API;
 - Real size, per the brief.
 - Creatures are built skeleton first and stand in a rest pose for rigging and animation: a neutral, readable pose, the non-humanoid equivalent of a T-pose, with limbs, digits, wings, tails and tentacles separated and extended, and the mouth built as a separate upper and lower jaw so it can open.
 - Joints carry names a rigger recognises (`hipL`, `kneeL`, `jaw`, `tail3`) and chains carry a `role` (`spine neck head jaw hinge tail leg arm wing digit tentacle fan`), so the rig answer key describes the whole skeleton.
-- Limits: 1000 parts, 60k triangles, 160 joints, 64 flat colours. Parts are free below the limit (the lab merges them into one mesh), so each piece stays its own part. Paints and textures share one atlas, which the report sizes.
+- Limits: 60k triangles, 160 joints, 64 flat colours. Parts are free (the lab merges them into one mesh), so each piece stays its own part. Paints and textures share one atlas, which the report sizes.
 
 ## Art direction, from Stefan
 

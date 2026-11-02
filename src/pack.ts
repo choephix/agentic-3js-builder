@@ -100,7 +100,7 @@ export type Assembly = {
   createBones: (() => { root: Bone; bones: Bone[] }) | null;
 };
 
-export const LIMITS = { colors: 64, parts: 1000, triangles: 120_000, trianglesSoft: 60_000, bones: 160 };
+export const LIMITS = { colors: 64, triangles: 120_000, trianglesSoft: 60_000, bones: 160 };
 const ZFIGHT_SCALE_EPSILON = 0.003;
 const BONE_NAME = /^[A-Za-z][A-Za-z0-9_]*$/;
 
@@ -284,8 +284,6 @@ export async function assemble(root: Object3D, rigged: boolean): Promise<Assembl
   if (ignored)
     issues.push({ level: "warning", message: `${ignored} line/point/sprite objects ignored; only meshes are baked` });
   if (!meshes.length) issues.push({ level: "error", message: "No visible meshes in the returned object" });
-  if (meshes.length > LIMITS.parts)
-    issues.push({ level: "error", message: `${meshes.length} parts exceeds the ${LIMITS.parts} limit` });
 
   // Skeleton.
   const jointNames = new Set<string>();

@@ -21,7 +21,7 @@ Your reply is one TypeScript module in a single ```ts code block. Text outside t
 - Joints carry names a rigger recognises (`hipL`, `kneeL`, `jaw`, `tail3`) and chains carry a `role` (`spine neck head jaw hinge tail leg arm wing digit tentacle fan`).
 - Props and scenery can be plain objects without joints.
 - Every piece of geometry joins the model through the builder (`b.part(geometry, color, { at, bone })`, `b.stick` and the shape helpers), which puts it on its bone and shares its material.
-- Limits: 1000 parts, 60k triangles, 160 joints, 64 flat colours.
+- Limits: 60k triangles, 160 joints, 64 flat colours.
 
 ## Art direction
 
