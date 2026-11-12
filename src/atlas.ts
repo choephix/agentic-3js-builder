@@ -83,7 +83,7 @@ async function pixels(texture: Texture, tint: string): Promise<Pixels> {
   if (image.data) {
     if (texture.format !== RGBAFormat || texture.type !== UnsignedByteType || image.data.length !== width * height * 4)
       throw new Error(`Texture "${texture.name || texture.uuid}": data textures must be RGBA, 8 bits per channel`);
-    data = Uint8ClampedArray.from(image.data);
+    data = new Uint8ClampedArray(image.data);
   } else {
     const canvas = document.createElement("canvas");
     canvas.width = width;
@@ -312,7 +312,7 @@ function adapt(chart: Pixels, covered: Uint8Array): { tile: Pixels; shrunk: bool
       shrunk: true,
     };
   }
-  const filled: Pixels = { ...chart, data: Uint8ClampedArray.from(chart.data) };
+  const filled: Pixels = { ...chart, data: new Uint8ClampedArray(chart.data) };
   for (let i = 0; i < covered.length; i++)
     if (!covered[i]) for (let k = 0; k < 3; k++) filled.data[i * 4 + k] = sum[k] / count;
   let tile = filled;
