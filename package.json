@@ -3,6 +3,16 @@
   "private": true,
   "type": "module",
   "description": "Helper SDK for LLMs writing primitive-built, skeleton-rigged three.js creatures, with a sample library and a local showcase.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./pack": "./src/pack.ts",
+    "./kits/*": "./kits/*.ts"
+  },
+  "files": [
+    "src",
+    "kits",
+    "docs"
+  ],
   "scripts": {
     "typecheck": "tsx scripts/typecheck.ts",
     "showcase": "vite showcase",
@@ -18,14 +28,17 @@
     "lab-export": "tsx scripts/lab-export.ts"
   },
   "dependencies": {
-    "marked": "^18.0.14",
-    "three": "0.185.1"
+    "marked": "^18.0.14"
+  },
+  "peerDependencies": {
+    "three": ">=0.185.0"
   },
   "devDependencies": {
     "@types/node": "^26.6.3",
     "@types/three": "0.185.1",
     "esbuild": "^0.28.2",
     "playwright-core": "1.54.1",
+    "three": "0.185.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vite": "^8.3.1"
